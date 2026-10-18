@@ -6976,6 +6976,7 @@ namespace Moonwell
         public static extern string AbilityId2String(int abilityId);
 
         /// @CSharpLua.Template = "GetObjectName({0})"
+        [MachineLocal]
         public static extern string GetObjectName(int objectId);
 
         /// @CSharpLua.Template = "GetBJMaxPlayers()"
@@ -7030,6 +7031,7 @@ namespace Moonwell
         public static extern float Pow(float x, float power);
 
         /// @CSharpLua.Template = "MathRound({0})"
+        [ChangesState]
         public static extern int MathRound(float r);
 
         /// @CSharpLua.Template = "I2R({0})"
@@ -7069,33 +7071,43 @@ namespace Moonwell
         public static extern int StringHash(string s);
 
         /// @CSharpLua.Template = "GetLocalizedString({0})"
+        [MachineLocal]
         public static extern string GetLocalizedString(string source);
 
         /// @CSharpLua.Template = "GetLocalizedHotkey({0})"
+        [MachineLocal]
         public static extern int GetLocalizedHotkey(string source);
 
         /// @CSharpLua.Template = "SetMapName({0})"
+        [ChangesState]
         public static extern void SetMapName(string name);
 
         /// @CSharpLua.Template = "SetMapDescription({0})"
+        [ChangesState]
         public static extern void SetMapDescription(string description);
 
         /// @CSharpLua.Template = "SetTeams({0})"
+        [ChangesState]
         public static extern void SetTeams(int teamcount);
 
         /// @CSharpLua.Template = "SetPlayers({0})"
+        [ChangesState]
         public static extern void SetPlayers(int playercount);
 
         /// @CSharpLua.Template = "DefineStartLocation({0}, {1}, {2})"
+        [ChangesState]
         public static extern void DefineStartLocation(int whichStartLoc, float x, float y);
 
         /// @CSharpLua.Template = "DefineStartLocationLoc({0}, {1})"
+        [ChangesState]
         public static extern void DefineStartLocationLoc(int whichStartLoc, location whichLocation);
 
         /// @CSharpLua.Template = "SetStartLocPrioCount({0}, {1})"
+        [ChangesState]
         public static extern void SetStartLocPrioCount(int whichStartLoc, int prioSlotCount);
 
         /// @CSharpLua.Template = "SetStartLocPrio({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetStartLocPrio(int whichStartLoc, int prioSlotIndex, int otherStartLocIndex, startlocprio priority);
 
         /// @CSharpLua.Template = "GetStartLocPrioSlot({0}, {1})"
@@ -7105,30 +7117,39 @@ namespace Moonwell
         public static extern startlocprio GetStartLocPrio(int whichStartLoc, int prioSlotIndex);
 
         /// @CSharpLua.Template = "SetEnemyStartLocPrioCount({0}, {1})"
+        [ChangesState]
         public static extern void SetEnemyStartLocPrioCount(int whichStartLoc, int prioSlotCount);
 
         /// @CSharpLua.Template = "SetEnemyStartLocPrio({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetEnemyStartLocPrio(int whichStartLoc, int prioSlotIndex, int otherStartLocIndex, startlocprio priority);
 
         /// @CSharpLua.Template = "SetGameTypeSupported({0}, {1})"
+        [ChangesState]
         public static extern void SetGameTypeSupported(gametype whichGameType, bool value);
 
         /// @CSharpLua.Template = "SetMapFlag({0}, {1})"
+        [ChangesState]
         public static extern void SetMapFlag(mapflag whichMapFlag, bool value);
 
         /// @CSharpLua.Template = "SetGamePlacement({0})"
+        [ChangesState]
         public static extern void SetGamePlacement(placement whichPlacementType);
 
         /// @CSharpLua.Template = "SetGameSpeed({0})"
+        [ChangesState]
         public static extern void SetGameSpeed(gamespeed whichspeed);
 
         /// @CSharpLua.Template = "SetGameDifficulty({0})"
+        [ChangesState]
         public static extern void SetGameDifficulty(gamedifficulty whichdifficulty);
 
         /// @CSharpLua.Template = "SetResourceDensity({0})"
+        [ChangesState]
         public static extern void SetResourceDensity(mapdensity whichdensity);
 
         /// @CSharpLua.Template = "SetCreatureDensity({0})"
+        [ChangesState]
         public static extern void SetCreatureDensity(mapdensity whichdensity);
 
         /// @CSharpLua.Template = "GetTeams()"
@@ -7168,42 +7189,55 @@ namespace Moonwell
         public static extern float GetStartLocationY(int whichStartLocation);
 
         /// @CSharpLua.Template = "GetStartLocationLoc({0})"
+        [CreatesHandle]
         public static extern location GetStartLocationLoc(int whichStartLocation);
 
         /// @CSharpLua.Template = "SetPlayerTeam({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerTeam(player whichPlayer, int whichTeam);
 
         /// @CSharpLua.Template = "SetPlayerStartLocation({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerStartLocation(player whichPlayer, int startLocIndex);
 
         /// @CSharpLua.Template = "ForcePlayerStartLocation({0}, {1})"
+        [ChangesState]
         public static extern void ForcePlayerStartLocation(player whichPlayer, int startLocIndex);
 
         /// @CSharpLua.Template = "SetPlayerColor({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerColor(player whichPlayer, playercolor color);
 
         /// @CSharpLua.Template = "SetPlayerAlliance({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetPlayerAlliance(player sourcePlayer, player otherPlayer, alliancetype whichAllianceSetting, bool value);
 
         /// @CSharpLua.Template = "SetPlayerTaxRate({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetPlayerTaxRate(player sourcePlayer, player otherPlayer, playerstate whichResource, int rate);
 
         /// @CSharpLua.Template = "SetPlayerRacePreference({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerRacePreference(player whichPlayer, racepreference whichRacePreference);
 
         /// @CSharpLua.Template = "SetPlayerRaceSkin({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerRaceSkin(player whichPlayer, racepreference whichRacePreference);
 
         /// @CSharpLua.Template = "SetPlayerRaceSelectable({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerRaceSelectable(player whichPlayer, bool value);
 
         /// @CSharpLua.Template = "SetPlayerController({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerController(player whichPlayer, mapcontrol controlType);
 
         /// @CSharpLua.Template = "SetPlayerName({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerName(player whichPlayer, string name);
 
         /// @CSharpLua.Template = "SetPlayerOnScoreScreen({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerOnScoreScreen(player whichPlayer, bool flag);
 
         /// @CSharpLua.Template = "GetPlayerTeam({0})"
@@ -7234,12 +7268,15 @@ namespace Moonwell
         public static extern string GetPlayerName(player whichPlayer);
 
         /// @CSharpLua.Template = "CreateTimer()"
+        [CreatesHandle]
         public static extern timer CreateTimer();
 
         /// @CSharpLua.Template = "DestroyTimer({0})"
+        [ChangesState]
         public static extern void DestroyTimer(timer whichTimer);
 
         /// @CSharpLua.Template = "TimerStart({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void TimerStart(timer whichTimer, float timeout, bool periodic, Action handlerFunc);
 
         /// @CSharpLua.Template = "TimerGetElapsed({0})"
@@ -7252,33 +7289,42 @@ namespace Moonwell
         public static extern float TimerGetTimeout(timer whichTimer);
 
         /// @CSharpLua.Template = "PauseTimer({0})"
+        [ChangesState]
         public static extern void PauseTimer(timer whichTimer);
 
         /// @CSharpLua.Template = "ResumeTimer({0})"
+        [ChangesState]
         public static extern void ResumeTimer(timer whichTimer);
 
         /// @CSharpLua.Template = "GetExpiredTimer()"
         public static extern timer GetExpiredTimer();
 
         /// @CSharpLua.Template = "CreateGroup()"
+        [CreatesHandle]
         public static extern group CreateGroup();
 
         /// @CSharpLua.Template = "DestroyGroup({0})"
+        [ChangesState]
         public static extern void DestroyGroup(group whichGroup);
 
         /// @CSharpLua.Template = "GroupAddUnit({0}, {1})"
+        [ChangesState]
         public static extern bool GroupAddUnit(group whichGroup, unit whichUnit);
 
         /// @CSharpLua.Template = "GroupRemoveUnit({0}, {1})"
+        [ChangesState]
         public static extern bool GroupRemoveUnit(group whichGroup, unit whichUnit);
 
         /// @CSharpLua.Template = "BlzGroupAddGroupFast({0}, {1})"
+        [ChangesState]
         public static extern int BlzGroupAddGroupFast(group whichGroup, group addGroup);
 
         /// @CSharpLua.Template = "BlzGroupRemoveGroupFast({0}, {1})"
+        [ChangesState]
         public static extern int BlzGroupRemoveGroupFast(group whichGroup, group removeGroup);
 
         /// @CSharpLua.Template = "GroupClear({0})"
+        [ChangesState]
         public static extern void GroupClear(group whichGroup);
 
         /// @CSharpLua.Template = "BlzGroupGetSize({0})"
@@ -7288,57 +7334,75 @@ namespace Moonwell
         public static extern unit BlzGroupUnitAt(group whichGroup, int index);
 
         /// @CSharpLua.Template = "GroupEnumUnitsOfType({0}, {1}, {2})"
+        [ChangesState]
         public static extern void GroupEnumUnitsOfType(group whichGroup, string unitname, boolexpr filter);
 
         /// @CSharpLua.Template = "GroupEnumUnitsOfPlayer({0}, {1}, {2})"
+        [ChangesState]
         public static extern void GroupEnumUnitsOfPlayer(group whichGroup, player whichPlayer, boolexpr filter);
 
         /// @CSharpLua.Template = "GroupEnumUnitsOfTypeCounted({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void GroupEnumUnitsOfTypeCounted(group whichGroup, string unitname, boolexpr filter, int countLimit);
 
         /// @CSharpLua.Template = "GroupEnumUnitsInRect({0}, {1}, {2})"
+        [ChangesState]
         public static extern void GroupEnumUnitsInRect(group whichGroup, rect r, boolexpr filter);
 
         /// @CSharpLua.Template = "GroupEnumUnitsInRectCounted({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void GroupEnumUnitsInRectCounted(group whichGroup, rect r, boolexpr filter, int countLimit);
 
         /// @CSharpLua.Template = "GroupEnumUnitsInRange({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void GroupEnumUnitsInRange(group whichGroup, float x, float y, float radius, boolexpr filter);
 
         /// @CSharpLua.Template = "GroupEnumUnitsInRangeOfLoc({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void GroupEnumUnitsInRangeOfLoc(group whichGroup, location whichLocation, float radius, boolexpr filter);
 
         /// @CSharpLua.Template = "GroupEnumUnitsInRangeCounted({0}, {1}, {2}, {3}, {4}, {5})"
+        [ChangesState]
         public static extern void GroupEnumUnitsInRangeCounted(group whichGroup, float x, float y, float radius, boolexpr filter, int countLimit);
 
         /// @CSharpLua.Template = "GroupEnumUnitsInRangeOfLocCounted({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void GroupEnumUnitsInRangeOfLocCounted(group whichGroup, location whichLocation, float radius, boolexpr filter, int countLimit);
 
         /// @CSharpLua.Template = "GroupEnumUnitsSelected({0}, {1}, {2})"
+        [ChangesState]
         public static extern void GroupEnumUnitsSelected(group whichGroup, player whichPlayer, boolexpr filter);
 
         /// @CSharpLua.Template = "GroupImmediateOrder({0}, {1})"
+        [ChangesState]
         public static extern bool GroupImmediateOrder(group whichGroup, string order);
 
         /// @CSharpLua.Template = "GroupImmediateOrderById({0}, {1})"
+        [ChangesState]
         public static extern bool GroupImmediateOrderById(group whichGroup, int order);
 
         /// @CSharpLua.Template = "GroupPointOrder({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool GroupPointOrder(group whichGroup, string order, float x, float y);
 
         /// @CSharpLua.Template = "GroupPointOrderLoc({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool GroupPointOrderLoc(group whichGroup, string order, location whichLocation);
 
         /// @CSharpLua.Template = "GroupPointOrderById({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool GroupPointOrderById(group whichGroup, int order, float x, float y);
 
         /// @CSharpLua.Template = "GroupPointOrderByIdLoc({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool GroupPointOrderByIdLoc(group whichGroup, int order, location whichLocation);
 
         /// @CSharpLua.Template = "GroupTargetOrder({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool GroupTargetOrder(group whichGroup, string order, widget targetWidget);
 
         /// @CSharpLua.Template = "GroupTargetOrderById({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool GroupTargetOrderById(group whichGroup, int order, widget targetWidget);
 
         /// @CSharpLua.Template = "ForGroup({0}, {1})"
@@ -7348,57 +7412,74 @@ namespace Moonwell
         public static extern unit FirstOfGroup(group whichGroup);
 
         /// @CSharpLua.Template = "CreateForce()"
+        [CreatesHandle]
         public static extern force CreateForce();
 
         /// @CSharpLua.Template = "DestroyForce({0})"
+        [ChangesState]
         public static extern void DestroyForce(force whichForce);
 
         /// @CSharpLua.Template = "ForceAddPlayer({0}, {1})"
+        [ChangesState]
         public static extern void ForceAddPlayer(force whichForce, player whichPlayer);
 
         /// @CSharpLua.Template = "ForceRemovePlayer({0}, {1})"
+        [ChangesState]
         public static extern void ForceRemovePlayer(force whichForce, player whichPlayer);
 
         /// @CSharpLua.Template = "BlzForceHasPlayer({0}, {1})"
+        [ChangesState]
         public static extern bool BlzForceHasPlayer(force whichForce, player whichPlayer);
 
         /// @CSharpLua.Template = "ForceClear({0})"
+        [ChangesState]
         public static extern void ForceClear(force whichForce);
 
         /// @CSharpLua.Template = "ForceEnumPlayers({0}, {1})"
+        [ChangesState]
         public static extern void ForceEnumPlayers(force whichForce, boolexpr filter);
 
         /// @CSharpLua.Template = "ForceEnumPlayersCounted({0}, {1}, {2})"
+        [ChangesState]
         public static extern void ForceEnumPlayersCounted(force whichForce, boolexpr filter, int countLimit);
 
         /// @CSharpLua.Template = "ForceEnumAllies({0}, {1}, {2})"
+        [ChangesState]
         public static extern void ForceEnumAllies(force whichForce, player whichPlayer, boolexpr filter);
 
         /// @CSharpLua.Template = "ForceEnumEnemies({0}, {1}, {2})"
+        [ChangesState]
         public static extern void ForceEnumEnemies(force whichForce, player whichPlayer, boolexpr filter);
 
         /// @CSharpLua.Template = "ForForce({0}, {1})"
         public static extern void ForForce(force whichForce, Action callback);
 
         /// @CSharpLua.Template = "Rect({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern rect Rect(float minx, float miny, float maxx, float maxy);
 
         /// @CSharpLua.Template = "RectFromLoc({0}, {1})"
+        [CreatesHandle]
         public static extern rect RectFromLoc(location min, location max);
 
         /// @CSharpLua.Template = "RemoveRect({0})"
+        [ChangesState]
         public static extern void RemoveRect(rect whichRect);
 
         /// @CSharpLua.Template = "SetRect({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void SetRect(rect whichRect, float minx, float miny, float maxx, float maxy);
 
         /// @CSharpLua.Template = "SetRectFromLoc({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetRectFromLoc(rect whichRect, location min, location max);
 
         /// @CSharpLua.Template = "MoveRectTo({0}, {1}, {2})"
+        [ChangesState]
         public static extern void MoveRectTo(rect whichRect, float newCenterX, float newCenterY);
 
         /// @CSharpLua.Template = "MoveRectToLoc({0}, {1})"
+        [ChangesState]
         public static extern void MoveRectToLoc(rect whichRect, location newCenterLoc);
 
         /// @CSharpLua.Template = "GetRectCenterX({0})"
@@ -7420,36 +7501,47 @@ namespace Moonwell
         public static extern float GetRectMaxY(rect whichRect);
 
         /// @CSharpLua.Template = "CreateRegion()"
+        [CreatesHandle]
         public static extern region CreateRegion();
 
         /// @CSharpLua.Template = "RemoveRegion({0})"
+        [ChangesState]
         public static extern void RemoveRegion(region whichRegion);
 
         /// @CSharpLua.Template = "RegionAddRect({0}, {1})"
+        [ChangesState]
         public static extern void RegionAddRect(region whichRegion, rect r);
 
         /// @CSharpLua.Template = "RegionClearRect({0}, {1})"
+        [ChangesState]
         public static extern void RegionClearRect(region whichRegion, rect r);
 
         /// @CSharpLua.Template = "RegionAddCell({0}, {1}, {2})"
+        [ChangesState]
         public static extern void RegionAddCell(region whichRegion, float x, float y);
 
         /// @CSharpLua.Template = "RegionAddCellAtLoc({0}, {1})"
+        [ChangesState]
         public static extern void RegionAddCellAtLoc(region whichRegion, location whichLocation);
 
         /// @CSharpLua.Template = "RegionClearCell({0}, {1}, {2})"
+        [ChangesState]
         public static extern void RegionClearCell(region whichRegion, float x, float y);
 
         /// @CSharpLua.Template = "RegionClearCellAtLoc({0}, {1})"
+        [ChangesState]
         public static extern void RegionClearCellAtLoc(region whichRegion, location whichLocation);
 
         /// @CSharpLua.Template = "Location({0}, {1})"
+        [CreatesHandle]
         public static extern location Location(float x, float y);
 
         /// @CSharpLua.Template = "RemoveLocation({0})"
+        [ChangesState]
         public static extern void RemoveLocation(location whichLocation);
 
         /// @CSharpLua.Template = "MoveLocation({0}, {1}, {2})"
+        [ChangesState]
         public static extern void MoveLocation(location whichLocation, float newX, float newY);
 
         /// @CSharpLua.Template = "GetLocationX({0})"
@@ -7459,6 +7551,7 @@ namespace Moonwell
         public static extern float GetLocationY(location whichLocation);
 
         /// @CSharpLua.Template = "GetLocationZ({0})"
+        [MachineLocal]
         public static extern float GetLocationZ(location whichLocation);
 
         /// @CSharpLua.Template = "IsUnitInRegion({0}, {1})"
@@ -7471,27 +7564,34 @@ namespace Moonwell
         public static extern bool IsLocationInRegion(region whichRegion, location whichLocation);
 
         /// @CSharpLua.Template = "GetWorldBounds()"
+        [CreatesHandle]
         public static extern rect GetWorldBounds();
 
         /// @CSharpLua.Template = "CreateTrigger()"
+        [CreatesHandle]
         public static extern trigger CreateTrigger();
 
         /// @CSharpLua.Template = "DestroyTrigger({0})"
+        [ChangesState]
         public static extern void DestroyTrigger(trigger whichTrigger);
 
         /// @CSharpLua.Template = "ResetTrigger({0})"
+        [ChangesState]
         public static extern void ResetTrigger(trigger whichTrigger);
 
         /// @CSharpLua.Template = "EnableTrigger({0})"
+        [ChangesState]
         public static extern void EnableTrigger(trigger whichTrigger);
 
         /// @CSharpLua.Template = "DisableTrigger({0})"
+        [ChangesState]
         public static extern void DisableTrigger(trigger whichTrigger);
 
         /// @CSharpLua.Template = "IsTriggerEnabled({0})"
         public static extern bool IsTriggerEnabled(trigger whichTrigger);
 
         /// @CSharpLua.Template = "TriggerWaitOnSleeps({0}, {1})"
+        [ChangesState]
         public static extern void TriggerWaitOnSleeps(trigger whichTrigger, bool flag);
 
         /// @CSharpLua.Template = "IsTriggerWaitOnSleeps({0})"
@@ -7537,60 +7637,77 @@ namespace Moonwell
         public static extern int GetTriggerExecCount(trigger whichTrigger);
 
         /// @CSharpLua.Template = "ExecuteFunc({0})"
+        [ChangesState]
         public static extern void ExecuteFunc(string funcName);
 
         /// @CSharpLua.Template = "And({0}, {1})"
+        [CreatesHandle]
         public static extern boolexpr And(boolexpr operandA, boolexpr operandB);
 
         /// @CSharpLua.Template = "Or({0}, {1})"
+        [CreatesHandle]
         public static extern boolexpr Or(boolexpr operandA, boolexpr operandB);
 
         /// @CSharpLua.Template = "Not({0})"
+        [CreatesHandle]
         public static extern boolexpr Not(boolexpr operand);
 
         /// @CSharpLua.Template = "Condition({0})"
+        [CreatesHandle]
         public static extern conditionfunc Condition(Func<bool> func);
 
         /// @CSharpLua.Template = "DestroyCondition({0})"
+        [ChangesState]
         public static extern void DestroyCondition(conditionfunc c);
 
         /// @CSharpLua.Template = "Filter({0})"
+        [CreatesHandle]
         public static extern filterfunc Filter(Func<bool> func);
 
         /// @CSharpLua.Template = "DestroyFilter({0})"
+        [ChangesState]
         public static extern void DestroyFilter(filterfunc f);
 
         /// @CSharpLua.Template = "DestroyBoolExpr({0})"
+        [ChangesState]
         public static extern void DestroyBoolExpr(boolexpr e);
 
         /// @CSharpLua.Template = "TriggerRegisterVariableEvent({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterVariableEvent(trigger whichTrigger, string varName, limitop opcode, float limitval);
 
         /// @CSharpLua.Template = "TriggerRegisterTimerEvent({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterTimerEvent(trigger whichTrigger, float timeout, bool periodic);
 
         /// @CSharpLua.Template = "TriggerRegisterTimerExpireEvent({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterTimerExpireEvent(trigger whichTrigger, timer t);
 
         /// @CSharpLua.Template = "TriggerRegisterGameStateEvent({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterGameStateEvent(trigger whichTrigger, gamestate whichState, limitop opcode, float limitval);
 
         /// @CSharpLua.Template = "TriggerRegisterDialogEvent({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterDialogEvent(trigger whichTrigger, dialog whichDialog);
 
         /// @CSharpLua.Template = "TriggerRegisterDialogButtonEvent({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterDialogButtonEvent(trigger whichTrigger, button whichButton);
 
         /// @CSharpLua.Template = "GetEventGameState()"
         public static extern gamestate GetEventGameState();
 
         /// @CSharpLua.Template = "TriggerRegisterGameEvent({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterGameEvent(trigger whichTrigger, gameevent whichGameEvent);
 
         /// @CSharpLua.Template = "GetWinningPlayer()"
         public static extern player GetWinningPlayer();
 
         /// @CSharpLua.Template = "TriggerRegisterEnterRegion({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterEnterRegion(trigger whichTrigger, region whichRegion, boolexpr filter);
 
         /// @CSharpLua.Template = "GetTriggeringRegion()"
@@ -7600,21 +7717,26 @@ namespace Moonwell
         public static extern unit GetEnteringUnit();
 
         /// @CSharpLua.Template = "TriggerRegisterLeaveRegion({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterLeaveRegion(trigger whichTrigger, region whichRegion, boolexpr filter);
 
         /// @CSharpLua.Template = "GetLeavingUnit()"
         public static extern unit GetLeavingUnit();
 
         /// @CSharpLua.Template = "TriggerRegisterTrackableHitEvent({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterTrackableHitEvent(trigger whichTrigger, trackable t);
 
         /// @CSharpLua.Template = "TriggerRegisterTrackableTrackEvent({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterTrackableTrackEvent(trigger whichTrigger, trackable t);
 
         /// @CSharpLua.Template = "TriggerRegisterCommandEvent({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterCommandEvent(trigger whichTrigger, int whichAbility, string order);
 
         /// @CSharpLua.Template = "TriggerRegisterUpgradeCommandEvent({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterUpgradeCommandEvent(trigger whichTrigger, int whichUpgrade);
 
         /// @CSharpLua.Template = "GetTriggeringTrackable()"
@@ -7642,12 +7764,14 @@ namespace Moonwell
         public static extern string GetSaveBasicFilename();
 
         /// @CSharpLua.Template = "TriggerRegisterPlayerEvent({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterPlayerEvent(trigger whichTrigger, player whichPlayer, playerevent whichPlayerEvent);
 
         /// @CSharpLua.Template = "GetTriggerPlayer()"
         public static extern player GetTriggerPlayer();
 
         /// @CSharpLua.Template = "TriggerRegisterPlayerUnitEvent({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterPlayerUnitEvent(trigger whichTrigger, player whichPlayer, playerunitevent whichPlayerUnitEvent, boolexpr filter);
 
         /// @CSharpLua.Template = "GetLevelingUnit()"
@@ -7777,6 +7901,7 @@ namespace Moonwell
         public static extern float GetOrderPointY();
 
         /// @CSharpLua.Template = "GetOrderPointLoc()"
+        [CreatesHandle]
         public static extern location GetOrderPointLoc();
 
         /// @CSharpLua.Template = "GetOrderTarget()"
@@ -7801,6 +7926,7 @@ namespace Moonwell
         public static extern ability GetSpellAbility();
 
         /// @CSharpLua.Template = "GetSpellTargetLoc()"
+        [CreatesHandle]
         public static extern location GetSpellTargetLoc();
 
         /// @CSharpLua.Template = "GetSpellTargetX()"
@@ -7819,15 +7945,18 @@ namespace Moonwell
         public static extern unit GetSpellTargetUnit();
 
         /// @CSharpLua.Template = "TriggerRegisterPlayerAllianceChange({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterPlayerAllianceChange(trigger whichTrigger, player whichPlayer, alliancetype whichAlliance);
 
         /// @CSharpLua.Template = "TriggerRegisterPlayerStateEvent({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterPlayerStateEvent(trigger whichTrigger, player whichPlayer, playerstate whichState, limitop opcode, float limitval);
 
         /// @CSharpLua.Template = "GetEventPlayerState()"
         public static extern playerstate GetEventPlayerState();
 
         /// @CSharpLua.Template = "TriggerRegisterPlayerChatEvent({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterPlayerChatEvent(trigger whichTrigger, player whichPlayer, string chatMessageToDetect, bool exactMatchOnly);
 
         /// @CSharpLua.Template = "GetEventPlayerChatString()"
@@ -7837,18 +7966,21 @@ namespace Moonwell
         public static extern string GetEventPlayerChatStringMatched();
 
         /// @CSharpLua.Template = "TriggerRegisterDeathEvent({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterDeathEvent(trigger whichTrigger, widget whichWidget);
 
         /// @CSharpLua.Template = "GetTriggerUnit()"
         public static extern unit GetTriggerUnit();
 
         /// @CSharpLua.Template = "TriggerRegisterUnitStateEvent({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterUnitStateEvent(trigger whichTrigger, unit whichUnit, unitstate whichState, limitop opcode, float limitval);
 
         /// @CSharpLua.Template = "GetEventUnitState()"
         public static extern unitstate GetEventUnitState();
 
         /// @CSharpLua.Template = "TriggerRegisterUnitEvent({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterUnitEvent(trigger whichTrigger, unit whichUnit, unitevent whichEvent);
 
         /// @CSharpLua.Template = "GetEventDamage()"
@@ -7861,63 +7993,81 @@ namespace Moonwell
         public static extern player GetEventDetectingPlayer();
 
         /// @CSharpLua.Template = "TriggerRegisterFilterUnitEvent({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterFilterUnitEvent(trigger whichTrigger, unit whichUnit, unitevent whichEvent, boolexpr filter);
 
         /// @CSharpLua.Template = "GetEventTargetUnit()"
         public static extern unit GetEventTargetUnit();
 
         /// @CSharpLua.Template = "TriggerRegisterUnitInRange({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterUnitInRange(trigger whichTrigger, unit whichUnit, float range, boolexpr filter);
 
         /// @CSharpLua.Template = "TriggerAddCondition({0}, {1})"
+        [CreatesHandle]
         public static extern triggercondition TriggerAddCondition(trigger whichTrigger, boolexpr condition);
 
         /// @CSharpLua.Template = "TriggerRemoveCondition({0}, {1})"
+        [ChangesState]
         public static extern void TriggerRemoveCondition(trigger whichTrigger, triggercondition whichCondition);
 
         /// @CSharpLua.Template = "TriggerClearConditions({0})"
+        [ChangesState]
         public static extern void TriggerClearConditions(trigger whichTrigger);
 
         /// @CSharpLua.Template = "TriggerAddAction({0}, {1})"
+        [CreatesHandle]
         public static extern triggeraction TriggerAddAction(trigger whichTrigger, Action actionFunc);
 
         /// @CSharpLua.Template = "TriggerRemoveAction({0}, {1})"
+        [ChangesState]
         public static extern void TriggerRemoveAction(trigger whichTrigger, triggeraction whichAction);
 
         /// @CSharpLua.Template = "TriggerClearActions({0})"
+        [ChangesState]
         public static extern void TriggerClearActions(trigger whichTrigger);
 
         /// @CSharpLua.Template = "TriggerSleepAction({0})"
+        [ChangesState]
         public static extern void TriggerSleepAction(float timeout);
 
         /// @CSharpLua.Template = "TriggerWaitForSound({0}, {1})"
+        [ChangesState]
         public static extern void TriggerWaitForSound(sound s, float offset);
 
         /// @CSharpLua.Template = "TriggerEvaluate({0})"
+        [ChangesState]
         public static extern bool TriggerEvaluate(trigger whichTrigger);
 
         /// @CSharpLua.Template = "TriggerExecute({0})"
+        [ChangesState]
         public static extern void TriggerExecute(trigger whichTrigger);
 
         /// @CSharpLua.Template = "TriggerExecuteWait({0})"
+        [ChangesState]
         public static extern void TriggerExecuteWait(trigger whichTrigger);
 
         /// @CSharpLua.Template = "TriggerSyncStart()"
+        [ChangesState]
         public static extern void TriggerSyncStart();
 
         /// @CSharpLua.Template = "TriggerSyncReady()"
+        [ChangesState]
         public static extern void TriggerSyncReady();
 
         /// @CSharpLua.Template = "BlzTriggerIsRunning({0})"
+        [ChangesState]
         public static extern bool BlzTriggerIsRunning(trigger whichTrigger);
 
         /// @CSharpLua.Template = "BlzTriggerInterrupt({0})"
+        [ChangesState]
         public static extern void BlzTriggerInterrupt(trigger whichTrigger);
 
         /// @CSharpLua.Template = "GetWidgetLife({0})"
         public static extern float GetWidgetLife(widget whichWidget);
 
         /// @CSharpLua.Template = "SetWidgetLife({0}, {1})"
+        [ChangesState]
         public static extern void SetWidgetLife(widget whichWidget, float newLife);
 
         /// @CSharpLua.Template = "GetWidgetX({0})"
@@ -7930,24 +8080,31 @@ namespace Moonwell
         public static extern widget GetTriggerWidget();
 
         /// @CSharpLua.Template = "CreateDestructable({0}, {1}, {2}, {3}, {4}, {5})"
+        [CreatesHandle]
         public static extern destructable CreateDestructable(int objectid, float x, float y, float face, float scale, int variation);
 
         /// @CSharpLua.Template = "CreateDestructableZ({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [CreatesHandle]
         public static extern destructable CreateDestructableZ(int objectid, float x, float y, float z, float face, float scale, int variation);
 
         /// @CSharpLua.Template = "CreateDeadDestructable({0}, {1}, {2}, {3}, {4}, {5})"
+        [CreatesHandle]
         public static extern destructable CreateDeadDestructable(int objectid, float x, float y, float face, float scale, int variation);
 
         /// @CSharpLua.Template = "CreateDeadDestructableZ({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [CreatesHandle]
         public static extern destructable CreateDeadDestructableZ(int objectid, float x, float y, float z, float face, float scale, int variation);
 
         /// @CSharpLua.Template = "RemoveDestructable({0})"
+        [ChangesState]
         public static extern void RemoveDestructable(destructable d);
 
         /// @CSharpLua.Template = "KillDestructable({0})"
+        [ChangesState]
         public static extern void KillDestructable(destructable d);
 
         /// @CSharpLua.Template = "SetDestructableInvulnerable({0}, {1})"
+        [ChangesState]
         public static extern void SetDestructableInvulnerable(destructable d, bool flag);
 
         /// @CSharpLua.Template = "IsDestructableInvulnerable({0})"
@@ -7966,51 +8123,63 @@ namespace Moonwell
         public static extern float GetDestructableY(destructable d);
 
         /// @CSharpLua.Template = "SetDestructableLife({0}, {1})"
+        [ChangesState]
         public static extern void SetDestructableLife(destructable d, float life);
 
         /// @CSharpLua.Template = "GetDestructableLife({0})"
         public static extern float GetDestructableLife(destructable d);
 
         /// @CSharpLua.Template = "SetDestructableMaxLife({0}, {1})"
+        [ChangesState]
         public static extern void SetDestructableMaxLife(destructable d, float max);
 
         /// @CSharpLua.Template = "GetDestructableMaxLife({0})"
         public static extern float GetDestructableMaxLife(destructable d);
 
         /// @CSharpLua.Template = "DestructableRestoreLife({0}, {1}, {2})"
+        [ChangesState]
         public static extern void DestructableRestoreLife(destructable d, float life, bool birth);
 
         /// @CSharpLua.Template = "QueueDestructableAnimation({0}, {1})"
+        [ChangesState]
         public static extern void QueueDestructableAnimation(destructable d, string whichAnimation);
 
         /// @CSharpLua.Template = "SetDestructableAnimation({0}, {1})"
+        [ChangesState]
         public static extern void SetDestructableAnimation(destructable d, string whichAnimation);
 
         /// @CSharpLua.Template = "SetDestructableAnimationSpeed({0}, {1})"
+        [ChangesState]
         public static extern void SetDestructableAnimationSpeed(destructable d, float speedFactor);
 
         /// @CSharpLua.Template = "SetDestructableColor({0}, {1})"
+        [ChangesState]
         public static extern void SetDestructableColor(destructable d, playercolor color);
 
         /// @CSharpLua.Template = "ShowDestructable({0}, {1})"
+        [ChangesState]
         public static extern void ShowDestructable(destructable d, bool flag);
 
         /// @CSharpLua.Template = "GetDestructableOccluderHeight({0})"
         public static extern float GetDestructableOccluderHeight(destructable d);
 
         /// @CSharpLua.Template = "SetDestructableOccluderHeight({0}, {1})"
+        [ChangesState]
         public static extern void SetDestructableOccluderHeight(destructable d, float height);
 
         /// @CSharpLua.Template = "GetDestructableName({0})"
+        [MachineLocal]
         public static extern string GetDestructableName(destructable d);
 
         /// @CSharpLua.Template = "GetTriggerDestructable()"
         public static extern destructable GetTriggerDestructable();
 
         /// @CSharpLua.Template = "CreateItem({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern item CreateItem(int itemid, float x, float y);
 
         /// @CSharpLua.Template = "RemoveItem({0})"
+        [ChangesState]
         public static extern void RemoveItem(item whichItem);
 
         /// @CSharpLua.Template = "GetItemPlayer({0})"
@@ -8026,24 +8195,31 @@ namespace Moonwell
         public static extern float GetItemY(item i);
 
         /// @CSharpLua.Template = "SetItemPosition({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetItemPosition(item i, float x, float y);
 
         /// @CSharpLua.Template = "SetItemColor({0}, {1})"
+        [ChangesState]
         public static extern void SetItemColor(item whichItem, playercolor whichColor);
 
         /// @CSharpLua.Template = "SetItemDropOnDeath({0}, {1})"
+        [ChangesState]
         public static extern void SetItemDropOnDeath(item whichItem, bool flag);
 
         /// @CSharpLua.Template = "SetItemDroppable({0}, {1})"
+        [ChangesState]
         public static extern void SetItemDroppable(item i, bool flag);
 
         /// @CSharpLua.Template = "SetItemPawnable({0}, {1})"
+        [ChangesState]
         public static extern void SetItemPawnable(item i, bool flag);
 
         /// @CSharpLua.Template = "SetItemPlayer({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetItemPlayer(item whichItem, player whichPlayer, bool changeColor);
 
         /// @CSharpLua.Template = "SetItemInvulnerable({0}, {1})"
+        [ChangesState]
         public static extern void SetItemInvulnerable(item whichItem, bool flag);
 
         /// @CSharpLua.Template = "IsItemInvulnerable({0})"
@@ -8056,6 +8232,7 @@ namespace Moonwell
         public static extern bool IsItemInBag(item whichItem);
 
         /// @CSharpLua.Template = "SetItemVisible({0}, {1})"
+        [ChangesState]
         public static extern void SetItemVisible(item whichItem, bool show);
 
         /// @CSharpLua.Template = "IsItemVisible({0})"
@@ -8092,21 +8269,25 @@ namespace Moonwell
         public static extern itemtype GetItemType(item whichItem);
 
         /// @CSharpLua.Template = "SetItemDropID({0}, {1})"
+        [ChangesState]
         public static extern void SetItemDropID(item whichItem, int unitId);
 
         /// @CSharpLua.Template = "GetItemName({0})"
+        [MachineLocal]
         public static extern string GetItemName(item whichItem);
 
         /// @CSharpLua.Template = "GetItemCharges({0})"
         public static extern int GetItemCharges(item whichItem);
 
         /// @CSharpLua.Template = "SetItemCharges({0}, {1})"
+        [ChangesState]
         public static extern void SetItemCharges(item whichItem, int charges);
 
         /// @CSharpLua.Template = "GetItemUserData({0})"
         public static extern int GetItemUserData(item whichItem);
 
         /// @CSharpLua.Template = "SetItemUserData({0}, {1})"
+        [ChangesState]
         public static extern void SetItemUserData(item whichItem, int data);
 
         /// @CSharpLua.Template = "GetItemEquipmentType({0})"
@@ -8116,66 +8297,87 @@ namespace Moonwell
         public static extern itemTag GetItemTag(item whichItem);
 
         /// @CSharpLua.Template = "CreateUnit({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle]
         public static extern unit CreateUnit(player id, int unitid, float x, float y, float face);
 
         /// @CSharpLua.Template = "CreateUnitByName({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle]
         public static extern unit CreateUnitByName(player whichPlayer, string unitname, float x, float y, float face);
 
         /// @CSharpLua.Template = "CreateUnitAtLoc({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern unit CreateUnitAtLoc(player id, int unitid, location whichLocation, float face);
 
         /// @CSharpLua.Template = "CreateUnitAtLocByName({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern unit CreateUnitAtLocByName(player id, string unitname, location whichLocation, float face);
 
         /// @CSharpLua.Template = "CreateCorpse({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle]
         public static extern unit CreateCorpse(player whichPlayer, int unitid, float x, float y, float face);
 
         /// @CSharpLua.Template = "KillUnit({0})"
+        [ChangesState]
         public static extern void KillUnit(unit whichUnit);
 
         /// @CSharpLua.Template = "RemoveUnit({0})"
+        [ChangesState]
         public static extern void RemoveUnit(unit whichUnit);
 
         /// @CSharpLua.Template = "ShowUnit({0}, {1})"
+        [ChangesState]
         public static extern void ShowUnit(unit whichUnit, bool show);
 
         /// @CSharpLua.Template = "SetUnitState({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetUnitState(unit whichUnit, unitstate whichUnitState, float newVal);
 
         /// @CSharpLua.Template = "SetUnitX({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitX(unit whichUnit, float newX);
 
         /// @CSharpLua.Template = "SetUnitY({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitY(unit whichUnit, float newY);
 
         /// @CSharpLua.Template = "SetUnitPosition({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetUnitPosition(unit whichUnit, float newX, float newY);
 
         /// @CSharpLua.Template = "SetUnitPositionLoc({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitPositionLoc(unit whichUnit, location whichLocation);
 
         /// @CSharpLua.Template = "SetUnitFacing({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitFacing(unit whichUnit, float facingAngle);
 
         /// @CSharpLua.Template = "SetUnitFacingTimed({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetUnitFacingTimed(unit whichUnit, float facingAngle, float duration);
 
         /// @CSharpLua.Template = "SetUnitMoveSpeed({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitMoveSpeed(unit whichUnit, float newSpeed);
 
         /// @CSharpLua.Template = "SetUnitFlyHeight({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetUnitFlyHeight(unit whichUnit, float newHeight, float rate);
 
         /// @CSharpLua.Template = "SetUnitTurnSpeed({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitTurnSpeed(unit whichUnit, float newTurnSpeed);
 
         /// @CSharpLua.Template = "SetUnitPropWindow({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitPropWindow(unit whichUnit, float newPropWindowAngle);
 
         /// @CSharpLua.Template = "SetUnitAcquireRange({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitAcquireRange(unit whichUnit, float newAcquireRange);
 
         /// @CSharpLua.Template = "SetUnitCreepGuard({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitCreepGuard(unit whichUnit, bool creepGuard);
 
         /// @CSharpLua.Template = "GetUnitAcquireRange({0})"
@@ -8203,42 +8405,55 @@ namespace Moonwell
         public static extern float GetUnitDefaultFlyHeight(unit whichUnit);
 
         /// @CSharpLua.Template = "SetUnitOwner({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetUnitOwner(unit whichUnit, player whichPlayer, bool changeColor);
 
         /// @CSharpLua.Template = "SetUnitColor({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitColor(unit whichUnit, playercolor whichColor);
 
         /// @CSharpLua.Template = "SetUnitScale({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetUnitScale(unit whichUnit, float scaleX, float scaleY, float scaleZ);
 
         /// @CSharpLua.Template = "SetUnitTimeScale({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitTimeScale(unit whichUnit, float timeScale);
 
         /// @CSharpLua.Template = "SetUnitBlendTime({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitBlendTime(unit whichUnit, float blendTime);
 
         /// @CSharpLua.Template = "SetUnitVertexColor({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void SetUnitVertexColor(unit whichUnit, int red, int green, int blue, int alpha);
 
         /// @CSharpLua.Template = "QueueUnitAnimation({0}, {1})"
+        [ChangesState]
         public static extern void QueueUnitAnimation(unit whichUnit, string whichAnimation);
 
         /// @CSharpLua.Template = "SetUnitAnimation({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitAnimation(unit whichUnit, string whichAnimation);
 
         /// @CSharpLua.Template = "SetUnitAnimationByIndex({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitAnimationByIndex(unit whichUnit, int whichAnimation);
 
         /// @CSharpLua.Template = "SetUnitAnimationWithRarity({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetUnitAnimationWithRarity(unit whichUnit, string whichAnimation, raritycontrol rarity);
 
         /// @CSharpLua.Template = "AddUnitAnimationProperties({0}, {1}, {2})"
+        [ChangesState]
         public static extern void AddUnitAnimationProperties(unit whichUnit, string animProperties, bool add);
 
         /// @CSharpLua.Template = "AllowHeroGlowOnUnit({0})"
+        [ChangesState]
         public static extern void AllowHeroGlowOnUnit(unit whichUnit);
 
         /// @CSharpLua.Template = "DisallowHeroGlowOnUnit({0})"
+        [ChangesState]
         public static extern void DisallowHeroGlowOnUnit(unit whichUnit);
 
         /// @CSharpLua.Template = "HeroGlowIsAllowedOnUnit({0})"
@@ -8251,24 +8466,31 @@ namespace Moonwell
         public static extern float BlzGetUnitAnimationDurationByIndex(unit whichUnit, int index);
 
         /// @CSharpLua.Template = "SetUnitLookAt({0}, {1}, {2}, {3}, {4}, {5})"
+        [ChangesState]
         public static extern void SetUnitLookAt(unit whichUnit, string whichBone, unit lookAtTarget, float offsetX, float offsetY, float offsetZ);
 
         /// @CSharpLua.Template = "ResetUnitLookAt({0})"
+        [ChangesState]
         public static extern void ResetUnitLookAt(unit whichUnit);
 
         /// @CSharpLua.Template = "SetUnitRescuable({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetUnitRescuable(unit whichUnit, player byWhichPlayer, bool flag);
 
         /// @CSharpLua.Template = "SetUnitRescueRange({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitRescueRange(unit whichUnit, float range);
 
         /// @CSharpLua.Template = "SetHeroStr({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetHeroStr(unit whichHero, int newStr, bool permanent);
 
         /// @CSharpLua.Template = "SetHeroAgi({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetHeroAgi(unit whichHero, int newAgi, bool permanent);
 
         /// @CSharpLua.Template = "SetHeroInt({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetHeroInt(unit whichHero, int newInt, bool permanent);
 
         /// @CSharpLua.Template = "GetHeroStr({0}, {1})"
@@ -8281,24 +8503,29 @@ namespace Moonwell
         public static extern int GetHeroInt(unit whichHero, bool includeBonuses);
 
         /// @CSharpLua.Template = "UnitStripHeroLevel({0}, {1})"
+        [ChangesState]
         public static extern bool UnitStripHeroLevel(unit whichHero, int howManyLevels);
 
         /// @CSharpLua.Template = "GetHeroXP({0})"
         public static extern int GetHeroXP(unit whichHero);
 
         /// @CSharpLua.Template = "SetHeroXP({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetHeroXP(unit whichHero, int newXpVal, bool showEyeCandy);
 
         /// @CSharpLua.Template = "GetHeroSkillPoints({0})"
         public static extern int GetHeroSkillPoints(unit whichHero);
 
         /// @CSharpLua.Template = "UnitModifySkillPoints({0}, {1})"
+        [ChangesState]
         public static extern bool UnitModifySkillPoints(unit whichHero, int skillPointDelta);
 
         /// @CSharpLua.Template = "AddHeroXP({0}, {1}, {2})"
+        [ChangesState]
         public static extern void AddHeroXP(unit whichHero, int xpToAdd, bool showEyeCandy);
 
         /// @CSharpLua.Template = "SetHeroLevel({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetHeroLevel(unit whichHero, int level, bool showEyeCandy);
 
         /// @CSharpLua.Template = "GetHeroLevel({0})"
@@ -8308,48 +8535,60 @@ namespace Moonwell
         public static extern int GetUnitLevel(unit whichUnit);
 
         /// @CSharpLua.Template = "GetHeroProperName({0})"
+        [MachineLocal]
         public static extern string GetHeroProperName(unit whichHero);
 
         /// @CSharpLua.Template = "SuspendHeroXP({0}, {1})"
+        [ChangesState]
         public static extern void SuspendHeroXP(unit whichHero, bool flag);
 
         /// @CSharpLua.Template = "IsSuspendedXP({0})"
         public static extern bool IsSuspendedXP(unit whichHero);
 
         /// @CSharpLua.Template = "SelectHeroSkill({0}, {1})"
+        [ChangesState]
         public static extern void SelectHeroSkill(unit whichHero, int abilcode);
 
         /// @CSharpLua.Template = "GetUnitAbilityLevel({0}, {1})"
         public static extern int GetUnitAbilityLevel(unit whichUnit, int abilcode);
 
         /// @CSharpLua.Template = "DecUnitAbilityLevel({0}, {1})"
+        [ChangesState]
         public static extern int DecUnitAbilityLevel(unit whichUnit, int abilcode);
 
         /// @CSharpLua.Template = "IncUnitAbilityLevel({0}, {1})"
+        [ChangesState]
         public static extern int IncUnitAbilityLevel(unit whichUnit, int abilcode);
 
         /// @CSharpLua.Template = "SetUnitAbilityLevel({0}, {1}, {2})"
+        [ChangesState]
         public static extern int SetUnitAbilityLevel(unit whichUnit, int abilcode, int level);
 
         /// @CSharpLua.Template = "ReviveHero({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool ReviveHero(unit whichHero, float x, float y, bool doEyecandy);
 
         /// @CSharpLua.Template = "ReviveHeroLoc({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool ReviveHeroLoc(unit whichHero, location loc, bool doEyecandy);
 
         /// @CSharpLua.Template = "SetUnitExploded({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitExploded(unit whichUnit, bool exploded);
 
         /// @CSharpLua.Template = "SetUnitInvulnerable({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitInvulnerable(unit whichUnit, bool flag);
 
         /// @CSharpLua.Template = "PauseUnit({0}, {1})"
+        [ChangesState]
         public static extern void PauseUnit(unit whichUnit, bool flag);
 
         /// @CSharpLua.Template = "IsUnitPaused({0})"
         public static extern bool IsUnitPaused(unit whichHero);
 
         /// @CSharpLua.Template = "SetUnitPathing({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitPathing(unit whichUnit, bool flag);
 
         /// @CSharpLua.Template = "ClearSelection()"
@@ -8365,33 +8604,43 @@ namespace Moonwell
         public static extern int GetUnitPointValueByType(int unitType);
 
         /// @CSharpLua.Template = "UnitAddItem({0}, {1})"
+        [ChangesState]
         public static extern bool UnitAddItem(unit whichUnit, item whichItem);
 
         /// @CSharpLua.Template = "UnitEquipItem({0}, {1})"
+        [ChangesState]
         public static extern bool UnitEquipItem(unit whichUnit, item whichItem);
 
         /// @CSharpLua.Template = "UnitAddItemById({0}, {1})"
+        [CreatesHandle]
         public static extern item UnitAddItemById(unit whichUnit, int itemId);
 
         /// @CSharpLua.Template = "UnitAddItemToSlotById({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool UnitAddItemToSlotById(unit whichUnit, int itemId, int itemSlot);
 
         /// @CSharpLua.Template = "UnitRemoveItem({0}, {1})"
+        [ChangesState]
         public static extern void UnitRemoveItem(unit whichUnit, item whichItem);
 
         /// @CSharpLua.Template = "UnitRemoveItemFromSlot({0}, {1})"
+        [ChangesState]
         public static extern item UnitRemoveItemFromSlot(unit whichUnit, int itemSlot);
 
         /// @CSharpLua.Template = "UnitUnequipItem({0}, {1})"
+        [ChangesState]
         public static extern void UnitUnequipItem(unit whichUnit, item whichItem);
 
         /// @CSharpLua.Template = "UnitUnequipItemFromSlot({0}, {1})"
+        [ChangesState]
         public static extern item UnitUnequipItemFromSlot(unit whichUnit, loadoutslot slot);
 
         /// @CSharpLua.Template = "UnitHasItem({0}, {1})"
+        [ChangesState]
         public static extern bool UnitHasItem(unit whichUnit, item whichItem);
 
         /// @CSharpLua.Template = "UnitHasItemBagged({0}, {1})"
+        [ChangesState]
         public static extern bool UnitHasItemBagged(unit whichUnit, item whichItem);
 
         /// @CSharpLua.Template = "UnitItemInSlot({0}, {1})"
@@ -8401,6 +8650,7 @@ namespace Moonwell
         public static extern int UnitInventorySize(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitExtendedInventorySize({0})"
+        [ChangesState]
         public static extern int UnitExtendedInventorySize(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitItemInBagSlot({0}, {1})"
@@ -8410,36 +8660,47 @@ namespace Moonwell
         public static extern item UnitItemInEquipmentSlot(unit whichUnit, loadoutslot itemSlot);
 
         /// @CSharpLua.Template = "UnitHasItemEquipped({0}, {1})"
+        [ChangesState]
         public static extern bool UnitHasItemEquipped(unit whichUnit, item whichItem);
 
         /// @CSharpLua.Template = "UnitHasLoadoutSlotEmpty({0}, {1})"
+        [ChangesState]
         public static extern bool UnitHasLoadoutSlotEmpty(unit whichUnit, loadoutslot itemSlot);
 
         /// @CSharpLua.Template = "UnitHasAnyItemEquiped({0})"
+        [ChangesState]
         public static extern bool UnitHasAnyItemEquiped(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitHasItemEquipmentOfType({0}, {1})"
+        [ChangesState]
         public static extern bool UnitHasItemEquipmentOfType(unit whichUnit, equipmentType equipmentId);
 
         /// @CSharpLua.Template = "UnitCanEquipItemOfEquipmentType({0}, {1})"
+        [ChangesState]
         public static extern bool UnitCanEquipItemOfEquipmentType(unit whichUnit, equipmentType equipmentId);
 
         /// @CSharpLua.Template = "UnitDropItemPoint({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool UnitDropItemPoint(unit whichUnit, item whichItem, float x, float y);
 
         /// @CSharpLua.Template = "UnitDropItemSlot({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool UnitDropItemSlot(unit whichUnit, item whichItem, int slot);
 
         /// @CSharpLua.Template = "UnitDropItemTarget({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool UnitDropItemTarget(unit whichUnit, item whichItem, widget target);
 
         /// @CSharpLua.Template = "UnitUseItem({0}, {1})"
+        [ChangesState]
         public static extern bool UnitUseItem(unit whichUnit, item whichItem);
 
         /// @CSharpLua.Template = "UnitUseItemPoint({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool UnitUseItemPoint(unit whichUnit, item whichItem, float x, float y);
 
         /// @CSharpLua.Template = "UnitUseItemTarget({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool UnitUseItemTarget(unit whichUnit, item whichItem, widget target);
 
         /// @CSharpLua.Template = "GetUnitX({0})"
@@ -8449,6 +8710,7 @@ namespace Moonwell
         public static extern float GetUnitY(unit whichUnit);
 
         /// @CSharpLua.Template = "GetUnitLoc({0})"
+        [CreatesHandle]
         public static extern location GetUnitLoc(unit whichUnit);
 
         /// @CSharpLua.Template = "GetUnitFacing({0})"
@@ -8473,6 +8735,7 @@ namespace Moonwell
         public static extern race GetUnitRace(unit whichUnit);
 
         /// @CSharpLua.Template = "GetUnitName({0})"
+        [MachineLocal]
         public static extern string GetUnitName(unit whichUnit);
 
         /// @CSharpLua.Template = "GetUnitFoodUsed({0})"
@@ -8488,9 +8751,11 @@ namespace Moonwell
         public static extern int GetFoodUsed(int unitId);
 
         /// @CSharpLua.Template = "SetUnitUseFood({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitUseFood(unit whichUnit, bool useFood);
 
         /// @CSharpLua.Template = "GetUnitRallyPoint({0})"
+        [CreatesHandle]
         public static extern location GetUnitRallyPoint(unit whichUnit);
 
         /// @CSharpLua.Template = "GetUnitRallyUnit({0})"
@@ -8569,153 +8834,202 @@ namespace Moonwell
         public static extern bool IsUnitIdType(int unitId, unittype whichUnitType);
 
         /// @CSharpLua.Template = "UnitShareVision({0}, {1}, {2})"
+        [ChangesState]
         public static extern void UnitShareVision(unit whichUnit, player whichPlayer, bool share);
 
         /// @CSharpLua.Template = "UnitSuspendDecay({0}, {1})"
+        [ChangesState]
         public static extern void UnitSuspendDecay(unit whichUnit, bool suspend);
 
         /// @CSharpLua.Template = "UnitAddType({0}, {1})"
+        [ChangesState]
         public static extern bool UnitAddType(unit whichUnit, unittype whichUnitType);
 
         /// @CSharpLua.Template = "UnitRemoveType({0}, {1})"
+        [ChangesState]
         public static extern bool UnitRemoveType(unit whichUnit, unittype whichUnitType);
 
         /// @CSharpLua.Template = "UnitAddAbility({0}, {1})"
+        [ChangesState]
         public static extern bool UnitAddAbility(unit whichUnit, int abilityId);
 
         /// @CSharpLua.Template = "UnitRemoveAbility({0}, {1})"
+        [ChangesState]
         public static extern bool UnitRemoveAbility(unit whichUnit, int abilityId);
 
         /// @CSharpLua.Template = "UnitMakeAbilityPermanent({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool UnitMakeAbilityPermanent(unit whichUnit, bool permanent, int abilityId);
 
         /// @CSharpLua.Template = "UnitRemoveBuffs({0}, {1}, {2})"
+        [ChangesState]
         public static extern void UnitRemoveBuffs(unit whichUnit, bool removePositive, bool removeNegative);
 
         /// @CSharpLua.Template = "UnitRemoveBuffsEx({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [ChangesState]
         public static extern void UnitRemoveBuffsEx(unit whichUnit, bool removePositive, bool removeNegative, bool magic, bool physical, bool timedLife, bool aura, bool autoDispel);
 
         /// @CSharpLua.Template = "UnitHasBuffsEx({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [ChangesState]
         public static extern bool UnitHasBuffsEx(unit whichUnit, bool removePositive, bool removeNegative, bool magic, bool physical, bool timedLife, bool aura, bool autoDispel);
 
         /// @CSharpLua.Template = "UnitCountBuffsEx({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [ChangesState]
         public static extern int UnitCountBuffsEx(unit whichUnit, bool removePositive, bool removeNegative, bool magic, bool physical, bool timedLife, bool aura, bool autoDispel);
 
         /// @CSharpLua.Template = "UnitAddSleep({0}, {1})"
+        [ChangesState]
         public static extern void UnitAddSleep(unit whichUnit, bool add);
 
         /// @CSharpLua.Template = "UnitCanSleep({0})"
+        [ChangesState]
         public static extern bool UnitCanSleep(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitAddSleepPerm({0}, {1})"
+        [ChangesState]
         public static extern void UnitAddSleepPerm(unit whichUnit, bool add);
 
         /// @CSharpLua.Template = "UnitCanSleepPerm({0})"
+        [ChangesState]
         public static extern bool UnitCanSleepPerm(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitIsSleeping({0})"
+        [ChangesState]
         public static extern bool UnitIsSleeping(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitWakeUp({0})"
+        [ChangesState]
         public static extern void UnitWakeUp(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitApplyTimedLife({0}, {1}, {2})"
+        [ChangesState]
         public static extern void UnitApplyTimedLife(unit whichUnit, int buffId, float duration);
 
         /// @CSharpLua.Template = "UnitIgnoreAlarm({0}, {1})"
+        [ChangesState]
         public static extern bool UnitIgnoreAlarm(unit whichUnit, bool flag);
 
         /// @CSharpLua.Template = "UnitIgnoreAlarmToggled({0})"
+        [ChangesState]
         public static extern bool UnitIgnoreAlarmToggled(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitResetCooldown({0})"
+        [ChangesState]
         public static extern void UnitResetCooldown(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitSetConstructionProgress({0}, {1})"
+        [ChangesState]
         public static extern void UnitSetConstructionProgress(unit whichUnit, int constructionPercentage);
 
         /// @CSharpLua.Template = "UnitSetUpgradeProgress({0}, {1})"
+        [ChangesState]
         public static extern void UnitSetUpgradeProgress(unit whichUnit, int upgradePercentage);
 
         /// @CSharpLua.Template = "UnitPauseTimedLife({0}, {1})"
+        [ChangesState]
         public static extern void UnitPauseTimedLife(unit whichUnit, bool flag);
 
         /// @CSharpLua.Template = "UnitSetUsesAltIcon({0}, {1})"
+        [ChangesState]
         public static extern void UnitSetUsesAltIcon(unit whichUnit, bool flag);
 
         /// @CSharpLua.Template = "UnitDamagePoint({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10})"
+        [ChangesState]
         public static extern bool UnitDamagePoint(unit whichUnit, float delay, float radius, float x, float y, float amount, bool attack, bool ranged, attacktype attackType, damagetype damageType, weapontype weaponType);
 
         /// @CSharpLua.Template = "UnitDamageTarget({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [ChangesState]
         public static extern bool UnitDamageTarget(unit whichUnit, widget target, float amount, bool attack, bool ranged, attacktype attackType, damagetype damageType, weapontype weaponType);
 
         /// @CSharpLua.Template = "IssueImmediateOrder({0}, {1})"
+        [ChangesState]
         public static extern bool IssueImmediateOrder(unit whichUnit, string order);
 
         /// @CSharpLua.Template = "IssueImmediateOrderById({0}, {1})"
+        [ChangesState]
         public static extern bool IssueImmediateOrderById(unit whichUnit, int order);
 
         /// @CSharpLua.Template = "IssuePointOrder({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool IssuePointOrder(unit whichUnit, string order, float x, float y);
 
         /// @CSharpLua.Template = "IssuePointOrderLoc({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool IssuePointOrderLoc(unit whichUnit, string order, location whichLocation);
 
         /// @CSharpLua.Template = "IssuePointOrderById({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool IssuePointOrderById(unit whichUnit, int order, float x, float y);
 
         /// @CSharpLua.Template = "IssuePointOrderByIdLoc({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool IssuePointOrderByIdLoc(unit whichUnit, int order, location whichLocation);
 
         /// @CSharpLua.Template = "IssueTargetOrder({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool IssueTargetOrder(unit whichUnit, string order, widget targetWidget);
 
         /// @CSharpLua.Template = "IssueTargetOrderById({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool IssueTargetOrderById(unit whichUnit, int order, widget targetWidget);
 
         /// @CSharpLua.Template = "IssueInstantPointOrder({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern bool IssueInstantPointOrder(unit whichUnit, string order, float x, float y, widget instantTargetWidget);
 
         /// @CSharpLua.Template = "IssueInstantPointOrderById({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern bool IssueInstantPointOrderById(unit whichUnit, int order, float x, float y, widget instantTargetWidget);
 
         /// @CSharpLua.Template = "IssueInstantTargetOrder({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool IssueInstantTargetOrder(unit whichUnit, string order, widget targetWidget, widget instantTargetWidget);
 
         /// @CSharpLua.Template = "IssueInstantTargetOrderById({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool IssueInstantTargetOrderById(unit whichUnit, int order, widget targetWidget, widget instantTargetWidget);
 
         /// @CSharpLua.Template = "IssueBuildOrder({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool IssueBuildOrder(unit whichPeon, string unitToBuild, float x, float y);
 
         /// @CSharpLua.Template = "IssueBuildOrderById({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool IssueBuildOrderById(unit whichPeon, int unitId, float x, float y);
 
         /// @CSharpLua.Template = "IssueNeutralImmediateOrder({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool IssueNeutralImmediateOrder(player forWhichPlayer, unit neutralStructure, string unitToBuild);
 
         /// @CSharpLua.Template = "IssueNeutralImmediateOrderById({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool IssueNeutralImmediateOrderById(player forWhichPlayer, unit neutralStructure, int unitId);
 
         /// @CSharpLua.Template = "IssueNeutralPointOrder({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern bool IssueNeutralPointOrder(player forWhichPlayer, unit neutralStructure, string unitToBuild, float x, float y);
 
         /// @CSharpLua.Template = "IssueNeutralPointOrderById({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern bool IssueNeutralPointOrderById(player forWhichPlayer, unit neutralStructure, int unitId, float x, float y);
 
         /// @CSharpLua.Template = "IssueNeutralTargetOrder({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool IssueNeutralTargetOrder(player forWhichPlayer, unit neutralStructure, string unitToBuild, widget target);
 
         /// @CSharpLua.Template = "IssueNeutralTargetOrderById({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool IssueNeutralTargetOrderById(player forWhichPlayer, unit neutralStructure, int unitId, widget target);
 
         /// @CSharpLua.Template = "GetUnitCurrentOrder({0})"
         public static extern int GetUnitCurrentOrder(unit whichUnit);
 
         /// @CSharpLua.Template = "SetResourceAmount({0}, {1})"
+        [ChangesState]
         public static extern void SetResourceAmount(unit whichUnit, int amount);
 
         /// @CSharpLua.Template = "AddResourceAmount({0}, {1})"
+        [ChangesState]
         public static extern void AddResourceAmount(unit whichUnit, int amount);
 
         /// @CSharpLua.Template = "GetResourceAmount({0})"
@@ -8728,60 +9042,76 @@ namespace Moonwell
         public static extern float WaygateGetDestinationY(unit waygate);
 
         /// @CSharpLua.Template = "WaygateSetDestination({0}, {1}, {2})"
+        [ChangesState]
         public static extern void WaygateSetDestination(unit waygate, float x, float y);
 
         /// @CSharpLua.Template = "WaygateActivate({0}, {1})"
+        [ChangesState]
         public static extern void WaygateActivate(unit waygate, bool activate);
 
         /// @CSharpLua.Template = "WaygateIsActive({0})"
         public static extern bool WaygateIsActive(unit waygate);
 
         /// @CSharpLua.Template = "AddItemToAllStock({0}, {1}, {2})"
+        [ChangesState]
         public static extern void AddItemToAllStock(int itemId, int currentStock, int stockMax);
 
         /// @CSharpLua.Template = "AddItemToStock({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void AddItemToStock(unit whichUnit, int itemId, int currentStock, int stockMax);
 
         /// @CSharpLua.Template = "AddUnitToAllStock({0}, {1}, {2})"
+        [ChangesState]
         public static extern void AddUnitToAllStock(int unitId, int currentStock, int stockMax);
 
         /// @CSharpLua.Template = "AddUnitToStock({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void AddUnitToStock(unit whichUnit, int unitId, int currentStock, int stockMax);
 
         /// @CSharpLua.Template = "RemoveItemFromAllStock({0})"
+        [ChangesState]
         public static extern void RemoveItemFromAllStock(int itemId);
 
         /// @CSharpLua.Template = "RemoveItemFromStock({0}, {1})"
+        [ChangesState]
         public static extern void RemoveItemFromStock(unit whichUnit, int itemId);
 
         /// @CSharpLua.Template = "RemoveUnitFromAllStock({0})"
+        [ChangesState]
         public static extern void RemoveUnitFromAllStock(int unitId);
 
         /// @CSharpLua.Template = "RemoveUnitFromStock({0}, {1})"
+        [ChangesState]
         public static extern void RemoveUnitFromStock(unit whichUnit, int unitId);
 
         /// @CSharpLua.Template = "SetAllItemTypeSlots({0})"
+        [ChangesState]
         public static extern void SetAllItemTypeSlots(int slots);
 
         /// @CSharpLua.Template = "SetAllUnitTypeSlots({0})"
+        [ChangesState]
         public static extern void SetAllUnitTypeSlots(int slots);
 
         /// @CSharpLua.Template = "SetItemTypeSlots({0}, {1})"
+        [ChangesState]
         public static extern void SetItemTypeSlots(unit whichUnit, int slots);
 
         /// @CSharpLua.Template = "SetUnitTypeSlots({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitTypeSlots(unit whichUnit, int slots);
 
         /// @CSharpLua.Template = "GetUnitUserData({0})"
         public static extern int GetUnitUserData(unit whichUnit);
 
         /// @CSharpLua.Template = "SetUnitUserData({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitUserData(unit whichUnit, int data);
 
         /// @CSharpLua.Template = "Player({0})"
         public static extern player Player(int number);
 
         /// @CSharpLua.Template = "GetLocalPlayer()"
+        [MachineLocal]
         public static extern player GetLocalPlayer();
 
         /// @CSharpLua.Template = "IsPlayerAlly({0}, {1})"
@@ -8851,27 +9181,34 @@ namespace Moonwell
         public static extern float GetPlayerHandicapDamage(player whichPlayer);
 
         /// @CSharpLua.Template = "SetPlayerHandicap({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerHandicap(player whichPlayer, float handicap);
 
         /// @CSharpLua.Template = "SetPlayerHandicapXP({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerHandicapXP(player whichPlayer, float handicap);
 
         /// @CSharpLua.Template = "SetPlayerHandicapReviveTime({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerHandicapReviveTime(player whichPlayer, float handicap);
 
         /// @CSharpLua.Template = "SetPlayerHandicapDamage({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerHandicapDamage(player whichPlayer, float handicap);
 
         /// @CSharpLua.Template = "SetPlayerTechMaxAllowed({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetPlayerTechMaxAllowed(player whichPlayer, int techid, int maximum);
 
         /// @CSharpLua.Template = "GetPlayerTechMaxAllowed({0}, {1})"
         public static extern int GetPlayerTechMaxAllowed(player whichPlayer, int techid);
 
         /// @CSharpLua.Template = "AddPlayerTechResearched({0}, {1}, {2})"
+        [ChangesState]
         public static extern void AddPlayerTechResearched(player whichPlayer, int techid, int levels);
 
         /// @CSharpLua.Template = "SetPlayerTechResearched({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetPlayerTechResearched(player whichPlayer, int techid, int setToLevel);
 
         /// @CSharpLua.Template = "GetPlayerTechResearched({0}, {1}, {2})"
@@ -8881,219 +9218,284 @@ namespace Moonwell
         public static extern int GetPlayerTechCount(player whichPlayer, int techid, bool specificonly);
 
         /// @CSharpLua.Template = "SetPlayerUnitsOwner({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerUnitsOwner(player whichPlayer, int newOwner);
 
         /// @CSharpLua.Template = "CripplePlayer({0}, {1}, {2})"
+        [ChangesState]
         public static extern void CripplePlayer(player whichPlayer, force toWhichPlayers, bool flag);
 
         /// @CSharpLua.Template = "SetPlayerAbilityAvailable({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetPlayerAbilityAvailable(player whichPlayer, int abilid, bool avail);
 
         /// @CSharpLua.Template = "SetPlayerState({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetPlayerState(player whichPlayer, playerstate whichPlayerState, int value);
 
         /// @CSharpLua.Template = "RemovePlayer({0}, {1})"
+        [ChangesState]
         public static extern void RemovePlayer(player whichPlayer, playergameresult gameResult);
 
         /// @CSharpLua.Template = "CachePlayerHeroData({0})"
+        [ChangesState]
         public static extern void CachePlayerHeroData(player whichPlayer);
 
         /// @CSharpLua.Template = "SetFogStateRect({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetFogStateRect(player forWhichPlayer, fogstate whichState, rect where, bool useSharedVision);
 
         /// @CSharpLua.Template = "SetFogStateRadius({0}, {1}, {2}, {3}, {4}, {5})"
+        [ChangesState]
         public static extern void SetFogStateRadius(player forWhichPlayer, fogstate whichState, float centerx, float centerY, float radius, bool useSharedVision);
 
         /// @CSharpLua.Template = "SetFogStateRadiusLoc({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void SetFogStateRadiusLoc(player forWhichPlayer, fogstate whichState, location center, float radius, bool useSharedVision);
 
         /// @CSharpLua.Template = "FogMaskEnable({0})"
+        [ChangesState]
         public static extern void FogMaskEnable(bool enable);
 
         /// @CSharpLua.Template = "IsFogMaskEnabled()"
         public static extern bool IsFogMaskEnabled();
 
         /// @CSharpLua.Template = "FogEnable({0})"
+        [ChangesState]
         public static extern void FogEnable(bool enable);
 
         /// @CSharpLua.Template = "IsFogEnabled()"
         public static extern bool IsFogEnabled();
 
         /// @CSharpLua.Template = "CreateFogModifierRect({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle]
         public static extern fogmodifier CreateFogModifierRect(player forWhichPlayer, fogstate whichState, rect where, bool useSharedVision, bool afterUnits);
 
         /// @CSharpLua.Template = "CreateFogModifierRadius({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [CreatesHandle]
         public static extern fogmodifier CreateFogModifierRadius(player forWhichPlayer, fogstate whichState, float centerx, float centerY, float radius, bool useSharedVision, bool afterUnits);
 
         /// @CSharpLua.Template = "CreateFogModifierRadiusLoc({0}, {1}, {2}, {3}, {4}, {5})"
+        [CreatesHandle]
         public static extern fogmodifier CreateFogModifierRadiusLoc(player forWhichPlayer, fogstate whichState, location center, float radius, bool useSharedVision, bool afterUnits);
 
         /// @CSharpLua.Template = "DestroyFogModifier({0})"
+        [ChangesState]
         public static extern void DestroyFogModifier(fogmodifier whichFogModifier);
 
         /// @CSharpLua.Template = "FogModifierStart({0})"
+        [ChangesState]
         public static extern void FogModifierStart(fogmodifier whichFogModifier);
 
         /// @CSharpLua.Template = "FogModifierStop({0})"
+        [ChangesState]
         public static extern void FogModifierStop(fogmodifier whichFogModifier);
 
         /// @CSharpLua.Template = "VersionGet()"
         public static extern version VersionGet();
 
         /// @CSharpLua.Template = "VersionCompatible({0})"
+        [ChangesState]
         public static extern bool VersionCompatible(version whichVersion);
 
         /// @CSharpLua.Template = "VersionSupported({0})"
+        [ChangesState]
         public static extern bool VersionSupported(version whichVersion);
 
         /// @CSharpLua.Template = "EndGame({0})"
+        [ChangesState]
         public static extern void EndGame(bool doScoreScreen);
 
         /// @CSharpLua.Template = "ChangeLevel({0}, {1})"
+        [ChangesState]
         public static extern void ChangeLevel(string newLevel, bool doScoreScreen);
 
         /// @CSharpLua.Template = "RestartGame({0})"
+        [ChangesState]
         public static extern void RestartGame(bool doScoreScreen);
 
         /// @CSharpLua.Template = "ReloadGame()"
+        [ChangesState]
         public static extern void ReloadGame();
 
         /// @CSharpLua.Template = "SetCampaignMenuRace({0})"
+        [ChangesState]
         public static extern void SetCampaignMenuRace(race r);
 
         /// @CSharpLua.Template = "SetCampaignMenuRaceEx({0})"
+        [ChangesState]
         public static extern void SetCampaignMenuRaceEx(int campaignIndex);
 
         /// @CSharpLua.Template = "ForceCampaignSelectScreen()"
+        [ChangesState]
         public static extern void ForceCampaignSelectScreen();
 
         /// @CSharpLua.Template = "LoadGame({0}, {1})"
+        [ChangesState]
         public static extern void LoadGame(string saveFileName, bool doScoreScreen);
 
         /// @CSharpLua.Template = "SaveGame({0})"
+        [ChangesState]
         public static extern void SaveGame(string saveFileName);
 
         /// @CSharpLua.Template = "RenameSaveDirectory({0}, {1})"
+        [ChangesState]
         public static extern bool RenameSaveDirectory(string sourceDirName, string destDirName);
 
         /// @CSharpLua.Template = "RemoveSaveDirectory({0})"
+        [ChangesState]
         public static extern bool RemoveSaveDirectory(string sourceDirName);
 
         /// @CSharpLua.Template = "CopySaveGame({0}, {1})"
+        [ChangesState]
         public static extern bool CopySaveGame(string sourceSaveName, string destSaveName);
 
         /// @CSharpLua.Template = "SaveGameExists({0})"
+        [ChangesState]
         public static extern bool SaveGameExists(string saveName);
 
         /// @CSharpLua.Template = "SetMaxCheckpointSaves({0})"
+        [ChangesState]
         public static extern void SetMaxCheckpointSaves(int maxCheckpointSaves);
 
         /// @CSharpLua.Template = "SaveGameCheckpoint({0}, {1})"
+        [ChangesState]
         public static extern void SaveGameCheckpoint(string saveFileName, bool showWindow);
 
         /// @CSharpLua.Template = "SyncSelections()"
+        [ChangesState]
         public static extern void SyncSelections();
 
         /// @CSharpLua.Template = "SetFloatGameState({0}, {1})"
+        [ChangesState]
         public static extern void SetFloatGameState(fgamestate whichFloatGameState, float value);
 
         /// @CSharpLua.Template = "GetFloatGameState({0})"
         public static extern float GetFloatGameState(fgamestate whichFloatGameState);
 
         /// @CSharpLua.Template = "SetIntegerGameState({0}, {1})"
+        [ChangesState]
         public static extern void SetIntegerGameState(igamestate whichIntegerGameState, int value);
 
         /// @CSharpLua.Template = "GetIntegerGameState({0})"
         public static extern int GetIntegerGameState(igamestate whichIntegerGameState);
 
         /// @CSharpLua.Template = "SetTutorialCleared({0})"
+        [ChangesState]
         public static extern void SetTutorialCleared(bool cleared);
 
         /// @CSharpLua.Template = "SetMissionAvailable({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetMissionAvailable(int campaignNumber, int missionNumber, bool available);
 
         /// @CSharpLua.Template = "SetCampaignAvailable({0}, {1})"
+        [ChangesState]
         public static extern void SetCampaignAvailable(int campaignNumber, bool available);
 
         /// @CSharpLua.Template = "SetOpCinematicAvailable({0}, {1})"
+        [ChangesState]
         public static extern void SetOpCinematicAvailable(int campaignNumber, bool available);
 
         /// @CSharpLua.Template = "SetEdCinematicAvailable({0}, {1})"
+        [ChangesState]
         public static extern void SetEdCinematicAvailable(int campaignNumber, bool available);
 
         /// @CSharpLua.Template = "GetDefaultDifficulty()"
         public static extern gamedifficulty GetDefaultDifficulty();
 
         /// @CSharpLua.Template = "SetDefaultDifficulty({0})"
+        [ChangesState]
         public static extern void SetDefaultDifficulty(gamedifficulty g);
 
         /// @CSharpLua.Template = "SetCustomCampaignButtonVisible({0}, {1})"
+        [ChangesState]
         public static extern void SetCustomCampaignButtonVisible(int whichButton, bool visible);
 
         /// @CSharpLua.Template = "GetCustomCampaignButtonVisible({0})"
         public static extern bool GetCustomCampaignButtonVisible(int whichButton);
 
         /// @CSharpLua.Template = "DoNotSaveReplay()"
+        [ChangesState]
         public static extern void DoNotSaveReplay();
 
         /// @CSharpLua.Template = "DialogCreate()"
+        [CreatesHandle]
         public static extern dialog DialogCreate();
 
         /// @CSharpLua.Template = "DialogDestroy({0})"
+        [ChangesState]
         public static extern void DialogDestroy(dialog whichDialog);
 
         /// @CSharpLua.Template = "DialogClear({0})"
+        [ChangesState]
         public static extern void DialogClear(dialog whichDialog);
 
         /// @CSharpLua.Template = "DialogSetMessage({0}, {1})"
+        [ChangesState]
         public static extern void DialogSetMessage(dialog whichDialog, string messageText);
 
         /// @CSharpLua.Template = "DialogAddButton({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern button DialogAddButton(dialog whichDialog, string buttonText, int hotkey);
 
         /// @CSharpLua.Template = "DialogAddQuitButton({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern button DialogAddQuitButton(dialog whichDialog, bool doScoreScreen, string buttonText, int hotkey);
 
         /// @CSharpLua.Template = "DialogDisplay({0}, {1}, {2})"
+        [ChangesState]
         public static extern void DialogDisplay(player whichPlayer, dialog whichDialog, bool flag);
 
         /// @CSharpLua.Template = "ReloadGameCachesFromDisk()"
+        [ChangesState]
         public static extern bool ReloadGameCachesFromDisk();
 
         /// @CSharpLua.Template = "InitGameCache({0})"
+        [CreatesHandle]
         public static extern gamecache InitGameCache(string campaignFile);
 
         /// @CSharpLua.Template = "SaveGameCache({0})"
+        [ChangesState]
         public static extern bool SaveGameCache(gamecache whichCache);
 
         /// @CSharpLua.Template = "StoreInteger({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void StoreInteger(gamecache cache, string missionKey, string key, int value);
 
         /// @CSharpLua.Template = "StoreReal({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void StoreReal(gamecache cache, string missionKey, string key, float value);
 
         /// @CSharpLua.Template = "StoreBoolean({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void StoreBoolean(gamecache cache, string missionKey, string key, bool value);
 
         /// @CSharpLua.Template = "StoreUnit({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool StoreUnit(gamecache cache, string missionKey, string key, unit whichUnit);
 
         /// @CSharpLua.Template = "StoreString({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool StoreString(gamecache cache, string missionKey, string key, string value);
 
         /// @CSharpLua.Template = "SyncStoredInteger({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SyncStoredInteger(gamecache cache, string missionKey, string key);
 
         /// @CSharpLua.Template = "SyncStoredReal({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SyncStoredReal(gamecache cache, string missionKey, string key);
 
         /// @CSharpLua.Template = "SyncStoredBoolean({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SyncStoredBoolean(gamecache cache, string missionKey, string key);
 
         /// @CSharpLua.Template = "SyncStoredUnit({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SyncStoredUnit(gamecache cache, string missionKey, string key);
 
         /// @CSharpLua.Template = "SyncStoredString({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SyncStoredString(gamecache cache, string missionKey, string key);
 
         /// @CSharpLua.Template = "HaveStoredInteger({0}, {1}, {2})"
@@ -9112,24 +9514,31 @@ namespace Moonwell
         public static extern bool HaveStoredString(gamecache cache, string missionKey, string key);
 
         /// @CSharpLua.Template = "FlushGameCache({0})"
+        [ChangesState]
         public static extern void FlushGameCache(gamecache cache);
 
         /// @CSharpLua.Template = "FlushStoredMission({0}, {1})"
+        [ChangesState]
         public static extern void FlushStoredMission(gamecache cache, string missionKey);
 
         /// @CSharpLua.Template = "FlushStoredInteger({0}, {1}, {2})"
+        [ChangesState]
         public static extern void FlushStoredInteger(gamecache cache, string missionKey, string key);
 
         /// @CSharpLua.Template = "FlushStoredReal({0}, {1}, {2})"
+        [ChangesState]
         public static extern void FlushStoredReal(gamecache cache, string missionKey, string key);
 
         /// @CSharpLua.Template = "FlushStoredBoolean({0}, {1}, {2})"
+        [ChangesState]
         public static extern void FlushStoredBoolean(gamecache cache, string missionKey, string key);
 
         /// @CSharpLua.Template = "FlushStoredUnit({0}, {1}, {2})"
+        [ChangesState]
         public static extern void FlushStoredUnit(gamecache cache, string missionKey, string key);
 
         /// @CSharpLua.Template = "FlushStoredString({0}, {1}, {2})"
+        [ChangesState]
         public static extern void FlushStoredString(gamecache cache, string missionKey, string key);
 
         /// @CSharpLua.Template = "GetStoredInteger({0}, {1}, {2})"
@@ -9145,141 +9554,187 @@ namespace Moonwell
         public static extern string GetStoredString(gamecache cache, string missionKey, string key);
 
         /// @CSharpLua.Template = "RestoreUnit({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [CreatesHandle]
         public static extern unit RestoreUnit(gamecache cache, string missionKey, string key, player forWhichPlayer, float x, float y, float facing);
 
         /// @CSharpLua.Template = "InitHashtable()"
+        [CreatesHandle]
         public static extern hashtable InitHashtable();
 
         /// @CSharpLua.Template = "SaveInteger({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SaveInteger(hashtable table, int parentKey, int childKey, int value);
 
         /// @CSharpLua.Template = "SaveReal({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SaveReal(hashtable table, int parentKey, int childKey, float value);
 
         /// @CSharpLua.Template = "SaveBoolean({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SaveBoolean(hashtable table, int parentKey, int childKey, bool value);
 
         /// @CSharpLua.Template = "SaveStr({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveStr(hashtable table, int parentKey, int childKey, string value);
 
         /// @CSharpLua.Template = "SavePlayerHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SavePlayerHandle(hashtable table, int parentKey, int childKey, player whichPlayer);
 
         /// @CSharpLua.Template = "SaveWidgetHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveWidgetHandle(hashtable table, int parentKey, int childKey, widget whichWidget);
 
         /// @CSharpLua.Template = "SaveDestructableHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveDestructableHandle(hashtable table, int parentKey, int childKey, destructable whichDestructable);
 
         /// @CSharpLua.Template = "SaveItemHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveItemHandle(hashtable table, int parentKey, int childKey, item whichItem);
 
         /// @CSharpLua.Template = "SaveUnitHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveUnitHandle(hashtable table, int parentKey, int childKey, unit whichUnit);
 
         /// @CSharpLua.Template = "SaveAbilityHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveAbilityHandle(hashtable table, int parentKey, int childKey, ability whichAbility);
 
         /// @CSharpLua.Template = "SaveTimerHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveTimerHandle(hashtable table, int parentKey, int childKey, timer whichTimer);
 
         /// @CSharpLua.Template = "SaveTriggerHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveTriggerHandle(hashtable table, int parentKey, int childKey, trigger whichTrigger);
 
         /// @CSharpLua.Template = "SaveTriggerConditionHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveTriggerConditionHandle(hashtable table, int parentKey, int childKey, triggercondition whichTriggercondition);
 
         /// @CSharpLua.Template = "SaveTriggerActionHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveTriggerActionHandle(hashtable table, int parentKey, int childKey, triggeraction whichTriggeraction);
 
         /// @CSharpLua.Template = "SaveTriggerEventHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveTriggerEventHandle(hashtable table, int parentKey, int childKey, @event whichEvent);
 
         /// @CSharpLua.Template = "SaveForceHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveForceHandle(hashtable table, int parentKey, int childKey, force whichForce);
 
         /// @CSharpLua.Template = "SaveGroupHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveGroupHandle(hashtable table, int parentKey, int childKey, group whichGroup);
 
         /// @CSharpLua.Template = "SaveLocationHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveLocationHandle(hashtable table, int parentKey, int childKey, location whichLocation);
 
         /// @CSharpLua.Template = "SaveRectHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveRectHandle(hashtable table, int parentKey, int childKey, rect whichRect);
 
         /// @CSharpLua.Template = "SaveBooleanExprHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveBooleanExprHandle(hashtable table, int parentKey, int childKey, boolexpr whichBoolexpr);
 
         /// @CSharpLua.Template = "SaveSoundHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveSoundHandle(hashtable table, int parentKey, int childKey, sound whichSound);
 
         /// @CSharpLua.Template = "SaveEffectHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveEffectHandle(hashtable table, int parentKey, int childKey, effect whichEffect);
 
         /// @CSharpLua.Template = "SaveUnitPoolHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveUnitPoolHandle(hashtable table, int parentKey, int childKey, unitpool whichUnitpool);
 
         /// @CSharpLua.Template = "SaveItemPoolHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveItemPoolHandle(hashtable table, int parentKey, int childKey, itempool whichItempool);
 
         /// @CSharpLua.Template = "SaveQuestHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveQuestHandle(hashtable table, int parentKey, int childKey, quest whichQuest);
 
         /// @CSharpLua.Template = "SaveQuestItemHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveQuestItemHandle(hashtable table, int parentKey, int childKey, questitem whichQuestitem);
 
         /// @CSharpLua.Template = "SaveDefeatConditionHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveDefeatConditionHandle(hashtable table, int parentKey, int childKey, defeatcondition whichDefeatcondition);
 
         /// @CSharpLua.Template = "SaveTimerDialogHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveTimerDialogHandle(hashtable table, int parentKey, int childKey, timerdialog whichTimerdialog);
 
         /// @CSharpLua.Template = "SaveLeaderboardHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveLeaderboardHandle(hashtable table, int parentKey, int childKey, leaderboard whichLeaderboard);
 
         /// @CSharpLua.Template = "SaveMultiboardHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveMultiboardHandle(hashtable table, int parentKey, int childKey, multiboard whichMultiboard);
 
         /// @CSharpLua.Template = "SaveMultiboardItemHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveMultiboardItemHandle(hashtable table, int parentKey, int childKey, multiboarditem whichMultiboarditem);
 
         /// @CSharpLua.Template = "SaveTrackableHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveTrackableHandle(hashtable table, int parentKey, int childKey, trackable whichTrackable);
 
         /// @CSharpLua.Template = "SaveDialogHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveDialogHandle(hashtable table, int parentKey, int childKey, dialog whichDialog);
 
         /// @CSharpLua.Template = "SaveButtonHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveButtonHandle(hashtable table, int parentKey, int childKey, button whichButton);
 
         /// @CSharpLua.Template = "SaveTextTagHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveTextTagHandle(hashtable table, int parentKey, int childKey, texttag whichTexttag);
 
         /// @CSharpLua.Template = "SaveLightningHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveLightningHandle(hashtable table, int parentKey, int childKey, lightning whichLightning);
 
         /// @CSharpLua.Template = "SaveImageHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveImageHandle(hashtable table, int parentKey, int childKey, image whichImage);
 
         /// @CSharpLua.Template = "SaveUbersplatHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveUbersplatHandle(hashtable table, int parentKey, int childKey, ubersplat whichUbersplat);
 
         /// @CSharpLua.Template = "SaveRegionHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveRegionHandle(hashtable table, int parentKey, int childKey, region whichRegion);
 
         /// @CSharpLua.Template = "SaveFogStateHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveFogStateHandle(hashtable table, int parentKey, int childKey, fogstate whichFogState);
 
         /// @CSharpLua.Template = "SaveFogModifierHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveFogModifierHandle(hashtable table, int parentKey, int childKey, fogmodifier whichFogModifier);
 
         /// @CSharpLua.Template = "SaveAgentHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveAgentHandle(hashtable table, int parentKey, int childKey, agent whichAgent);
 
         /// @CSharpLua.Template = "SaveHashtableHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveHashtableHandle(hashtable table, int parentKey, int childKey, hashtable whichHashtable);
 
         /// @CSharpLua.Template = "SaveFrameHandle({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveFrameHandle(hashtable table, int parentKey, int childKey, framehandle whichFrameHandle);
 
         /// @CSharpLua.Template = "LoadInteger({0}, {1}, {2})"
@@ -9427,78 +9882,103 @@ namespace Moonwell
         public static extern bool HaveSavedHandle(hashtable table, int parentKey, int childKey);
 
         /// @CSharpLua.Template = "RemoveSavedInteger({0}, {1}, {2})"
+        [ChangesState]
         public static extern void RemoveSavedInteger(hashtable table, int parentKey, int childKey);
 
         /// @CSharpLua.Template = "RemoveSavedReal({0}, {1}, {2})"
+        [ChangesState]
         public static extern void RemoveSavedReal(hashtable table, int parentKey, int childKey);
 
         /// @CSharpLua.Template = "RemoveSavedBoolean({0}, {1}, {2})"
+        [ChangesState]
         public static extern void RemoveSavedBoolean(hashtable table, int parentKey, int childKey);
 
         /// @CSharpLua.Template = "RemoveSavedString({0}, {1}, {2})"
+        [ChangesState]
         public static extern void RemoveSavedString(hashtable table, int parentKey, int childKey);
 
         /// @CSharpLua.Template = "RemoveSavedHandle({0}, {1}, {2})"
+        [ChangesState]
         public static extern void RemoveSavedHandle(hashtable table, int parentKey, int childKey);
 
         /// @CSharpLua.Template = "FlushParentHashtable({0})"
+        [ChangesState]
         public static extern void FlushParentHashtable(hashtable table);
 
         /// @CSharpLua.Template = "FlushChildHashtable({0}, {1})"
+        [ChangesState]
         public static extern void FlushChildHashtable(hashtable table, int parentKey);
 
         /// @CSharpLua.Template = "GetRandomInt({0}, {1})"
+        [ChangesState]
         public static extern int GetRandomInt(int lowBound, int highBound);
 
         /// @CSharpLua.Template = "GetRandomReal({0}, {1})"
+        [ChangesState]
         public static extern float GetRandomReal(float lowBound, float highBound);
 
         /// @CSharpLua.Template = "CreateUnitPool()"
+        [CreatesHandle]
         public static extern unitpool CreateUnitPool();
 
         /// @CSharpLua.Template = "DestroyUnitPool({0})"
+        [ChangesState]
         public static extern void DestroyUnitPool(unitpool whichPool);
 
         /// @CSharpLua.Template = "UnitPoolAddUnitType({0}, {1}, {2})"
+        [ChangesState]
         public static extern void UnitPoolAddUnitType(unitpool whichPool, int unitId, float weight);
 
         /// @CSharpLua.Template = "UnitPoolRemoveUnitType({0}, {1})"
+        [ChangesState]
         public static extern void UnitPoolRemoveUnitType(unitpool whichPool, int unitId);
 
         /// @CSharpLua.Template = "PlaceRandomUnit({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle]
         public static extern unit PlaceRandomUnit(unitpool whichPool, player forWhichPlayer, float x, float y, float facing);
 
         /// @CSharpLua.Template = "CreateItemPool()"
+        [CreatesHandle]
         public static extern itempool CreateItemPool();
 
         /// @CSharpLua.Template = "DestroyItemPool({0})"
+        [ChangesState]
         public static extern void DestroyItemPool(itempool whichItemPool);
 
         /// @CSharpLua.Template = "ItemPoolAddItemType({0}, {1}, {2})"
+        [ChangesState]
         public static extern void ItemPoolAddItemType(itempool whichItemPool, int itemId, float weight);
 
         /// @CSharpLua.Template = "ItemPoolRemoveItemType({0}, {1})"
+        [ChangesState]
         public static extern void ItemPoolRemoveItemType(itempool whichItemPool, int itemId);
 
         /// @CSharpLua.Template = "PlaceRandomItem({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern item PlaceRandomItem(itempool whichItemPool, float x, float y);
 
         /// @CSharpLua.Template = "ChooseRandomCreep({0})"
+        [ChangesState]
         public static extern int ChooseRandomCreep(int level);
 
         /// @CSharpLua.Template = "ChooseRandomNPBuilding()"
+        [ChangesState]
         public static extern int ChooseRandomNPBuilding();
 
         /// @CSharpLua.Template = "ChooseRandomItem({0})"
+        [ChangesState]
         public static extern int ChooseRandomItem(int level);
 
         /// @CSharpLua.Template = "ChooseRandomItemEx({0}, {1})"
+        [ChangesState]
         public static extern int ChooseRandomItemEx(itemtype whichType, int level);
 
         /// @CSharpLua.Template = "ChooseRandomItemExWithFilter({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern int ChooseRandomItemExWithFilter(itemtype whichType, int level, equipmentType whichEquipmentType, itemTag whichTag);
 
         /// @CSharpLua.Template = "SetRandomSeed({0})"
+        [ChangesState]
         public static extern void SetRandomSeed(int seed);
 
         /// @CSharpLua.Template = "SetTerrainFog({0}, {1}, {2}, {3}, {4})"
@@ -9508,12 +9988,14 @@ namespace Moonwell
         public static extern void ResetTerrainFog();
 
         /// @CSharpLua.Template = "SetUnitFog({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void SetUnitFog(float a, float b, float c, float d, float e);
 
         /// @CSharpLua.Template = "SetTerrainFogEx({0}, {1}, {2}, {3}, {4}, {5}, {6})"
         public static extern void SetTerrainFogEx(int style, float zstart, float zend, float density, float red, float green, float blue);
 
         /// @CSharpLua.Template = "SetTerrainFogExV({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10})"
+        [ChangesState]
         public static extern void SetTerrainFogExV(int style, float zstart, float zend, float density, float heightStart, float heightEnd, float linearStart, float linearEnd, float red, float green, float blue);
 
         /// @CSharpLua.Template = "BlzSetTerrainFogStyle({0})"
@@ -9562,12 +10044,14 @@ namespace Moonwell
         public static extern void ClearTextMessages();
 
         /// @CSharpLua.Template = "SetDayNightModels({0}, {1})"
+        [ChangesState]
         public static extern void SetDayNightModels(string terrainDNCFile, string unitDNCFile);
 
         /// @CSharpLua.Template = "SetPortraitLight({0})"
         public static extern void SetPortraitLight(string portraitDNCFile);
 
         /// @CSharpLua.Template = "SetSkyModel({0})"
+        [ChangesState]
         public static extern void SetSkyModel(string skyModelFile);
 
         /// @CSharpLua.Template = "EnableUserControl({0})"
@@ -9577,9 +10061,11 @@ namespace Moonwell
         public static extern void EnableUserUI(bool b);
 
         /// @CSharpLua.Template = "SuspendTimeOfDay({0})"
+        [ChangesState]
         public static extern void SuspendTimeOfDay(bool b);
 
         /// @CSharpLua.Template = "SetTimeOfDayScale({0})"
+        [ChangesState]
         public static extern void SetTimeOfDayScale(float r);
 
         /// @CSharpLua.Template = "GetTimeOfDayScale()"
@@ -9589,12 +10075,15 @@ namespace Moonwell
         public static extern void ShowInterface(bool flag, float fadeDuration);
 
         /// @CSharpLua.Template = "PauseGame({0})"
+        [ChangesState]
         public static extern void PauseGame(bool flag);
 
         /// @CSharpLua.Template = "UnitAddIndicator({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void UnitAddIndicator(unit whichUnit, int red, int green, int blue, int alpha);
 
         /// @CSharpLua.Template = "AddIndicator({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void AddIndicator(widget whichWidget, int red, int green, int blue, int alpha);
 
         /// @CSharpLua.Template = "PingMinimap({0}, {1}, {2})"
@@ -9604,42 +10093,55 @@ namespace Moonwell
         public static extern void PingMinimapEx(float x, float y, float duration, int red, int green, int blue, bool extraEffects);
 
         /// @CSharpLua.Template = "CreateMinimapIconOnUnit({0}, {1}, {2}, {3}, {4}, {5})"
+        [CreatesHandle]
         public static extern minimapicon CreateMinimapIconOnUnit(unit whichUnit, int red, int green, int blue, string pingPath, fogstate fogVisibility);
 
         /// @CSharpLua.Template = "CreateMinimapIconAtLoc({0}, {1}, {2}, {3}, {4}, {5})"
+        [CreatesHandle]
         public static extern minimapicon CreateMinimapIconAtLoc(location where, int red, int green, int blue, string pingPath, fogstate fogVisibility);
 
         /// @CSharpLua.Template = "CreateMinimapIcon({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [CreatesHandle]
         public static extern minimapicon CreateMinimapIcon(float x, float y, int red, int green, int blue, string pingPath, fogstate fogVisibility);
 
         /// @CSharpLua.Template = "SkinManagerGetLocalPath({0})"
+        [MachineLocal]
         public static extern string SkinManagerGetLocalPath(string key);
 
         /// @CSharpLua.Template = "DestroyMinimapIcon({0})"
+        [ChangesState]
         public static extern void DestroyMinimapIcon(minimapicon pingId);
 
         /// @CSharpLua.Template = "SetMinimapIconVisible({0}, {1})"
+        [ChangesState]
         public static extern void SetMinimapIconVisible(minimapicon whichMinimapIcon, bool visible);
 
         /// @CSharpLua.Template = "SetMinimapIconOrphanDestroy({0}, {1})"
+        [ChangesState]
         public static extern void SetMinimapIconOrphanDestroy(minimapicon whichMinimapIcon, bool doDestroy);
 
         /// @CSharpLua.Template = "EnableOcclusion({0})"
+        [ChangesState]
         public static extern void EnableOcclusion(bool flag);
 
         /// @CSharpLua.Template = "SetIntroShotText({0})"
+        [ChangesState]
         public static extern void SetIntroShotText(string introText);
 
         /// @CSharpLua.Template = "SetIntroShotModel({0})"
+        [ChangesState]
         public static extern void SetIntroShotModel(string introModelPath);
 
         /// @CSharpLua.Template = "EnableWorldFogBoundary({0})"
+        [ChangesState]
         public static extern void EnableWorldFogBoundary(bool b);
 
         /// @CSharpLua.Template = "PlayModelCinematic({0})"
+        [ChangesState]
         public static extern void PlayModelCinematic(string modelName);
 
         /// @CSharpLua.Template = "BlzPreloadModelCinematicGame({0})"
+        [ChangesState]
         public static extern bool BlzPreloadModelCinematicGame(string modelName);
 
         /// @CSharpLua.Template = "BlzGetModelCinematicGameShotCount()"
@@ -9652,39 +10154,50 @@ namespace Moonwell
         public static extern float BlzGetModelCinematicGameRemainingTime();
 
         /// @CSharpLua.Template = "BlzPlayModelCinematicGameAtPosition({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void BlzPlayModelCinematicGameAtPosition(string modelName, float posX, float posY, float posZ, float RotZ);
 
         /// @CSharpLua.Template = "BlzSetCinematicEnabledDE({0})"
+        [ChangesState]
         public static extern void BlzSetCinematicEnabledDE(bool enable);
 
         /// @CSharpLua.Template = "BlzSetMinShadowCastingPointLightCount({0})"
+        [ChangesState]
         public static extern void BlzSetMinShadowCastingPointLightCount(int count);
 
         /// @CSharpLua.Template = "BlzGetMinShadowCastingPointLightCount()"
         public static extern int BlzGetMinShadowCastingPointLightCount();
 
         /// @CSharpLua.Template = "PlayCinematic({0})"
+        [ChangesState]
         public static extern void PlayCinematic(string movieName);
 
         /// @CSharpLua.Template = "ForceUIKey({0})"
+        [ChangesState]
         public static extern void ForceUIKey(string key);
 
         /// @CSharpLua.Template = "ForceUICancel()"
+        [ChangesState]
         public static extern void ForceUICancel();
 
         /// @CSharpLua.Template = "DisplayLoadDialog()"
+        [ChangesState]
         public static extern void DisplayLoadDialog();
 
         /// @CSharpLua.Template = "SetAltMinimapIcon({0})"
+        [ChangesState]
         public static extern void SetAltMinimapIcon(string iconPath);
 
         /// @CSharpLua.Template = "DisableRestartMission({0})"
+        [ChangesState]
         public static extern void DisableRestartMission(bool flag);
 
         /// @CSharpLua.Template = "CreateTextTag()"
+        [CreatesHandle]
         public static extern texttag CreateTextTag();
 
         /// @CSharpLua.Template = "DestroyTextTag({0})"
+        [ChangesState]
         public static extern void DestroyTextTag(texttag t);
 
         /// @CSharpLua.Template = "SetTextTagText({0}, {1}, {2})"
@@ -9721,21 +10234,25 @@ namespace Moonwell
         public static extern void SetTextTagFadepoint(texttag t, float fadepoint);
 
         /// @CSharpLua.Template = "SetReservedLocalHeroButtons({0})"
+        [ChangesState]
         public static extern void SetReservedLocalHeroButtons(int reserved);
 
         /// @CSharpLua.Template = "GetAllyColorFilterState()"
         public static extern int GetAllyColorFilterState();
 
         /// @CSharpLua.Template = "SetAllyColorFilterState({0})"
+        [ChangesState]
         public static extern void SetAllyColorFilterState(int state);
 
         /// @CSharpLua.Template = "GetCreepCampFilterState()"
         public static extern bool GetCreepCampFilterState();
 
         /// @CSharpLua.Template = "SetCreepCampFilterState({0})"
+        [ChangesState]
         public static extern void SetCreepCampFilterState(bool state);
 
         /// @CSharpLua.Template = "EnableMinimapFilterButtons({0}, {1})"
+        [ChangesState]
         public static extern void EnableMinimapFilterButtons(bool enableAlly, bool enableCreep);
 
         /// @CSharpLua.Template = "EnableDragSelect({0}, {1})"
@@ -9748,36 +10265,47 @@ namespace Moonwell
         public static extern void EnableSelect(bool state, bool ui);
 
         /// @CSharpLua.Template = "CreateTrackable({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern trackable CreateTrackable(string trackableModelPath, float x, float y, float facing);
 
         /// @CSharpLua.Template = "CreateQuest()"
+        [CreatesHandle]
         public static extern quest CreateQuest();
 
         /// @CSharpLua.Template = "DestroyQuest({0})"
+        [ChangesState]
         public static extern void DestroyQuest(quest whichQuest);
 
         /// @CSharpLua.Template = "QuestSetTitle({0}, {1})"
+        [ChangesState]
         public static extern void QuestSetTitle(quest whichQuest, string title);
 
         /// @CSharpLua.Template = "QuestSetDescription({0}, {1})"
+        [ChangesState]
         public static extern void QuestSetDescription(quest whichQuest, string description);
 
         /// @CSharpLua.Template = "QuestSetIconPath({0}, {1})"
+        [ChangesState]
         public static extern void QuestSetIconPath(quest whichQuest, string iconPath);
 
         /// @CSharpLua.Template = "QuestSetRequired({0}, {1})"
+        [ChangesState]
         public static extern void QuestSetRequired(quest whichQuest, bool required);
 
         /// @CSharpLua.Template = "QuestSetCompleted({0}, {1})"
+        [ChangesState]
         public static extern void QuestSetCompleted(quest whichQuest, bool completed);
 
         /// @CSharpLua.Template = "QuestSetDiscovered({0}, {1})"
+        [ChangesState]
         public static extern void QuestSetDiscovered(quest whichQuest, bool discovered);
 
         /// @CSharpLua.Template = "QuestSetFailed({0}, {1})"
+        [ChangesState]
         public static extern void QuestSetFailed(quest whichQuest, bool failed);
 
         /// @CSharpLua.Template = "QuestSetEnabled({0}, {1})"
+        [ChangesState]
         public static extern void QuestSetEnabled(quest whichQuest, bool enabled);
 
         /// @CSharpLua.Template = "IsQuestRequired({0})"
@@ -9796,96 +10324,122 @@ namespace Moonwell
         public static extern bool IsQuestEnabled(quest whichQuest);
 
         /// @CSharpLua.Template = "QuestCreateItem({0})"
+        [CreatesHandle]
         public static extern questitem QuestCreateItem(quest whichQuest);
 
         /// @CSharpLua.Template = "QuestItemSetDescription({0}, {1})"
+        [ChangesState]
         public static extern void QuestItemSetDescription(questitem whichQuestItem, string description);
 
         /// @CSharpLua.Template = "QuestItemSetCompleted({0}, {1})"
+        [ChangesState]
         public static extern void QuestItemSetCompleted(questitem whichQuestItem, bool completed);
 
         /// @CSharpLua.Template = "IsQuestItemCompleted({0})"
         public static extern bool IsQuestItemCompleted(questitem whichQuestItem);
 
         /// @CSharpLua.Template = "CreateDefeatCondition()"
+        [CreatesHandle]
         public static extern defeatcondition CreateDefeatCondition();
 
         /// @CSharpLua.Template = "DestroyDefeatCondition({0})"
+        [ChangesState]
         public static extern void DestroyDefeatCondition(defeatcondition whichCondition);
 
         /// @CSharpLua.Template = "DefeatConditionSetDescription({0}, {1})"
+        [ChangesState]
         public static extern void DefeatConditionSetDescription(defeatcondition whichCondition, string description);
 
         /// @CSharpLua.Template = "FlashQuestDialogButton()"
         public static extern void FlashQuestDialogButton();
 
         /// @CSharpLua.Template = "ForceQuestDialogUpdate()"
+        [ChangesState]
         public static extern void ForceQuestDialogUpdate();
 
         /// @CSharpLua.Template = "CreateTimerDialog({0})"
+        [CreatesHandle]
         public static extern timerdialog CreateTimerDialog(timer t);
 
         /// @CSharpLua.Template = "DestroyTimerDialog({0})"
+        [ChangesState]
         public static extern void DestroyTimerDialog(timerdialog whichDialog);
 
         /// @CSharpLua.Template = "TimerDialogSetTitle({0}, {1})"
+        [ChangesState]
         public static extern void TimerDialogSetTitle(timerdialog whichDialog, string title);
 
         /// @CSharpLua.Template = "TimerDialogSetTitleColor({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void TimerDialogSetTitleColor(timerdialog whichDialog, int red, int green, int blue, int alpha);
 
         /// @CSharpLua.Template = "TimerDialogSetTimeColor({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void TimerDialogSetTimeColor(timerdialog whichDialog, int red, int green, int blue, int alpha);
 
         /// @CSharpLua.Template = "TimerDialogSetSpeed({0}, {1})"
+        [ChangesState]
         public static extern void TimerDialogSetSpeed(timerdialog whichDialog, float speedMultFactor);
 
         /// @CSharpLua.Template = "TimerDialogDisplay({0}, {1})"
         public static extern void TimerDialogDisplay(timerdialog whichDialog, bool display);
 
         /// @CSharpLua.Template = "IsTimerDialogDisplayed({0})"
+        [MachineLocal]
         public static extern bool IsTimerDialogDisplayed(timerdialog whichDialog);
 
         /// @CSharpLua.Template = "TimerDialogSetRealTimeRemaining({0}, {1})"
+        [ChangesState]
         public static extern void TimerDialogSetRealTimeRemaining(timerdialog whichDialog, float timeRemaining);
 
         /// @CSharpLua.Template = "CreateLeaderboard()"
+        [CreatesHandle]
         public static extern leaderboard CreateLeaderboard();
 
         /// @CSharpLua.Template = "DestroyLeaderboard({0})"
+        [ChangesState]
         public static extern void DestroyLeaderboard(leaderboard lb);
 
         /// @CSharpLua.Template = "LeaderboardDisplay({0}, {1})"
         public static extern void LeaderboardDisplay(leaderboard lb, bool show);
 
         /// @CSharpLua.Template = "IsLeaderboardDisplayed({0})"
+        [MachineLocal]
         public static extern bool IsLeaderboardDisplayed(leaderboard lb);
 
         /// @CSharpLua.Template = "LeaderboardGetItemCount({0})"
         public static extern int LeaderboardGetItemCount(leaderboard lb);
 
         /// @CSharpLua.Template = "LeaderboardSetSizeByItemCount({0}, {1})"
+        [ChangesState]
         public static extern void LeaderboardSetSizeByItemCount(leaderboard lb, int count);
 
         /// @CSharpLua.Template = "LeaderboardAddItem({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void LeaderboardAddItem(leaderboard lb, string label, int value, player p);
 
         /// @CSharpLua.Template = "LeaderboardRemoveItem({0}, {1})"
+        [ChangesState]
         public static extern void LeaderboardRemoveItem(leaderboard lb, int index);
 
         /// @CSharpLua.Template = "LeaderboardRemovePlayerItem({0}, {1})"
+        [ChangesState]
         public static extern void LeaderboardRemovePlayerItem(leaderboard lb, player p);
 
         /// @CSharpLua.Template = "LeaderboardClear({0})"
+        [ChangesState]
         public static extern void LeaderboardClear(leaderboard lb);
 
         /// @CSharpLua.Template = "LeaderboardSortItemsByValue({0}, {1})"
+        [ChangesState]
         public static extern void LeaderboardSortItemsByValue(leaderboard lb, bool ascending);
 
         /// @CSharpLua.Template = "LeaderboardSortItemsByPlayer({0}, {1})"
+        [ChangesState]
         public static extern void LeaderboardSortItemsByPlayer(leaderboard lb, bool ascending);
 
         /// @CSharpLua.Template = "LeaderboardSortItemsByLabel({0}, {1})"
+        [ChangesState]
         public static extern void LeaderboardSortItemsByLabel(leaderboard lb, bool ascending);
 
         /// @CSharpLua.Template = "LeaderboardHasPlayerItem({0}, {1})"
@@ -9895,69 +10449,88 @@ namespace Moonwell
         public static extern int LeaderboardGetPlayerIndex(leaderboard lb, player p);
 
         /// @CSharpLua.Template = "LeaderboardSetLabel({0}, {1})"
+        [ChangesState]
         public static extern void LeaderboardSetLabel(leaderboard lb, string label);
 
         /// @CSharpLua.Template = "LeaderboardGetLabelText({0})"
+        [MachineLocal]
         public static extern string LeaderboardGetLabelText(leaderboard lb);
 
         /// @CSharpLua.Template = "PlayerSetLeaderboard({0}, {1})"
+        [ChangesState]
         public static extern void PlayerSetLeaderboard(player toPlayer, leaderboard lb);
 
         /// @CSharpLua.Template = "PlayerGetLeaderboard({0})"
         public static extern leaderboard PlayerGetLeaderboard(player toPlayer);
 
         /// @CSharpLua.Template = "LeaderboardSetLabelColor({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void LeaderboardSetLabelColor(leaderboard lb, int red, int green, int blue, int alpha);
 
         /// @CSharpLua.Template = "LeaderboardSetValueColor({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void LeaderboardSetValueColor(leaderboard lb, int red, int green, int blue, int alpha);
 
         /// @CSharpLua.Template = "LeaderboardSetStyle({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void LeaderboardSetStyle(leaderboard lb, bool showLabel, bool showNames, bool showValues, bool showIcons);
 
         /// @CSharpLua.Template = "LeaderboardSetItemValue({0}, {1}, {2})"
+        [ChangesState]
         public static extern void LeaderboardSetItemValue(leaderboard lb, int whichItem, int val);
 
         /// @CSharpLua.Template = "LeaderboardSetItemLabel({0}, {1}, {2})"
+        [ChangesState]
         public static extern void LeaderboardSetItemLabel(leaderboard lb, int whichItem, string val);
 
         /// @CSharpLua.Template = "LeaderboardSetItemStyle({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void LeaderboardSetItemStyle(leaderboard lb, int whichItem, bool showLabel, bool showValue, bool showIcon);
 
         /// @CSharpLua.Template = "LeaderboardSetItemLabelColor({0}, {1}, {2}, {3}, {4}, {5})"
+        [ChangesState]
         public static extern void LeaderboardSetItemLabelColor(leaderboard lb, int whichItem, int red, int green, int blue, int alpha);
 
         /// @CSharpLua.Template = "LeaderboardSetItemValueColor({0}, {1}, {2}, {3}, {4}, {5})"
+        [ChangesState]
         public static extern void LeaderboardSetItemValueColor(leaderboard lb, int whichItem, int red, int green, int blue, int alpha);
 
         /// @CSharpLua.Template = "CreateMultiboard()"
+        [CreatesHandle]
         public static extern multiboard CreateMultiboard();
 
         /// @CSharpLua.Template = "DestroyMultiboard({0})"
+        [ChangesState]
         public static extern void DestroyMultiboard(multiboard lb);
 
         /// @CSharpLua.Template = "MultiboardDisplay({0}, {1})"
         public static extern void MultiboardDisplay(multiboard lb, bool show);
 
         /// @CSharpLua.Template = "IsMultiboardDisplayed({0})"
+        [MachineLocal]
         public static extern bool IsMultiboardDisplayed(multiboard lb);
 
         /// @CSharpLua.Template = "MultiboardMinimize({0}, {1})"
         public static extern void MultiboardMinimize(multiboard lb, bool minimize);
 
         /// @CSharpLua.Template = "IsMultiboardMinimized({0})"
+        [MachineLocal]
         public static extern bool IsMultiboardMinimized(multiboard lb);
 
         /// @CSharpLua.Template = "MultiboardClear({0})"
+        [ChangesState]
         public static extern void MultiboardClear(multiboard lb);
 
         /// @CSharpLua.Template = "MultiboardSetTitleText({0}, {1})"
+        [ChangesState]
         public static extern void MultiboardSetTitleText(multiboard lb, string label);
 
         /// @CSharpLua.Template = "MultiboardGetTitleText({0})"
+        [MachineLocal]
         public static extern string MultiboardGetTitleText(multiboard lb);
 
         /// @CSharpLua.Template = "MultiboardSetTitleTextColor({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void MultiboardSetTitleTextColor(multiboard lb, int red, int green, int blue, int alpha);
 
         /// @CSharpLua.Template = "MultiboardGetRowCount({0})"
@@ -9967,48 +10540,63 @@ namespace Moonwell
         public static extern int MultiboardGetColumnCount(multiboard lb);
 
         /// @CSharpLua.Template = "MultiboardSetColumnCount({0}, {1})"
+        [ChangesState]
         public static extern void MultiboardSetColumnCount(multiboard lb, int count);
 
         /// @CSharpLua.Template = "MultiboardSetRowCount({0}, {1})"
+        [ChangesState]
         public static extern void MultiboardSetRowCount(multiboard lb, int count);
 
         /// @CSharpLua.Template = "MultiboardSetItemsStyle({0}, {1}, {2})"
+        [ChangesState]
         public static extern void MultiboardSetItemsStyle(multiboard lb, bool showValues, bool showIcons);
 
         /// @CSharpLua.Template = "MultiboardSetItemsValue({0}, {1})"
+        [ChangesState]
         public static extern void MultiboardSetItemsValue(multiboard lb, string value);
 
         /// @CSharpLua.Template = "MultiboardSetItemsValueColor({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void MultiboardSetItemsValueColor(multiboard lb, int red, int green, int blue, int alpha);
 
         /// @CSharpLua.Template = "MultiboardSetItemsWidth({0}, {1})"
+        [ChangesState]
         public static extern void MultiboardSetItemsWidth(multiboard lb, float width);
 
         /// @CSharpLua.Template = "MultiboardSetItemsIcon({0}, {1})"
+        [ChangesState]
         public static extern void MultiboardSetItemsIcon(multiboard lb, string iconPath);
 
         /// @CSharpLua.Template = "MultiboardGetItem({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern multiboarditem MultiboardGetItem(multiboard lb, int row, int column);
 
         /// @CSharpLua.Template = "MultiboardReleaseItem({0})"
+        [ChangesState]
         public static extern void MultiboardReleaseItem(multiboarditem mbi);
 
         /// @CSharpLua.Template = "MultiboardSetItemStyle({0}, {1}, {2})"
+        [ChangesState]
         public static extern void MultiboardSetItemStyle(multiboarditem mbi, bool showValue, bool showIcon);
 
         /// @CSharpLua.Template = "MultiboardSetItemValue({0}, {1})"
+        [ChangesState]
         public static extern void MultiboardSetItemValue(multiboarditem mbi, string val);
 
         /// @CSharpLua.Template = "MultiboardSetItemValueColor({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void MultiboardSetItemValueColor(multiboarditem mbi, int red, int green, int blue, int alpha);
 
         /// @CSharpLua.Template = "MultiboardSetItemWidth({0}, {1})"
+        [ChangesState]
         public static extern void MultiboardSetItemWidth(multiboarditem mbi, float width);
 
         /// @CSharpLua.Template = "MultiboardSetItemIcon({0}, {1})"
+        [ChangesState]
         public static extern void MultiboardSetItemIcon(multiboarditem mbi, string iconFileName);
 
         /// @CSharpLua.Template = "MultiboardSuppressDisplay({0})"
+        [ChangesState]
         public static extern void MultiboardSuppressDisplay(bool flag);
 
         /// @CSharpLua.Template = "SetCameraPosition({0}, {1})"
@@ -10054,6 +10642,7 @@ namespace Moonwell
         public static extern void SetCameraFieldControlledByInput(camerafield whichField, bool controlled);
 
         /// @CSharpLua.Template = "GetCameraFieldControlledByInput({0})"
+        [MachineLocal]
         public static extern bool GetCameraFieldControlledByInput(camerafield whichField);
 
         /// @CSharpLua.Template = "SetCameraTargetController({0}, {1}, {2}, {3})"
@@ -10066,9 +10655,11 @@ namespace Moonwell
         public static extern void BlzCameraSetCameraType(int cameraType);
 
         /// @CSharpLua.Template = "BlzCameraGetCameraType()"
+        [MachineLocal]
         public static extern int BlzCameraGetCameraType();
 
         /// @CSharpLua.Template = "CreateCameraSetup()"
+        [CreatesHandle]
         public static extern camerasetup CreateCameraSetup();
 
         /// @CSharpLua.Template = "CameraSetupSetField({0}, {1}, {2}, {3})"
@@ -10081,6 +10672,7 @@ namespace Moonwell
         public static extern void CameraSetupSetDestPosition(camerasetup whichSetup, float x, float y, float duration);
 
         /// @CSharpLua.Template = "CameraSetupGetDestPositionLoc({0})"
+        [CreatesHandle]
         public static extern location CameraSetupGetDestPositionLoc(camerasetup whichSetup);
 
         /// @CSharpLua.Template = "CameraSetupGetDestPositionX({0})"
@@ -10102,15 +10694,19 @@ namespace Moonwell
         public static extern void CameraSetupApplyForceDurationWithZ(camerasetup whichSetup, float zDestOffset, float forceDuration);
 
         /// @CSharpLua.Template = "BlzCameraSetupSetLabel({0}, {1})"
+        [ChangesState]
         public static extern void BlzCameraSetupSetLabel(camerasetup whichSetup, string label);
 
         /// @CSharpLua.Template = "BlzCameraSetupGetLabel({0})"
+        [ChangesState]
         public static extern string BlzCameraSetupGetLabel(camerasetup whichSetup);
 
         /// @CSharpLua.Template = "BlzCameraSetupSetCameraType({0}, {1})"
+        [ChangesState]
         public static extern void BlzCameraSetupSetCameraType(camerasetup whichSetup, int cameraType);
 
         /// @CSharpLua.Template = "BlzCameraSetupGetCameraType({0})"
+        [ChangesState]
         public static extern int BlzCameraSetupGetCameraType(camerasetup whichSetup);
 
         /// @CSharpLua.Template = "CameraSetTargetNoise({0}, {1})"
@@ -10162,6 +10758,7 @@ namespace Moonwell
         public static extern void DisplayCineFilter(bool flag);
 
         /// @CSharpLua.Template = "IsCineFilterDisplayed()"
+        [MachineLocal]
         public static extern bool IsCineFilterDisplayed();
 
         /// @CSharpLua.Template = "SetCinematicScene({0}, {1}, {2}, {3}, {4}, {5})"
@@ -10174,78 +10771,102 @@ namespace Moonwell
         public static extern void ForceCinematicSubtitles(bool flag);
 
         /// @CSharpLua.Template = "SetCinematicAudio({0})"
+        [ChangesState]
         public static extern void SetCinematicAudio(bool cinematicAudio);
 
         /// @CSharpLua.Template = "GetCameraMargin({0})"
+        [MachineLocal]
         public static extern float GetCameraMargin(int whichMargin);
 
         /// @CSharpLua.Template = "EnableCameraBlocker({0}, {1})"
+        [ChangesState]
         public static extern void EnableCameraBlocker(rect r, bool flag);
 
         /// @CSharpLua.Template = "AddCameraBlocker({0})"
+        [ChangesState]
         public static extern void AddCameraBlocker(rect where);
 
         /// @CSharpLua.Template = "GetCameraBoundMinX()"
+        [MachineLocal]
         public static extern float GetCameraBoundMinX();
 
         /// @CSharpLua.Template = "GetCameraBoundMinY()"
+        [MachineLocal]
         public static extern float GetCameraBoundMinY();
 
         /// @CSharpLua.Template = "GetCameraBoundMaxX()"
+        [MachineLocal]
         public static extern float GetCameraBoundMaxX();
 
         /// @CSharpLua.Template = "GetCameraBoundMaxY()"
+        [MachineLocal]
         public static extern float GetCameraBoundMaxY();
 
         /// @CSharpLua.Template = "GetCameraField({0})"
+        [MachineLocal]
         public static extern float GetCameraField(camerafield whichField);
 
         /// @CSharpLua.Template = "GetCameraTargetPositionX()"
+        [MachineLocal]
         public static extern float GetCameraTargetPositionX();
 
         /// @CSharpLua.Template = "GetCameraTargetPositionY()"
+        [MachineLocal]
         public static extern float GetCameraTargetPositionY();
 
         /// @CSharpLua.Template = "GetCameraTargetPositionZ()"
+        [MachineLocal]
         public static extern float GetCameraTargetPositionZ();
 
         /// @CSharpLua.Template = "GetCameraTargetPositionLoc()"
+        [MachineLocal, CreatesHandle]
         public static extern location GetCameraTargetPositionLoc();
 
         /// @CSharpLua.Template = "GetCameraEyePositionX()"
+        [MachineLocal]
         public static extern float GetCameraEyePositionX();
 
         /// @CSharpLua.Template = "GetCameraEyePositionY()"
+        [MachineLocal]
         public static extern float GetCameraEyePositionY();
 
         /// @CSharpLua.Template = "GetCameraEyePositionZ()"
+        [MachineLocal]
         public static extern float GetCameraEyePositionZ();
 
         /// @CSharpLua.Template = "GetCameraEyePositionLoc()"
+        [MachineLocal, CreatesHandle]
         public static extern location GetCameraEyePositionLoc();
 
         /// @CSharpLua.Template = "NewSoundEnvironment({0})"
+        [ChangesState]
         public static extern void NewSoundEnvironment(string environmentName);
 
         /// @CSharpLua.Template = "CreateSound({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [CreatesHandle]
         public static extern sound CreateSound(string fileName, bool looping, bool is3D, bool stopwhenoutofrange, int fadeInRate, int fadeOutRate, string eaxSetting);
 
         /// @CSharpLua.Template = "CreateSoundFilenameWithLabel({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [CreatesHandle]
         public static extern sound CreateSoundFilenameWithLabel(string fileName, bool looping, bool is3D, bool stopwhenoutofrange, int fadeInRate, int fadeOutRate, string SLKEntryName);
 
         /// @CSharpLua.Template = "CreateSoundFromLabel({0}, {1}, {2}, {3}, {4}, {5})"
+        [CreatesHandle]
         public static extern sound CreateSoundFromLabel(string soundLabel, bool looping, bool is3D, bool stopwhenoutofrange, int fadeInRate, int fadeOutRate);
 
         /// @CSharpLua.Template = "CreateMIDISound({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern sound CreateMIDISound(string soundLabel, int fadeInRate, int fadeOutRate);
 
         /// @CSharpLua.Template = "SetSoundParamsFromLabel({0}, {1})"
+        [ChangesState]
         public static extern void SetSoundParamsFromLabel(sound soundHandle, string soundLabel);
 
         /// @CSharpLua.Template = "SetSoundDistanceCutoff({0}, {1})"
         public static extern void SetSoundDistanceCutoff(sound soundHandle, float cutoff);
 
         /// @CSharpLua.Template = "SetSoundChannel({0}, {1})"
+        [ChangesState]
         public static extern void SetSoundChannel(sound soundHandle, int channel);
 
         /// @CSharpLua.Template = "SetSoundVolume({0}, {1})"
@@ -10273,6 +10894,7 @@ namespace Moonwell
         public static extern void SetSoundVelocity(sound soundHandle, float x, float y, float z);
 
         /// @CSharpLua.Template = "AttachSoundToUnit({0}, {1})"
+        [ChangesState]
         public static extern void AttachSoundToUnit(sound soundHandle, unit whichUnit);
 
         /// @CSharpLua.Template = "StartSound({0})"
@@ -10285,6 +10907,7 @@ namespace Moonwell
         public static extern void StopSound(sound soundHandle, bool killWhenDone, bool fadeOut);
 
         /// @CSharpLua.Template = "KillSoundWhenDone({0})"
+        [ChangesState]
         public static extern void KillSoundWhenDone(sound soundHandle);
 
         /// @CSharpLua.Template = "SetMapMusic({0}, {1}, {2})"
@@ -10312,6 +10935,7 @@ namespace Moonwell
         public static extern void PlayThematicMusicEx(string musicFileName, int frommsecs);
 
         /// @CSharpLua.Template = "BlzPauseThematicMusicOnFocusLost({0})"
+        [ChangesState]
         public static extern void BlzPauseThematicMusicOnFocusLost(bool pause);
 
         /// @CSharpLua.Template = "EndThematicMusic()"
@@ -10330,12 +10954,15 @@ namespace Moonwell
         public static extern void SetThematicMusicPlayPosition(int millisecs);
 
         /// @CSharpLua.Template = "SetSoundDuration({0}, {1})"
+        [ChangesState]
         public static extern void SetSoundDuration(sound soundHandle, int duration);
 
         /// @CSharpLua.Template = "GetSoundDuration({0})"
+        [MachineLocal]
         public static extern int GetSoundDuration(sound soundHandle);
 
         /// @CSharpLua.Template = "GetSoundFileDuration({0})"
+        [MachineLocal]
         public static extern int GetSoundFileDuration(string musicFileName);
 
         /// @CSharpLua.Template = "VolumeGroupSetVolume({0}, {1})"
@@ -10345,123 +10972,161 @@ namespace Moonwell
         public static extern void VolumeGroupReset();
 
         /// @CSharpLua.Template = "GetSoundIsPlaying({0})"
+        [MachineLocal]
         public static extern bool GetSoundIsPlaying(sound soundHandle);
 
         /// @CSharpLua.Template = "GetSoundIsLoading({0})"
+        [MachineLocal]
         public static extern bool GetSoundIsLoading(sound soundHandle);
 
         /// @CSharpLua.Template = "RegisterStackedSound({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void RegisterStackedSound(sound soundHandle, bool byPosition, float rectwidth, float rectheight);
 
         /// @CSharpLua.Template = "UnregisterStackedSound({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void UnregisterStackedSound(sound soundHandle, bool byPosition, float rectwidth, float rectheight);
 
         /// @CSharpLua.Template = "SetSoundFacialAnimationLabel({0}, {1})"
+        [ChangesState]
         public static extern bool SetSoundFacialAnimationLabel(sound soundHandle, string animationLabel);
 
         /// @CSharpLua.Template = "SetSoundFacialAnimationGroupLabel({0}, {1})"
+        [ChangesState]
         public static extern bool SetSoundFacialAnimationGroupLabel(sound soundHandle, string groupLabel);
 
         /// @CSharpLua.Template = "SetSoundFacialAnimationSetFilepath({0}, {1})"
+        [ChangesState]
         public static extern bool SetSoundFacialAnimationSetFilepath(sound soundHandle, string animationSetFilepath);
 
         /// @CSharpLua.Template = "SetDialogueSpeakerNameKey({0}, {1})"
+        [ChangesState]
         public static extern bool SetDialogueSpeakerNameKey(sound soundHandle, string speakerName);
 
         /// @CSharpLua.Template = "GetDialogueSpeakerNameKey({0})"
         public static extern string GetDialogueSpeakerNameKey(sound soundHandle);
 
         /// @CSharpLua.Template = "SetDialogueTextKey({0}, {1})"
+        [ChangesState]
         public static extern bool SetDialogueTextKey(sound soundHandle, string dialogueText);
 
         /// @CSharpLua.Template = "GetDialogueTextKey({0})"
         public static extern string GetDialogueTextKey(sound soundHandle);
 
         /// @CSharpLua.Template = "AddWeatherEffect({0}, {1})"
+        [CreatesHandle]
         public static extern weathereffect AddWeatherEffect(rect where, int effectID);
 
         /// @CSharpLua.Template = "RemoveWeatherEffect({0})"
+        [ChangesState]
         public static extern void RemoveWeatherEffect(weathereffect whichEffect);
 
         /// @CSharpLua.Template = "EnableWeatherEffect({0}, {1})"
+        [ChangesState]
         public static extern void EnableWeatherEffect(weathereffect whichEffect, bool enable);
 
         /// @CSharpLua.Template = "TerrainDeformCrater({0}, {1}, {2}, {3}, {4}, {5})"
+        [CreatesHandle]
         public static extern terraindeformation TerrainDeformCrater(float x, float y, float radius, float depth, int duration, bool permanent);
 
         /// @CSharpLua.Template = "TerrainDeformRipple({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9})"
+        [CreatesHandle]
         public static extern terraindeformation TerrainDeformRipple(float x, float y, float radius, float depth, int duration, int count, float spaceWaves, float timeWaves, float radiusStartPct, bool limitNeg);
 
         /// @CSharpLua.Template = "TerrainDeformWave({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9})"
+        [CreatesHandle]
         public static extern terraindeformation TerrainDeformWave(float x, float y, float dirX, float dirY, float distance, float speed, float radius, float depth, int trailTime, int count);
 
         /// @CSharpLua.Template = "TerrainDeformRandom({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [CreatesHandle]
         public static extern terraindeformation TerrainDeformRandom(float x, float y, float radius, float minDelta, float maxDelta, int duration, int updateInterval);
 
         /// @CSharpLua.Template = "TerrainDeformStop({0}, {1})"
+        [ChangesState]
         public static extern void TerrainDeformStop(terraindeformation deformation, int duration);
 
         /// @CSharpLua.Template = "TerrainDeformStopAll()"
+        [ChangesState]
         public static extern void TerrainDeformStopAll();
 
         /// @CSharpLua.Template = "AddSpecialEffect({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern effect AddSpecialEffect(string modelName, float x, float y);
 
         /// @CSharpLua.Template = "AddSpecialEffectLoc({0}, {1})"
+        [CreatesHandle]
         public static extern effect AddSpecialEffectLoc(string modelName, location where);
 
         /// @CSharpLua.Template = "AddSpecialEffectTarget({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern effect AddSpecialEffectTarget(string modelName, widget targetWidget, string attachPointName);
 
         /// @CSharpLua.Template = "DestroyEffect({0})"
+        [ChangesState]
         public static extern void DestroyEffect(effect whichEffect);
 
         /// @CSharpLua.Template = "AddSpellEffect({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern effect AddSpellEffect(string abilityString, effecttype t, float x, float y);
 
         /// @CSharpLua.Template = "AddSpellEffectLoc({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern effect AddSpellEffectLoc(string abilityString, effecttype t, location where);
 
         /// @CSharpLua.Template = "AddSpellEffectById({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern effect AddSpellEffectById(int abilityId, effecttype t, float x, float y);
 
         /// @CSharpLua.Template = "AddSpellEffectByIdLoc({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern effect AddSpellEffectByIdLoc(int abilityId, effecttype t, location where);
 
         /// @CSharpLua.Template = "AddSpellEffectTarget({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern effect AddSpellEffectTarget(string modelName, effecttype t, widget targetWidget, string attachPoint);
 
         /// @CSharpLua.Template = "AddSpellEffectTargetById({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern effect AddSpellEffectTargetById(int abilityId, effecttype t, widget targetWidget, string attachPoint);
 
         /// @CSharpLua.Template = "AddLightning({0}, {1}, {2}, {3}, {4}, {5})"
+        [CreatesHandle]
         public static extern lightning AddLightning(string codeName, bool checkVisibility, float x1, float y1, float x2, float y2);
 
         /// @CSharpLua.Template = "AddLightningEx({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [CreatesHandle]
         public static extern lightning AddLightningEx(string codeName, bool checkVisibility, float x1, float y1, float z1, float x2, float y2, float z2);
 
         /// @CSharpLua.Template = "DestroyLightning({0})"
+        [ChangesState]
         public static extern bool DestroyLightning(lightning whichBolt);
 
         /// @CSharpLua.Template = "MoveLightning({0}, {1}, {2}, {3}, {4}, {5})"
+        [ChangesState]
         public static extern bool MoveLightning(lightning whichBolt, bool checkVisibility, float x1, float y1, float x2, float y2);
 
         /// @CSharpLua.Template = "MoveLightningEx({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [ChangesState]
         public static extern bool MoveLightningEx(lightning whichBolt, bool checkVisibility, float x1, float y1, float z1, float x2, float y2, float z2);
 
         /// @CSharpLua.Template = "GetLightningColorA({0})"
+        [MachineLocal]
         public static extern float GetLightningColorA(lightning whichBolt);
 
         /// @CSharpLua.Template = "GetLightningColorR({0})"
+        [MachineLocal]
         public static extern float GetLightningColorR(lightning whichBolt);
 
         /// @CSharpLua.Template = "GetLightningColorG({0})"
+        [MachineLocal]
         public static extern float GetLightningColorG(lightning whichBolt);
 
         /// @CSharpLua.Template = "GetLightningColorB({0})"
+        [MachineLocal]
         public static extern float GetLightningColorB(lightning whichBolt);
 
         /// @CSharpLua.Template = "SetLightningColor({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern bool SetLightningColor(lightning whichBolt, float r, float g, float b, float a);
 
         /// @CSharpLua.Template = "GetAbilityEffect({0}, {1}, {2})"
@@ -10480,45 +11145,59 @@ namespace Moonwell
         public static extern int GetTerrainCliffLevel(float x, float y);
 
         /// @CSharpLua.Template = "SetWaterBaseColor({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetWaterBaseColor(int red, int green, int blue, int alpha);
 
         /// @CSharpLua.Template = "SetHDWaterParams({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10})"
+        [ChangesState]
         public static extern void SetHDWaterParams(int red, int green, int blue, bool useColor, int vertexDisplacement, int minOpacity, int maxOpacity, int reflectivity, int emissivity, int edgeSoftness, int waveStrength);
 
         /// @CSharpLua.Template = "SetHDWaterParamsEx({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11})"
+        [ChangesState]
         public static extern void SetHDWaterParamsEx(int red, int green, int blue, bool @override, int vertexDisplacement, int minOpacity, int maxOpacity, int reflectivity, int emissivity, int edgeSoftness, int waveStrength, int envMapStrength);
 
         /// @CSharpLua.Template = "BlzSetHDWaterColor({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetHDWaterColor(int red, int green, int blue);
 
         /// @CSharpLua.Template = "BlzSetHDWaterColorOverride({0})"
+        [ChangesState]
         public static extern void BlzSetHDWaterColorOverride(bool @override);
 
         /// @CSharpLua.Template = "BlzSetHDWaterVertexDisplacement({0})"
+        [ChangesState]
         public static extern void BlzSetHDWaterVertexDisplacement(int vertexDisplacement);
 
         /// @CSharpLua.Template = "BlzSetHDWaterMinOpacity({0})"
+        [ChangesState]
         public static extern void BlzSetHDWaterMinOpacity(int minOpacity);
 
         /// @CSharpLua.Template = "BlzSetHDWaterMaxOpacity({0})"
+        [ChangesState]
         public static extern void BlzSetHDWaterMaxOpacity(int maxOpacity);
 
         /// @CSharpLua.Template = "BlzSetHDWaterReflectivity({0})"
+        [ChangesState]
         public static extern void BlzSetHDWaterReflectivity(int reflectivity);
 
         /// @CSharpLua.Template = "BlzSetHDWaterEmissivity({0})"
+        [ChangesState]
         public static extern void BlzSetHDWaterEmissivity(int emissivity);
 
         /// @CSharpLua.Template = "BlzSetHDWaterEdgeSoftness({0})"
+        [ChangesState]
         public static extern void BlzSetHDWaterEdgeSoftness(int edgeSoftness);
 
         /// @CSharpLua.Template = "BlzSetHDWaterWaveStrength({0})"
+        [ChangesState]
         public static extern void BlzSetHDWaterWaveStrength(int waveStrength);
 
         /// @CSharpLua.Template = "BlzSetHDWaterEnvMapStrength({0})"
+        [ChangesState]
         public static extern void BlzSetHDWaterEnvMapStrength(int envMapStrengthy);
 
         /// @CSharpLua.Template = "SetWaterDeforms({0})"
+        [ChangesState]
         public static extern void SetWaterDeforms(bool val);
 
         /// @CSharpLua.Template = "GetTerrainType({0}, {1})"
@@ -10528,6 +11207,7 @@ namespace Moonwell
         public static extern int GetTerrainVariance(float x, float y);
 
         /// @CSharpLua.Template = "SetTerrainType({0}, {1}, {2}, {3}, {4}, {5})"
+        [ChangesState]
         public static extern void SetTerrainType(float x, float y, int terrainType, int variation, int area, int shape);
 
         /// @CSharpLua.Template = "IsTerrainPathable({0}, {1}, {2})"
@@ -10537,93 +11217,120 @@ namespace Moonwell
         public static extern bool BlzIsTerrainPathableEx(float x, float y, pathingtype t);
 
         /// @CSharpLua.Template = "SetTerrainPathable({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetTerrainPathable(float x, float y, pathingtype t, bool flag);
 
         /// @CSharpLua.Template = "CreateImage({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10})"
+        [CreatesHandle]
         public static extern image CreateImage(string file, float sizeX, float sizeY, float sizeZ, float posX, float posY, float posZ, float originX, float originY, float originZ, int imageType);
 
         /// @CSharpLua.Template = "DestroyImage({0})"
+        [ChangesState]
         public static extern void DestroyImage(image whichImage);
 
         /// @CSharpLua.Template = "ShowImage({0}, {1})"
         public static extern void ShowImage(image whichImage, bool flag);
 
         /// @CSharpLua.Template = "SetImageConstantHeight({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetImageConstantHeight(image whichImage, bool flag, float height);
 
         /// @CSharpLua.Template = "SetImagePosition({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetImagePosition(image whichImage, float x, float y, float z);
 
         /// @CSharpLua.Template = "SetImageColor({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void SetImageColor(image whichImage, int red, int green, int blue, int alpha);
 
         /// @CSharpLua.Template = "SetImageRender({0}, {1})"
+        [ChangesState]
         public static extern void SetImageRender(image whichImage, bool flag);
 
         /// @CSharpLua.Template = "SetImageRenderAlways({0}, {1})"
+        [ChangesState]
         public static extern void SetImageRenderAlways(image whichImage, bool flag);
 
         /// @CSharpLua.Template = "SetImageAboveWater({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetImageAboveWater(image whichImage, bool flag, bool useWaterAlpha);
 
         /// @CSharpLua.Template = "SetImageType({0}, {1})"
+        [ChangesState]
         public static extern void SetImageType(image whichImage, int imageType);
 
         /// @CSharpLua.Template = "CreateUbersplat({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8})"
+        [CreatesHandle]
         public static extern ubersplat CreateUbersplat(float x, float y, string name, int red, int green, int blue, int alpha, bool forcePaused, bool noBirthTime);
 
         /// @CSharpLua.Template = "DestroyUbersplat({0})"
+        [ChangesState]
         public static extern void DestroyUbersplat(ubersplat whichSplat);
 
         /// @CSharpLua.Template = "ResetUbersplat({0})"
+        [ChangesState]
         public static extern void ResetUbersplat(ubersplat whichSplat);
 
         /// @CSharpLua.Template = "FinishUbersplat({0})"
+        [ChangesState]
         public static extern void FinishUbersplat(ubersplat whichSplat);
 
         /// @CSharpLua.Template = "ShowUbersplat({0}, {1})"
         public static extern void ShowUbersplat(ubersplat whichSplat, bool flag);
 
         /// @CSharpLua.Template = "SetUbersplatRender({0}, {1})"
+        [ChangesState]
         public static extern void SetUbersplatRender(ubersplat whichSplat, bool flag);
 
         /// @CSharpLua.Template = "SetUbersplatRenderAlways({0}, {1})"
+        [ChangesState]
         public static extern void SetUbersplatRenderAlways(ubersplat whichSplat, bool flag);
 
         /// @CSharpLua.Template = "SetBlight({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void SetBlight(player whichPlayer, float x, float y, float radius, bool addBlight);
 
         /// @CSharpLua.Template = "SetBlightRect({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetBlightRect(player whichPlayer, rect r, bool addBlight);
 
         /// @CSharpLua.Template = "SetBlightPoint({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetBlightPoint(player whichPlayer, float x, float y, bool addBlight);
 
         /// @CSharpLua.Template = "SetBlightLoc({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetBlightLoc(player whichPlayer, location whichLocation, float radius, bool addBlight);
 
         /// @CSharpLua.Template = "CreateBlightedGoldmine({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern unit CreateBlightedGoldmine(player id, float x, float y, float face);
 
         /// @CSharpLua.Template = "IsPointBlighted({0}, {1})"
         public static extern bool IsPointBlighted(float x, float y);
 
         /// @CSharpLua.Template = "SetDoodadAnimation({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [ChangesState]
         public static extern void SetDoodadAnimation(float x, float y, float radius, int doodadID, bool nearestOnly, string animName, bool animRandom);
 
         /// @CSharpLua.Template = "SetDoodadAnimationRect({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetDoodadAnimationRect(rect r, int doodadID, string animName, bool animRandom);
 
         /// @CSharpLua.Template = "BlzSetSingleDoodadAnimation({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetSingleDoodadAnimation(int index, string animName, bool animRandom);
 
         /// @CSharpLua.Template = "SetDoodadColor({0}, {1}, {2}, {3}, {4}, {5})"
+        [ChangesState]
         public static extern void SetDoodadColor(float x, float y, float radius, int doodadID, bool nearestOnly, playercolor whichColor);
 
         /// @CSharpLua.Template = "SetDoodadColorRect({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetDoodadColorRect(rect r, int doodadID, playercolor whichColor);
 
         /// @CSharpLua.Template = "BlzSetSingleDoodadColor({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetSingleDoodadColor(int index, playercolor whichColor);
 
         /// @CSharpLua.Template = "BlzGetDoodadX({0})"
@@ -10666,30 +11373,38 @@ namespace Moonwell
         public static extern int BlzGetNumDoodads();
 
         /// @CSharpLua.Template = "StartMeleeAI({0}, {1})"
+        [ChangesState]
         public static extern void StartMeleeAI(player num, string script);
 
         /// @CSharpLua.Template = "StartCampaignAI({0}, {1})"
+        [ChangesState]
         public static extern void StartCampaignAI(player num, string script);
 
         /// @CSharpLua.Template = "CommandAI({0}, {1}, {2})"
+        [ChangesState]
         public static extern void CommandAI(player num, int command, int data);
 
         /// @CSharpLua.Template = "PauseCompAI({0}, {1})"
+        [ChangesState]
         public static extern void PauseCompAI(player p, bool pause);
 
         /// @CSharpLua.Template = "GetAIDifficulty({0})"
         public static extern aidifficulty GetAIDifficulty(player num);
 
         /// @CSharpLua.Template = "RemoveGuardPosition({0})"
+        [ChangesState]
         public static extern void RemoveGuardPosition(unit hUnit);
 
         /// @CSharpLua.Template = "RecycleGuardPosition({0})"
+        [ChangesState]
         public static extern void RecycleGuardPosition(unit hUnit);
 
         /// @CSharpLua.Template = "RemoveAllGuardPositions({0})"
+        [ChangesState]
         public static extern void RemoveAllGuardPositions(player num);
 
         /// @CSharpLua.Template = "Cheat({0})"
+        [ChangesState]
         public static extern void Cheat(string cheatStr);
 
         /// @CSharpLua.Template = "IsNoVictoryCheat()"
@@ -10702,15 +11417,19 @@ namespace Moonwell
         public static extern void Preload(string filename);
 
         /// @CSharpLua.Template = "PreloadEnd({0})"
+        [ChangesState]
         public static extern void PreloadEnd(float timeout);
 
         /// @CSharpLua.Template = "PreloadStart()"
+        [ChangesState]
         public static extern void PreloadStart();
 
         /// @CSharpLua.Template = "PreloadRefresh()"
+        [ChangesState]
         public static extern void PreloadRefresh();
 
         /// @CSharpLua.Template = "PreloadEndEx()"
+        [ChangesState]
         public static extern void PreloadEndEx();
 
         /// @CSharpLua.Template = "PreloadGenClear()"
@@ -10723,21 +11442,26 @@ namespace Moonwell
         public static extern void PreloadGenEnd(string filename);
 
         /// @CSharpLua.Template = "Preloader({0})"
+        [ChangesState]
         public static extern void Preloader(string filename);
 
         /// @CSharpLua.Template = "BlzHideCinematicPanels({0})"
         public static extern void BlzHideCinematicPanels(bool enable);
 
         /// @CSharpLua.Template = "AutomationSetTestType({0})"
+        [ChangesState]
         public static extern void AutomationSetTestType(string testType);
 
         /// @CSharpLua.Template = "AutomationTestStart({0})"
+        [ChangesState]
         public static extern void AutomationTestStart(string testName);
 
         /// @CSharpLua.Template = "AutomationTestEnd()"
+        [ChangesState]
         public static extern void AutomationTestEnd();
 
         /// @CSharpLua.Template = "AutomationTestingFinished()"
+        [ChangesState]
         public static extern void AutomationTestingFinished();
 
         /// @CSharpLua.Template = "BlzGetTriggerPlayerMouseX()"
@@ -10747,27 +11471,34 @@ namespace Moonwell
         public static extern float BlzGetTriggerPlayerMouseY();
 
         /// @CSharpLua.Template = "BlzGetTriggerPlayerMousePosition()"
+        [CreatesHandle]
         public static extern location BlzGetTriggerPlayerMousePosition();
 
         /// @CSharpLua.Template = "BlzGetTriggerPlayerMouseButton()"
         public static extern mousebuttontype BlzGetTriggerPlayerMouseButton();
 
         /// @CSharpLua.Template = "BlzSetAbilityTooltip({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetAbilityTooltip(int abilCode, string tooltip, int level);
 
         /// @CSharpLua.Template = "BlzSetAbilityActivatedTooltip({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetAbilityActivatedTooltip(int abilCode, string tooltip, int level);
 
         /// @CSharpLua.Template = "BlzSetAbilityExtendedTooltip({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetAbilityExtendedTooltip(int abilCode, string extendedTooltip, int level);
 
         /// @CSharpLua.Template = "BlzSetAbilityActivatedExtendedTooltip({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetAbilityActivatedExtendedTooltip(int abilCode, string extendedTooltip, int level);
 
         /// @CSharpLua.Template = "BlzSetAbilityResearchTooltip({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetAbilityResearchTooltip(int abilCode, string researchTooltip, int level);
 
         /// @CSharpLua.Template = "BlzSetAbilityResearchExtendedTooltip({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetAbilityResearchExtendedTooltip(int abilCode, string researchExtendedTooltip, int level);
 
         /// @CSharpLua.Template = "BlzGetAbilityTooltip({0}, {1})"
@@ -10789,12 +11520,14 @@ namespace Moonwell
         public static extern string BlzGetAbilityResearchExtendedTooltip(int abilCode, int level);
 
         /// @CSharpLua.Template = "BlzSetAbilityIcon({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetAbilityIcon(int abilCode, string iconPath);
 
         /// @CSharpLua.Template = "BlzGetAbilityIcon({0})"
         public static extern string BlzGetAbilityIcon(int abilCode);
 
         /// @CSharpLua.Template = "BlzSetAbilityActivatedIcon({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetAbilityActivatedIcon(int abilCode, string iconPath);
 
         /// @CSharpLua.Template = "BlzGetAbilityActivatedIcon({0})"
@@ -10807,9 +11540,11 @@ namespace Moonwell
         public static extern int BlzGetAbilityPosY(int abilCode);
 
         /// @CSharpLua.Template = "BlzSetAbilityPosX({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetAbilityPosX(int abilCode, int x);
 
         /// @CSharpLua.Template = "BlzSetAbilityPosY({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetAbilityPosY(int abilCode, int y);
 
         /// @CSharpLua.Template = "BlzGetAbilityActivatedPosX({0})"
@@ -10819,81 +11554,97 @@ namespace Moonwell
         public static extern int BlzGetAbilityActivatedPosY(int abilCode);
 
         /// @CSharpLua.Template = "BlzSetAbilityActivatedPosX({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetAbilityActivatedPosX(int abilCode, int x);
 
         /// @CSharpLua.Template = "BlzSetAbilityActivatedPosY({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetAbilityActivatedPosY(int abilCode, int y);
 
         /// @CSharpLua.Template = "BlzGetUnitMaxHP({0})"
         public static extern int BlzGetUnitMaxHP(unit whichUnit);
 
         /// @CSharpLua.Template = "BlzSetUnitMaxHP({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetUnitMaxHP(unit whichUnit, int hp);
 
         /// @CSharpLua.Template = "BlzGetUnitMaxMana({0})"
         public static extern int BlzGetUnitMaxMana(unit whichUnit);
 
         /// @CSharpLua.Template = "BlzSetUnitMaxMana({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetUnitMaxMana(unit whichUnit, int mana);
 
         /// @CSharpLua.Template = "BlzSetItemName({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetItemName(item whichItem, string name);
 
         /// @CSharpLua.Template = "BlzSetItemDescription({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetItemDescription(item whichItem, string description);
 
         /// @CSharpLua.Template = "BlzGetItemDescription({0})"
         public static extern string BlzGetItemDescription(item whichItem);
 
         /// @CSharpLua.Template = "BlzSetItemTooltip({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetItemTooltip(item whichItem, string tooltip);
 
         /// @CSharpLua.Template = "BlzGetItemTooltip({0})"
         public static extern string BlzGetItemTooltip(item whichItem);
 
         /// @CSharpLua.Template = "BlzSetItemExtendedTooltip({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetItemExtendedTooltip(item whichItem, string extendedTooltip);
 
         /// @CSharpLua.Template = "BlzGetItemExtendedTooltip({0})"
         public static extern string BlzGetItemExtendedTooltip(item whichItem);
 
         /// @CSharpLua.Template = "BlzSetItemIconPath({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetItemIconPath(item whichItem, string iconPath);
 
         /// @CSharpLua.Template = "BlzGetItemIconPath({0})"
         public static extern string BlzGetItemIconPath(item whichItem);
 
         /// @CSharpLua.Template = "BlzSetUnitName({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetUnitName(unit whichUnit, string name);
 
         /// @CSharpLua.Template = "BlzSetHeroProperName({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetHeroProperName(unit whichUnit, string heroProperName);
 
         /// @CSharpLua.Template = "BlzGetUnitBaseDamage({0}, {1})"
         public static extern int BlzGetUnitBaseDamage(unit whichUnit, int weaponIndex);
 
         /// @CSharpLua.Template = "BlzSetUnitBaseDamage({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetUnitBaseDamage(unit whichUnit, int baseDamage, int weaponIndex);
 
         /// @CSharpLua.Template = "BlzGetUnitDiceNumber({0}, {1})"
         public static extern int BlzGetUnitDiceNumber(unit whichUnit, int weaponIndex);
 
         /// @CSharpLua.Template = "BlzSetUnitDiceNumber({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetUnitDiceNumber(unit whichUnit, int diceNumber, int weaponIndex);
 
         /// @CSharpLua.Template = "BlzGetUnitDiceSides({0}, {1})"
         public static extern int BlzGetUnitDiceSides(unit whichUnit, int weaponIndex);
 
         /// @CSharpLua.Template = "BlzSetUnitDiceSides({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetUnitDiceSides(unit whichUnit, int diceSides, int weaponIndex);
 
         /// @CSharpLua.Template = "BlzGetUnitAttackCooldown({0}, {1})"
         public static extern float BlzGetUnitAttackCooldown(unit whichUnit, int weaponIndex);
 
         /// @CSharpLua.Template = "BlzSetUnitAttackCooldown({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetUnitAttackCooldown(unit whichUnit, float cooldown, int weaponIndex);
 
         /// @CSharpLua.Template = "BlzResetUnitAttack({0}, {1})"
+        [ChangesState]
         public static extern void BlzResetUnitAttack(unit whichUnit, int weaponIndex);
 
         /// @CSharpLua.Template = "BlzSetSpecialEffectColorByPlayer({0}, {1})"
@@ -10945,33 +11696,42 @@ namespace Moonwell
         public static extern void BlzSetSpecialEffectPositionLoc(effect whichEffect, location loc);
 
         /// @CSharpLua.Template = "BlzGetLocalSpecialEffectX({0})"
+        [MachineLocal]
         public static extern float BlzGetLocalSpecialEffectX(effect whichEffect);
 
         /// @CSharpLua.Template = "BlzGetLocalSpecialEffectY({0})"
+        [MachineLocal]
         public static extern float BlzGetLocalSpecialEffectY(effect whichEffect);
 
         /// @CSharpLua.Template = "BlzGetLocalSpecialEffectZ({0})"
+        [MachineLocal]
         public static extern float BlzGetLocalSpecialEffectZ(effect whichEffect);
 
         /// @CSharpLua.Template = "BlzSpecialEffectClearSubAnimations({0})"
+        [ChangesState]
         public static extern void BlzSpecialEffectClearSubAnimations(effect whichEffect);
 
         /// @CSharpLua.Template = "BlzSpecialEffectRemoveSubAnimation({0}, {1})"
+        [ChangesState]
         public static extern void BlzSpecialEffectRemoveSubAnimation(effect whichEffect, subanimtype whichSubAnim);
 
         /// @CSharpLua.Template = "BlzSpecialEffectAddSubAnimation({0}, {1})"
+        [ChangesState]
         public static extern void BlzSpecialEffectAddSubAnimation(effect whichEffect, subanimtype whichSubAnim);
 
         /// @CSharpLua.Template = "BlzPlaySpecialEffect({0}, {1})"
+        [ChangesState]
         public static extern void BlzPlaySpecialEffect(effect whichEffect, animtype whichAnim);
 
         /// @CSharpLua.Template = "BlzPlaySpecialEffectWithTimeScale({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzPlaySpecialEffectWithTimeScale(effect whichEffect, animtype whichAnim, float timeScale);
 
         /// @CSharpLua.Template = "BlzSetSpecialEffectAnimationBlendTime({0}, {1})"
         public static extern void BlzSetSpecialEffectAnimationBlendTime(effect whichEffect, float blendTime);
 
         /// @CSharpLua.Template = "BlzQueueSpecialEffectAnimation({0}, {1})"
+        [ChangesState]
         public static extern void BlzQueueSpecialEffectAnimation(effect whichEffect, string whichAnimation);
 
         /// @CSharpLua.Template = "BlzSetSpecialEffectAnimation({0}, {1})"
@@ -10984,18 +11744,23 @@ namespace Moonwell
         public static extern float BlzGetUnitArmor(unit whichUnit);
 
         /// @CSharpLua.Template = "BlzSetUnitArmor({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetUnitArmor(unit whichUnit, float armorAmount);
 
         /// @CSharpLua.Template = "BlzUnitHideAbility({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzUnitHideAbility(unit whichUnit, int abilId, bool flag);
 
         /// @CSharpLua.Template = "BlzUnitDisableAbility({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzUnitDisableAbility(unit whichUnit, int abilId, bool flag, bool hideUI);
 
         /// @CSharpLua.Template = "BlzUnitEnableAuras({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzUnitEnableAuras(unit whichUnit, bool enable, bool affectsUI);
 
         /// @CSharpLua.Template = "BlzUnitCancelTimedLife({0})"
+        [ChangesState]
         public static extern void BlzUnitCancelTimedLife(unit whichUnit);
 
         /// @CSharpLua.Template = "BlzIsUnitSelectable({0})"
@@ -11005,6 +11770,7 @@ namespace Moonwell
         public static extern bool BlzIsUnitInvulnerable(unit whichUnit);
 
         /// @CSharpLua.Template = "BlzUnitInterruptAttack({0})"
+        [ChangesState]
         public static extern void BlzUnitInterruptAttack(unit whichUnit);
 
         /// @CSharpLua.Template = "BlzGetUnitCollisionSize({0})"
@@ -11017,6 +11783,7 @@ namespace Moonwell
         public static extern float BlzGetAbilityCooldown(int abilId, int level);
 
         /// @CSharpLua.Template = "BlzSetUnitAbilityCooldown({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzSetUnitAbilityCooldown(unit whichUnit, int abilId, int level, float cooldown);
 
         /// @CSharpLua.Template = "BlzGetUnitAbilityCooldown({0}, {1}, {2})"
@@ -11029,36 +11796,46 @@ namespace Moonwell
         public static extern float BlzGetUnitAbilityCooldownPercent(unit whichUnit, int abilId);
 
         /// @CSharpLua.Template = "BlzSetUnitAbilityCooldownRemaining({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetUnitAbilityCooldownRemaining(unit whichUnit, int abilId, float duration);
 
         /// @CSharpLua.Template = "BlzSetUnitAbilityCooldownPercent({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetUnitAbilityCooldownPercent(unit whichUnit, int abilId, float percent);
 
         /// @CSharpLua.Template = "BlzAdjustUnitAbilityCooldownRemaining({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzAdjustUnitAbilityCooldownRemaining(unit whichUnit, int abilId, float duration);
 
         /// @CSharpLua.Template = "BlzAdjustUnitAbilityCooldownPercent({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzAdjustUnitAbilityCooldownPercent(unit whichUnit, int abilId, float percent);
 
         /// @CSharpLua.Template = "BlzEndUnitAbilityCooldown({0}, {1})"
+        [ChangesState]
         public static extern void BlzEndUnitAbilityCooldown(unit whichUnit, int abilCode);
 
         /// @CSharpLua.Template = "BlzStartUnitAbilityCooldown({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzStartUnitAbilityCooldown(unit whichUnit, int abilCode, float cooldown);
 
         /// @CSharpLua.Template = "BlzGetUnitAbilityManaCost({0}, {1}, {2})"
         public static extern int BlzGetUnitAbilityManaCost(unit whichUnit, int abilId, int level);
 
         /// @CSharpLua.Template = "BlzSetUnitAbilityManaCost({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzSetUnitAbilityManaCost(unit whichUnit, int abilId, int level, int manaCost);
 
         /// @CSharpLua.Template = "BlzGetLocalUnitZ({0})"
+        [MachineLocal]
         public static extern float BlzGetLocalUnitZ(unit whichUnit);
 
         /// @CSharpLua.Template = "BlzDecPlayerTechResearched({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzDecPlayerTechResearched(player whichPlayer, int techid, int levels);
 
         /// @CSharpLua.Template = "BlzSetEventDamage({0})"
+        [ChangesState]
         public static extern void BlzSetEventDamage(float damage);
 
         /// @CSharpLua.Template = "BlzGetEventDamageTarget()"
@@ -11074,54 +11851,67 @@ namespace Moonwell
         public static extern weapontype BlzGetEventWeaponType();
 
         /// @CSharpLua.Template = "BlzSetEventAttackType({0})"
+        [ChangesState]
         public static extern bool BlzSetEventAttackType(attacktype attackType);
 
         /// @CSharpLua.Template = "BlzSetEventDamageType({0})"
+        [ChangesState]
         public static extern bool BlzSetEventDamageType(damagetype damageType);
 
         /// @CSharpLua.Template = "BlzSetEventWeaponType({0})"
+        [ChangesState]
         public static extern bool BlzSetEventWeaponType(weapontype weaponType);
 
         /// @CSharpLua.Template = "BlzGetEventIsAttack()"
         public static extern bool BlzGetEventIsAttack();
 
         /// @CSharpLua.Template = "BlzGetUnitZ({0})"
+        [MachineLocal]
         public static extern float BlzGetUnitZ(unit whichUnit);
 
         /// @CSharpLua.Template = "BlzEnableSelections({0}, {1})"
         public static extern void BlzEnableSelections(bool enableSelection, bool enableSelectionCircle);
 
         /// @CSharpLua.Template = "BlzIsSelectionEnabled()"
+        [MachineLocal]
         public static extern bool BlzIsSelectionEnabled();
 
         /// @CSharpLua.Template = "BlzIsSelectionCircleEnabled()"
+        [MachineLocal]
         public static extern bool BlzIsSelectionCircleEnabled();
 
         /// @CSharpLua.Template = "BlzCameraSetupApplyForceDurationSmooth({0}, {1}, {2}, {3}, {4}, {5})"
         public static extern void BlzCameraSetupApplyForceDurationSmooth(camerasetup whichSetup, bool doPan, float forcedDuration, float easeInDuration, float easeOutDuration, float smoothFactor);
 
         /// @CSharpLua.Template = "BlzEnableTargetIndicator({0})"
+        [ChangesState]
         public static extern void BlzEnableTargetIndicator(bool enable);
 
         /// @CSharpLua.Template = "BlzIsTargetIndicatorEnabled()"
         public static extern bool BlzIsTargetIndicatorEnabled();
 
         /// @CSharpLua.Template = "BlzShowTerrain({0})"
+        [ChangesState]
         public static extern void BlzShowTerrain(bool show);
 
         /// @CSharpLua.Template = "BlzShowSkyBox({0})"
+        [ChangesState]
         public static extern void BlzShowSkyBox(bool show);
 
         /// @CSharpLua.Template = "BlzStartRecording({0})"
+        [ChangesState]
         public static extern void BlzStartRecording(int fps);
 
         /// @CSharpLua.Template = "BlzEndRecording()"
+        [ChangesState]
         public static extern void BlzEndRecording();
 
         /// @CSharpLua.Template = "BlzShowUnitTeamGlow({0}, {1})"
+        [ChangesState]
         public static extern void BlzShowUnitTeamGlow(unit whichUnit, bool show);
 
         /// @CSharpLua.Template = "BlzGetOriginFrame({0}, {1})"
+        [CreatesHandle]
         public static extern framehandle BlzGetOriginFrame(originframetype frameType, int index);
 
         /// @CSharpLua.Template = "BlzEnableUIAutoPosition({0})"
@@ -11134,18 +11924,23 @@ namespace Moonwell
         public static extern int BlzConvertColor(int a, int r, int g, int b);
 
         /// @CSharpLua.Template = "BlzLoadTOCFile({0})"
+        [ChangesState]
         public static extern bool BlzLoadTOCFile(string TOCFile);
 
         /// @CSharpLua.Template = "BlzCreateFrame({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern framehandle BlzCreateFrame(string name, framehandle owner, int priority, int createContext);
 
         /// @CSharpLua.Template = "BlzCreateSimpleFrame({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern framehandle BlzCreateSimpleFrame(string name, framehandle owner, int createContext);
 
         /// @CSharpLua.Template = "BlzCreateFrameByType({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle]
         public static extern framehandle BlzCreateFrameByType(string typeName, string name, framehandle owner, string inherits, int createContext);
 
         /// @CSharpLua.Template = "BlzDestroyFrame({0})"
+        [ChangesState]
         public static extern void BlzDestroyFrame(framehandle frame);
 
         /// @CSharpLua.Template = "BlzFrameSetPoint({0}, {1}, {2}, {3}, {4}, {5})"
@@ -11164,21 +11959,26 @@ namespace Moonwell
         public static extern void BlzFrameSetVisible(framehandle frame, bool visible);
 
         /// @CSharpLua.Template = "BlzFrameIsVisible({0})"
+        [MachineLocal]
         public static extern bool BlzFrameIsVisible(framehandle frame);
 
         /// @CSharpLua.Template = "BlzGetFrameByName({0}, {1})"
+        [CreatesHandle]
         public static extern framehandle BlzGetFrameByName(string name, int createContext);
 
         /// @CSharpLua.Template = "BlzFrameGetName({0})"
+        [MachineLocal]
         public static extern string BlzFrameGetName(framehandle frame);
 
         /// @CSharpLua.Template = "BlzFrameClick({0})"
+        [ChangesState]
         public static extern void BlzFrameClick(framehandle frame);
 
         /// @CSharpLua.Template = "BlzFrameSetText({0}, {1})"
         public static extern void BlzFrameSetText(framehandle frame, string text);
 
         /// @CSharpLua.Template = "BlzFrameGetText({0})"
+        [MachineLocal]
         public static extern string BlzFrameGetText(framehandle frame);
 
         /// @CSharpLua.Template = "BlzFrameAddText({0}, {1})"
@@ -11188,6 +11988,7 @@ namespace Moonwell
         public static extern void BlzFrameSetTextSizeLimit(framehandle frame, int size);
 
         /// @CSharpLua.Template = "BlzFrameGetTextSizeLimit({0})"
+        [MachineLocal]
         public static extern int BlzFrameGetTextSizeLimit(framehandle frame);
 
         /// @CSharpLua.Template = "BlzFrameSetTextColor({0}, {1})"
@@ -11203,12 +12004,14 @@ namespace Moonwell
         public static extern void BlzFrameSetEnable(framehandle frame, bool enabled);
 
         /// @CSharpLua.Template = "BlzFrameGetEnable({0})"
+        [MachineLocal]
         public static extern bool BlzFrameGetEnable(framehandle frame);
 
         /// @CSharpLua.Template = "BlzFrameSetAlpha({0}, {1})"
         public static extern void BlzFrameSetAlpha(framehandle frame, int alpha);
 
         /// @CSharpLua.Template = "BlzFrameGetAlpha({0})"
+        [MachineLocal]
         public static extern int BlzFrameGetAlpha(framehandle frame);
 
         /// @CSharpLua.Template = "BlzFrameSetSpriteAnimate({0}, {1}, {2})"
@@ -11230,6 +12033,7 @@ namespace Moonwell
         public static extern void BlzFrameSetValue(framehandle frame, float value);
 
         /// @CSharpLua.Template = "BlzFrameGetValue({0})"
+        [MachineLocal]
         public static extern float BlzFrameGetValue(framehandle frame);
 
         /// @CSharpLua.Template = "BlzTextAreaFrameSetAutoScroll({0}, {1})"
@@ -11254,12 +12058,15 @@ namespace Moonwell
         public static extern void BlzFrameSetParent(framehandle frame, framehandle parent);
 
         /// @CSharpLua.Template = "BlzFrameGetParent({0})"
+        [CreatesHandle]
         public static extern framehandle BlzFrameGetParent(framehandle frame);
 
         /// @CSharpLua.Template = "BlzFrameGetHeight({0})"
+        [MachineLocal]
         public static extern float BlzFrameGetHeight(framehandle frame);
 
         /// @CSharpLua.Template = "BlzFrameGetWidth({0})"
+        [MachineLocal]
         public static extern float BlzFrameGetWidth(framehandle frame);
 
         /// @CSharpLua.Template = "BlzFrameSetFont({0}, {1}, {2}, {3})"
@@ -11269,12 +12076,15 @@ namespace Moonwell
         public static extern void BlzFrameSetTextAlignment(framehandle frame, textaligntype vert, textaligntype horz);
 
         /// @CSharpLua.Template = "BlzFrameGetChildrenCount({0})"
+        [MachineLocal]
         public static extern int BlzFrameGetChildrenCount(framehandle frame);
 
         /// @CSharpLua.Template = "BlzFrameGetChild({0}, {1})"
+        [CreatesHandle]
         public static extern framehandle BlzFrameGetChild(framehandle frame, int index);
 
         /// @CSharpLua.Template = "BlzTriggerRegisterFrameEvent({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern @event BlzTriggerRegisterFrameEvent(trigger whichTrigger, framehandle frame, frameeventtype eventId);
 
         /// @CSharpLua.Template = "BlzGetTriggerFrame()"
@@ -11290,9 +12100,11 @@ namespace Moonwell
         public static extern string BlzGetTriggerFrameText();
 
         /// @CSharpLua.Template = "BlzTriggerRegisterPlayerSyncEvent({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern @event BlzTriggerRegisterPlayerSyncEvent(trigger whichTrigger, player whichPlayer, string prefix, bool fromServer);
 
         /// @CSharpLua.Template = "BlzSendSyncData({0}, {1})"
+        [ChangesState]
         public static extern bool BlzSendSyncData(string prefix, string data);
 
         /// @CSharpLua.Template = "BlzGetTriggerSyncPrefix()"
@@ -11302,6 +12114,7 @@ namespace Moonwell
         public static extern string BlzGetTriggerSyncData();
 
         /// @CSharpLua.Template = "BlzTriggerRegisterPlayerKeyEvent({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle]
         public static extern @event BlzTriggerRegisterPlayerKeyEvent(trigger whichTrigger, player whichPlayer, oskeytype key, int metaKey, bool keyDown);
 
         /// @CSharpLua.Template = "BlzGetTriggerPlayerKey()"
@@ -11314,18 +12127,23 @@ namespace Moonwell
         public static extern bool BlzGetTriggerPlayerIsKeyDown();
 
         /// @CSharpLua.Template = "BlzIsMetaKeyPressed({0})"
+        [MachineLocal]
         public static extern bool BlzIsMetaKeyPressed(int metakey);
 
         /// @CSharpLua.Template = "BlzIsKeyPressed({0})"
+        [MachineLocal]
         public static extern bool BlzIsKeyPressed(oskeytype key);
 
         /// @CSharpLua.Template = "BlzIsMouseButtonPressed({0})"
+        [MachineLocal]
         public static extern bool BlzIsMouseButtonPressed(mousebuttontype mouseButtonType);
 
         /// @CSharpLua.Template = "BlzGetMouseScreenPosX()"
+        [MachineLocal]
         public static extern int BlzGetMouseScreenPosX();
 
         /// @CSharpLua.Template = "BlzGetMouseScreenPosY()"
+        [MachineLocal]
         public static extern int BlzGetMouseScreenPosY();
 
         /// @CSharpLua.Template = "BlzEnableCursor({0})"
@@ -11335,42 +12153,53 @@ namespace Moonwell
         public static extern void BlzSetMousePos(int x, int y);
 
         /// @CSharpLua.Template = "BlzGetLocalClientWidth()"
+        [MachineLocal]
         public static extern int BlzGetLocalClientWidth();
 
         /// @CSharpLua.Template = "BlzGetLocalClientHeight()"
+        [MachineLocal]
         public static extern int BlzGetLocalClientHeight();
 
         /// @CSharpLua.Template = "BlzIsLocalClientActive()"
+        [MachineLocal]
         public static extern bool BlzIsLocalClientActive();
 
         /// @CSharpLua.Template = "BlzGetMouseFocusUnit()"
+        [MachineLocal]
         public static extern unit BlzGetMouseFocusUnit();
 
         /// @CSharpLua.Template = "BlzPixelToFrameX({0})"
+        [ChangesState]
         public static extern float BlzPixelToFrameX(int pixelX);
 
         /// @CSharpLua.Template = "BlzPixelToFrameY({0})"
+        [ChangesState]
         public static extern float BlzPixelToFrameY(int pixelY);
 
         /// @CSharpLua.Template = "BlzFrameToPixelX({0})"
+        [MachineLocal]
         public static extern int BlzFrameToPixelX(float frameX);
 
         /// @CSharpLua.Template = "BlzFrameToPixelY({0})"
+        [MachineLocal]
         public static extern int BlzFrameToPixelY(float frameY);
 
         /// @CSharpLua.Template = "BlzChangeMinimapTerrainTex({0})"
         public static extern bool BlzChangeMinimapTerrainTex(string texFile);
 
         /// @CSharpLua.Template = "BlzGetLocale()"
+        [MachineLocal]
         public static extern string BlzGetLocale();
 
         /// @CSharpLua.Template = "BlzGetSpecialEffectScale({0})"
+        [MachineLocal]
         public static extern float BlzGetSpecialEffectScale(effect whichEffect);
 
         /// @CSharpLua.Template = "BlzSetSpecialEffectMatrixScale({0}, {1}, {2}, {3})"
         public static extern void BlzSetSpecialEffectMatrixScale(effect whichEffect, float x, float y, float z);
 
         /// @CSharpLua.Template = "BlzResetSpecialEffectMatrix({0})"
+        [ChangesState]
         public static extern void BlzResetSpecialEffectMatrix(effect whichEffect);
 
         /// @CSharpLua.Template = "BlzGetUnitAbility({0}, {1})"
@@ -11386,21 +12215,27 @@ namespace Moonwell
         public static extern void BlzDisplayChatMessage(player whichPlayer, int recipient, string message);
 
         /// @CSharpLua.Template = "BlzPauseUnitEx({0}, {1})"
+        [ChangesState]
         public static extern void BlzPauseUnitEx(unit whichUnit, bool flag);
 
         /// @CSharpLua.Template = "BlzSetUnitFacingEx({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetUnitFacingEx(unit whichUnit, float facingAngle);
 
         /// @CSharpLua.Template = "CreateCommandButtonEffect({0}, {1})"
+        [CreatesHandle]
         public static extern commandbuttoneffect CreateCommandButtonEffect(int abilityId, string order);
 
         /// @CSharpLua.Template = "CreateUpgradeCommandButtonEffect({0})"
+        [CreatesHandle]
         public static extern commandbuttoneffect CreateUpgradeCommandButtonEffect(int whichUprgade);
 
         /// @CSharpLua.Template = "CreateLearnCommandButtonEffect({0})"
+        [CreatesHandle]
         public static extern commandbuttoneffect CreateLearnCommandButtonEffect(int abilityId);
 
         /// @CSharpLua.Template = "DestroyCommandButtonEffect({0})"
+        [ChangesState]
         public static extern void DestroyCommandButtonEffect(commandbuttoneffect whichEffect);
 
         /// @CSharpLua.Template = "BlzBitOr({0}, {1})"
@@ -11449,63 +12284,83 @@ namespace Moonwell
         public static extern string BlzGetAbilityStringLevelArrayField(ability whichAbility, abilitystringlevelarrayfield whichField, int level, int index);
 
         /// @CSharpLua.Template = "BlzSetAbilityBooleanField({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool BlzSetAbilityBooleanField(ability whichAbility, abilitybooleanfield whichField, bool value);
 
         /// @CSharpLua.Template = "BlzSetAbilityIntegerField({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool BlzSetAbilityIntegerField(ability whichAbility, abilityintegerfield whichField, int value);
 
         /// @CSharpLua.Template = "BlzSetAbilityRealField({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool BlzSetAbilityRealField(ability whichAbility, abilityrealfield whichField, float value);
 
         /// @CSharpLua.Template = "BlzSetAbilityStringField({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool BlzSetAbilityStringField(ability whichAbility, abilitystringfield whichField, string value);
 
         /// @CSharpLua.Template = "BlzSetAbilityBooleanLevelField({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzSetAbilityBooleanLevelField(ability whichAbility, abilitybooleanlevelfield whichField, int level, bool value);
 
         /// @CSharpLua.Template = "BlzSetAbilityIntegerLevelField({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzSetAbilityIntegerLevelField(ability whichAbility, abilityintegerlevelfield whichField, int level, int value);
 
         /// @CSharpLua.Template = "BlzSetAbilityRealLevelField({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzSetAbilityRealLevelField(ability whichAbility, abilityreallevelfield whichField, int level, float value);
 
         /// @CSharpLua.Template = "BlzSetAbilityStringLevelField({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzSetAbilityStringLevelField(ability whichAbility, abilitystringlevelfield whichField, int level, string value);
 
         /// @CSharpLua.Template = "BlzSetAbilityBooleanLevelArrayField({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern bool BlzSetAbilityBooleanLevelArrayField(ability whichAbility, abilitybooleanlevelarrayfield whichField, int level, int index, bool value);
 
         /// @CSharpLua.Template = "BlzSetAbilityIntegerLevelArrayField({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern bool BlzSetAbilityIntegerLevelArrayField(ability whichAbility, abilityintegerlevelarrayfield whichField, int level, int index, int value);
 
         /// @CSharpLua.Template = "BlzSetAbilityRealLevelArrayField({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern bool BlzSetAbilityRealLevelArrayField(ability whichAbility, abilityreallevelarrayfield whichField, int level, int index, float value);
 
         /// @CSharpLua.Template = "BlzSetAbilityStringLevelArrayField({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern bool BlzSetAbilityStringLevelArrayField(ability whichAbility, abilitystringlevelarrayfield whichField, int level, int index, string value);
 
         /// @CSharpLua.Template = "BlzAddAbilityBooleanLevelArrayField({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzAddAbilityBooleanLevelArrayField(ability whichAbility, abilitybooleanlevelarrayfield whichField, int level, bool value);
 
         /// @CSharpLua.Template = "BlzAddAbilityIntegerLevelArrayField({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzAddAbilityIntegerLevelArrayField(ability whichAbility, abilityintegerlevelarrayfield whichField, int level, int value);
 
         /// @CSharpLua.Template = "BlzAddAbilityRealLevelArrayField({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzAddAbilityRealLevelArrayField(ability whichAbility, abilityreallevelarrayfield whichField, int level, float value);
 
         /// @CSharpLua.Template = "BlzAddAbilityStringLevelArrayField({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzAddAbilityStringLevelArrayField(ability whichAbility, abilitystringlevelarrayfield whichField, int level, string value);
 
         /// @CSharpLua.Template = "BlzRemoveAbilityBooleanLevelArrayField({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzRemoveAbilityBooleanLevelArrayField(ability whichAbility, abilitybooleanlevelarrayfield whichField, int level, bool value);
 
         /// @CSharpLua.Template = "BlzRemoveAbilityIntegerLevelArrayField({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzRemoveAbilityIntegerLevelArrayField(ability whichAbility, abilityintegerlevelarrayfield whichField, int level, int value);
 
         /// @CSharpLua.Template = "BlzRemoveAbilityRealLevelArrayField({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzRemoveAbilityRealLevelArrayField(ability whichAbility, abilityreallevelarrayfield whichField, int level, float value);
 
         /// @CSharpLua.Template = "BlzRemoveAbilityStringLevelArrayField({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzRemoveAbilityStringLevelArrayField(ability whichAbility, abilitystringlevelarrayfield whichField, int level, string value);
 
         /// @CSharpLua.Template = "BlzGetItemAbilityByIndex({0}, {1})"
@@ -11515,6 +12370,7 @@ namespace Moonwell
         public static extern ability BlzGetItemAbility(item whichItem, int abilCode);
 
         /// @CSharpLua.Template = "BlzItemAddAbility({0}, {1})"
+        [ChangesState]
         public static extern bool BlzItemAddAbility(item whichItem, int abilCode);
 
         /// @CSharpLua.Template = "BlzGetItemBooleanField({0}, {1})"
@@ -11530,18 +12386,23 @@ namespace Moonwell
         public static extern string BlzGetItemStringField(item whichItem, itemstringfield whichField);
 
         /// @CSharpLua.Template = "BlzSetItemBooleanField({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool BlzSetItemBooleanField(item whichItem, itembooleanfield whichField, bool value);
 
         /// @CSharpLua.Template = "BlzSetItemIntegerField({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool BlzSetItemIntegerField(item whichItem, itemintegerfield whichField, int value);
 
         /// @CSharpLua.Template = "BlzSetItemRealField({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool BlzSetItemRealField(item whichItem, itemrealfield whichField, float value);
 
         /// @CSharpLua.Template = "BlzSetItemStringField({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool BlzSetItemStringField(item whichItem, itemstringfield whichField, string value);
 
         /// @CSharpLua.Template = "BlzItemRemoveAbility({0}, {1})"
+        [ChangesState]
         public static extern bool BlzItemRemoveAbility(item whichItem, int abilCode);
 
         /// @CSharpLua.Template = "BlzGetUnitBooleanField({0}, {1})"
@@ -11557,15 +12418,19 @@ namespace Moonwell
         public static extern string BlzGetUnitStringField(unit whichUnit, unitstringfield whichField);
 
         /// @CSharpLua.Template = "BlzSetUnitBooleanField({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool BlzSetUnitBooleanField(unit whichUnit, unitbooleanfield whichField, bool value);
 
         /// @CSharpLua.Template = "BlzSetUnitIntegerField({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool BlzSetUnitIntegerField(unit whichUnit, unitintegerfield whichField, int value);
 
         /// @CSharpLua.Template = "BlzSetUnitRealField({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool BlzSetUnitRealField(unit whichUnit, unitrealfield whichField, float value);
 
         /// @CSharpLua.Template = "BlzSetUnitStringField({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool BlzSetUnitStringField(unit whichUnit, unitstringfield whichField, string value);
 
         /// @CSharpLua.Template = "BlzGetUnitWeaponBooleanField({0}, {1}, {2})"
@@ -11581,15 +12446,19 @@ namespace Moonwell
         public static extern string BlzGetUnitWeaponStringField(unit whichUnit, unitweaponstringfield whichField, int index);
 
         /// @CSharpLua.Template = "BlzSetUnitWeaponBooleanField({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzSetUnitWeaponBooleanField(unit whichUnit, unitweaponbooleanfield whichField, int index, bool value);
 
         /// @CSharpLua.Template = "BlzSetUnitWeaponIntegerField({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzSetUnitWeaponIntegerField(unit whichUnit, unitweaponintegerfield whichField, int index, int value);
 
         /// @CSharpLua.Template = "BlzSetUnitWeaponRealField({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzSetUnitWeaponRealField(unit whichUnit, unitweaponrealfield whichField, int index, float value);
 
         /// @CSharpLua.Template = "BlzSetUnitWeaponStringField({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzSetUnitWeaponStringField(unit whichUnit, unitweaponstringfield whichField, int index, string value);
 
         /// @CSharpLua.Template = "BlzGetUnitSkin({0})"
@@ -11599,150 +12468,196 @@ namespace Moonwell
         public static extern int BlzGetItemSkin(item whichItem);
 
         /// @CSharpLua.Template = "BlzSetUnitSkin({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetUnitSkin(unit whichUnit, int skinId);
 
         /// @CSharpLua.Template = "BlzSetItemSkin({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetItemSkin(item whichItem, int skinId);
 
         /// @CSharpLua.Template = "BlzCreateItemWithSkin({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern item BlzCreateItemWithSkin(int itemid, float x, float y, int skinId);
 
         /// @CSharpLua.Template = "BlzCreateUnitWithSkin({0}, {1}, {2}, {3}, {4}, {5})"
+        [CreatesHandle]
         public static extern unit BlzCreateUnitWithSkin(player id, int unitid, float x, float y, float face, int skinId);
 
         /// @CSharpLua.Template = "BlzCreateDestructableWithSkin({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDestructableWithSkin(int objectid, float x, float y, float face, float scale, int variation, int skinId);
 
         /// @CSharpLua.Template = "BlzCreateDestructableZWithSkin({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDestructableZWithSkin(int objectid, float x, float y, float z, float face, float scale, int variation, int skinId);
 
         /// @CSharpLua.Template = "BlzCreateDeadDestructableWithSkin({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDeadDestructableWithSkin(int objectid, float x, float y, float face, float scale, int variation, int skinId);
 
         /// @CSharpLua.Template = "BlzCreateDeadDestructableZWithSkin({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDeadDestructableZWithSkin(int objectid, float x, float y, float z, float face, float scale, int variation, int skinId);
 
         /// @CSharpLua.Template = "BlzGetPlayerTownHallCount({0})"
         public static extern int BlzGetPlayerTownHallCount(player whichPlayer);
 
         /// @CSharpLua.Template = "BlzQueueImmediateOrderById({0}, {1})"
+        [ChangesState]
         public static extern bool BlzQueueImmediateOrderById(unit whichUnit, int order);
 
         /// @CSharpLua.Template = "BlzQueuePointOrderById({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzQueuePointOrderById(unit whichUnit, int order, float x, float y);
 
         /// @CSharpLua.Template = "BlzQueueTargetOrderById({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool BlzQueueTargetOrderById(unit whichUnit, int order, widget targetWidget);
 
         /// @CSharpLua.Template = "BlzQueueInstantPointOrderById({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern bool BlzQueueInstantPointOrderById(unit whichUnit, int order, float x, float y, widget instantTargetWidget);
 
         /// @CSharpLua.Template = "BlzQueueInstantTargetOrderById({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzQueueInstantTargetOrderById(unit whichUnit, int order, widget targetWidget, widget instantTargetWidget);
 
         /// @CSharpLua.Template = "BlzQueueBuildOrderById({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzQueueBuildOrderById(unit whichPeon, int unitId, float x, float y);
 
         /// @CSharpLua.Template = "BlzQueueNeutralImmediateOrderById({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool BlzQueueNeutralImmediateOrderById(player forWhichPlayer, unit neutralStructure, int unitId);
 
         /// @CSharpLua.Template = "BlzQueueNeutralPointOrderById({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern bool BlzQueueNeutralPointOrderById(player forWhichPlayer, unit neutralStructure, int unitId, float x, float y);
 
         /// @CSharpLua.Template = "BlzQueueNeutralTargetOrderById({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool BlzQueueNeutralTargetOrderById(player forWhichPlayer, unit neutralStructure, int unitId, widget target);
 
         /// @CSharpLua.Template = "BlzGetUnitOrderCount({0})"
         public static extern int BlzGetUnitOrderCount(unit whichUnit);
 
         /// @CSharpLua.Template = "BlzUnitClearOrders({0}, {1})"
+        [ChangesState]
         public static extern void BlzUnitClearOrders(unit whichUnit, bool onlyQueued);
 
         /// @CSharpLua.Template = "BlzUnitForceStopOrder({0}, {1})"
+        [ChangesState]
         public static extern void BlzUnitForceStopOrder(unit whichUnit, bool clearQueue);
 
         /// @CSharpLua.Template = "BlzCreateDestructablePitchRoll({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDestructablePitchRoll(int objectid, float x, float y, float face, float roll, float pitch, float scale, int variation);
 
         /// @CSharpLua.Template = "BlzCreateDestructableZPitchRoll({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDestructableZPitchRoll(int objectid, float x, float y, float z, float face, float roll, float pitch, float scale, int variation);
 
         /// @CSharpLua.Template = "BlzCreateDeadDestructablePitchRoll({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDeadDestructablePitchRoll(int objectid, float x, float y, float face, float roll, float pitch, float scale, int variation);
 
         /// @CSharpLua.Template = "BlzCreateDeadDestructableZPitchRoll({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDeadDestructableZPitchRoll(int objectid, float x, float y, float z, float face, float roll, float pitch, float scale, int variation);
 
         /// @CSharpLua.Template = "BlzCreateDestructableWithSkinPitchRoll({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDestructableWithSkinPitchRoll(int objectid, float x, float y, float face, float roll, float pitch, float scale, int variation, int skinId);
 
         /// @CSharpLua.Template = "BlzCreateDestructableZWithSkinPitchRoll({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDestructableZWithSkinPitchRoll(int objectid, float x, float y, float z, float face, float roll, float pitch, float scale, int variation, int skinId);
 
         /// @CSharpLua.Template = "BlzCreateDeadDestructableWithSkinPitchRoll({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDeadDestructableWithSkinPitchRoll(int objectid, float x, float y, float face, float roll, float pitch, float scale, int variation, int skinId);
 
         /// @CSharpLua.Template = "BlzCreateDeadDestructableZWithSkinPitchRoll({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDeadDestructableZWithSkinPitchRoll(int objectid, float x, float y, float z, float face, float roll, float pitch, float scale, int variation, int skinId);
 
         /// @CSharpLua.Template = "BlzCreateDestructableWithColor({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDestructableWithColor(int objectid, float x, float y, float face, float scale, int variation, playercolor color);
 
         /// @CSharpLua.Template = "BlzCreateDestructableZWithColor({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDestructableZWithColor(int objectid, float x, float y, float z, float face, float scale, int variation, playercolor color);
 
         /// @CSharpLua.Template = "BlzCreateDeadDestructableWithColor({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDeadDestructableWithColor(int objectid, float x, float y, float face, float scale, int variation, playercolor color);
 
         /// @CSharpLua.Template = "BlzCreateDeadDestructableZWithColor({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDeadDestructableZWithColor(int objectid, float x, float y, float z, float face, float scale, int variation, playercolor color);
 
         /// @CSharpLua.Template = "BlzCreateDestructableWithSkinColor({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDestructableWithSkinColor(int objectid, float x, float y, float face, float scale, int variation, int skinId, playercolor color);
 
         /// @CSharpLua.Template = "BlzCreateDestructableZWithSkinColor({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDestructableZWithSkinColor(int objectid, float x, float y, float z, float face, float scale, int variation, int skinId, playercolor color);
 
         /// @CSharpLua.Template = "BlzCreateDeadDestructableWithSkinColor({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDeadDestructableWithSkinColor(int objectid, float x, float y, float face, float scale, int variation, int skinId, playercolor color);
 
         /// @CSharpLua.Template = "BlzCreateDeadDestructableZWithSkinColor({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDeadDestructableZWithSkinColor(int objectid, float x, float y, float z, float face, float scale, int variation, int skinId, playercolor color);
 
         /// @CSharpLua.Template = "BlzCreateDestructablePitchRollWithColor({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDestructablePitchRollWithColor(int objectid, float x, float y, float face, float roll, float pitch, float scale, int variation, playercolor color);
 
         /// @CSharpLua.Template = "BlzCreateDestructableZPitchRollWithColor({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDestructableZPitchRollWithColor(int objectid, float x, float y, float z, float face, float roll, float pitch, float scale, int variation, playercolor color);
 
         /// @CSharpLua.Template = "BlzCreateDeadDestructablePitchRollWithColor({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDeadDestructablePitchRollWithColor(int objectid, float x, float y, float face, float roll, float pitch, float scale, int variation, playercolor color);
 
         /// @CSharpLua.Template = "BlzCreateDeadDestructableZPitchRollWithColor({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDeadDestructableZPitchRollWithColor(int objectid, float x, float y, float z, float face, float roll, float pitch, float scale, int variation, playercolor color);
 
         /// @CSharpLua.Template = "BlzCreateDestructableWithSkinPitchRollColor({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDestructableWithSkinPitchRollColor(int objectid, float x, float y, float face, float roll, float pitch, float scale, int variation, int skinId, playercolor color);
 
         /// @CSharpLua.Template = "BlzCreateDestructableZWithSkinPitchRollColor({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDestructableZWithSkinPitchRollColor(int objectid, float x, float y, float z, float face, float roll, float pitch, float scale, int variation, int skinId, playercolor color);
 
         /// @CSharpLua.Template = "BlzCreateDeadDestructableWithSkinPitchRollColor({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDeadDestructableWithSkinPitchRollColor(int objectid, float x, float y, float face, float roll, float pitch, float scale, int variation, int skinId, playercolor color);
 
         /// @CSharpLua.Template = "BlzCreateDeadDestructableZWithSkinPitchRollColor({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10})"
+        [CreatesHandle]
         public static extern destructable BlzCreateDeadDestructableZWithSkinPitchRollColor(int objectid, float x, float y, float z, float face, float roll, float pitch, float scale, int variation, int skinId, playercolor color);
 
         /// @CSharpLua.Template = "SetDestructableVertexColor({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void SetDestructableVertexColor(destructable whichDestructable, int red, int green, int blue, int alpha);
 
         /// @CSharpLua.Template = "BJDebugMsg({0})"
         public static extern void BJDebugMsg(string msg);
 
         /// @CSharpLua.Template = "SetWantDestroyGroupBJ()"
+        [ChangesState]
         public static extern void SetWantDestroyGroupBJ();
 
         /// @CSharpLua.Template = "ClearWantDestroyGroupBJ()"
+        [ChangesState]
         public static extern void ClearWantDestroyGroupBJ();
 
         /// @CSharpLua.Template = "GetWantDestroyGroupBJ()"
@@ -11800,15 +12715,19 @@ namespace Moonwell
         public static extern float DistanceBetweenPoints(location locA, location locB);
 
         /// @CSharpLua.Template = "PolarProjectionBJ({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern location PolarProjectionBJ(location source, float dist, float angle);
 
         /// @CSharpLua.Template = "GetRandomDirectionDeg()"
+        [ChangesState]
         public static extern float GetRandomDirectionDeg();
 
         /// @CSharpLua.Template = "GetRandomPercentageBJ()"
+        [ChangesState]
         public static extern float GetRandomPercentageBJ();
 
         /// @CSharpLua.Template = "GetRandomLocInRect({0})"
+        [CreatesHandle, ChangesState]
         public static extern location GetRandomLocInRect(rect whichRect);
 
         /// @CSharpLua.Template = "ModuloInteger({0}, {1})"
@@ -11818,12 +12737,15 @@ namespace Moonwell
         public static extern float ModuloReal(float dividend, float divisor);
 
         /// @CSharpLua.Template = "OffsetLocation({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern location OffsetLocation(location loc, float dx, float dy);
 
         /// @CSharpLua.Template = "OffsetRectBJ({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern rect OffsetRectBJ(rect r, float dx, float dy);
 
         /// @CSharpLua.Template = "RectFromCenterSizeBJ({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern rect RectFromCenterSizeBJ(location center, float width, float height);
 
         /// @CSharpLua.Template = "RectContainsCoords({0}, {1}, {2})"
@@ -11839,12 +12761,15 @@ namespace Moonwell
         public static extern bool RectContainsItem(item whichItem, rect r);
 
         /// @CSharpLua.Template = "ConditionalTriggerExecute({0})"
+        [ChangesState]
         public static extern void ConditionalTriggerExecute(trigger trig);
 
         /// @CSharpLua.Template = "TriggerExecuteBJ({0}, {1})"
+        [ChangesState]
         public static extern bool TriggerExecuteBJ(trigger trig, bool checkConditions);
 
         /// @CSharpLua.Template = "PostTriggerExecuteBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern bool PostTriggerExecuteBJ(trigger trig, bool checkConditions);
 
         /// @CSharpLua.Template = "QueuedTriggerCheck()"
@@ -11854,24 +12779,31 @@ namespace Moonwell
         public static extern int QueuedTriggerGetIndex(trigger trig);
 
         /// @CSharpLua.Template = "QueuedTriggerRemoveByIndex({0})"
+        [ChangesState]
         public static extern bool QueuedTriggerRemoveByIndex(int trigIndex);
 
         /// @CSharpLua.Template = "QueuedTriggerAttemptExec()"
+        [ChangesState]
         public static extern bool QueuedTriggerAttemptExec();
 
         /// @CSharpLua.Template = "QueuedTriggerAddBJ({0}, {1})"
+        [ChangesState]
         public static extern bool QueuedTriggerAddBJ(trigger trig, bool checkConditions);
 
         /// @CSharpLua.Template = "QueuedTriggerRemoveBJ({0})"
+        [ChangesState]
         public static extern void QueuedTriggerRemoveBJ(trigger trig);
 
         /// @CSharpLua.Template = "QueuedTriggerDoneBJ()"
+        [ChangesState]
         public static extern void QueuedTriggerDoneBJ();
 
         /// @CSharpLua.Template = "QueuedTriggerClearBJ()"
+        [ChangesState]
         public static extern void QueuedTriggerClearBJ();
 
         /// @CSharpLua.Template = "QueuedTriggerClearInactiveBJ()"
+        [ChangesState]
         public static extern void QueuedTriggerClearInactiveBJ();
 
         /// @CSharpLua.Template = "QueuedTriggerCountBJ()"
@@ -11887,15 +12819,18 @@ namespace Moonwell
         public static extern int GetForLoopIndexA();
 
         /// @CSharpLua.Template = "SetForLoopIndexA({0})"
+        [ChangesState]
         public static extern void SetForLoopIndexA(int newIndex);
 
         /// @CSharpLua.Template = "GetForLoopIndexB()"
         public static extern int GetForLoopIndexB();
 
         /// @CSharpLua.Template = "SetForLoopIndexB({0})"
+        [ChangesState]
         public static extern void SetForLoopIndexB(int newIndex);
 
         /// @CSharpLua.Template = "PolledWait({0})"
+        [CreatesHandle, ChangesState]
         public static extern void PolledWait(float duration);
 
         /// @CSharpLua.Template = "IntegerTertiaryOp({0}, {1}, {2})"
@@ -11908,6 +12843,7 @@ namespace Moonwell
         public static extern void CommentString(string commentString);
 
         /// @CSharpLua.Template = "StringIdentity({0})"
+        [MachineLocal]
         public static extern string StringIdentity(string theString);
 
         /// @CSharpLua.Template = "GetBooleanAnd({0}, {1})"
@@ -11917,24 +12853,29 @@ namespace Moonwell
         public static extern bool GetBooleanOr(bool valueA, bool valueB);
 
         /// @CSharpLua.Template = "PercentToInt({0}, {1})"
+        [ChangesState]
         public static extern int PercentToInt(float percentage, int max);
 
         /// @CSharpLua.Template = "PercentTo255({0})"
+        [ChangesState]
         public static extern int PercentTo255(float percentage);
 
         /// @CSharpLua.Template = "GetTimeOfDay()"
         public static extern float GetTimeOfDay();
 
         /// @CSharpLua.Template = "SetTimeOfDay({0})"
+        [ChangesState]
         public static extern void SetTimeOfDay(float whatTime);
 
         /// @CSharpLua.Template = "SetTimeOfDayScalePercentBJ({0})"
+        [ChangesState]
         public static extern void SetTimeOfDayScalePercentBJ(float scalePercent);
 
         /// @CSharpLua.Template = "GetTimeOfDayScalePercentBJ()"
         public static extern float GetTimeOfDayScalePercentBJ();
 
         /// @CSharpLua.Template = "PlaySound({0})"
+        [CreatesHandle, ChangesState]
         public static extern void PlaySound(string soundName);
 
         /// @CSharpLua.Template = "CompareLocationsBJ({0}, {1})"
@@ -11944,9 +12885,11 @@ namespace Moonwell
         public static extern bool CompareRectsBJ(rect A, rect B);
 
         /// @CSharpLua.Template = "GetRectFromCircleBJ({0}, {1})"
+        [CreatesHandle]
         public static extern rect GetRectFromCircleBJ(location center, float radius);
 
         /// @CSharpLua.Template = "GetCurrentCameraSetup()"
+        [MachineLocal, CreatesHandle]
         public static extern camerasetup GetCurrentCameraSetup();
 
         /// @CSharpLua.Template = "CameraSetupApplyForPlayer({0}, {1}, {2}, {3})"
@@ -11992,6 +12935,7 @@ namespace Moonwell
         public static extern void PanCameraToTimedLocWithZForPlayer(player whichPlayer, location loc, float zOffset, float duration);
 
         /// @CSharpLua.Template = "SmartCameraPanBJ({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern void SmartCameraPanBJ(player whichPlayer, location loc, float duration);
 
         /// @CSharpLua.Template = "SetCinematicCameraForPlayer({0}, {1})"
@@ -12013,6 +12957,7 @@ namespace Moonwell
         public static extern void CameraClearNoiseForPlayer(player whichPlayer);
 
         /// @CSharpLua.Template = "GetCurrentCameraBoundsMapRectBJ()"
+        [MachineLocal, CreatesHandle]
         public static extern rect GetCurrentCameraBoundsMapRectBJ();
 
         /// @CSharpLua.Template = "GetCameraBoundsMapRect()"
@@ -12022,6 +12967,7 @@ namespace Moonwell
         public static extern rect GetPlayableMapRect();
 
         /// @CSharpLua.Template = "GetEntireMapRect()"
+        [CreatesHandle]
         public static extern rect GetEntireMapRect();
 
         /// @CSharpLua.Template = "SetCameraBoundsToRect({0})"
@@ -12076,162 +13022,213 @@ namespace Moonwell
         public static extern int StringHashBJ(string s);
 
         /// @CSharpLua.Template = "TriggerRegisterTimerEventPeriodic({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterTimerEventPeriodic(trigger trig, float timeout);
 
         /// @CSharpLua.Template = "TriggerRegisterTimerEventSingle({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterTimerEventSingle(trigger trig, float timeout);
 
         /// @CSharpLua.Template = "TriggerRegisterTimerExpireEventBJ({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterTimerExpireEventBJ(trigger trig, timer t);
 
         /// @CSharpLua.Template = "TriggerRegisterPlayerUnitEventSimple({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterPlayerUnitEventSimple(trigger trig, player whichPlayer, playerunitevent whichEvent);
 
         /// @CSharpLua.Template = "TriggerRegisterAnyUnitEventBJ({0}, {1})"
+        [CreatesHandle]
         public static extern void TriggerRegisterAnyUnitEventBJ(trigger trig, playerunitevent whichEvent);
 
         /// @CSharpLua.Template = "TriggerRegisterPlayerSelectionEventBJ({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterPlayerSelectionEventBJ(trigger trig, player whichPlayer, bool selected);
 
         /// @CSharpLua.Template = "TriggerRegisterPlayerKeyEventBJ({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterPlayerKeyEventBJ(trigger trig, player whichPlayer, int keType, int keKey);
 
         /// @CSharpLua.Template = "TriggerRegisterPlayerMouseEventBJ({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterPlayerMouseEventBJ(trigger trig, player whichPlayer, int meType);
 
         /// @CSharpLua.Template = "IsMouseButtonPressedBJ({0})"
+        [MachineLocal]
         public static extern bool IsMouseButtonPressedBJ(mousebuttontype mouseButtonType);
 
         /// @CSharpLua.Template = "IsMetaKeyPressedBJ({0})"
+        [MachineLocal]
         public static extern bool IsMetaKeyPressedBJ(int metakey);
 
         /// @CSharpLua.Template = "IsKeyPressedBJ({0})"
+        [MachineLocal]
         public static extern bool IsKeyPressedBJ(oskeytype key);
 
         /// @CSharpLua.Template = "TriggerRegisterPlayerEventVictory({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterPlayerEventVictory(trigger trig, player whichPlayer);
 
         /// @CSharpLua.Template = "TriggerRegisterPlayerEventDefeat({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterPlayerEventDefeat(trigger trig, player whichPlayer);
 
         /// @CSharpLua.Template = "TriggerRegisterPlayerEventLeave({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterPlayerEventLeave(trigger trig, player whichPlayer);
 
         /// @CSharpLua.Template = "TriggerRegisterPlayerEventAllianceChanged({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterPlayerEventAllianceChanged(trigger trig, player whichPlayer);
 
         /// @CSharpLua.Template = "TriggerRegisterPlayerEventEndCinematic({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterPlayerEventEndCinematic(trigger trig, player whichPlayer);
 
         /// @CSharpLua.Template = "TriggerRegisterGameStateEventTimeOfDay({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterGameStateEventTimeOfDay(trigger trig, limitop opcode, float limitval);
 
         /// @CSharpLua.Template = "TriggerRegisterEnterRegionSimple({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterEnterRegionSimple(trigger trig, region whichRegion);
 
         /// @CSharpLua.Template = "TriggerRegisterLeaveRegionSimple({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterLeaveRegionSimple(trigger trig, region whichRegion);
 
         /// @CSharpLua.Template = "TriggerRegisterEnterRectSimple({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern @event TriggerRegisterEnterRectSimple(trigger trig, rect r);
 
         /// @CSharpLua.Template = "TriggerRegisterLeaveRectSimple({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern @event TriggerRegisterLeaveRectSimple(trigger trig, rect r);
 
         /// @CSharpLua.Template = "TriggerRegisterDistanceBetweenUnits({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterDistanceBetweenUnits(trigger trig, unit whichUnit, boolexpr condition, float range);
 
         /// @CSharpLua.Template = "TriggerRegisterUnitInRangeSimple({0}, {1}, {2})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterUnitInRangeSimple(trigger trig, float range, unit whichUnit);
 
         /// @CSharpLua.Template = "TriggerRegisterUnitLifeEvent({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterUnitLifeEvent(trigger trig, unit whichUnit, limitop opcode, float limitval);
 
         /// @CSharpLua.Template = "TriggerRegisterUnitManaEvent({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterUnitManaEvent(trigger trig, unit whichUnit, limitop opcode, float limitval);
 
         /// @CSharpLua.Template = "TriggerRegisterDialogEventBJ({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterDialogEventBJ(trigger trig, dialog whichDialog);
 
         /// @CSharpLua.Template = "TriggerRegisterShowSkillEventBJ({0})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterShowSkillEventBJ(trigger trig);
 
         /// @CSharpLua.Template = "TriggerRegisterBuildSubmenuEventBJ({0})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterBuildSubmenuEventBJ(trigger trig);
 
         /// @CSharpLua.Template = "TriggerRegisterBuildCommandEventBJ({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterBuildCommandEventBJ(trigger trig, int unitId);
 
         /// @CSharpLua.Template = "TriggerRegisterTrainCommandEventBJ({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterTrainCommandEventBJ(trigger trig, int unitId);
 
         /// @CSharpLua.Template = "TriggerRegisterUpgradeCommandEventBJ({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterUpgradeCommandEventBJ(trigger trig, int techId);
 
         /// @CSharpLua.Template = "TriggerRegisterCommonCommandEventBJ({0}, {1})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterCommonCommandEventBJ(trigger trig, string order);
 
         /// @CSharpLua.Template = "TriggerRegisterGameLoadedEventBJ({0})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterGameLoadedEventBJ(trigger trig);
 
         /// @CSharpLua.Template = "TriggerRegisterGameSavedEventBJ({0})"
+        [CreatesHandle]
         public static extern @event TriggerRegisterGameSavedEventBJ(trigger trig);
 
         /// @CSharpLua.Template = "RegisterDestDeathInRegionEnum()"
+        [CreatesHandle, ChangesState]
         public static extern void RegisterDestDeathInRegionEnum();
 
         /// @CSharpLua.Template = "TriggerRegisterDestDeathInRegionEvent({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern void TriggerRegisterDestDeathInRegionEvent(trigger trig, rect r);
 
         /// @CSharpLua.Template = "AddWeatherEffectSaveLast({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern weathereffect AddWeatherEffectSaveLast(rect where, int effectID);
 
         /// @CSharpLua.Template = "GetLastCreatedWeatherEffect()"
         public static extern weathereffect GetLastCreatedWeatherEffect();
 
         /// @CSharpLua.Template = "RemoveWeatherEffectBJ({0})"
+        [ChangesState]
         public static extern void RemoveWeatherEffectBJ(weathereffect whichWeatherEffect);
 
         /// @CSharpLua.Template = "TerrainDeformationCraterBJ({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle, ChangesState]
         public static extern terraindeformation TerrainDeformationCraterBJ(float duration, bool permanent, location where, float radius, float depth);
 
         /// @CSharpLua.Template = "TerrainDeformationRippleBJ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [CreatesHandle, ChangesState]
         public static extern terraindeformation TerrainDeformationRippleBJ(float duration, bool limitNeg, location where, float startRadius, float endRadius, float depth, float wavePeriod, float waveWidth);
 
         /// @CSharpLua.Template = "TerrainDeformationWaveBJ({0}, {1}, {2}, {3}, {4}, {5})"
+        [CreatesHandle, ChangesState]
         public static extern terraindeformation TerrainDeformationWaveBJ(float duration, location source, location target, float radius, float depth, float trailDelay);
 
         /// @CSharpLua.Template = "TerrainDeformationRandomBJ({0}, {1}, {2}, {3}, {4}, {5})"
+        [CreatesHandle, ChangesState]
         public static extern terraindeformation TerrainDeformationRandomBJ(float duration, location where, float radius, float minDelta, float maxDelta, float updateInterval);
 
         /// @CSharpLua.Template = "TerrainDeformationStopBJ({0}, {1})"
+        [ChangesState]
         public static extern void TerrainDeformationStopBJ(terraindeformation deformation, float duration);
 
         /// @CSharpLua.Template = "GetLastCreatedTerrainDeformation()"
         public static extern terraindeformation GetLastCreatedTerrainDeformation();
 
         /// @CSharpLua.Template = "AddLightningLoc({0}, {1}, {2})"
+        [MachineLocal, CreatesHandle, ChangesState]
         public static extern lightning AddLightningLoc(string codeName, location where1, location where2);
 
         /// @CSharpLua.Template = "DestroyLightningBJ({0})"
+        [ChangesState]
         public static extern bool DestroyLightningBJ(lightning whichBolt);
 
         /// @CSharpLua.Template = "MoveLightningLoc({0}, {1}, {2})"
+        [MachineLocal, ChangesState]
         public static extern bool MoveLightningLoc(lightning whichBolt, location where1, location where2);
 
         /// @CSharpLua.Template = "GetLightningColorABJ({0})"
+        [MachineLocal]
         public static extern float GetLightningColorABJ(lightning whichBolt);
 
         /// @CSharpLua.Template = "GetLightningColorRBJ({0})"
+        [MachineLocal]
         public static extern float GetLightningColorRBJ(lightning whichBolt);
 
         /// @CSharpLua.Template = "GetLightningColorGBJ({0})"
+        [MachineLocal]
         public static extern float GetLightningColorGBJ(lightning whichBolt);
 
         /// @CSharpLua.Template = "GetLightningColorBBJ({0})"
+        [MachineLocal]
         public static extern float GetLightningColorBBJ(lightning whichBolt);
 
         /// @CSharpLua.Template = "SetLightningColorBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern bool SetLightningColorBJ(lightning whichBolt, float r, float g, float b, float a);
 
         /// @CSharpLua.Template = "GetLastCreatedLightningBJ()"
@@ -12253,87 +13250,112 @@ namespace Moonwell
         public static extern int GetTerrainVarianceBJ(location where);
 
         /// @CSharpLua.Template = "SetTerrainTypeBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void SetTerrainTypeBJ(location where, int terrainType, int variation, int area, int shape);
 
         /// @CSharpLua.Template = "IsTerrainPathableBJ({0}, {1})"
         public static extern bool IsTerrainPathableBJ(location where, pathingtype t);
 
         /// @CSharpLua.Template = "SetTerrainPathableBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetTerrainPathableBJ(location where, pathingtype t, bool flag);
 
         /// @CSharpLua.Template = "SetWaterBaseColorBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetWaterBaseColorBJ(float red, float green, float blue, float transparency);
 
         /// @CSharpLua.Template = "SetHDWaterParamsExBJ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11})"
+        [ChangesState]
         public static extern void SetHDWaterParamsExBJ(float red, float green, float blue, bool @override, int vertexDisplacement, int minOpacity, int maxOpacity, int reflectivity, int emissivity, int edgeSoftness, int waveStrength, int envMapStrength);
 
         /// @CSharpLua.Template = "BlzSetHDWaterColorBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetHDWaterColorBJ(float red, float green, float blue);
 
         /// @CSharpLua.Template = "BlzSetHDWaterColorOverrideBJ()"
+        [ChangesState]
         public static extern void BlzSetHDWaterColorOverrideBJ();
 
         /// @CSharpLua.Template = "BlzClearHDWaterColorOverrideBJ()"
+        [ChangesState]
         public static extern void BlzClearHDWaterColorOverrideBJ();
 
         /// @CSharpLua.Template = "BlzSetHDWaterVertexDisplacementBJ({0})"
+        [ChangesState]
         public static extern void BlzSetHDWaterVertexDisplacementBJ(int vertexDisplacement);
 
         /// @CSharpLua.Template = "BlzSetHDWaterMinOpacityBJ({0})"
+        [ChangesState]
         public static extern void BlzSetHDWaterMinOpacityBJ(int minOpacity);
 
         /// @CSharpLua.Template = "BlzSetHDWaterMaxOpacityBJ({0})"
+        [ChangesState]
         public static extern void BlzSetHDWaterMaxOpacityBJ(int maxOpacity);
 
         /// @CSharpLua.Template = "BlzSetHDWaterReflectivityBJ({0})"
+        [ChangesState]
         public static extern void BlzSetHDWaterReflectivityBJ(int reflectivity);
 
         /// @CSharpLua.Template = "BlzSetHDWaterEmissivityBJ({0})"
+        [ChangesState]
         public static extern void BlzSetHDWaterEmissivityBJ(int emissivity);
 
         /// @CSharpLua.Template = "BlzSetHDWaterEdgeSoftnessBJ({0})"
+        [ChangesState]
         public static extern void BlzSetHDWaterEdgeSoftnessBJ(int edgeSoftness);
 
         /// @CSharpLua.Template = "BlzSetHDWaterWaveStrengthBJ({0})"
+        [ChangesState]
         public static extern void BlzSetHDWaterWaveStrengthBJ(int waveStrength);
 
         /// @CSharpLua.Template = "BlzSetHDWaterEnvMapStrengthBJ({0})"
+        [ChangesState]
         public static extern void BlzSetHDWaterEnvMapStrengthBJ(int envMapStrengthy);
 
         /// @CSharpLua.Template = "CreateFogModifierRectSimple({0}, {1}, {2}, {3})"
+        [CreatesHandle, ChangesState]
         public static extern fogmodifier CreateFogModifierRectSimple(player whichPlayer, fogstate whichFogState, rect r, bool afterUnits);
 
         /// @CSharpLua.Template = "CreateFogModifierRadiusLocSimple({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle, ChangesState]
         public static extern fogmodifier CreateFogModifierRadiusLocSimple(player whichPlayer, fogstate whichFogState, location center, float radius, bool afterUnits);
 
         /// @CSharpLua.Template = "CreateFogModifierRectBJ({0}, {1}, {2}, {3})"
+        [CreatesHandle, ChangesState]
         public static extern fogmodifier CreateFogModifierRectBJ(bool enabled, player whichPlayer, fogstate whichFogState, rect r);
 
         /// @CSharpLua.Template = "CreateFogModifierRadiusLocBJ({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle, ChangesState]
         public static extern fogmodifier CreateFogModifierRadiusLocBJ(bool enabled, player whichPlayer, fogstate whichFogState, location center, float radius);
 
         /// @CSharpLua.Template = "GetLastCreatedFogModifier()"
         public static extern fogmodifier GetLastCreatedFogModifier();
 
         /// @CSharpLua.Template = "FogEnableOn()"
+        [ChangesState]
         public static extern void FogEnableOn();
 
         /// @CSharpLua.Template = "FogEnableOff()"
+        [ChangesState]
         public static extern void FogEnableOff();
 
         /// @CSharpLua.Template = "FogMaskEnableOn()"
+        [ChangesState]
         public static extern void FogMaskEnableOn();
 
         /// @CSharpLua.Template = "FogMaskEnableOff()"
+        [ChangesState]
         public static extern void FogMaskEnableOff();
 
         /// @CSharpLua.Template = "UseTimeOfDayBJ({0})"
+        [ChangesState]
         public static extern void UseTimeOfDayBJ(bool flag);
 
         /// @CSharpLua.Template = "SetTerrainFogExBJ({0}, {1}, {2}, {3}, {4}, {5}, {6})"
         public static extern void SetTerrainFogExBJ(int style, float zstart, float zend, float density, float red, float green, float blue);
 
         /// @CSharpLua.Template = "SetTerrainFogExVBJ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10})"
+        [ChangesState]
         public static extern void SetTerrainFogExVBJ(int style, float zstart, float zend, float density, float heightStart, float heightEnd, float linearStart, float linearEnd, float red, float green, float blue);
 
         /// @CSharpLua.Template = "BlzSetTerrainFogStyleBJ({0})"
@@ -12373,63 +13395,80 @@ namespace Moonwell
         public static extern void ResetTerrainFogBJ();
 
         /// @CSharpLua.Template = "SetDoodadAnimationBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetDoodadAnimationBJ(string animName, int doodadID, float radius, location center);
 
         /// @CSharpLua.Template = "SetDoodadAnimationRectBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetDoodadAnimationRectBJ(string animName, int doodadID, rect r);
 
         /// @CSharpLua.Template = "BlzSetSingleDoodadAnimationBJ({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetSingleDoodadAnimationBJ(string animName, int index);
 
         /// @CSharpLua.Template = "AddUnitAnimationPropertiesBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void AddUnitAnimationPropertiesBJ(bool add, string animProperties, unit whichUnit);
 
         /// @CSharpLua.Template = "SetDoodadColorBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetDoodadColorBJ(playercolor color, int doodadID, float radius, location center);
 
         /// @CSharpLua.Template = "SetDoodadColorRectBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetDoodadColorRectBJ(playercolor color, int doodadID, rect r);
 
         /// @CSharpLua.Template = "BlzSetSingleDoodadColorBJ({0}, {1})"
+        [ChangesState]
         public static extern void BlzSetSingleDoodadColorBJ(playercolor color, int index);
 
         /// @CSharpLua.Template = "AllowHeroGlowOnUnitBJ({0})"
+        [ChangesState]
         public static extern void AllowHeroGlowOnUnitBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "DisallowHeroGlowOnUnitBJ({0})"
+        [ChangesState]
         public static extern void DisallowHeroGlowOnUnitBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "ToggleHeroGlowOnAllUnitsBJEnum()"
+        [ChangesState]
         public static extern void ToggleHeroGlowOnAllUnitsBJEnum();
 
         /// @CSharpLua.Template = "ToggleHeroGlowOnAllUnitsBJ({0})"
+        [CreatesHandle, ChangesState]
         public static extern void ToggleHeroGlowOnAllUnitsBJ(bool allow);
 
         /// @CSharpLua.Template = "AllowHeroGlowOnAllUnitsBJ()"
+        [CreatesHandle, ChangesState]
         public static extern void AllowHeroGlowOnAllUnitsBJ();
 
         /// @CSharpLua.Template = "DisallowHeroGlowOnAllUnitsBJ()"
+        [CreatesHandle, ChangesState]
         public static extern void DisallowHeroGlowOnAllUnitsBJ();
 
         /// @CSharpLua.Template = "HeroGlowIsAllowedOnUnitBJ({0})"
         public static extern bool HeroGlowIsAllowedOnUnitBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "CreateImageBJ({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle, ChangesState]
         public static extern image CreateImageBJ(string file, float size, location where, float zOffset, int imageType);
 
         /// @CSharpLua.Template = "ShowImageBJ({0}, {1})"
         public static extern void ShowImageBJ(bool flag, image whichImage);
 
         /// @CSharpLua.Template = "SetImagePositionBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetImagePositionBJ(image whichImage, location where, float zOffset);
 
         /// @CSharpLua.Template = "SetImageColorBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void SetImageColorBJ(image whichImage, float red, float green, float blue, float alpha);
 
         /// @CSharpLua.Template = "GetLastCreatedImage()"
         public static extern image GetLastCreatedImage();
 
         /// @CSharpLua.Template = "CreateUbersplatBJ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [CreatesHandle, ChangesState]
         public static extern ubersplat CreateUbersplatBJ(location where, string name, float red, float green, float blue, float alpha, bool forcePaused, bool noBirthTime);
 
         /// @CSharpLua.Template = "ShowUbersplatBJ({0}, {1})"
@@ -12442,27 +13481,34 @@ namespace Moonwell
         public static extern minimapicon GetLastCreatedMinimapIcon();
 
         /// @CSharpLua.Template = "CreateMinimapIconOnUnitBJ({0}, {1}, {2}, {3}, {4}, {5})"
+        [CreatesHandle, ChangesState]
         public static extern minimapicon CreateMinimapIconOnUnitBJ(unit whichUnit, int red, int green, int blue, string pingPath, fogstate fogVisibility);
 
         /// @CSharpLua.Template = "CreateMinimapIconAtLocBJ({0}, {1}, {2}, {3}, {4}, {5})"
+        [CreatesHandle, ChangesState]
         public static extern minimapicon CreateMinimapIconAtLocBJ(location where, int red, int green, int blue, string pingPath, fogstate fogVisibility);
 
         /// @CSharpLua.Template = "CreateMinimapIconBJ({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [CreatesHandle, ChangesState]
         public static extern minimapicon CreateMinimapIconBJ(float x, float y, int red, int green, int blue, string pingPath, fogstate fogVisibility);
 
         /// @CSharpLua.Template = "CampaignMinimapIconUnitBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern void CampaignMinimapIconUnitBJ(unit whichUnit, int style);
 
         /// @CSharpLua.Template = "CampaignMinimapIconLocBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern void CampaignMinimapIconLocBJ(location where, int style);
 
         /// @CSharpLua.Template = "PlaySoundBJ({0})"
+        [ChangesState]
         public static extern void PlaySoundBJ(sound soundHandle);
 
         /// @CSharpLua.Template = "StopSoundBJ({0}, {1})"
         public static extern void StopSoundBJ(sound soundHandle, bool fadeOut);
 
         /// @CSharpLua.Template = "SetSoundVolumeBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetSoundVolumeBJ(sound soundHandle, float volumePercent);
 
         /// @CSharpLua.Template = "SetSoundOffsetBJ({0}, {1})"
@@ -12478,27 +13524,35 @@ namespace Moonwell
         public static extern void SetSoundPositionLocBJ(sound soundHandle, location loc, float z);
 
         /// @CSharpLua.Template = "AttachSoundToUnitBJ({0}, {1})"
+        [ChangesState]
         public static extern void AttachSoundToUnitBJ(sound soundHandle, unit whichUnit);
 
         /// @CSharpLua.Template = "SetSoundConeAnglesBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetSoundConeAnglesBJ(sound soundHandle, float inside, float outside, float outsideVolumePercent);
 
         /// @CSharpLua.Template = "KillSoundWhenDoneBJ({0})"
+        [ChangesState]
         public static extern void KillSoundWhenDoneBJ(sound soundHandle);
 
         /// @CSharpLua.Template = "PlaySoundAtPointBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void PlaySoundAtPointBJ(sound soundHandle, float volumePercent, location loc, float z);
 
         /// @CSharpLua.Template = "PlaySoundOnUnitBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void PlaySoundOnUnitBJ(sound soundHandle, float volumePercent, unit whichUnit);
 
         /// @CSharpLua.Template = "PlaySoundFromOffsetBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void PlaySoundFromOffsetBJ(sound soundHandle, float volumePercent, float startingOffset);
 
         /// @CSharpLua.Template = "PlayMusicBJ({0})"
+        [ChangesState]
         public static extern void PlayMusicBJ(string musicFileName);
 
         /// @CSharpLua.Template = "PlayMusicExBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void PlayMusicExBJ(string musicFileName, float startingOffset, float fadeInTime);
 
         /// @CSharpLua.Template = "SetMusicOffsetBJ({0})"
@@ -12523,15 +13577,19 @@ namespace Moonwell
         public static extern void ResumeMusicBJ();
 
         /// @CSharpLua.Template = "SetMusicVolumeBJ({0})"
+        [ChangesState]
         public static extern void SetMusicVolumeBJ(float volumePercent);
 
         /// @CSharpLua.Template = "SetThematicMusicVolumeBJ({0})"
+        [ChangesState]
         public static extern void SetThematicMusicVolumeBJ(float volumePercent);
 
         /// @CSharpLua.Template = "GetSoundDurationBJ({0})"
+        [MachineLocal]
         public static extern float GetSoundDurationBJ(sound soundHandle);
 
         /// @CSharpLua.Template = "GetSoundFileDurationBJ({0})"
+        [MachineLocal]
         public static extern float GetSoundFileDurationBJ(string musicFileName);
 
         /// @CSharpLua.Template = "GetLastPlayedSound()"
@@ -12547,24 +13605,29 @@ namespace Moonwell
         public static extern void SetCineModeVolumeGroupsImmediateBJ();
 
         /// @CSharpLua.Template = "SetCineModeVolumeGroupsBJ()"
+        [ChangesState]
         public static extern void SetCineModeVolumeGroupsBJ();
 
         /// @CSharpLua.Template = "SetSpeechVolumeGroupsImmediateBJ()"
         public static extern void SetSpeechVolumeGroupsImmediateBJ();
 
         /// @CSharpLua.Template = "SetSpeechVolumeGroupsBJ()"
+        [ChangesState]
         public static extern void SetSpeechVolumeGroupsBJ();
 
         /// @CSharpLua.Template = "VolumeGroupResetImmediateBJ()"
         public static extern void VolumeGroupResetImmediateBJ();
 
         /// @CSharpLua.Template = "VolumeGroupResetBJ()"
+        [ChangesState]
         public static extern void VolumeGroupResetBJ();
 
         /// @CSharpLua.Template = "GetSoundIsPlayingBJ({0})"
+        [MachineLocal]
         public static extern bool GetSoundIsPlayingBJ(sound soundHandle);
 
         /// @CSharpLua.Template = "WaitForSoundBJ({0}, {1})"
+        [ChangesState]
         public static extern void WaitForSoundBJ(sound soundHandle, float offset);
 
         /// @CSharpLua.Template = "SetMapMusicIndexedBJ({0}, {1})"
@@ -12577,6 +13640,7 @@ namespace Moonwell
         public static extern void ClearMapMusicBJ();
 
         /// @CSharpLua.Template = "SetStackedSoundBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetStackedSoundBJ(bool add, sound soundHandle, rect r);
 
         /// @CSharpLua.Template = "StartSoundForPlayerBJ({0}, {1})"
@@ -12586,78 +13650,99 @@ namespace Moonwell
         public static extern void VolumeGroupSetVolumeForPlayerBJ(player whichPlayer, volumegroup vgroup, float scale);
 
         /// @CSharpLua.Template = "EnableDawnDusk({0})"
+        [ChangesState]
         public static extern void EnableDawnDusk(bool flag);
 
         /// @CSharpLua.Template = "IsDawnDuskEnabled()"
         public static extern bool IsDawnDuskEnabled();
 
         /// @CSharpLua.Template = "SetAmbientDaySound({0})"
+        [CreatesHandle, ChangesState]
         public static extern void SetAmbientDaySound(string inLabel);
 
         /// @CSharpLua.Template = "SetAmbientNightSound({0})"
+        [CreatesHandle, ChangesState]
         public static extern void SetAmbientNightSound(string inLabel);
 
         /// @CSharpLua.Template = "AddSpecialEffectLocBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern effect AddSpecialEffectLocBJ(location where, string modelName);
 
         /// @CSharpLua.Template = "AddSpecialEffectTargetUnitBJ({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern effect AddSpecialEffectTargetUnitBJ(string attachPointName, widget targetWidget, string modelName);
 
         /// @CSharpLua.Template = "DestroyEffectBJ({0})"
+        [ChangesState]
         public static extern void DestroyEffectBJ(effect whichEffect);
 
         /// @CSharpLua.Template = "GetLastCreatedEffectBJ()"
         public static extern effect GetLastCreatedEffectBJ();
 
         /// @CSharpLua.Template = "DestroyEffectAsyncBJ()"
+        [ChangesState]
         public static extern void DestroyEffectAsyncBJ();
 
         /// @CSharpLua.Template = "DestroyEffectAfterTimeBJ({0}, {1})"
+        [ChangesState]
         public static extern void DestroyEffectAfterTimeBJ(effect whichEffect, float time);
 
         /// @CSharpLua.Template = "CreateCommandButtonEffectBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern commandbuttoneffect CreateCommandButtonEffectBJ(int abilityId, string order);
 
         /// @CSharpLua.Template = "CreateTrainCommandButtonEffectBJ({0})"
+        [CreatesHandle, ChangesState]
         public static extern commandbuttoneffect CreateTrainCommandButtonEffectBJ(int unitId);
 
         /// @CSharpLua.Template = "CreateUpgradeCommandButtonEffectBJ({0})"
+        [CreatesHandle, ChangesState]
         public static extern commandbuttoneffect CreateUpgradeCommandButtonEffectBJ(int techId);
 
         /// @CSharpLua.Template = "CreateCommonCommandButtonEffectBJ({0})"
+        [CreatesHandle, ChangesState]
         public static extern commandbuttoneffect CreateCommonCommandButtonEffectBJ(string order);
 
         /// @CSharpLua.Template = "CreateLearnCommandButtonEffectBJ({0})"
+        [CreatesHandle, ChangesState]
         public static extern commandbuttoneffect CreateLearnCommandButtonEffectBJ(int abilityId);
 
         /// @CSharpLua.Template = "CreateBuildCommandButtonEffectBJ({0})"
+        [MachineLocal, CreatesHandle, ChangesState]
         public static extern commandbuttoneffect CreateBuildCommandButtonEffectBJ(int unitId);
 
         /// @CSharpLua.Template = "GetLastCreatedCommandButtonEffectBJ()"
         public static extern commandbuttoneffect GetLastCreatedCommandButtonEffectBJ();
 
         /// @CSharpLua.Template = "GetItemLoc({0})"
+        [CreatesHandle]
         public static extern location GetItemLoc(item whichItem);
 
         /// @CSharpLua.Template = "GetItemLifeBJ({0})"
         public static extern float GetItemLifeBJ(widget whichWidget);
 
         /// @CSharpLua.Template = "SetItemLifeBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetItemLifeBJ(widget whichWidget, float life);
 
         /// @CSharpLua.Template = "AddHeroXPSwapped({0}, {1}, {2})"
+        [ChangesState]
         public static extern void AddHeroXPSwapped(int xpToAdd, unit whichHero, bool showEyeCandy);
 
         /// @CSharpLua.Template = "SetHeroLevelBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetHeroLevelBJ(unit whichHero, int newLevel, bool showEyeCandy);
 
         /// @CSharpLua.Template = "DecUnitAbilityLevelSwapped({0}, {1})"
+        [ChangesState]
         public static extern int DecUnitAbilityLevelSwapped(int abilcode, unit whichUnit);
 
         /// @CSharpLua.Template = "IncUnitAbilityLevelSwapped({0}, {1})"
+        [ChangesState]
         public static extern int IncUnitAbilityLevelSwapped(int abilcode, unit whichUnit);
 
         /// @CSharpLua.Template = "SetUnitAbilityLevelSwapped({0}, {1}, {2})"
+        [ChangesState]
         public static extern int SetUnitAbilityLevelSwapped(int abilcode, unit whichUnit, int level);
 
         /// @CSharpLua.Template = "GetUnitAbilityLevelSwapped({0}, {1})"
@@ -12667,33 +13752,43 @@ namespace Moonwell
         public static extern bool UnitHasBuffBJ(unit whichUnit, int buffcode);
 
         /// @CSharpLua.Template = "UnitRemoveBuffBJ({0}, {1})"
+        [ChangesState]
         public static extern bool UnitRemoveBuffBJ(int buffcode, unit whichUnit);
 
         /// @CSharpLua.Template = "UnitAddItemSwapped({0}, {1})"
+        [ChangesState]
         public static extern bool UnitAddItemSwapped(item whichItem, unit whichHero);
 
         /// @CSharpLua.Template = "UnitAddItemByIdSwapped({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern item UnitAddItemByIdSwapped(int itemId, unit whichHero);
 
         /// @CSharpLua.Template = "UnitRemoveItemSwapped({0}, {1})"
+        [ChangesState]
         public static extern void UnitRemoveItemSwapped(item whichItem, unit whichHero);
 
         /// @CSharpLua.Template = "UnitEquipItemSwapped({0}, {1})"
+        [ChangesState]
         public static extern bool UnitEquipItemSwapped(item whichItem, unit whichHero);
 
         /// @CSharpLua.Template = "UnitEquipItemByIdSwapped({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern item UnitEquipItemByIdSwapped(int itemId, unit whichHero);
 
         /// @CSharpLua.Template = "UnitRemoveItemFromSlotSwapped({0}, {1})"
+        [ChangesState]
         public static extern item UnitRemoveItemFromSlotSwapped(int itemSlot, unit whichHero);
 
         /// @CSharpLua.Template = "UnitUnequipItemSwapped({0}, {1})"
+        [ChangesState]
         public static extern void UnitUnequipItemSwapped(unit whichHero, item whichItem);
 
         /// @CSharpLua.Template = "UnitUnequipItemFromSlotSwapped({0}, {1})"
+        [ChangesState]
         public static extern item UnitUnequipItemFromSlotSwapped(unit whichHero, loadoutslot slot);
 
         /// @CSharpLua.Template = "CreateItemLoc({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern item CreateItemLoc(int itemId, location loc);
 
         /// @CSharpLua.Template = "GetLastCreatedItem()"
@@ -12709,33 +13804,39 @@ namespace Moonwell
         public static extern item GetLastUnequippedItem();
 
         /// @CSharpLua.Template = "SetItemPositionLoc({0}, {1})"
+        [ChangesState]
         public static extern void SetItemPositionLoc(item whichItem, location loc);
 
         /// @CSharpLua.Template = "GetLearnedSkillBJ()"
         public static extern int GetLearnedSkillBJ();
 
         /// @CSharpLua.Template = "SuspendHeroXPBJ({0}, {1})"
+        [ChangesState]
         public static extern void SuspendHeroXPBJ(bool flag, unit whichHero);
 
         /// @CSharpLua.Template = "SetPlayerHandicapDamageBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerHandicapDamageBJ(player whichPlayer, float handicapPercent);
 
         /// @CSharpLua.Template = "GetPlayerHandicapDamageBJ({0})"
         public static extern float GetPlayerHandicapDamageBJ(player whichPlayer);
 
         /// @CSharpLua.Template = "SetPlayerHandicapReviveTimeBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerHandicapReviveTimeBJ(player whichPlayer, float handicapPercent);
 
         /// @CSharpLua.Template = "GetPlayerHandicapReviveTimeBJ({0})"
         public static extern float GetPlayerHandicapReviveTimeBJ(player whichPlayer);
 
         /// @CSharpLua.Template = "SetPlayerHandicapXPBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerHandicapXPBJ(player whichPlayer, float handicapPercent);
 
         /// @CSharpLua.Template = "GetPlayerHandicapXPBJ({0})"
         public static extern float GetPlayerHandicapXPBJ(player whichPlayer);
 
         /// @CSharpLua.Template = "SetPlayerHandicapBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerHandicapBJ(player whichPlayer, float handicapPercent);
 
         /// @CSharpLua.Template = "GetPlayerHandicapBJ({0})"
@@ -12745,30 +13846,39 @@ namespace Moonwell
         public static extern int GetHeroStatBJ(int whichStat, unit whichHero, bool includeBonuses);
 
         /// @CSharpLua.Template = "SetHeroStat({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetHeroStat(unit whichHero, int whichStat, int value);
 
         /// @CSharpLua.Template = "ModifyHeroStat({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void ModifyHeroStat(int whichStat, unit whichHero, int modifyMethod, int value);
 
         /// @CSharpLua.Template = "ModifyHeroSkillPoints({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool ModifyHeroSkillPoints(unit whichHero, int modifyMethod, int value);
 
         /// @CSharpLua.Template = "UnitDropItemPointBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool UnitDropItemPointBJ(unit whichUnit, item whichItem, float x, float y);
 
         /// @CSharpLua.Template = "UnitDropItemPointLoc({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool UnitDropItemPointLoc(unit whichUnit, item whichItem, location loc);
 
         /// @CSharpLua.Template = "UnitDropItemSlotBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool UnitDropItemSlotBJ(unit whichUnit, item whichItem, int slot);
 
         /// @CSharpLua.Template = "UnitDropItemTargetBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool UnitDropItemTargetBJ(unit whichUnit, item whichItem, widget target);
 
         /// @CSharpLua.Template = "UnitUseItemDestructable({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool UnitUseItemDestructable(unit whichUnit, item whichItem, widget target);
 
         /// @CSharpLua.Template = "UnitUseItemPointLoc({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool UnitUseItemPointLoc(unit whichUnit, item whichItem, location loc);
 
         /// @CSharpLua.Template = "UnitItemInSlotBJ({0}, {1})"
@@ -12829,54 +13939,68 @@ namespace Moonwell
         public static extern int UnitExtendedInventoryCount(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitExtendedInventorySizeBJ({0})"
+        [ChangesState]
         public static extern int UnitExtendedInventorySizeBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitEquipmentCount({0})"
         public static extern int UnitEquipmentCount(unit whichUnit);
 
         /// @CSharpLua.Template = "SetItemInvulnerableBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetItemInvulnerableBJ(item whichItem, bool flag);
 
         /// @CSharpLua.Template = "SetItemDropOnDeathBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetItemDropOnDeathBJ(item whichItem, bool flag);
 
         /// @CSharpLua.Template = "SetItemDroppableBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetItemDroppableBJ(item whichItem, bool flag);
 
         /// @CSharpLua.Template = "SetItemPlayerBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetItemPlayerBJ(item whichItem, player whichPlayer, bool changeColor);
 
         /// @CSharpLua.Template = "SetItemVisibleBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetItemVisibleBJ(bool show, item whichItem);
 
         /// @CSharpLua.Template = "IsItemHiddenBJ({0})"
         public static extern bool IsItemHiddenBJ(item whichItem);
 
         /// @CSharpLua.Template = "ChooseRandomItemBJ({0})"
+        [ChangesState]
         public static extern int ChooseRandomItemBJ(int level);
 
         /// @CSharpLua.Template = "ChooseRandomItemExBJ({0}, {1})"
+        [ChangesState]
         public static extern int ChooseRandomItemExBJ(int level, itemtype whichType);
 
         /// @CSharpLua.Template = "ChooseRandomItemExWithFilterBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern int ChooseRandomItemExWithFilterBJ(int level, itemtype whichType, equipmentType whichEquipmentType, itemTag whichTag);
 
         /// @CSharpLua.Template = "ChooseRandomNPBuildingBJ()"
+        [ChangesState]
         public static extern int ChooseRandomNPBuildingBJ();
 
         /// @CSharpLua.Template = "ChooseRandomCreepBJ({0})"
+        [ChangesState]
         public static extern int ChooseRandomCreepBJ(int level);
 
         /// @CSharpLua.Template = "EnumItemsInRectBJ({0}, {1})"
         public static extern void EnumItemsInRectBJ(rect r, Action actionFunc);
 
         /// @CSharpLua.Template = "RandomItemInRectBJEnum()"
+        [ChangesState]
         public static extern void RandomItemInRectBJEnum();
 
         /// @CSharpLua.Template = "RandomItemInRectBJ({0}, {1})"
+        [ChangesState]
         public static extern item RandomItemInRectBJ(rect r, boolexpr filter);
 
         /// @CSharpLua.Template = "RandomItemInRectSimpleBJ({0})"
+        [ChangesState]
         public static extern item RandomItemInRectSimpleBJ(rect r);
 
         /// @CSharpLua.Template = "CheckItemStatus({0}, {1})"
@@ -12907,45 +14031,58 @@ namespace Moonwell
         public static extern unit GetKillingUnitBJ();
 
         /// @CSharpLua.Template = "CreateUnitAtLocSaveLast({0}, {1}, {2}, {3})"
+        [CreatesHandle, ChangesState]
         public static extern unit CreateUnitAtLocSaveLast(player id, int unitid, location loc, float face);
 
         /// @CSharpLua.Template = "GetLastCreatedUnit()"
         public static extern unit GetLastCreatedUnit();
 
         /// @CSharpLua.Template = "CreateNUnitsAtLoc({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle, ChangesState]
         public static extern group CreateNUnitsAtLoc(int count, int unitId, player whichPlayer, location loc, float face);
 
         /// @CSharpLua.Template = "CreateNUnitsAtLocFacingLocBJ({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle, ChangesState]
         public static extern group CreateNUnitsAtLocFacingLocBJ(int count, int unitId, player whichPlayer, location loc, location lookAt);
 
         /// @CSharpLua.Template = "GetLastCreatedGroupEnum()"
+        [ChangesState]
         public static extern void GetLastCreatedGroupEnum();
 
         /// @CSharpLua.Template = "GetLastCreatedGroup()"
+        [CreatesHandle, ChangesState]
         public static extern group GetLastCreatedGroup();
 
         /// @CSharpLua.Template = "CreateCorpseLocBJ({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern unit CreateCorpseLocBJ(int unitid, player whichPlayer, location loc);
 
         /// @CSharpLua.Template = "UnitSuspendDecayBJ({0}, {1})"
+        [ChangesState]
         public static extern void UnitSuspendDecayBJ(bool suspend, unit whichUnit);
 
         /// @CSharpLua.Template = "DelayedSuspendDecayStopAnimEnum()"
+        [ChangesState]
         public static extern void DelayedSuspendDecayStopAnimEnum();
 
         /// @CSharpLua.Template = "DelayedSuspendDecayBoneEnum()"
+        [ChangesState]
         public static extern void DelayedSuspendDecayBoneEnum();
 
         /// @CSharpLua.Template = "DelayedSuspendDecayFleshEnum()"
+        [ChangesState]
         public static extern void DelayedSuspendDecayFleshEnum();
 
         /// @CSharpLua.Template = "DelayedSuspendDecay()"
+        [CreatesHandle, ChangesState]
         public static extern void DelayedSuspendDecay();
 
         /// @CSharpLua.Template = "DelayedSuspendDecayCreate()"
+        [CreatesHandle, ChangesState]
         public static extern void DelayedSuspendDecayCreate();
 
         /// @CSharpLua.Template = "CreatePermanentCorpseLocBJ({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle, ChangesState]
         public static extern unit CreatePermanentCorpseLocBJ(int style, int unitid, player whichPlayer, location loc, float facing);
 
         /// @CSharpLua.Template = "GetUnitStateSwap({0}, {1})"
@@ -12991,15 +14128,19 @@ namespace Moonwell
         public static extern void SelectUnitRemoveForPlayer(unit whichUnit, player whichPlayer);
 
         /// @CSharpLua.Template = "SetUnitLifeBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitLifeBJ(unit whichUnit, float newValue);
 
         /// @CSharpLua.Template = "SetUnitManaBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitManaBJ(unit whichUnit, float newValue);
 
         /// @CSharpLua.Template = "SetUnitLifePercentBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitLifePercentBJ(unit whichUnit, float percent);
 
         /// @CSharpLua.Template = "SetUnitManaPercentBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitManaPercentBJ(unit whichUnit, float percent);
 
         /// @CSharpLua.Template = "IsUnitDeadBJ({0})"
@@ -13009,60 +14150,76 @@ namespace Moonwell
         public static extern bool IsUnitAliveBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "IsUnitGroupDeadBJEnum()"
+        [ChangesState]
         public static extern void IsUnitGroupDeadBJEnum();
 
         /// @CSharpLua.Template = "IsUnitGroupDeadBJ({0})"
+        [ChangesState]
         public static extern bool IsUnitGroupDeadBJ(group g);
 
         /// @CSharpLua.Template = "IsUnitGroupEmptyBJEnum()"
+        [ChangesState]
         public static extern void IsUnitGroupEmptyBJEnum();
 
         /// @CSharpLua.Template = "IsUnitGroupEmptyBJ({0})"
+        [ChangesState]
         public static extern bool IsUnitGroupEmptyBJ(group g);
 
         /// @CSharpLua.Template = "IsUnitGroupInRectBJEnum()"
+        [ChangesState]
         public static extern void IsUnitGroupInRectBJEnum();
 
         /// @CSharpLua.Template = "IsUnitGroupInRectBJ({0}, {1})"
+        [ChangesState]
         public static extern bool IsUnitGroupInRectBJ(group g, rect r);
 
         /// @CSharpLua.Template = "IsUnitHiddenBJ({0})"
         public static extern bool IsUnitHiddenBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "ShowUnitHide({0})"
+        [ChangesState]
         public static extern void ShowUnitHide(unit whichUnit);
 
         /// @CSharpLua.Template = "ShowUnitShow({0})"
+        [ChangesState]
         public static extern void ShowUnitShow(unit whichUnit);
 
         /// @CSharpLua.Template = "IssueHauntOrderAtLocBJFilter()"
         public static extern bool IssueHauntOrderAtLocBJFilter();
 
         /// @CSharpLua.Template = "IssueHauntOrderAtLocBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern bool IssueHauntOrderAtLocBJ(unit whichPeon, location loc);
 
         /// @CSharpLua.Template = "IssueBuildOrderByIdLocBJ({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern bool IssueBuildOrderByIdLocBJ(unit whichPeon, int unitId, location loc);
 
         /// @CSharpLua.Template = "IssueTrainOrderByIdBJ({0}, {1})"
+        [ChangesState]
         public static extern bool IssueTrainOrderByIdBJ(unit whichUnit, int unitId);
 
         /// @CSharpLua.Template = "GroupTrainOrderByIdBJ({0}, {1})"
+        [ChangesState]
         public static extern bool GroupTrainOrderByIdBJ(group g, int unitId);
 
         /// @CSharpLua.Template = "IssueUpgradeOrderByIdBJ({0}, {1})"
+        [ChangesState]
         public static extern bool IssueUpgradeOrderByIdBJ(unit whichUnit, int techId);
 
         /// @CSharpLua.Template = "GetAttackedUnitBJ()"
         public static extern unit GetAttackedUnitBJ();
 
         /// @CSharpLua.Template = "SetUnitFlyHeightBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetUnitFlyHeightBJ(unit whichUnit, float newHeight, float rate);
 
         /// @CSharpLua.Template = "SetUnitTurnSpeedBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitTurnSpeedBJ(unit whichUnit, float turnSpeed);
 
         /// @CSharpLua.Template = "SetUnitPropWindowBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitPropWindowBJ(unit whichUnit, float propWindow);
 
         /// @CSharpLua.Template = "GetUnitPropWindowBJ({0})"
@@ -13072,93 +14229,122 @@ namespace Moonwell
         public static extern float GetUnitDefaultPropWindowBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "SetUnitBlendTimeBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitBlendTimeBJ(unit whichUnit, float blendTime);
 
         /// @CSharpLua.Template = "SetUnitAcquireRangeBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitAcquireRangeBJ(unit whichUnit, float acquireRange);
 
         /// @CSharpLua.Template = "UnitSetCanSleepBJ({0}, {1})"
+        [ChangesState]
         public static extern void UnitSetCanSleepBJ(unit whichUnit, bool canSleep);
 
         /// @CSharpLua.Template = "UnitCanSleepBJ({0})"
+        [ChangesState]
         public static extern bool UnitCanSleepBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitWakeUpBJ({0})"
+        [ChangesState]
         public static extern void UnitWakeUpBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitIsSleepingBJ({0})"
+        [ChangesState]
         public static extern bool UnitIsSleepingBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "WakePlayerUnitsEnum()"
+        [ChangesState]
         public static extern void WakePlayerUnitsEnum();
 
         /// @CSharpLua.Template = "WakePlayerUnits({0})"
+        [CreatesHandle, ChangesState]
         public static extern void WakePlayerUnits(player whichPlayer);
 
         /// @CSharpLua.Template = "EnableCreepSleepBJ({0})"
+        [CreatesHandle, ChangesState]
         public static extern void EnableCreepSleepBJ(bool enable);
 
         /// @CSharpLua.Template = "UnitGenerateAlarms({0}, {1})"
+        [ChangesState]
         public static extern bool UnitGenerateAlarms(unit whichUnit, bool generate);
 
         /// @CSharpLua.Template = "DoesUnitGenerateAlarms({0})"
+        [ChangesState]
         public static extern bool DoesUnitGenerateAlarms(unit whichUnit);
 
         /// @CSharpLua.Template = "PauseAllUnitsBJEnum()"
+        [ChangesState]
         public static extern void PauseAllUnitsBJEnum();
 
         /// @CSharpLua.Template = "PauseAllUnitsBJ({0})"
+        [CreatesHandle, ChangesState]
         public static extern void PauseAllUnitsBJ(bool pause);
 
         /// @CSharpLua.Template = "PauseUnitBJ({0}, {1})"
+        [ChangesState]
         public static extern void PauseUnitBJ(bool pause, unit whichUnit);
 
         /// @CSharpLua.Template = "IsUnitPausedBJ({0})"
         public static extern bool IsUnitPausedBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "BlzAllUnitsEnableAurasBJEnum()"
+        [ChangesState]
         public static extern void BlzAllUnitsEnableAurasBJEnum();
 
         /// @CSharpLua.Template = "BlzAllUnitsEnableAurasBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern void BlzAllUnitsEnableAurasBJ(bool enable, bool affectsUI);
 
         /// @CSharpLua.Template = "UnitPauseTimedLifeBJ({0}, {1})"
+        [ChangesState]
         public static extern void UnitPauseTimedLifeBJ(bool flag, unit whichUnit);
 
         /// @CSharpLua.Template = "UnitApplyTimedLifeBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void UnitApplyTimedLifeBJ(float duration, int buffId, unit whichUnit);
 
         /// @CSharpLua.Template = "UnitShareVisionBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void UnitShareVisionBJ(bool share, unit whichUnit, player whichPlayer);
 
         /// @CSharpLua.Template = "UnitRemoveBuffsBJ({0}, {1})"
+        [ChangesState]
         public static extern void UnitRemoveBuffsBJ(int buffType, unit whichUnit);
 
         /// @CSharpLua.Template = "UnitRemoveBuffsExBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void UnitRemoveBuffsExBJ(int polarity, int resist, unit whichUnit, bool bTLife, bool bAura);
 
         /// @CSharpLua.Template = "UnitCountBuffsExBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern int UnitCountBuffsExBJ(int polarity, int resist, unit whichUnit, bool bTLife, bool bAura);
 
         /// @CSharpLua.Template = "UnitRemoveAbilityBJ({0}, {1})"
+        [ChangesState]
         public static extern bool UnitRemoveAbilityBJ(int abilityId, unit whichUnit);
 
         /// @CSharpLua.Template = "UnitAddAbilityBJ({0}, {1})"
+        [ChangesState]
         public static extern bool UnitAddAbilityBJ(int abilityId, unit whichUnit);
 
         /// @CSharpLua.Template = "UnitRemoveTypeBJ({0}, {1})"
+        [ChangesState]
         public static extern bool UnitRemoveTypeBJ(unittype whichType, unit whichUnit);
 
         /// @CSharpLua.Template = "UnitAddTypeBJ({0}, {1})"
+        [ChangesState]
         public static extern bool UnitAddTypeBJ(unittype whichType, unit whichUnit);
 
         /// @CSharpLua.Template = "UnitMakeAbilityPermanentBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool UnitMakeAbilityPermanentBJ(bool permanent, int abilityId, unit whichUnit);
 
         /// @CSharpLua.Template = "SetUnitExplodedBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitExplodedBJ(unit whichUnit, bool exploded);
 
         /// @CSharpLua.Template = "ExplodeUnitBJ({0})"
+        [ChangesState]
         public static extern void ExplodeUnitBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "GetTransportUnitBJ()"
@@ -13177,63 +14363,79 @@ namespace Moonwell
         public static extern bool IsUnitIllusionBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "ReplaceUnitBJ({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern unit ReplaceUnitBJ(unit whichUnit, int newUnitId, int unitStateMethod);
 
         /// @CSharpLua.Template = "GetLastReplacedUnitBJ()"
         public static extern unit GetLastReplacedUnitBJ();
 
         /// @CSharpLua.Template = "SetUnitPositionLocFacingBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetUnitPositionLocFacingBJ(unit whichUnit, location loc, float facing);
 
         /// @CSharpLua.Template = "SetUnitPositionLocFacingLocBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetUnitPositionLocFacingLocBJ(unit whichUnit, location loc, location lookAt);
 
         /// @CSharpLua.Template = "AddItemToStockBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void AddItemToStockBJ(int itemId, unit whichUnit, int currentStock, int stockMax);
 
         /// @CSharpLua.Template = "AddUnitToStockBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void AddUnitToStockBJ(int unitId, unit whichUnit, int currentStock, int stockMax);
 
         /// @CSharpLua.Template = "RemoveItemFromStockBJ({0}, {1})"
+        [ChangesState]
         public static extern void RemoveItemFromStockBJ(int itemId, unit whichUnit);
 
         /// @CSharpLua.Template = "RemoveUnitFromStockBJ({0}, {1})"
+        [ChangesState]
         public static extern void RemoveUnitFromStockBJ(int unitId, unit whichUnit);
 
         /// @CSharpLua.Template = "SetUnitUseFoodBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitUseFoodBJ(bool enable, unit whichUnit);
 
         /// @CSharpLua.Template = "UnitDamagePointLoc({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [ChangesState]
         public static extern bool UnitDamagePointLoc(unit whichUnit, float delay, float radius, location loc, float amount, attacktype whichAttack, damagetype whichDamage);
 
         /// @CSharpLua.Template = "UnitDamageTargetBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern bool UnitDamageTargetBJ(unit whichUnit, unit target, float amount, attacktype whichAttack, damagetype whichDamage);
 
         /// @CSharpLua.Template = "CreateDestructableLoc({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle, ChangesState]
         public static extern destructable CreateDestructableLoc(int objectid, location loc, float facing, float scale, int variation);
 
         /// @CSharpLua.Template = "CreateDeadDestructableLocBJ({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle, ChangesState]
         public static extern destructable CreateDeadDestructableLocBJ(int objectid, location loc, float facing, float scale, int variation);
 
         /// @CSharpLua.Template = "GetLastCreatedDestructable()"
         public static extern destructable GetLastCreatedDestructable();
 
         /// @CSharpLua.Template = "ShowDestructableBJ({0}, {1})"
+        [ChangesState]
         public static extern void ShowDestructableBJ(bool flag, destructable d);
 
         /// @CSharpLua.Template = "SetDestructableInvulnerableBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetDestructableInvulnerableBJ(destructable d, bool flag);
 
         /// @CSharpLua.Template = "IsDestructableInvulnerableBJ({0})"
         public static extern bool IsDestructableInvulnerableBJ(destructable d);
 
         /// @CSharpLua.Template = "GetDestructableLoc({0})"
+        [CreatesHandle]
         public static extern location GetDestructableLoc(destructable whichDestructable);
 
         /// @CSharpLua.Template = "EnumDestructablesInRectAll({0}, {1})"
         public static extern void EnumDestructablesInRectAll(rect r, Action actionFunc);
 
         /// @CSharpLua.Template = "EnumDestructablesInCircleBJFilter()"
+        [CreatesHandle, ChangesState]
         public static extern bool EnumDestructablesInCircleBJFilter();
 
         /// @CSharpLua.Template = "IsDestructableDeadBJ({0})"
@@ -13243,255 +14445,332 @@ namespace Moonwell
         public static extern bool IsDestructableAliveBJ(destructable d);
 
         /// @CSharpLua.Template = "RandomDestructableInRectBJEnum()"
+        [ChangesState]
         public static extern void RandomDestructableInRectBJEnum();
 
         /// @CSharpLua.Template = "RandomDestructableInRectBJ({0}, {1})"
+        [ChangesState]
         public static extern destructable RandomDestructableInRectBJ(rect r, boolexpr filter);
 
         /// @CSharpLua.Template = "RandomDestructableInRectSimpleBJ({0})"
+        [ChangesState]
         public static extern destructable RandomDestructableInRectSimpleBJ(rect r);
 
         /// @CSharpLua.Template = "EnumDestructablesInCircleBJ({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern void EnumDestructablesInCircleBJ(float radius, location loc, Action actionFunc);
 
         /// @CSharpLua.Template = "SetDestructableLifePercentBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetDestructableLifePercentBJ(destructable d, float percent);
 
         /// @CSharpLua.Template = "SetDestructableMaxLifeBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetDestructableMaxLifeBJ(destructable d, float max);
 
         /// @CSharpLua.Template = "ModifyGateBJ({0}, {1})"
+        [ChangesState]
         public static extern void ModifyGateBJ(int gateOperation, destructable d);
 
         /// @CSharpLua.Template = "GetElevatorHeight({0})"
         public static extern int GetElevatorHeight(destructable d);
 
         /// @CSharpLua.Template = "ChangeElevatorHeight({0}, {1})"
+        [ChangesState]
         public static extern void ChangeElevatorHeight(destructable d, int newHeight);
 
         /// @CSharpLua.Template = "NudgeUnitsInRectEnum()"
+        [ChangesState]
         public static extern void NudgeUnitsInRectEnum();
 
         /// @CSharpLua.Template = "NudgeItemsInRectEnum()"
+        [ChangesState]
         public static extern void NudgeItemsInRectEnum();
 
         /// @CSharpLua.Template = "NudgeObjectsInRect({0})"
+        [CreatesHandle, ChangesState]
         public static extern void NudgeObjectsInRect(rect nudgeArea);
 
         /// @CSharpLua.Template = "NearbyElevatorExistsEnum()"
+        [ChangesState]
         public static extern void NearbyElevatorExistsEnum();
 
         /// @CSharpLua.Template = "NearbyElevatorExists({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern bool NearbyElevatorExists(float x, float y);
 
         /// @CSharpLua.Template = "FindElevatorWallBlockerEnum()"
+        [ChangesState]
         public static extern void FindElevatorWallBlockerEnum();
 
         /// @CSharpLua.Template = "ChangeElevatorWallBlocker({0}, {1}, {2}, {3})"
+        [CreatesHandle, ChangesState]
         public static extern void ChangeElevatorWallBlocker(float x, float y, float facing, bool open);
 
         /// @CSharpLua.Template = "ChangeElevatorWalls({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern void ChangeElevatorWalls(bool open, int walls, destructable d);
 
         /// @CSharpLua.Template = "WaygateActivateBJ({0}, {1})"
+        [ChangesState]
         public static extern void WaygateActivateBJ(bool activate, unit waygate);
 
         /// @CSharpLua.Template = "WaygateIsActiveBJ({0})"
         public static extern bool WaygateIsActiveBJ(unit waygate);
 
         /// @CSharpLua.Template = "WaygateSetDestinationLocBJ({0}, {1})"
+        [ChangesState]
         public static extern void WaygateSetDestinationLocBJ(unit waygate, location loc);
 
         /// @CSharpLua.Template = "WaygateGetDestinationLocBJ({0})"
+        [CreatesHandle]
         public static extern location WaygateGetDestinationLocBJ(unit waygate);
 
         /// @CSharpLua.Template = "UnitSetUsesAltIconBJ({0}, {1})"
+        [ChangesState]
         public static extern void UnitSetUsesAltIconBJ(bool flag, unit whichUnit);
 
         /// @CSharpLua.Template = "ForceUIKeyBJ({0}, {1})"
+        [ChangesState]
         public static extern void ForceUIKeyBJ(player whichPlayer, string key);
 
         /// @CSharpLua.Template = "ForceUICancelBJ({0})"
+        [ChangesState]
         public static extern void ForceUICancelBJ(player whichPlayer);
 
         /// @CSharpLua.Template = "ForGroupBJ({0}, {1})"
+        [ChangesState]
         public static extern void ForGroupBJ(group whichGroup, Action callback);
 
         /// @CSharpLua.Template = "GroupAddUnitSimple({0}, {1})"
+        [ChangesState]
         public static extern void GroupAddUnitSimple(unit whichUnit, group whichGroup);
 
         /// @CSharpLua.Template = "GroupRemoveUnitSimple({0}, {1})"
+        [ChangesState]
         public static extern void GroupRemoveUnitSimple(unit whichUnit, group whichGroup);
 
         /// @CSharpLua.Template = "GroupAddGroupEnum()"
+        [ChangesState]
         public static extern void GroupAddGroupEnum();
 
         /// @CSharpLua.Template = "GroupAddGroup({0}, {1})"
+        [ChangesState]
         public static extern void GroupAddGroup(group sourceGroup, group destGroup);
 
         /// @CSharpLua.Template = "GroupRemoveGroupEnum()"
+        [ChangesState]
         public static extern void GroupRemoveGroupEnum();
 
         /// @CSharpLua.Template = "GroupRemoveGroup({0}, {1})"
+        [ChangesState]
         public static extern void GroupRemoveGroup(group sourceGroup, group destGroup);
 
         /// @CSharpLua.Template = "ForceAddPlayerSimple({0}, {1})"
+        [ChangesState]
         public static extern void ForceAddPlayerSimple(player whichPlayer, force whichForce);
 
         /// @CSharpLua.Template = "ForceRemovePlayerSimple({0}, {1})"
+        [ChangesState]
         public static extern void ForceRemovePlayerSimple(player whichPlayer, force whichForce);
 
         /// @CSharpLua.Template = "GroupPickRandomUnitEnum()"
+        [ChangesState]
         public static extern void GroupPickRandomUnitEnum();
 
         /// @CSharpLua.Template = "GroupPickRandomUnit({0})"
+        [ChangesState]
         public static extern unit GroupPickRandomUnit(group whichGroup);
 
         /// @CSharpLua.Template = "ForcePickRandomPlayerEnum()"
+        [ChangesState]
         public static extern void ForcePickRandomPlayerEnum();
 
         /// @CSharpLua.Template = "ForcePickRandomPlayer({0})"
+        [ChangesState]
         public static extern player ForcePickRandomPlayer(force whichForce);
 
         /// @CSharpLua.Template = "EnumUnitsSelected({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern void EnumUnitsSelected(player whichPlayer, boolexpr enumFilter, Action enumAction);
 
         /// @CSharpLua.Template = "GetUnitsInRectMatching({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern group GetUnitsInRectMatching(rect r, boolexpr filter);
 
         /// @CSharpLua.Template = "GetUnitsInRectAll({0})"
+        [CreatesHandle, ChangesState]
         public static extern group GetUnitsInRectAll(rect r);
 
         /// @CSharpLua.Template = "GetUnitsInRectOfPlayerFilter()"
         public static extern bool GetUnitsInRectOfPlayerFilter();
 
         /// @CSharpLua.Template = "GetUnitsInRectOfPlayer({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern group GetUnitsInRectOfPlayer(rect r, player whichPlayer);
 
         /// @CSharpLua.Template = "GetUnitsInRangeOfLocMatching({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern group GetUnitsInRangeOfLocMatching(float radius, location whichLocation, boolexpr filter);
 
         /// @CSharpLua.Template = "GetUnitsInRangeOfLocAll({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern group GetUnitsInRangeOfLocAll(float radius, location whichLocation);
 
         /// @CSharpLua.Template = "GetUnitsOfTypeIdAllFilter()"
         public static extern bool GetUnitsOfTypeIdAllFilter();
 
         /// @CSharpLua.Template = "GetUnitsOfTypeIdAll({0})"
+        [CreatesHandle, ChangesState]
         public static extern group GetUnitsOfTypeIdAll(int unitid);
 
         /// @CSharpLua.Template = "GetUnitsOfPlayerMatching({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern group GetUnitsOfPlayerMatching(player whichPlayer, boolexpr filter);
 
         /// @CSharpLua.Template = "GetUnitsOfPlayerAll({0})"
+        [CreatesHandle, ChangesState]
         public static extern group GetUnitsOfPlayerAll(player whichPlayer);
 
         /// @CSharpLua.Template = "GetUnitsOfPlayerAndTypeIdFilter()"
         public static extern bool GetUnitsOfPlayerAndTypeIdFilter();
 
         /// @CSharpLua.Template = "GetUnitsOfPlayerAndTypeId({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern group GetUnitsOfPlayerAndTypeId(player whichPlayer, int unitid);
 
         /// @CSharpLua.Template = "GetUnitsSelectedAll({0})"
+        [CreatesHandle, ChangesState]
         public static extern group GetUnitsSelectedAll(player whichPlayer);
 
         /// @CSharpLua.Template = "GetForceOfPlayer({0})"
+        [CreatesHandle, ChangesState]
         public static extern force GetForceOfPlayer(player whichPlayer);
 
         /// @CSharpLua.Template = "GetPlayersAll()"
         public static extern force GetPlayersAll();
 
         /// @CSharpLua.Template = "GetPlayersByMapControl({0})"
+        [CreatesHandle, ChangesState]
         public static extern force GetPlayersByMapControl(mapcontrol whichControl);
 
         /// @CSharpLua.Template = "GetPlayersAllies({0})"
+        [CreatesHandle, ChangesState]
         public static extern force GetPlayersAllies(player whichPlayer);
 
         /// @CSharpLua.Template = "GetPlayersEnemies({0})"
+        [CreatesHandle, ChangesState]
         public static extern force GetPlayersEnemies(player whichPlayer);
 
         /// @CSharpLua.Template = "GetPlayersMatching({0})"
+        [CreatesHandle, ChangesState]
         public static extern force GetPlayersMatching(boolexpr filter);
 
         /// @CSharpLua.Template = "CountUnitsInGroupEnum()"
+        [ChangesState]
         public static extern void CountUnitsInGroupEnum();
 
         /// @CSharpLua.Template = "CountUnitsInGroup({0})"
+        [ChangesState]
         public static extern int CountUnitsInGroup(group g);
 
         /// @CSharpLua.Template = "CountPlayersInForceEnum()"
+        [ChangesState]
         public static extern void CountPlayersInForceEnum();
 
         /// @CSharpLua.Template = "CountPlayersInForceBJ({0})"
+        [ChangesState]
         public static extern int CountPlayersInForceBJ(force f);
 
         /// @CSharpLua.Template = "GetRandomSubGroupEnum()"
+        [ChangesState]
         public static extern void GetRandomSubGroupEnum();
 
         /// @CSharpLua.Template = "GetRandomSubGroup({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern group GetRandomSubGroup(int count, group sourceGroup);
 
         /// @CSharpLua.Template = "LivingPlayerUnitsOfTypeIdFilter()"
         public static extern bool LivingPlayerUnitsOfTypeIdFilter();
 
         /// @CSharpLua.Template = "CountLivingPlayerUnitsOfTypeId({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern int CountLivingPlayerUnitsOfTypeId(int unitId, player whichPlayer);
 
         /// @CSharpLua.Template = "ResetUnitAnimation({0})"
+        [ChangesState]
         public static extern void ResetUnitAnimation(unit whichUnit);
 
         /// @CSharpLua.Template = "SetUnitTimeScalePercent({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitTimeScalePercent(unit whichUnit, float percentScale);
 
         /// @CSharpLua.Template = "SetUnitScalePercent({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetUnitScalePercent(unit whichUnit, float percentScaleX, float percentScaleY, float percentScaleZ);
 
         /// @CSharpLua.Template = "SetUnitVertexColorBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void SetUnitVertexColorBJ(unit whichUnit, float red, float green, float blue, float transparency);
 
         /// @CSharpLua.Template = "UnitAddIndicatorBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void UnitAddIndicatorBJ(unit whichUnit, float red, float green, float blue, float transparency);
 
         /// @CSharpLua.Template = "DestructableAddIndicatorBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void DestructableAddIndicatorBJ(destructable whichDestructable, float red, float green, float blue, float transparency);
 
         /// @CSharpLua.Template = "ItemAddIndicatorBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void ItemAddIndicatorBJ(item whichItem, float red, float green, float blue, float transparency);
 
         /// @CSharpLua.Template = "SetUnitFacingToFaceLocTimed({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern void SetUnitFacingToFaceLocTimed(unit whichUnit, location target, float duration);
 
         /// @CSharpLua.Template = "SetUnitFacingToFaceUnitTimed({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern void SetUnitFacingToFaceUnitTimed(unit whichUnit, unit target, float duration);
 
         /// @CSharpLua.Template = "QueueUnitAnimationBJ({0}, {1})"
+        [ChangesState]
         public static extern void QueueUnitAnimationBJ(unit whichUnit, string whichAnimation);
 
         /// @CSharpLua.Template = "SetDestructableVertexColorBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void SetDestructableVertexColorBJ(destructable whichDestructable, float red, float green, float blue, float transparency);
 
         /// @CSharpLua.Template = "SetDestructableAnimationBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetDestructableAnimationBJ(destructable d, string whichAnimation);
 
         /// @CSharpLua.Template = "QueueDestructableAnimationBJ({0}, {1})"
+        [ChangesState]
         public static extern void QueueDestructableAnimationBJ(destructable d, string whichAnimation);
 
         /// @CSharpLua.Template = "SetDestAnimationSpeedPercent({0}, {1})"
+        [ChangesState]
         public static extern void SetDestAnimationSpeedPercent(destructable d, float percentScale);
 
         /// @CSharpLua.Template = "DialogDisplayBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void DialogDisplayBJ(bool flag, dialog whichDialog, player whichPlayer);
 
         /// @CSharpLua.Template = "DialogSetMessageBJ({0}, {1})"
+        [ChangesState]
         public static extern void DialogSetMessageBJ(dialog whichDialog, string message);
 
         /// @CSharpLua.Template = "DialogAddButtonBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern button DialogAddButtonBJ(dialog whichDialog, string buttonText);
 
         /// @CSharpLua.Template = "DialogAddButtonWithHotkeyBJ({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern button DialogAddButtonWithHotkeyBJ(dialog whichDialog, string buttonText, int hotkey);
 
         /// @CSharpLua.Template = "DialogClearBJ({0})"
+        [ChangesState]
         public static extern void DialogClearBJ(dialog whichDialog);
 
         /// @CSharpLua.Template = "GetLastCreatedButtonBJ()"
@@ -13504,150 +14783,195 @@ namespace Moonwell
         public static extern dialog GetClickedDialogBJ();
 
         /// @CSharpLua.Template = "SetPlayerAllianceBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetPlayerAllianceBJ(player sourcePlayer, alliancetype whichAllianceSetting, bool value, player otherPlayer);
 
         /// @CSharpLua.Template = "SetPlayerAllianceStateAllyBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetPlayerAllianceStateAllyBJ(player sourcePlayer, player otherPlayer, bool flag);
 
         /// @CSharpLua.Template = "SetPlayerAllianceStateVisionBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetPlayerAllianceStateVisionBJ(player sourcePlayer, player otherPlayer, bool flag);
 
         /// @CSharpLua.Template = "SetPlayerAllianceStateControlBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetPlayerAllianceStateControlBJ(player sourcePlayer, player otherPlayer, bool flag);
 
         /// @CSharpLua.Template = "SetPlayerAllianceStateFullControlBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetPlayerAllianceStateFullControlBJ(player sourcePlayer, player otherPlayer, bool flag);
 
         /// @CSharpLua.Template = "SetPlayerAllianceStateBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetPlayerAllianceStateBJ(player sourcePlayer, player otherPlayer, int allianceState);
 
         /// @CSharpLua.Template = "SetForceAllianceStateBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetForceAllianceStateBJ(force sourceForce, force targetForce, int allianceState);
 
         /// @CSharpLua.Template = "PlayersAreCoAllied({0}, {1})"
         public static extern bool PlayersAreCoAllied(player playerA, player playerB);
 
         /// @CSharpLua.Template = "ShareEverythingWithTeamAI({0})"
+        [ChangesState]
         public static extern void ShareEverythingWithTeamAI(player whichPlayer);
 
         /// @CSharpLua.Template = "ShareEverythingWithTeam({0})"
+        [ChangesState]
         public static extern void ShareEverythingWithTeam(player whichPlayer);
 
         /// @CSharpLua.Template = "ConfigureNeutralVictim()"
+        [ChangesState]
         public static extern void ConfigureNeutralVictim();
 
         /// @CSharpLua.Template = "MakeUnitsPassiveForPlayerEnum()"
+        [ChangesState]
         public static extern void MakeUnitsPassiveForPlayerEnum();
 
         /// @CSharpLua.Template = "MakeUnitsPassiveForPlayer({0})"
+        [CreatesHandle, ChangesState]
         public static extern void MakeUnitsPassiveForPlayer(player whichPlayer);
 
         /// @CSharpLua.Template = "MakeUnitsPassiveForTeam({0})"
+        [CreatesHandle, ChangesState]
         public static extern void MakeUnitsPassiveForTeam(player whichPlayer);
 
         /// @CSharpLua.Template = "AllowVictoryDefeat({0})"
         public static extern bool AllowVictoryDefeat(playergameresult gameResult);
 
         /// @CSharpLua.Template = "EndGameBJ()"
+        [ChangesState]
         public static extern void EndGameBJ();
 
         /// @CSharpLua.Template = "MeleeVictoryDialogBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeVictoryDialogBJ(player whichPlayer, bool leftGame);
 
         /// @CSharpLua.Template = "MeleeDefeatDialogBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeDefeatDialogBJ(player whichPlayer, bool leftGame);
 
         /// @CSharpLua.Template = "GameOverDialogBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern void GameOverDialogBJ(player whichPlayer, bool leftGame);
 
         /// @CSharpLua.Template = "RemovePlayerPreserveUnitsBJ({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern void RemovePlayerPreserveUnitsBJ(player whichPlayer, playergameresult gameResult, bool leftGame);
 
         /// @CSharpLua.Template = "CustomVictoryOkBJ()"
+        [ChangesState]
         public static extern void CustomVictoryOkBJ();
 
         /// @CSharpLua.Template = "CustomVictoryQuitBJ()"
+        [ChangesState]
         public static extern void CustomVictoryQuitBJ();
 
         /// @CSharpLua.Template = "CustomVictoryDialogBJ({0})"
+        [CreatesHandle, ChangesState]
         public static extern void CustomVictoryDialogBJ(player whichPlayer);
 
         /// @CSharpLua.Template = "CustomVictorySkipBJ({0})"
+        [ChangesState]
         public static extern void CustomVictorySkipBJ(player whichPlayer);
 
         /// @CSharpLua.Template = "CustomVictoryBJ({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern void CustomVictoryBJ(player whichPlayer, bool showDialog, bool showScores);
 
         /// @CSharpLua.Template = "CustomDefeatRestartBJ()"
+        [ChangesState]
         public static extern void CustomDefeatRestartBJ();
 
         /// @CSharpLua.Template = "CustomDefeatReduceDifficultyBJ()"
+        [ChangesState]
         public static extern void CustomDefeatReduceDifficultyBJ();
 
         /// @CSharpLua.Template = "CustomDefeatLoadBJ()"
+        [ChangesState]
         public static extern void CustomDefeatLoadBJ();
 
         /// @CSharpLua.Template = "CustomDefeatQuitBJ()"
+        [ChangesState]
         public static extern void CustomDefeatQuitBJ();
 
         /// @CSharpLua.Template = "CustomDefeatDialogBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern void CustomDefeatDialogBJ(player whichPlayer, string message);
 
         /// @CSharpLua.Template = "CustomDefeatBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern void CustomDefeatBJ(player whichPlayer, string message);
 
         /// @CSharpLua.Template = "SetNextLevelBJ({0})"
+        [ChangesState]
         public static extern void SetNextLevelBJ(string nextLevel);
 
         /// @CSharpLua.Template = "SetPlayerOnScoreScreenBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerOnScoreScreenBJ(bool flag, player whichPlayer);
 
         /// @CSharpLua.Template = "CreateQuestBJ({0}, {1}, {2}, {3})"
+        [CreatesHandle, ChangesState]
         public static extern quest CreateQuestBJ(int questType, string title, string description, string iconPath);
 
         /// @CSharpLua.Template = "DestroyQuestBJ({0})"
+        [ChangesState]
         public static extern void DestroyQuestBJ(quest whichQuest);
 
         /// @CSharpLua.Template = "QuestSetEnabledBJ({0}, {1})"
+        [ChangesState]
         public static extern void QuestSetEnabledBJ(bool enabled, quest whichQuest);
 
         /// @CSharpLua.Template = "QuestSetTitleBJ({0}, {1})"
+        [ChangesState]
         public static extern void QuestSetTitleBJ(quest whichQuest, string title);
 
         /// @CSharpLua.Template = "QuestSetDescriptionBJ({0}, {1})"
+        [ChangesState]
         public static extern void QuestSetDescriptionBJ(quest whichQuest, string description);
 
         /// @CSharpLua.Template = "QuestSetCompletedBJ({0}, {1})"
+        [ChangesState]
         public static extern void QuestSetCompletedBJ(quest whichQuest, bool completed);
 
         /// @CSharpLua.Template = "QuestSetFailedBJ({0}, {1})"
+        [ChangesState]
         public static extern void QuestSetFailedBJ(quest whichQuest, bool failed);
 
         /// @CSharpLua.Template = "QuestSetDiscoveredBJ({0}, {1})"
+        [ChangesState]
         public static extern void QuestSetDiscoveredBJ(quest whichQuest, bool discovered);
 
         /// @CSharpLua.Template = "GetLastCreatedQuestBJ()"
         public static extern quest GetLastCreatedQuestBJ();
 
         /// @CSharpLua.Template = "CreateQuestItemBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern questitem CreateQuestItemBJ(quest whichQuest, string description);
 
         /// @CSharpLua.Template = "QuestItemSetDescriptionBJ({0}, {1})"
+        [ChangesState]
         public static extern void QuestItemSetDescriptionBJ(questitem whichQuestItem, string description);
 
         /// @CSharpLua.Template = "QuestItemSetCompletedBJ({0}, {1})"
+        [ChangesState]
         public static extern void QuestItemSetCompletedBJ(questitem whichQuestItem, bool completed);
 
         /// @CSharpLua.Template = "GetLastCreatedQuestItemBJ()"
         public static extern questitem GetLastCreatedQuestItemBJ();
 
         /// @CSharpLua.Template = "CreateDefeatConditionBJ({0})"
+        [CreatesHandle, ChangesState]
         public static extern defeatcondition CreateDefeatConditionBJ(string description);
 
         /// @CSharpLua.Template = "DestroyDefeatConditionBJ({0})"
+        [ChangesState]
         public static extern void DestroyDefeatConditionBJ(defeatcondition whichCondition);
 
         /// @CSharpLua.Template = "DefeatConditionSetDescriptionBJ({0}, {1})"
+        [ChangesState]
         public static extern void DefeatConditionSetDescriptionBJ(defeatcondition whichCondition, string description);
 
         /// @CSharpLua.Template = "GetLastCreatedDefeatConditionBJ()"
@@ -13660,36 +14984,46 @@ namespace Moonwell
         public static extern void QuestMessageBJ(force f, int messageType, string message);
 
         /// @CSharpLua.Template = "StartTimerBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern timer StartTimerBJ(timer t, bool periodic, float timeout);
 
         /// @CSharpLua.Template = "CreateTimerBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern timer CreateTimerBJ(bool periodic, float timeout);
 
         /// @CSharpLua.Template = "DestroyTimerBJ({0})"
+        [ChangesState]
         public static extern void DestroyTimerBJ(timer whichTimer);
 
         /// @CSharpLua.Template = "PauseTimerBJ({0}, {1})"
+        [ChangesState]
         public static extern void PauseTimerBJ(bool pause, timer whichTimer);
 
         /// @CSharpLua.Template = "GetLastCreatedTimerBJ()"
         public static extern timer GetLastCreatedTimerBJ();
 
         /// @CSharpLua.Template = "CreateTimerDialogBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern timerdialog CreateTimerDialogBJ(timer t, string title);
 
         /// @CSharpLua.Template = "DestroyTimerDialogBJ({0})"
+        [ChangesState]
         public static extern void DestroyTimerDialogBJ(timerdialog td);
 
         /// @CSharpLua.Template = "TimerDialogSetTitleBJ({0}, {1})"
+        [ChangesState]
         public static extern void TimerDialogSetTitleBJ(timerdialog td, string title);
 
         /// @CSharpLua.Template = "TimerDialogSetTitleColorBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void TimerDialogSetTitleColorBJ(timerdialog td, float red, float green, float blue, float transparency);
 
         /// @CSharpLua.Template = "TimerDialogSetTimeColorBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void TimerDialogSetTimeColorBJ(timerdialog td, float red, float green, float blue, float transparency);
 
         /// @CSharpLua.Template = "TimerDialogSetSpeedBJ({0}, {1})"
+        [ChangesState]
         public static extern void TimerDialogSetSpeedBJ(timerdialog td, float speedMultFactor);
 
         /// @CSharpLua.Template = "TimerDialogDisplayForPlayerBJ({0}, {1}, {2})"
@@ -13702,33 +15036,43 @@ namespace Moonwell
         public static extern timerdialog GetLastCreatedTimerDialogBJ();
 
         /// @CSharpLua.Template = "LeaderboardResizeBJ({0})"
+        [ChangesState]
         public static extern void LeaderboardResizeBJ(leaderboard lb);
 
         /// @CSharpLua.Template = "LeaderboardSetPlayerItemValueBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void LeaderboardSetPlayerItemValueBJ(player whichPlayer, leaderboard lb, int val);
 
         /// @CSharpLua.Template = "LeaderboardSetPlayerItemLabelBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void LeaderboardSetPlayerItemLabelBJ(player whichPlayer, leaderboard lb, string val);
 
         /// @CSharpLua.Template = "LeaderboardSetPlayerItemStyleBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void LeaderboardSetPlayerItemStyleBJ(player whichPlayer, leaderboard lb, bool showLabel, bool showValue, bool showIcon);
 
         /// @CSharpLua.Template = "LeaderboardSetPlayerItemLabelColorBJ({0}, {1}, {2}, {3}, {4}, {5})"
+        [ChangesState]
         public static extern void LeaderboardSetPlayerItemLabelColorBJ(player whichPlayer, leaderboard lb, float red, float green, float blue, float transparency);
 
         /// @CSharpLua.Template = "LeaderboardSetPlayerItemValueColorBJ({0}, {1}, {2}, {3}, {4}, {5})"
+        [ChangesState]
         public static extern void LeaderboardSetPlayerItemValueColorBJ(player whichPlayer, leaderboard lb, float red, float green, float blue, float transparency);
 
         /// @CSharpLua.Template = "LeaderboardSetLabelColorBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void LeaderboardSetLabelColorBJ(leaderboard lb, float red, float green, float blue, float transparency);
 
         /// @CSharpLua.Template = "LeaderboardSetValueColorBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void LeaderboardSetValueColorBJ(leaderboard lb, float red, float green, float blue, float transparency);
 
         /// @CSharpLua.Template = "LeaderboardSetLabelBJ({0}, {1})"
+        [ChangesState]
         public static extern void LeaderboardSetLabelBJ(leaderboard lb, string label);
 
         /// @CSharpLua.Template = "LeaderboardSetStyleBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void LeaderboardSetStyleBJ(leaderboard lb, bool showLabel, bool showNames, bool showValues, bool showIcons);
 
         /// @CSharpLua.Template = "LeaderboardGetItemCountBJ({0})"
@@ -13738,30 +15082,38 @@ namespace Moonwell
         public static extern bool LeaderboardHasPlayerItemBJ(leaderboard lb, player whichPlayer);
 
         /// @CSharpLua.Template = "ForceSetLeaderboardBJ({0}, {1})"
+        [ChangesState]
         public static extern void ForceSetLeaderboardBJ(leaderboard lb, force toForce);
 
         /// @CSharpLua.Template = "CreateLeaderboardBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern leaderboard CreateLeaderboardBJ(force toForce, string label);
 
         /// @CSharpLua.Template = "DestroyLeaderboardBJ({0})"
+        [ChangesState]
         public static extern void DestroyLeaderboardBJ(leaderboard lb);
 
         /// @CSharpLua.Template = "LeaderboardDisplayBJ({0}, {1})"
         public static extern void LeaderboardDisplayBJ(bool show, leaderboard lb);
 
         /// @CSharpLua.Template = "LeaderboardAddItemBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void LeaderboardAddItemBJ(player whichPlayer, leaderboard lb, string label, int value);
 
         /// @CSharpLua.Template = "LeaderboardRemovePlayerItemBJ({0}, {1})"
+        [ChangesState]
         public static extern void LeaderboardRemovePlayerItemBJ(player whichPlayer, leaderboard lb);
 
         /// @CSharpLua.Template = "LeaderboardSortItemsBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void LeaderboardSortItemsBJ(leaderboard lb, int sortType, bool ascending);
 
         /// @CSharpLua.Template = "LeaderboardSortItemsByPlayerBJ({0}, {1})"
+        [ChangesState]
         public static extern void LeaderboardSortItemsByPlayerBJ(leaderboard lb, bool ascending);
 
         /// @CSharpLua.Template = "LeaderboardSortItemsByLabelBJ({0}, {1})"
+        [ChangesState]
         public static extern void LeaderboardSortItemsByLabelBJ(leaderboard lb, bool ascending);
 
         /// @CSharpLua.Template = "LeaderboardGetPlayerIndexBJ({0}, {1})"
@@ -13777,9 +15129,11 @@ namespace Moonwell
         public static extern leaderboard GetLastCreatedLeaderboard();
 
         /// @CSharpLua.Template = "CreateMultiboardBJ({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern multiboard CreateMultiboardBJ(int cols, int rows, string title);
 
         /// @CSharpLua.Template = "DestroyMultiboardBJ({0})"
+        [ChangesState]
         public static extern void DestroyMultiboardBJ(multiboard mb);
 
         /// @CSharpLua.Template = "GetLastCreatedMultiboard()"
@@ -13792,24 +15146,31 @@ namespace Moonwell
         public static extern void MultiboardMinimizeBJ(bool minimize, multiboard mb);
 
         /// @CSharpLua.Template = "MultiboardSetTitleTextColorBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void MultiboardSetTitleTextColorBJ(multiboard mb, float red, float green, float blue, float transparency);
 
         /// @CSharpLua.Template = "MultiboardAllowDisplayBJ({0})"
+        [ChangesState]
         public static extern void MultiboardAllowDisplayBJ(bool flag);
 
         /// @CSharpLua.Template = "MultiboardSetItemStyleBJ({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle, ChangesState]
         public static extern void MultiboardSetItemStyleBJ(multiboard mb, int col, int row, bool showValue, bool showIcon);
 
         /// @CSharpLua.Template = "MultiboardSetItemValueBJ({0}, {1}, {2}, {3})"
+        [CreatesHandle, ChangesState]
         public static extern void MultiboardSetItemValueBJ(multiboard mb, int col, int row, string val);
 
         /// @CSharpLua.Template = "MultiboardSetItemColorBJ({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [CreatesHandle, ChangesState]
         public static extern void MultiboardSetItemColorBJ(multiboard mb, int col, int row, float red, float green, float blue, float transparency);
 
         /// @CSharpLua.Template = "MultiboardSetItemWidthBJ({0}, {1}, {2}, {3})"
+        [CreatesHandle, ChangesState]
         public static extern void MultiboardSetItemWidthBJ(multiboard mb, int col, int row, float width);
 
         /// @CSharpLua.Template = "MultiboardSetItemIconBJ({0}, {1}, {2}, {3})"
+        [CreatesHandle, ChangesState]
         public static extern void MultiboardSetItemIconBJ(multiboard mb, int col, int row, string iconFileName);
 
         /// @CSharpLua.Template = "TextTagSize2Height({0})"
@@ -13819,6 +15180,7 @@ namespace Moonwell
         public static extern float TextTagSpeed2Velocity(float speed);
 
         /// @CSharpLua.Template = "SetTextTagColorBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void SetTextTagColorBJ(texttag tt, float red, float green, float blue, float transparency);
 
         /// @CSharpLua.Template = "SetTextTagVelocityBJ({0}, {1}, {2})"
@@ -13849,12 +15211,15 @@ namespace Moonwell
         public static extern void SetTextTagFadepointBJ(texttag tt, float fadepoint);
 
         /// @CSharpLua.Template = "CreateTextTagLocBJ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [CreatesHandle, ChangesState]
         public static extern texttag CreateTextTagLocBJ(string s, location loc, float zOffset, float size, float red, float green, float blue, float transparency);
 
         /// @CSharpLua.Template = "CreateTextTagUnitBJ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [CreatesHandle, ChangesState]
         public static extern texttag CreateTextTagUnitBJ(string s, unit whichUnit, float zOffset, float size, float red, float green, float blue, float transparency);
 
         /// @CSharpLua.Template = "DestroyTextTagBJ({0})"
+        [ChangesState]
         public static extern void DestroyTextTagBJ(texttag tt);
 
         /// @CSharpLua.Template = "ShowTextTagForceBJ({0}, {1}, {2})"
@@ -13864,9 +15229,11 @@ namespace Moonwell
         public static extern texttag GetLastCreatedTextTag();
 
         /// @CSharpLua.Template = "PauseGameOn()"
+        [ChangesState]
         public static extern void PauseGameOn();
 
         /// @CSharpLua.Template = "PauseGameOff()"
+        [ChangesState]
         public static extern void PauseGameOff();
 
         /// @CSharpLua.Template = "SetUserControlForceOn({0})"
@@ -13894,120 +15261,155 @@ namespace Moonwell
         public static extern void PingMinimapLocForPlayer(player whichPlayer, location loc, float duration);
 
         /// @CSharpLua.Template = "PingMinimapForForceEx({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [ChangesState]
         public static extern void PingMinimapForForceEx(force whichForce, float x, float y, float duration, int style, float red, float green, float blue);
 
         /// @CSharpLua.Template = "PingMinimapLocForForceEx({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [ChangesState]
         public static extern void PingMinimapLocForForceEx(force whichForce, location loc, float duration, int style, float red, float green, float blue);
 
         /// @CSharpLua.Template = "EnableWorldFogBoundaryBJ({0}, {1})"
+        [ChangesState]
         public static extern void EnableWorldFogBoundaryBJ(bool enable, force f);
 
         /// @CSharpLua.Template = "EnableOcclusionBJ({0}, {1})"
+        [ChangesState]
         public static extern void EnableOcclusionBJ(bool enable, force f);
 
         /// @CSharpLua.Template = "CancelCineSceneBJ()"
         public static extern void CancelCineSceneBJ();
 
         /// @CSharpLua.Template = "TryInitCinematicBehaviorBJ()"
+        [CreatesHandle, ChangesState]
         public static extern void TryInitCinematicBehaviorBJ();
 
         /// @CSharpLua.Template = "SetCinematicSceneBJ({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [ChangesState]
         public static extern void SetCinematicSceneBJ(sound soundHandle, int portraitUnitId, playercolor color, string speakerTitle, string text, float sceneDuration, float voiceoverDuration);
 
         /// @CSharpLua.Template = "GetTransmissionDuration({0}, {1}, {2})"
+        [MachineLocal]
         public static extern float GetTransmissionDuration(sound soundHandle, int timeType, float timeVal);
 
         /// @CSharpLua.Template = "WaitTransmissionDuration({0}, {1}, {2})"
+        [ChangesState]
         public static extern void WaitTransmissionDuration(sound soundHandle, int timeType, float timeVal);
 
         /// @CSharpLua.Template = "DoTransmissionBasicsXYBJ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [ChangesState]
         public static extern void DoTransmissionBasicsXYBJ(int unitId, playercolor color, float x, float y, sound soundHandle, string unitName, string message, float duration);
 
         /// @CSharpLua.Template = "TransmissionFromUnitWithNameBJ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [CreatesHandle, ChangesState]
         public static extern void TransmissionFromUnitWithNameBJ(force toForce, unit whichUnit, string unitName, sound soundHandle, string message, int timeType, float timeVal, bool wait);
 
         /// @CSharpLua.Template = "PlayDialogueFromSpeakerEx({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [MachineLocal, CreatesHandle, ChangesState]
         public static extern bool PlayDialogueFromSpeakerEx(force toForce, unit speaker, int speakerType, sound soundHandle, int timeType, float timeVal, bool wait);
 
         /// @CSharpLua.Template = "PlayDialogueFromSpeakerTypeEx({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})"
+        [MachineLocal, CreatesHandle, ChangesState]
         public static extern bool PlayDialogueFromSpeakerTypeEx(force toForce, player fromPlayer, int speakerType, location loc, sound soundHandle, int timeType, float timeVal, bool wait);
 
         /// @CSharpLua.Template = "TransmissionFromUnitTypeWithNameBJ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9})"
+        [CreatesHandle, ChangesState]
         public static extern void TransmissionFromUnitTypeWithNameBJ(force toForce, player fromPlayer, int unitId, string unitName, location loc, sound soundHandle, string message, int timeType, float timeVal, bool wait);
 
         /// @CSharpLua.Template = "GetLastTransmissionDurationBJ()"
         public static extern float GetLastTransmissionDurationBJ();
 
         /// @CSharpLua.Template = "SetCameraBlockerForPlayerBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetCameraBlockerForPlayerBJ(rect r, bool flag, player whichPlayer);
 
         /// @CSharpLua.Template = "ForceCinematicSubtitlesBJ({0})"
         public static extern void ForceCinematicSubtitlesBJ(bool flag);
 
         /// @CSharpLua.Template = "CinematicModeExBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void CinematicModeExBJ(bool cineMode, force forForce, float interfaceFadeTime);
 
         /// @CSharpLua.Template = "CinematicModeBJ({0}, {1})"
+        [ChangesState]
         public static extern void CinematicModeBJ(bool cineMode, force forForce);
 
         /// @CSharpLua.Template = "DisplayCineFilterBJ({0})"
         public static extern void DisplayCineFilterBJ(bool flag);
 
         /// @CSharpLua.Template = "CinematicFadeCommonBJ({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [ChangesState]
         public static extern void CinematicFadeCommonBJ(float red, float green, float blue, float duration, string tex, float startTrans, float endTrans);
 
         /// @CSharpLua.Template = "FinishCinematicFadeBJ()"
+        [ChangesState]
         public static extern void FinishCinematicFadeBJ();
 
         /// @CSharpLua.Template = "FinishCinematicFadeAfterBJ({0})"
+        [CreatesHandle, ChangesState]
         public static extern void FinishCinematicFadeAfterBJ(float duration);
 
         /// @CSharpLua.Template = "ContinueCinematicFadeBJ()"
+        [ChangesState]
         public static extern void ContinueCinematicFadeBJ();
 
         /// @CSharpLua.Template = "ContinueCinematicFadeAfterBJ({0}, {1}, {2}, {3}, {4}, {5})"
+        [CreatesHandle, ChangesState]
         public static extern void ContinueCinematicFadeAfterBJ(float duration, float red, float green, float blue, float trans, string tex);
 
         /// @CSharpLua.Template = "AbortCinematicFadeBJ()"
+        [ChangesState]
         public static extern void AbortCinematicFadeBJ();
 
         /// @CSharpLua.Template = "CinematicFadeBJ({0}, {1}, {2}, {3}, {4}, {5}, {6})"
+        [CreatesHandle, ChangesState]
         public static extern void CinematicFadeBJ(int fadetype, float duration, string tex, float red, float green, float blue, float trans);
 
         /// @CSharpLua.Template = "CinematicFilterGenericBJ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10})"
+        [ChangesState]
         public static extern void CinematicFilterGenericBJ(float duration, blendmode bmode, string tex, float red0, float green0, float blue0, float trans0, float red1, float green1, float blue1, float trans1);
 
         /// @CSharpLua.Template = "RescueUnitBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void RescueUnitBJ(unit whichUnit, player rescuer, bool changeColor);
 
         /// @CSharpLua.Template = "TriggerActionUnitRescuedBJ()"
+        [ChangesState]
         public static extern void TriggerActionUnitRescuedBJ();
 
         /// @CSharpLua.Template = "TryInitRescuableTriggersBJ()"
+        [CreatesHandle, ChangesState]
         public static extern void TryInitRescuableTriggersBJ();
 
         /// @CSharpLua.Template = "SetRescueUnitColorChangeBJ({0})"
+        [ChangesState]
         public static extern void SetRescueUnitColorChangeBJ(bool changeColor);
 
         /// @CSharpLua.Template = "SetRescueBuildingColorChangeBJ({0})"
+        [ChangesState]
         public static extern void SetRescueBuildingColorChangeBJ(bool changeColor);
 
         /// @CSharpLua.Template = "MakeUnitRescuableToForceBJEnum()"
+        [CreatesHandle, ChangesState]
         public static extern void MakeUnitRescuableToForceBJEnum();
 
         /// @CSharpLua.Template = "MakeUnitRescuableToForceBJ({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern void MakeUnitRescuableToForceBJ(unit whichUnit, bool isRescuable, force whichForce);
 
         /// @CSharpLua.Template = "InitRescuableBehaviorBJ()"
+        [CreatesHandle, ChangesState]
         public static extern void InitRescuableBehaviorBJ();
 
         /// @CSharpLua.Template = "SetPlayerTechResearchedSwap({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetPlayerTechResearchedSwap(int techid, int levels, player whichPlayer);
 
         /// @CSharpLua.Template = "SetPlayerTechMaxAllowedSwap({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetPlayerTechMaxAllowedSwap(int techid, int maximum, player whichPlayer);
 
         /// @CSharpLua.Template = "SetPlayerMaxHeroesAllowed({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerMaxHeroesAllowed(int maximum, player whichPlayer);
 
         /// @CSharpLua.Template = "GetPlayerTechCountSimple({0}, {1})"
@@ -14017,177 +15419,233 @@ namespace Moonwell
         public static extern int GetPlayerTechMaxAllowedSwap(int techid, player whichPlayer);
 
         /// @CSharpLua.Template = "SetPlayerAbilityAvailableBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetPlayerAbilityAvailableBJ(bool avail, int abilid, player whichPlayer);
 
         /// @CSharpLua.Template = "SetCampaignMenuRaceBJ({0})"
+        [ChangesState]
         public static extern void SetCampaignMenuRaceBJ(int campaignNumber);
 
         /// @CSharpLua.Template = "SetMissionAvailableBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetMissionAvailableBJ(bool available, int missionIndex);
 
         /// @CSharpLua.Template = "SetCampaignAvailableBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetCampaignAvailableBJ(bool available, int campaignNumber);
 
         /// @CSharpLua.Template = "SetCinematicAvailableBJ({0}, {1})"
+        [ChangesState]
         public static extern void SetCinematicAvailableBJ(bool available, int cinematicIndex);
 
         /// @CSharpLua.Template = "InitGameCacheBJ({0})"
+        [CreatesHandle, ChangesState]
         public static extern gamecache InitGameCacheBJ(string campaignFile);
 
         /// @CSharpLua.Template = "SaveGameCacheBJ({0})"
+        [ChangesState]
         public static extern bool SaveGameCacheBJ(gamecache cache);
 
         /// @CSharpLua.Template = "GetLastCreatedGameCacheBJ()"
         public static extern gamecache GetLastCreatedGameCacheBJ();
 
         /// @CSharpLua.Template = "InitHashtableBJ()"
+        [CreatesHandle, ChangesState]
         public static extern hashtable InitHashtableBJ();
 
         /// @CSharpLua.Template = "GetLastCreatedHashtableBJ()"
         public static extern hashtable GetLastCreatedHashtableBJ();
 
         /// @CSharpLua.Template = "StoreRealBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void StoreRealBJ(float value, string key, string missionKey, gamecache cache);
 
         /// @CSharpLua.Template = "StoreIntegerBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void StoreIntegerBJ(int value, string key, string missionKey, gamecache cache);
 
         /// @CSharpLua.Template = "StoreBooleanBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void StoreBooleanBJ(bool value, string key, string missionKey, gamecache cache);
 
         /// @CSharpLua.Template = "StoreStringBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool StoreStringBJ(string value, string key, string missionKey, gamecache cache);
 
         /// @CSharpLua.Template = "StoreUnitBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool StoreUnitBJ(unit whichUnit, string key, string missionKey, gamecache cache);
 
         /// @CSharpLua.Template = "SaveRealBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SaveRealBJ(float value, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveIntegerBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SaveIntegerBJ(int value, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveBooleanBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SaveBooleanBJ(bool value, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveStringBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveStringBJ(string value, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SavePlayerHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SavePlayerHandleBJ(player whichPlayer, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveWidgetHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveWidgetHandleBJ(widget whichWidget, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveDestructableHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveDestructableHandleBJ(destructable whichDestructable, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveItemHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveItemHandleBJ(item whichItem, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveUnitHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveUnitHandleBJ(unit whichUnit, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveAbilityHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveAbilityHandleBJ(ability whichAbility, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveTimerHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveTimerHandleBJ(timer whichTimer, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveTriggerHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveTriggerHandleBJ(trigger whichTrigger, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveTriggerConditionHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveTriggerConditionHandleBJ(triggercondition whichTriggercondition, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveTriggerActionHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveTriggerActionHandleBJ(triggeraction whichTriggeraction, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveTriggerEventHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveTriggerEventHandleBJ(@event whichEvent, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveForceHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveForceHandleBJ(force whichForce, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveGroupHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveGroupHandleBJ(group whichGroup, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveLocationHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveLocationHandleBJ(location whichLocation, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveRectHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveRectHandleBJ(rect whichRect, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveBooleanExprHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveBooleanExprHandleBJ(boolexpr whichBoolexpr, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveSoundHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveSoundHandleBJ(sound whichSound, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveEffectHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveEffectHandleBJ(effect whichEffect, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveUnitPoolHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveUnitPoolHandleBJ(unitpool whichUnitpool, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveItemPoolHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveItemPoolHandleBJ(itempool whichItempool, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveQuestHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveQuestHandleBJ(quest whichQuest, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveQuestItemHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveQuestItemHandleBJ(questitem whichQuestitem, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveDefeatConditionHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveDefeatConditionHandleBJ(defeatcondition whichDefeatcondition, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveTimerDialogHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveTimerDialogHandleBJ(timerdialog whichTimerdialog, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveLeaderboardHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveLeaderboardHandleBJ(leaderboard whichLeaderboard, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveMultiboardHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveMultiboardHandleBJ(multiboard whichMultiboard, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveMultiboardItemHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveMultiboardItemHandleBJ(multiboarditem whichMultiboarditem, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveTrackableHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveTrackableHandleBJ(trackable whichTrackable, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveDialogHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveDialogHandleBJ(dialog whichDialog, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveButtonHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveButtonHandleBJ(button whichButton, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveTextTagHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveTextTagHandleBJ(texttag whichTexttag, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveLightningHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveLightningHandleBJ(lightning whichLightning, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveImageHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveImageHandleBJ(image whichImage, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveUbersplatHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveUbersplatHandleBJ(ubersplat whichUbersplat, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveRegionHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveRegionHandleBJ(region whichRegion, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveFogStateHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveFogStateHandleBJ(fogstate whichFogState, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveFogModifierHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveFogModifierHandleBJ(fogmodifier whichFogModifier, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveAgentHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveAgentHandleBJ(agent whichAgent, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "SaveHashtableHandleBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern bool SaveHashtableHandleBJ(hashtable whichHashtable, int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "GetStoredRealBJ({0}, {1}, {2})"
@@ -14329,24 +15787,30 @@ namespace Moonwell
         public static extern hashtable LoadHashtableHandleBJ(int key, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "RestoreUnitLocFacingAngleBJ({0}, {1}, {2}, {3}, {4}, {5})"
+        [CreatesHandle, ChangesState]
         public static extern unit RestoreUnitLocFacingAngleBJ(string key, string missionKey, gamecache cache, player forWhichPlayer, location loc, float facing);
 
         /// @CSharpLua.Template = "RestoreUnitLocFacingPointBJ({0}, {1}, {2}, {3}, {4}, {5})"
+        [CreatesHandle, ChangesState]
         public static extern unit RestoreUnitLocFacingPointBJ(string key, string missionKey, gamecache cache, player forWhichPlayer, location loc, location lookAt);
 
         /// @CSharpLua.Template = "GetLastRestoredUnitBJ()"
         public static extern unit GetLastRestoredUnitBJ();
 
         /// @CSharpLua.Template = "FlushGameCacheBJ({0})"
+        [ChangesState]
         public static extern void FlushGameCacheBJ(gamecache cache);
 
         /// @CSharpLua.Template = "FlushStoredMissionBJ({0}, {1})"
+        [ChangesState]
         public static extern void FlushStoredMissionBJ(string missionKey, gamecache cache);
 
         /// @CSharpLua.Template = "FlushParentHashtableBJ({0})"
+        [ChangesState]
         public static extern void FlushParentHashtableBJ(hashtable table);
 
         /// @CSharpLua.Template = "FlushChildHashtableBJ({0}, {1})"
+        [ChangesState]
         public static extern void FlushChildHashtableBJ(int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "HaveStoredValue({0}, {1}, {2}, {3})"
@@ -14356,30 +15820,38 @@ namespace Moonwell
         public static extern bool HaveSavedValue(int key, int valueType, int missionKey, hashtable table);
 
         /// @CSharpLua.Template = "ShowCustomCampaignButton({0}, {1})"
+        [ChangesState]
         public static extern void ShowCustomCampaignButton(bool show, int whichButton);
 
         /// @CSharpLua.Template = "IsCustomCampaignButtonVisibile({0})"
         public static extern bool IsCustomCampaignButtonVisibile(int whichButton);
 
         /// @CSharpLua.Template = "SaveGameCheckPointBJ({0}, {1})"
+        [ChangesState]
         public static extern void SaveGameCheckPointBJ(string mapSaveName, bool doCheckpointHint);
 
         /// @CSharpLua.Template = "LoadGameBJ({0}, {1})"
+        [ChangesState]
         public static extern void LoadGameBJ(string loadFileName, bool doScoreScreen);
 
         /// @CSharpLua.Template = "SaveAndChangeLevelBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SaveAndChangeLevelBJ(string saveFileName, string newLevel, bool doScoreScreen);
 
         /// @CSharpLua.Template = "SaveAndLoadGameBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SaveAndLoadGameBJ(string saveFileName, string loadFileName, bool doScoreScreen);
 
         /// @CSharpLua.Template = "RenameSaveDirectoryBJ({0}, {1})"
+        [ChangesState]
         public static extern bool RenameSaveDirectoryBJ(string sourceDirName, string destDirName);
 
         /// @CSharpLua.Template = "RemoveSaveDirectoryBJ({0})"
+        [ChangesState]
         public static extern bool RemoveSaveDirectoryBJ(string sourceDirName);
 
         /// @CSharpLua.Template = "CopySaveGameBJ({0}, {1})"
+        [ChangesState]
         public static extern bool CopySaveGameBJ(string sourceSaveName, string destSaveName);
 
         /// @CSharpLua.Template = "GetPlayerStartLocationX({0})"
@@ -14389,9 +15861,11 @@ namespace Moonwell
         public static extern float GetPlayerStartLocationY(player whichPlayer);
 
         /// @CSharpLua.Template = "GetPlayerStartLocationLoc({0})"
+        [CreatesHandle]
         public static extern location GetPlayerStartLocationLoc(player whichPlayer);
 
         /// @CSharpLua.Template = "GetRectCenter({0})"
+        [CreatesHandle]
         public static extern location GetRectCenter(rect whichRect);
 
         /// @CSharpLua.Template = "IsPlayerSlotState({0}, {1})"
@@ -14404,18 +15878,23 @@ namespace Moonwell
         public static extern float GetFadeFromSecondsAsReal(float seconds);
 
         /// @CSharpLua.Template = "AdjustPlayerStateSimpleBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void AdjustPlayerStateSimpleBJ(player whichPlayer, playerstate whichPlayerState, int delta);
 
         /// @CSharpLua.Template = "AdjustPlayerStateBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void AdjustPlayerStateBJ(int delta, player whichPlayer, playerstate whichPlayerState);
 
         /// @CSharpLua.Template = "SetPlayerStateBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetPlayerStateBJ(player whichPlayer, playerstate whichPlayerState, int value);
 
         /// @CSharpLua.Template = "SetPlayerFlagBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetPlayerFlagBJ(playerstate whichPlayerFlag, bool flag, player whichPlayer);
 
         /// @CSharpLua.Template = "SetPlayerTaxRateBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetPlayerTaxRateBJ(int rate, playerstate whichResource, player sourcePlayer, player otherPlayer);
 
         /// @CSharpLua.Template = "GetPlayerTaxRateBJ({0}, {1}, {2})"
@@ -14425,6 +15904,7 @@ namespace Moonwell
         public static extern bool IsPlayerFlagSetBJ(playerstate whichPlayerFlag, player whichPlayer);
 
         /// @CSharpLua.Template = "AddResourceAmountBJ({0}, {1})"
+        [ChangesState]
         public static extern void AddResourceAmountBJ(int delta, unit whichUnit);
 
         /// @CSharpLua.Template = "GetConvertedPlayerId({0})"
@@ -14440,9 +15920,11 @@ namespace Moonwell
         public static extern float GetRectHeightBJ(rect r);
 
         /// @CSharpLua.Template = "BlightGoldMineForPlayerBJ({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern unit BlightGoldMineForPlayerBJ(unit goldMine, player whichPlayer);
 
         /// @CSharpLua.Template = "BlightGoldMineForPlayer({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern unit BlightGoldMineForPlayer(unit goldMine, player whichPlayer);
 
         /// @CSharpLua.Template = "GetLastHauntedGoldMine()"
@@ -14452,156 +15934,204 @@ namespace Moonwell
         public static extern bool IsPointBlightedBJ(location where);
 
         /// @CSharpLua.Template = "SetPlayerColorBJEnum()"
+        [ChangesState]
         public static extern void SetPlayerColorBJEnum();
 
         /// @CSharpLua.Template = "SetPlayerColorBJ({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern void SetPlayerColorBJ(player whichPlayer, playercolor color, bool changeExisting);
 
         /// @CSharpLua.Template = "SetPlayerUnitAvailableBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetPlayerUnitAvailableBJ(int unitId, bool allowed, player whichPlayer);
 
         /// @CSharpLua.Template = "LockGameSpeedBJ()"
+        [ChangesState]
         public static extern void LockGameSpeedBJ();
 
         /// @CSharpLua.Template = "UnlockGameSpeedBJ()"
+        [ChangesState]
         public static extern void UnlockGameSpeedBJ();
 
         /// @CSharpLua.Template = "IssueTargetOrderBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool IssueTargetOrderBJ(unit whichUnit, string order, widget targetWidget);
 
         /// @CSharpLua.Template = "IssuePointOrderLocBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool IssuePointOrderLocBJ(unit whichUnit, string order, location whichLocation);
 
         /// @CSharpLua.Template = "IssueTargetDestructableOrder({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool IssueTargetDestructableOrder(unit whichUnit, string order, widget targetWidget);
 
         /// @CSharpLua.Template = "IssueTargetItemOrder({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool IssueTargetItemOrder(unit whichUnit, string order, widget targetWidget);
 
         /// @CSharpLua.Template = "IssueImmediateOrderBJ({0}, {1})"
+        [ChangesState]
         public static extern bool IssueImmediateOrderBJ(unit whichUnit, string order);
 
         /// @CSharpLua.Template = "GroupTargetOrderBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool GroupTargetOrderBJ(group whichGroup, string order, widget targetWidget);
 
         /// @CSharpLua.Template = "GroupPointOrderLocBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool GroupPointOrderLocBJ(group whichGroup, string order, location whichLocation);
 
         /// @CSharpLua.Template = "GroupImmediateOrderBJ({0}, {1})"
+        [ChangesState]
         public static extern bool GroupImmediateOrderBJ(group whichGroup, string order);
 
         /// @CSharpLua.Template = "GroupTargetDestructableOrder({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool GroupTargetDestructableOrder(group whichGroup, string order, widget targetWidget);
 
         /// @CSharpLua.Template = "GroupTargetItemOrder({0}, {1}, {2})"
+        [ChangesState]
         public static extern bool GroupTargetItemOrder(group whichGroup, string order, widget targetWidget);
 
         /// @CSharpLua.Template = "GetDyingDestructable()"
         public static extern destructable GetDyingDestructable();
 
         /// @CSharpLua.Template = "SetUnitRallyPoint({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitRallyPoint(unit whichUnit, location targPos);
 
         /// @CSharpLua.Template = "SetUnitRallyUnit({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitRallyUnit(unit whichUnit, unit targUnit);
 
         /// @CSharpLua.Template = "SetUnitRallyDestructable({0}, {1})"
+        [ChangesState]
         public static extern void SetUnitRallyDestructable(unit whichUnit, destructable targDest);
 
         /// @CSharpLua.Template = "SaveDyingWidget()"
+        [ChangesState]
         public static extern void SaveDyingWidget();
 
         /// @CSharpLua.Template = "SetBlightRectBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void SetBlightRectBJ(bool addBlight, player whichPlayer, rect r);
 
         /// @CSharpLua.Template = "SetBlightRadiusLocBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void SetBlightRadiusLocBJ(bool addBlight, player whichPlayer, location loc, float radius);
 
         /// @CSharpLua.Template = "GetAbilityName({0})"
+        [MachineLocal]
         public static extern string GetAbilityName(int abilcode);
 
         /// @CSharpLua.Template = "MeleeStartingVisibility()"
+        [ChangesState]
         public static extern void MeleeStartingVisibility();
 
         /// @CSharpLua.Template = "MeleeStartingResources()"
+        [ChangesState]
         public static extern void MeleeStartingResources();
 
         /// @CSharpLua.Template = "ReducePlayerTechMaxAllowed({0}, {1}, {2})"
+        [ChangesState]
         public static extern void ReducePlayerTechMaxAllowed(player whichPlayer, int techId, int limit);
 
         /// @CSharpLua.Template = "MeleeStartingHeroLimit()"
+        [ChangesState]
         public static extern void MeleeStartingHeroLimit();
 
         /// @CSharpLua.Template = "MeleeTrainedUnitIsHeroBJFilter()"
         public static extern bool MeleeTrainedUnitIsHeroBJFilter();
 
         /// @CSharpLua.Template = "MeleeGrantItemsToHero({0})"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeGrantItemsToHero(unit whichUnit);
 
         /// @CSharpLua.Template = "MeleeGrantItemsToTrainedHero()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeGrantItemsToTrainedHero();
 
         /// @CSharpLua.Template = "MeleeGrantItemsToHiredHero()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeGrantItemsToHiredHero();
 
         /// @CSharpLua.Template = "MeleeGrantHeroItems()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeGrantHeroItems();
 
         /// @CSharpLua.Template = "MeleeClearExcessUnit()"
+        [ChangesState]
         public static extern void MeleeClearExcessUnit();
 
         /// @CSharpLua.Template = "MeleeClearNearbyUnits({0}, {1}, {2})"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeClearNearbyUnits(float x, float y, float range);
 
         /// @CSharpLua.Template = "MeleeClearExcessUnits()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeClearExcessUnits();
 
         /// @CSharpLua.Template = "MeleeEnumFindNearestMine()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeEnumFindNearestMine();
 
         /// @CSharpLua.Template = "MeleeFindNearestMine({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern unit MeleeFindNearestMine(location src, float range);
 
         /// @CSharpLua.Template = "MeleeRandomHeroLoc({0}, {1}, {2}, {3}, {4}, {5})"
+        [CreatesHandle, ChangesState]
         public static extern unit MeleeRandomHeroLoc(player p, int id1, int id2, int id3, int id4, location loc);
 
         /// @CSharpLua.Template = "MeleeGetProjectedLoc({0}, {1}, {2}, {3})"
+        [CreatesHandle]
         public static extern location MeleeGetProjectedLoc(location src, location targ, float distance, float deltaAngle);
 
         /// @CSharpLua.Template = "MeleeGetNearestValueWithin({0}, {1}, {2})"
         public static extern float MeleeGetNearestValueWithin(float val, float minVal, float maxVal);
 
         /// @CSharpLua.Template = "MeleeGetLocWithinRect({0}, {1})"
+        [CreatesHandle]
         public static extern location MeleeGetLocWithinRect(location src, rect r);
 
         /// @CSharpLua.Template = "MeleeStartingUnitsHuman({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeStartingUnitsHuman(player whichPlayer, location startLoc, bool doHeroes, bool doCamera, bool doPreload);
 
         /// @CSharpLua.Template = "MeleeStartingUnitsOrc({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeStartingUnitsOrc(player whichPlayer, location startLoc, bool doHeroes, bool doCamera, bool doPreload);
 
         /// @CSharpLua.Template = "MeleeStartingUnitsUndead({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeStartingUnitsUndead(player whichPlayer, location startLoc, bool doHeroes, bool doCamera, bool doPreload);
 
         /// @CSharpLua.Template = "MeleeStartingUnitsNightElf({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeStartingUnitsNightElf(player whichPlayer, location startLoc, bool doHeroes, bool doCamera, bool doPreload);
 
         /// @CSharpLua.Template = "MeleeStartingUnitsUnknownRace({0}, {1}, {2}, {3}, {4})"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeStartingUnitsUnknownRace(player whichPlayer, location startLoc, bool doHeroes, bool doCamera, bool doPreload);
 
         /// @CSharpLua.Template = "MeleeStartingUnits()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeStartingUnits();
 
         /// @CSharpLua.Template = "MeleeStartingUnitsForPlayer({0}, {1}, {2}, {3})"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeStartingUnitsForPlayer(race whichRace, player whichPlayer, location loc, bool doHeroes);
 
         /// @CSharpLua.Template = "PickMeleeAI({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void PickMeleeAI(player num, string s1, string s2, string s3);
 
         /// @CSharpLua.Template = "MeleeStartingAI()"
+        [ChangesState]
         public static extern void MeleeStartingAI();
 
         /// @CSharpLua.Template = "LockGuardPosition({0})"
+        [ChangesState]
         public static extern void LockGuardPosition(unit targ);
 
         /// @CSharpLua.Template = "MeleePlayerIsOpponent({0}, {1})"
@@ -14617,111 +16147,145 @@ namespace Moonwell
         public static extern int MeleeGetAllyKeyStructureCount(player whichPlayer);
 
         /// @CSharpLua.Template = "MeleeDoDrawEnum()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeDoDrawEnum();
 
         /// @CSharpLua.Template = "MeleeDoVictoryEnum()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeDoVictoryEnum();
 
         /// @CSharpLua.Template = "MeleeDoDefeat({0})"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeDoDefeat(player whichPlayer);
 
         /// @CSharpLua.Template = "MeleeDoDefeatEnum()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeDoDefeatEnum();
 
         /// @CSharpLua.Template = "MeleeDoLeave({0})"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeDoLeave(player whichPlayer);
 
         /// @CSharpLua.Template = "MeleeRemoveObservers()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeRemoveObservers();
 
         /// @CSharpLua.Template = "MeleeCheckForVictors()"
+        [CreatesHandle, ChangesState]
         public static extern force MeleeCheckForVictors();
 
         /// @CSharpLua.Template = "MeleeCheckForLosersAndVictors()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeCheckForLosersAndVictors();
 
         /// @CSharpLua.Template = "MeleeGetCrippledWarningMessage({0})"
+        [MachineLocal]
         public static extern string MeleeGetCrippledWarningMessage(player whichPlayer);
 
         /// @CSharpLua.Template = "MeleeGetCrippledTimerMessage({0})"
+        [MachineLocal]
         public static extern string MeleeGetCrippledTimerMessage(player whichPlayer);
 
         /// @CSharpLua.Template = "MeleeGetCrippledRevealedMessage({0})"
+        [MachineLocal]
         public static extern string MeleeGetCrippledRevealedMessage(player whichPlayer);
 
         /// @CSharpLua.Template = "MeleeExposePlayer({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeExposePlayer(player whichPlayer, bool expose);
 
         /// @CSharpLua.Template = "MeleeExposeAllPlayers()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeExposeAllPlayers();
 
         /// @CSharpLua.Template = "MeleeCrippledPlayerTimeout()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeCrippledPlayerTimeout();
 
         /// @CSharpLua.Template = "MeleePlayerIsCrippled({0})"
         public static extern bool MeleePlayerIsCrippled(player whichPlayer);
 
         /// @CSharpLua.Template = "MeleeCheckForCrippledPlayers()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeCheckForCrippledPlayers();
 
         /// @CSharpLua.Template = "MeleeCheckLostUnit({0})"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeCheckLostUnit(unit lostUnit);
 
         /// @CSharpLua.Template = "MeleeCheckAddedUnit({0})"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeCheckAddedUnit(unit addedUnit);
 
         /// @CSharpLua.Template = "MeleeTriggerActionConstructCancel()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeTriggerActionConstructCancel();
 
         /// @CSharpLua.Template = "MeleeTriggerActionUnitDeath()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeTriggerActionUnitDeath();
 
         /// @CSharpLua.Template = "MeleeTriggerActionUnitConstructionStart()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeTriggerActionUnitConstructionStart();
 
         /// @CSharpLua.Template = "MeleeTriggerActionPlayerDefeated()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeTriggerActionPlayerDefeated();
 
         /// @CSharpLua.Template = "MeleeTriggerActionPlayerLeft()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeTriggerActionPlayerLeft();
 
         /// @CSharpLua.Template = "MeleeTriggerActionAllianceChange()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeTriggerActionAllianceChange();
 
         /// @CSharpLua.Template = "MeleeTriggerTournamentFinishSoon()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeTriggerTournamentFinishSoon();
 
         /// @CSharpLua.Template = "MeleeWasUserPlayer({0})"
         public static extern bool MeleeWasUserPlayer(player whichPlayer);
 
         /// @CSharpLua.Template = "MeleeTournamentFinishNowRuleA({0})"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeTournamentFinishNowRuleA(int multiplier);
 
         /// @CSharpLua.Template = "MeleeTriggerTournamentFinishNow()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeTriggerTournamentFinishNow();
 
         /// @CSharpLua.Template = "MeleeInitVictoryDefeat()"
+        [CreatesHandle, ChangesState]
         public static extern void MeleeInitVictoryDefeat();
 
         /// @CSharpLua.Template = "CheckInitPlayerSlotAvailability()"
+        [ChangesState]
         public static extern void CheckInitPlayerSlotAvailability();
 
         /// @CSharpLua.Template = "SetPlayerSlotAvailable({0}, {1})"
+        [ChangesState]
         public static extern void SetPlayerSlotAvailable(player whichPlayer, mapcontrol control);
 
         /// @CSharpLua.Template = "TeamInitPlayerSlots({0})"
+        [ChangesState]
         public static extern void TeamInitPlayerSlots(int teamCount);
 
         /// @CSharpLua.Template = "MeleeInitPlayerSlots()"
+        [ChangesState]
         public static extern void MeleeInitPlayerSlots();
 
         /// @CSharpLua.Template = "FFAInitPlayerSlots()"
+        [ChangesState]
         public static extern void FFAInitPlayerSlots();
 
         /// @CSharpLua.Template = "OneOnOneInitPlayerSlots()"
+        [ChangesState]
         public static extern void OneOnOneInitPlayerSlots();
 
         /// @CSharpLua.Template = "InitGenericPlayerSlots()"
+        [ChangesState]
         public static extern void InitGenericPlayerSlots();
 
         /// @CSharpLua.Template = "SetDNCSoundsDawn()"
@@ -14731,177 +16295,234 @@ namespace Moonwell
         public static extern void SetDNCSoundsDusk();
 
         /// @CSharpLua.Template = "SetDNCSoundsDay()"
+        [ChangesState]
         public static extern void SetDNCSoundsDay();
 
         /// @CSharpLua.Template = "SetDNCSoundsNight()"
+        [ChangesState]
         public static extern void SetDNCSoundsNight();
 
         /// @CSharpLua.Template = "InitDNCSounds()"
+        [CreatesHandle, ChangesState]
         public static extern void InitDNCSounds();
 
         /// @CSharpLua.Template = "InitBlizzardGlobals()"
+        [CreatesHandle, ChangesState]
         public static extern void InitBlizzardGlobals();
 
         /// @CSharpLua.Template = "InitQueuedTriggers()"
+        [CreatesHandle, ChangesState]
         public static extern void InitQueuedTriggers();
 
         /// @CSharpLua.Template = "InitMapRects()"
+        [CreatesHandle, ChangesState]
         public static extern void InitMapRects();
 
         /// @CSharpLua.Template = "InitSummonableCaps()"
+        [ChangesState]
         public static extern void InitSummonableCaps();
 
         /// @CSharpLua.Template = "UpdateStockAvailability({0})"
+        [ChangesState]
         public static extern void UpdateStockAvailability(item whichItem);
 
         /// @CSharpLua.Template = "UpdateEachStockBuildingEnum()"
+        [ChangesState]
         public static extern void UpdateEachStockBuildingEnum();
 
         /// @CSharpLua.Template = "UpdateEachStockBuilding({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern void UpdateEachStockBuilding(itemtype iType, int iLevel);
 
         /// @CSharpLua.Template = "PerformStockUpdates()"
+        [CreatesHandle, ChangesState]
         public static extern void PerformStockUpdates();
 
         /// @CSharpLua.Template = "StartStockUpdates()"
+        [CreatesHandle, ChangesState]
         public static extern void StartStockUpdates();
 
         /// @CSharpLua.Template = "RemovePurchasedItem()"
+        [ChangesState]
         public static extern void RemovePurchasedItem();
 
         /// @CSharpLua.Template = "InitNeutralBuildings()"
+        [CreatesHandle, ChangesState]
         public static extern void InitNeutralBuildings();
 
         /// @CSharpLua.Template = "MarkGameStarted()"
+        [ChangesState]
         public static extern void MarkGameStarted();
 
         /// @CSharpLua.Template = "DetectGameStarted()"
+        [CreatesHandle, ChangesState]
         public static extern void DetectGameStarted();
 
         /// @CSharpLua.Template = "InitBlizzard()"
+        [CreatesHandle, ChangesState]
         public static extern void InitBlizzard();
 
         /// @CSharpLua.Template = "RandomDistReset()"
+        [ChangesState]
         public static extern void RandomDistReset();
 
         /// @CSharpLua.Template = "RandomDistAddItem({0}, {1})"
+        [ChangesState]
         public static extern void RandomDistAddItem(int inID, int inChance);
 
         /// @CSharpLua.Template = "RandomDistChoose()"
+        [ChangesState]
         public static extern int RandomDistChoose();
 
         /// @CSharpLua.Template = "UnitDropItem({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern item UnitDropItem(unit inUnit, int inItemID);
 
         /// @CSharpLua.Template = "WidgetDropItem({0}, {1})"
+        [CreatesHandle, ChangesState]
         public static extern item WidgetDropItem(widget inWidget, int inItemID);
 
         /// @CSharpLua.Template = "BlzIsLastInstanceObjectFunctionSuccessful()"
         public static extern bool BlzIsLastInstanceObjectFunctionSuccessful();
 
         /// @CSharpLua.Template = "BlzSetAbilityBooleanFieldBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetAbilityBooleanFieldBJ(ability whichAbility, abilitybooleanfield whichField, bool value);
 
         /// @CSharpLua.Template = "BlzSetAbilityIntegerFieldBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetAbilityIntegerFieldBJ(ability whichAbility, abilityintegerfield whichField, int value);
 
         /// @CSharpLua.Template = "BlzSetAbilityRealFieldBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetAbilityRealFieldBJ(ability whichAbility, abilityrealfield whichField, float value);
 
         /// @CSharpLua.Template = "BlzSetAbilityStringFieldBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetAbilityStringFieldBJ(ability whichAbility, abilitystringfield whichField, string value);
 
         /// @CSharpLua.Template = "BlzSetAbilityBooleanLevelFieldBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzSetAbilityBooleanLevelFieldBJ(ability whichAbility, abilitybooleanlevelfield whichField, int level, bool value);
 
         /// @CSharpLua.Template = "BlzSetAbilityIntegerLevelFieldBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzSetAbilityIntegerLevelFieldBJ(ability whichAbility, abilityintegerlevelfield whichField, int level, int value);
 
         /// @CSharpLua.Template = "BlzSetAbilityRealLevelFieldBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzSetAbilityRealLevelFieldBJ(ability whichAbility, abilityreallevelfield whichField, int level, float value);
 
         /// @CSharpLua.Template = "BlzSetAbilityStringLevelFieldBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzSetAbilityStringLevelFieldBJ(ability whichAbility, abilitystringlevelfield whichField, int level, string value);
 
         /// @CSharpLua.Template = "BlzSetAbilityBooleanLevelArrayFieldBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void BlzSetAbilityBooleanLevelArrayFieldBJ(ability whichAbility, abilitybooleanlevelarrayfield whichField, int level, int index, bool value);
 
         /// @CSharpLua.Template = "BlzSetAbilityIntegerLevelArrayFieldBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void BlzSetAbilityIntegerLevelArrayFieldBJ(ability whichAbility, abilityintegerlevelarrayfield whichField, int level, int index, int value);
 
         /// @CSharpLua.Template = "BlzSetAbilityRealLevelArrayFieldBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void BlzSetAbilityRealLevelArrayFieldBJ(ability whichAbility, abilityreallevelarrayfield whichField, int level, int index, float value);
 
         /// @CSharpLua.Template = "BlzSetAbilityStringLevelArrayFieldBJ({0}, {1}, {2}, {3}, {4})"
+        [ChangesState]
         public static extern void BlzSetAbilityStringLevelArrayFieldBJ(ability whichAbility, abilitystringlevelarrayfield whichField, int level, int index, string value);
 
         /// @CSharpLua.Template = "BlzAddAbilityBooleanLevelArrayFieldBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzAddAbilityBooleanLevelArrayFieldBJ(ability whichAbility, abilitybooleanlevelarrayfield whichField, int level, bool value);
 
         /// @CSharpLua.Template = "BlzAddAbilityIntegerLevelArrayFieldBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzAddAbilityIntegerLevelArrayFieldBJ(ability whichAbility, abilityintegerlevelarrayfield whichField, int level, int value);
 
         /// @CSharpLua.Template = "BlzAddAbilityRealLevelArrayFieldBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzAddAbilityRealLevelArrayFieldBJ(ability whichAbility, abilityreallevelarrayfield whichField, int level, float value);
 
         /// @CSharpLua.Template = "BlzAddAbilityStringLevelArrayFieldBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzAddAbilityStringLevelArrayFieldBJ(ability whichAbility, abilitystringlevelarrayfield whichField, int level, string value);
 
         /// @CSharpLua.Template = "BlzRemoveAbilityBooleanLevelArrayFieldBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzRemoveAbilityBooleanLevelArrayFieldBJ(ability whichAbility, abilitybooleanlevelarrayfield whichField, int level, bool value);
 
         /// @CSharpLua.Template = "BlzRemoveAbilityIntegerLevelArrayFieldBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzRemoveAbilityIntegerLevelArrayFieldBJ(ability whichAbility, abilityintegerlevelarrayfield whichField, int level, int value);
 
         /// @CSharpLua.Template = "BlzRemoveAbilityRealLevelArrayFieldBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzRemoveAbilityRealLevelArrayFieldBJ(ability whichAbility, abilityreallevelarrayfield whichField, int level, float value);
 
         /// @CSharpLua.Template = "BlzRemoveAbilityStringLevelArrayFieldBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzRemoveAbilityStringLevelArrayFieldBJ(ability whichAbility, abilitystringlevelarrayfield whichField, int level, string value);
 
         /// @CSharpLua.Template = "BlzItemAddAbilityBJ({0}, {1})"
+        [ChangesState]
         public static extern void BlzItemAddAbilityBJ(item whichItem, int abilCode);
 
         /// @CSharpLua.Template = "BlzItemRemoveAbilityBJ({0}, {1})"
+        [ChangesState]
         public static extern void BlzItemRemoveAbilityBJ(item whichItem, int abilCode);
 
         /// @CSharpLua.Template = "BlzSetItemBooleanFieldBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetItemBooleanFieldBJ(item whichItem, itembooleanfield whichField, bool value);
 
         /// @CSharpLua.Template = "BlzSetItemIntegerFieldBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetItemIntegerFieldBJ(item whichItem, itemintegerfield whichField, int value);
 
         /// @CSharpLua.Template = "BlzSetItemRealFieldBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetItemRealFieldBJ(item whichItem, itemrealfield whichField, float value);
 
         /// @CSharpLua.Template = "BlzSetItemStringFieldBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetItemStringFieldBJ(item whichItem, itemstringfield whichField, string value);
 
         /// @CSharpLua.Template = "BlzSetUnitBooleanFieldBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetUnitBooleanFieldBJ(unit whichUnit, unitbooleanfield whichField, bool value);
 
         /// @CSharpLua.Template = "BlzSetUnitIntegerFieldBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetUnitIntegerFieldBJ(unit whichUnit, unitintegerfield whichField, int value);
 
         /// @CSharpLua.Template = "BlzSetUnitRealFieldBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetUnitRealFieldBJ(unit whichUnit, unitrealfield whichField, float value);
 
         /// @CSharpLua.Template = "BlzSetUnitStringFieldBJ({0}, {1}, {2})"
+        [ChangesState]
         public static extern void BlzSetUnitStringFieldBJ(unit whichUnit, unitstringfield whichField, string value);
 
         /// @CSharpLua.Template = "BlzSetUnitWeaponBooleanFieldBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzSetUnitWeaponBooleanFieldBJ(unit whichUnit, unitweaponbooleanfield whichField, int index, bool value);
 
         /// @CSharpLua.Template = "BlzSetUnitWeaponIntegerFieldBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzSetUnitWeaponIntegerFieldBJ(unit whichUnit, unitweaponintegerfield whichField, int index, int value);
 
         /// @CSharpLua.Template = "BlzSetUnitWeaponRealFieldBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzSetUnitWeaponRealFieldBJ(unit whichUnit, unitweaponrealfield whichField, int index, float value);
 
         /// @CSharpLua.Template = "BlzSetUnitWeaponStringFieldBJ({0}, {1}, {2}, {3})"
+        [ChangesState]
         public static extern void BlzSetUnitWeaponStringFieldBJ(unit whichUnit, unitweaponstringfield whichField, int index, string value);
 
         /// @CSharpLua.Template = "BlzEnableAuras({0}, {1})"
+        [ChangesState]
         public static extern void BlzEnableAuras(unit whichUnit, bool enable);
 
         /// @CSharpLua.Template = "FourCC({0})"

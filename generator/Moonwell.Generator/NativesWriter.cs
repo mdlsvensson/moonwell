@@ -77,21 +77,27 @@ public static class NativesWriter
             WriteGlobal(text, global, constants);
         }
 
+        var tags = NativeTags.Classify(scripts);
         foreach (var function in scripts.Functions)
         {
-            WriteFunction(text, function);
+            WriteFunction(text, function, tags[function.Name]);
         }
 
         text.Append("    }\n}\n");
         return text.ToString();
     }
 
-    private static void WriteFunction(StringBuilder text, JassFunction function)
+    private static void WriteFunction(StringBuilder text, JassFunction function, NativeTag tag)
     {
         var parameters = string.Join(", ", function.Parameters.Select(p =>
             $"{CsType(p.Type, function.Name)} {Identifier(p.Name)}"));
         var arguments = string.Join(", ", function.Parameters.Select((_, i) => $"{{{i}}}"));
         text.Append($"\n        /// @CSharpLua.Template = \"{function.Name}({arguments})\"\n");
+        if (Attributes(tag) is { } attributes)
+        {
+            text.Append($"        [{attributes}]\n");
+        }
+
         text.Append($"        public static extern {CsType(function.Returns, function.Name)} {Identifier(function.Name)}({parameters});\n");
     }
 
@@ -121,6 +127,28 @@ public static class NativesWriter
 
         var accessors = global.IsConstant ? "get;" : "get; set;";
         text.Append($"        public static extern {type} {name} {{ {accessors} }}\n");
+    }
+
+    /// <summary>The attributes that carry a native's tags to the analyzer; null for none.</summary>
+    public static string? Attributes(NativeTag tag)
+    {
+        var names = new List<string>();
+        if (tag.HasFlag(NativeTag.MachineLocal))
+        {
+            names.Add("MachineLocal");
+        }
+
+        if (tag.HasFlag(NativeTag.CreatesHandle))
+        {
+            names.Add("CreatesHandle");
+        }
+
+        if (tag.HasFlag(NativeTag.ChangesState))
+        {
+            names.Add("ChangesState");
+        }
+
+        return names.Count == 0 ? null : string.Join(", ", names);
     }
 
     public static string? ConstantValue(JassGlobal global, IReadOnlySet<string> constants)
