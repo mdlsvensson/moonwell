@@ -141,6 +141,17 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void map_without_terrain_is_an_error()
+        {
+            var folder = folders.TemporaryCopyOfSample();
+            File.Delete(Path.Combine(folder, "map", "war3map.w3e"));
+
+            var error = Assert.Throws<BuildException>(() => MapBuild.Run(folder, new BuildOptions(), TextWriter.Null));
+
+            Assert.Equal(@"the script has no main: map\war3map.w3e is missing (save the map in World Editor)", error.Message);
+        }
+
+        [Fact]
         public void missing_libraries_are_an_error()
         {
             var empty = Path.Combine(Path.GetTempPath(), "moonwell-empty-" + Guid.NewGuid().ToString("N"));

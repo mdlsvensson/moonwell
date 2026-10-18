@@ -106,7 +106,15 @@ namespace Moonwell.Build
                 throw new BuildException(string.Join(Environment.NewLine, errors));
             }
 
-            return map.Script ?? throw new BuildException("CSharp.lua wrote no script");
+            var script = map.Script ?? throw new BuildException("CSharp.lua wrote no script");
+
+            // Without war3map.w3e War3Net writes config but no main, and the game crashes to desktop.
+            if (!script.Contains("function main(", StringComparison.Ordinal))
+            {
+                throw new BuildException(@"the script has no main: map\war3map.w3e is missing (save the map in World Editor)");
+            }
+
+            return script;
         }
     }
 }
