@@ -363,6 +363,7 @@ public class ObjectsWriterTests
             Assert.Equal(fields[i].PerLevel, field.GetProperty("perLevel").GetBoolean());
             Assert.Equal(fields[i].DataPointer, field.GetProperty("pointer").GetInt32());
             Assert.Equal(fields[i].Skin, field.GetProperty("skin").GetBoolean());
+            Assert.Equal(fields[i].Store, field.GetProperty("store").GetString());
         }
 
         var parsed = document.RootElement.GetProperty("objects");

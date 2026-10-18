@@ -245,7 +245,7 @@ namespace Moonwell.Build.Tests
             var standard = built.Standard;
 
             Assert.Equal(standard.Fields("unit"), standard.Fields("hero"));
-            Assert.Contains(new StandardData.ObjectField("Htb1", "float", true, 1, false), standard.Fields("ability"));
+            Assert.Contains(new StandardData.ObjectField("Htb1", "float", true, 1, false, "unreal"), standard.Fields("ability"));
             Assert.Contains("Hpal", standard.Ids("hero"));
             Assert.Contains("AHtb", standard.Ids("ability"));
             Assert.DoesNotContain("AHtb", standard.Ids("unit"));

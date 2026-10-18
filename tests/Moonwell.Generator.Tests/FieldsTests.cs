@@ -75,6 +75,19 @@ public class FieldsTests
     }
 
     [Fact]
+    public void store_from_metadata_type()
+    {
+        var tables = MiniExport();
+
+        Assert.Equal("int", Find(Fields.Of(tables, Kind.Unit), "uhpm").Store);
+        Assert.Equal("string", Find(Fields.Of(tables, Kind.Unit), "unam").Store);
+        Assert.Equal("string", Find(Fields.Of(tables, Kind.Unit), "uabi").Store);
+        Assert.Equal("unreal", Find(Fields.Of(tables, Kind.Unit), "uhpr").Store);
+        Assert.Equal("int", Find(Fields.Of(tables, Kind.Ability), "aher").Store);
+        Assert.Equal("unreal", Find(Fields.Of(tables, Kind.Ability), "Htb1").Store);
+    }
+
+    [Fact]
     public void per_level_and_pointer()
     {
         var field = Find(Fields.Of(MiniExport(), Kind.Ability), "Htb1");

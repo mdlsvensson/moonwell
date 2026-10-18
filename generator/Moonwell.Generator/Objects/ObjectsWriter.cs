@@ -178,7 +178,7 @@ public static class ObjectsWriter
     }
 
     /// <summary>
-    /// The JSON of a kind's standard values: <c>fields</c> (id, type, perLevel, pointer, skin), one per line, then
+    /// The JSON of a kind's standard values: <c>fields</c> (id, type, perLevel, pointer, skin, store), one per line, then
     /// <c>objects</c> by id, one per line, each with its <c>values</c>, the <c>sets</c> that differ and, only when
     /// there are any, the <c>missingFrom</c> sets. Keys are in ordinal order. A key whose value is the empty string in
     /// a set is a key the set has no value for.
@@ -195,6 +195,7 @@ public static class ObjectsWriter
             text.Append(",\"perLevel\":").Append(field.PerLevel ? "true" : "false");
             text.Append(",\"pointer\":").Append(field.DataPointer.ToString(CultureInfo.InvariantCulture));
             text.Append(",\"skin\":").Append(field.Skin ? "true" : "false");
+            text.Append(",\"store\":").Append(Json(field.Store));
             text.Append(i + 1 < fields.Count ? "},\n" : "}\n");
         }
 

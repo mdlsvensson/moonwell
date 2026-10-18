@@ -32,6 +32,7 @@ public enum FieldType
 /// True for a unit field only heroes have (<c>useHero</c> without <c>useUnit</c> or <c>useBuilding</c>); false for
 /// every field of another kind.
 /// </param>
+/// <param name="Store">How an object file stores the field's value: <c>int</c>, <c>real</c>, <c>unreal</c> or <c>string</c>.</param>
 public sealed record Field(
     Kind Kind,
     string Id,
@@ -43,7 +44,8 @@ public sealed record Field(
     bool Skin,
     IReadOnlyList<string> Specific,
     string Column,
-    bool HeroOnly = false);
+    bool HeroOnly = false,
+    string Store = "string");
 
 /// <summary>The fields of each kind of object, from the export's metadata tables.</summary>
 /// <remarks>
@@ -131,7 +133,8 @@ public static class Fields
                 Value(row, "netsafe") == "1",
                 specific,
                 ColumnOf(row, repeat, pointer, perField),
-                kind == Kind.Unit && Value(row, "useHero") == "1" && Value(row, "useUnit") != "1" && Value(row, "useBuilding") != "1"));
+                kind == Kind.Unit && Value(row, "useHero") == "1" && Value(row, "useUnit") != "1" && Value(row, "useBuilding") != "1",
+                StoreOf(Value(row, "type"))));
             candidates.Add(new NameCandidate(row.Id, name!, listed, GroupsOf(kind, row, specific, mentioned)));
         }
 
@@ -216,6 +219,23 @@ public static class Fields
             default:
                 return (FieldType.String, null);
         }
+    }
+
+    // The metadata types an object file stores as a whole number: the game's enums and flag sets are numbers there.
+    private static readonly HashSet<string> IntTypes = new HashSet<string>(StringComparer.Ordinal)
+    {
+        "int", "bool", "attackBits", "channelType", "deathType", "defenseTypeInt", "detectionType", "spellDetail",
+        "teamColor", "techAvail",
+    };
+
+    private static string StoreOf(string type)
+    {
+        if (IntTypes.Contains(type) || type.EndsWith("Flags", StringComparison.Ordinal))
+        {
+            return "int";
+        }
+
+        return type == "real" || type == "unreal" ? type : "string";
     }
 
     private static string ColumnOf(MetaRow row, int repeat, int pointer, Dictionary<string, int> perField)

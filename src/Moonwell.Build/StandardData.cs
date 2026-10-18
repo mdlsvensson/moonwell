@@ -29,7 +29,8 @@ namespace Moonwell.Build
         /// <param name="PerLevel">Whether the field has one value for each level.</param>
         /// <param name="Pointer">The data pointer of an ability field; 0 for the others.</param>
         /// <param name="Skin">Whether the field goes in the skin file.</param>
-        public sealed record ObjectField(string Id, string Type, bool PerLevel, int Pointer, bool Skin);
+        /// <param name="Store">How the object file stores the value: <c>int</c>, <c>real</c>, <c>unreal</c> or <c>string</c>.</param>
+        public sealed record ObjectField(string Id, string Type, bool PerLevel, int Pointer, bool Skin, string Store);
 
         /// <summary>Reads the standard values embedded in the map's copy of <c>Moonwell.Objects.dll</c>.</summary>
         /// <param name="objectsDll">The path of <c>Moonwell.Objects.dll</c>, beside the map's assembly.</param>
@@ -135,7 +136,8 @@ namespace Moonwell.Build
                     field.GetProperty("type").GetString()!,
                     field.GetProperty("perLevel").GetBoolean(),
                     field.GetProperty("pointer").GetInt32(),
-                    field.GetProperty("skin").GetBoolean()));
+                    field.GetProperty("skin").GetBoolean(),
+                    field.GetProperty("store").GetString()!));
             }
 
             return list;
