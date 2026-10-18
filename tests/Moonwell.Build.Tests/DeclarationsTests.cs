@@ -272,8 +272,11 @@ namespace Moonwell.Build.Tests
             var data = GameData.Of(2, 1);
 
             // Eevi (Illidan) is in custom_v1 and the base tables, not in melee_v0; the spur is in neither custom_v1 nor the base tables.
+            // The Forsaken Apothecary (fapo) is in the base tables only, which tells custom_v1 apart from the base.
             Assert.False(built.Standard.IsMissing("Eevi", data.ExistenceSet));
             Assert.True(built.Standard.IsMissing("spur", data.ExistenceSet));
+            Assert.True(built.Standard.IsMissing("fapo", data.ExistenceSet));
+            Assert.False(built.Standard.IsMissing("fapo", null));
             Assert.Equal("400", built.Standard.Value("Hpal", "ugol", 0, data.ValueSet));
             Assert.True(built.Standard.IsMissing("Eevi", GameData.Of(2, 0).ExistenceSet));
             Assert.False(built.Standard.IsMissing("spur", GameData.Of(2, 0).ExistenceSet));
@@ -307,7 +310,7 @@ namespace Moonwell.Build.Tests
         {
             var standard = built.Standard;
 
-            // Illidan is in the base tables only; the Spur of Shadows is in a set only.
+            // Illidan is in the base tables and custom_v1, not in custom_v0 or melee_v0; the Spur of Shadows is in custom_v0 and melee_v0, not in the base tables or custom_v1.
             Assert.False(standard.IsMissing("Eevi", null));
             Assert.True(standard.IsMissing("Eevi", "custom_v0"));
             Assert.True(standard.IsMissing("Eevi", "melee_v0"));

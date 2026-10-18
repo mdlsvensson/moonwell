@@ -261,6 +261,24 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void melee_with_frozen_throne_leaves_out_what_only_the_base_tables_have()
+        {
+            // The Forsaken Apothecary (fapo) is in the base tables only: Melee / Forsaken Kingdom reads them, Melee / Frozen Throne reads custom_v1.
+            var copy = folders.TemporaryCopyOfSample();
+            File.WriteAllText(
+                Path.Combine(copy, "Poisoner.cs"),
+                "namespace Sample\n{\n    public sealed class Poisoner : Moonwell.Objects.Units.Campaign.Apothecary\n    {\n    }\n}\n");
+            SetData(copy, "Melee", "ForsakenKingdom");
+            Assert.True(File.Exists(MapBuild.Run(copy, new BuildOptions(), TextWriter.Null)));
+
+            ReplaceInFile(Path.Combine(copy, "Map.cs"), "DataVersion = DataVersion.ForsakenKingdom;", "DataVersion = DataVersion.FrozenThrone;");
+
+            var error = Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), TextWriter.Null));
+
+            Assert.Equal("Sample.Poisoner: fapo does not exist under Melee / Frozen Throne", error.Message);
+        }
+
+        [Fact]
         public void object_in_every_set_of_tables_builds_under_melee()
         {
             foreach (var version in new[] { "ReignOfChaos", "FrozenThrone", "ForsakenKingdom" })
