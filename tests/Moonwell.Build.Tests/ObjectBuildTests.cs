@@ -311,9 +311,10 @@ namespace Moonwell.Build.Tests
                 File.Copy(Path.Combine(fixture, name), Path.Combine(copy, "map", name), true);
             }
 
-            // A registry an earlier build left would not compile without Moonwell.Objects.
+            // A registry or stubs an earlier build left would not compile without Moonwell.Objects.
             Directory.CreateDirectory(Path.Combine(copy, "build", "generated"));
             File.WriteAllText(Path.Combine(copy, "build", "generated", "ObjectRegistry.g.cs"), "namespace Left { public class Over : DoesNotExist { } }\n");
+            File.WriteAllText(Path.Combine(copy, "build", "generated", "ObjectStubs.g.cs"), "namespace Left { public class Stub : DoesNotExist { } }\n");
 
             var log = new StringWriter();
             var archive = MapBuild.Run(copy, new BuildOptions(), log);
@@ -322,12 +323,65 @@ namespace Moonwell.Build.Tests
             Assert.DoesNotContain("warning", log.ToString());
             Assert.False(File.Exists(Path.Combine(copy, "ids.json")));
             Assert.False(File.Exists(Path.Combine(copy, "build", "generated", "ObjectRegistry.g.cs")));
+            Assert.False(File.Exists(Path.Combine(copy, "build", "generated", "ObjectStubs.g.cs")));
             foreach (var name in new[] { "war3map.w3u", "war3mapSkin.w3u" })
             {
                 Assert.Equal(File.ReadAllBytes(Path.Combine(fixture, name)), File.ReadAllBytes(Path.Combine(copy, "build", "Sample", name)));
             }
 
             Assert.DoesNotContain("MoonwellObjectValues = {", File.ReadAllText(Path.Combine(copy, "build", "Sample", "war3map.lua")));
+        }
+
+        [Fact]
+        public void a_referenced_name_brings_every_overload_into_the_stubs()
+        {
+            // The constructor calls only Set(field, value); CSharp.lua names overloads by their order, so the stub keeps both.
+            var copy = folders.TemporaryCopyOfSample();
+            File.WriteAllText(Path.Combine(copy, "Objects.cs"), """
+                namespace Sample
+                {
+                    public sealed class Arthas : Moonwell.Objects.Units.Human.Paladin
+                    {
+                        public Arthas()
+                        {
+                            Set("unam", "Arthas");
+                        }
+                    }
+                }
+                """);
+
+            MapBuild.Run(copy, new BuildOptions(), new StringWriter());
+
+            var stubs = File.ReadAllText(Path.Combine(copy, "build", "generated", "ObjectStubs.g.cs"));
+            var first = stubs.IndexOf("protected void Set(string field, object value)", StringComparison.Ordinal);
+            var second = stubs.IndexOf("protected void Set(string field, int level, object value)", StringComparison.Ordinal);
+            Assert.True(first >= 0 && second > first, stubs);
+            Assert.DoesNotContain("HitPoints", stubs);
+            var script = File.ReadAllText(Path.Combine(copy, "build", "Sample", "war3map.lua"));
+            Assert.Contains("Set = nothing", script);
+            Assert.Contains("Set1 = nothing", script);
+        }
+
+        [Fact]
+        public void a_name_the_assembly_does_not_reference_is_an_error_that_says_why()
+        {
+            // nameof leaves no reference in the assembly, so the stubs lack HitPoints and CSharp.lua cannot compile the map.
+            var copy = folders.TemporaryCopyOfSample();
+            File.AppendAllText(Path.Combine(copy, "Objects.cs"), """
+
+                namespace Sample
+                {
+                    public static class Names
+                    {
+                        public static readonly string Life = nameof(Moonwell.Objects.Units.Human.Paladin.HitPoints);
+                    }
+                }
+                """);
+
+            var error = Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), new StringWriter()));
+
+            Assert.Contains("HitPoints", error.Message);
+            Assert.Contains("only the members of Moonwell.Objects that the map's assembly references", error.Message);
         }
 
         [Fact]

@@ -60,6 +60,8 @@ namespace Moonwell.Build.Tests
         public void jass_source_map_becomes_lua()
         {
             var folder = folders.TemporaryCopyOfSample();
+            // Compiled without the objects' stubs, so the copy declares no object.
+            File.Delete(Path.Combine(folder, "Objects.cs"));
             var infoPath = Path.Combine(folder, "map", "war3map.w3i");
             MapInfo info;
             using (var reader = new BinaryReader(File.OpenRead(infoPath)))

@@ -96,6 +96,29 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void stubs_have_only_the_members_the_map_references()
+        {
+            // Arthas's constructor reads and sets HitPoints; no code names AnimationWalkSpeed.
+            var hero = compiled.Declarations.Used.Single(one => one.FullName == "Moonwell.Objects.StandardHero");
+            Assert.Contains(hero.Fields, field => field.Property == "HitPoints");
+            Assert.DoesNotContain(hero.Fields, field => field.Property == "AnimationWalkSpeed");
+
+            Assert.Contains("    public abstract class StandardHero : global::Moonwell.Hero\n", compiled.Stubs);
+            Assert.Contains("        public int HitPoints\n        {\n            get { return default; }\n            protected set { }\n        }\n", compiled.Stubs);
+            Assert.Contains("    public class Paladin : global::Moonwell.Objects.StandardHero\n", compiled.Stubs);
+            Assert.DoesNotContain("AnimationWalkSpeed", compiled.Stubs);
+            Assert.DoesNotContain("getAnimationWalkSpeed", compiled.Script);
+            Assert.DoesNotContain("Archmage", compiled.Stubs);
+        }
+
+        [Fact]
+        public void unused_generated_namespace_leaves_nothing_in_the_script()
+        {
+            Assert.DoesNotContain("Moonwell.Objects.Units.Campaign", compiled.Script);
+            Assert.DoesNotContain("Moonwell.Objects.Abilities.Other", compiled.Script);
+        }
+
+        [Fact]
         public void unused_standard_class_absent()
         {
             Assert.DoesNotContain("Archmage", compiled.Script);
@@ -283,6 +306,7 @@ namespace Moonwell.Build.Tests
                 Registry = File.ReadAllText(RegistryWriter.Write(project, Declarations.Used, Declarations.Objects, Ids));
                 Entry = File.ReadAllText(EntryWriter.Write(project, settings, true));
                 Script = LuaCompiler.Compile(project, map, assembly, false, Declarations, Ids, Standard, null);
+                Stubs = File.ReadAllText(Path.Combine(project.GeneratedFolder, "ObjectStubs.g.cs"));
                 ReleaseScript = LuaCompiler.Compile(project, SourceMap.Open(project, settings, TextWriter.Null), assembly, true, Declarations, Ids, Standard, null);
             }
 
@@ -297,6 +321,9 @@ namespace Moonwell.Build.Tests
             public string Entry { get; }
 
             public string Script { get; }
+
+            /// <summary>The stubs of the used classes CSharp.lua compiled.</summary>
+            public string Stubs { get; }
 
             /// <summary>The script of a release build, which has no comments.</summary>
             public string ReleaseScript { get; }
