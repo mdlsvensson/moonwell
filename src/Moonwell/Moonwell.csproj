@@ -5,13 +5,17 @@
   </ItemGroup>
 
   <!--
-    The multiplayer analyzer runs in every project that references the package: it is built first and packed under
-    analyzers/dotnet/cs. A project that references Moonwell.csproj itself adds it as an Analyzer reference.
+    The multiplayer analyzer runs in every project that references the package: pack builds it and puts it under
+    analyzers/dotnet/cs. It is not a ProjectReference, because CSharp.lua would compile a referenced project's source.
+    A project that references Moonwell.csproj itself adds the analyzer as an Analyzer reference.
   -->
   <ItemGroup>
-    <ProjectReference Include="..\Moonwell.Analyzers\Moonwell.Analyzers.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
     <None Include="..\Moonwell.Analyzers\bin\$(Configuration)\netstandard2.0\Moonwell.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
+
+  <Target Name="BuildAnalyzer" BeforeTargets="GenerateNuspec">
+    <MSBuild Projects="..\Moonwell.Analyzers\Moonwell.Analyzers.csproj" Targets="Restore;Build" Properties="Configuration=$(Configuration)" />
+  </Target>
 
   <ItemGroup>
     <EmbeddedResource Include="moonwell.lua" LogicalName="Moonwell.moonwell.lua" />
