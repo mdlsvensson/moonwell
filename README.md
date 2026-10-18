@@ -10,7 +10,7 @@ project and a World Editor map into a playable map, with the script compiled to 
 
 An object is a class in the project that inherits one of the standard classes of `Moonwell.Objects` (`class Arthas : Paladin`);
 its constructor changes the fields, and the build writes the object into the map and keeps its id in `ids.json`. Set
-`Balance` in the map class to play with the melee or a custom balance data.
+`DataSet` and `DataVersion` in the map class, as World Editor's Data Set and Data Version, to play with another balance.
 
 It needs the .NET 10 SDK, and `common.j` and `Blizzard.j` in `Documents\Warcraft III\JassHelper`.
 
