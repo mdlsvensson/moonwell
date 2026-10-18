@@ -93,26 +93,29 @@ end
 -- previous triple's, the file's number or 0 for none, the C# line). CoreSystem calls an exception's traceback where it is
 -- thrown and in try's handler, before the stack unwinds; this one reads the stack with error's position, which
 -- pcall(error, "", level) gives without the debug library, and keeps the C# locations, innermost first, one a line, at most
--- eight. MoonwellWhere(e) gives them to Errors.Where. A Lua error's message loses its position in war3map.lua.
+-- eight. MoonwellWhere(e) gives them to Errors.Where. A Lua error's message loses its position in war3map.lua. Nothing here
+-- may break the report: the reading runs under pcall, and a table that fails to load is read again at the next error.
 local lineStarts, lineFiles, lineNumbers
 
 local function loadLines()
-  lineStarts, lineFiles, lineNumbers = {}, {}, {}
-  local lines = rawget(_G, "MoonwellLines")
-  if type(lines) ~= "table" or type(lines.map) ~= "string" then return end
-  local line, count, k, triple = 0, 0, 0, {}
-  for number in string.gmatch(lines.map, "%d+") do
-    k = k + 1
-    triple[k] = tonumber(number)
-    if k == 3 then
-      line = line + triple[1]
-      count = count + 1
-      lineStarts[count] = line
-      lineFiles[count] = lines.files[triple[2]]
-      lineNumbers[count] = triple[3]
-      k = 0
+  local starts, files, numbers = {}, {}, {}
+  local lines = MoonwellLines
+  if type(lines) == "table" and type(lines.map) == "string" then
+    local line, count, k, triple = 0, 0, 0, {}
+    for number in string.gmatch(lines.map, "%d+") do
+      k = k + 1
+      triple[k] = tonumber(number)
+      if k == 3 then
+        line = line + triple[1]
+        count = count + 1
+        starts[count] = line
+        files[count] = lines.files[triple[2]]
+        numbers[count] = triple[3]
+        k = 0
+      end
     end
   end
+  lineStarts, lineFiles, lineNumbers = starts, files, numbers
 end
 
 local function locationOf(line)
@@ -161,7 +164,8 @@ end
 -- A rethrown exception keeps where it was first thrown.
 System.Exception.traceback = function (this)
   if this.moonwellWhere ~= nil then return end
-  this.moonwellWhere = stackLocations()
+  local ok, where = pcall(stackLocations)
+  this.moonwellWhere = ok and where or ""
   this.message = withoutPosition(this.message)
 end
 

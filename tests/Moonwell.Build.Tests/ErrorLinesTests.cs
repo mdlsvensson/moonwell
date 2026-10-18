@@ -59,6 +59,17 @@ namespace Moonwell.Build.Tests
             Assert.Equal(expected, builds.Release.Log);
         }
 
+        [Fact]
+        public void broken_line_table_keeps_the_messages()
+        {
+            var broken = "MoonwellLines = setmetatable({}, { __index = function () error('broken table') end })";
+
+            var run = FailsBuilds.Start(builds.DevelopmentScript, broken);
+
+            Assert.Equal(Red + "Moonwell: Throws.OnGameStart failed:|r thrown", run.Screen[0]);
+            Assert.Equal("Moonwell: CallsHelper.OnGameStart failed: from helper", run.Log[2]);
+        }
+
         /// <summary>What a run of a built script showed on the screen and wrote to the log.</summary>
         public sealed record Run(IReadOnlyList<string> Screen, IReadOnlyList<string> Log);
 
@@ -69,9 +80,12 @@ namespace Moonwell.Build.Tests
 
             public FailsBuilds()
             {
-                Development = BuildAndRun(false);
-                Release = BuildAndRun(true);
+                DevelopmentScript = Build(false);
+                Development = Start(DevelopmentScript, string.Empty);
+                Release = Start(Build(true), string.Empty);
             }
+
+            public string DevelopmentScript { get; }
 
             public Run Development { get; }
 
@@ -82,16 +96,11 @@ namespace Moonwell.Build.Tests
                 folders.Dispose();
             }
 
-            private Run BuildAndRun(bool release)
-            {
-                var folder = folders.TemporaryCopyOf("Fails");
-                MapBuild.Run(folder, new BuildOptions { Release = release }, TextWriter.Null);
-                var script = File.ReadAllText(Path.Combine(MapProject.Find(folder).StagedFolder, "war3map.lua"));
-                return Start(script);
-            }
-
-            // Runs main and then every timer the game was asked for, until none is left; the chunk is named as the game names it.
-            private static Run Start(string script)
+            /// <summary>
+            /// Runs a built script's main and then every timer the game was asked for, until none is left; the chunk is named as
+            /// the game names it, and the Lua in before runs after the script loads.
+            /// </summary>
+            public static Run Start(string script, string before)
             {
                 using var lua = new NLua.Lua();
                 lua.DoString("screen = {}; log = {}; pending = {}");
@@ -104,9 +113,17 @@ namespace Moonwell.Build.Tests
                 lua.DoString("PreloadGenClear = function() log = {} end");
                 lua.DoString("Preload = function(text) log[#log + 1] = string.match(text, '^\"%)\\n(.*)\\n//$') end");
                 lua.DoString(script, "war3map.lua");
+                lua.DoString(before);
                 lua.DoString("main()");
                 lua.DoString("for round = 1, 10 do local due = pending; pending = {}; for i = 1, #due do due[i]() end end");
                 return new Run(Strings(lua, "screen"), Strings(lua, "log"));
+            }
+
+            private string Build(bool release)
+            {
+                var folder = folders.TemporaryCopyOf("Fails");
+                MapBuild.Run(folder, new BuildOptions { Release = release }, TextWriter.Null);
+                return File.ReadAllText(Path.Combine(MapProject.Find(folder).StagedFolder, "war3map.lua"));
             }
 
             private static List<string> Strings(NLua.Lua lua, string table)
