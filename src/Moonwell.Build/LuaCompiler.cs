@@ -17,7 +17,10 @@ namespace Moonwell.Build
         /// <exception cref="BuildException">Common.j and Blizzard.j are missing or the C# does not compile to Lua.</exception>
         public static string Compile(MapProject project, War3Net.Build.Map map, string targetPath, bool release)
         {
-            return Compile(project, map, targetPath, release, null);
+            var script = Compile(project, map, targetPath, release, null, out var files);
+            script = LineTable.Apply(script, files);
+            map.Script = script;
+            return script;
         }
 
         /// <summary>
@@ -44,7 +47,7 @@ namespace Moonwell.Build
             StandardData standard,
             string? set)
         {
-            var script = Compile(project, map, targetPath, release, ObjectLua.Definitions(declarations.Used));
+            var script = Compile(project, map, targetPath, release, ObjectLua.Definitions(declarations.Used), out var files);
             var named = new Dictionary<string, string>(declarations.StandardClassIds, StringComparer.Ordinal);
             foreach (var entry in ids)
             {
@@ -53,12 +56,14 @@ namespace Moonwell.Build
 
             script = ObjectLua.AddToInit(script, declarations.Used);
             script = ObjectLua.Values(script, declarations.Used, declarations.Objects, named, standard, set);
+            script = LineTable.Apply(script, files);
             map.Script = script;
             return script;
         }
 
-        // The objects' library, when given, is linked after moonwell.lua, just before the compiled code.
-        private static string Compile(MapProject project, War3Net.Build.Map map, string targetPath, bool release, string? objects)
+        // The objects' library, when given, is linked after moonwell.lua, just before the compiled code. CSharp.lua compiles the
+        // marked copy of the project; files gives its marked files for the line table, which the callers add last.
+        private static string Compile(MapProject project, War3Net.Build.Map map, string targetPath, bool release, string? objects, out IReadOnlyList<string> files)
         {
             var jassHelper = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Warcraft III", "JassHelper");
             var commonJ = Path.Combine(jassHelper, "common.j");
@@ -77,7 +82,9 @@ namespace Moonwell.Build
                 libraries.Add(path);
             }
 
-            var compiler = new Compiler(project.ProjectFile, project.GeneratedFolder, string.Empty, null!, null!, "*", release ? string.Empty : "-define:DEBUG", false, null!, string.Empty)
+            var marked = MarkedProject.Stage(project, release ? Array.Empty<string>() : new[] { "DEBUG" });
+            files = marked.Files;
+            var compiler = new Compiler(marked.ProjectFile, project.GeneratedFolder, string.Empty, null!, null!, "*", release ? string.Empty : "-define:DEBUG", false, null!, string.Empty)
             {
                 IsExportMetadata = false,
                 IsModule = false,
@@ -96,13 +103,13 @@ namespace Moonwell.Build
             catch (CompilationErrorException failure)
             {
                 // CSharp.lua's own translation errors; a Roslyn error comes back as a result below.
-                throw new BuildException(failure.Message);
+                throw new BuildException(marked.Unstage(failure.Message));
             }
             if (!result.Success)
             {
                 var errors = result.Diagnostics
                     .Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
-                    .Select(diagnostic => diagnostic.ToString());
+                    .Select(diagnostic => marked.Unstage(diagnostic.ToString()));
                 throw new BuildException(string.Join(Environment.NewLine, errors));
             }
 

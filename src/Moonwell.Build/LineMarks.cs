@@ -6,7 +6,7 @@ namespace Moonwell.Build
 {
     /// <summary>
     /// Puts a location marker before every statement of a C# file, which CSharp.lua copies into the script as a line of its
-    /// own (<c>--@mw 3:12</c>) just before that statement's Lua; <c>LineTable</c> turns them into the script's line table.
+    /// own (<c>--@mw 3:12</c>) just before that statement's Lua; <see cref="LineTable"/> turns them into the script's line table.
     /// </summary>
     public static class LineMarks
     {

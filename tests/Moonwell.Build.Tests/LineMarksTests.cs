@@ -154,6 +154,9 @@ namespace Moonwell.Build.Tests
             Assert.Equal(
                 "error at " + Path.Combine(folder, "Hello.cs"),
                 marked.Unstage("error at " + Path.Combine(marked.Folder, "Hello.cs")));
+            Assert.Equal(
+                "(" + Path.Combine(folder, "Bad.cs") + "@7:42)",
+                marked.Unstage("(" + marked.Folder.Replace('\\', '/') + "\\Bad.cs@7:42)"));
         }
 
         [Fact]

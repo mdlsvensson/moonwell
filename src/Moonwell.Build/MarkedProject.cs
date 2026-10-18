@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace Moonwell.Build
@@ -65,10 +66,12 @@ namespace Moonwell.Build
             return new MarkedProject(folder, projectFile, marked, project.Folder);
         }
 
-        /// <summary>A message from CSharp.lua with the copy's paths changed back to the project's.</summary>
+        /// <summary>A message from CSharp.lua with the copy's paths changed back to the project's, whichever separators they use.</summary>
         public string Unstage(string message)
         {
-            return message.Replace(Folder, projectFolder, StringComparison.OrdinalIgnoreCase);
+            var marked = Path.DirectorySeparatorChar + "build" + Path.DirectorySeparatorChar + "marked";
+            var pattern = Regex.Escape(projectFolder).Replace(@"\\", @"[\\/]") + Regex.Escape(marked).Replace(@"\\", @"[\\/]");
+            return Regex.Replace(message, pattern, projectFolder.Replace("$", "$$"), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         }
 
         private static IEnumerable<string> SourceFiles(string projectFolder, string markedFolder)

@@ -57,6 +57,24 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void development_script_has_line_table()
+        {
+            AssertLineTable(builds.Development.Script);
+        }
+
+        [Fact]
+        public void release_script_has_line_table()
+        {
+            AssertLineTable(builds.Release.Script);
+        }
+
+        private static void AssertLineTable(string script)
+        {
+            Assert.Contains("MoonwellLines = { files = { \"Hello.cs\", \"Map.cs\", \"Objects.cs\" }, map = \"", script);
+            Assert.DoesNotContain(script.Split('\n'), line => line.TrimStart().StartsWith("--@mw ", StringComparison.Ordinal));
+        }
+
+        [Fact]
         public void jass_source_map_becomes_lua()
         {
             var folder = folders.TemporaryCopyOfSample();
@@ -138,6 +156,7 @@ namespace Moonwell.Build.Tests
 
             Assert.Contains("named argument is not support at dynamic", error.Message);
             Assert.DoesNotContain("unexpected error", error.Message);
+            Assert.DoesNotContain("marked", error.Message);
         }
 
         [Fact]
