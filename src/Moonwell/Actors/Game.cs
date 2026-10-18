@@ -4,6 +4,7 @@ namespace Moonwell
     public sealed class Game : Actor
     {
         /// <summary>The game of this runtime; set by Runtime.Reset.</summary>
+        [LocalSafe]
         public static Game Instance { get; internal set; } = null!;
 
         /// <summary>Adds a component to the game, and returns it.</summary>

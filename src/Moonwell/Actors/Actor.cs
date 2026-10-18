@@ -16,6 +16,7 @@ namespace Moonwell
         private bool holes;
 
         /// <summary>How many components are on this actor.</summary>
+        [LocalSafe]
         public int ComponentCount
         {
             get
@@ -34,6 +35,7 @@ namespace Moonwell
         }
 
         /// <summary>The first component of a class in add order, or null when there is none.</summary>
+        [LocalSafe]
         public T? Get<T>() where T : Component
         {
             for (var i = 0; i < components.Count; i++)
@@ -48,6 +50,7 @@ namespace Moonwell
         }
 
         /// <summary>Every component of a class, in add order.</summary>
+        [LocalSafe]
         public List<T> GetAll<T>() where T : Component
         {
             var found = new List<T>();
@@ -63,6 +66,7 @@ namespace Moonwell
         }
 
         /// <summary>Whether a component of a class is on this actor.</summary>
+        [LocalSafe]
         public bool Has<T>() where T : Component
         {
             return Get<T>() != null;

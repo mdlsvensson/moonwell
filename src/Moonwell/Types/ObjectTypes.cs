@@ -110,6 +110,7 @@ namespace Moonwell
         }
 
         /// <summary>The object id a class is registered with; throws when the class is not registered.</summary>
+        [LocalSafe]
         public static int IdOf<T>()
         {
             if (!ids.TryGetValue(typeof(T), out var id))
@@ -121,6 +122,7 @@ namespace Moonwell
         }
 
         /// <summary>The object id made from four characters, the first one the highest byte.</summary>
+        [LocalSafe]
         public static int FourCC(string code)
         {
             return ((Code(code, 0) * 256 + Code(code, 1)) * 256 + Code(code, 2)) * 256 + Code(code, 3);

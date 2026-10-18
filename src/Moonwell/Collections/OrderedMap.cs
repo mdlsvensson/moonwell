@@ -3,6 +3,7 @@ using System.Collections.Generic;
 namespace Moonwell
 {
     /// <summary>A map that keeps its keys in insertion order, so a loop gives the same order on every machine.</summary>
+    [LocalSafe]
     public sealed class OrderedMap<TKey, TValue> where TKey : notnull
     {
         private readonly List<TKey> keys = new List<TKey>();

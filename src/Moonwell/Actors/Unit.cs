@@ -22,15 +22,18 @@ namespace Moonwell
         private readonly OrderedMap<int, Ability> abilities = new OrderedMap<int, Ability>();
 
         /// <summary>The game's handle of the unit.</summary>
+        [LocalSafe]
         public unit Handle { get; internal set; } = null!;
 
         /// <summary>The type id of the unit, as the game read it when the unit was taken in.</summary>
+        [LocalSafe]
         public int TypeId { get; internal set; }
 
         /// <summary>The game's player that owned the unit when it was last read; kept for when the game no longer gives it.</summary>
         internal player owner = null!;
 
         /// <summary>The player that owns the unit; once the game has removed the unit, the last owner read.</summary>
+        [LocalSafe]
         public Player Player
         {
             get

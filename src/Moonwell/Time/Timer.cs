@@ -21,12 +21,15 @@ namespace Moonwell
         }
 
         /// <summary>The seconds between runs of a repeating timer; 0 for a one-shot timer.</summary>
+        [LocalSafe]
         public float Interval { get; }
 
         /// <summary>Whether the timer runs again at every interval.</summary>
+        [LocalSafe]
         public bool IsPeriodic { get; }
 
         /// <summary>The seconds until the timer is next due; 0 once it has ended.</summary>
+        [LocalSafe]
         public float Remaining
         {
             get

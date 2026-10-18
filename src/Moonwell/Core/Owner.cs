@@ -18,6 +18,7 @@ namespace Moonwell
         private int count;
 
         /// <summary>The owner running code makes new objects for: the one set by Run, else the root.</summary>
+        [LocalSafe]
         public static Owner Current
         {
             get
@@ -27,6 +28,7 @@ namespace Moonwell
         }
 
         /// <summary>How many children this owner holds that have not ended.</summary>
+        [LocalSafe]
         public int OwnedCount
         {
             get

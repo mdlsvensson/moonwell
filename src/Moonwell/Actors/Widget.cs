@@ -4,6 +4,7 @@ namespace Moonwell
     public abstract class Widget : Actor
     {
         /// <summary>Whether the object has been removed from the game, by the runtime or found removed by the game.</summary>
+        [LocalSafe]
         public bool IsGone { get; internal set; }
     }
 }

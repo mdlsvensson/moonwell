@@ -19,9 +19,11 @@ namespace Moonwell
         protected List<DestructableComponent> Components { get; } = new List<DestructableComponent>();
 
         /// <summary>The game's handle of the destructable.</summary>
+        [LocalSafe]
         public destructable Handle { get; internal set; } = null!;
 
         /// <summary>The type id of the destructable, as the game read it when it was taken in.</summary>
+        [LocalSafe]
         public int TypeId { get; internal set; }
 
         /// <summary>The starting components, which the runtime adds in order when the destructable is taken in.</summary>

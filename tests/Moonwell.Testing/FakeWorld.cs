@@ -12,6 +12,9 @@ namespace Moonwell.Testing
         /// <summary>The absolute time of the pending wake request; null when there is none.</summary>
         public float? WakeAt;
 
+        /// <summary>The slot of the player at this machine.</summary>
+        public int LocalSlot;
+
         /// <summary>The lines printed on the screen.</summary>
         public List<string> Printed = new List<string>();
 
@@ -231,6 +234,12 @@ namespace Moonwell.Testing
             }
 
             return -1;
+        }
+
+        /// <summary>Whether a player is the one at this machine: the player in LocalSlot.</summary>
+        public bool IsLocal(player player)
+        {
+            return SlotOf(player) == LocalSlot;
         }
 
         /// <summary>A copy of the units placed in the world.</summary>

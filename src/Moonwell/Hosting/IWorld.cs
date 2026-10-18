@@ -29,6 +29,9 @@ namespace Moonwell.Hosting
         /// <summary>The slot of a player.</summary>
         int SlotOf(player player);
 
+        /// <summary>Whether a player is the one at this machine.</summary>
+        bool IsLocal(player player);
+
         /// <summary>Every unit in the world.</summary>
         List<unit> UnitsInWorld();
 

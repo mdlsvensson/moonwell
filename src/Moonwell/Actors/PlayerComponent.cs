@@ -4,6 +4,7 @@ namespace Moonwell
     public abstract class PlayerComponent : MapComponent
     {
         /// <summary>The player this component is on.</summary>
+        [LocalSafe]
         public Player Player => (Player)Actor;
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 namespace Moonwell
 {
     /// <summary>A set that keeps its items in insertion order, so a loop gives the same order on every machine.</summary>
+    [LocalSafe]
     public sealed class OrderedSet<T> where T : notnull
     {
         private readonly List<T> items = new List<T>();

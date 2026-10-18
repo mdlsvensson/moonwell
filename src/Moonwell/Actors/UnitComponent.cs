@@ -7,6 +7,7 @@ namespace Moonwell
         internal static readonly HookTable ComponentHooks = new HookTable(typeof(UnitComponent), new string[] { "OnItemPickedUp", "OnItemDropped", "OnDamaged", "OnDealtDamage", "OnDeath", "OnKill", "OnCast" }, new int[] { Hook.OnItemPickedUp, Hook.OnItemDropped, Hook.OnDamaged, Hook.OnDealtDamage, Hook.OnDeath, Hook.OnKill, Hook.OnCast });
 
         /// <summary>The unit this component is on.</summary>
+        [LocalSafe]
         public Unit Unit => (Unit)Actor;
 
         /// <summary>The reactions this kind of component declares.</summary>

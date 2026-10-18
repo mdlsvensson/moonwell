@@ -13,15 +13,19 @@ namespace Moonwell
         }
 
         /// <summary>The unit that takes the damage.</summary>
+        [LocalSafe]
         public Unit Target { get; }
 
         /// <summary>The unit that deals the damage; null when it is not known.</summary>
+        [LocalSafe]
         public Unit? Source { get; }
 
         /// <summary>The amount of the damage; a reaction may change it.</summary>
+        [LocalSafe]
         public float Amount { get; set; }
 
         /// <summary>Whether the damage is an attack.</summary>
+        [LocalSafe]
         public bool IsAttack { get; }
     }
 }

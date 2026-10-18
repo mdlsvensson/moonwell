@@ -4,6 +4,7 @@ namespace Moonwell
     public abstract class GameComponent : MapComponent
     {
         /// <summary>The game this component is on.</summary>
+        [LocalSafe]
         public Game Game => (Game)Actor;
     }
 }

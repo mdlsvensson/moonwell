@@ -1,6 +1,7 @@
 namespace Moonwell
 {
     /// <summary>One cast of a spell: it begins when the spell takes effect, and ends at the spell's end or when the caster's next cast begins.</summary>
+    [LocalSafe]
     public sealed class Cast : Owner
     {
         /// <summary>Makes the cast of an ability by a caster, at a target and a place, with the level the ability has now.</summary>

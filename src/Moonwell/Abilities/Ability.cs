@@ -10,12 +10,15 @@ namespace Moonwell
         internal int Mask;
 
         /// <summary>The unit that has the ability.</summary>
+        [LocalSafe]
         public Unit Unit { get; internal set; } = null!;
 
         /// <summary>The id of the ability.</summary>
+        [LocalSafe]
         public int Id { get; internal set; }
 
         /// <summary>The level of the ability on its unit, as the game reads it now.</summary>
+        [LocalSafe]
         public int Level => Runtime.World.AbilityLevel(Unit.Handle, Id);
 
         /// <summary>Runs when the unit begins a cast of the ability; Owner.Current is the cast while it runs.</summary>

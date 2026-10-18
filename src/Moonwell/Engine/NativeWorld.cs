@@ -134,6 +134,12 @@ namespace Moonwell.Engine
             return Natives.GetPlayerId(player);
         }
 
+        /// <summary>Whether a player is the one at this machine.</summary>
+        public bool IsLocal(player player)
+        {
+            return Natives.GetLocalPlayer() == player;
+        }
+
         /// <summary>Every unit in the world, by player slot: the world's rect misses hidden and Locust units, a player's units do not.</summary>
         public List<unit> UnitsInWorld()
         {

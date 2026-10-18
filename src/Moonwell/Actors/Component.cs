@@ -15,6 +15,7 @@ namespace Moonwell
         internal int Mask;
 
         /// <summary>The actor the component is on; null until it is added.</summary>
+        [LocalSafe]
         public Actor Actor => actor!;
 
         /// <summary>The reactions this kind of component declares.</summary>

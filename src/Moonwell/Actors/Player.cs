@@ -17,12 +17,15 @@ namespace Moonwell
         }
 
         /// <summary>The slot of the player.</summary>
+        [LocalSafe]
         public int Slot { get; }
 
         /// <summary>The game's player in this slot.</summary>
+        [LocalSafe]
         public player Handle { get; }
 
         /// <summary>The player object of a slot; made on first ask.</summary>
+        [LocalSafe]
         public static Player Get(int slot)
         {
             var existing = bySlot[slot];
@@ -37,6 +40,7 @@ namespace Moonwell
         }
 
         /// <summary>The player object of a game player; null for null.</summary>
+        [LocalSafe]
         public static Player? Of(player? handle)
         {
             if (handle == null)
@@ -59,6 +63,7 @@ namespace Moonwell
         }
 
         /// <summary>The level the player has of an upgrade class.</summary>
+        [LocalSafe]
         public int LevelOf<T>() where T : Upgrade
         {
             return Runtime.World.UpgradeLevel(Handle, ObjectTypes.IdOf<T>());

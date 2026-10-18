@@ -6,9 +6,11 @@ namespace Moonwell
     public abstract class Owned
     {
         /// <summary>The owner that adopted this object; kept after the object ends.</summary>
+        [LocalSafe]
         public Owner? Owner { get; internal set; }
 
         /// <summary>Whether this object has ended.</summary>
+        [LocalSafe]
         public bool HasEnded { get; private set; }
 
         /// <summary>The older sibling in the owner's list of children; null for the oldest.</summary>

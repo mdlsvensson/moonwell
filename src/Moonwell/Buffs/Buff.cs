@@ -9,21 +9,27 @@ namespace Moonwell
         internal Timer? expiry;
 
         /// <summary>The seconds the buff lasts; 0 until it is removed.</summary>
+        [LocalSafe]
         public float Duration { get; protected set; }
 
         /// <summary>The seconds between ticks; 0 for no ticks.</summary>
+        [LocalSafe]
         public float Tick { get; protected set; }
 
         /// <summary>What a second apply of the buff does when the unit already has one of its class.</summary>
+        [LocalSafe]
         public Stacking Stacking { get; protected set; } = Stacking.Refresh;
 
         /// <summary>Whether the unit's death ends the buff, after the buff has seen it; true unless the class keeps it through death.</summary>
+        [LocalSafe]
         public bool EndsOnDeath { get; protected set; } = true;
 
         /// <summary>The unit that applied the buff last; null when none did.</summary>
+        [LocalSafe]
         public Unit? Source { get; internal set; }
 
         /// <summary>The seconds until the buff expires; 0 without an expiry.</summary>
+        [LocalSafe]
         public float Remaining
         {
             get

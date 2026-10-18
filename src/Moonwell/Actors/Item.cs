@@ -16,9 +16,11 @@ namespace Moonwell
         protected List<ItemComponent> Components { get; } = new List<ItemComponent>();
 
         /// <summary>The game's handle of the item.</summary>
+        [LocalSafe]
         public item Handle { get; internal set; } = null!;
 
         /// <summary>The type id of the item, as the game read it when the item was taken in.</summary>
+        [LocalSafe]
         public int TypeId { get; internal set; }
 
         /// <summary>The starting components, which the runtime adds in order when the item is taken in.</summary>
