@@ -424,7 +424,7 @@ namespace Moonwell.Build
         // release build writes no header before the compiled code, so the library's last line marks where it starts.
         private static HashSet<string> GettersCalled(string script)
         {
-            var end = script.LastIndexOf(LibraryEnd, StringComparison.Ordinal);
+            var end = script.IndexOf(LibraryEnd, StringComparison.Ordinal);
             var code = end < 0 ? script : script.Substring(end + LibraryEnd.Length);
             var names = new HashSet<string>(StringComparer.Ordinal);
             foreach (Match match in Getter.Matches(code))

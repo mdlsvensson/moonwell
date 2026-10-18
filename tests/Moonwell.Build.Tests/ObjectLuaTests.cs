@@ -141,6 +141,23 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void values_are_found_when_the_code_holds_the_end_of_the_library_as_text()
+        {
+            // The text of the library's last line, in a string of the map's code, is not where the library ends.
+            var ids = new Dictionary<string, string>(compiled.Declarations.StandardClassIds, StringComparer.Ordinal);
+            foreach (var entry in compiled.Ids)
+            {
+                ids[entry.Key] = entry.Value;
+            }
+
+            var script = compiled.Script + "\nlocal text = \"local endOfMoonwellObjects = true\"\n";
+
+            var values = CompiledObjects.ValuesOf(ObjectLua.Values(script, compiled.Declarations.Used, compiled.Declarations.Objects, ids, compiled.Standard, null));
+
+            Assert.Contains("[\"uhpm\"] = ", values);
+        }
+
+        [Fact]
         public void unset_string_reads_empty_in_lua()
         {
             using var lua = compiled.Start();
@@ -232,12 +249,6 @@ namespace Moonwell.Build.Tests
             public CompiledObjects()
             {
                 var folder = folders.TemporaryCopyOf("Objects");
-
-                // The Sample's World Editor map: the script War3Net writes for the fixture's bare map has no main.
-                foreach (var file in Directory.GetFiles(Path.Combine(TestFolders.Fixture("Sample"), "map")))
-                {
-                    File.Copy(file, Path.Combine(folder, "map", Path.GetFileName(file)), true);
-                }
 
                 var project = MapProject.Find(folder);
                 var assembly = DotnetBuild.Run(project, false, TextWriter.Null);
