@@ -172,6 +172,7 @@ public class FieldsTests
     }
 
     [Theory]
+    [InlineData("Declared")]
     [InlineData("Fields")]
     [InlineData("Levels")]
     [InlineData("PerLevel")]
@@ -204,5 +205,54 @@ public class FieldsTests
         }));
 
         Assert.Equal("fields uhpm and uhpr are both named Life", error.Message);
+    }
+
+    [Fact]
+    public void a_name_of_a_runtime_member_gets_its_id()
+    {
+        var names = FieldNames.Assign(
+            new[]
+            {
+                new NameCandidate("uhnd", "Handle", false, new[] { "unit" }),
+                new NameCandidate("uply", "Player", false, new[] { "unit" }),
+                new NameCandidate("uabc", "Other", false, new[] { "unit" }),
+            },
+            new HashSet<string> { "Handle", "Player" });
+
+        Assert.Equal(new[] { "HandleUhnd", "PlayerUply", "Other" }, names);
+    }
+
+    [Fact]
+    public void a_hand_picked_runtime_member_name_is_an_error()
+    {
+        var error = Assert.Throws<InvalidOperationException>(() => FieldNames.Assign(
+            new[] { new NameCandidate("uhpm", "Handle", true, new[] { "unit" }) },
+            new HashSet<string> { "Handle" }));
+
+        Assert.Equal("field uhpm is hand-picked as Handle, a member of the class it belongs to", error.Message);
+    }
+
+    [Fact]
+    public void fields_of_a_kind_avoid_the_reserved_names()
+    {
+        var tables = MiniExport();
+
+        var plain = Find(Fields.Of(tables, Kind.Unit), "ubpx");
+        var avoided = Find(Fields.Of(tables, Kind.Unit, new HashSet<string> { plain.Name }), "ubpx");
+
+        Assert.Equal("ButtonPositionX", plain.Name);
+        Assert.Equal("ButtonPositionXUbpx", avoided.Name);
+    }
+
+    [Fact]
+    public void a_hero_only_unit_field_is_marked()
+    {
+        var fields = Fields.Of(MiniExport(), Kind.Unit);
+
+        Assert.True(Find(fields, "ustr").HeroOnly);
+        Assert.True(Find(fields, "uhab").HeroOnly);
+        Assert.False(Find(fields, "uhpm").HeroOnly);
+        Assert.False(Find(fields, "uabi").HeroOnly);
+        Assert.All(Fields.Of(MiniExport(), Kind.Ability), f => Assert.False(f.HeroOnly));
     }
 }

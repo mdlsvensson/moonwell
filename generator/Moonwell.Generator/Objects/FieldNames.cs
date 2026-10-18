@@ -16,7 +16,7 @@ public static class FieldNames
 {
     private static readonly string[] Reserved =
     {
-        "Equals", "Fields", "Finalize", "GetHashCode", "GetType", "Levels", "MemberwiseClone", "PerLevel",
+        "Declared", "Equals", "Fields", "Finalize", "GetHashCode", "GetType", "Levels", "MemberwiseClone", "PerLevel",
         "ReferenceEquals", "Set", "ToString",
     };
 
@@ -66,11 +66,13 @@ public static class FieldNames
     /// The final names of the candidates, in their order. A name two candidates share in a group gets the field id
     /// appended (<c>AreaOfEffect</c> and <c>AreaOfEffect</c> become <c>AreaOfEffectAare</c> and <c>AreaOfEffectHbz2</c>)
     /// except a hand-picked one, which keeps its name; a name that is a member of <c>object</c> or of the generated
-    /// kind bases (<c>Fields</c>, <c>Levels</c>,
-    /// <c>PerLevel</c>, <c>Set</c>) gets the id too.
+    /// kind bases (<c>Declared</c>, <c>Fields</c>, <c>Levels</c>, <c>PerLevel</c>, <c>Set</c>) gets the id too, as does
+    /// a name in <paramref name="reserved"/> (the members of the runtime class the objects inherit).
     /// </summary>
-    /// <exception cref="InvalidOperationException">A name is still shared after that.</exception>
-    public static IReadOnlyList<string> Assign(IReadOnlyList<NameCandidate> candidates)
+    /// <exception cref="InvalidOperationException">
+    /// A name is still shared after that, or a hand-picked name is in <paramref name="reserved"/>.
+    /// </exception>
+    public static IReadOnlyList<string> Assign(IReadOnlyList<NameCandidate> candidates, IReadOnlySet<string>? reserved = null)
     {
         var names = new string[candidates.Count];
         var first = new Dictionary<(string, string), int>();
@@ -93,6 +95,17 @@ public static class FieldNames
 
             if (Array.IndexOf(Reserved, candidates[i].Name) >= 0)
             {
+                shared.Add(i);
+            }
+
+            if (reserved != null && reserved.Contains(candidates[i].Name))
+            {
+                if (candidates[i].Listed)
+                {
+                    throw new InvalidOperationException(
+                        $"field {candidates[i].Id} is hand-picked as {candidates[i].Name}, a member of the class it belongs to");
+                }
+
                 shared.Add(i);
             }
         }

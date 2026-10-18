@@ -28,6 +28,10 @@ public enum FieldType
 /// <param name="Skin">True when the game keeps the field's value in the skin files, which every player sees.</param>
 /// <param name="Specific">The ability codes the field belongs to; empty for a field of every ability.</param>
 /// <param name="Column">How the field's values are keyed in <see cref="ObjectRows.Values"/>; see <see cref="Fields"/>.</param>
+/// <param name="HeroOnly">
+/// True for a unit field only heroes have (<c>useHero</c> without <c>useUnit</c> or <c>useBuilding</c>); false for
+/// every field of another kind.
+/// </param>
 public sealed record Field(
     Kind Kind,
     string Id,
@@ -38,7 +42,8 @@ public sealed record Field(
     int DataPointer,
     bool Skin,
     IReadOnlyList<string> Specific,
-    string Column);
+    string Column,
+    bool HeroOnly = false);
 
 /// <summary>The fields of each kind of object, from the export's metadata tables.</summary>
 /// <remarks>
@@ -67,8 +72,11 @@ public static class Fields
     private const string Text = "Profile";
     private const int LabelDepth = 8;
 
-    /// <summary>The fields of <paramref name="kind"/>, ordered by field id.</summary>
-    public static IReadOnlyList<Field> Of(ExportTables tables, Kind kind)
+    /// <summary>
+    /// The fields of <paramref name="kind"/>, ordered by field id. A name in <paramref name="reserved"/> (the members
+    /// of the runtime class the kind's objects inherit) is never given to a field: see <see cref="FieldNames.Assign"/>.
+    /// </summary>
+    public static IReadOnlyList<Field> Of(ExportTables tables, Kind kind, IReadOnlySet<string>? reserved = null)
     {
         var rows = new List<MetaRow>();
         foreach (var row in tables.Meta(kind))
@@ -122,11 +130,12 @@ public static class Fields
                 pointer,
                 Value(row, "netsafe") == "1",
                 specific,
-                ColumnOf(row, repeat, pointer, perField)));
+                ColumnOf(row, repeat, pointer, perField),
+                kind == Kind.Unit && Value(row, "useHero") == "1" && Value(row, "useUnit") != "1" && Value(row, "useBuilding") != "1"));
             candidates.Add(new NameCandidate(row.Id, name!, listed, GroupsOf(kind, row, specific, mentioned)));
         }
 
-        var names = FieldNames.Assign(candidates);
+        var names = FieldNames.Assign(candidates, reserved);
         var result = new List<Field>(fields.Count);
         for (var i = 0; i < fields.Count; i++)
         {

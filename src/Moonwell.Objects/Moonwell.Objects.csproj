@@ -9,6 +9,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Generated/Values/*.json" LogicalName="Moonwell.Objects.Values.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
     <InternalsVisibleTo Include="Moonwell.Objects.Tests" />
   </ItemGroup>
 
