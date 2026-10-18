@@ -126,6 +126,18 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void skips_placed_ids()
+        {
+            var ids = Assign(
+                None,
+                None,
+                new HashSet<string> { "h001" },
+                Obj("Objects.A", "unit"));
+
+            Assert.Equal("h002", ids["Objects.A"]);
+        }
+
+        [Fact]
         public void skips_ids_of_gone_entries()
         {
             Assign(Obj("Objects.Old", "unit"));
@@ -159,14 +171,23 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
-        public void no_rename_report_when_nothing_new_or_the_new_kind_differs()
+        public void no_rename_report_when_nothing_is_new()
         {
             Assign(Obj("Objects.Old", "unit"));
 
             Assign();
-            Assert.Equal(string.Empty, log.ToString());
 
-            Assign(Obj("Objects.Sword", "item"));
+            Assert.Equal(string.Empty, log.ToString());
+        }
+
+        [Fact]
+        public void no_rename_report_when_the_new_class_is_of_another_kind()
+        {
+            Assign(Obj("Objects.Old", "unit"));
+
+            var ids = Assign(Obj("Objects.Sword", "item"));
+
+            Assert.Equal("I001", ids["Objects.Sword"]);
             Assert.Equal(string.Empty, log.ToString());
         }
 

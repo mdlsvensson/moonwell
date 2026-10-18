@@ -27,7 +27,7 @@ namespace Moonwell.Build
         /// <param name="objects">The declared objects.</param>
         /// <param name="standardIds">The ids of the standard objects; no new id is one of them.</param>
         /// <param name="sourceMapIds">The ids the source map's object files define; no new id is one of them.</param>
-        /// <param name="placedIds">The ids of the objects the source map places (units, items, destructables and doodads).</param>
+        /// <param name="placedIds">The ids of the objects the source map places (units, items, destructables and doodads); a rename of one is an error and no new id is one of them.</param>
         /// <param name="log">The build log; warnings start with <c>warning: </c>.</param>
         /// <returns>The id by class name, and by <c>&lt;class&gt;#carrier</c> for the carrier ability of a buff.</returns>
         /// <exception cref="BuildException"><c>ids.json</c> is malformed, a pin is not valid or clashes, or a renamed class's id is placed in the map.</exception>
@@ -136,14 +136,14 @@ namespace Moonwell.Build
             foreach (var declared in pending)
             {
                 var space = SpaceOf(declared.Kind);
-                var id = Next(counters, LetterOf(declared.Kind), space, standardIds, sourceMapIds, reserved[space], claims[space], declared.ClassName);
+                var id = Next(counters, LetterOf(declared.Kind), space, standardIds, sourceMapIds, placedIds, reserved[space], claims[space], declared.ClassName);
                 Claim(claims[space], id, declared.ClassName);
                 ids[declared.ClassName] = id;
             }
 
             foreach (var key in pendingCarriers)
             {
-                var id = Next(counters, 'A', "ability", standardIds, sourceMapIds, reserved["ability"], claims["ability"], key);
+                var id = Next(counters, 'A', "ability", standardIds, sourceMapIds, placedIds, reserved["ability"], claims["ability"], key);
                 Claim(claims["ability"], id, key);
                 ids[key] = id;
             }
@@ -295,6 +295,7 @@ namespace Moonwell.Build
             string space,
             IReadOnlySet<string> standardIds,
             IReadOnlySet<string> sourceMapIds,
+            IReadOnlySet<string> placedIds,
             HashSet<string> reserved,
             Dictionary<string, string> claimed,
             string owner)
@@ -310,7 +311,7 @@ namespace Moonwell.Build
                 }
 
                 var id = new string(new[] { letter, Digits[count / 1296], Digits[count / 36 % 36], Digits[count % 36] });
-                if (standardIds.Contains(id) || sourceMapIds.Contains(id) || reserved.Contains(id) || claimed.ContainsKey(id))
+                if (standardIds.Contains(id) || sourceMapIds.Contains(id) || placedIds.Contains(id) || reserved.Contains(id) || claimed.ContainsKey(id))
                 {
                     continue;
                 }
