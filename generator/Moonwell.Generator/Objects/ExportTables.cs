@@ -113,7 +113,7 @@ public sealed class ExportTables
     /// </summary>
     public static ExportTables Read(string folder)
     {
-        var tables = new ExportTables(folder, new Dictionary<string, string>(StringComparer.Ordinal));
+        var tables = new ExportTables(folder, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
         tables.ReadLabels(LabelsFile);
         tables.ReadLabels(GameLabelsFile);
         return tables;
@@ -229,7 +229,7 @@ public sealed class ExportTables
         return present;
     }
 
-    /// <summary>The English label for a <c>WESTRING_</c> key, or the key itself when the export has none.</summary>
+    /// <summary>The English label for a <c>WESTRING_</c> key (looked up without regard to case, as the game does), or the key itself when the export has none.</summary>
     public string Label(string key)
     {
         return _labels.TryGetValue(key, out var label) ? label : key;

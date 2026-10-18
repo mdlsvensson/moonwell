@@ -376,11 +376,21 @@ public class StandardObjectsTests
     public void a_world_editor_string_key_without_a_label_is_no_name()
     {
         using var copy = new Copy();
-        copy.Replace("_locales/enus.w3mod/ui/worldeditstrings.txt", "WESTRING_DOOD_LPLP=", "WESTRING_DOOD_LPLP=Lilypad", "WESTRING_DOOD_OTHER=Lilypad");
-        copy.Replace("_locales/enus.w3mod/ui/worldeditgamestrings.txt", "WESTRING_DOOD_LPLP=", "WESTRING_DOOD_LPLP=", "WESTRING_DOOD_OTHER=");
+        copy.Replace("doodads/doodadskins.txt", "[ZPlp]", "Name=WESTRING_DOOD_LPLP", "Name=WESTRING_DOOD_NO_SUCH_LABEL");
 
         var doodad = Find(Of(copy.Tables(), Kind.Doodad), "ZPlp");
         Assert.Equal("", doodad.Name);
-        Assert.Equal("WESTRING_DOOD_LPLP", doodad.Values["dnam"]);
+        Assert.Equal("WESTRING_DOOD_NO_SUCH_LABEL", doodad.Values["dnam"]);
+    }
+
+    [Fact]
+    public void a_key_that_differs_from_its_labels_key_in_case_is_resolved()
+    {
+        using var copy = new Copy();
+        copy.Replace("_locales/enus.w3mod/ui/worldeditgamestrings.txt", "[WorldEditStrings]", "WESTRING_DEST_SUMMER_TREE_WALL=", "WESTRING_Dest_Summer_Tree_Wall=");
+
+        var destructable = Find(Of(copy.Tables(), Kind.Destructable), "LTlt");
+        Assert.Equal("Summer Tree Wall", destructable.Name);
+        Assert.Equal("WESTRING_DEST_SUMMER_TREE_WALL", destructable.Values["bnam"]);
     }
 }

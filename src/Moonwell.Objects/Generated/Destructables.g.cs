@@ -690,6 +690,27 @@ namespace Moonwell.Objects.Destructables
     {
     }
 
+    /// <summary>King's Throne (XOkt).</summary>
+    /// @CSharpLua.Ignore
+    [global::Moonwell.Objects.Standard("XOkt")]
+    public class KingsThrone : global::Moonwell.Objects.StandardDestructable
+    {
+    }
+
+    /// <summary>King's Throne (Diagonal 1) (XOk1).</summary>
+    /// @CSharpLua.Ignore
+    [global::Moonwell.Objects.Standard("XOk1")]
+    public class KingsThroneDiagonal1 : global::Moonwell.Objects.StandardDestructable
+    {
+    }
+
+    /// <summary>King's Throne (Diagonal 1) (XOk2).</summary>
+    /// @CSharpLua.Ignore
+    [global::Moonwell.Objects.Standard("XOk2")]
+    public class KingsThroneDiagonal1XOk2 : global::Moonwell.Objects.StandardDestructable
+    {
+    }
+
     /// <summary>Last Hope Bridge (LTtc).</summary>
     /// @CSharpLua.Ignore
     [global::Moonwell.Objects.Standard("LTtc")]
@@ -2388,27 +2409,6 @@ namespace Moonwell.Objects.Destructables
     /// @CSharpLua.Ignore
     [global::Moonwell.Objects.Standard("WTtw")]
     public class WinterTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>XOk1.</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XOk1")]
-    public class XOk1 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>XOk2.</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XOk2")]
-    public class XOk2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>XOkt.</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XOkt")]
-    public class XOkt : global::Moonwell.Objects.StandardDestructable
     {
     }
 }

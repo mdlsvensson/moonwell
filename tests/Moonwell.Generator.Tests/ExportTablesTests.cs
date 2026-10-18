@@ -243,12 +243,13 @@ public class ExportTablesTests
     }
 
     [Fact]
-    public void labels_from_the_game_file_too_and_the_editor_file_wins()
+    public void labels_from_the_game_file_too_the_editor_file_wins_and_case_does_not_matter()
     {
         var tables = ExportTables.Read(MiniExport());
 
         Assert.Equal("Summer Tree Wall", tables.Label("WESTRING_DEST_SUMMER_TREE_WALL"));
         Assert.Equal("Lilypad", tables.Label("WESTRING_DOOD_LPLP"));
+        Assert.Equal("Lilypad", tables.Label("WESTRING_DOOD_lplp"));
     }
 
     [Fact]

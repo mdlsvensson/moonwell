@@ -1103,6 +1103,20 @@ namespace Moonwell.Objects.Doodads
     {
     }
 
+    /// <summary>Cliff Cave (LCc0).</summary>
+    /// @CSharpLua.Ignore
+    [global::Moonwell.Objects.Standard("LCc0")]
+    public class CliffCave : global::Moonwell.Objects.StandardDoodad
+    {
+    }
+
+    /// <summary>Cliff Cave 2 (LCc2).</summary>
+    /// @CSharpLua.Ignore
+    [global::Moonwell.Objects.Standard("LCc2")]
+    public class CliffCave2 : global::Moonwell.Objects.StandardDoodad
+    {
+    }
+
     /// <summary>Column Angled Double (YSc5).</summary>
     /// @CSharpLua.Ignore
     [global::Moonwell.Objects.Standard("YSc5")]
@@ -2150,20 +2164,6 @@ namespace Moonwell.Objects.Doodads
     /// @CSharpLua.Ignore
     [global::Moonwell.Objects.Standard("YOss")]
     public class KingTerenasStatue : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>LCc0.</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCc0")]
-    public class LCc0 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>LCc2.</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCc2")]
-    public class LCc2 : global::Moonwell.Objects.StandardDoodad
     {
     }
 
@@ -4659,6 +4659,13 @@ namespace Moonwell.Objects.Doodads
     {
     }
 
+    /// <summary>Tulips (ZPf0).</summary>
+    /// @CSharpLua.Ignore
+    [global::Moonwell.Objects.Standard("ZPf0")]
+    public class Tulips : global::Moonwell.Objects.StandardDoodad
+    {
+    }
+
     /// <summary>Undead Lab (UCul).</summary>
     /// @CSharpLua.Ignore
     [global::Moonwell.Objects.Standard("UCul")]
@@ -5391,13 +5398,6 @@ namespace Moonwell.Objects.Doodads
     /// @CSharpLua.Ignore
     [global::Moonwell.Objects.Standard("ASwt")]
     public class WorldTree : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>ZPf0.</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZPf0")]
-    public class ZPf0 : global::Moonwell.Objects.StandardDoodad
     {
     }
 }
