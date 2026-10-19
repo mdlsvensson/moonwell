@@ -27,6 +27,30 @@ public class LocalTests
     }
 
     [Fact]
+    public void enumerating_with_a_callback_is_rejected_inside()
+    {
+        // Hive thread 317486: ForGroup or ForForce in local code desyncs whatever it does (Insanity_AI).
+        var found = MapCode.Check("""
+            Local.For(p, () =>
+            {
+                Natives.ForGroup(null!, () => { });
+                Natives.ForForce(null!, () => { });
+                Natives.EnumItemsInRect(null!, null!, () => { });
+                Natives.EnumDestructablesInRect(null!, null!, () => { });
+                Natives.SelectUnit(u, true);
+            });
+            """);
+
+        Assert.Equal(new[]
+        {
+            "MW0001: Natives.ForGroup(null!, () => { })",
+            "MW0001: Natives.ForForce(null!, () => { })",
+            "MW0001: Natives.EnumItemsInRect(null!, null!, () => { })",
+            "MW0001: Natives.EnumDestructablesInRect(null!, null!, () => { })",
+        }, found);
+    }
+
+    [Fact]
     public void the_same_natives_are_allowed_outside()
     {
         Assert.Empty(MapCode.Check("""
@@ -106,6 +130,33 @@ public class LocalTests
             """);
 
         Assert.Equal(new[] { "MW0002: Natives.GetLocalPlayer()", "MW0002: Natives.GetCameraTargetPositionX()" }, found);
+    }
+
+    [Fact]
+    public void localised_tooltips_and_filter_states_are_machine_local()
+    {
+        var found = MapCode.Check("""
+            var a = Natives.BlzGetItemTooltip(null!);
+            var b = Natives.BlzGetItemDescription(null!);
+            var c = Natives.BlzGetItemExtendedTooltip(null!);
+            var d = Natives.BlzGetAbilityTooltip(0, 0);
+            var e = Natives.BlzGetAbilityActivatedExtendedTooltip(0, 0);
+            var f = Natives.BlzGetAbilityResearchTooltip(0, 0);
+            var g = Natives.GetAllyColorFilterState();
+            var h = Natives.GetCreepCampFilterState();
+            """);
+
+        Assert.Equal(new[]
+        {
+            "MW0002: Natives.BlzGetItemTooltip(null!)",
+            "MW0002: Natives.BlzGetItemDescription(null!)",
+            "MW0002: Natives.BlzGetItemExtendedTooltip(null!)",
+            "MW0002: Natives.BlzGetAbilityTooltip(0, 0)",
+            "MW0002: Natives.BlzGetAbilityActivatedExtendedTooltip(0, 0)",
+            "MW0002: Natives.BlzGetAbilityResearchTooltip(0, 0)",
+            "MW0002: Natives.GetAllyColorFilterState()",
+            "MW0002: Natives.GetCreepCampFilterState()",
+        }, found);
     }
 
     [Fact]

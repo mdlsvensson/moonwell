@@ -59,6 +59,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
         private readonly INamedTypeSymbol? createsHandle;
         private readonly INamedTypeSymbol? changesState;
         private readonly INamedTypeSymbol? machineLocal;
+        private readonly INamedTypeSymbol? desyncs;
         private readonly INamedTypeSymbol? localSafe;
         private readonly INamedTypeSymbol? syncUnchecked;
         private readonly INamedTypeSymbol?[] hashTypes;
@@ -78,6 +79,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             createsHandle = compilation.GetTypeByMetadataName("Moonwell.CreatesHandleAttribute");
             changesState = compilation.GetTypeByMetadataName("Moonwell.ChangesStateAttribute");
             machineLocal = compilation.GetTypeByMetadataName("Moonwell.MachineLocalAttribute");
+            desyncs = compilation.GetTypeByMetadataName("Moonwell.DesyncsAttribute");
             localSafe = compilation.GetTypeByMetadataName("Moonwell.LocalSafeAttribute");
             syncUnchecked = compilation.GetTypeByMetadataName("Moonwell.SyncUncheckedAttribute");
             hashTypes = new[]
@@ -111,7 +113,11 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
                 context.ReportDiagnostic(Diagnostic.Create(Rules.HashLoop, location, member.ContainingType.Name));
             }
 
-            if (IsLocal(operation, context.ContainingSymbol))
+            if (Has(member, desyncs))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rules.Desyncs, location, Name(member)));
+            }
+            else if (IsLocal(operation, context.ContainingSymbol))
             {
                 var finding = Rejected(member, write, new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default));
                 if (finding != null)

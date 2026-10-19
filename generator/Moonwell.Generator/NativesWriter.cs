@@ -148,6 +148,11 @@ public static class NativesWriter
             names.Add("ChangesState");
         }
 
+        if (tag.HasFlag(NativeTag.Desyncs))
+        {
+            names.Add("Desyncs");
+        }
+
         return names.Count == 0 ? null : string.Join(", ", names);
     }
 

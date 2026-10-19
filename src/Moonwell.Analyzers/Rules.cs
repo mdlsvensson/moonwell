@@ -55,6 +55,15 @@ public static class Rules
         isEnabledByDefault: true,
         description: "The game's Lua has 32-bit integers and single-precision floats." + Silence);
 
+    public static readonly DiagnosticDescriptor Desyncs = new(
+        "MW0006",
+        "Desyncs wherever it runs",
+        "'{0}' changes the game inside its own GetLocalPlayer() block, so it desyncs wherever it runs",
+        Category,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "A blizzard.j function that compares GetLocalPlayer() and then changes the game, such as SelectGroupForPlayerBJ, desyncs on every call. Do its local part inside Local.For with what the analyzer allows there." + Silence);
+
     public static ImmutableArray<DiagnosticDescriptor> All { get; } =
-        ImmutableArray.Create(StateInLocal, LocalOutside, HandleId, HashLoop, NumberType);
+        ImmutableArray.Create(StateInLocal, LocalOutside, HandleId, HashLoop, NumberType, Desyncs);
 }

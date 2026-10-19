@@ -20,6 +20,7 @@ namespace Moonwell.Build.Tests
             Assert.Matches(@"Mistakes\.cs\(14,\d+\): error MW0003", output);
             Assert.Matches(@"Mistakes\.cs\(15,\d+\): error MW0004", output);
             Assert.Matches(@"Mistakes\.cs\(19,\d+\): error MW0005: 'long'", output);
+            Assert.Matches(@"Mistakes\.cs\(20,\d+\): error MW0006: 'SelectGroupForPlayerBJ'", output);
         }
     }
 }

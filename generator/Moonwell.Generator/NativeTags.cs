@@ -17,22 +17,33 @@ public enum NativeTag
 
     /// <summary>Gives a different answer on each machine.</summary>
     MachineLocal = 4,
+
+    /// <summary>Changes the game inside its own <c>GetLocalPlayer()</c> block, so it desyncs wherever it is called.</summary>
+    Desyncs = 8,
 }
 
 /// <summary>
 /// Tags each native and blizzard.j function. Natives are tagged by the lists and name rules below; a native none of
 /// them covers changes state, so a new patch's natives are rejected inside <c>Local.For</c> until they are listed.
 /// A blizzard.j function takes the handle and state tags of what its body calls, and changes state when it sets a
-/// global; it is machine-local when it returns a value and calls a machine-local native.
+/// global; it is machine-local when it returns a value and calls a machine-local native. It desyncs when, inside its
+/// own <c>if</c> on <c>GetLocalPlayer()</c>, it creates a handle or calls a native known to desync there, or when it
+/// calls a function that desyncs. Other state changes in Blizzard's local blocks (pausing for a dialog, setting bj_
+/// globals, fog and occlusion) are left to Blizzard; map code still may not make them inside <c>Local.For</c>.
 /// </summary>
 public static partial class NativeTags
 {
     /// <summary>Natives whose answer differs per machine: the local player, the camera, the mouse and keyboard,
-    /// frames, sounds, localised names, heights and what a player may have changed locally.</summary>
+    /// frames, sounds, localised names and tooltips, heights and what a player may have changed locally. jassdoc's
+    /// <c>@async</c> natives are all here.</summary>
     private static readonly HashSet<string> MachineLocal = new(StringComparer.Ordinal)
     {
         "GetLocalPlayer", "GetLocalizedString", "GetLocalizedHotkey", "BlzGetLocale", "SkinManagerGetLocalPath",
         "GetObjectName", "GetUnitName", "GetItemName", "GetDestructableName", "GetHeroProperName",
+        "BlzGetItemDescription", "BlzGetItemTooltip", "BlzGetItemExtendedTooltip", "BlzGetAbilityTooltip",
+        "BlzGetAbilityActivatedTooltip", "BlzGetAbilityExtendedTooltip", "BlzGetAbilityActivatedExtendedTooltip",
+        "BlzGetAbilityResearchTooltip", "BlzGetAbilityResearchExtendedTooltip",
+        "GetAllyColorFilterState", "GetCreepCampFilterState",
         "GetLocationZ", "BlzGetLocalUnitZ", "BlzGetUnitZ",
         "GetCameraBoundMinX", "GetCameraBoundMinY", "GetCameraBoundMaxX", "GetCameraBoundMaxY", "GetCameraField",
         "GetCameraMargin", "GetCameraTargetPositionX", "GetCameraTargetPositionY", "GetCameraTargetPositionZ",
@@ -43,6 +54,7 @@ public static partial class NativeTags
         "BlzIsLocalClientActive", "BlzIsSelectionEnabled", "BlzIsSelectionCircleEnabled",
         "BlzFrameIsVisible", "BlzFrameGetName", "BlzFrameGetText", "BlzFrameGetTextSizeLimit", "BlzFrameGetEnable",
         "BlzFrameGetAlpha", "BlzFrameGetValue", "BlzFrameGetHeight", "BlzFrameGetWidth", "BlzFrameGetChildrenCount",
+        "BlzFrameGetParent", "BlzFrameGetChild",
         "BlzFrameToPixelX", "BlzFrameToPixelY",
         "GetSoundDuration", "GetSoundFileDuration", "GetSoundIsPlaying", "GetSoundIsLoading",
         "IsCineFilterDisplayed", "IsMultiboardDisplayed", "IsMultiboardMinimized", "MultiboardGetTitleText",
@@ -78,6 +90,13 @@ public static partial class NativeTags
         "ShowImage", "ShowUbersplat", "SetTerrainFog", "SetTerrainFogEx", "ResetTerrainFog",
         "MultiboardDisplay", "MultiboardMinimize", "LeaderboardDisplay", "TimerDialogDisplay",
         "Preload", "PreloadGenClear", "PreloadGenStart", "PreloadGenEnd",
+    };
+
+    /// <summary>Natives that desync when run in local code, whatever their callback does: ForGroup and ForForce by
+    /// Hive thread 317486 (Insanity_AI on SelectGroupForPlayerBJ, which desyncs since 1.32), the Enum natives
+    /// inferred, since they run a callback the same way. They change state.</summary>
+    private static readonly HashSet<string> DesyncInLocal = new(StringComparer.Ordinal)
+    {
         "ForGroup", "ForForce", "EnumDestructablesInRect", "EnumItemsInRect",
     };
 
@@ -200,6 +219,15 @@ public static partial class NativeTags
     private static NativeTag FromBody(JassFunction function, IReadOnlyDictionary<string, NativeTag> known)
     {
         var tag = function.SetsGlobal ? NativeTag.ChangesState : NativeTag.None;
+        foreach (var call in function.LocalCalls)
+        {
+            if (DesyncInLocal.Contains(call)
+                || (known.TryGetValue(call, out var callee) && callee.HasFlag(NativeTag.CreatesHandle)))
+            {
+                tag |= NativeTag.Desyncs;
+            }
+        }
+
         foreach (var call in function.Calls)
         {
             if (!known.TryGetValue(call, out var callee))
@@ -207,7 +235,7 @@ public static partial class NativeTags
                 continue;
             }
 
-            tag |= callee & (NativeTag.CreatesHandle | NativeTag.ChangesState);
+            tag |= callee & (NativeTag.CreatesHandle | NativeTag.ChangesState | NativeTag.Desyncs);
 
             // A function that returns nothing keeps what it read (comparing the local player is how it keeps its
             // work local, and localised strings go to the screen); one that returns a value may return it.

@@ -17,6 +17,7 @@ namespace Desyncs
             }
 
             long total = Natives.GetPlayerId(player.Handle);
+            Natives.SelectGroupForPlayerBJ(Natives.CreateGroup(), player.Handle);
         }
     }
 }

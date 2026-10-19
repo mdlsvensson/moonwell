@@ -17,6 +17,14 @@ namespace Moonwell
     }
 
     /// @CSharpLua.Ignore
+    /// <summary>The function changes the game inside its own <c>GetLocalPlayer()</c> block, so it desyncs wherever it
+    /// is called; the analyzer rejects every call.</summary>
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Constructor)]
+    public sealed class DesyncsAttribute : Attribute
+    {
+    }
+
+    /// @CSharpLua.Ignore
     /// <summary>
     /// The member gives a different answer, or runs, on one machine only. The analyzer rejects a call to it outside
     /// <c>Local.For</c>, and checks the body of a map method that carries it as it checks a <c>Local.For</c> block.

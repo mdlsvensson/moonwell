@@ -11,6 +11,27 @@ public class AnywhereTests
     }
 
     [Fact]
+    public void a_function_that_desyncs_on_its_own_is_rejected_inside_and_outside()
+    {
+        Assert.Equal(new[]
+        {
+            "MW0006: Natives.SelectGroupForPlayerBJ(null!, p.Handle)",
+            "MW0006: Natives.SelectGroupForPlayerBJ(null!, p.Handle)",
+        }, MapCode.Check("""
+            Natives.SelectGroupForPlayerBJ(null!, p.Handle);
+            Local.For(p, () => Natives.SelectGroupForPlayerBJ(null!, p.Handle));
+            """));
+    }
+
+    [Fact]
+    public void a_desync_message_names_the_function()
+    {
+        Assert.Equal(
+            "'SelectGroupForPlayerBJ' changes the game inside its own GetLocalPlayer() block, so it desyncs wherever it runs",
+            MapCode.Message("Natives.SelectGroupForPlayerBJ(null!, p.Handle);"));
+    }
+
+    [Fact]
     public void looping_over_a_dictionary_or_hash_set_is_rejected()
     {
         var found = MapCode.Check("""
