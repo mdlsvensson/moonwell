@@ -11,6 +11,9 @@ public sealed record JassFunction(string Name, IReadOnlyList<JassParameter> Para
     /// <summary>The functions a function's body calls or names with <c>function</c>, in order, each once; empty for a native.</summary>
     public IReadOnlyList<string> Calls { get; init; } = Array.Empty<string>();
 
+    /// <summary>What a function's body calls inside an <c>if</c> on <c>GetLocalPlayer()</c>, else branches included.</summary>
+    public IReadOnlyList<string> LocalCalls { get; init; } = Array.Empty<string>();
+
     /// <summary>Whether a function's body sets a global.</summary>
     public bool SetsGlobal { get; init; }
 }
@@ -51,7 +54,7 @@ public static partial class Jass
                 if (line == "endfunction")
                 {
                     var index = scripts.Functions.Count - 1;
-                    scripts.Functions[index] = scripts.Functions[index] with { Calls = body.Calls, SetsGlobal = body.SetsGlobal };
+                    scripts.Functions[index] = scripts.Functions[index] with { Calls = body.Calls, LocalCalls = body.LocalCalls, SetsGlobal = body.SetsGlobal };
                     body = null;
                 }
                 else
@@ -159,6 +162,10 @@ public static partial class Jass
     {
         private readonly HashSet<string> locals;
         private readonly HashSet<string> seen = new(StringComparer.Ordinal);
+        private readonly HashSet<string> seenLocal = new(StringComparer.Ordinal);
+
+        /// <summary>For each open <c>if</c>, whether it or one around it tests the local player.</summary>
+        private readonly Stack<bool> blocks = new();
 
         public Body(IEnumerable<string> parameters)
         {
@@ -166,6 +173,8 @@ public static partial class Jass
         }
 
         public List<string> Calls { get; } = new();
+
+        public List<string> LocalCalls { get; } = new();
 
         public bool SetsGlobal { get; private set; }
 
@@ -184,13 +193,35 @@ public static partial class Jass
                 SetsGlobal = true;
             }
 
+            // An if line's own condition runs where the block around it runs; its body is local when it tests the
+            // local player. Else and elseif branches run on the machines the if skipped, so they stay local.
+            var inLocal = blocks.Count > 0 && blocks.Peek();
             foreach (Match call in CallName().Matches(code))
             {
                 var name = call.Groups["call"].Success ? call.Groups["call"].Value : call.Groups["named"].Value;
-                if (!Words.Contains(name) && seen.Add(name))
+                if (Words.Contains(name))
+                {
+                    continue;
+                }
+
+                if (seen.Add(name))
                 {
                     Calls.Add(name);
                 }
+
+                if (inLocal && seenLocal.Add(name))
+                {
+                    LocalCalls.Add(name);
+                }
+            }
+
+            if (IfLine().IsMatch(code))
+            {
+                blocks.Push(inLocal || code.Contains("GetLocalPlayer", StringComparison.Ordinal));
+            }
+            else if (code == "endif" && blocks.Count > 0)
+            {
+                blocks.Pop();
             }
         }
 
@@ -199,6 +230,9 @@ public static partial class Jass
 
     [GeneratedRegex(@"^local\s+\w+\s+(?:array\s+)?(?<name>\w+)")]
     private static partial Regex LocalLine();
+
+    [GeneratedRegex(@"^if\b")]
+    private static partial Regex IfLine();
 
     [GeneratedRegex(@"^set\s+(?<name>\w+)")]
     private static partial Regex SetLine();

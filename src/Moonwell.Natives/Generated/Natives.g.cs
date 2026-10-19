@@ -7406,6 +7406,7 @@ namespace Moonwell
         public static extern bool GroupTargetOrderById(group whichGroup, int order, widget targetWidget);
 
         /// @CSharpLua.Template = "ForGroup({0}, {1})"
+        [ChangesState]
         public static extern void ForGroup(group whichGroup, Action callback);
 
         /// @CSharpLua.Template = "FirstOfGroup({0})"
@@ -7452,6 +7453,7 @@ namespace Moonwell
         public static extern void ForceEnumEnemies(force whichForce, player whichPlayer, boolexpr filter);
 
         /// @CSharpLua.Template = "ForForce({0}, {1})"
+        [ChangesState]
         public static extern void ForForce(force whichForce, Action callback);
 
         /// @CSharpLua.Template = "Rect({0}, {1}, {2}, {3})"
@@ -8111,6 +8113,7 @@ namespace Moonwell
         public static extern bool IsDestructableInvulnerable(destructable d);
 
         /// @CSharpLua.Template = "EnumDestructablesInRect({0}, {1}, {2})"
+        [ChangesState]
         public static extern void EnumDestructablesInRect(rect r, boolexpr filter, Action actionFunc);
 
         /// @CSharpLua.Template = "GetDestructableTypeId({0})"
@@ -8260,6 +8263,7 @@ namespace Moonwell
         public static extern bool IsItemIdPawnable(int itemId);
 
         /// @CSharpLua.Template = "EnumItemsInRect({0}, {1}, {2})"
+        [ChangesState]
         public static extern void EnumItemsInRect(rect r, boolexpr filter, Action actionFunc);
 
         /// @CSharpLua.Template = "GetItemLevel({0})"
@@ -10238,6 +10242,7 @@ namespace Moonwell
         public static extern void SetReservedLocalHeroButtons(int reserved);
 
         /// @CSharpLua.Template = "GetAllyColorFilterState()"
+        [MachineLocal]
         public static extern int GetAllyColorFilterState();
 
         /// @CSharpLua.Template = "SetAllyColorFilterState({0})"
@@ -10245,6 +10250,7 @@ namespace Moonwell
         public static extern void SetAllyColorFilterState(int state);
 
         /// @CSharpLua.Template = "GetCreepCampFilterState()"
+        [MachineLocal]
         public static extern bool GetCreepCampFilterState();
 
         /// @CSharpLua.Template = "SetCreepCampFilterState({0})"
@@ -11502,21 +11508,27 @@ namespace Moonwell
         public static extern void BlzSetAbilityResearchExtendedTooltip(int abilCode, string researchExtendedTooltip, int level);
 
         /// @CSharpLua.Template = "BlzGetAbilityTooltip({0}, {1})"
+        [MachineLocal]
         public static extern string BlzGetAbilityTooltip(int abilCode, int level);
 
         /// @CSharpLua.Template = "BlzGetAbilityActivatedTooltip({0}, {1})"
+        [MachineLocal]
         public static extern string BlzGetAbilityActivatedTooltip(int abilCode, int level);
 
         /// @CSharpLua.Template = "BlzGetAbilityExtendedTooltip({0}, {1})"
+        [MachineLocal]
         public static extern string BlzGetAbilityExtendedTooltip(int abilCode, int level);
 
         /// @CSharpLua.Template = "BlzGetAbilityActivatedExtendedTooltip({0}, {1})"
+        [MachineLocal]
         public static extern string BlzGetAbilityActivatedExtendedTooltip(int abilCode, int level);
 
         /// @CSharpLua.Template = "BlzGetAbilityResearchTooltip({0}, {1})"
+        [MachineLocal]
         public static extern string BlzGetAbilityResearchTooltip(int abilCode, int level);
 
         /// @CSharpLua.Template = "BlzGetAbilityResearchExtendedTooltip({0}, {1})"
+        [MachineLocal]
         public static extern string BlzGetAbilityResearchExtendedTooltip(int abilCode, int level);
 
         /// @CSharpLua.Template = "BlzSetAbilityIcon({0}, {1})"
@@ -11584,6 +11596,7 @@ namespace Moonwell
         public static extern void BlzSetItemDescription(item whichItem, string description);
 
         /// @CSharpLua.Template = "BlzGetItemDescription({0})"
+        [MachineLocal]
         public static extern string BlzGetItemDescription(item whichItem);
 
         /// @CSharpLua.Template = "BlzSetItemTooltip({0}, {1})"
@@ -11591,6 +11604,7 @@ namespace Moonwell
         public static extern void BlzSetItemTooltip(item whichItem, string tooltip);
 
         /// @CSharpLua.Template = "BlzGetItemTooltip({0})"
+        [MachineLocal]
         public static extern string BlzGetItemTooltip(item whichItem);
 
         /// @CSharpLua.Template = "BlzSetItemExtendedTooltip({0}, {1})"
@@ -11598,6 +11612,7 @@ namespace Moonwell
         public static extern void BlzSetItemExtendedTooltip(item whichItem, string extendedTooltip);
 
         /// @CSharpLua.Template = "BlzGetItemExtendedTooltip({0})"
+        [MachineLocal]
         public static extern string BlzGetItemExtendedTooltip(item whichItem);
 
         /// @CSharpLua.Template = "BlzSetItemIconPath({0}, {1})"
@@ -12058,7 +12073,7 @@ namespace Moonwell
         public static extern void BlzFrameSetParent(framehandle frame, framehandle parent);
 
         /// @CSharpLua.Template = "BlzFrameGetParent({0})"
-        [CreatesHandle]
+        [MachineLocal, CreatesHandle]
         public static extern framehandle BlzFrameGetParent(framehandle frame);
 
         /// @CSharpLua.Template = "BlzFrameGetHeight({0})"
@@ -12080,7 +12095,7 @@ namespace Moonwell
         public static extern int BlzFrameGetChildrenCount(framehandle frame);
 
         /// @CSharpLua.Template = "BlzFrameGetChild({0}, {1})"
-        [CreatesHandle]
+        [MachineLocal, CreatesHandle]
         public static extern framehandle BlzFrameGetChild(framehandle frame, int index);
 
         /// @CSharpLua.Template = "BlzTriggerRegisterFrameEvent({0}, {1}, {2})"
@@ -13989,6 +14004,7 @@ namespace Moonwell
         public static extern int ChooseRandomCreepBJ(int level);
 
         /// @CSharpLua.Template = "EnumItemsInRectBJ({0}, {1})"
+        [ChangesState]
         public static extern void EnumItemsInRectBJ(rect r, Action actionFunc);
 
         /// @CSharpLua.Template = "RandomItemInRectBJEnum()"
@@ -14104,6 +14120,7 @@ namespace Moonwell
         public static extern void SelectGroupBJEnum();
 
         /// @CSharpLua.Template = "SelectGroupBJ({0})"
+        [ChangesState]
         public static extern void SelectGroupBJ(group g);
 
         /// @CSharpLua.Template = "SelectUnitAdd({0})"
@@ -14119,6 +14136,7 @@ namespace Moonwell
         public static extern void SelectUnitForPlayerSingle(unit whichUnit, player whichPlayer);
 
         /// @CSharpLua.Template = "SelectGroupForPlayerBJ({0}, {1})"
+        [ChangesState, Desyncs]
         public static extern void SelectGroupForPlayerBJ(group g, player whichPlayer);
 
         /// @CSharpLua.Template = "SelectUnitAddForPlayer({0}, {1})"
@@ -14432,6 +14450,7 @@ namespace Moonwell
         public static extern location GetDestructableLoc(destructable whichDestructable);
 
         /// @CSharpLua.Template = "EnumDestructablesInRectAll({0}, {1})"
+        [ChangesState]
         public static extern void EnumDestructablesInRectAll(rect r, Action actionFunc);
 
         /// @CSharpLua.Template = "EnumDestructablesInCircleBJFilter()"

@@ -32,6 +32,16 @@ public class NativeTagsTests
         native Player takes integer number returns player
         native IsPlayerInForce takes player whichPlayer, force whichForce returns boolean
         native SomeNewNative takes nothing returns nothing
+        native ForGroup takes group whichGroup, code callback returns nothing
+        native ForForce takes force whichForce, code callback returns nothing
+        native EnumItemsInRect takes rect r, boolexpr filter, code actionFunc returns nothing
+        native ClearSelection takes nothing returns nothing
+        native SelectUnit takes unit whichUnit, boolean flag returns nothing
+        native GetEnumUnit takes nothing returns unit
+        native BlzGetItemTooltip takes item whichItem returns string
+        native BlzGetAbilityResearchTooltip takes integer abilCode, integer level returns string
+        native GetAllyColorFilterState takes nothing returns integer
+        native BlzFrameGetParent takes framehandle frame returns framehandle
         """;
 
     private const string Blizzard = """
@@ -68,6 +78,39 @@ public class NativeTagsTests
             call ForGroup(null, function KillUnit)
             call DisplayTextToPlayer(Player(0), 0, 0, "KillUnit(")
         endfunction
+
+        function SelectGroupBJEnum takes nothing returns nothing
+            call SelectUnit( GetEnumUnit(), true )
+        endfunction
+
+        function SelectGroupForPlayerBJ takes group g, player whichPlayer returns nothing
+            if (GetLocalPlayer() == whichPlayer) then
+                // Use only local code (no net traffic) within this block to avoid desyncs.
+                call ClearSelection()
+                call ForGroup( g, function SelectGroupBJEnum )
+            endif
+        endfunction
+
+        function SelectAllBJ takes group g returns nothing
+            call SelectGroupForPlayerBJ(g, Player(0))
+        endfunction
+
+        function KillOthersBJ takes player whichPlayer, unit u returns nothing
+            if (GetLocalPlayer() == whichPlayer) then
+                call DisplayTextToPlayer(whichPlayer, 0, 0, "kept")
+            else
+                call KillUnit(u)
+            endif
+            call KillUnit(u)
+        endfunction
+
+        function MakeOthersBJ takes player whichPlayer returns nothing
+            if (GetLocalPlayer() == whichPlayer) then
+                call DisplayTextToPlayer(whichPlayer, 0, 0, "kept")
+            else
+                call CreateUnit(whichPlayer, 0, 0, 0, 0)
+            endif
+        endfunction
         """;
 
     private static IReadOnlyDictionary<string, NativeTag> Tags() => NativeTags.Classify(Jass.Read(Common, Blizzard));
@@ -91,6 +134,15 @@ public class NativeTagsTests
     [InlineData("ConvertRace", NativeTag.None)]
     [InlineData("Player", NativeTag.None)]
     [InlineData("SomeNewNative", NativeTag.ChangesState)]
+    [InlineData("ForGroup", NativeTag.ChangesState)]
+    [InlineData("ForForce", NativeTag.ChangesState)]
+    [InlineData("EnumItemsInRect", NativeTag.ChangesState)]
+    [InlineData("ClearSelection", NativeTag.None)]
+    [InlineData("SelectUnit", NativeTag.None)]
+    [InlineData("BlzGetItemTooltip", NativeTag.MachineLocal)]
+    [InlineData("BlzGetAbilityResearchTooltip", NativeTag.MachineLocal)]
+    [InlineData("GetAllyColorFilterState", NativeTag.MachineLocal)]
+    [InlineData("BlzFrameGetParent", NativeTag.MachineLocal | NativeTag.CreatesHandle)]
     public void TagsNatives(string name, NativeTag expected)
     {
         Assert.Equal(expected, Tags()[name]);
@@ -103,6 +155,10 @@ public class NativeTagsTests
     [InlineData("NoteBJ", NativeTag.None)]
     [InlineData("CameraXBJ", NativeTag.MachineLocal)]
     [InlineData("KillLaterBJ", NativeTag.ChangesState)]
+    [InlineData("SelectGroupForPlayerBJ", NativeTag.ChangesState | NativeTag.Desyncs)]
+    [InlineData("SelectAllBJ", NativeTag.ChangesState | NativeTag.Desyncs)]
+    [InlineData("KillOthersBJ", NativeTag.ChangesState)]
+    [InlineData("MakeOthersBJ", NativeTag.CreatesHandle | NativeTag.Desyncs)]
     public void TagsBlizzardFunctionsByTheirBodies(string name, NativeTag expected)
     {
         Assert.Equal(expected, Tags()[name]);
@@ -114,7 +170,19 @@ public class NativeTagsTests
         var display = Jass.Read(Common, Blizzard).Functions.Single(f => f.Name == "DisplayTextToForce");
 
         Assert.Equal(new[] { "IsPlayerInForce", "GetLocalPlayer", "DisplayTextToPlayer" }, display.Calls);
+        Assert.Equal(new[] { "DisplayTextToPlayer", "GetLocalPlayer" }, display.LocalCalls);
         Assert.False(display.SetsGlobal);
+    }
+
+    [Fact]
+    public void ReadsWhatABodyCallsInItsLocalPlayerBlocks()
+    {
+        var functions = Jass.Read(Common, Blizzard).Functions;
+
+        Assert.Equal(new[] { "ClearSelection", "ForGroup", "SelectGroupBJEnum" },
+            functions.Single(f => f.Name == "SelectGroupForPlayerBJ").LocalCalls);
+        Assert.Equal(new[] { "DisplayTextToPlayer", "KillUnit" }, functions.Single(f => f.Name == "KillOthersBJ").LocalCalls);
+        Assert.Empty(functions.Single(f => f.Name == "SelectAllBJ").LocalCalls);
     }
 
     [Fact]
@@ -125,5 +193,6 @@ public class NativeTagsTests
         Assert.Contains("        [CreatesHandle]\n        public static extern unit CreateUnit(", natives);
         Assert.Contains("        [MachineLocal, CreatesHandle]\n        public static extern location GetCameraTargetPositionLoc(", natives);
         Assert.Contains("\"GetUnitX({0})\"\n        public static extern float GetUnitX(", natives);
+        Assert.Contains("        [ChangesState, Desyncs]\n        public static extern void SelectGroupForPlayerBJ(", natives);
     }
 }
