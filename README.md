@@ -1,8 +1,6 @@
 <div align="center">
   <img src="mw.gif" alt="Moonwell" width="256" />
   
-  <h1>Moonwell</h1>
-  
   <p>
     <i>All-in-one modding framework for Warcraft III: Reforged.</i>
   </p>
