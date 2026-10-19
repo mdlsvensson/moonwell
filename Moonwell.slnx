@@ -10,6 +10,9 @@
     <Project Path="src/Moonwell.Objects/Moonwell.Objects.csproj" />
     <Project Path="src/Moonwell/Moonwell.csproj" />
   </Folder>
+  <Folder Name="/template/">
+    <Project Path="template/Moonwell.Templates.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Moonwell.Analyzers.Tests/Moonwell.Analyzers.Tests.csproj" />
     <Project Path="tests/Moonwell.Build.Tests/Moonwell.Build.Tests.csproj" />
