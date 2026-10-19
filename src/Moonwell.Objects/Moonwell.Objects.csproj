@@ -1,5 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <Description>Warcraft III's standard units, abilities, items, buffs and other objects as C# classes to inherit, for Moonwell.</Description>
+  </PropertyGroup>
+
   <ItemGroup>
     <!-- PrivateAssets none, so that a map that references only Moonwell.Objects still gets Moonwell's analyzer. -->
     <ProjectReference Include="..\Moonwell\Moonwell.csproj" PrivateAssets="none" />

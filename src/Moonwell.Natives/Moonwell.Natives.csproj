@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Description>Warcraft III's natives as C#, for Moonwell.</Description>
     <!-- The generated layer names its types as the game does (unit, player), and its members are templates. -->
     <NoWarn>$(NoWarn);CS0626;CS8981</NoWarn>
   </PropertyGroup>

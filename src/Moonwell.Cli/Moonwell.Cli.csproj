@@ -8,6 +8,7 @@
     <OutputType>Exe</OutputType>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>moonwell</ToolCommandName>
+    <Description>The moonwell command: builds a Moonwell map project into a Warcraft III map and starts the game with it.</Description>
   </PropertyGroup>
 
 </Project>

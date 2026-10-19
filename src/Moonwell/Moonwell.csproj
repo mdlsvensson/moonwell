@@ -1,5 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <Description>The Moonwell runtime for Warcraft III maps in C#: units, components, reactions, buffs and timers, with its C# source for the Lua build and the multiplayer analyzer.</Description>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Moonwell.Natives\Moonwell.Natives.csproj" />
   </ItemGroup>

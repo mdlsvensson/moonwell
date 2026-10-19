@@ -7,6 +7,16 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
+  <!-- What every package says about itself on nuget.org; each project gives its own Description. -->
+  <PropertyGroup>
+    <Authors>mdlsvensson</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/mdlsvensson/moonwell</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mdlsvensson/moonwell.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>warcraft3;wc3;map;lua</PackageTags>
+  </PropertyGroup>
+
   <!--
     The projects under src/ that end up inside a map (the native layer, the generated standard objects, the runtime)
     and tests/Moonwell.Testing (the cases the map runs) are compiled to Lua by CSharp.lua, whose Roslyn reads C# 13.
