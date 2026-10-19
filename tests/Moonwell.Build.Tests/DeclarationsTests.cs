@@ -360,6 +360,14 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void set_of_another_abilitys_field_names_line()
+        {
+            AssertFails(
+                "OtherAbilityField",
+                "Objects.cs:13: OtherAbilityField.Bolt's constructor threw: StormBolt has no field Hhb1, which other abilities have (Parameter 'field')");
+        }
+
+        [Fact]
         public void formula_that_throws_names_line()
         {
             AssertFails("FormulaThrows", "Objects.cs:13: FormulaThrows.Bolt's constructor threw: no level 1");

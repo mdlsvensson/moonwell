@@ -281,6 +281,19 @@ namespace Moonwell.Objects.Tests
         }
 
         [Fact]
+        public void set_of_another_abilitys_field_names_the_class_and_the_field()
+        {
+            var bolt = new OpenStormBolt();
+
+            var whole = Assert.Throws<ArgumentException>(() => bolt.Put("Hhb1", bolt.PerLevelOf(10f, 20f)));
+            var level = Assert.Throws<ArgumentException>(() => bolt.PutLevel("Hhb1", 1, 10f));
+
+            Assert.StartsWith("StormBolt has no field Hhb1, which other abilities have", whole.Message);
+            Assert.StartsWith("StormBolt has no field Hhb1, which other abilities have", level.Message);
+            Assert.Empty(bolt.Declared);
+        }
+
+        [Fact]
         public void the_values_are_embedded_for_each_kind()
         {
             foreach (var kind in new[] { "unit", "item", "destructable", "doodad", "ability", "buff", "upgrade" })

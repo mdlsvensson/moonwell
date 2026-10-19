@@ -1548,13 +1548,13 @@ namespace Moonwell.Objects
         /// <summary>Puts a value by its field id; a value of another type than the field holds is an error naming the field.</summary>
         protected void Set(string field, object value)
         {
-            Fields.Put(field, global::Moonwell.Objects.FieldChecks.Value("StandardAbility", fieldTypes, field, value));
+            Fields.Put(field, global::Moonwell.Objects.FieldChecks.Value("StandardAbility", fieldTypes, this, field, value));
         }
 
         /// <summary>Puts the value of one level of a field by its field id; a value of another type is an error naming the field.</summary>
         protected void Set(string field, int level, object value)
         {
-            Fields.Put(field + ":" + level, global::Moonwell.Objects.FieldChecks.LevelValue("StandardAbility", fieldTypes, field, level, value));
+            Fields.Put(field + ":" + level, global::Moonwell.Objects.FieldChecks.LevelValue("StandardAbility", fieldTypes, this, field, level, value));
         }
     }
 }

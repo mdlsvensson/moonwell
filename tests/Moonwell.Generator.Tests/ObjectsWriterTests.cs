@@ -269,6 +269,8 @@ public class ObjectsWriterTests
         Assert.Contains("protected void Set(string field, object value)", unit);
         Assert.Contains("\n        internal global::System.Collections.Generic.IReadOnlyDictionary<string, object?> Declared => Fields.Values;", unit);
         Assert.Contains("protected void Set(string field, int level, object value)", unit);
+        Assert.Contains("FieldChecks.Value(\"StandardUnit\", fieldTypes, this, field, value)", unit);
+        Assert.Contains("FieldChecks.LevelValue(\"StandardUnit\", fieldTypes, this, field, level, value)", unit);
         Assert.Contains("[\"uhpm\"] = typeof(int),", unit);
         Assert.Contains("[\"ua1b\"] = typeof(int),", unit);
 

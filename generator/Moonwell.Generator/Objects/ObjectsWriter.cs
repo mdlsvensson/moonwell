@@ -96,10 +96,10 @@ public static class ObjectsWriter
         text.Append($"            return new {Root}.Levels<T>(formula);\n        }}\n\n");
         text.Append("        /// <summary>Puts a value by its field id; a value of another type than the field holds is an error naming the field.</summary>\n");
         text.Append("        protected void Set(string field, object value)\n        {\n");
-        text.Append($"            Fields.Put(field, {Root}.FieldChecks.Value({Literal(name)}, fieldTypes, field, value));\n        }}\n\n");
+        text.Append($"            Fields.Put(field, {Root}.FieldChecks.Value({Literal(name)}, fieldTypes, this, field, value));\n        }}\n\n");
         text.Append("        /// <summary>Puts the value of one level of a field by its field id; a value of another type is an error naming the field.</summary>\n");
         text.Append("        protected void Set(string field, int level, object value)\n        {\n");
-        text.Append($"            Fields.Put(field + \":\" + level, {Root}.FieldChecks.LevelValue({Literal(name)}, fieldTypes, field, level, value));\n        }}\n");
+        text.Append($"            Fields.Put(field + \":\" + level, {Root}.FieldChecks.LevelValue({Literal(name)}, fieldTypes, this, field, level, value));\n        }}\n");
         text.Append("    }\n}\n");
         return text.ToString();
     }
