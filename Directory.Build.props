@@ -21,4 +21,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <!-- Every dotnet test run ends: a test that stops making progress fails the run (tests/Tests.runsettings). -->
+  <PropertyGroup>
+    <RunSettingsFilePath>$(MSBuildThisFileDirectory)tests\Tests.runsettings</RunSettingsFilePath>
+  </PropertyGroup>
+
 </Project>
