@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The Moonwell.Templates package: `dotnet new install Moonwell.Templates` adds `dotnet new moonwell`, which makes a
+    map project from MoonwellMap/. The package builds nothing; it carries MoonwellMap/ under content/.
+  -->
+  <PropertyGroup>
+    <PackageType>Template</PackageType>
+    <Description>The Moonwell map project template: dotnet new moonwell.</Description>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <ContentTargetFolders>content</ContentTargetFolders>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <!-- NU5128: a template package has no library for its framework. -->
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+  </PropertyGroup>
+
+  <!--
+    The map project references the packages released with this one: pack writes its .csproj with MOONWELL_VERSION
+    replaced by this package's version, and packs that copy.
+  -->
+  <ItemGroup>
+    <Content Include="MoonwellMap/**" Exclude="MoonwellMap/MoonwellMap.csproj;MoonwellMap/bin/**;MoonwellMap/obj/**;MoonwellMap/build/**" PackagePath="content/MoonwellMap/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <Target Name="WriteTemplateProject" BeforeTargets="_GetPackageFiles">
+    <PropertyGroup>
+      <TemplateProject>$(IntermediateOutputPath)MoonwellMap.csproj</TemplateProject>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(TemplateProject)" Lines="$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)MoonwellMap/MoonwellMap.csproj').Replace('MOONWELL_VERSION', '$(Version)'))" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <ItemGroup>
+      <Content Include="$(TemplateProject)" PackagePath="content/MoonwellMap/MoonwellMap.csproj" />
+    </ItemGroup>
+  </Target>
+
+</Project>

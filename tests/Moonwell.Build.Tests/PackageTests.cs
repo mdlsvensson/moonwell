@@ -129,6 +129,38 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void template_map_builds()
+        {
+            var hive = folders.TemporaryFolderOutsideRepository();
+            var parent = folders.TemporaryFolderOutsideRepository();
+            PackedMoonwell.Dotnet(parent, "new", "install", packed.TemplatesPackage, "--debug:custom-hive", hive);
+            PackedMoonwell.Dotnet(parent, "new", "moonwell", "-n", "Keep", "--debug:custom-hive", hive);
+            var map = Path.Combine(parent, "Keep");
+            WriteFeedConfig(map);
+
+            // The map's own code is the template's, so a failure shows the build's output.
+            var log = new StringWriter();
+            string archive;
+            try
+            {
+                archive = MapBuild.Run(map, new BuildOptions(), log);
+            }
+            catch (BuildException failure)
+            {
+                throw new Xunit.Sdk.XunitException(failure.Message + "\n" + log);
+            }
+
+            Assert.Equal(Path.Combine(map, "build", "Keep.w3x"), archive);
+            Assert.True(File.Exists(archive), log.ToString());
+            Assert.Contains("Name = \"Keep\";", File.ReadAllText(Path.Combine(map, "Map.cs")));
+            var script = File.ReadAllText(Path.Combine(map, "build", "Keep", "war3map.lua"));
+            Assert.Contains("[\"Keep.Champion\"]", script);
+            var ids = File.ReadAllText(Path.Combine(map, "ids.json"));
+            Assert.Contains("\"Keep.Champion\"", ids);
+            Assert.Contains("\"Keep.Smite\"", ids);
+        }
+
+        [Fact]
         public void package_folder_elsewhere_is_reported()
         {
             var copy = folders.TemporaryCopyOfSample();
@@ -175,8 +207,15 @@ namespace Moonwell.Build.Tests
             }
 
             File.WriteAllText(project, replaced);
+            WriteFeedConfig(copy);
+            return copy;
+        }
+
+        // Restores the folder's project from the test feed only.
+        private void WriteFeedConfig(string folder)
+        {
             File.WriteAllText(
-                Path.Combine(copy, "nuget.config"),
+                Path.Combine(folder, "nuget.config"),
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
                 + "<configuration>\n"
                 + "  <packageSources>\n"
@@ -184,7 +223,6 @@ namespace Moonwell.Build.Tests
                 + $"    <add key=\"moonwell-test\" value=\"{packed.Feed}\" />\n"
                 + "  </packageSources>\n"
                 + "</configuration>\n");
-            return copy;
         }
 
         private static void WriteAssets(string folder, string library, string type)

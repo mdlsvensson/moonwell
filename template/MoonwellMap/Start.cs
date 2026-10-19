@@ -1,0 +1,23 @@
+using Moonwell;
+using Moonwell.Objects.Units.Human;
+
+namespace MoonwellMap
+{
+    /// <summary>Gives the first player a champion at their start location, and puts three footmen nearby to fight.</summary>
+    public sealed class Start : GameComponent
+    {
+        public override void OnGameStart()
+        {
+            var player = Player.Get(0);
+            var x = Natives.GetPlayerStartLocationX(player.Handle);
+            var y = Natives.GetPlayerStartLocationY(player.Handle);
+            Unit.Create<Champion>(player, x, y, 270f);
+
+            var enemy = Player.Get(Natives.PLAYER_NEUTRAL_AGGRESSIVE);
+            for (var i = 0; i < 3; i++)
+            {
+                Unit.Create<Footman>(enemy, x - 200f + i * 200f, y + 600f, 270f);
+            }
+        }
+    }
+}

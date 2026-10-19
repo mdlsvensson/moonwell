@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Moonwell",
+  "classifications": [ "Warcraft III", "Map" ],
+  "identity": "Moonwell.Map",
+  "name": "Moonwell map",
+  "description": "A Warcraft III map in C#: the map's settings, a hero with a spell, and a World Editor map.",
+  "shortName": "moonwell",
+  "sourceName": "MoonwellMap",
+  "preferNameDirectory": true,
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  }
+}

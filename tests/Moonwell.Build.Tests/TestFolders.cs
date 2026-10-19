@@ -35,6 +35,15 @@ namespace Moonwell.Build.Tests
             return folder;
         }
 
+        /// <summary>An empty folder in the system's temporary folder, outside the repository.</summary>
+        public string TemporaryFolderOutsideRepository()
+        {
+            var folder = Path.Combine(Path.GetTempPath(), "moonwell-empty-" + Guid.NewGuid().ToString("N"));
+            folders.Add(folder);
+            Directory.CreateDirectory(folder);
+            return folder;
+        }
+
         /// <summary>Deletes the temporary copies.</summary>
         public void Dispose()
         {
