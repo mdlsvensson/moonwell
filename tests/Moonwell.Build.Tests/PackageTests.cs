@@ -1,6 +1,8 @@
 using System.IO.Compression;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using War3Net.Build.Extensions;
+using War3Net.Build.Info;
 using Xunit;
 
 namespace Moonwell.Build.Tests
@@ -129,6 +131,18 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void template_map_has_the_game_data_the_build_writes()
+        {
+            var info = Path.Combine(TestFolders.Fixture("."), "..", "..", "..", "template", "MoonwellMap", "map", "war3map.w3i");
+            using var reader = new BinaryReader(File.OpenRead(info));
+
+            var data = reader.ReadMapInfo();
+
+            Assert.Equal(GameDataSet.Default, data.GameDataSet);
+            Assert.Equal(GameDataVersion.Unset, data.GameDataVersion);
+        }
+
+        [Fact]
         public void template_map_builds()
         {
             var hive = folders.TemporaryFolderOutsideRepository();
@@ -152,6 +166,7 @@ namespace Moonwell.Build.Tests
 
             Assert.Equal(Path.Combine(map, "build", "Keep.w3x"), archive);
             Assert.True(File.Exists(archive), log.ToString());
+            Assert.DoesNotContain("note:", log.ToString());
             Assert.Contains("Name = \"Keep\";", File.ReadAllText(Path.Combine(map, "Map.cs")));
             var script = File.ReadAllText(Path.Combine(map, "build", "Keep", "war3map.lua"));
             Assert.Contains("[\"Keep.Champion\"]", script);

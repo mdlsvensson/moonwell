@@ -1,3 +1,4 @@
+using System.Reflection;
 using Moonwell.Build;
 
 namespace Moonwell.Tool
@@ -19,6 +20,12 @@ namespace Moonwell.Tool
         /// <returns>0 when it worked, 1 for an error, 2 for arguments it does not understand.</returns>
         public static int Run(string[] args, TextWriter output, TextWriter error, Action<string, string> start)
         {
+            if (args.Length == 1 && args[0] == "--version")
+            {
+                output.WriteLine(Version());
+                return 0;
+            }
+
             if (!TryParse(args, out var run, out var folder, out var release, out var game))
             {
                 error.WriteLine(Usage);
@@ -51,6 +58,17 @@ namespace Moonwell.Tool
                 error.WriteLine(failure.StackTrace);
                 return 1;
             }
+        }
+
+        // The tool's version without the source revision the SDK appends after a plus sign.
+        private static string Version()
+        {
+            var assembly = typeof(Cli).Assembly;
+            var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+                ?? assembly.GetName().Version?.ToString(3)
+                ?? "unknown";
+            var plus = version.IndexOf('+', StringComparison.Ordinal);
+            return plus < 0 ? version : version.Substring(0, plus);
         }
 
         private static bool TryParse(string[] args, out bool run, out string folder, out bool release, out string game)

@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Moonwell.Tool;
 using War3Net.IO.Mpq;
 using Xunit;
@@ -102,6 +103,20 @@ namespace Moonwell.Build.Tests
             Assert.Equal(2, exitCode);
             Assert.Equal(string.Empty, output);
             Assert.Equal(Usage, error.Trim());
+            Assert.Empty(started);
+        }
+
+        [Fact]
+        public void version_prints_the_tools_version()
+        {
+            var props = File.ReadAllText(Path.Combine(TestFolders.Fixture("."), "..", "..", "..", "Directory.Build.props"));
+            var version = Regex.Match(props, "<Version>([^<]+)</Version>").Groups[1].Value;
+
+            var (exitCode, output, error, started) = Run("--version");
+
+            Assert.Equal(0, exitCode);
+            Assert.Equal(version, output.Trim());
+            Assert.Equal(string.Empty, error);
             Assert.Empty(started);
         }
 
