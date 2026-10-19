@@ -8,6 +8,8 @@ public class NativeTagsTests
         type agent extends handle
         type widget extends agent
         type unit extends widget
+        type item extends widget
+        type loadoutslot extends handle
         type player extends handle
         type location extends agent
         type framehandle extends handle
@@ -38,6 +40,17 @@ public class NativeTagsTests
         native ClearSelection takes nothing returns nothing
         native SelectUnit takes unit whichUnit, boolean flag returns nothing
         native GetEnumUnit takes nothing returns unit
+        native BlzUnitIsAlive takes unit whichUnit returns boolean
+        native BlzUnitItemInBagSlot takes unit whichUnit, integer itemSlot returns item
+        native BlzUnitItemInEquipmentSlot takes unit whichUnit, loadoutslot itemSlot returns item
+        native BlzUnitUnequipItemFromSlot takes unit whichUnit, loadoutslot slot returns item
+        native BlzGetHUDScale takes nothing returns real
+        native BlzSetHUDScale takes integer percentage returns nothing
+        native BlzLockHUDScale takes nothing returns nothing
+        native BlzUnlockHUDScale takes nothing returns nothing
+        native BlzGetCameraAllowsHotkeyTargetLock takes nothing returns boolean
+        native BlzSetCameraAllowsHotkeyTargetLock takes boolean allows returns nothing
+        native BlzSetThematicMusicAbsoluteVolume takes integer volume returns nothing
         native BlzGetItemTooltip takes item whichItem returns string
         native BlzGetAbilityResearchTooltip takes integer abilCode, integer level returns string
         native GetAllyColorFilterState takes nothing returns integer
@@ -143,6 +156,17 @@ public class NativeTagsTests
     [InlineData("BlzGetAbilityResearchTooltip", NativeTag.MachineLocal)]
     [InlineData("GetAllyColorFilterState", NativeTag.MachineLocal)]
     [InlineData("BlzFrameGetParent", NativeTag.MachineLocal | NativeTag.CreatesHandle)]
+    [InlineData("BlzUnitIsAlive", NativeTag.None)]
+    [InlineData("BlzUnitItemInBagSlot", NativeTag.None)]
+    [InlineData("BlzUnitItemInEquipmentSlot", NativeTag.None)]
+    [InlineData("BlzUnitUnequipItemFromSlot", NativeTag.ChangesState)]
+    [InlineData("BlzGetHUDScale", NativeTag.MachineLocal)]
+    [InlineData("BlzSetHUDScale", NativeTag.None)]
+    [InlineData("BlzLockHUDScale", NativeTag.None)]
+    [InlineData("BlzUnlockHUDScale", NativeTag.None)]
+    [InlineData("BlzGetCameraAllowsHotkeyTargetLock", NativeTag.MachineLocal)]
+    [InlineData("BlzSetCameraAllowsHotkeyTargetLock", NativeTag.None)]
+    [InlineData("BlzSetThematicMusicAbsoluteVolume", NativeTag.None)]
     public void TagsNatives(string name, NativeTag expected)
     {
         Assert.Equal(expected, Tags()[name]);

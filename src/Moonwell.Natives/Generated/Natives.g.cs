@@ -9069,7 +9069,7 @@ namespace Moonwell
         public static extern item UnitUnequipItemFromSlot(unit whichUnit, loadoutslot slot);
 
         /// @CSharpLua.Template = "BlzUnitUnequipItemFromSlot({0}, {1})"
-        [CreatesHandle]
+        [ChangesState]
         public static extern item BlzUnitUnequipItemFromSlot(unit whichUnit, loadoutslot slot);
 
         /// @CSharpLua.Template = "UnitHasItem({0}, {1})"
@@ -9125,11 +9125,9 @@ namespace Moonwell
         public static extern bool UnitCanEquipItemOfEquipmentType(unit whichUnit, equipmentType equipmentId);
 
         /// @CSharpLua.Template = "BlzUnitItemInBagSlot({0}, {1})"
-        [CreatesHandle]
         public static extern item BlzUnitItemInBagSlot(unit whichUnit, int itemSlot);
 
         /// @CSharpLua.Template = "BlzUnitItemInEquipmentSlot({0}, {1})"
-        [CreatesHandle]
         public static extern item BlzUnitItemInEquipmentSlot(unit whichUnit, loadoutslot itemSlot);
 
         /// @CSharpLua.Template = "BlzUnitHasItemEquipped({0}, {1})"
@@ -9371,7 +9369,6 @@ namespace Moonwell
         public static extern bool UnitIsSleeping(unit whichUnit);
 
         /// @CSharpLua.Template = "BlzUnitIsAlive({0})"
-        [ChangesState]
         public static extern bool BlzUnitIsAlive(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitWakeUp({0})"
@@ -10756,18 +10753,16 @@ namespace Moonwell
         public static extern void EnableSelect(bool state, bool ui);
 
         /// @CSharpLua.Template = "BlzGetHUDScale()"
+        [MachineLocal]
         public static extern float BlzGetHUDScale();
 
         /// @CSharpLua.Template = "BlzSetHUDScale({0})"
-        [ChangesState]
         public static extern void BlzSetHUDScale(int percentage);
 
         /// @CSharpLua.Template = "BlzLockHUDScale()"
-        [ChangesState]
         public static extern void BlzLockHUDScale();
 
         /// @CSharpLua.Template = "BlzUnlockHUDScale()"
-        [ChangesState]
         public static extern void BlzUnlockHUDScale();
 
         /// @CSharpLua.Template = "CreateTrackable({0}, {1}, {2}, {3})"
@@ -11158,10 +11153,10 @@ namespace Moonwell
         public static extern void SetCameraOrientController(unit whichUnit, float xoffset, float yoffset);
 
         /// @CSharpLua.Template = "BlzGetCameraAllowsHotkeyTargetLock()"
+        [MachineLocal]
         public static extern bool BlzGetCameraAllowsHotkeyTargetLock();
 
         /// @CSharpLua.Template = "BlzSetCameraAllowsHotkeyTargetLock({0})"
-        [ChangesState]
         public static extern void BlzSetCameraAllowsHotkeyTargetLock(bool allows);
 
         /// @CSharpLua.Template = "BlzCameraSetCameraType({0})"
@@ -11464,7 +11459,6 @@ namespace Moonwell
         public static extern void SetThematicMusicVolume(int volume);
 
         /// @CSharpLua.Template = "BlzSetThematicMusicAbsoluteVolume({0})"
-        [ChangesState]
         public static extern void BlzSetThematicMusicAbsoluteVolume(int volume);
 
         /// @CSharpLua.Template = "SetThematicMusicPlayPosition({0})"
@@ -13438,7 +13432,6 @@ namespace Moonwell
         public static extern void SetCameraFieldControlledByInputForPlayer(player whichPlayer, camerafield whichField, bool controlled);
 
         /// @CSharpLua.Template = "SetCameraTargetControllerNoZForPlayer({0}, {1}, {2}, {3}, {4})"
-        [ChangesState]
         public static extern void SetCameraTargetControllerNoZForPlayer(player whichPlayer, unit whichUnit, float xoffset, float yoffset, bool inheritOrientation);
 
         /// @CSharpLua.Template = "SetCameraPositionForPlayer({0}, {1}, {2})"
@@ -13473,7 +13466,6 @@ namespace Moonwell
         public static extern void SetCinematicCameraForPlayer(player whichPlayer, string cameraModelFile);
 
         /// @CSharpLua.Template = "ResetToGameCameraForPlayer({0}, {1})"
-        [ChangesState]
         public static extern void ResetToGameCameraForPlayer(player whichPlayer, float duration);
 
         /// @CSharpLua.Template = "CameraSetSourceNoiseForPlayer({0}, {1}, {2})"
@@ -13527,7 +13519,6 @@ namespace Moonwell
         public static extern void StopCameraForPlayerBJ(player whichPlayer);
 
         /// @CSharpLua.Template = "SetCameraOrientControllerForPlayerBJ({0}, {1}, {2}, {3})"
-        [ChangesState]
         public static extern void SetCameraOrientControllerForPlayerBJ(player whichPlayer, unit whichUnit, float xoffset, float yoffset);
 
         /// @CSharpLua.Template = "CameraSetSmoothingFactorBJ({0})"
@@ -14329,7 +14320,7 @@ namespace Moonwell
         public static extern void UnitUnequipItemSwapped(unit whichHero, item whichItem);
 
         /// @CSharpLua.Template = "UnitUnequipItemFromSlotSwapped({0}, {1})"
-        [CreatesHandle, ChangesState]
+        [ChangesState]
         public static extern item UnitUnequipItemFromSlotSwapped(unit whichHero, loadoutslot slot);
 
         /// @CSharpLua.Template = "CreateItemLoc({0}, {1})"
@@ -14430,11 +14421,9 @@ namespace Moonwell
         public static extern item UnitItemInSlotBJ(unit whichUnit, int itemSlot);
 
         /// @CSharpLua.Template = "UnitItemInBagSlotBJ({0}, {1})"
-        [CreatesHandle]
         public static extern item UnitItemInBagSlotBJ(unit whichUnit, int itemSlot);
 
         /// @CSharpLua.Template = "UnitItemInEquipmentSlotBJ({0}, {1})"
-        [CreatesHandle]
         public static extern item UnitItemInEquipmentSlotBJ(unit whichUnit, loadoutslot slot);
 
         /// @CSharpLua.Template = "GetInventoryIndexOfItemTypeBJ({0}, {1})"
@@ -14447,43 +14436,33 @@ namespace Moonwell
         public static extern bool UnitHasItemOfTypeBJ(unit whichUnit, int itemId);
 
         /// @CSharpLua.Template = "GetInventoryBagIndexOfItemTypeBJ({0}, {1})"
-        [CreatesHandle]
         public static extern int GetInventoryBagIndexOfItemTypeBJ(unit whichUnit, int itemId);
 
         /// @CSharpLua.Template = "GetItemOfTypeFromUnitBagBJ({0}, {1})"
-        [CreatesHandle]
         public static extern item GetItemOfTypeFromUnitBagBJ(unit whichUnit, int itemId);
 
         /// @CSharpLua.Template = "UnitHasItemOfTypeBaggedBJ({0}, {1})"
-        [CreatesHandle]
         public static extern bool UnitHasItemOfTypeBaggedBJ(unit whichUnit, int itemId);
 
         /// @CSharpLua.Template = "GetInventoryBagIndexOfEquipmentTypeBJ({0}, {1})"
-        [CreatesHandle]
         public static extern int GetInventoryBagIndexOfEquipmentTypeBJ(unit whichUnit, equipmentType whichEquipmentType);
 
         /// @CSharpLua.Template = "GetItemOfEquipmentTypeFromUnitBagBJ({0}, {1})"
-        [CreatesHandle]
         public static extern item GetItemOfEquipmentTypeFromUnitBagBJ(unit whichUnit, equipmentType whichEquipmentType);
 
         /// @CSharpLua.Template = "GetEquipmentInventoryIndexOfItemTypeBJ({0}, {1})"
-        [CreatesHandle]
         public static extern int GetEquipmentInventoryIndexOfItemTypeBJ(unit whichUnit, int itemId);
 
         /// @CSharpLua.Template = "GetEquipmentInventoryIndexOfEquipmentTypeBJ({0}, {1})"
-        [CreatesHandle]
         public static extern int GetEquipmentInventoryIndexOfEquipmentTypeBJ(unit whichUnit, equipmentType whichEquipmentType);
 
         /// @CSharpLua.Template = "GetItemEquippedByHeroOfTypeBJ({0}, {1})"
-        [CreatesHandle]
         public static extern item GetItemEquippedByHeroOfTypeBJ(unit whichUnit, int itemId);
 
         /// @CSharpLua.Template = "GetItemEquippedByHeroOfEquipmentTypeBJ({0}, {1})"
-        [CreatesHandle]
         public static extern item GetItemEquippedByHeroOfEquipmentTypeBJ(unit whichUnit, equipmentType whichEquipmentType);
 
         /// @CSharpLua.Template = "UnitHasItemOfTypeEquippedBJ({0}, {1})"
-        [CreatesHandle]
         public static extern bool UnitHasItemOfTypeEquippedBJ(unit whichUnit, int itemId);
 
         /// @CSharpLua.Template = "UnitInventoryCount({0})"
@@ -14493,7 +14472,6 @@ namespace Moonwell
         public static extern int UnitInventorySizeBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitExtendedInventoryCount({0})"
-        [CreatesHandle]
         public static extern int UnitExtendedInventoryCount(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitExtendedInventorySizeBJ({0})"
@@ -14501,7 +14479,6 @@ namespace Moonwell
         public static extern int UnitExtendedInventorySizeBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitEquipmentCount({0})"
-        [CreatesHandle]
         public static extern int UnitEquipmentCount(unit whichUnit);
 
         /// @CSharpLua.Template = "SetItemInvulnerableBJ({0}, {1})"
@@ -14716,11 +14693,9 @@ namespace Moonwell
         public static extern bool IsUnitAliveBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitIsDeadBJ({0})"
-        [ChangesState]
         public static extern bool UnitIsDeadBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "UnitIsAliveBJ({0})"
-        [ChangesState]
         public static extern bool UnitIsAliveBJ(unit whichUnit);
 
         /// @CSharpLua.Template = "IsUnitGroupDeadBJEnum()"

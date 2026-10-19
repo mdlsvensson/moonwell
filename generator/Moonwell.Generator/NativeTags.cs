@@ -62,6 +62,7 @@ public static partial class NativeTags
         "BlzGetLocalSpecialEffectX", "BlzGetLocalSpecialEffectY", "BlzGetLocalSpecialEffectZ",
         "BlzGetSpecialEffectScale", "GetLightningColorA", "GetLightningColorR", "GetLightningColorG",
         "GetLightningColorB",
+        "BlzGetHUDScale", "BlzGetCameraAllowsHotkeyTargetLock",
     };
 
     /// <summary>Natives that change only what the local player sees or hears, so they may run on one machine.</summary>
@@ -81,11 +82,12 @@ public static partial class NativeTags
         "SetSoundConeOrientation", "PlayMusic", "PlayMusicEx", "StopMusic", "ResumeMusic", "PlayThematicMusic",
         "PlayThematicMusicEx", "EndThematicMusic", "SetMusicVolume", "SetMusicPlayPosition",
         "SetThematicMusicVolume", "SetThematicMusicPlayPosition", "VolumeGroupSetVolume", "VolumeGroupReset",
-        "SetMapMusic", "ClearMapMusic",
+        "SetMapMusic", "ClearMapMusic", "BlzSetThematicMusicAbsoluteVolume",
         "ShowInterface", "EnableUserControl", "EnableUserUI", "EnableDragSelect", "EnablePreSelect", "EnableSelect",
         "BlzEnableSelections", "BlzHideOriginFrames", "BlzEnableUIAutoPosition", "BlzFrameClearAllPoints",
         "BlzFrameAddText", "BlzFrameCageMouse", "BlzTextAreaFrameSetAutoScroll", "BlzEnableCursor",
-        "BlzSetMousePos", "BlzChangeMinimapTerrainTex", "SetPortraitLight", "PingMinimap", "PingMinimapEx",
+        "BlzSetMousePos", "BlzChangeMinimapTerrainTex", "BlzSetHUDScale", "BlzLockHUDScale", "BlzUnlockHUDScale",
+        "BlzSetCameraAllowsHotkeyTargetLock", "SetPortraitLight", "PingMinimap", "PingMinimapEx",
         "FlashQuestDialogButton", "SelectUnit", "ClearSelection",
         "ShowImage", "ShowUbersplat", "SetTerrainFog", "SetTerrainFogEx", "ResetTerrainFog",
         "MultiboardDisplay", "MultiboardMinimize", "LeaderboardDisplay", "TimerDialogDisplay",
@@ -117,12 +119,13 @@ public static partial class NativeTags
         "UnitAlive", "UnitItemInSlot", "FirstOfGroup", "BlzGroupUnitAt", "BlzGroupGetSize", "UnitInventorySize",
         "RectContainsCoords", "TimerGetElapsed", "TimerGetRemaining", "TimerGetTimeout", "UnitItemInBagSlot",
         "UnitItemInEquipmentSlot", "VersionGet", "PlayerGetLeaderboard",
+        "BlzUnitIsAlive", "BlzUnitItemInBagSlot", "BlzUnitItemInEquipmentSlot",
     };
 
     /// <summary>Natives that change state and return a handle that already existed.</summary>
     private static readonly HashSet<string> ReturnExisting = new(StringComparer.Ordinal)
     {
-        "UnitRemoveItemFromSlot", "UnitUnequipItemFromSlot",
+        "UnitRemoveItemFromSlot", "UnitUnequipItemFromSlot", "BlzUnitUnequipItemFromSlot",
     };
 
     /// <summary>Natives that return a handle that did not exist before the call.</summary>
