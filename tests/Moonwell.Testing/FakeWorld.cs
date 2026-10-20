@@ -21,6 +21,15 @@ namespace Moonwell.Testing
         /// <summary>The lines printed on the screen.</summary>
         public List<string> Printed = new List<string>();
 
+        /// <summary>The slot of each line printed to a player, -1 for a line printed to everyone.</summary>
+        public List<int> PrintedSlots = new List<int>();
+
+        /// <summary>Each line printed to a player or to everyone.</summary>
+        public List<string> PrintedTexts = new List<string>();
+
+        /// <summary>The seconds of each line printed to a player or to everyone; below 0 for the game's own time.</summary>
+        public List<float> PrintedSeconds = new List<float>();
+
         /// <summary>The lines appended to the log.</summary>
         public List<string> Logged = new List<string>();
 
@@ -83,6 +92,9 @@ namespace Moonwell.Testing
 
         /// <summary>The y of each player slot's start location, for the slots that have one set.</summary>
         private readonly Dictionary<int, float> startYs = new Dictionary<int, float>();
+
+        /// <summary>The states set on players, by slot times 16 plus the state.</summary>
+        private readonly Dictionary<int, int> states = new Dictionary<int, int>();
 
         /// <summary>The slot of each player made.</summary>
         private readonly Dictionary<player, int> slots = new Dictionary<player, int>();
@@ -219,6 +231,34 @@ namespace Moonwell.Testing
         public void Print(string text)
         {
             Printed.Add(text);
+        }
+
+        /// <summary>A state of a player; 0 until it is set.</summary>
+        public int StateOf(player player, PlayerState state)
+        {
+            return states.TryGetValue(SlotOf(player) * 16 + (int)state, out var value) ? value : 0;
+        }
+
+        /// <summary>Sets a state of a player.</summary>
+        public void SetState(player player, PlayerState state, int value)
+        {
+            states[SlotOf(player) * 16 + (int)state] = value;
+        }
+
+        /// <summary>Records a line printed to one player.</summary>
+        public void PrintTo(player player, string text, float seconds)
+        {
+            PrintedSlots.Add(SlotOf(player));
+            PrintedTexts.Add(text);
+            PrintedSeconds.Add(seconds);
+        }
+
+        /// <summary>Records a line printed to everyone.</summary>
+        public void PrintToAll(string text, float seconds)
+        {
+            PrintedSlots.Add(-1);
+            PrintedTexts.Add(text);
+            PrintedSeconds.Add(seconds);
         }
 
         /// <summary>Records a line appended to the log.</summary>

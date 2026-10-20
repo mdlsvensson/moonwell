@@ -103,6 +103,62 @@ namespace Moonwell.Engine
             Natives.DisplayTimedTextToPlayer(Natives.GetLocalPlayer(), 0f, 0f, 30f, text);
         }
 
+        /// <summary>A state of a player, from the game.</summary>
+        public int StateOf(player player, PlayerState state)
+        {
+            return Natives.GetPlayerState(player, NativeState(state));
+        }
+
+        /// <summary>Sets a state of a player in the game.</summary>
+        public void SetState(player player, PlayerState state, int value)
+        {
+            Natives.SetPlayerState(player, NativeState(state), value);
+        }
+
+        private static playerstate NativeState(PlayerState state)
+        {
+            switch (state)
+            {
+                case PlayerState.Gold:
+                    return Natives.PLAYER_STATE_RESOURCE_GOLD;
+                case PlayerState.Lumber:
+                    return Natives.PLAYER_STATE_RESOURCE_LUMBER;
+                case PlayerState.FoodUsed:
+                    return Natives.PLAYER_STATE_RESOURCE_FOOD_USED;
+                case PlayerState.FoodCap:
+                    return Natives.PLAYER_STATE_RESOURCE_FOOD_CAP;
+                case PlayerState.FoodCapCeiling:
+                    return Natives.PLAYER_STATE_FOOD_CAP_CEILING;
+                case PlayerState.GoldGathered:
+                    return Natives.PLAYER_STATE_GOLD_GATHERED;
+                case PlayerState.LumberGathered:
+                    return Natives.PLAYER_STATE_LUMBER_GATHERED;
+                case PlayerState.GoldUpkeepRate:
+                    return Natives.PLAYER_STATE_GOLD_UPKEEP_RATE;
+                default:
+                    return Natives.PLAYER_STATE_LUMBER_UPKEEP_RATE;
+            }
+        }
+
+        /// <summary>Shows a line to one player: the game shows it only on that player's machine.</summary>
+        public void PrintTo(player player, string text, float seconds)
+        {
+            if (seconds < 0f)
+            {
+                Natives.DisplayTextToPlayer(player, 0f, 0f, text);
+            }
+            else
+            {
+                Natives.DisplayTimedTextToPlayer(player, 0f, 0f, seconds, text);
+            }
+        }
+
+        /// <summary>Shows a line to every player: each machine shows it to its own player.</summary>
+        public void PrintToAll(string text, float seconds)
+        {
+            PrintTo(Natives.GetLocalPlayer(), text, seconds);
+        }
+
         /// <summary>Appends a line to the log, and rewrites the log file with its last lines.</summary>
         public void Log(string text)
         {

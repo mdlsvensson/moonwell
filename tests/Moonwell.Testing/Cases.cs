@@ -63,6 +63,11 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "players.neutral", Run = ActorCases.PlayersNeutral });
             list.Add(new Case { Name = "players.start", Run = ActorCases.PlayersStart });
             list.Add(new Case { Name = "players.existing-out-of-range", Run = ActorCases.ExistingOutOfRange });
+            list.Add(new Case { Name = "players.print", Run = PlayerCases.PlayersPrint });
+            list.Add(new Case { Name = "players.print-seconds", Run = PlayerCases.PlayersPrintSeconds });
+            list.Add(new Case { Name = "game.print", Run = PlayerCases.GamePrint });
+            list.Add(new Case { Name = "players.gold", Run = PlayerCases.PlayersGold });
+            list.Add(new Case { Name = "players.states", Run = PlayerCases.PlayersStates });
             list.Add(new Case { Name = "local.runs-for-local-player", Run = LocalCases.RunsForLocalPlayer });
             list.Add(new Case { Name = "local.skips-other-players", Run = LocalCases.SkipsOtherPlayers });
             list.Add(new Case { Name = "map.components-in-order", Run = MapCases.ComponentsInOrder });

@@ -1,3 +1,5 @@
+using Moonwell.Hosting;
+
 namespace Moonwell
 {
     /// <summary>A player slot of the map: an actor that holds the components of one player, with one object per slot.</summary>
@@ -180,6 +182,85 @@ namespace Moonwell
             }
 
             return bySlot[slot];
+        }
+
+        /// <summary>The gold the player has.</summary>
+        [LocalSafe]
+        public int Gold
+        {
+            get { return Runtime.World.StateOf(Handle, PlayerState.Gold); }
+            set { Runtime.World.SetState(Handle, PlayerState.Gold, value); }
+        }
+
+        /// <summary>The lumber the player has.</summary>
+        [LocalSafe]
+        public int Lumber
+        {
+            get { return Runtime.World.StateOf(Handle, PlayerState.Lumber); }
+            set { Runtime.World.SetState(Handle, PlayerState.Lumber, value); }
+        }
+
+        /// <summary>The food the player's units use.</summary>
+        [LocalSafe]
+        public int FoodUsed
+        {
+            get { return Runtime.World.StateOf(Handle, PlayerState.FoodUsed); }
+            set { Runtime.World.SetState(Handle, PlayerState.FoodUsed, value); }
+        }
+
+        /// <summary>The food the player's buildings give.</summary>
+        [LocalSafe]
+        public int FoodCap
+        {
+            get { return Runtime.World.StateOf(Handle, PlayerState.FoodCap); }
+            set { Runtime.World.SetState(Handle, PlayerState.FoodCap, value); }
+        }
+
+        /// <summary>The most food the player can have, whatever its buildings give.</summary>
+        [LocalSafe]
+        public int FoodCapCeiling
+        {
+            get { return Runtime.World.StateOf(Handle, PlayerState.FoodCapCeiling); }
+            set { Runtime.World.SetState(Handle, PlayerState.FoodCapCeiling, value); }
+        }
+
+        /// <summary>The gold the player has gathered in the game.</summary>
+        [LocalSafe]
+        public int GoldGathered
+        {
+            get { return Runtime.World.StateOf(Handle, PlayerState.GoldGathered); }
+            set { Runtime.World.SetState(Handle, PlayerState.GoldGathered, value); }
+        }
+
+        /// <summary>The lumber the player has gathered in the game.</summary>
+        [LocalSafe]
+        public int LumberGathered
+        {
+            get { return Runtime.World.StateOf(Handle, PlayerState.LumberGathered); }
+            set { Runtime.World.SetState(Handle, PlayerState.LumberGathered, value); }
+        }
+
+        /// <summary>The percent of gathered gold the player loses to upkeep.</summary>
+        [LocalSafe]
+        public int GoldUpkeepRate
+        {
+            get { return Runtime.World.StateOf(Handle, PlayerState.GoldUpkeepRate); }
+            set { Runtime.World.SetState(Handle, PlayerState.GoldUpkeepRate, value); }
+        }
+
+        /// <summary>The percent of gathered lumber the player loses to upkeep.</summary>
+        [LocalSafe]
+        public int LumberUpkeepRate
+        {
+            get { return Runtime.World.StateOf(Handle, PlayerState.LumberUpkeepRate); }
+            set { Runtime.World.SetState(Handle, PlayerState.LumberUpkeepRate, value); }
+        }
+
+        /// <summary>Shows a line to the player, for the seconds, or for the game's own time without them; it changes nothing in the game.</summary>
+        [LocalSafe]
+        public void Print(string text, float seconds = -1f)
+        {
+            Runtime.World.PrintTo(Handle, text, seconds);
         }
 
         /// <summary>The level the player has of an upgrade class.</summary>

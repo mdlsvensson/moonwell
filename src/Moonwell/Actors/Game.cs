@@ -7,6 +7,13 @@ namespace Moonwell
         [LocalSafe]
         public static Game Instance { get; internal set; } = null!;
 
+        /// <summary>Shows a line to every player, for the seconds, or for the game's own time without them; it changes nothing in the game.</summary>
+        [LocalSafe]
+        public static void Print(string text, float seconds = -1f)
+        {
+            Runtime.World.PrintToAll(text, seconds);
+        }
+
         /// <summary>Adds a component to the game, and returns it.</summary>
         public T Add<T>(T component) where T : GameComponent => AddComponent(component);
     }
