@@ -28,14 +28,13 @@ and cast it: the screen names the target. Each kill shows the Champion's count.
 | `MyMap.csproj` | The C# project; the built map takes its name |
 | `Map.cs` | The map's settings, and the components the game starts with |
 | `Start.cs` | The game's start: makes the Champion and the footmen |
-| `Champion/` | One feature: the Champion, its spell and its component |
+| `Heroes/` | One feature: the Champion, its spell and its kill counter |
 | `map/` | The World Editor map, saved as a folder |
 | `assets/` | Files copied into the map at the same paths (models, icons, sounds); make it when you need it |
-| `ids.json` | The object ids the build gave, written by the build; commit it |
 | `build/` | What the build writes: the staged map and `MyMap.w3x`; do not commit it |
 
-Code can sit in any folder: the build finds objects and the map class by what they inherit. Keep one folder per
-feature.
+Code can sit in any folder and any namespace: the build finds objects and the map class by what they inherit. The
+template keeps one folder per feature, each with its own namespace (`MyMap.Heroes`).
 
 World Editor is for terrain and placed things: regions, cameras, units, items, trees. Open `map/` in World Editor,
 change it, and save it as a folder again. Objects, triggers and the map's settings are in code; the build replaces the
@@ -45,35 +44,45 @@ saved script.
 
 `Map.cs` holds the one class of the project that inherits `Map`. Its constructor sets `Name`, `Author`, `Description`
 and `RecommendedPlayers`; one left empty keeps World Editor's value. `DataSet` and `DataVersion` pick the balance the
-map plays with, as World Editor's Data Set and Data Version. `Components.Add` lists the game components the game
-starts with.
+map plays with, as World Editor's Data Set and Data Version. `Components` lists the game components the game
+starts with: `Components.Add(new Start(), new Rules());` adds them, and `Components = new() { new Start(), new Rules() };`
+replaces the list.
 
 ## Objects
 
 A unit, hero, item, ability, buff, destructable, doodad or upgrade is a class that inherits one of the game's own,
-from `Moonwell.Objects`: `Units.Human.Paladin`, `Abilities.Human.StormBolt`, `Items.ClawsOfAttack15`. Its constructor
-changes fields; a field it does not change keeps its base's value.
+from `Moonwell.Objects`, by race and kind: `Human.Units.Paladin`, `Human.Abilities.Defend`, `Human.Upgrades.Defend`,
+`Campaign.Units.Arthas`, and `Items.ClawsOfAttack15`, `Destructables.X` and `Doodads.X` for the kinds with no race.
+`using Moonwell.Objects;` reaches all of them; `using static Moonwell.Objects.Human;` lets a file write
+`Abilities.Defend`. Its constructor changes fields; a field it does not change keeps its base's value. Every new object
+has its id on the class, as World Editor shows it: a hero's starts with an upper-case letter, another unit's with a
+lower-case one.
 
 ```csharp
-public sealed class Champion : Paladin
+[ObjectId("H001")]
+public sealed class Champion : Human.Units.Paladin
 {
     public Champion()
     {
         Name = "Champion";
         HitPoints = HitPoints + 200;
-        HeroAbilities.Remove<HolyLight>();
-        HeroAbilities.Add<Smite>();
-        Components.Add(new Fury());
+        HeroAbilities.Replace<Human.Abilities.HolyLight, Smite>();
+        Components.Add(new KillCounter());
     }
 }
 ```
 
 - A field with levels takes `Levels(75f, 150f, 225f)`, or `PerLevel(level => ...)` to compute each level.
+- A list takes `Set<A, B, C>()` (the whole list, in order), `Replace<Old, New>()` (in the old one's place), `Add<T>()`
+  and `Remove<T>()`.
+- The tooltips are World Editor's four: `Tooltip` (Tooltip - Normal), `TooltipExtended` (Tooltip - Normal - Extended),
+  `TooltipLearn` (Tooltip - Learn) and `TooltipLearnExtended` (Tooltip - Learn - Extended).
 - A field with no name of its own is set by its id: `Set("Htb1", 2, 250f)`.
 - A constructor may compute, but must not call the game: the build fails at such a line.
-- The build gives each object an id and keeps it in `ids.json`. `[ObjectId("H001")]` on the class pins one.
+- A class with no `[ObjectId]` fails the build, which names a free id to use. A buff also names its carrier, the
+  hidden ability that shows its icon: `[ObjectId("B001", Carrier = "A002")]`.
 - `[Replaces]` makes the class the game's object itself: every unit of that type is made as the class.
-- `Unit.Create<Champion>(player, x, y, facing)` makes one in the game.
+- `Unit.Create<Champion>(player, x, y)` makes one in the game, facing 270 degrees unless a facing follows.
 
 ## Components and reactions
 
@@ -83,21 +92,21 @@ destructable, player or the game: it inherits `UnitComponent`, `ItemComponent`, 
 `PlayerComponent` or `GameComponent`.
 
 ```csharp
-public sealed class Fury : UnitComponent
+public sealed class KillCounter : UnitComponent
 {
     private int kills;
 
     public override void OnKill(Unit victim)
     {
         kills++;
-        Natives.DisplayTextToPlayer(Unit.Player.Handle, 0f, 0f, "Kills: " + kills);
+        Unit.Player.Print("Kills: " + kills);
     }
 }
 ```
 
-- A type lists the components its instances start with in its constructor. `unit.Add(new Fury())` adds one in the
+- A type lists the components its instances start with in its constructor. `unit.Add(new KillCounter())` adds one in the
   game, and `End()` removes it.
-- Reactions to the whole map (`OnGameStart`, `OnUnitDied`, `OnUnitCast`) go on a game or player component.
+- Reactions to the whole map (`OnGameStart`, `OnUnitDied`, `OnUnitCast`, `OnLeave`) go on a game or player component.
 - An event runs the type's reaction first, then its components' in the order added, then the game's and the
   players'. A reaction that fails is reported, and the others still run.
 - A buff is a class that inherits `Buff`, or a standard buff to show its icon. `Duration` and `Tick` set its time,
@@ -112,6 +121,14 @@ public sealed class Fury : UnitComponent
 slot from 0, so `Player.Get(0)` is `Player.One`. A slot is not a colour: a map can recolour its players.
 `Player.NeutralAggressive`, `NeutralPassive`, `NeutralVictim` and `NeutralExtra` are the neutral players, and
 `StartX` and `StartY` a player's start location.
+
+`player.Print("Kills: 3")` shows a line to one player and `Game.Print("Wave 2")` to everyone; both take a time on
+screen, `seconds: 10f`. `Gold`, `Lumber`, `FoodUsed`, `FoodCap`, `FoodCapCeiling`, `GoldGathered`, `LumberGathered`,
+`GoldUpkeepRate` and `LumberUpkeepRate` are the player's own: `player.Gold += 25`.
+
+`Player.Playing` is every player in the game, people and computers, and `Player.Users` the people:
+`foreach (var player in Player.Users)`. `player.SlotState` is `Empty`, `Playing` or `Left`, and `player.Controller`
+says who plays it. `OnLeave(Player player)` runs on the game's components, then the leaving player's.
 
 The `Natives` class has every native of the game for what Moonwell does not cover yet.
 

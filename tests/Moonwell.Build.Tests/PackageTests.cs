@@ -168,7 +168,7 @@ namespace Moonwell.Build.Tests
             Assert.DoesNotContain("note:", log.ToString());
             Assert.Contains("Name = \"Keep\";", File.ReadAllText(Path.Combine(map, "Map.cs")));
             var script = File.ReadAllText(Path.Combine(map, "build", "Keep", "war3map.lua"));
-            Assert.Contains("[\"Keep.Champion\"]", script);
+            Assert.Contains("[\"Keep.Heroes.Champion\"]", script);
         }
 
         [Fact]

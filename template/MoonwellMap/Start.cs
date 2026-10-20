@@ -1,5 +1,6 @@
 using Moonwell;
-using static Moonwell.Objects.Human.Units;
+using Moonwell.Objects;
+using MoonwellMap.Heroes;
 
 namespace MoonwellMap
 {
@@ -11,12 +12,12 @@ namespace MoonwellMap
             var player = Player.One;
             var x = player.StartX;
             var y = player.StartY;
-            Unit.Create<Champion>(player, x, y, 270f);
+            Unit.Create<Champion>(player, x, y);
 
             var enemy = Player.NeutralAggressive;
             for (var i = 0; i < 3; i++)
             {
-                Unit.Create<Footman>(enemy, x - 200f + i * 200f, y + 600f, 270f);
+                Unit.Create<Human.Units.Footman>(enemy, x - 200f + i * 200f, y + 600f);
             }
         }
     }
