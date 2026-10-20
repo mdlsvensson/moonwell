@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
+    <!-- The analyzer would stop the compile at this value (MW0009); the fixture tests the build's own check of it. -->
+    <NoWarn>$(NoWarn);MW0009</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

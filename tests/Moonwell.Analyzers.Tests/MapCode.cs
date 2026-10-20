@@ -82,7 +82,7 @@ internal static class MapCode
         var errors = compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
         Assert.True(errors.Count == 0, string.Join("\n", errors));
 
-        var analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(new SyncAnalyzer(), new LuaAnalyzer());
+        var analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(new SyncAnalyzer(), new LuaAnalyzer(), new FieldRulesAnalyzer());
         return (tree, compilation.WithAnalyzers(analyzers).GetAnalyzerDiagnosticsAsync().Result);
     }
 }

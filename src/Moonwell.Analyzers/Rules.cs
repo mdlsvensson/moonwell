@@ -92,4 +92,18 @@ public static class Rules
 
     /// <summary>The rules of C# that CSharp.lua cannot compile.</summary>
     public static ImmutableArray<DiagnosticDescriptor> Lua { get; } = ImmutableArray.Create(CollectionExpression, StaticNatives);
+
+    private const string ObjectsCategory = "Objects";
+
+    public static readonly DiagnosticDescriptor FieldRule = new(
+        "MW0009",
+        "Value World Editor does not allow",
+        "{0}",
+        ObjectsCategory,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "A constant a class puts on a field of a standard object (an assignment, an argument of Levels, a Set by field id) is outside what World Editor allows: a number outside its range, a negative where none is allowed, an empty required name, a text or list that is too long, or a choice that is no value of its enum. The message is the one the build gives. [BeyondLimits(nameof(Property))] on the class goes past a range or a length; it never allows a negative, an empty name or a wrong choice. It also reports a [BeyondLimits] name that is no property, which lifts nothing.");
+
+    /// <summary>The rules for the values a map's classes put on object fields.</summary>
+    public static ImmutableArray<DiagnosticDescriptor> Objects { get; } = ImmutableArray.Create(FieldRule);
 }
