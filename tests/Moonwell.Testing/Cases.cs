@@ -139,6 +139,11 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "damage-package.immunity-inside-hit", Run = LandingCases.ImmunityInsideHit });
             list.Add(new Case { Name = "damage-package.nested-keeps-outer", Run = LandingCases.NestedKeepsOuter });
             list.Add(new Case { Name = "damage-package.stray-open-ended", Run = LandingCases.StrayOpenEnded });
+            list.Add(new Case { Name = "damage-package.deal-returns-hit", Run = DealCases.DealReturnsHit });
+            list.Add(new Case { Name = "damage-package.deal-starts-listening", Run = DealCases.DealStartsListening });
+            list.Add(new Case { Name = "damage-package.deal-inside-reaction-nests", Run = DealCases.DealInsideReactionNests });
+            list.Add(new Case { Name = "damage-package.chain-cut", Run = DealCases.ChainCut });
+            list.Add(new Case { Name = "damage-package.chain-across-frames", Run = DealCases.ChainAcrossFrames });
             list.Add(new Case { Name = "death.order", Run = DeathCases.Order });
             list.Add(new Case { Name = "death.self", Run = DeathCases.Self });
             list.Add(new Case { Name = "death.not-an-end", Run = DeathCases.NotAnEnd });

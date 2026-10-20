@@ -24,6 +24,9 @@ namespace Moonwell
         /// <summary>The hits that finished their after-armor stage since the 0 s timer last ran, in order: they land when it runs.</summary>
         private static List<Hit> moment = new List<Hit>();
 
+        /// <summary>The deal from code waiting for its before-armor event; null when none.</summary>
+        private static PendingDeal? pending;
+
         /// <summary>Makes a world the package's world, clears its state and plugs it into the runtime.</summary>
         internal static void Install(IDamageWorld world)
         {
@@ -32,6 +35,7 @@ namespace Moonwell
             Watched = false;
             open.Clear();
             moment = new List<Hit>();
+            pending = null;
             Reactions.Reset();
             Events.DamageListener = Listen;
             Hooks.Seen = Saw;
@@ -69,6 +73,32 @@ namespace Moonwell
             return Units.Find(target) != null || (source != null && Units.Find(source) != null) || Watched || Events.Wants(Hook.OnUnitDamaged);
         }
 
+        /// <summary>Deals damage from code: the hit its before-armor event makes is marked as code's and returned. A deal from a reaction continues the reacting hit's chain; one that would make the chain longer than MaxChain throws, which the reaction reports.</summary>
+        internal static Hit? Deal(Unit source, Unit target, float amount, int attackType, DamageType type, bool isAttack, bool ranged, WeaponSound sound, object? tag)
+        {
+            var running = Reactions.Running;
+            var chain = running.Count == 0 ? 0 : running[running.Count - 1].Chain + 1;
+            if (chain >= MaxChain)
+            {
+                throw new MoonwellException(Names.NameOf(source) + " to " + Names.NameOf(target) + ": not dealt, a chain of " + MaxChain + " hits dealt from reactions ends here");
+            }
+
+            Listen();
+            var previous = pending;
+            var deal = new PendingDeal(source.Handle, target.Handle, isAttack, ranged, tag, chain);
+            pending = deal;
+            try
+            {
+                World.Deal(source.Handle, target.Handle, amount, isAttack, ranged, attackType, (int)type, (int)sound);
+            }
+            finally
+            {
+                pending = previous;
+            }
+
+            return deal.Hit;
+        }
+
         /// <summary>Makes the hit of the current event, read from the game.</summary>
         private static Hit? Read()
         {
@@ -81,11 +111,25 @@ namespace Moonwell
             }
 
             var source = sourceHandle == null ? null : Unit.Of(sourceHandle);
-            var hit = new Hit(target, source, World.EventAmount(), World.EventIsAttack());
+            var deal = pending != null && pending.Hit == null && pending.Target == targetHandle && pending.Source == sourceHandle ? pending : null;
+            var hit = new Hit(target, source, World.EventAmount(), deal != null ? deal.IsAttack : World.EventIsAttack());
+            if (deal != null)
+            {
+                deal.Hit = hit;
+                hit.IsCode = true;
+                hit.Tag = deal.Tag;
+                hit.Chain = deal.Chain;
+            }
+
             hit.AttackTypeCode = World.EventAttackType();
             hit.DefenseTypeCode = World.DefenseType(targetHandle);
             hit.Fill((DamageType)World.EventDamageType(), (WeaponSound)World.EventWeaponType(), World.Armor(targetHandle));
-            if (hit.IsAttack && sourceHandle != null)
+            if (deal != null)
+            {
+                hit.IsRanged = deal.IsAttack && deal.Ranged;
+                hit.IsMelee = deal.IsAttack && !deal.Ranged;
+            }
+            else if (hit.IsAttack && sourceHandle != null)
             {
                 var melee = World.IsMelee(sourceHandle);
                 var ranged = World.IsRanged(sourceHandle);
@@ -105,7 +149,7 @@ namespace Moonwell
         /// <summary>The game's damaging event: the before-armor stage, then what it changed written back to the game.</summary>
         private static void Damaging()
         {
-            if (!Wanted(World.EventTarget(), World.EventSource()))
+            if (pending == null && !Wanted(World.EventTarget(), World.EventSource()))
             {
                 return;
             }
@@ -305,5 +349,41 @@ namespace Moonwell
                 World.SetDefenseType(target, hit.DefenseRestore);
             }
         }
+    }
+
+    /// <summary>A deal from code waiting for the game's before-armor event it makes.</summary>
+    internal sealed class PendingDeal
+    {
+        /// <summary>Makes the record of a deal.</summary>
+        internal PendingDeal(unit source, unit target, bool isAttack, bool ranged, object? tag, int chain)
+        {
+            Source = source;
+            Target = target;
+            IsAttack = isAttack;
+            Ranged = ranged;
+            Tag = tag;
+            Chain = chain;
+        }
+
+        /// <summary>The dealing unit.</summary>
+        internal readonly unit Source;
+
+        /// <summary>The unit dealt to.</summary>
+        internal readonly unit Target;
+
+        /// <summary>Whether reactions see the hit as an attack.</summary>
+        internal readonly bool IsAttack;
+
+        /// <summary>Whether an attack is ranged.</summary>
+        internal readonly bool Ranged;
+
+        /// <summary>The map's tag.</summary>
+        internal readonly object? Tag;
+
+        /// <summary>The hit's place in its chain.</summary>
+        internal readonly int Chain;
+
+        /// <summary>The hit the deal made; null until its before-armor event.</summary>
+        internal Hit? Hit;
     }
 }
