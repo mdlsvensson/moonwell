@@ -75,7 +75,11 @@ public sealed class Champion : Human.Units.Paladin
 - A field with levels takes `Levels(75f, 150f, 225f)`, or `PerLevel(level => ...)` to compute each level.
 - A field World Editor offers a list of values for holds an enum of them, named as the game's data spells them:
   `AttackType = AttackType.Magic`. One that takes several, such as the targets, holds flags:
-  `Attack1TargetsAllowed = Targets.Air | Targets.Ground`.
+  `Attack1TargetsAllowed = Targets.Air | Targets.Ground`. A flags field of 0 has none of them; `Targets.None` is
+  World Editor's target "none", a value of its own. The numbers are Moonwell's, in World Editor's order, not the
+  natives' (JASS's `ATTACK_TYPE_MAGIC` is 4, `AttackType.Magic` is 6): never cast one to or from a native's value.
+  In the game an enum has its numbers only, no names: `ToString`, a string made with one and `Enum.GetValues` are
+  rejected as error MW0010; compare with its members, `|`, `&` and `HasFlag`.
 - A list takes `Set<A, B, C>()` (the whole list, in order), `Replace<Old, New>()` (in the old one's place), `Add<T>()`
   and `Remove<T>()`.
 - The tooltips are World Editor's four: `Tooltip` (Tooltip - Normal), `TooltipExtended` (Tooltip - Normal - Extended),
@@ -96,11 +100,12 @@ Heroes/Giant.cs:12: Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) 
 ```
 
 `[BeyondLimits(nameof(HitPoints))]` on the class goes past a range on purpose. It lifts ranges, lengths and counts
-only: an empty name, a negative where none is allowed and a number that is no value of the enum still fail. The values
-a standard class has are the game's, and are never checked.
+only: an empty name, a negative on a field the game never lets go below 0, and a choice that is none of the enum's
+values still fail. The values a standard class has are the game's, and are never checked.
 
 To see a standard object's values, go to its class (Go to Definition on `Paladin`): its constructor sets each value
-World Editor shows for it.
+of the base tables, World Editor's Default. A map on another data set plays that set's values for the fields it leaves
+unset.
 
 ## Components and reactions
 
