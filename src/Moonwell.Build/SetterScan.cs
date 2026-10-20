@@ -104,7 +104,7 @@ namespace Moonwell.Build
             }
 
             var definition = owner.GetGenericTypeDefinition().FullName;
-            return (definition == "Moonwell.Objects.ObjectList`1" && (target.Name == "Add" || target.Name == "Remove"))
+            return (definition == "Moonwell.Objects.ObjectList`1" && (target.Name == "Add" || target.Name == "Remove" || target.Name == "Set" || target.Name == "Replace"))
                 || (definition == "Moonwell.Objects.ObjectRef`1" && target.Name == "Set");
         }
 

@@ -13,6 +13,15 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void reads_the_carrier_of_a_buff()
+        {
+            var burn = Find(built.Read(null).Objects, "Objects.Burn");
+
+            Assert.Equal("B001", burn.PinnedId);
+            Assert.Equal("A005", burn.CarrierId);
+        }
+
+        [Fact]
         public void reads_arthas()
         {
             var arthas = Find(built.Read(null).Objects, "Objects.Arthas");
@@ -20,7 +29,8 @@ namespace Moonwell.Build.Tests
             Assert.Equal("hero", arthas.Kind);
             Assert.Equal("Hpal", arthas.StandardRoot);
             Assert.False(arthas.Replaces);
-            Assert.Null(arthas.PinnedId);
+            Assert.Equal("H001", arthas.PinnedId);
+            Assert.Null(arthas.CarrierId);
             Assert.Equal(new[] { "uabi", "ugol", "uhab", "uhpm", "unam" }, arthas.Changed.Keys);
             Assert.Equal("Arthas", arthas.Changed["unam"]);
             Assert.Equal(2 * BaseInt("Hpal", "uhpm"), arthas.Changed["uhpm"]);
@@ -349,6 +359,22 @@ namespace Moonwell.Build.Tests
             AssertFails(
                 "AddOutsideCtor",
                 "AddOutsideCtor.Grow.Learn changes Abilities; declared fields are set only in the constructor");
+        }
+
+        [Fact]
+        public void list_set_outside_ctor()
+        {
+            AssertFails(
+                "SetListOutsideCtor",
+                "SetListOutsideCtor.Grow.Learn changes Abilities; declared fields are set only in the constructor");
+        }
+
+        [Fact]
+        public void list_replace_outside_ctor()
+        {
+            AssertFails(
+                "ReplaceOutsideCtor",
+                "ReplaceOutsideCtor.Grow.Learn changes Abilities; declared fields are set only in the constructor");
         }
 
         [Fact]

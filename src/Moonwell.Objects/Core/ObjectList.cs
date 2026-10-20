@@ -66,6 +66,122 @@ namespace Moonwell.Objects
             entries.Remove(typeof(TObject));
         }
 
+        /// <summary>Replaces the whole list with this class.</summary>
+        public void Set<T1>()
+            where T1 : T
+        {
+            SetTo(typeof(T1));
+        }
+
+        /// <summary>Replaces the whole list with these classes, in order; a class given twice is kept at its first place.</summary>
+        public void Set<T1, T2>()
+            where T1 : T
+            where T2 : T
+        {
+            SetTo(typeof(T1), typeof(T2));
+        }
+
+        /// <summary>Replaces the whole list with these classes, in order; a class given twice is kept at its first place.</summary>
+        public void Set<T1, T2, T3>()
+            where T1 : T
+            where T2 : T
+            where T3 : T
+        {
+            SetTo(typeof(T1), typeof(T2), typeof(T3));
+        }
+
+        /// <summary>Replaces the whole list with these classes, in order; a class given twice is kept at its first place.</summary>
+        public void Set<T1, T2, T3, T4>()
+            where T1 : T
+            where T2 : T
+            where T3 : T
+            where T4 : T
+        {
+            SetTo(typeof(T1), typeof(T2), typeof(T3), typeof(T4));
+        }
+
+        /// <summary>Replaces the whole list with these classes, in order; a class given twice is kept at its first place.</summary>
+        public void Set<T1, T2, T3, T4, T5>()
+            where T1 : T
+            where T2 : T
+            where T3 : T
+            where T4 : T
+            where T5 : T
+        {
+            SetTo(typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
+        }
+
+        /// <summary>Replaces the whole list with these classes, in order; a class given twice is kept at its first place.</summary>
+        public void Set<T1, T2, T3, T4, T5, T6>()
+            where T1 : T
+            where T2 : T
+            where T3 : T
+            where T4 : T
+            where T5 : T
+            where T6 : T
+        {
+            SetTo(typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
+        }
+
+        /// <summary>Replaces the whole list with these classes, in order; a class given twice is kept at its first place.</summary>
+        public void Set<T1, T2, T3, T4, T5, T6, T7>()
+            where T1 : T
+            where T2 : T
+            where T3 : T
+            where T4 : T
+            where T5 : T
+            where T6 : T
+            where T7 : T
+        {
+            SetTo(typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7));
+        }
+
+        /// <summary>Replaces the whole list with these classes, in order; a class given twice is kept at its first place.</summary>
+        public void Set<T1, T2, T3, T4, T5, T6, T7, T8>()
+            where T1 : T
+            where T2 : T
+            where T3 : T
+            where T4 : T
+            where T5 : T
+            where T6 : T
+            where T7 : T
+            where T8 : T
+        {
+            SetTo(typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8));
+        }
+
+        /// <summary>Puts a class in the place of another; with the other absent nothing changes, and with the class already there the other is only taken out.</summary>
+        public void Replace<TOld, TNew>()
+            where TOld : T
+            where TNew : T
+        {
+            var at = entries.IndexOf(typeof(TOld));
+            if (at < 0)
+            {
+                return;
+            }
+
+            if (entries.Contains(typeof(TNew)))
+            {
+                entries.RemoveAt(at);
+                return;
+            }
+
+            entries[at] = typeof(TNew);
+        }
+
+        private void SetTo(params Type[] types)
+        {
+            entries.Clear();
+            foreach (var type in types)
+            {
+                if (!entries.Contains(type))
+                {
+                    entries.Add(type);
+                }
+            }
+        }
+
         /// <summary>Whether the list holds this class.</summary>
         public bool Contains<TObject>()
             where TObject : T

@@ -184,6 +184,83 @@ namespace Moonwell.Objects.Tests
         }
 
         [Fact]
+        public void set_replaces_in_order()
+        {
+            var list = new ObjectList<Moonwell.Unit>();
+            list.Add<Footman>();
+
+            list.Set<Arthas, Knight, Sir>();
+
+            Assert.Equal(new[] { typeof(Arthas), typeof(Knight), typeof(Sir) }, list.Types);
+        }
+
+        [Fact]
+        public void set_drops_standard_entries()
+        {
+            StandardValues.Read = (id, field, level) => id == "Hpal" && field == "utra" && level == 0 ? "hfoo,zzzz" : null;
+            var trains = new Paladin().Trains;
+
+            trains.Set<Arthas>();
+
+            Assert.Equal(new object[] { typeof(Arthas) }, trains.Entries);
+        }
+
+        [Fact]
+        public void set_twice_keeps_first_place()
+        {
+            var list = new ObjectList<Moonwell.Unit>();
+
+            list.Set<Arthas, Knight, Arthas>();
+
+            Assert.Equal(new[] { typeof(Arthas), typeof(Knight) }, list.Types);
+        }
+
+        [Fact]
+        public void set_takes_eight()
+        {
+            var list = new ObjectList<Moonwell.Unit>();
+
+            list.Set<Arthas, Knight, Sir, Footman, Paladin, Uther, Scholar, Captain>();
+
+            Assert.Equal(
+                new[] { typeof(Arthas), typeof(Knight), typeof(Sir), typeof(Footman), typeof(Paladin), typeof(Uther), typeof(Scholar), typeof(Captain) },
+                list.Types);
+        }
+
+        [Fact]
+        public void replace_keeps_the_position()
+        {
+            var list = new ObjectList<Moonwell.Unit>();
+            list.Set<Footman, Arthas, Knight>();
+
+            list.Replace<Arthas, Sir>();
+
+            Assert.Equal(new[] { typeof(Footman), typeof(Sir), typeof(Knight) }, list.Types);
+        }
+
+        [Fact]
+        public void replace_of_absent_changes_nothing()
+        {
+            var list = new ObjectList<Moonwell.Unit>();
+            list.Add<Footman>();
+
+            list.Replace<Arthas, Sir>();
+
+            Assert.Equal(new[] { typeof(Footman) }, list.Types);
+        }
+
+        [Fact]
+        public void replace_with_present_removes_old()
+        {
+            var list = new ObjectList<Moonwell.Unit>();
+            list.Set<Footman, Arthas, Sir>();
+
+            list.Replace<Footman, Sir>();
+
+            Assert.Equal(new[] { typeof(Arthas), typeof(Sir) }, list.Types);
+        }
+
+        [Fact]
         public void list_keeps_order_once()
         {
             var trains = new Trainer().Trains;
