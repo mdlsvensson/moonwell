@@ -34,12 +34,41 @@ namespace Moonwell.Objects.Tests
         [Fact]
         public void a_choice_field_is_its_enum()
         {
-            Assert.Equal(typeof(AttackType), typeof(StandardUnit).GetProperty("AttackType")!.PropertyType);
+            Assert.Equal(typeof(Moonwell.AttackType), typeof(StandardUnit).GetProperty("AttackType")!.PropertyType);
+            Assert.Equal(typeof(Moonwell.DefenseType), typeof(StandardUnit).GetProperty("DefenseType")!.PropertyType);
+            Assert.Equal(typeof(Levels<DefenseTypeInt>), typeof(NightElf.Abilities.Root).GetProperty("UprootedDefenseType")!.PropertyType);
             Assert.Equal(typeof(Targets), typeof(StandardUnit).GetProperty("Attack1TargetsAllowed")!.PropertyType);
             Assert.Equal(typeof(DeathType), typeof(StandardUnit).GetProperty("DeathType")!.PropertyType);
             Assert.Equal(typeof(Levels<Targets>), typeof(StandardAbility).GetProperty("TargetsAllowed")!.PropertyType);
             Assert.Equal(typeof(MoveType), typeof(StandardUnit).GetProperty("Type")!.PropertyType);
             Assert.Equal(typeof(ArmorType), typeof(StandardUnit).GetProperty("ArmorType")!.PropertyType);
+        }
+
+        [Fact]
+        public void attack_and_defense_types_are_core_moonwells_not_the_libraries()
+        {
+            // The damage package names them too, and it cannot reference Moonwell.Objects (C19).
+            Assert.Null(Objects.GetType("Moonwell.Objects.AttackType"));
+            Assert.Null(Objects.GetType("Moonwell.Objects.DefenseType"));
+            Assert.NotNull(Objects.GetType("Moonwell.Objects.DefenseTypeInt"));
+            Assert.Equal(
+                new[] { "Normal", "Small", "Medium", "Large", "Fort", "Hero", "Divine", "None" },
+                Enum.GetNames<Moonwell.DefenseType>());
+            Assert.Equal(6, (int)Moonwell.DefenseType.Divine);
+        }
+
+        [Fact]
+        public void a_core_enums_game_values_have_its_members()
+        {
+            var table = Objects.GetType("Moonwell.Objects.CoreChoices", true)!;
+            foreach (var core in new[] { typeof(Moonwell.AttackType), typeof(Moonwell.DefenseType) })
+            {
+                var texts = table.GetNestedType(core.Name, BindingFlags.NonPublic)!;
+                Assert.Equal(
+                    core.GetFields(BindingFlags.Public | BindingFlags.Static).Select(field => (field.Name, Convert.ToInt32(field.GetValue(null)))),
+                    texts.GetFields(BindingFlags.Public | BindingFlags.Static).Select(field => (field.Name, Convert.ToInt32(field.GetValue(null)))));
+                Assert.All(texts.GetFields(BindingFlags.Public | BindingFlags.Static), field => Assert.NotNull(field.GetCustomAttribute<GameValueAttribute>()));
+            }
         }
 
         [Fact]
@@ -87,6 +116,15 @@ namespace Moonwell.Objects.Tests
         }
 
         [Theory]
+        [InlineData("divine", Moonwell.DefenseType.Divine)]
+        [InlineData("Fort", Moonwell.DefenseType.Fort)]
+        [InlineData("none", Moonwell.DefenseType.None)]
+        public void a_core_choice_reads_its_text(string text, Moonwell.DefenseType expected)
+        {
+            Assert.Equal(expected, StandardValues.Parse<Moonwell.DefenseType>(text));
+        }
+
+        [Theory]
         [InlineData("air,enemies", Targets.Air | Targets.Enemies)]
         [InlineData("aliv", Targets.Alive)]
         [InlineData("alive", Targets.Alive)]
@@ -122,7 +160,7 @@ namespace Moonwell.Objects.Tests
         public void every_member_has_its_game_value_and_a_flag_is_one_bit_the_games_integers_hold()
         {
             var enums = Enums().ToList();
-            Assert.Equal(41, enums.Count);
+            Assert.Equal(39, enums.Count);
             foreach (var type in enums)
             {
                 var flags = type.IsDefined(typeof(FlagsAttribute), false);

@@ -36,13 +36,13 @@ namespace Moonwell.Objects
                     Attack1DamageSpillDistance = 0f;
                     Attack1DamageSpillRadius = 0f;
                     Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
                     Attack2MaximumNumberOfTargets = 1;
                     Attack2ShowUI = true;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 60;
                     ButtonPositionX = 1;
@@ -57,7 +57,7 @@ namespace Moonwell.Objects
                     Construction = "BuildingConstructionLoop";
                     DeathTimeSeconds = 2.335f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 1;
                     ElevationSamplePoints = 4;
                     ElevationSampleRadius = 50f;
@@ -163,13 +163,13 @@ namespace Moonwell.Objects
                     Attack1DamageSpillDistance = 0f;
                     Attack1DamageSpillRadius = 0f;
                     Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
                     Attack2MaximumNumberOfTargets = 1;
                     Attack2ShowUI = true;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 70;
                     ButtonPositionX = 2;
@@ -184,7 +184,7 @@ namespace Moonwell.Objects
                     Construction = "BuildingConstructionLoop";
                     DeathTimeSeconds = 2.34f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 1;
                     ElevationSamplePoints = 4;
                     ElevationSampleRadius = 50f;
@@ -300,7 +300,7 @@ namespace Moonwell.Objects
                     Attack1ShowUI = true;
                     Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Missile;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
@@ -308,7 +308,7 @@ namespace Moonwell.Objects
                     Attack2ShowUI = true;
                     AttackCooldown = 1f;
                     AttackRange = 800;
-                    AttackType = global::Moonwell.Objects.AttackType.Pierce;
+                    AttackType = global::Moonwell.AttackType.Pierce;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 50;
                     ButtonPositionX = 2;
@@ -326,7 +326,7 @@ namespace Moonwell.Objects
                     DamageSides = 3;
                     DeathTimeSeconds = 2.67f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Large;
+                    DefenseType = global::Moonwell.DefenseType.Large;
                     DefenseUpgradeBonus = 1;
                     ElevationSamplePoints = 4;
                     ElevationSampleRadius = 50f;
@@ -430,14 +430,14 @@ namespace Moonwell.Objects
                     Attack1DamageSpillRadius = 0f;
                     Attack1MaximumNumberOfTargets = 1;
                     Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
                     Attack2MaximumNumberOfTargets = 1;
                     Attack2ShowUI = true;
                     AttackCooldown = 0f;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 60;
                     ButtonPositionX = 2;
@@ -451,7 +451,7 @@ namespace Moonwell.Objects
                     CollisionSize = 50f;
                     DeathTimeSeconds = 2.33f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 1;
                     DisplayAsNeutralHostile = false;
                     ElevationSamplePoints = 4;
@@ -568,7 +568,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     Attack2AnimationBackswingPoint = 0.85f;
                     Attack2AnimationDamagePoint = 0.55f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Hero;
+                    Attack2AttackType = global::Moonwell.AttackType.Hero;
                     Attack2CooldownTime = 2.13f;
                     Attack2DamageBase = 0;
                     Attack2DamageLossFactor = 0f;
@@ -584,7 +584,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     AttackCooldown = 2.13f;
                     AttackRange = 600;
-                    AttackType = global::Moonwell.Objects.AttackType.Hero;
+                    AttackType = global::Moonwell.AttackType.Hero;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 55;
                     ButtonPositionX = 0;
@@ -599,7 +599,7 @@ namespace Moonwell.Objects
                     DamageSides = 4;
                     DeathTimeSeconds = 2.8f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Hero;
+                    DefenseType = global::Moonwell.DefenseType.Hero;
                     DefenseUpgradeBonus = 0;
                     ElevationSampleRadius = 30f;
                     FogOfWarSampleRadius = 0f;
@@ -737,13 +737,13 @@ namespace Moonwell.Objects
                     Attack1DamageSpillDistance = 0f;
                     Attack1DamageSpillRadius = 0f;
                     Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
                     Attack2MaximumNumberOfTargets = 1;
                     Attack2ShowUI = true;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 60;
                     ButtonPositionX = 1;
@@ -758,7 +758,7 @@ namespace Moonwell.Objects
                     Construction = "BuildingConstructionLoop";
                     DeathTimeSeconds = 2.34f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 1;
                     ElevationSamplePoints = 4;
                     ElevationSampleRadius = 50f;
@@ -862,13 +862,13 @@ namespace Moonwell.Objects
                     Attack1DamageSpillDistance = 0f;
                     Attack1DamageSpillRadius = 0f;
                     Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
                     Attack2MaximumNumberOfTargets = 1;
                     Attack2ShowUI = true;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 70;
                     ButtonPositionX = 3;
@@ -883,7 +883,7 @@ namespace Moonwell.Objects
                     Construction = "BuildingConstructionLoop";
                     DeathTimeSeconds = 2.34f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 1;
                     ElevationSamplePoints = 4;
                     ElevationSampleRadius = 50f;
@@ -1000,7 +1000,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     Attack2AnimationBackswingPoint = 0.85f;
                     Attack2AnimationDamagePoint = 0.55f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Hero;
+                    Attack2AttackType = global::Moonwell.AttackType.Hero;
                     Attack2CooldownTime = 1.64f;
                     Attack2DamageBase = 0;
                     Attack2DamageLossFactor = 0f;
@@ -1016,7 +1016,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     AttackCooldown = 1.64f;
                     AttackRange = 600;
-                    AttackType = global::Moonwell.Objects.AttackType.Hero;
+                    AttackType = global::Moonwell.AttackType.Hero;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 55;
                     ButtonPositionX = 0;
@@ -1031,7 +1031,7 @@ namespace Moonwell.Objects
                     DamageSides = 4;
                     DeathTimeSeconds = 3f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Hero;
+                    DefenseType = global::Moonwell.DefenseType.Hero;
                     DefenseUpgradeBonus = 0;
                     ElevationSampleRadius = 30f;
                     FogOfWarSampleRadius = 0f;
@@ -1183,7 +1183,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Artillery;
                     Attack2AnimationBackswingPoint = 0.3f;
                     Attack2AnimationDamagePoint = 0.3f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Siege;
+                    Attack2AttackType = global::Moonwell.AttackType.Siege;
                     Attack2CooldownTime = 2.5f;
                     Attack2DamageBase = 89;
                     Attack2DamageLossFactor = 0f;
@@ -1199,7 +1199,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     AttackCooldown = 2.5f;
                     AttackRange = 800;
-                    AttackType = global::Moonwell.Objects.AttackType.Siege;
+                    AttackType = global::Moonwell.AttackType.Siege;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Both;
                     BuildTime = 65;
                     ButtonPositionX = 1;
@@ -1217,7 +1217,7 @@ namespace Moonwell.Objects
                     DamageSides = 22;
                     DeathTimeSeconds = 2.34f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 1;
                     ElevationSamplePoints = 4;
                     ElevationSampleRadius = 50f;
@@ -1325,13 +1325,13 @@ namespace Moonwell.Objects
                     Attack1ProjectileArt = "Abilities\\Weapons\\GuardTowerMissile\\GuardTowerMissile.mdl";
                     Attack1ProjectileSpeed = 1800;
                     Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
                     Attack2MaximumNumberOfTargets = 1;
                     Attack2ShowUI = true;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 140;
                     ButtonPositionX = 0;
@@ -1346,7 +1346,7 @@ namespace Moonwell.Objects
                     Construction = "BuildingConstructionLoop";
                     DeathTimeSeconds = 3.17f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 1;
                     ElevationSamplePoints = 4;
                     ElevationSampleRadius = 50f;
@@ -1465,7 +1465,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Instant;
                     Attack2AnimationBackswingPoint = 0.5f;
                     Attack2AnimationDamagePoint = 0.5f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Pierce;
+                    Attack2AttackType = global::Moonwell.AttackType.Pierce;
                     Attack2CooldownTime = 2f;
                     Attack2DamageBase = 14;
                     Attack2DamageLossFactor = 0f;
@@ -1482,7 +1482,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     AttackCooldown = 2.1f;
                     AttackRange = 192;
-                    AttackType = global::Moonwell.Objects.AttackType.Siege;
+                    AttackType = global::Moonwell.AttackType.Siege;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 55;
                     ButtonPositionX = 2;
@@ -1497,7 +1497,7 @@ namespace Moonwell.Objects
                     DamageSides = 11;
                     DeathTimeSeconds = 3f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 2;
                     ElevationSamplePoints = 3;
                     ElevationSampleRadius = 50f;
@@ -1619,7 +1619,7 @@ namespace Moonwell.Objects
                     Attack1ShowUI = true;
                     Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Missile;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
@@ -1627,7 +1627,7 @@ namespace Moonwell.Objects
                     Attack2ShowUI = true;
                     AttackCooldown = 1.75f;
                     AttackRange = 300;
-                    AttackType = global::Moonwell.Objects.AttackType.Pierce;
+                    AttackType = global::Moonwell.AttackType.Pierce;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 28;
                     ButtonPositionX = 0;
@@ -1642,7 +1642,7 @@ namespace Moonwell.Objects
                     DamageSides = 3;
                     DeathTimeSeconds = 2.13f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Small;
+                    DefenseType = global::Moonwell.DefenseType.Small;
                     DefenseUpgradeBonus = 2;
                     ElevationSamplePoints = 2;
                     ElevationSampleRadius = 50f;
@@ -1767,7 +1767,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Instant;
                     Attack2AnimationBackswingPoint = 0.5f;
                     Attack2AnimationDamagePoint = 0.5f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Pierce;
+                    Attack2AttackType = global::Moonwell.AttackType.Pierce;
                     Attack2CooldownTime = 2f;
                     Attack2DamageBase = 14;
                     Attack2DamageLossFactor = 0f;
@@ -1784,7 +1784,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     AttackCooldown = 2.1f;
                     AttackRange = 192;
-                    AttackType = global::Moonwell.Objects.AttackType.Siege;
+                    AttackType = global::Moonwell.AttackType.Siege;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 55;
                     ButtonPositionX = 2;
@@ -1799,7 +1799,7 @@ namespace Moonwell.Objects
                     DamageSides = 11;
                     DeathTimeSeconds = 3f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 2;
                     ElevationSamplePoints = 3;
                     ElevationSampleRadius = 50f;
@@ -1910,13 +1910,13 @@ namespace Moonwell.Objects
                     Attack1DamageSpillDistance = 0f;
                     Attack1DamageSpillRadius = 0f;
                     Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
                     Attack2MaximumNumberOfTargets = 1;
                     Attack2ShowUI = true;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 35;
                     ButtonPositionX = 0;
@@ -1931,7 +1931,7 @@ namespace Moonwell.Objects
                     Construction = "BuildingConstructionLoop";
                     DeathTimeSeconds = 2.34f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 1;
                     ElevationSamplePoints = 4;
                     ElevationSampleRadius = 50f;
@@ -2044,7 +2044,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Instant;
                     Attack2AnimationBackswingPoint = 0.7f;
                     Attack2AnimationDamagePoint = 0.633f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Siege;
+                    Attack2AttackType = global::Moonwell.AttackType.Siege;
                     Attack2CooldownTime = 2.5f;
                     Attack2DamageBase = 6;
                     Attack2DamageLossFactor = 0f;
@@ -2063,7 +2063,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     AttackCooldown = 2f;
                     AttackRange = 500;
-                    AttackType = global::Moonwell.Objects.AttackType.Pierce;
+                    AttackType = global::Moonwell.AttackType.Pierce;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 13;
                     ButtonPositionX = 0;
@@ -2078,7 +2078,7 @@ namespace Moonwell.Objects
                     DamageSides = 2;
                     DeathTimeSeconds = 2.67f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Large;
+                    DefenseType = global::Moonwell.DefenseType.Large;
                     DefenseUpgradeBonus = 2;
                     ElevationSamplePoints = 2;
                     ElevationSampleRadius = 50f;
@@ -2200,7 +2200,7 @@ namespace Moonwell.Objects
                     Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
                     Attack1WeaponSound = global::Moonwell.Objects.CombatSound.MetalMediumSlice;
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Normal;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
@@ -2208,7 +2208,7 @@ namespace Moonwell.Objects
                     Attack2ShowUI = true;
                     AttackCooldown = 1.35f;
                     AttackRange = 90;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 20;
                     ButtonPositionX = 0;
@@ -2223,7 +2223,7 @@ namespace Moonwell.Objects
                     DamageSides = 2;
                     DeathTimeSeconds = 3.04f;
                     DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Large;
+                    DefenseType = global::Moonwell.DefenseType.Large;
                     DefenseUpgradeBonus = 2;
                     ElevationSampleRadius = 20f;
                     FogOfWarSampleRadius = 0f;
@@ -2335,13 +2335,13 @@ namespace Moonwell.Objects
                     Attack1DamageSpillDistance = 0f;
                     Attack1DamageSpillRadius = 0f;
                     Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
                     Attack2MaximumNumberOfTargets = 1;
                     Attack2ShowUI = true;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 75;
                     ButtonPositionX = 1;
@@ -2356,7 +2356,7 @@ namespace Moonwell.Objects
                     Construction = "BuildingConstructionLoop";
                     DeathTimeSeconds = 2.34f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 1;
                     ElevationSamplePoints = 4;
                     ElevationSampleRadius = 50f;
@@ -2471,7 +2471,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Mline;
                     Attack2AnimationBackswingPoint = 0.87f;
                     Attack2AnimationDamagePoint = 0.8f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Magic;
+                    Attack2AttackType = global::Moonwell.AttackType.Magic;
                     Attack2CooldownTime = 2.4f;
                     Attack2DamageBase = 44;
                     Attack2DamageLossFactor = 0f;
@@ -2487,7 +2487,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     AttackCooldown = 2.2f;
                     AttackRange = 450;
-                    AttackType = global::Moonwell.Objects.AttackType.Magic;
+                    AttackType = global::Moonwell.AttackType.Magic;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Both;
                     BuildTime = 45;
                     ButtonPositionX = 1;
@@ -2502,7 +2502,7 @@ namespace Moonwell.Objects
                     DamageSides = 11;
                     DeathTimeSeconds = 1.67f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Small;
+                    DefenseType = global::Moonwell.DefenseType.Small;
                     DefenseUpgradeBonus = 2;
                     ElevationSamplePoints = 2;
                     ElevationSampleRadius = 50f;
@@ -2628,7 +2628,7 @@ namespace Moonwell.Objects
                     Attack1ShowUI = true;
                     Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Missile;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
@@ -2636,7 +2636,7 @@ namespace Moonwell.Objects
                     Attack2ShowUI = true;
                     AttackCooldown = 0.9f;
                     AttackRange = 700;
-                    AttackType = global::Moonwell.Objects.AttackType.Pierce;
+                    AttackType = global::Moonwell.AttackType.Pierce;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 50;
                     ButtonPositionX = 0;
@@ -2654,7 +2654,7 @@ namespace Moonwell.Objects
                     DamageSides = 5;
                     DeathTimeSeconds = 2.34f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Large;
+                    DefenseType = global::Moonwell.DefenseType.Large;
                     DefenseUpgradeBonus = 1;
                     ElevationSamplePoints = 4;
                     ElevationSampleRadius = 50f;
@@ -2762,13 +2762,13 @@ namespace Moonwell.Objects
                     Attack1ProjectileArt = "Abilities\\Weapons\\GuardTowerMissile\\GuardTowerMissile.mdl";
                     Attack1ProjectileSpeed = 1800;
                     Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
                     Attack2MaximumNumberOfTargets = 1;
                     Attack2ShowUI = true;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 140;
                     ButtonPositionX = 0;
@@ -2783,7 +2783,7 @@ namespace Moonwell.Objects
                     Construction = "BuildingConstructionLoop";
                     DeathTimeSeconds = 3.17f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 1;
                     ElevationSamplePoints = 4;
                     ElevationSampleRadius = 50f;
@@ -2904,7 +2904,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     Attack2AnimationBackswingPoint = 0.85f;
                     Attack2AnimationDamagePoint = 0.55f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Hero;
+                    Attack2AttackType = global::Moonwell.AttackType.Hero;
                     Attack2CooldownTime = 2.13f;
                     Attack2DamageBase = 0;
                     Attack2DamageLossFactor = 0f;
@@ -2920,7 +2920,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     AttackCooldown = 2.13f;
                     AttackRange = 600;
-                    AttackType = global::Moonwell.Objects.AttackType.Hero;
+                    AttackType = global::Moonwell.AttackType.Hero;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 55;
                     ButtonPositionX = 0;
@@ -2935,7 +2935,7 @@ namespace Moonwell.Objects
                     DamageSides = 4;
                     DeathTimeSeconds = 2.8f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Hero;
+                    DefenseType = global::Moonwell.DefenseType.Hero;
                     DefenseUpgradeBonus = 0;
                     ElevationSampleRadius = 30f;
                     FogOfWarSampleRadius = 0f;
@@ -3071,7 +3071,7 @@ namespace Moonwell.Objects
                     Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
                     Attack1WeaponSound = global::Moonwell.Objects.CombatSound.MetalMediumSlice;
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Normal;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
@@ -3079,7 +3079,7 @@ namespace Moonwell.Objects
                     Attack2ShowUI = true;
                     AttackCooldown = 1.4f;
                     AttackRange = 100;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 40;
                     ButtonPositionX = 2;
@@ -3094,7 +3094,7 @@ namespace Moonwell.Objects
                     DamageSides = 5;
                     DeathTimeSeconds = 5.1f;
                     DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Large;
+                    DefenseType = global::Moonwell.DefenseType.Large;
                     DefenseUpgradeBonus = 2;
                     ElevationSampleRadius = 30f;
                     FogOfWarSampleRadius = 0f;
@@ -3211,13 +3211,13 @@ namespace Moonwell.Objects
                     Attack1DamageSpillDistance = 0f;
                     Attack1DamageSpillRadius = 0f;
                     Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
                     Attack2MaximumNumberOfTargets = 1;
                     Attack2ShowUI = true;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 60;
                     ButtonPositionX = 2;
@@ -3232,7 +3232,7 @@ namespace Moonwell.Objects
                     Construction = "BuildingConstructionLoop";
                     DeathTimeSeconds = 2.34f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 1;
                     ElevationSamplePoints = 4;
                     ElevationSampleRadius = 50f;
@@ -3341,7 +3341,7 @@ namespace Moonwell.Objects
                     Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
                     Attack1WeaponSound = global::Moonwell.Objects.CombatSound.MetalMediumSlice;
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Normal;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
@@ -3349,7 +3349,7 @@ namespace Moonwell.Objects
                     Attack2ShowUI = true;
                     AttackCooldown = 1.2f;
                     AttackRange = 90;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 15;
                     Builds.Set<global::Moonwell.Objects.Human.Units.TownHall, global::Moonwell.Objects.Human.Units.Farm, global::Moonwell.Objects.Human.Units.Barracks, global::Moonwell.Objects.Human.Units.Blacksmith, global::Moonwell.Objects.Human.Units.ScoutTower, global::Moonwell.Objects.Human.Units.AltarOfKings, global::Moonwell.Objects.Human.Units.Workshop, global::Moonwell.Objects.Human.Units.ArcaneSanctum>();
@@ -3366,7 +3366,7 @@ namespace Moonwell.Objects
                     DamageSides = 2;
                     DeathTimeSeconds = 3.34f;
                     DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Large;
+                    DefenseType = global::Moonwell.DefenseType.Large;
                     DefenseUpgradeBonus = 2;
                     ElevationSampleRadius = 20f;
                     FogOfWarSampleRadius = 0f;
@@ -3492,7 +3492,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Artillery;
                     Attack2AnimationBackswingPoint = 1.1f;
                     Attack2AnimationDamagePoint = 1f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Siege;
+                    Attack2AttackType = global::Moonwell.AttackType.Siege;
                     Attack2CooldownTime = 3.5f;
                     Attack2DamageBase = 51;
                     Attack2DamageLossFactor = 0f;
@@ -3508,7 +3508,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     AttackCooldown = 3.5f;
                     AttackRange = 1150;
-                    AttackType = global::Moonwell.Objects.AttackType.Siege;
+                    AttackType = global::Moonwell.AttackType.Siege;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Both;
                     BuildTime = 32;
                     ButtonPositionX = 1;
@@ -3523,7 +3523,7 @@ namespace Moonwell.Objects
                     DamageSides = 13;
                     DeathTimeSeconds = 1.5f;
                     DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Large;
+                    DefenseType = global::Moonwell.DefenseType.Large;
                     DefenseUpgradeBonus = 2;
                     ElevationSampleRadius = 30f;
                     FogOfWarSampleRadius = 0f;
@@ -3648,7 +3648,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Normal;
                     Attack2AnimationBackswingPoint = 0.65f;
                     Attack2AnimationDamagePoint = 0.35f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Hero;
+                    Attack2AttackType = global::Moonwell.AttackType.Hero;
                     Attack2CooldownTime = 2.22f;
                     Attack2DamageBase = 0;
                     Attack2DamageLossFactor = 0f;
@@ -3664,7 +3664,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     AttackCooldown = 2.22f;
                     AttackRange = 100;
-                    AttackType = global::Moonwell.Objects.AttackType.Hero;
+                    AttackType = global::Moonwell.AttackType.Hero;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 55;
                     ButtonPositionX = 1;
@@ -3679,7 +3679,7 @@ namespace Moonwell.Objects
                     DamageSides = 6;
                     DeathTimeSeconds = 2.5f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Hero;
+                    DefenseType = global::Moonwell.DefenseType.Hero;
                     DefenseUpgradeBonus = 0;
                     ElevationSampleRadius = 50f;
                     FogOfWarSampleRadius = 0f;
@@ -3823,7 +3823,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Instant;
                     Attack2AnimationBackswingPoint = 0.5f;
                     Attack2AnimationDamagePoint = 0.5f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Pierce;
+                    Attack2AttackType = global::Moonwell.AttackType.Pierce;
                     Attack2CooldownTime = 2f;
                     Attack2DamageBase = 14;
                     Attack2DamageLossFactor = 0f;
@@ -3840,7 +3840,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     AttackCooldown = 2.1f;
                     AttackRange = 192;
-                    AttackType = global::Moonwell.Objects.AttackType.Siege;
+                    AttackType = global::Moonwell.AttackType.Siege;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 55;
                     ButtonPositionX = 2;
@@ -3855,7 +3855,7 @@ namespace Moonwell.Objects
                     DamageSides = 11;
                     DeathTimeSeconds = 3f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 2;
                     ElevationSamplePoints = 3;
                     ElevationSampleRadius = 50f;
@@ -3977,7 +3977,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Normal;
                     Attack2AnimationBackswingPoint = 0.567f;
                     Attack2AnimationDamagePoint = 0.433f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Hero;
+                    Attack2AttackType = global::Moonwell.AttackType.Hero;
                     Attack2CooldownTime = 2f;
                     Attack2DamageBase = 0;
                     Attack2DamageLossFactor = 0f;
@@ -3993,7 +3993,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     AttackCooldown = 2f;
                     AttackRange = 100;
-                    AttackType = global::Moonwell.Objects.AttackType.Hero;
+                    AttackType = global::Moonwell.AttackType.Hero;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 55;
                     ButtonPositionX = 2;
@@ -4008,7 +4008,7 @@ namespace Moonwell.Objects
                     DamageSides = 6;
                     DeathTimeSeconds = 1.5f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Hero;
+                    DefenseType = global::Moonwell.DefenseType.Hero;
                     DefenseUpgradeBonus = 0;
                     ElevationSampleRadius = 30f;
                     FogOfWarSampleRadius = 0f;
@@ -4149,7 +4149,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Normal;
                     Attack2AnimationBackswingPoint = 0.433f;
                     Attack2AnimationDamagePoint = 0.433f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2CooldownTime = 1.1f;
                     Attack2DamageBase = 0;
                     Attack2DamageLossFactor = 0f;
@@ -4166,7 +4166,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Normal;
                     AttackCooldown = 2f;
                     AttackRange = 90;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Both;
                     BuildTime = 15;
                     Builds.Set<global::Moonwell.Objects.Human.Units.TownHall, global::Moonwell.Objects.Human.Units.Farm, global::Moonwell.Objects.Human.Units.Barracks, global::Moonwell.Objects.Human.Units.Blacksmith, global::Moonwell.Objects.Human.Units.ScoutTower, global::Moonwell.Objects.Human.Units.AltarOfKings, global::Moonwell.Objects.Human.Units.Workshop, global::Moonwell.Objects.Human.Units.ArcaneSanctum>();
@@ -4185,7 +4185,7 @@ namespace Moonwell.Objects
                     DamageSides = 2;
                     DeathTimeSeconds = 3.34f;
                     DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Medium;
+                    DefenseType = global::Moonwell.DefenseType.Medium;
                     DefenseUpgradeBonus = 2;
                     ElevationSampleRadius = 20f;
                     FogOfWarSampleRadius = 0f;
@@ -4315,7 +4315,7 @@ namespace Moonwell.Objects
                     Attack1ShowUI = true;
                     Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Msplash;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
@@ -4323,7 +4323,7 @@ namespace Moonwell.Objects
                     Attack2ShowUI = true;
                     AttackCooldown = 1.4f;
                     AttackRange = 600;
-                    AttackType = global::Moonwell.Objects.AttackType.Magic;
+                    AttackType = global::Moonwell.AttackType.Magic;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 45;
                     ButtonPositionX = 0;
@@ -4338,7 +4338,7 @@ namespace Moonwell.Objects
                     DamageSides = 15;
                     DeathTimeSeconds = 0.7f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Small;
+                    DefenseType = global::Moonwell.DefenseType.Small;
                     DefenseUpgradeBonus = 2;
                     ElevationSamplePoints = 2;
                     ElevationSampleRadius = 50f;
@@ -4445,13 +4445,13 @@ namespace Moonwell.Objects
                     Attack1DamageSpillDistance = 0f;
                     Attack1DamageSpillRadius = 0f;
                     Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
                     Attack2MaximumNumberOfTargets = 1;
                     Attack2ShowUI = true;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 45;
                     CanDropItemsOnDeath = true;
@@ -4461,7 +4461,7 @@ namespace Moonwell.Objects
                     CollisionSize = 32f;
                     DeathTimeSeconds = 1.33f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Large;
+                    DefenseType = global::Moonwell.DefenseType.Large;
                     DefenseUpgradeBonus = 2;
                     ElevationSampleRadius = 50f;
                     FogOfWarSampleRadius = 0f;
@@ -4573,7 +4573,7 @@ namespace Moonwell.Objects
                     Attack1ShowUI = true;
                     Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Missile;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
@@ -4581,7 +4581,7 @@ namespace Moonwell.Objects
                     Attack2ShowUI = true;
                     AttackCooldown = 2f;
                     AttackRange = 600;
-                    AttackType = global::Moonwell.Objects.AttackType.Magic;
+                    AttackType = global::Moonwell.AttackType.Magic;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 28;
                     ButtonPositionX = 1;
@@ -4600,7 +4600,7 @@ namespace Moonwell.Objects
                     DeathTimeSeconds = 2f;
                     DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
                     DefaultActiveAbility.Set<global::Moonwell.Objects.Human.Abilities.Heal>();
-                    DefenseType = global::Moonwell.Objects.DefenseType.None;
+                    DefenseType = global::Moonwell.DefenseType.None;
                     DefenseUpgradeBonus = 2;
                     ElevationSampleRadius = 50f;
                     FogOfWarSampleRadius = 0f;
@@ -4723,7 +4723,7 @@ namespace Moonwell.Objects
                     Attack1ShowUI = true;
                     Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Instant;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
@@ -4731,7 +4731,7 @@ namespace Moonwell.Objects
                     Attack2ShowUI = true;
                     AttackCooldown = 1.4f;
                     AttackRange = 400;
-                    AttackType = global::Moonwell.Objects.AttackType.Pierce;
+                    AttackType = global::Moonwell.AttackType.Pierce;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 26;
                     ButtonPositionX = 1;
@@ -4746,7 +4746,7 @@ namespace Moonwell.Objects
                     DamageSides = 4;
                     DeathTimeSeconds = 1.7f;
                     DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Medium;
+                    DefenseType = global::Moonwell.DefenseType.Medium;
                     DefenseUpgradeBonus = 2;
                     ElevationSampleRadius = 20f;
                     FogOfWarSampleRadius = 0f;
@@ -4868,7 +4868,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Normal;
                     Attack2AnimationBackswingPoint = 0.433f;
                     Attack2AnimationDamagePoint = 0.433f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2CooldownTime = 1.1f;
                     Attack2DamageBase = 0;
                     Attack2DamageLossFactor = 0f;
@@ -4884,7 +4884,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Normal;
                     AttackCooldown = 2f;
                     AttackRange = 90;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Both;
                     BuildTime = 15;
                     Builds.Set<global::Moonwell.Objects.Human.Units.TownHall, global::Moonwell.Objects.Human.Units.Farm, global::Moonwell.Objects.Human.Units.Barracks, global::Moonwell.Objects.Human.Units.Blacksmith, global::Moonwell.Objects.Human.Units.ScoutTower, global::Moonwell.Objects.Human.Units.AltarOfKings, global::Moonwell.Objects.Human.Units.Workshop, global::Moonwell.Objects.Human.Units.ArcaneSanctum>();
@@ -4903,7 +4903,7 @@ namespace Moonwell.Objects
                     DamageSides = 2;
                     DeathTimeSeconds = 3.34f;
                     DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Medium;
+                    DefenseType = global::Moonwell.DefenseType.Medium;
                     DefenseUpgradeBonus = 2;
                     ElevationSampleRadius = 20f;
                     FogOfWarSampleRadius = 0f;
@@ -5015,13 +5015,13 @@ namespace Moonwell.Objects
                     Attack1DamageSpillDistance = 0f;
                     Attack1DamageSpillRadius = 0f;
                     Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
                     Attack2MaximumNumberOfTargets = 1;
                     Attack2ShowUI = true;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 25;
                     ButtonPositionX = 0;
@@ -5036,7 +5036,7 @@ namespace Moonwell.Objects
                     Construction = "BuildingConstructionLoop";
                     DeathTimeSeconds = 2.34f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Small;
+                    DefenseType = global::Moonwell.DefenseType.Small;
                     DefenseUpgradeBonus = 1;
                     ElevationSamplePoints = 4;
                     ElevationSampleRadius = 50f;
@@ -5149,7 +5149,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Instant;
                     Attack2AnimationBackswingPoint = 0.5f;
                     Attack2AnimationDamagePoint = 0.5f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Pierce;
+                    Attack2AttackType = global::Moonwell.AttackType.Pierce;
                     Attack2CooldownTime = 2f;
                     Attack2DamageBase = 16;
                     Attack2DamageLossFactor = 0f;
@@ -5166,7 +5166,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     AttackCooldown = 2.1f;
                     AttackRange = 192;
-                    AttackType = global::Moonwell.Objects.AttackType.Siege;
+                    AttackType = global::Moonwell.AttackType.Siege;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 55;
                     ButtonPositionX = 2;
@@ -5181,7 +5181,7 @@ namespace Moonwell.Objects
                     DamageSides = 11;
                     DeathTimeSeconds = 3f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 2;
                     ElevationSamplePoints = 3;
                     ElevationSampleRadius = 50f;
@@ -5310,7 +5310,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Instant;
                     Attack2AnimationBackswingPoint = 0.875f;
                     Attack2AnimationDamagePoint = 0.125f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Pierce;
+                    Attack2AttackType = global::Moonwell.AttackType.Pierce;
                     Attack2CooldownTime = 2f;
                     Attack2DamageBase = 16;
                     Attack2DamageLossFactor = 0f;
@@ -5330,7 +5330,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     AttackCooldown = 2.1f;
                     AttackRange = 192;
-                    AttackType = global::Moonwell.Objects.AttackType.Siege;
+                    AttackType = global::Moonwell.AttackType.Siege;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Both;
                     BuildTime = 55;
                     ButtonPositionX = 2;
@@ -5345,7 +5345,7 @@ namespace Moonwell.Objects
                     DamageSides = 11;
                     DeathTimeSeconds = 3f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 2;
                     ElevationSamplePoints = 3;
                     ElevationSampleRadius = 50f;
@@ -5474,7 +5474,7 @@ namespace Moonwell.Objects
                     Attack1ShowUI = true;
                     Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Missile;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
@@ -5482,7 +5482,7 @@ namespace Moonwell.Objects
                     Attack2ShowUI = true;
                     AttackCooldown = 1.75f;
                     AttackRange = 600;
-                    AttackType = global::Moonwell.Objects.AttackType.Magic;
+                    AttackType = global::Moonwell.AttackType.Magic;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 30;
                     ButtonPositionX = 0;
@@ -5501,7 +5501,7 @@ namespace Moonwell.Objects
                     DeathTimeSeconds = 1.87f;
                     DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
                     DefaultActiveAbility.Set<global::Moonwell.Objects.Human.Abilities.Slow>();
-                    DefenseType = global::Moonwell.Objects.DefenseType.None;
+                    DefenseType = global::Moonwell.DefenseType.None;
                     DefenseUpgradeBonus = 2;
                     ElevationSampleRadius = 30f;
                     FogOfWarSampleRadius = 0f;
@@ -5626,7 +5626,7 @@ namespace Moonwell.Objects
                     Attack1ShowUI = true;
                     Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Missile;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
@@ -5634,7 +5634,7 @@ namespace Moonwell.Objects
                     Attack2ShowUI = true;
                     AttackCooldown = 1.9f;
                     AttackRange = 250;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 28;
                     ButtonPositionX = 2;
@@ -5650,7 +5650,7 @@ namespace Moonwell.Objects
                     DeathTimeSeconds = 2f;
                     DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
                     DefaultActiveAbility.Set<global::Moonwell.Objects.Human.Abilities.SpellSteal>();
-                    DefenseType = global::Moonwell.Objects.DefenseType.Medium;
+                    DefenseType = global::Moonwell.DefenseType.Medium;
                     DefenseUpgradeBonus = 2;
                     ElevationSampleRadius = 20f;
                     FogOfWarSampleRadius = 0f;
@@ -5771,13 +5771,13 @@ namespace Moonwell.Objects
                     Attack1ProjectileArt = "Abilities\\Weapons\\GuardTowerMissile\\GuardTowerMissile.mdl";
                     Attack1ProjectileSpeed = 1800;
                     Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
                     Attack2MaximumNumberOfTargets = 1;
                     Attack2ShowUI = true;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 180;
                     ButtonPositionX = 0;
@@ -5792,7 +5792,7 @@ namespace Moonwell.Objects
                     Construction = "BuildingConstructionLoop";
                     DeathTimeSeconds = 3.17f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 1;
                     ElevationSamplePoints = 4;
                     ElevationSampleRadius = 50f;
@@ -5910,7 +5910,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Instant;
                     Attack2AnimationBackswingPoint = 0.5f;
                     Attack2AnimationDamagePoint = 0.5f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Pierce;
+                    Attack2AttackType = global::Moonwell.AttackType.Pierce;
                     Attack2CooldownTime = 2f;
                     Attack2DamageBase = 14;
                     Attack2DamageLossFactor = 0f;
@@ -5927,7 +5927,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     AttackCooldown = 2.1f;
                     AttackRange = 192;
-                    AttackType = global::Moonwell.Objects.AttackType.Siege;
+                    AttackType = global::Moonwell.AttackType.Siege;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 55;
                     ButtonPositionX = 2;
@@ -5942,7 +5942,7 @@ namespace Moonwell.Objects
                     DamageSides = 11;
                     DeathTimeSeconds = 3f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 2;
                     ElevationSamplePoints = 3;
                     ElevationSampleRadius = 50f;
@@ -6064,7 +6064,7 @@ namespace Moonwell.Objects
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Instant;
                     Attack2AnimationBackswingPoint = 0.5f;
                     Attack2AnimationDamagePoint = 0.5f;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Pierce;
+                    Attack2AttackType = global::Moonwell.AttackType.Pierce;
                     Attack2CooldownTime = 2f;
                     Attack2DamageBase = 14;
                     Attack2DamageLossFactor = 0f;
@@ -6081,7 +6081,7 @@ namespace Moonwell.Objects
                     Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
                     AttackCooldown = 2.1f;
                     AttackRange = 192;
-                    AttackType = global::Moonwell.Objects.AttackType.Siege;
+                    AttackType = global::Moonwell.AttackType.Siege;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 55;
                     ButtonPositionX = 2;
@@ -6096,7 +6096,7 @@ namespace Moonwell.Objects
                     DamageSides = 11;
                     DeathTimeSeconds = 3f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 2;
                     ElevationSamplePoints = 3;
                     ElevationSampleRadius = 50f;
@@ -6224,7 +6224,7 @@ namespace Moonwell.Objects
                     Attack1ShowUI = true;
                     Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Missile;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
@@ -6232,7 +6232,7 @@ namespace Moonwell.Objects
                     Attack2ShowUI = true;
                     AttackCooldown = 1.5f;
                     AttackRange = 300;
-                    AttackType = global::Moonwell.Objects.AttackType.Pierce;
+                    AttackType = global::Moonwell.AttackType.Pierce;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 1;
                     CanDropItemsOnDeath = true;
@@ -6245,7 +6245,7 @@ namespace Moonwell.Objects
                     DamageSides = 5;
                     DeathTimeSeconds = 1.5f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Large;
+                    DefenseType = global::Moonwell.DefenseType.Large;
                     DefenseUpgradeBonus = 2;
                     ElevationSampleRadius = 50f;
                     FogOfWarSampleRadius = 0f;
@@ -6366,7 +6366,7 @@ namespace Moonwell.Objects
                     Attack1ShowUI = true;
                     Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Missile;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
@@ -6374,7 +6374,7 @@ namespace Moonwell.Objects
                     Attack2ShowUI = true;
                     AttackCooldown = 1.5f;
                     AttackRange = 300;
-                    AttackType = global::Moonwell.Objects.AttackType.Pierce;
+                    AttackType = global::Moonwell.AttackType.Pierce;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 1;
                     CanDropItemsOnDeath = true;
@@ -6387,7 +6387,7 @@ namespace Moonwell.Objects
                     DamageSides = 5;
                     DeathTimeSeconds = 1.5f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Large;
+                    DefenseType = global::Moonwell.DefenseType.Large;
                     DefenseUpgradeBonus = 2;
                     ElevationSampleRadius = 50f;
                     FogOfWarSampleRadius = 0f;
@@ -6504,7 +6504,7 @@ namespace Moonwell.Objects
                     Attack1ShowUI = true;
                     Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
                     Attack1WeaponType = global::Moonwell.Objects.WeaponType.Missile;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
@@ -6512,7 +6512,7 @@ namespace Moonwell.Objects
                     Attack2ShowUI = true;
                     AttackCooldown = 1.5f;
                     AttackRange = 300;
-                    AttackType = global::Moonwell.Objects.AttackType.Pierce;
+                    AttackType = global::Moonwell.AttackType.Pierce;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
                     BuildTime = 1;
                     CanDropItemsOnDeath = true;
@@ -6525,7 +6525,7 @@ namespace Moonwell.Objects
                     DamageSides = 5;
                     DeathTimeSeconds = 1.5f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Large;
+                    DefenseType = global::Moonwell.DefenseType.Large;
                     DefenseUpgradeBonus = 2;
                     ElevationSampleRadius = 50f;
                     FogOfWarSampleRadius = 0f;
@@ -6630,13 +6630,13 @@ namespace Moonwell.Objects
                     Attack1DamageSpillDistance = 0f;
                     Attack1DamageSpillRadius = 0f;
                     Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
                     Attack2DamageLossFactor = 0f;
                     Attack2DamageSpillDistance = 0f;
                     Attack2DamageSpillRadius = 0f;
                     Attack2MaximumNumberOfTargets = 1;
                     Attack2ShowUI = true;
-                    AttackType = global::Moonwell.Objects.AttackType.Normal;
+                    AttackType = global::Moonwell.AttackType.Normal;
                     AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
                     BuildTime = 60;
                     ButtonPositionX = 3;
@@ -6651,7 +6651,7 @@ namespace Moonwell.Objects
                     Construction = "BuildingConstructionLoop";
                     DeathTimeSeconds = 2.335f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.Objects.DefenseType.Fort;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
                     DefenseUpgradeBonus = 1;
                     ElevationSamplePoints = 4;
                     ElevationSampleRadius = 50f;

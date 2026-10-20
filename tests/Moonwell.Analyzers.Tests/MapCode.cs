@@ -36,6 +36,21 @@ internal static class MapCode
         return Analyze(source).Diagnostics.OrderBy(d => d.Location.SourceSpan.Start).Select(d => d.GetMessage()).ToList();
     }
 
+    /// <summary>
+    /// The analyzer's diagnostics for a whole file that does not compile, in source order, each as "id: the code it points at";
+    /// its compiler errors are left to the caller.
+    /// </summary>
+    public static List<string> CheckBrokenFile(string source)
+    {
+        return Found(Analyze(source, broken: true));
+    }
+
+    /// <summary>The messages of the analyzer's diagnostics for a whole file that does not compile, in source order.</summary>
+    public static List<string> MessagesOfBrokenFile(string source)
+    {
+        return Analyze(source, broken: true).Diagnostics.OrderBy(d => d.Location.SourceSpan.Start).Select(d => d.GetMessage()).ToList();
+    }
+
     private static List<string> Found((SyntaxTree Tree, ImmutableArray<Diagnostic> Diagnostics) analyzed)
     {
         var (tree, diagnostics) = analyzed;
@@ -84,20 +99,20 @@ internal static class MapCode
         return System.Reflection.Assembly.Load(stream.ToArray());
     }
 
-    private static (SyntaxTree Tree, CSharpCompilation Compilation) Compile(string source)
+    private static (SyntaxTree Tree, CSharpCompilation Compilation) Compile(string source, bool broken = false)
     {
         var tree = CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.Latest));
         var compilation = CSharpCompilation.Create("Map" + Guid.NewGuid().ToString("N"), new[] { tree }, References,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));
         var errors = compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
-        Assert.True(errors.Count == 0, string.Join("\n", errors));
+        Assert.True(broken ? errors.Count > 0 : errors.Count == 0, string.Join("\n", errors));
         return (tree, compilation);
     }
 
-    private static (SyntaxTree Tree, ImmutableArray<Diagnostic> Diagnostics) Analyze(string source)
+    private static (SyntaxTree Tree, ImmutableArray<Diagnostic> Diagnostics) Analyze(string source, bool broken = false)
     {
-        var (tree, compilation) = Compile(source);
-        var analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(new SyncAnalyzer(), new LuaAnalyzer(), new FieldRulesAnalyzer());
+        var (tree, compilation) = Compile(source, broken);
+        var analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(new SyncAnalyzer(), new LuaAnalyzer(), new FieldRulesAnalyzer(), new MovedAnalyzer());
         return (tree, compilation.WithAnalyzers(analyzers).GetAnalyzerDiagnosticsAsync().Result);
     }
 }

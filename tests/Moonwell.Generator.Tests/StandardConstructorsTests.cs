@@ -122,7 +122,7 @@ public class StandardConstructorsTests
         Assert.Contains("                    ManaRegen = 0.01f;\n", paladin);
         Assert.Contains("                    Name = \"Paladin\";\n", paladin);
         Assert.Contains("                    Icon = \"ReplaceableTextures\\\\CommandButtons\\\\BTNHeroPaladin.blp\";\n", paladin);
-        Assert.Contains("                    AttackType = global::Moonwell.Objects.AttackType.Hero;\n", paladin);
+        Assert.Contains("                    AttackType = global::Moonwell.AttackType.Hero;\n", paladin);
         Assert.Contains("                    PrimaryAttribute = global::Moonwell.Objects.AttributeType.STR;\n", paladin);
         // A list names the standard classes; an id with no class in the export is added by its id.
         Assert.Contains(
@@ -190,7 +190,7 @@ public class StandardConstructorsTests
             new[]
             {
                 "AttackCooldown = 1E-05f;",
-                "AttackType = global::Moonwell.Objects.AttackType.Hero;",
+                "AttackType = global::Moonwell.AttackType.Hero;",
                 "Dropped = true;",
                 "HitPoints = -7;",
                 "TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies;",
@@ -211,7 +211,7 @@ public class StandardConstructorsTests
     {
         var lines = UnitLines(new Dictionary<string, string> { ["ua1t"] = "-3", ["ua1g"] = "debris" });
 
-        Assert.Equal(new[] { "AttackType = (global::Moonwell.Objects.AttackType)(-3);", "TargetsAllowed = 0;" }, lines);
+        Assert.Equal(new[] { "AttackType = (global::Moonwell.AttackType)(-3);", "TargetsAllowed = 0;" }, lines);
     }
 
     [Fact]

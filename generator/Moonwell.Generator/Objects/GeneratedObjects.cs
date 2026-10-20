@@ -41,6 +41,13 @@ public static class GeneratedObjects
         // A bit the game's own data uses is a member of its enum, and a negative it holds is allowed past the range
         // (ruling R14): a map may write any standard value.
         var choices = Choices.WithStandardBits(listed, fieldsOf.Keys.Select(kind => (fieldsOf[kind], objectsOf[kind])).ToList());
+        if (runtime != null)
+        {
+            foreach (var choice in choices.Values.Where(choice => choice.Core))
+            {
+                Choices.CheckCore(choice, runtime.EnumMembers(choice.Name));
+            }
+        }
 
         // Like the classes, the enums are left out under MOONWELL_LUA: they write no Lua, but a file of them would still
         // write an empty namespace block into every map.

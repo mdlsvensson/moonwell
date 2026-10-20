@@ -30,7 +30,6 @@ namespace Moonwell.Generator.Objects;
 /// </remarks>
 public sealed class StandardConstructors
 {
-    private const string Root = "global::Moonwell.Objects";
     private const int MostInSet = 8;
 
     private readonly IReadOnlyDictionary<Kind, IReadOnlyList<Field>> fields;
@@ -292,7 +291,7 @@ public sealed class StandardConstructors
     /// <summary>A choice's number as its member, a flags enum's members joined with <c>|</c>, else a cast of the number.</summary>
     private static string Choice(ChoiceType choice, int number)
     {
-        var type = $"{Root}.{choice.Name}";
+        var type = choice.TypeName;
         var exact = choice.Members.FirstOrDefault(member => member.Value == number);
         if (exact != null)
         {

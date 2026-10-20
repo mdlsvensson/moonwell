@@ -25,7 +25,7 @@ namespace Moonwell.Objects
                 ["ua1q"] = typeof(int),
                 ["ua1r"] = typeof(int),
                 ["ua1s"] = typeof(int),
-                ["ua1t"] = typeof(global::Moonwell.Objects.AttackType),
+                ["ua1t"] = typeof(global::Moonwell.AttackType),
                 ["ua1w"] = typeof(global::Moonwell.Objects.WeaponType),
                 ["ua1z"] = typeof(int),
                 ["ua2b"] = typeof(int),
@@ -39,7 +39,7 @@ namespace Moonwell.Objects
                 ["ua2q"] = typeof(int),
                 ["ua2r"] = typeof(int),
                 ["ua2s"] = typeof(int),
-                ["ua2t"] = typeof(global::Moonwell.Objects.AttackType),
+                ["ua2t"] = typeof(global::Moonwell.AttackType),
                 ["ua2w"] = typeof(global::Moonwell.Objects.WeaponType),
                 ["ua2z"] = typeof(int),
                 ["uaap"] = typeof(string),
@@ -91,7 +91,7 @@ namespace Moonwell.Objects
                 ["udp2"] = typeof(float),
                 ["udro"] = typeof(bool),
                 ["udtm"] = typeof(float),
-                ["udty"] = typeof(global::Moonwell.Objects.DefenseType),
+                ["udty"] = typeof(global::Moonwell.DefenseType),
                 ["udu1"] = typeof(int),
                 ["udu2"] = typeof(int),
                 ["udup"] = typeof(int),
@@ -352,9 +352,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>ua1t</c>.</summary>
         [global::Moonwell.Objects.Field("ua1t", Label = "Attack 1 - Attack Type")]
-        public global::Moonwell.Objects.AttackType AttackType
+        public global::Moonwell.AttackType AttackType
         {
-            get { return Fields.Get<global::Moonwell.Objects.AttackType>(this, "ua1t"); }
+            get { return Fields.Get<global::Moonwell.AttackType>(this, "ua1t"); }
             protected set { Fields.Put("ua1t", value); }
         }
 
@@ -474,9 +474,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>ua2t</c>.</summary>
         [global::Moonwell.Objects.Field("ua2t", Label = "Attack 2 - Attack Type")]
-        public global::Moonwell.Objects.AttackType Attack2AttackType
+        public global::Moonwell.AttackType Attack2AttackType
         {
-            get { return Fields.Get<global::Moonwell.Objects.AttackType>(this, "ua2t"); }
+            get { return Fields.Get<global::Moonwell.AttackType>(this, "ua2t"); }
             protected set { Fields.Put("ua2t", value); }
         }
 
@@ -927,9 +927,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>udty</c>.</summary>
         [global::Moonwell.Objects.Field("udty", Label = "Defense Type")]
-        public global::Moonwell.Objects.DefenseType DefenseType
+        public global::Moonwell.DefenseType DefenseType
         {
-            get { return Fields.Get<global::Moonwell.Objects.DefenseType>(this, "udty"); }
+            get { return Fields.Get<global::Moonwell.DefenseType>(this, "udty"); }
             protected set { Fields.Put("udty", value); }
         }
 

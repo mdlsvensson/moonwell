@@ -159,12 +159,14 @@ namespace Objects
     }
 
     // Choices: a text, a list and a number in the object file; a choice the same as the footman's is not written.
+    // The attack and defense types are core Moonwell's enums; inside the class AttackType.Magic is the enum, as in the guide.
     [Moonwell.Objects.ObjectId("h003")]
     public class Mage : Moonwell.Objects.Human.Units.Footman
     {
         public Mage()
         {
-            AttackType = Moonwell.Objects.AttackType.Magic;
+            AttackType = AttackType.Magic;
+            DefenseType = DefenseType.Divine;
             Attack1TargetsAllowed = Moonwell.Objects.Targets.Air | Moonwell.Objects.Targets.Enemies;
             DeathType = Moonwell.Objects.DeathType.CanRaiseDoesNotDecay;
             Type = Moonwell.Objects.MoveType.Foot;

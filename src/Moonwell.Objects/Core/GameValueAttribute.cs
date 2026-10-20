@@ -5,9 +5,10 @@ using System;
 namespace Moonwell.Objects
 {
     /// <summary>
-    /// How the game's data spells a member of a choice enum (<see cref="AttackType"/>, <see cref="Targets"/>): the text the
+    /// How the game's data spells a member of a choice enum (<see cref="ArmorType"/>, <see cref="Targets"/>): the text the
     /// object file holds, then the other spellings the standard data uses (<c>aliv</c> for <c>alive</c>). A value stored as a
-    /// number has the number as its text.
+    /// number has the number as its text. A core enum's members (<c>Moonwell.AttackType</c>) have theirs on the members of
+    /// its name in <c>CoreChoices</c>.
     /// </summary>
     /// @CSharpLua.Ignore
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]

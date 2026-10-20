@@ -33,6 +33,12 @@ public sealed record ChoiceType(string Type, string Name, ChoiceForm Form, strin
 {
     /// <summary>True for a <c>[Flags]</c> enum: the field holds any of the values.</summary>
     public bool Flags => Form != ChoiceForm.One;
+
+    /// <summary>True when the enum is core Moonwell's (<c>Moonwell.AttackType</c>), not one of <c>Moonwell.Objects</c>: see <see cref="Choices.IsCore"/>.</summary>
+    public bool Core => Choices.IsCore(Type);
+
+    /// <summary>The enum as generated C# names it: <c>global::Moonwell.AttackType</c>, <c>global::Moonwell.Objects.Targets</c>.</summary>
+    public string TypeName => (Core ? "global::Moonwell." : "global::Moonwell.Objects.") + Name;
 }
 
 /// <summary>The choice types of the export: every metadata type a field uses that <c>ui/uniteditordata.txt</c> has a section for.</summary>
@@ -62,10 +68,49 @@ public static class Choices
     // Only, Mana Only and Always are the numbers 0 to 3, and Rejuvenation's standard 3 is Always.
     private static readonly HashSet<string> NumberedFlags = new(StringComparer.Ordinal) { "fullFlags" };
 
+    // The types whose enums are core Moonwell's: the damage package's hits hold them too, and it cannot reference
+    // Moonwell.Objects (CSharp.lua problem C19), so a map has one of each, in namespace Moonwell.
+    private static readonly HashSet<string> CoreTypes = new(StringComparer.Ordinal) { "attackType", "defenseType" };
+
     /// <summary>
-    /// The choice types of every metadata type a field of any kind uses, by type. An enum whose name is in
-    /// <paramref name="taken"/> (a type of namespace <c>Moonwell</c> or a member the standard classes inherit, either
-    /// of which would hide it) gets <c>Choice</c> appended.
+    /// Whether the enum of a metadata type is core Moonwell's (<c>attackType</c> is <c>Moonwell.AttackType</c>), written by
+    /// hand in <c>src/Moonwell/Types</c> and compiled to the map's Lua with its names, rather than generated into
+    /// <c>Moonwell.Objects</c>. The fields hold the core enum, and <c>Moonwell.Objects</c> keeps the game's texts of its
+    /// members (<see cref="ObjectsWriter.Choices"/>).
+    /// </summary>
+    public static bool IsCore(string type)
+    {
+        return CoreTypes.Contains(type);
+    }
+
+    /// <summary>
+    /// Fails unless the core enum of <paramref name="choice"/> has the members the game's data gives, by name and number in
+    /// its order: the generated fields and the game's texts take the data's.
+    /// </summary>
+    /// <param name="choice">A core choice type.</param>
+    /// <param name="members">The core enum's members in order (<see cref="RuntimeMembers.EnumMembers"/>); null when Moonwell has no such enum.</param>
+    /// <exception cref="InvalidOperationException">The members differ, or there is no enum.</exception>
+    public static void CheckCore(ChoiceType choice, IReadOnlyList<(string Name, int Value)>? members)
+    {
+        var expected = choice.Members.Select(member => (member.Name, member.Value)).ToList();
+        var given = string.Join(", ", expected.Select(member => $"{member.Name} = {member.Value.ToString(CultureInfo.InvariantCulture)}"));
+        if (members == null)
+        {
+            throw new InvalidOperationException($"{choice.Type}: Moonwell has no enum {choice.Name}; the game's data gives {given}");
+        }
+
+        if (!members.SequenceEqual(expected))
+        {
+            var has = string.Join(", ", members.Select(member => $"{member.Name} = {member.Value.ToString(CultureInfo.InvariantCulture)}"));
+            throw new InvalidOperationException($"{choice.Type}: Moonwell.{choice.Name} has {has}; the game's data gives {given}");
+        }
+    }
+
+    /// <summary>
+    /// The choice types of every metadata type a field of any kind uses, by type. An enum of <c>Moonwell.Objects</c> whose
+    /// name is in <paramref name="taken"/> (a type of namespace <c>Moonwell</c> or a member the standard classes inherit,
+    /// either of which would hide it) gets <c>Choice</c> appended; a core enum (<see cref="IsCore"/>) is that type of
+    /// namespace <c>Moonwell</c> and keeps its name.
     /// </summary>
     public static IReadOnlyDictionary<string, ChoiceType> All(ExportTables tables, IReadOnlySet<string>? taken)
     {
@@ -83,7 +128,7 @@ public static class Choices
                 var choice = Of(tables, type, Fields.StoreOf(type));
                 if (choice != null)
                 {
-                    all[type] = taken != null && taken.Contains(choice.Name) ? choice with { Name = choice.Name + "Choice" } : choice;
+                    all[type] = !choice.Core && taken != null && taken.Contains(choice.Name) ? choice with { Name = choice.Name + "Choice" } : choice;
                 }
             }
         }

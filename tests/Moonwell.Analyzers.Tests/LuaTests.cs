@@ -93,25 +93,25 @@ public class LuaTests
     [Fact]
     public void a_name_of_a_choice_enum_is_rejected()
     {
-        // In the game's Lua the enums of Moonwell.Objects are numbers only: ToString and a joined or interpolated string give 6, Enum.GetValues stops.
+        // In the game's Lua the enums of Moonwell.Objects are numbers only: ToString and a joined or interpolated string give 1, Enum.GetValues stops.
         Assert.Equal(new[]
         {
-            "MW0010: attack.ToString()",
-            "MW0010: attack",
-            "MW0010: {attack}",
-            "MW0010: Enum.GetValues(typeof(Moonwell.Objects.AttackType))",
+            "MW0010: armor.ToString()",
+            "MW0010: armor",
+            "MW0010: {armor}",
+            "MW0010: Enum.GetValues(typeof(Moonwell.Objects.ArmorType))",
             "MW0010: Enum.GetNames<Moonwell.Objects.Targets>()",
-            "MW0010: Enum.IsDefined(attack)",
-            "MW0010: Enum.TryParse(\"magic\", out attack)",
+            "MW0010: Enum.IsDefined(armor)",
+            "MW0010: Enum.TryParse(\"metal\", out armor)",
         }, MapCode.Check("""
-            var attack = Moonwell.Objects.AttackType.Magic;
-            var a = attack.ToString();
-            var b = "attack " + attack;
-            var c = $"{attack}";
-            var d = Enum.GetValues(typeof(Moonwell.Objects.AttackType));
+            var armor = Moonwell.Objects.ArmorType.Metal;
+            var a = armor.ToString();
+            var b = "armor " + armor;
+            var c = $"{armor}";
+            var d = Enum.GetValues(typeof(Moonwell.Objects.ArmorType));
             var e = Enum.GetNames<Moonwell.Objects.Targets>();
-            var f = Enum.IsDefined(attack);
-            var g = Enum.TryParse("magic", out attack);
+            var f = Enum.IsDefined(armor);
+            var g = Enum.TryParse("metal", out armor);
             """));
     }
 
@@ -119,19 +119,29 @@ public class LuaTests
     public void a_choice_enum_message_says_why_and_what_to_write()
     {
         Assert.Equal(
-            "'attack.ToString()' needs the names of AttackType, which the game's Lua does not have: there a choice is only its number (AttackType.Magic shows as 6) and Enum.GetValues stops; compare with its members, or show (int) of it",
-            MapCode.Message("var attack = Moonwell.Objects.AttackType.Magic; var a = attack.ToString();"));
+            "'armor.ToString()' needs the names of ArmorType, which the game's Lua does not have: there a choice is only its number (ArmorType.Metal shows as 1) and Enum.GetValues stops; compare with its members, or show (int) of it",
+            MapCode.Message("var armor = Moonwell.Objects.ArmorType.Metal; var a = armor.ToString();"));
     }
 
     [Fact]
     public void comparing_combining_and_has_flag_on_a_choice_enum_and_names_of_other_enums_are_accepted()
     {
         Assert.Empty(MapCode.Check("""
-            var attack = Moonwell.Objects.AttackType.Magic;
+            var armor = Moonwell.Objects.ArmorType.Metal;
             var targets = Moonwell.Objects.Targets.Air | Moonwell.Objects.Targets.Enemies;
-            var a = attack == Moonwell.Objects.AttackType.Hero || targets.HasFlag(Moonwell.Objects.Targets.Air) || (targets & Moonwell.Objects.Targets.Enemies) != 0;
-            var b = "attack " + (int)attack + $"{(int)targets}";
+            var a = armor == Moonwell.Objects.ArmorType.Stone || targets.HasFlag(Moonwell.Objects.Targets.Air) || (targets & Moonwell.Objects.Targets.Enemies) != 0;
+            var b = "armor " + (int)armor + $"{(int)targets}";
             var c = DayOfWeek.Monday.ToString() + Enum.GetNames(typeof(DayOfWeek)).Length;
+            """));
+    }
+
+    [Fact]
+    public void names_of_the_core_attack_and_defense_types_are_accepted()
+    {
+        // AttackType and DefenseType are Moonwell's own: CSharp.lua compiles them, so the game's Lua has their names.
+        Assert.Empty(MapCode.Check("""
+            var attack = AttackType.Magic;
+            var a = AttackType.Magic.ToString() + " " + DefenseType.Divine + $"{attack}";
             """));
     }
 }

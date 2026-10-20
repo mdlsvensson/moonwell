@@ -78,8 +78,11 @@ public sealed class Champion : Human.Units.Paladin
   `Attack1TargetsAllowed = Targets.Air | Targets.Ground`. A flags field of 0 has none of them; `Targets.None` is
   World Editor's target "none", a value of its own. The numbers are Moonwell's, in World Editor's order, not the
   natives' (JASS's `ATTACK_TYPE_MAGIC` is 4, `AttackType.Magic` is 6): never cast one to or from a native's value.
-  In the game an enum has its numbers only, no names: `ToString`, a string made with one and `Enum.GetValues` are
-  rejected as error MW0010; compare with its members, `|`, `&` and `HasFlag`.
+  In the game an enum of `Moonwell.Objects` has its numbers only, no names: `ToString`, a string made with one and
+  `Enum.GetValues` are rejected as error MW0010; compare with its members, `|`, `&` and `HasFlag`.
+- `AttackType` and `DefenseType` are core Moonwell's (`Moonwell.AttackType`), shared with the damage package, and keep
+  their names in the game. A file writes them with `using Moonwell;`; a name of the old `Moonwell.Objects.AttackType`
+  is error MW0011.
 - A list takes `Set<A, B, C>()` (the whole list, in order), `Replace<Old, New>()` (in the old one's place), `Add<T>()`
   and `Remove<T>()`.
 - The tooltips are World Editor's four: `Tooltip` (Tooltip - Normal), `TooltipExtended` (Tooltip - Normal - Extended),

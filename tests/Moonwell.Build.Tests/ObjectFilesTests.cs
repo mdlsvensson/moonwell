@@ -473,6 +473,9 @@ namespace Moonwell.Build.Tests
             var attack = Assert.Single(mage.Modifications, one => one.Id == IdOf("ua1t"));
             Assert.Equal(ObjectDataType.String, attack.Type);
             Assert.Equal("magic", attack.Value);
+            var defense = Assert.Single(mage.Modifications, one => one.Id == IdOf("udty"));
+            Assert.Equal(ObjectDataType.String, defense.Type);
+            Assert.Equal("divine", defense.Value);
             var targets = Assert.Single(mage.Modifications, one => one.Id == IdOf("ua1g"));
             Assert.Equal(ObjectDataType.String, targets.Type);
             Assert.Equal("air,enemies", targets.Value);

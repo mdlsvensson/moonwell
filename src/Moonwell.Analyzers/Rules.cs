@@ -93,11 +93,11 @@ public static class Rules
     public static readonly DiagnosticDescriptor ChoiceNames = new(
         "MW0010",
         "Name of a Moonwell.Objects enum",
-        "'{0}' needs the names of {1}, which the game's Lua does not have: there a choice is only its number (AttackType.Magic shows as 6) and Enum.GetValues stops; compare with its members, or show (int) of it",
+        "'{0}' needs the names of {1}, which the game's Lua does not have: there a choice is only its number (ArmorType.Metal shows as 1) and Enum.GetValues stops; compare with its members, or show (int) of it",
         LuaCategory,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "The enums of Moonwell.Objects (AttackType, Targets, ...) are ignored by CSharp.lua: the game's Lua has their numbers only. ToString, a string joined or interpolated with one, and Enum methods given one (GetValues, GetNames, GetName, IsDefined, Parse, TryParse, Format, ToObject) give the number where .NET gives the name, or stop. Comparing, |, & and HasFlag work.");
+        description: "The enums of Moonwell.Objects (ArmorType, Targets, ...) are ignored by CSharp.lua: the game's Lua has their numbers only. ToString, a string joined or interpolated with one, and Enum methods given one (GetValues, GetNames, GetName, IsDefined, Parse, TryParse, Format, ToObject) give the number where .NET gives the name, or stop. Comparing, |, & and HasFlag work.");
 
     /// <summary>The rules of C# that CSharp.lua cannot compile.</summary>
     public static ImmutableArray<DiagnosticDescriptor> Lua { get; } = ImmutableArray.Create(CollectionExpression, StaticNatives, ChoiceNames);
@@ -115,4 +115,16 @@ public static class Rules
 
     /// <summary>The rules for the values a map's classes put on object fields.</summary>
     public static ImmutableArray<DiagnosticDescriptor> Objects { get; } = ImmutableArray.Create(FieldRule);
+
+    public static readonly DiagnosticDescriptor MovedChoice = new(
+        "MW0011",
+        "Choice enum moved to namespace Moonwell",
+        "{0} is Moonwell.{1} since Moonwell 0.2.1, which the damage package uses too: write Moonwell.{1}, or {1} with using Moonwell",
+        ObjectsCategory,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "AttackType and DefenseType left Moonwell.Objects for core Moonwell in 0.2.1, so that object data and the damage package share one of each. The compiler's own error does not name the new enum: CS0234 for Moonwell.Objects.AttackType, CS0103 for AttackType without using Moonwell, and CS0176 for AttackType.Magic in a standard class without using Moonwell, where AttackType is the property.");
+
+    /// <summary>The rules for names that moved between Moonwell's namespaces.</summary>
+    public static ImmutableArray<DiagnosticDescriptor> Moved { get; } = ImmutableArray.Create(MovedChoice);
 }

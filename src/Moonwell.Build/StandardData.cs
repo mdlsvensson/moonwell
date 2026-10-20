@@ -138,7 +138,8 @@ namespace Moonwell.Build
             {
                 if (!choices.TryGetValue(name, out var choice))
                 {
-                    var type = assembly.GetType("Moonwell.Objects." + name)
+                    // A core enum's texts (Moonwell.AttackType's) are on the internal enum of its name in CoreChoices.
+                    var type = assembly.GetType("Moonwell.Objects." + name) ?? assembly.GetType("Moonwell.Objects.CoreChoices+" + name)
                         ?? throw new BuildException($"{Path.GetFileName(objectsDll)} has no enum Moonwell.Objects.{name}, which its values name");
                     choices[name] = choice = Choice.Read(type);
                 }

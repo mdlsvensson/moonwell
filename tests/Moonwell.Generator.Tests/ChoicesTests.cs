@@ -171,7 +171,46 @@ public class ChoicesTests
         // The mini export's metadata uses attackType, attributeType and targetList; deathType and morphFlags have sections but no field.
         Assert.Equal(new[] { "attackType", "attributeType", "targetList" }, all.Keys.OrderBy(k => k, StringComparer.Ordinal));
         Assert.Equal("Targets", all["targetList"].Name);
-        Assert.Equal("AttackTypeChoice", Choices.All(MiniExport(), new HashSet<string> { "AttackType" })["attackType"].Name);
+        Assert.Equal("AttributeTypeChoice", Choices.All(MiniExport(), new HashSet<string> { "AttributeType" })["attributeType"].Name);
+    }
+
+    [Fact]
+    public void attack_and_defense_types_are_core_moonwells_enums()
+    {
+        // The damage package names them too, and it cannot reference Moonwell.Objects (C19): a map has one of each, in core.
+        var attack = Choices.Of(MiniExport(), "attackType", "string")!;
+        var defense = Choices.Make("defenseType", "string", new[] { Entry(0, "normal", "Normal"), Entry(1, "divine", "Divine") }, Label);
+        var numbered = Choices.Make("defenseTypeInt", "int", new[] { Entry(0, "4", "Normal") }, Label);
+
+        Assert.True(attack.Core);
+        Assert.Equal("global::Moonwell.AttackType", attack.TypeName);
+        Assert.True(defense.Core);
+        Assert.Equal("global::Moonwell.DefenseType", defense.TypeName);
+        Assert.False(numbered.Core);
+        Assert.Equal("global::Moonwell.Objects.DefenseTypeInt", numbered.TypeName);
+
+        // Namespace Moonwell has them, so their names are taken there; they keep them.
+        Assert.Equal("AttackType", Choices.All(MiniExport(), new HashSet<string> { "AttackType" })["attackType"].Name);
+    }
+
+    [Fact]
+    public void a_core_enum_has_the_members_the_game_data_gives()
+    {
+        var attack = Choices.Of(MiniExport(), "attackType", "string")!;
+        var members = attack.Members.Select(m => (m.Name, m.Value)).ToList();
+
+        Choices.CheckCore(attack, members);
+        var renumbered = members.Select(m => m.Name == "Magic" ? (m.Name, 4) : m).ToList();
+        var error = Assert.Throws<InvalidOperationException>(() => Choices.CheckCore(attack, renumbered));
+        var missing = Assert.Throws<InvalidOperationException>(() => Choices.CheckCore(attack, null));
+
+        Assert.Equal(
+            "attackType: Moonwell.AttackType has Unknown = 0, Normal = 1, Pierce = 2, Siege = 3, Spells = 4, Chaos = 5, Magic = 4, Hero = 7; "
+            + "the game's data gives Unknown = 0, Normal = 1, Pierce = 2, Siege = 3, Spells = 4, Chaos = 5, Magic = 6, Hero = 7",
+            error.Message);
+        Assert.Equal(
+            "attackType: Moonwell has no enum AttackType; the game's data gives Unknown = 0, Normal = 1, Pierce = 2, Siege = 3, Spells = 4, Chaos = 5, Magic = 6, Hero = 7",
+            missing.Message);
     }
 
     [Fact]
@@ -219,14 +258,14 @@ public class ChoicesTests
         var source = ObjectsWriter.Choices(Choices.All(MiniExport(), null).Values);
 
         Assert.Contains(
-            "    /// <summary>A value of the metadata type <c>attackType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, "
+            "    /// <summary>A value of the metadata type <c>attributeType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, "
             + "not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>\n"
             + "    /// @CSharpLua.Ignore\n"
-            + "    public enum AttackType\n"
+            + "    public enum AttributeType\n"
             + "    {\n"
-            + "        /// <summary>None.</summary>\n"
-            + "        [global::Moonwell.Objects.GameValue(\"unknown\")]\n"
-            + "        Unknown = 0,\n",
+            + "        /// <summary>Agility.</summary>\n"
+            + "        [global::Moonwell.Objects.GameValue(\"AGI\")]\n"
+            + "        AGI = 0,\n",
             source);
         Assert.Contains(
             "    /// @CSharpLua.Ignore\n"
@@ -238,7 +277,28 @@ public class ChoicesTests
             + "        [global::Moonwell.Objects.GameValue(\"alive\", \"aliv\")]\n"
             + "        Alive = 2,\n",
             source);
-        Assert.True(source.IndexOf("enum AttackType", StringComparison.Ordinal) < source.IndexOf("enum AttributeType", StringComparison.Ordinal));
+        Assert.True(source.IndexOf("enum AttributeType", StringComparison.Ordinal) < source.IndexOf("enum Targets", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void a_core_enums_game_values_are_a_table_beside_the_others()
+    {
+        // The enum is Moonwell.AttackType; Moonwell.Objects keeps the texts of its members, which the map's Lua never needs.
+        var source = ObjectsWriter.Choices(Choices.All(MiniExport(), null).Values);
+
+        Assert.DoesNotContain("public enum AttackType", source);
+        Assert.Contains(
+            "    /// @CSharpLua.Ignore\n"
+            + "    internal static class CoreChoices\n"
+            + "    {\n"
+            + "        /// <summary>The game's texts of <see cref=\"global::Moonwell.AttackType\"/>, the metadata type <c>attackType</c>: each member is the core enum's member of its name and number.</summary>\n"
+            + "        internal enum AttackType\n"
+            + "        {\n"
+            + "            /// <summary>None.</summary>\n"
+            + "            [global::Moonwell.Objects.GameValue(\"unknown\")]\n"
+            + "            Unknown = 0,\n",
+            source);
+        Assert.True(source.IndexOf("enum Targets", StringComparison.Ordinal) < source.IndexOf("class CoreChoices", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -303,14 +363,14 @@ public class ChoicesTests
         var files = GeneratedObjects.Make(MiniExport(), null, "3.0.1.24370");
 
         Assert.Contains(
-            "        public global::Moonwell.Objects.AttackType AttackType\n"
+            "        public global::Moonwell.AttackType AttackType\n"
             + "        {\n"
-            + "            get { return Fields.Get<global::Moonwell.Objects.AttackType>(this, \"ua1t\"); }\n"
+            + "            get { return Fields.Get<global::Moonwell.AttackType>(this, \"ua1t\"); }\n"
             + "            protected set { Fields.Put(\"ua1t\", value); }\n"
             + "        }\n",
             files["Kinds/StandardUnit.g.cs"]);
         Assert.Contains("public global::Moonwell.Objects.Levels<global::Moonwell.Objects.Targets> TargetsAllowed\n", files["Kinds/StandardAbility.g.cs"]);
-        Assert.Contains("[\"ua1t\"] = typeof(global::Moonwell.Objects.AttackType),", files["Kinds/StandardUnit.g.cs"]);
+        Assert.Contains("[\"ua1t\"] = typeof(global::Moonwell.AttackType),", files["Kinds/StandardUnit.g.cs"]);
         Assert.Contains("{\"id\":\"ua1t\",\"type\":\"choice\",\"perLevel\":false,\"pointer\":0,\"skin\":false,\"store\":\"string\",\"choice\":\"AttackType\"}", files["Values/unit.json"]);
     }
 }

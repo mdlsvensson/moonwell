@@ -87,7 +87,7 @@ namespace Moonwell.Objects
                 if (!membersOf.TryGetValue(type, out var members))
                 {
                     members = new List<KeyValuePair<int, string[]>>();
-                    foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.Static))
+                    foreach (var field in TextsOf(type).GetFields(BindingFlags.Public | BindingFlags.Static))
                     {
                         var value = field.GetCustomAttribute<GameValueAttribute>(false);
                         if (value != null)
@@ -104,6 +104,13 @@ namespace Moonwell.Objects
 
                 return members;
             }
+        }
+
+        // The enum whose members carry the game's texts: a core enum's (Moonwell.AttackType) are in the generated CoreChoices,
+        // under its name, found as the build finds them.
+        private static Type TextsOf(Type type)
+        {
+            return type.Namespace == "Moonwell" ? typeof(ChoiceTexts).Assembly.GetType("Moonwell.Objects.CoreChoices+" + type.Name) ?? type : type;
         }
     }
 }

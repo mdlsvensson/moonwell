@@ -149,43 +149,6 @@ namespace Moonwell.Objects
         Both = 3,
     }
 
-    /// <summary>A value of the metadata type <c>attackType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
-    /// @CSharpLua.Ignore
-    public enum AttackType
-    {
-        /// <summary>None.</summary>
-        [global::Moonwell.Objects.GameValue("unknown")]
-        Unknown = 0,
-
-        /// <summary>Normal.</summary>
-        [global::Moonwell.Objects.GameValue("normal")]
-        Normal = 1,
-
-        /// <summary>Pierce.</summary>
-        [global::Moonwell.Objects.GameValue("pierce")]
-        Pierce = 2,
-
-        /// <summary>Siege.</summary>
-        [global::Moonwell.Objects.GameValue("siege")]
-        Siege = 3,
-
-        /// <summary>Spells.</summary>
-        [global::Moonwell.Objects.GameValue("spells")]
-        Spells = 4,
-
-        /// <summary>Chaos.</summary>
-        [global::Moonwell.Objects.GameValue("chaos")]
-        Chaos = 5,
-
-        /// <summary>Magic.</summary>
-        [global::Moonwell.Objects.GameValue("magic")]
-        Magic = 6,
-
-        /// <summary>Hero.</summary>
-        [global::Moonwell.Objects.GameValue("hero")]
-        Hero = 7,
-    }
-
     /// <summary>A value of the metadata type <c>attributeType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum AttributeType
@@ -343,43 +306,6 @@ namespace Moonwell.Objects
         /// <summary>Can raise, Does decay.</summary>
         [global::Moonwell.Objects.GameValue("3")]
         CanRaiseDoesDecay = 3,
-    }
-
-    /// <summary>A value of the metadata type <c>defenseType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
-    /// @CSharpLua.Ignore
-    public enum DefenseType
-    {
-        /// <summary>Normal.</summary>
-        [global::Moonwell.Objects.GameValue("normal")]
-        Normal = 0,
-
-        /// <summary>Small.</summary>
-        [global::Moonwell.Objects.GameValue("small")]
-        Small = 1,
-
-        /// <summary>Medium.</summary>
-        [global::Moonwell.Objects.GameValue("medium")]
-        Medium = 2,
-
-        /// <summary>Large.</summary>
-        [global::Moonwell.Objects.GameValue("large")]
-        Large = 3,
-
-        /// <summary>Fortified.</summary>
-        [global::Moonwell.Objects.GameValue("fort")]
-        Fort = 4,
-
-        /// <summary>Hero.</summary>
-        [global::Moonwell.Objects.GameValue("hero")]
-        Hero = 5,
-
-        /// <summary>Divine.</summary>
-        [global::Moonwell.Objects.GameValue("divine")]
-        Divine = 6,
-
-        /// <summary>Unarmored.</summary>
-        [global::Moonwell.Objects.GameValue("none")]
-        None = 7,
     }
 
     /// <summary>A value of the metadata type <c>defenseTypeInt</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
@@ -1515,6 +1441,83 @@ namespace Moonwell.Objects
         /// <summary>Missile (Line).</summary>
         [global::Moonwell.Objects.GameValue("mline")]
         Mline = 7,
+    }
+
+    /// <summary>The game's texts of the members of the choice enums that are core Moonwell's, by the enum's name: the build and StandardValues read them here, and the map's Lua has none of them.</summary>
+    /// @CSharpLua.Ignore
+    internal static class CoreChoices
+    {
+        /// <summary>The game's texts of <see cref="global::Moonwell.AttackType"/>, the metadata type <c>attackType</c>: each member is the core enum's member of its name and number.</summary>
+        internal enum AttackType
+        {
+            /// <summary>None.</summary>
+            [global::Moonwell.Objects.GameValue("unknown")]
+            Unknown = 0,
+
+            /// <summary>Normal.</summary>
+            [global::Moonwell.Objects.GameValue("normal")]
+            Normal = 1,
+
+            /// <summary>Pierce.</summary>
+            [global::Moonwell.Objects.GameValue("pierce")]
+            Pierce = 2,
+
+            /// <summary>Siege.</summary>
+            [global::Moonwell.Objects.GameValue("siege")]
+            Siege = 3,
+
+            /// <summary>Spells.</summary>
+            [global::Moonwell.Objects.GameValue("spells")]
+            Spells = 4,
+
+            /// <summary>Chaos.</summary>
+            [global::Moonwell.Objects.GameValue("chaos")]
+            Chaos = 5,
+
+            /// <summary>Magic.</summary>
+            [global::Moonwell.Objects.GameValue("magic")]
+            Magic = 6,
+
+            /// <summary>Hero.</summary>
+            [global::Moonwell.Objects.GameValue("hero")]
+            Hero = 7,
+        }
+
+        /// <summary>The game's texts of <see cref="global::Moonwell.DefenseType"/>, the metadata type <c>defenseType</c>: each member is the core enum's member of its name and number.</summary>
+        internal enum DefenseType
+        {
+            /// <summary>Normal.</summary>
+            [global::Moonwell.Objects.GameValue("normal")]
+            Normal = 0,
+
+            /// <summary>Small.</summary>
+            [global::Moonwell.Objects.GameValue("small")]
+            Small = 1,
+
+            /// <summary>Medium.</summary>
+            [global::Moonwell.Objects.GameValue("medium")]
+            Medium = 2,
+
+            /// <summary>Large.</summary>
+            [global::Moonwell.Objects.GameValue("large")]
+            Large = 3,
+
+            /// <summary>Fortified.</summary>
+            [global::Moonwell.Objects.GameValue("fort")]
+            Fort = 4,
+
+            /// <summary>Hero.</summary>
+            [global::Moonwell.Objects.GameValue("hero")]
+            Hero = 5,
+
+            /// <summary>Divine.</summary>
+            [global::Moonwell.Objects.GameValue("divine")]
+            Divine = 6,
+
+            /// <summary>Unarmored.</summary>
+            [global::Moonwell.Objects.GameValue("none")]
+            None = 7,
+        }
     }
 }
 

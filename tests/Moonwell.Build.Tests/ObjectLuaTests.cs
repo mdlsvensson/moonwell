@@ -130,13 +130,18 @@ namespace Moonwell.Build.Tests
         public void stubs_have_only_the_enums_the_map_names()
         {
             // The enums' own file is left out of CSharp.lua's compile, which would write a blank line for each of them into every map: the stubs carry the ones the code names.
-            Assert.Contains("    /// @CSharpLua.Ignore\n    public enum AttackType\n    {\n", compiled.Stubs);
-            Assert.Contains("        Magic = 6,\n", compiled.Stubs);
+            Assert.Contains("    /// @CSharpLua.Ignore\n    public enum DeathType\n    {\n", compiled.Stubs);
+            Assert.Contains("        CanRaiseDoesNotDecay = 1,\n", compiled.Stubs);
             Assert.Contains("    /// @CSharpLua.Ignore\n    [global::System.Flags]\n    public enum Targets\n    {\n", compiled.Stubs);
             Assert.Contains("    public enum ArmorType\n", compiled.Stubs);
             Assert.DoesNotContain("public enum AiBuffer", compiled.Stubs);
             Assert.DoesNotContain("public enum AbilityModifierStats", compiled.Stubs);
             Assert.DoesNotContain("BeyondLimitsAttribute", compiled.Stubs);
+
+            // The attack and defense types are core Moonwell's, compiled with it: no stub.
+            Assert.DoesNotContain("enum AttackType", compiled.Stubs);
+            Assert.DoesNotContain("enum DefenseType", compiled.Stubs);
+            Assert.Contains("public global::Moonwell.AttackType AttackType\n", compiled.Stubs);
         }
 
         [Fact]
@@ -243,6 +248,7 @@ namespace Moonwell.Build.Tests
 
             // The mage's declared choices, the footman's standard ones (Metal armor, targeted as ground) and the zap's levels.
             Assert.Equal("6", Query(lua, "return tostring(Objects.Mage():getAttackType())"));
+            Assert.Equal("6", Query(lua, "return tostring(Objects.Mage():getDefenseType())"));
             Assert.Equal("33", Query(lua, "return tostring(Objects.Mage():getAttack1TargetsAllowed())"));
             Assert.Equal("1", Query(lua, "return tostring(Objects.Mage():getArmorType())"));
             Assert.Equal("64", Query(lua, "return tostring(Objects.Mage():getTargetedAs())"));
@@ -250,8 +256,8 @@ namespace Moonwell.Build.Tests
 
             // The enums are ignored: CSharp.lua writes their members as numbers (a debug build names them in a comment) and no Lua of their own.
             Assert.Contains("33 --[[Moonwell.Objects.Targets.Air | Moonwell.Objects.Targets.Enemies]]", compiled.Script);
-            // Report's enum methods name the type (MoonwellObjects.AttackType, a nil in the game); nothing defines it.
-            Assert.DoesNotMatch(@"(?<![gs]et|MoonwellObjects\.)AttackType", compiled.ReleaseScript);
+            // Report's enum methods name the type (MoonwellObjects.DeathType, a nil in the game); nothing defines it.
+            Assert.DoesNotMatch(@"(?<![gs]et|MoonwellObjects\.)DeathType", compiled.ReleaseScript);
             Assert.DoesNotContain("Moonwell.Objects.Targets", compiled.ReleaseScript);
         }
 
@@ -262,10 +268,19 @@ namespace Moonwell.Build.Tests
 
             // The enums are ignored, so the Lua has no type of theirs: a name is the number (on .NET it is "Magic"), and
             // Enum.GetValues stops. HasFlag needs only the numbers. MW0010 rejects the first two in map code.
-            Assert.Equal("6", Outcome(lua, "return Objects.Report.Named(Objects.Mage())"));
-            Assert.Equal("attack 6 6", Outcome(lua, "return Objects.Report.Joined(Objects.Mage())"));
+            Assert.Equal("1", Outcome(lua, "return Objects.Report.Named(Objects.Mage())"));
+            Assert.Equal("death 1 1", Outcome(lua, "return Objects.Report.Joined(Objects.Mage())"));
             Assert.Equal("True", Outcome(lua, "return Objects.Report.Flagged(Objects.Mage())"));
             Assert.StartsWith("error: ", Outcome(lua, "return Objects.Report.Counted()"));
+        }
+
+        [Fact]
+        public void a_core_choice_has_its_names_in_lua()
+        {
+            using var lua = compiled.Start();
+
+            // AttackType and DefenseType are core Moonwell's: CSharp.lua compiles them, so MW0010 lets their names be read.
+            Assert.Equal("Magic Divine Hero", Outcome(lua, "return Objects.Report.CoreNamed(Objects.Mage())"));
         }
 
         // What a chunk returns, or "error: " and the error it raises.

@@ -21,11 +21,17 @@ namespace Objects
         // Choices read in the game as their enums' numbers: the mage's declared ones, the footman's standard ones, the zap's levels.
         public static string Chosen(Mage mage, Zap zap)
         {
-            var declared = mage.AttackType == Moonwell.Objects.AttackType.Magic
+            var declared = mage.AttackType == AttackType.Magic && mage.DefenseType == DefenseType.Divine
                 && (mage.Attack1TargetsAllowed & Moonwell.Objects.Targets.Enemies) != 0
                 && mage.DeathType == Moonwell.Objects.DeathType.CanRaiseDoesNotDecay;
             var standard = mage.ArmorType == Moonwell.Objects.ArmorType.Metal && mage.TargetedAs == Moonwell.Objects.Targets.Ground;
             return (declared ? "yes" : "no") + " " + (standard ? "yes" : "no") + " " + (int)zap.TargetsAllowed[3];
+        }
+
+        // The core enums are compiled to Lua with their names, so a name reads as on .NET.
+        public static string CoreNamed(Mage mage)
+        {
+            return mage.AttackType.ToString() + " " + mage.DefenseType + " " + $"{AttackType.Hero}";
         }
 
         // The methods C# gives an enum, on a choice in game code: the enums are ignored, so the Lua has no type of theirs.
@@ -33,12 +39,12 @@ namespace Objects
 #pragma warning disable MW0010
         public static string Named(Mage mage)
         {
-            return mage.AttackType.ToString();
+            return mage.DeathType.ToString();
         }
 
         public static string Joined(Mage mage)
         {
-            return "attack " + mage.AttackType + " " + $"{mage.AttackType}";
+            return "death " + mage.DeathType + " " + $"{mage.DeathType}";
         }
 
         public static bool Flagged(Mage mage)
@@ -48,7 +54,7 @@ namespace Objects
 
         public static int Counted()
         {
-            return System.Enum.GetValues(typeof(Moonwell.Objects.AttackType)).Length;
+            return System.Enum.GetValues(typeof(Moonwell.Objects.DeathType)).Length;
         }
 #pragma warning restore MW0010
 

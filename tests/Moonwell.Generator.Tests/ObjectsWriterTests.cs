@@ -302,7 +302,7 @@ public class ObjectsWriterTests
         Assert.Contains("        [global::Moonwell.Objects.MaxEntries(5)]\n        public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> ", hero);
 
         // A choice has no rule attribute: its enum is the rule. A list without a maxVal has none either.
-        Assert.Contains("[global::Moonwell.Objects.Field(\"ua1t\", Label = \"Attack 1 - Attack Type\")]\n        public global::Moonwell.Objects.AttackType ", unit);
+        Assert.Contains("[global::Moonwell.Objects.Field(\"ua1t\", Label = \"Attack 1 - Attack Type\")]\n        public global::Moonwell.AttackType ", unit);
         Assert.Contains("[global::Moonwell.Objects.Field(\"uabi\", Label = \"Normal\")]\n        public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Abilities\n", unit);
     }
 

@@ -4,9 +4,10 @@ using System.Reflection;
 namespace Moonwell.Build
 {
     /// <summary>
-    /// A choice enum of <c>Moonwell.Objects</c> (<c>AttackType</c>, <c>Targets</c>) as the build reads and writes it: each member's
-    /// number and the game's texts from its <c>[GameValue]</c>. The build turns the standard data's texts into the numbers the map's
-    /// Lua reads, and a declared number into the text or number the object file holds.
+    /// A choice enum of <c>Moonwell.Objects</c> (<c>ArmorType</c>, <c>Targets</c>), or of core Moonwell (<c>AttackType</c>, whose
+    /// texts <c>Moonwell.Objects</c> keeps in <c>CoreChoices</c>), as the build reads and writes it: each member's number and the
+    /// game's texts from its <c>[GameValue]</c>. The build turns the standard data's texts into the numbers the map's Lua reads,
+    /// and a declared number into the text or number the object file holds.
     /// </summary>
     public sealed class Choice
     {

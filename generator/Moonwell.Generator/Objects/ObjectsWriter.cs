@@ -231,13 +231,17 @@ public static class ObjectsWriter
     /// The source of the enums of the choice types, ordered by name, in namespace <c>Moonwell.Objects</c>. Each member
     /// has the game's text in <c>[GameValue]</c>, then the other spellings the game's data uses; a flags type is a
     /// <c>[Flags]</c> enum. Each enum is <c>@CSharpLua.Ignore</c>: the map's Lua has the members' numbers, not the enum.
+    /// A core enum (<see cref="ChoiceType.Core"/>, <c>Moonwell.AttackType</c>) is not written: an internal enum of its
+    /// name in the class <c>CoreChoices</c>, after the others, holds the game's texts of its members, the table the build
+    /// and <c>StandardValues</c> read them from.
     /// </summary>
     public static string Choices(IEnumerable<ChoiceType> choices)
     {
+        var ordered = choices.OrderBy(c => c.Name, StringComparer.Ordinal).ToList();
         var text = new StringBuilder();
         text.Append("namespace Moonwell.Objects\n{\n");
         var first = true;
-        foreach (var choice in choices.OrderBy(c => c.Name, StringComparer.Ordinal))
+        foreach (var choice in ordered.Where(c => !c.Core))
         {
             text.Append(first ? "" : "\n");
             first = false;
@@ -249,14 +253,25 @@ public static class ObjectsWriter
             }
 
             text.Append($"    public enum {choice.Name}\n    {{\n");
-            for (var m = 0; m < choice.Members.Count; m++)
+            AppendMembers(text, choice, "        ");
+            text.Append("    }\n");
+        }
+
+        var core = ordered.Where(c => c.Core).ToList();
+        if (core.Count > 0)
+        {
+            text.Append(first ? "" : "\n");
+            text.Append("    /// <summary>The game's texts of the members of the choice enums that are core Moonwell's, by the enum's name: the build and StandardValues read them here, and the map's Lua has none of them.</summary>\n");
+            text.Append($"    {Ignore}\n");
+            text.Append("    internal static class CoreChoices\n    {\n");
+            for (var c = 0; c < core.Count; c++)
             {
-                var member = choice.Members[m];
-                var texts = string.Join(", ", new[] { member.Text }.Concat(member.Alternates).Select(Literal));
-                text.Append(m > 0 ? "\n" : "");
-                text.Append($"        /// <summary>{MemberSummary(choice, member)}</summary>\n");
-                text.Append($"        [{Root}.GameValue({texts})]\n");
-                text.Append($"        {member.Name} = {member.Value.ToString(CultureInfo.InvariantCulture)},\n");
+                var choice = core[c];
+                text.Append(c > 0 ? "\n" : "");
+                text.Append($"        /// <summary>The game's texts of <see cref=\"{choice.TypeName}\"/>, the metadata type <c>{Xml(choice.Type)}</c>: each member is the core enum's member of its name and number.</summary>\n");
+                text.Append($"        internal enum {choice.Name}\n        {{\n");
+                AppendMembers(text, choice, "            ");
+                text.Append("        }\n");
             }
 
             text.Append("    }\n");
@@ -264,6 +279,19 @@ public static class ObjectsWriter
 
         text.Append("}\n");
         return text.ToString();
+    }
+
+    private static void AppendMembers(StringBuilder text, ChoiceType choice, string indent)
+    {
+        for (var m = 0; m < choice.Members.Count; m++)
+        {
+            var member = choice.Members[m];
+            var texts = string.Join(", ", new[] { member.Text }.Concat(member.Alternates).Select(Literal));
+            text.Append(m > 0 ? "\n" : "");
+            text.Append($"{indent}/// <summary>{MemberSummary(choice, member)}</summary>\n");
+            text.Append($"{indent}[{Root}.GameValue({texts})]\n");
+            text.Append($"{indent}{member.Name} = {member.Value.ToString(CultureInfo.InvariantCulture)},\n");
+        }
     }
 
     // Ruling R15: an enum's numbers are Moonwell's (World Editor's list), not the natives'.
@@ -454,7 +482,7 @@ public static class ObjectsWriter
             case FieldType.String:
                 return "string";
             case FieldType.Choice:
-                return $"{Root}.{field.Choice!.Name}";
+                return field.Choice!.TypeName;
             default:
                 return field.ListOf == null || field.ListOf == "object" ? "object" : $"{Runtime}.{field.ListOf}";
         }

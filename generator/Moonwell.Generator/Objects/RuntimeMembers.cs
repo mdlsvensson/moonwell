@@ -93,6 +93,21 @@ public sealed class RuntimeMembers
         return names;
     }
 
+    /// <summary>The members of the public enum <c>Moonwell.</c><paramref name="name"/>, by name and number in its order; null when <c>Moonwell.dll</c> has none.</summary>
+    public IReadOnlyList<(string Name, int Value)>? EnumMembers(string name)
+    {
+        var type = _runtime.GetType("Moonwell." + name);
+        if (type == null || !type.IsEnum || !type.IsPublic)
+        {
+            return null;
+        }
+
+        return type.GetFields(BindingFlags.Public | BindingFlags.Static)
+            .OrderBy(field => field.MetadataToken)
+            .Select(field => (field.Name, Convert.ToInt32(field.GetRawConstantValue(), System.Globalization.CultureInfo.InvariantCulture)))
+            .ToList();
+    }
+
     private static string[] TypesOf(Kind kind)
     {
         return kind == Kind.Unit ? new[] { "Unit", "Hero" } : new[] { kind.ToString() };
