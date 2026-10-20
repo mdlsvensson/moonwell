@@ -29,6 +29,7 @@ namespace Moonwell.Objects
     /// The value is shown as C# would print it in the invariant culture (<c>600000</c>, <c>0.5</c>, a choice as its number);
     /// a text in double quotes, with <c> (51 characters)</c> or <c> (33 entries)</c> after it when it is too long; an
     /// object list as <c>13 entries</c>; null as <c>null</c>. The limits are printed as doubles in the invariant culture.
+    /// A float value is compared with the limits narrowed to float, so that 0.01f is within a minimum of 0.01.
     /// </para>
     /// </remarks>
     /// @CSharpLua.Ignore
@@ -99,10 +100,10 @@ namespace Moonwell.Objects
                     CheckChoice(rules, level, choice, putAt);
                     break;
                 case int whole:
-                    CheckNumber(rules, level, whole, whole.ToString(CultureInfo.InvariantCulture), string.Empty, putAt);
+                    CheckNumber(rules, level, whole, false, whole.ToString(CultureInfo.InvariantCulture), string.Empty, putAt);
                     break;
                 case float real:
-                    CheckNumber(rules, level, real, real.ToString(CultureInfo.InvariantCulture), string.Empty, putAt);
+                    CheckNumber(rules, level, real, true, real.ToString(CultureInfo.InvariantCulture), string.Empty, putAt);
                     break;
                 case string text:
                     CheckText(rules, level, text, putAt);
@@ -120,8 +121,13 @@ namespace Moonwell.Objects
             }
         }
 
-        private static void CheckNumber(Rules rules, int? level, double number, string shown, string each, StackTrace? putAt)
+        // A float is compared with the limits narrowed to float: 0.01f is 0.0099999997... as a double, below the limit 0.01,
+        // yet it is the float World Editor writes for 0.01. A number of a list held as text is compared as the double its
+        // text reads as, which is exact.
+        private static void CheckNumber(Rules rules, int? level, double number, bool single, string shown, string each, StackTrace? putAt)
         {
+            var min = single ? (float)rules.Min : rules.Min;
+            var max = single ? (float)rules.Max : rules.Max;
             if (rules.NonNegative && number < 0)
             {
                 var allowed = rules.Lifted ? "0 or more, even with [BeyondLimits]"
@@ -130,7 +136,7 @@ namespace Moonwell.Objects
                 throw rules.Error(shown, allowed, level, putAt);
             }
 
-            if (rules.HasLimits && !rules.Lifted && !(number >= rules.Min && number <= rules.Max))
+            if (rules.HasLimits && !rules.Lifted && !(number >= min && number <= max))
             {
                 throw rules.Error(shown, Range(rules.Min, rules.Max) + each + Lift, level, putAt);
             }
@@ -162,7 +168,7 @@ namespace Moonwell.Objects
                 {
                     if (double.TryParse(entry.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var number))
                     {
-                        CheckNumber(rules, level, number, shown, " for each number", putAt);
+                        CheckNumber(rules, level, number, false, shown, " for each number", putAt);
                     }
                 }
             }

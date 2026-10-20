@@ -320,6 +320,60 @@ namespace Moonwell.Objects.Tests
         }
     }
 
+    public class TinyTree : Moonwell.Objects.Doodads.AlchemySet
+    {
+        public TinyTree()
+        {
+            Scale = 0.01f;
+            MinimumScale = 0.01f;
+            MaximumScale = 100f;
+        }
+    }
+
+    public class TooTinyTree : Moonwell.Objects.Doodads.AlchemySet
+    {
+        public TooTinyTree()
+        {
+            Scale = MathF.BitDecrement(0.01f);
+        }
+    }
+
+    public class TooTallTree : Moonwell.Objects.Doodads.AlchemySet
+    {
+        public TooTallTree()
+        {
+            MaximumScale = MathF.BitIncrement(100f);
+        }
+    }
+
+    /// <summary>A unit with a per-level field whose limits a float cannot hold exactly (0.3f is above 0.3 as a double).</summary>
+    public class FineUnit : TestUnitBase
+    {
+        public FineUnit(Levels<float> fine)
+        {
+            Fine = fine;
+        }
+
+        [Field("ufin", Label = "Fine")]
+        [Limits(0.1, 0.3)]
+        [NonNegative]
+        public Levels<float> Fine
+        {
+            get { return Fields.GetLevels<float>(this, "ufin"); }
+            protected set { Fields.Put("ufin", value); }
+        }
+
+        public static Levels<float> Of(params float[] values)
+        {
+            return Levels(values);
+        }
+
+        public static Levels<float> Formula(Func<int, float> formula)
+        {
+            return PerLevel(formula);
+        }
+    }
+
     public class DeclaredTests : IDisposable
     {
         public DeclaredTests()
@@ -757,6 +811,35 @@ namespace Moonwell.Objects.Tests
                 "DeepRequirements.RequirementsLevels is \"1,200\"; Requirements - Levels (arqa) allows at most 100 for each number; [BeyondLimits] goes past it",
                 Assert.Throws<FieldRuleException>(() => new DeepRequirements()).Message);
             Assert.Equal("1,100", new ShallowRequirements().RequirementsLevels);
+        }
+
+        [Fact]
+        public void a_float_at_a_limit_is_allowed_though_the_limit_is_not_a_float()
+        {
+            // 0.01f is 0.0099999997... as a double, below the limit 0.01; the value is compared as a float.
+            var tree = new TinyTree();
+
+            Assert.Equal(0.01f, tree.Scale);
+            Assert.Equal(100f, tree.MaximumScale);
+            Assert.Equal(new[] { 0.1f, 0.3f }, new FineUnit(FineUnit.Of(0.1f, 0.3f)).Fine.Values);
+
+            var formula = new FineUnit(FineUnit.Formula(level => level == 1 ? 0.1f : 0.3f));
+            formula.Fine.Resolve(2);
+            Assert.Equal(new[] { 0.1f, 0.3f }, formula.Fine.Values);
+        }
+
+        [Fact]
+        public void the_float_next_to_a_limit_is_outside_it()
+        {
+            var below = Assert.Throws<FieldRuleException>(() => new TooTinyTree());
+            Assert.Equal(MathF.BitDecrement(0.01f).ToString(CultureInfo.InvariantCulture), below.Value);
+            Assert.EndsWith("; Default Scale (ddes) allows 0.01 to 100; [BeyondLimits] goes past it", below.Message);
+
+            var above = Assert.Throws<FieldRuleException>(() => new TooTallTree());
+            Assert.Equal("TooTallTree.MaximumScale is 100.00001; Maximum Scale (dmas) allows 0.01 to 100; [BeyondLimits] goes past it", above.Message);
+
+            var level = Assert.Throws<FieldRuleException>(() => new FineUnit(FineUnit.Of(0.1f, MathF.BitIncrement(0.3f))));
+            Assert.Equal(2, level.Level);
         }
 
         [Fact]
