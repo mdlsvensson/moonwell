@@ -3,8 +3,8 @@ namespace Moonwell
     /// <summary>One hit, as the damage package hands it to every stage: the damage with its types, where it came from, and what it did.</summary>
     public sealed class Hit : Damage
     {
-        /// <summary>The damage type, kept behind the property that checks the stage.</summary>
-        private DamageType damageType;
+        /// <summary>The damage kind, kept behind the property that checks the stage.</summary>
+        private DamageKind damageKind;
 
         /// <summary>The weapon sound, kept behind the property that checks the stage.</summary>
         private WeaponSound weaponSound;
@@ -43,15 +43,15 @@ namespace Moonwell
         [LocalSafe]
         public bool IsRanged { get; internal set; }
 
-        /// <summary>The damage type; a reaction may change it before armor only.</summary>
+        /// <summary>The damage kind, which the game calls its damage type; a reaction may change it before armor only.</summary>
         [LocalSafe]
-        public DamageType DamageType
+        public DamageKind DamageKind
         {
-            get => damageType;
+            get => damageKind;
             set
             {
-                CheckBeforeArmor("DamageType");
-                damageType = value;
+                CheckBeforeArmor("DamageKind");
+                damageKind = value;
             }
         }
 
@@ -119,9 +119,9 @@ namespace Moonwell
         }
 
         /// <summary>Sets a type or the armor without the stage check; the package fills a new hit with it.</summary>
-        internal void Fill(DamageType type, WeaponSound sound, float targetArmor)
+        internal void Fill(DamageKind type, WeaponSound sound, float targetArmor)
         {
-            damageType = type;
+            damageKind = type;
             weaponSound = sound;
             armor = targetArmor;
         }

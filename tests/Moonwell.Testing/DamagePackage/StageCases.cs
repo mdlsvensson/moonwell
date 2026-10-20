@@ -53,20 +53,20 @@ namespace Moonwell.Testing
             Arena(world, out var source, out var target);
             fake.Body(target.Handle).Life = 1000f;
             var seenAmount = 0f;
-            var seenType = DamageType.Unknown;
+            var seenType = DamageKind.Unknown;
             target.Taking = hit =>
             {
                 hit.Amount = hit.Amount * 2f;
-                hit.DamageType = DamageType.Fire;
+                hit.DamageKind = DamageKind.Fire;
             };
             target.Taken = hit =>
             {
                 seenAmount = hit.Amount;
-                seenType = hit.DamageType;
+                seenType = hit.DamageKind;
             };
             fake.Hit(source.Handle, target.Handle, 100f, damageType: 4);
             Expect.Near(200f, seenAmount, "the amount after armor");
-            Expect.Equal((int)DamageType.Fire, (int)seenType, "the damage type after armor");
+            Expect.Equal((int)DamageKind.Fire, (int)seenType, "the damage type after armor");
             Expect.Near(800f, fake.Body(target.Handle).Life, "the life after the doubled hit");
         }
 
@@ -100,7 +100,7 @@ namespace Moonwell.Testing
         public static void TypeSetAfterArmorReported(FakeWorld world)
         {
             Arena(world, out var source, out var target);
-            target.Taken = hit => hit.DamageType = DamageType.Fire;
+            target.Taken = hit => hit.DamageKind = DamageKind.Fire;
             fake.Hit(source.Handle, target.Handle, 10f, damageType: 4);
 #if DEBUG
             Expect.Equal(1, world.Logged.Count, "one error is logged in a development build");

@@ -25,7 +25,7 @@ namespace DamageFixture
         {
             var first = Unit.Create<Guard>(Player.One, 0f, 0f);
             var second = Unit.Create<Guard>(Player.Two, 100f, 0f);
-            first.Damage(second, 10f, DamageType.Fire, tag: "opening");
+            first.Damage(second, 10f, DamageKind.Fire, tag: "opening");
         }
     }
 }

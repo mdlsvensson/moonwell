@@ -1,6 +1,6 @@
 namespace Moonwell
 {
-    /// <summary>Dealing damage from code: <c>source.Damage(target, 10f, DamageType.Fire)</c>.</summary>
+    /// <summary>Dealing damage from code: <c>source.Damage(target, 10f, DamageKind.Fire)</c>.</summary>
     public static class UnitDamage
     {
         /// <summary>Deals damage from a unit to another, through every stage up to lethal before it returns; landed and burst come 0 s later. Returns the hit, or null when the game dealt nothing. Dealt from a reaction, the hit continues that reaction's chain; a chain of 8 hits is cut there with an error.</summary>
@@ -12,7 +12,7 @@ namespace Moonwell
         /// <param name="ranged">Whether an attack is ranged; reactions see it as melee otherwise.</param>
         /// <param name="sound">The sound of the hit.</param>
         /// <param name="tag">Anything of the map's own, which reactions read as Hit.Tag.</param>
-        public static Hit? Damage(this Unit source, Unit target, float amount, DamageType type = DamageType.Magic, bool isAttack = false, bool ranged = false, WeaponSound sound = WeaponSound.None, object? tag = null)
+        public static Hit? Damage(this Unit source, Unit target, float amount, DamageKind type = DamageKind.Magic, bool isAttack = false, bool ranged = false, WeaponSound sound = WeaponSound.None, object? tag = null)
         {
             return Pipeline.Deal(source, target, amount, 0, type, isAttack, ranged, sound, tag);
         }

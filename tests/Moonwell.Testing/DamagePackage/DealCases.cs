@@ -14,11 +14,11 @@ namespace Moonwell.Testing
         {
             StageCases.Arena(world, out var source, out var target);
             var fake = StageCases.Fake;
-            var hit = source.Damage(target, 30f, DamageType.Fire, tag: "t");
+            var hit = source.Damage(target, 30f, DamageKind.Fire, tag: "t");
             Expect.True(hit != null, "a hit is returned");
             Expect.True(hit!.IsCode, "the hit is code's");
             Expect.True((string?)hit.Tag == "t", "the hit has the tag");
-            Expect.Equal((int)DamageType.Fire, (int)hit.DamageType, "the damage type");
+            Expect.Equal((int)DamageKind.Fire, (int)hit.DamageKind, "the damage type");
             Expect.Near(30f, hit.Original, "the original amount");
             Expect.Near(70f, fake.Body(target.Handle).Life, "the target lost 30");
         }
@@ -48,7 +48,7 @@ namespace Moonwell.Testing
             {
                 if (inner == null)
                 {
-                    inner = target.Damage(source, 5f, DamageType.Normal);
+                    inner = target.Damage(source, 5f, DamageKind.Normal);
                 }
             };
             target.Taken = hit => sourceLifeInTaken = fake.Body(source.Handle).Life;
@@ -67,12 +67,12 @@ namespace Moonwell.Testing
             target.Taken = hit =>
             {
                 taken++;
-                target.Damage(hit.Source!, 1f, DamageType.Normal);
+                target.Damage(hit.Source!, 1f, DamageKind.Normal);
             };
             other.Taken = hit =>
             {
                 taken++;
-                other.Damage(hit.Source!, 1f, DamageType.Normal);
+                other.Damage(hit.Source!, 1f, DamageKind.Normal);
             };
             fake.Hit(other.Handle, target.Handle, 1f, damageType: 4);
             Expect.Equal(8, taken, "eight hits in the chain");
@@ -89,12 +89,12 @@ namespace Moonwell.Testing
             target.Hurt = hit =>
             {
                 hurt++;
-                target.Damage(hit.Source!, 1f, DamageType.Normal);
+                target.Damage(hit.Source!, 1f, DamageKind.Normal);
             };
             other.Hurt = hit =>
             {
                 hurt++;
-                other.Damage(hit.Source!, 1f, DamageType.Normal);
+                other.Damage(hit.Source!, 1f, DamageKind.Normal);
             };
             fake.Hit(other.Handle, target.Handle, 1f, damageType: 4);
             var rounds = 0;

@@ -74,7 +74,7 @@ namespace Moonwell
         }
 
         /// <summary>Deals damage from code: the hit its before-armor event makes is marked as code's and returned. A deal from a reaction continues the reacting hit's chain; one that would make the chain longer than MaxChain throws, which the reaction reports.</summary>
-        internal static Hit? Deal(Unit source, Unit target, float amount, int attackType, DamageType type, bool isAttack, bool ranged, WeaponSound sound, object? tag)
+        internal static Hit? Deal(Unit source, Unit target, float amount, int attackType, DamageKind type, bool isAttack, bool ranged, WeaponSound sound, object? tag)
         {
             var running = Reactions.Running;
             var chain = running.Count == 0 ? 0 : running[running.Count - 1].Chain + 1;
@@ -123,7 +123,7 @@ namespace Moonwell
 
             hit.AttackTypeCode = World.EventAttackType();
             hit.DefenseTypeCode = World.DefenseType(targetHandle);
-            hit.Fill((DamageType)World.EventDamageType(), (WeaponSound)World.EventWeaponType(), World.Armor(targetHandle));
+            hit.Fill((DamageKind)World.EventDamageType(), (WeaponSound)World.EventWeaponType(), World.Armor(targetHandle));
             if (deal != null)
             {
                 hit.IsRanged = deal.IsAttack && deal.Ranged;
@@ -162,7 +162,7 @@ namespace Moonwell
 
             var amount = hit.Amount;
             var attackType = hit.AttackTypeCode;
-            var damageType = hit.DamageType;
+            var damageType = hit.DamageKind;
             var sound = hit.WeaponSound;
             var armor = hit.Armor;
             var defense = hit.DefenseTypeCode;
@@ -180,9 +180,9 @@ namespace Moonwell
                 World.SetEventAttackType(hit.AttackTypeCode);
             }
 
-            if (hit.DamageType != damageType)
+            if (hit.DamageKind != damageType)
             {
-                World.SetEventDamageType((int)hit.DamageType);
+                World.SetEventDamageType((int)hit.DamageKind);
             }
 
             if (hit.WeaponSound != sound)
@@ -204,7 +204,7 @@ namespace Moonwell
             }
 
             // Spell immunity: the game will not send this hit's after-armor event, so it ends here.
-            if (Immunity.Stops(World.IsMagicImmune(target), hit.AttackTypeCode, (int)hit.DamageType))
+            if (Immunity.Stops(World.IsMagicImmune(target), hit.AttackTypeCode, (int)hit.DamageKind))
             {
                 PutBack(hit);
                 return;

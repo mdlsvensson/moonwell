@@ -1,7 +1,7 @@
 namespace Moonwell
 {
-    /// <summary>The game's damage types, numbered as the game numbers them.</summary>
-    public enum DamageType
+    /// <summary>The game's damage types, numbered as the game numbers them; called kinds to stay clear of Moonwell.Objects' DamageType, an ability field's choice.</summary>
+    public enum DamageKind
     {
         /// <summary>Unknown.</summary>
         Unknown = 0,

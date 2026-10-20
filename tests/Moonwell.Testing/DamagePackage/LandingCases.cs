@@ -106,7 +106,7 @@ namespace Moonwell.Testing
             StageCases.Arena(world, out var source, out var target);
             var fake = StageCases.Fake;
             fake.Body(target.Handle).Immune = true;
-            target.Taking = hit => hit.DamageType = DamageType.Normal;
+            target.Taking = hit => hit.DamageKind = DamageKind.Normal;
             fake.Hit(source.Handle, target.Handle, 10f, damageType: 14);
             Expect.True(TestLog.Lines.Contains("target taken"), "the after-armor stage ran");
         }
