@@ -4,6 +4,7 @@ using static Moonwell.Objects.Human.Abilities;
 namespace MoonwellMap
 {
     /// <summary>A Storm Bolt with damage of its own, which tells the caster's owner whom it was thrown at.</summary>
+    [Moonwell.Objects.ObjectId("A001")]
     public sealed class Smite : StormBolt
     {
         public Smite()

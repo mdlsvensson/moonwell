@@ -1,6 +1,6 @@
 namespace Moonwell.Build
 {
-    /// <summary>The object ids the source map already uses: those its object files define and those it places.</summary>
+    /// <summary>The object ids the source map's object files already define.</summary>
     public static class MapObjectIds
     {
         /// <summary>The id of every object in the source map's object files, main and skin, of every kind.</summary>
@@ -19,36 +19,6 @@ namespace Moonwell.Build
                     {
                         ids.Add(entry.Id);
                     }
-                }
-            }
-
-            return ids;
-        }
-
-        /// <summary>The id of every unit, item, destructable and doodad the source map places.</summary>
-        /// <param name="map">The opened source map, with its units and doodads.</param>
-        /// <returns>The ids; empty when the map places nothing.</returns>
-        public static IReadOnlySet<string> Placed(War3Net.Build.Map map)
-        {
-            var ids = new HashSet<string>(StringComparer.Ordinal);
-            if (map.Units != null)
-            {
-                foreach (var unit in map.Units.Units)
-                {
-                    ids.Add(ObjectTable.TextOf(unit.TypeId));
-                }
-            }
-
-            if (map.Doodads != null)
-            {
-                foreach (var doodad in map.Doodads.Doodads)
-                {
-                    ids.Add(ObjectTable.TextOf(doodad.TypeId));
-                }
-
-                foreach (var special in map.Doodads.SpecialDoodads)
-                {
-                    ids.Add(ObjectTable.TextOf(special.TypeId));
                 }
             }
 

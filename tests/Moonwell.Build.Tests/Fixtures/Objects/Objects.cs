@@ -6,6 +6,7 @@ namespace Objects
     {
     }
 
+    [Moonwell.Objects.ObjectId("H001")]
     public class Arthas : Moonwell.Objects.Human.Units.Paladin
     {
         public Arthas()
@@ -19,6 +20,7 @@ namespace Objects
         }
     }
 
+    [Moonwell.Objects.ObjectId("H002")]
     public class DarkArthas : Arthas
     {
         public DarkArthas()
@@ -27,6 +29,7 @@ namespace Objects
         }
     }
 
+    [Moonwell.Objects.ObjectId("A002")]
     public class Firebolt : Moonwell.Objects.Human.Abilities.StormBolt
     {
         public Firebolt()
@@ -37,6 +40,7 @@ namespace Objects
         }
     }
 
+    [Moonwell.Objects.ObjectId("A004")]
     public class Tuned : Firebolt
     {
         public Tuned()
@@ -47,6 +51,7 @@ namespace Objects
         }
     }
 
+    [Moonwell.Objects.ObjectId("A001")]
     public class Elemental : Moonwell.Objects.Human.Abilities.SummonWaterElemental
     {
         public Elemental()
@@ -55,6 +60,7 @@ namespace Objects
         }
     }
 
+    [Moonwell.Objects.ObjectId("A003")]
     public class Portal : Moonwell.Objects.Creeps.Abilities.DarkPortal
     {
         public Portal()
@@ -63,6 +69,7 @@ namespace Objects
         }
     }
 
+    [Moonwell.Objects.ObjectId("h001")]
     public class Duelist : Moonwell.Objects.Human.Units.Footman
     {
         public Duelist()
@@ -81,6 +88,7 @@ namespace Objects
         }
     }
 
+    [Moonwell.Objects.ObjectId("B001", Carrier = "A005")]
     public class Burn : Moonwell.Objects.NightElf.Buffs.Immolation
     {
         public Burn()
@@ -94,6 +102,7 @@ namespace Objects
     {
     }
 
+    [Moonwell.Objects.ObjectId("I001")]
     public class Claws : Moonwell.Objects.Items.ClawsOfAttack15
     {
         public Claws()
@@ -102,6 +111,7 @@ namespace Objects
         }
     }
 
+    [Moonwell.Objects.ObjectId("B001")]
     public class Gate : Moonwell.Objects.Destructables.DemonicGate
     {
         public Gate()
@@ -110,6 +120,7 @@ namespace Objects
         }
     }
 
+    [Moonwell.Objects.ObjectId("D001")]
     public class Rock : Moonwell.Objects.Doodads.RocksBRrk
     {
         public Rock()
@@ -118,6 +129,7 @@ namespace Objects
         }
     }
 
+    [Moonwell.Objects.ObjectId("R001")]
     public class Forge : Moonwell.Objects.Human.Upgrades.IronForgedSwords
     {
         public Forge()

@@ -112,7 +112,6 @@ namespace Moonwell.Build.Tests
             Assert.Contains("namespace.class(\"Paladin\"", script);
             Assert.Contains("[\"Sample.Arthas\"]", script);
             Assert.DoesNotContain("Archmage", script);
-            Assert.True(File.Exists(Path.Combine(copy, "ids.json")));
         }
 
         [Fact]
@@ -170,9 +169,6 @@ namespace Moonwell.Build.Tests
             Assert.Contains("Name = \"Keep\";", File.ReadAllText(Path.Combine(map, "Map.cs")));
             var script = File.ReadAllText(Path.Combine(map, "build", "Keep", "war3map.lua"));
             Assert.Contains("[\"Keep.Champion\"]", script);
-            var ids = File.ReadAllText(Path.Combine(map, "ids.json"));
-            Assert.Contains("\"Keep.Champion\"", ids);
-            Assert.Contains("\"Keep.Smite\"", ids);
         }
 
         [Fact]
@@ -211,7 +207,6 @@ namespace Moonwell.Build.Tests
             if (!withObjects)
             {
                 File.Delete(Path.Combine(copy, "Objects.cs"));
-                File.Delete(Path.Combine(copy, "ids.json"));
             }
 
             if (withoutOwnRemove)

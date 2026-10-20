@@ -58,7 +58,7 @@ namespace Moonwell.Build
             var declarations = Declarations.Read(targetPath, project, standard, data.ValueSet);
             BalanceCheck.Run(declarations, standard, data);
 
-            var ids = ObjectIds.Assign(project, declarations.Objects, standard.AllIds(), MapObjectIds.Defined(project), MapObjectIds.Placed(map), log);
+            var ids = ObjectIds.Assign(declarations.Objects, standard.AllIds(), MapObjectIds.Defined(project));
             EntryWriter.Write(project, settings, true);
             RegistryWriter.Write(project, declarations.Used, declarations.Objects, ids);
             LuaCompiler.Compile(project, map, targetPath, options.Release, declarations, ids, standard, data.ValueSet);

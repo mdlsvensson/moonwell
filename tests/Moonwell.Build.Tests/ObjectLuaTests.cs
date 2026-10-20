@@ -307,7 +307,7 @@ namespace Moonwell.Build.Tests
                     standardIds.UnionWith(Standard.Ids(kind));
                 }
 
-                Ids = ObjectIds.Assign(project, Declarations.Objects, standardIds, new HashSet<string>(), new HashSet<string>(), TextWriter.Null);
+                Ids = ObjectIds.Assign(Declarations.Objects, standardIds, new HashSet<string>());
                 Registry = File.ReadAllText(RegistryWriter.Write(project, Declarations.Used, Declarations.Objects, Ids));
                 Entry = File.ReadAllText(EntryWriter.Write(project, settings, true));
                 Script = LuaCompiler.Compile(project, map, assembly, false, Declarations, Ids, Standard, null);

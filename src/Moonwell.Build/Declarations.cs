@@ -168,6 +168,7 @@ namespace Moonwell.Build
                 root,
                 HasAttribute(type, ReplacesAttributeName),
                 PinnedIdOf(type),
+                CarrierIdOf(type),
                 changed,
                 references.ToList());
         }
@@ -239,6 +240,25 @@ namespace Moonwell.Build
         private static string? PinnedIdOf(Type type)
         {
             return FirstArgument(type, ObjectIdAttributeName);
+        }
+
+        private static string? CarrierIdOf(Type type)
+        {
+            foreach (var data in type.GetCustomAttributesData())
+            {
+                if (data.AttributeType.FullName == ObjectIdAttributeName)
+                {
+                    foreach (var named in data.NamedArguments)
+                    {
+                        if (named.MemberName == "Carrier")
+                        {
+                            return (string?)named.TypedValue.Value;
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
 
         // Attributes are read by name, since the map's copy of Moonwell.Objects is not the build's own.

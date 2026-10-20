@@ -1,286 +1,142 @@
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-
 namespace Moonwell.Build
 {
-    /// <summary>Gives each declared object its four-character object id, kept stable across builds in the project's <c>ids.json</c>.</summary>
+    /// <summary>Checks the object id each declared class gives itself in <c>[ObjectId]</c>, and its buff's carrier id; the build assigns none.</summary>
     public static class ObjectIds
     {
-        private const string FileName = "ids.json";
         private const string CarrierSuffix = "#carrier";
         private const string Digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private const int CounterLimit = 36 * 36 * 36;
 
-        private static readonly string[] AllSpaces = { "unit", "item", "destructable", "doodad", "ability", "buff", "upgrade" };
-
-        private static readonly JsonSerializerOptions TextOptions = new JsonSerializerOptions
-        {
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        };
-
         /// <summary>
-        /// Assigns the object ids of a build: keeps the id of each class <c>ids.json</c> already holds, applies <c>[ObjectId]</c> pins,
-        /// gives new classes the next free id of their kind, gives each buff a carrier ability, reports renamed classes and rewrites <c>ids.json</c>.
+        /// The object ids of a build, as the classes give them: a <c>[Replaces]</c> class has its standard object's id, every other
+        /// declared class the id of its <c>[ObjectId]</c>, and a buff also the carrier ability's id its <c>[ObjectId]</c> gives.
         /// </summary>
-        /// <param name="project">The map project; <c>ids.json</c> is in its folder.</param>
         /// <param name="objects">The declared objects.</param>
-        /// <param name="standardIds">The ids of the standard objects; no new id is one of them.</param>
-        /// <param name="sourceMapIds">The ids the source map's object files define; no new id is one of them.</param>
-        /// <param name="placedIds">The ids of the objects the source map places (units, items, destructables and doodads); a rename of one is an error and no new id is one of them.</param>
-        /// <param name="log">The build log; warnings start with <c>warning: </c>.</param>
+        /// <param name="standardIds">The ids of the standard objects; no class may have one, and no suggested id is one.</param>
+        /// <param name="sourceMapIds">The ids the source map's object files define; no suggested id is one of them.</param>
         /// <returns>The id by class name, and by <c>&lt;class&gt;#carrier</c> for the carrier ability of a buff.</returns>
-        /// <exception cref="BuildException"><c>ids.json</c> is malformed, a pin is not valid or clashes, or a renamed class's id is placed in the map.</exception>
+        /// <exception cref="BuildException">
+        /// A class has no id (the message names a free id for each such class), an id is not valid, or two classes have one id.
+        /// </exception>
         public static IReadOnlyDictionary<string, string> Assign(
-            MapProject project,
             IReadOnlyList<DeclaredObject> objects,
             IReadOnlySet<string> standardIds,
-            IReadOnlySet<string> sourceMapIds,
-            IReadOnlySet<string> placedIds,
-            TextWriter log)
+            IReadOnlySet<string> sourceMapIds)
         {
-            var path = Path.Combine(project.Folder, FileName);
-            var old = Read(path);
             var sorted = objects.OrderBy(declared => declared.ClassName, StringComparer.Ordinal).ToList();
-            var declaredKinds = new Dictionary<string, string>(StringComparer.Ordinal);
-            foreach (var declared in sorted)
-            {
-                declaredKinds[declared.ClassName] = declared.Kind;
-            }
-
             var claims = new Dictionary<string, Dictionary<string, string>>(StringComparer.Ordinal);
-            var reserved = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
-            foreach (var space in AllSpaces)
+            foreach (var space in new[] { "unit", "item", "destructable", "doodad", "ability", "buff", "upgrade" })
             {
                 claims[space] = new Dictionary<string, string>(StringComparer.Ordinal);
-                reserved[space] = new HashSet<string>(StringComparer.Ordinal);
-            }
-
-            foreach (var entry in old)
-            {
-                foreach (var space in SpacesOf(entry.Key, entry.Value, declaredKinds))
-                {
-                    reserved[space].Add(entry.Value);
-                }
             }
 
             var ids = new SortedDictionary<string, string>(StringComparer.Ordinal);
-            var replacing = new HashSet<string>(StringComparer.Ordinal);
-            var pending = new List<DeclaredObject>();
+            var missing = new List<DeclaredObject>();
+            var missingCarrier = new List<DeclaredObject>();
             foreach (var declared in sorted)
             {
+                if (declared.CarrierId != null && declared.Kind != "buff")
+                {
+                    throw new BuildException($"{declared.ClassName} is not a buff, so its [ObjectId] cannot give a carrier");
+                }
+
                 if (declared.Replaces)
                 {
                     if (declared.PinnedId != null)
                     {
-                        throw new BuildException($"{declared.ClassName} replaces {declared.StandardRoot} and cannot pin an id");
+                        throw new BuildException($"{declared.ClassName} replaces {declared.StandardRoot} and cannot have an id of its own");
                     }
 
                     ids[declared.ClassName] = declared.StandardRoot;
-                    replacing.Add(declared.ClassName);
                     continue;
                 }
 
-                string id;
-                if (declared.PinnedId != null)
+                if (declared.PinnedId == null)
                 {
-                    if (declared.PinnedId.Length != 4)
+                    missing.Add(declared);
+                    continue;
+                }
+
+                Check(declared.ClassName, declared.Kind, declared.PinnedId, standardIds);
+                Claim(claims[SpaceOf(declared.Kind)], declared.PinnedId, declared.ClassName);
+                ids[declared.ClassName] = declared.PinnedId;
+                if (declared.Kind == "buff")
+                {
+                    if (declared.CarrierId == null)
                     {
-                        throw new BuildException($"{declared.ClassName} pins the id \"{declared.PinnedId}\", which is not four characters");
+                        missingCarrier.Add(declared);
+                        continue;
                     }
 
-                    if (standardIds.Contains(declared.PinnedId))
-                    {
-                        throw new BuildException($"{declared.ClassName} pins the id {declared.PinnedId}, which a standard object has");
-                    }
-
-                    id = declared.PinnedId;
+                    var key = declared.ClassName + CarrierSuffix;
+                    Check(key, "ability", declared.CarrierId, standardIds);
+                    Claim(claims["ability"], declared.CarrierId, key);
+                    ids[key] = declared.CarrierId;
                 }
-                else if (old.TryGetValue(declared.ClassName, out var kept))
-                {
-                    id = kept;
-                }
-                else
-                {
-                    pending.Add(declared);
-                    continue;
-                }
-
-                Claim(claims[SpaceOf(declared.Kind)], id, declared.ClassName);
-                ids[declared.ClassName] = id;
             }
 
-            var pendingCarriers = new List<string>();
-            foreach (var declared in sorted)
+            if (missing.Count > 0 || missingCarrier.Count > 0)
             {
-                if (declared.Kind != "buff")
-                {
-                    continue;
-                }
-
-                var key = declared.ClassName + CarrierSuffix;
-                if (old.TryGetValue(key, out var kept))
-                {
-                    Claim(claims["ability"], kept, key);
-                    ids[key] = kept;
-                }
-                else
-                {
-                    pendingCarriers.Add(key);
-                }
+                throw new BuildException(Suggestions(missing, missingCarrier, claims, standardIds, sourceMapIds));
             }
 
-            ReportRenames(old, declaredKinds, pending, claims, placedIds, log);
-
-            var counters = new Dictionary<string, int>(StringComparer.Ordinal);
-            foreach (var declared in pending)
-            {
-                var space = SpaceOf(declared.Kind);
-                var id = Next(counters, LetterOf(declared.Kind), space, standardIds, sourceMapIds, placedIds, reserved[space], claims[space], declared.ClassName);
-                Claim(claims[space], id, declared.ClassName);
-                ids[declared.ClassName] = id;
-            }
-
-            foreach (var key in pendingCarriers)
-            {
-                var id = Next(counters, 'A', "ability", standardIds, sourceMapIds, placedIds, reserved["ability"], claims["ability"], key);
-                Claim(claims["ability"], id, key);
-                ids[key] = id;
-            }
-
-            Write(path, ids, replacing);
             return ids;
         }
 
-        private static void ReportRenames(
-            Dictionary<string, string> old,
-            Dictionary<string, string> declaredKinds,
-            List<DeclaredObject> pending,
+        // One line per class with no id (a buff also with no carrier), then one per buff with no carrier, each naming free ids.
+        private static string Suggestions(
+            List<DeclaredObject> missing,
+            List<DeclaredObject> missingCarrier,
             Dictionary<string, Dictionary<string, string>> claims,
-            IReadOnlySet<string> placedIds,
-            TextWriter log)
+            IReadOnlySet<string> standardIds,
+            IReadOnlySet<string> sourceMapIds)
         {
-            var suggested = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var entry in old.OrderBy(pair => pair.Key, StringComparer.Ordinal))
+            var lines = new List<string>();
+            foreach (var declared in missing)
             {
-                if (entry.Key.EndsWith(CarrierSuffix, StringComparison.Ordinal) || declaredKinds.ContainsKey(entry.Key))
+                var id = Free(LetterOf(declared.Kind), claims[SpaceOf(declared.Kind)], standardIds, sourceMapIds, declared.ClassName);
+                if (declared.Kind == "buff")
                 {
-                    continue;
+                    var carrier = Free('A', claims["ability"], standardIds, sourceMapIds, declared.ClassName + CarrierSuffix);
+                    lines.Add($"{declared.ClassName} has no object id; add [ObjectId(\"{id}\", Carrier = \"{carrier}\")] to it");
                 }
-
-                var spaces = SpacesOfId(entry.Value);
-                var pinned = false;
-                foreach (var space in spaces)
+                else
                 {
-                    pinned |= claims[space].ContainsKey(entry.Value);
+                    lines.Add($"{declared.ClassName} has no object id; add [ObjectId(\"{id}\")] to it");
                 }
-
-                if (pinned)
-                {
-                    continue;
-                }
-
-                var candidates = pending.Where(declared => spaces.Contains(SpaceOf(declared.Kind))).ToList();
-                if (candidates.Count == 0)
-                {
-                    // Nothing could have replaced it, but the map still places the object.
-                    if (placedIds.Contains(entry.Value))
-                    {
-                        log.WriteLine($"warning: {entry.Key} was {entry.Value}, which the map places, and no class declares it now");
-                    }
-
-                    continue;
-                }
-
-                var target = candidates.FirstOrDefault(declared => !suggested.Contains(declared.ClassName)) ?? candidates[0];
-                suggested.Add(target.ClassName);
-                var advice = $"if it was renamed to {target.ClassName}, add [ObjectId(\"{entry.Value}\")] to {target.ClassName}";
-                if (placedIds.Contains(entry.Value))
-                {
-                    throw new BuildException($"{entry.Key} was {entry.Value}, which the map places, and no class declares it now; {advice}");
-                }
-
-                log.WriteLine($"warning: {entry.Key} was {entry.Value}, and no class declares it now; {advice}");
             }
+
+            foreach (var declared in missingCarrier)
+            {
+                var carrier = Free('A', claims["ability"], standardIds, sourceMapIds, declared.ClassName + CarrierSuffix);
+                lines.Add($"{declared.ClassName} has no carrier id; add Carrier = \"{carrier}\" to its [ObjectId]");
+            }
+
+            return string.Join("\n", lines);
         }
 
-        private static Dictionary<string, string> Read(string path)
+        private static void Check(string owner, string kind, string id, IReadOnlySet<string> standardIds)
         {
-            var entries = new Dictionary<string, string>(StringComparer.Ordinal);
-            if (!File.Exists(path))
+            if (id.Length != 4)
             {
-                return entries;
+                throw new BuildException($"{owner} has the id \"{id}\", which is not four characters");
             }
 
-            var problem = path + " is not a JSON object from class name to id: ";
-            try
+            if (standardIds.Contains(id))
             {
-                using var document = JsonDocument.Parse(File.ReadAllBytes(path));
-                if (document.RootElement.ValueKind != JsonValueKind.Object)
-                {
-                    throw new BuildException(problem + "it holds a " + document.RootElement.ValueKind.ToString().ToLowerInvariant());
-                }
-
-                foreach (var property in document.RootElement.EnumerateObject())
-                {
-                    if (property.Value.ValueKind != JsonValueKind.String || property.Value.GetString()!.Length != 4)
-                    {
-                        throw new BuildException(problem + $"the value of \"{property.Name}\" is not a four-character id");
-                    }
-
-                    if (!entries.TryAdd(property.Name, property.Value.GetString()!))
-                    {
-                        throw new BuildException(problem + $"\"{property.Name}\" is there twice");
-                    }
-                }
-            }
-            catch (JsonException exception)
-            {
-                throw new BuildException(problem + exception.Message);
+                throw new BuildException($"{owner} has the id {id}, which a standard object has");
             }
 
-            return entries;
-        }
-
-        private static void Write(string path, SortedDictionary<string, string> ids, HashSet<string> replacing)
-        {
-            var text = new StringBuilder("{\n");
-            var first = true;
-            foreach (var entry in ids)
+            // The game makes a unit whose id starts with an upper-case letter a hero, and only such a unit.
+            if (kind == "hero" && !char.IsAsciiLetterUpper(id[0]))
             {
-                if (replacing.Contains(entry.Key))
-                {
-                    continue;
-                }
-
-                if (!first)
-                {
-                    text.Append(",\n");
-                }
-
-                first = false;
-                text.Append("  ").Append(JsonSerializer.Serialize(entry.Key, TextOptions))
-                    .Append(": ").Append(JsonSerializer.Serialize(entry.Value, TextOptions));
+                throw new BuildException($"{owner} is a hero, so its id {id} must start with an upper-case letter");
             }
 
-            if (!first)
+            if (kind == "unit" && char.IsAsciiLetterUpper(id[0]))
             {
-                text.Append('\n');
+                throw new BuildException($"{owner} is a unit, so its id {id} must not start with an upper-case letter: the game makes such a unit a hero");
             }
-
-            text.Append("}\n");
-            var bytes = new UTF8Encoding(false).GetBytes(text.ToString());
-            if (first && !File.Exists(path))
-            {
-                return;
-            }
-
-            if (File.Exists(path) && File.ReadAllBytes(path).AsSpan().SequenceEqual(bytes))
-            {
-                return;
-            }
-
-            File.WriteAllBytes(path, bytes);
         }
 
         private static void Claim(Dictionary<string, string> claimed, string id, string owner)
@@ -295,36 +151,27 @@ namespace Moonwell.Build
             claimed[id] = owner;
         }
 
-        private static string Next(
-            Dictionary<string, int> counters,
+        // The first id of the letter that nothing has, claimed for the owner so that the next suggestion differs.
+        private static string Free(
             char letter,
-            string space,
+            Dictionary<string, string> claimed,
             IReadOnlySet<string> standardIds,
             IReadOnlySet<string> sourceMapIds,
-            IReadOnlySet<string> placedIds,
-            HashSet<string> reserved,
-            Dictionary<string, string> claimed,
             string owner)
         {
-            var counterKey = letter + space;
-            counters.TryGetValue(counterKey, out var count);
-            while (true)
+            for (var count = 1; count < CounterLimit; count++)
             {
-                count++;
-                if (count >= CounterLimit)
-                {
-                    throw new BuildException($"no free id starting with {letter} is left for {owner}");
-                }
-
                 var id = new string(new[] { letter, Digits[count / 1296], Digits[count / 36 % 36], Digits[count % 36] });
-                if (standardIds.Contains(id) || sourceMapIds.Contains(id) || placedIds.Contains(id) || reserved.Contains(id) || claimed.ContainsKey(id))
+                if (standardIds.Contains(id) || sourceMapIds.Contains(id) || claimed.ContainsKey(id))
                 {
                     continue;
                 }
 
-                counters[counterKey] = count;
+                claimed[id] = owner;
                 return id;
             }
+
+            throw new BuildException($"no free id starting with {letter} is left for {owner}");
         }
 
         private static string SpaceOf(string kind)
@@ -367,39 +214,6 @@ namespace Moonwell.Build
                     return 'R';
                 default:
                     throw new BuildException($"unknown object kind {kind}");
-            }
-        }
-
-        // The id spaces an ids.json entry can be in: its class's when the class is still declared, a carrier's ability space, else the id's first letter tells.
-        private static IReadOnlyList<string> SpacesOf(string key, string id, Dictionary<string, string> declaredKinds)
-        {
-            if (key.EndsWith(CarrierSuffix, StringComparison.Ordinal))
-            {
-                return new[] { "ability" };
-            }
-
-            return declaredKinds.TryGetValue(key, out var kind) ? new[] { SpaceOf(kind) } : SpacesOfId(id);
-        }
-
-        private static IReadOnlyList<string> SpacesOfId(string id)
-        {
-            switch (id[0])
-            {
-                case 'H':
-                case 'h':
-                    return new[] { "unit" };
-                case 'I':
-                    return new[] { "item" };
-                case 'A':
-                    return new[] { "ability" };
-                case 'B':
-                    return new[] { "buff", "destructable" };
-                case 'D':
-                    return new[] { "doodad" };
-                case 'R':
-                    return new[] { "upgrade" };
-                default:
-                    return AllSpaces;
             }
         }
     }

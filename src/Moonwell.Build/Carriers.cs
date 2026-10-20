@@ -33,7 +33,7 @@ namespace Moonwell.Build
                     ["atar:1"] = "self",
                     ["aare:1"] = 1f,
                 };
-                carriers.Add(new DeclaredObject(name, "ability", BaseAbility, false, null, changed, new[] { buff.ClassName }));
+                carriers.Add(new DeclaredObject(name, "ability", BaseAbility, false, null, null, changed, new[] { buff.ClassName }));
             }
 
             return carriers;

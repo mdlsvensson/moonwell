@@ -35,10 +35,8 @@ namespace Moonwell.Build.Tests
                 Assert.DoesNotContain("warning", built.Output);
             }
 
-            var sample = TestFolders.Fixture("Sample");
-            var ids = ReadIds(Path.Combine(sample, "ids.json"));
-            var entry = Assert.Single(ids);
-            Assert.Equal("Sample.Arthas", entry.Key);
+            // Sample.Arthas has [ObjectId("H001")].
+            var entry = new KeyValuePair<string, string>("Sample.Arthas", "H001");
 
             var staged = Path.Combine(builds.Development.BuildFolder, "Sample");
             using (var reader = new BinaryReader(File.OpenRead(Path.Combine(staged, "war3map.w3u")), Encoding.UTF8))
@@ -69,17 +67,29 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
-        public void ids_unchanged_on_rebuild()
+        public void a_leftover_ids_json_changes_nothing()
         {
-            var committed = File.ReadAllBytes(Path.Combine(TestFolders.Fixture("Sample"), "ids.json"));
             var copy = folders.TemporaryCopyOfSample();
-            Assert.Equal(committed, File.ReadAllBytes(Path.Combine(copy, "ids.json")));
+            var leftover = "{\n  \"Sample.Arthas\": \"H009\"\n}\n";
+            File.WriteAllText(Path.Combine(copy, "ids.json"), leftover);
 
             MapBuild.Run(copy, new BuildOptions(), TextWriter.Null);
-            Assert.Equal(committed, File.ReadAllBytes(Path.Combine(copy, "ids.json")));
+
+            Assert.Equal(leftover, File.ReadAllText(Path.Combine(copy, "ids.json")));
+            using (var reader = new BinaryReader(File.OpenRead(Path.Combine(copy, "build", "Sample", "war3map.w3u")), Encoding.UTF8))
+            {
+                Assert.Equal(IdOf("H001"), Assert.Single(reader.ReadUnitObjectData().NewUnits).NewId);
+            }
+        }
+
+        [Fact]
+        public void a_build_writes_no_ids_json()
+        {
+            var copy = folders.TemporaryCopyOfSample();
 
             MapBuild.Run(copy, new BuildOptions(), TextWriter.Null);
-            Assert.Equal(committed, File.ReadAllBytes(Path.Combine(copy, "ids.json")));
+
+            Assert.False(File.Exists(Path.Combine(copy, "ids.json")));
         }
 
         // DataSet: 0 Default, 1 Custom, 2 Melee. DataVersion: 0 ReignOfChaos, 1 FrozenThrone, 2 ForsakenKingdom.
@@ -223,7 +233,7 @@ namespace Moonwell.Build.Tests
             SetData(copy, "Custom", "ReignOfChaos");
             File.WriteAllText(
                 Path.Combine(copy, "Illidan.cs"),
-                "namespace Sample\n{\n    public sealed class Illidan : Moonwell.Objects.Campaign.Units.IllidanEevi\n    {\n    }\n}\n");
+                "namespace Sample\n{\n    [Moonwell.Objects.ObjectId(\"H00I\")]\n    public sealed class Illidan : Moonwell.Objects.Campaign.Units.IllidanEevi\n    {\n    }\n}\n");
 
             var error = Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), TextWriter.Null));
 
@@ -253,7 +263,7 @@ namespace Moonwell.Build.Tests
 
             File.WriteAllText(
                 Path.Combine(copy, "Spurred.cs"),
-                "namespace Sample\n{\n    public sealed class Spurred : Moonwell.Objects.Items.spur\n    {\n    }\n}\n");
+                "namespace Sample\n{\n    [Moonwell.Objects.ObjectId(\"I00S\")]\n    public sealed class Spurred : Moonwell.Objects.Items.spur\n    {\n    }\n}\n");
 
             var error = Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), TextWriter.Null));
 
@@ -267,7 +277,7 @@ namespace Moonwell.Build.Tests
             var copy = folders.TemporaryCopyOfSample();
             File.WriteAllText(
                 Path.Combine(copy, "Poisoner.cs"),
-                "namespace Sample\n{\n    public sealed class Poisoner : Moonwell.Objects.Campaign.Units.Apothecary\n    {\n    }\n}\n");
+                "namespace Sample\n{\n    [Moonwell.Objects.ObjectId(\"h00P\")]\n    public sealed class Poisoner : Moonwell.Objects.Campaign.Units.Apothecary\n    {\n    }\n}\n");
             SetData(copy, "Melee", "ForsakenKingdom");
             Assert.True(File.Exists(MapBuild.Run(copy, new BuildOptions(), TextWriter.Null)));
 
@@ -343,6 +353,7 @@ namespace Moonwell.Build.Tests
                 {
                     public static class Spells
                     {
+                        [Moonwell.Objects.ObjectId("A00F")]
                         public sealed class Fireball : Abilities.StormBolt
                         {
                             public Fireball()
@@ -369,6 +380,7 @@ namespace Moonwell.Build.Tests
             File.WriteAllText(Path.Combine(copy, "Objects.cs"), """
                 namespace Sample
                 {
+                    [Moonwell.Objects.ObjectId("H001")]
                     public sealed class Arthas : Moonwell.Objects.Human.Units.Paladin
                     {
                         public Arthas()
@@ -421,7 +433,8 @@ namespace Moonwell.Build.Tests
             File.Delete(Path.Combine(copy, "ids.json"));
             var project = Path.Combine(copy, "Sample.csproj");
             var text = File.ReadAllText(project);
-            File.WriteAllText(project, Regex.Replace(text, @"[ 	]*<ProjectReference [^>]*Moonwell\.Objects\.csproj"" />?
+            File.WriteAllText(project, Regex.Replace(text, @"[ 	]*<ProjectReference [^>]*Moonwell\.Objects\.csproj"" />
+?
 ", string.Empty));
 
             // The library an earlier build of the project, when it still used Moonwell.Objects, left in its output.
@@ -453,26 +466,6 @@ namespace Moonwell.Build.Tests
             var ids = MapObjectIds.Defined(project);
 
             Assert.Contains("h000", ids);
-        }
-
-        [Fact]
-        public void placed_ids_are_those_of_the_units_and_doodads_the_map_places()
-        {
-            var project = MapProject.Find(folders.TemporaryCopyOfSample());
-            var map = SourceMap.Open(project, new MapSettings("Sample.SampleMap", string.Empty, string.Empty, string.Empty, string.Empty), TextWriter.Null);
-
-            var placed = MapObjectIds.Placed(map);
-
-            Assert.NotEmpty(placed);
-            foreach (var unit in map.Units!.Units)
-            {
-                Assert.Contains(Encoding.ASCII.GetString(BitConverter.GetBytes(unit.TypeId)), placed);
-            }
-
-            foreach (var doodad in map.Doodads!.Doodads)
-            {
-                Assert.Contains(Encoding.ASCII.GetString(BitConverter.GetBytes(doodad.TypeId)), placed);
-            }
         }
 
         private static void SetData(string folder, string dataSet, string dataVersion)

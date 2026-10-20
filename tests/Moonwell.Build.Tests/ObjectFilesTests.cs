@@ -67,6 +67,7 @@ namespace Moonwell.Build.Tests
                 "hpea",
                 false,
                 null,
+                null,
                 new SortedDictionary<string, object?> { ["unam"] = "TRIGSTR_012" },
                 Array.Empty<string>());
 
@@ -86,6 +87,7 @@ namespace Moonwell.Build.Tests
                 "ability",
                 "ANab",
                 false,
+                null,
                 null,
                 new SortedDictionary<string, object?> { ["anam"] = "TRIGSTR_016" },
                 Array.Empty<string>());
@@ -233,6 +235,7 @@ namespace Moonwell.Build.Tests
                 "BEim",
                 true,
                 null,
+                null,
                 new SortedDictionary<string, object?> { ["fnam"] = "Hot" },
                 Array.Empty<string>());
             var ids = new Dictionary<string, string> { ["Objects.Hot"] = "BEim", ["Objects.Hot#carrier"] = "A001" };
@@ -301,7 +304,7 @@ namespace Moonwell.Build.Tests
             skinSource.NewUnits.Add(NewUnit("hfoo", "H001", Mod("unam", "Mine")));
             WriteSource("war3map.w3u", source);
             WriteSource("war3mapSkin.w3u", skinSource);
-            var arthas = new DeclaredObject("Objects.Arthas", "hero", "Hpal", false, null, new SortedDictionary<string, object?>(), Array.Empty<string>());
+            var arthas = new DeclaredObject("Objects.Arthas", "hero", "Hpal", false, null, null, new SortedDictionary<string, object?>(), Array.Empty<string>());
 
             var staged = WriteObjects(new[] { arthas }, new Dictionary<string, string> { ["Objects.Arthas"] = "H001" }, new Dictionary<string, string>());
 
@@ -315,7 +318,7 @@ namespace Moonwell.Build.Tests
             var source = new UnitObjectData(ObjectDataFormatVersion.v3);
             source.NewUnits.Add(NewUnit("Hpal", "H001", Mod("uhpm", 1)));
             WriteSource("war3map.w3u", source);
-            var arthas = new DeclaredObject("Objects.Arthas", "hero", "Hpal", false, null, new SortedDictionary<string, object?>(), Array.Empty<string>());
+            var arthas = new DeclaredObject("Objects.Arthas", "hero", "Hpal", false, null, null, new SortedDictionary<string, object?>(), Array.Empty<string>());
 
             WriteObjects(new[] { arthas }, new Dictionary<string, string> { ["Objects.Arthas"] = "H001" }, new Dictionary<string, string>());
 
@@ -370,7 +373,7 @@ namespace Moonwell.Build.Tests
             }
 
             var project = MapProject.Find(folder);
-            var again = ObjectIds.Assign(project, set.Objects, AllStandardIds(), new HashSet<string>(ids.Values), new HashSet<string>(), log);
+            var again = ObjectIds.Assign(set.Objects, AllStandardIds(), new HashSet<string>(ids.Values));
             var stagedAgain = WriteObjects(set.Objects, again, set.StandardClassIds, built.Standard);
 
             Assert.Equal(ids, again);
@@ -393,6 +396,7 @@ namespace Moonwell.Build.Tests
                 "hfoo",
                 false,
                 null,
+                null,
                 new SortedDictionary<string, object?> { ["uabi"] = new[] { "Objects.Missing" } },
                 new[] { "Objects.Missing" });
 
@@ -411,6 +415,7 @@ namespace Moonwell.Build.Tests
                 "hfoo",
                 false,
                 null,
+                null,
                 new SortedDictionary<string, object?> { ["uabi"] = new[] { "Adef", "Objects.Odd" } },
                 new[] { "Objects.Odd" });
 
@@ -428,6 +433,7 @@ namespace Moonwell.Build.Tests
                 "unit",
                 "hfoo",
                 false,
+                null,
                 null,
                 new SortedDictionary<string, object?> { ["udea"] = "2" },
                 Array.Empty<string>());
@@ -448,6 +454,7 @@ namespace Moonwell.Build.Tests
                 "hfoo",
                 false,
                 null,
+                null,
                 new SortedDictionary<string, object?> { ["udea"] = "some" },
                 Array.Empty<string>());
 
@@ -466,6 +473,7 @@ namespace Moonwell.Build.Tests
                 "ratf",
                 false,
                 null,
+                null,
                 new SortedDictionary<string, object?> { ["isca"] = 2f },
                 Array.Empty<string>());
 
@@ -480,7 +488,7 @@ namespace Moonwell.Build.Tests
         {
             set = built.Read(null);
             var project = MapProject.Find(folder);
-            ids = ObjectIds.Assign(project, set.Objects, AllStandardIds(), new HashSet<string>(), new HashSet<string>(), log);
+            ids = ObjectIds.Assign(set.Objects, AllStandardIds(), new HashSet<string>());
             return WriteObjects(set.Objects, ids, set.StandardClassIds, built.Standard);
         }
 

@@ -153,6 +153,7 @@ namespace Moonwell.Build.Tests
                 "hpea",
                 false,
                 null,
+                null,
                 new SortedDictionary<string, object?>(),
                 Array.Empty<string>());
             Stage.Write(

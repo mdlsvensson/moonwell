@@ -5,7 +5,8 @@ namespace Moonwell.Build
     /// <param name="Kind">The kind: <c>unit</c>, <c>hero</c>, <c>item</c>, <c>destructable</c>, <c>doodad</c>, <c>ability</c>, <c>buff</c> or <c>upgrade</c>.</param>
     /// <param name="StandardRoot">The id of the standard object at the root of the class's base chain.</param>
     /// <param name="Replaces">Whether the class changes the standard object itself instead of adding a new one.</param>
-    /// <param name="PinnedId">The id the class's <c>[ObjectId]</c> pins; null when none.</param>
+    /// <param name="PinnedId">The id the class's <c>[ObjectId]</c> gives; null when none.</param>
+    /// <param name="CarrierId">The carrier ability's id the class's <c>[ObjectId]</c> gives (<c>Carrier</c>); null when none.</param>
     /// <param name="Changed">
     /// The changed values by field id, or <c>&lt;field id&gt;:&lt;level&gt;</c> for a per-level field: an <c>int</c>,
     /// <c>float</c>, <c>bool</c> or <c>string</c>; for a list the full class names in order (<c>IReadOnlyList&lt;string&gt;</c>),
@@ -19,6 +20,7 @@ namespace Moonwell.Build
         string StandardRoot,
         bool Replaces,
         string? PinnedId,
+        string? CarrierId,
         IReadOnlyDictionary<string, object?> Changed,
         IReadOnlyList<string> References);
 }
