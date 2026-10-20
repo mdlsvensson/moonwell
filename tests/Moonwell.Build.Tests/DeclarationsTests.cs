@@ -514,6 +514,21 @@ namespace Moonwell.Build.Tests
                 "Objects.cs:15: Hollow.HitPoints is -5; Hit Points Maximum (Base) (uhpm) allows 0 or more, even with [BeyondLimits]");
         }
 
+        [Fact]
+        public void dotnet_build_stops_at_a_value_out_of_range_with_the_analyzers_error()
+        {
+            // The other ObjectErrors fixtures turn MW0009 off to test the build's own check; this one keeps it on.
+            var project = MapProject.Find(Path.Combine(TestFolders.Fixture("ObjectErrors"), "AnalyzerStops"));
+            var log = new StringWriter();
+
+            var error = Assert.Throws<BuildException>(() => DotnetBuild.Run(project, false, log));
+
+            Assert.Equal("dotnet build failed", error.Message);
+            Assert.Contains(
+                "error MW0009: Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it",
+                log.ToString());
+        }
+
         private static DeclaredObject Find(IReadOnlyList<DeclaredObject> declared, string className)
         {
             return Assert.Single(declared, one => one.ClassName == className);
