@@ -79,6 +79,20 @@ namespace Moonwell.Testing
             Expect.Equal(1, world.Logged.Count, "one error is reported");
         }
 
+        /// <summary>Hitting back from core's OnDamaged counts too: with the package, the chain stops at 8.</summary>
+        public static void ChainThroughOnDamaged(FakeWorld world)
+        {
+            var fake = new FakeDamageWorld();
+            DamageSystem.Install(fake);
+            ObjectTypes.Unit(ObjectTypes.FourCC("h003"), () => new CoreHitback());
+            var first = (CoreHitback)Unit.Of(world.NewUnit(ObjectTypes.FourCC("h003"), slot: 0))!;
+            var second = (CoreHitback)Unit.Of(world.NewUnit(ObjectTypes.FourCC("h003"), slot: 1))!;
+            CoreHitback.Count = 0;
+            fake.Hit(first.Handle, second.Handle, 1f, damageType: 4);
+            Expect.Equal(8, CoreHitback.Count, "eight hits in the chain");
+            Expect.Equal(1, world.Logged.Count, "one error is reported");
+        }
+
         /// <summary>The same with OnHurt, across 0 s timers: the chain still stops at 8.</summary>
         public static void ChainAcrossFrames(FakeWorld world)
         {
@@ -105,6 +119,23 @@ namespace Moonwell.Testing
 
             Expect.Equal(8, hurt, "eight hits landed");
             Expect.Equal(1, world.Logged.Count, "one error is reported");
+        }
+    }
+
+    /// <summary>A unit whose core OnDamaged hits the source back for 1, counting every hit it takes.</summary>
+    public class CoreHitback : Unit
+    {
+        /// <summary>The hits every CoreHitback has taken.</summary>
+        public static int Count;
+
+        /// <summary>Counts the hit and hits back.</summary>
+        public override void OnDamaged(Damage damage)
+        {
+            Count++;
+            if (damage.Source != null)
+            {
+                this.Damage(damage.Source, 1f, DamageKind.Normal);
+            }
         }
     }
 }

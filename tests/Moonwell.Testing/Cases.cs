@@ -144,6 +144,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "damage-package.deal-inside-reaction-nests", Run = DealCases.DealInsideReactionNests });
             list.Add(new Case { Name = "damage-package.chain-cut", Run = DealCases.ChainCut });
             list.Add(new Case { Name = "damage-package.chain-across-frames", Run = DealCases.ChainAcrossFrames });
+            list.Add(new Case { Name = "damage-package.chain-through-on-damaged", Run = DealCases.ChainThroughOnDamaged });
             list.Add(new Case { Name = "death.order", Run = DeathCases.Order });
             list.Add(new Case { Name = "death.self", Run = DeathCases.Self });
             list.Add(new Case { Name = "death.not-an-end", Run = DeathCases.NotAnEnd });

@@ -239,7 +239,11 @@ namespace Moonwell
             var amount = hit.Amount;
             hit.Stage = Stage.AfterArmor;
             hit.LifeBefore = World.Life(targetHandle);
+
+            // Core's OnDamaged family runs as reactions to this hit too, so damage it deals continues the hit's chain.
+            Reactions.Running.Add(hit);
             Inbound.Dispatch(hit);
+            Reactions.Running.RemoveAt(Reactions.Running.Count - 1);
             Reactions.Run(hit, Stage.AfterArmor);
             if (hit.LifeBefore - hit.Amount <= 0.405f)
             {
