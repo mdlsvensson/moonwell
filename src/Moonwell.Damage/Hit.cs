@@ -98,6 +98,18 @@ namespace Moonwell
         /// <summary>The target's life when the after-armor stage began, before the hit lowered it.</summary>
         internal float LifeBefore;
 
+        /// <summary>Whether the package put armor on the target for this hit, to be put back.</summary>
+        internal bool ArmorChanged;
+
+        /// <summary>The armor to set on the target to put its own back.</summary>
+        internal float ArmorRestore;
+
+        /// <summary>Whether the package put a defense type on the target for this hit, to be put back.</summary>
+        internal bool DefenseChanged;
+
+        /// <summary>The target's own defense type, to be put back.</summary>
+        internal int DefenseRestore;
+
         /// <summary>In the lethal stage: lowers the amount so that the target keeps that much life.</summary>
         public void Spare(float life = 1f)
         {

@@ -123,6 +123,13 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "damage-package.no-trigger-without-need", Run = InstallCases.NoTriggerWithoutNeed });
             list.Add(new Case { Name = "damage-package.listens-for-an-interface", Run = InstallCases.ListensForAnInterface });
             list.Add(new Case { Name = "damage-package.listens-for-on-damaged", Run = InstallCases.ListensForOnDamaged });
+            list.Add(new Case { Name = "damage-package.order", Run = StageCases.Order });
+            list.Add(new Case { Name = "damage-package.before-armor-changes", Run = StageCases.BeforeArmorChanges });
+            list.Add(new Case { Name = "damage-package.armor-for-one-hit", Run = StageCases.ArmorForOneHit });
+            list.Add(new Case { Name = "damage-package.after-armor-changes", Run = StageCases.AfterArmorChanges });
+            list.Add(new Case { Name = "damage-package.type-set-after-armor-reported", Run = StageCases.TypeSetAfterArmorReported });
+            list.Add(new Case { Name = "damage-package.removed-mid-stage", Run = StageCases.RemovedMidStage });
+            list.Add(new Case { Name = "damage-package.melee-or-ranged", Run = StageCases.MeleeOrRanged });
             list.Add(new Case { Name = "death.order", Run = DeathCases.Order });
             list.Add(new Case { Name = "death.self", Run = DeathCases.Self });
             list.Add(new Case { Name = "death.not-an-end", Run = DeathCases.NotAnEnd });
