@@ -127,6 +127,19 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void stubs_have_only_the_enums_the_map_names()
+        {
+            // The enums' own file is left out of CSharp.lua's compile, which would write a blank line for each of them into every map: the stubs carry the ones the code names.
+            Assert.Contains("    /// @CSharpLua.Ignore\n    public enum AttackType\n    {\n", compiled.Stubs);
+            Assert.Contains("        Magic = 6,\n", compiled.Stubs);
+            Assert.Contains("    /// @CSharpLua.Ignore\n    [global::System.Flags]\n    public enum Targets\n    {\n", compiled.Stubs);
+            Assert.Contains("    public enum ArmorType\n", compiled.Stubs);
+            Assert.DoesNotContain("public enum AiBuffer", compiled.Stubs);
+            Assert.DoesNotContain("public enum AbilityModifierStats", compiled.Stubs);
+            Assert.DoesNotContain("BeyondLimitsAttribute", compiled.Stubs);
+        }
+
+        [Fact]
         public void unused_generated_namespace_leaves_nothing_in_the_script()
         {
             Assert.DoesNotContain("Moonwell.Objects.Campaign.Units", compiled.Script);

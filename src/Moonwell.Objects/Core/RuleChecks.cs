@@ -1,3 +1,5 @@
+#if !MOONWELL_LUA
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -337,4 +339,31 @@ namespace Moonwell.Objects
             }
         }
     }
+
+    /// <summary>The levels of a value as the rule checks read them, whatever the type of a level.</summary>
+    /// @CSharpLua.Ignore
+    internal interface ILevelValues
+    {
+        /// <summary>True when the number of levels is known: values given one by one, or a formula resolved.</summary>
+        bool Counted { get; }
+
+        /// <summary>The number of levels; 0 for a formula not yet resolved.</summary>
+        int Count { get; }
+
+        /// <summary>The value of a level, counted from 0.</summary>
+        object? ValueAt(int index);
+
+        /// <summary>Calls <paramref name="check"/> with each level (counted from 1) and its value when a formula is resolved.</summary>
+        void WhenCounted(Action<int, object?> check);
+    }
+
+    /// <summary>An object list as the rule checks read it, whatever the type of its entries.</summary>
+    /// @CSharpLua.Ignore
+    internal interface IObjectList
+    {
+        /// <summary>The number of entries in the list.</summary>
+        int Count { get; }
+    }
 }
+
+#endif

@@ -1,3 +1,5 @@
+#if !MOONWELL_LUA
+
 using System;
 using System.Diagnostics;
 
@@ -63,3 +65,5 @@ namespace Moonwell.Objects
         }
     }
 }
+
+#endif

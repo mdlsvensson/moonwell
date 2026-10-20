@@ -1,3 +1,5 @@
+#if !MOONWELL_LUA
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -105,3 +107,5 @@ namespace Moonwell.Objects
         }
     }
 }
+
+#endif

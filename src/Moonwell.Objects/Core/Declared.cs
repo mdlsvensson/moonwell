@@ -94,10 +94,13 @@ namespace Moonwell.Objects
                 return;
             }
 
+// The rule checks run on .NET only: MOONWELL_LUA leaves their classes out, so that the map's Lua has no empty namespace for each.
+#if !MOONWELL_LUA
             if (owner != null)
             {
                 RuleChecks.Put(owner, field, null, value);
             }
+#endif
 
             values[field] = value;
         }
@@ -111,10 +114,12 @@ namespace Moonwell.Objects
                 return;
             }
 
+#if !MOONWELL_LUA
             if (owner != null)
             {
                 RuleChecks.Put(owner, field, level, value);
             }
+#endif
 
             values[Key(field, level)] = value;
         }
@@ -162,11 +167,13 @@ namespace Moonwell.Objects
                 }
 
                 var made = new ObjectList<T>(entries);
+#if !MOONWELL_LUA
                 if (this.owner != null)
                 {
                     var checkedOwner = this.owner;
                     made.Grew = count => RuleChecks.Entries(checkedOwner, field, count);
                 }
+#endif
 
                 list = made;
                 values[field] = list;
@@ -226,7 +233,8 @@ namespace Moonwell.Objects
 
         private static string Key(string field, int level)
         {
-            return field + ":" + level.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            // A level is a whole number from 1 up, so no culture changes its digits; CultureInfo would add a local to every map's Lua.
+            return field + ":" + level;
         }
 
         private static List<object> StandardEntries(string? text)

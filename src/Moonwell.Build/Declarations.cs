@@ -84,12 +84,12 @@ namespace Moonwell.Build
             var map = context.Open(assemblyPath);
             if (!map.GetReferencedAssemblies().Any(name => name.Name == ObjectsAssemblyName))
             {
-                return new DeclarationSet(Array.Empty<DeclaredObject>(), new Dictionary<string, string>(), Array.Empty<UsedClass>());
+                return new DeclarationSet(Array.Empty<DeclaredObject>(), new Dictionary<string, string>(), Array.Empty<UsedClass>(), string.Empty);
             }
 
             var objects = context.LoadFromAssemblyName(new AssemblyName(ObjectsAssemblyName));
             SetterScan.Check(map);
-            var used = ObjectLua.UsedClasses(map, objects, assemblyPath);
+            var used = ObjectLua.UsedClasses(map, objects, assemblyPath, out var support);
 
             var classNames = new Dictionary<string, string>(StringComparer.Ordinal);
             var standardClasses = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -132,7 +132,7 @@ namespace Moonwell.Build
                     }
                 }
 
-                return new DeclarationSet(declared, named, used);
+                return new DeclarationSet(declared, named, used, support);
             }
             finally
             {

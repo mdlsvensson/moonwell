@@ -42,8 +42,9 @@ public static class GeneratedObjects
         // (ruling R14): a map may write any standard value.
         var choices = Choices.WithStandardBits(listed, fieldsOf.Keys.Select(kind => (fieldsOf[kind], objectsOf[kind])).ToList());
 
-        // The enums are not left out under MOONWELL_LUA: the build's stubs name them. CSharp.lua writes no Lua for them.
-        files["Choices.g.cs"] = ObjectsWriter.Header(gameVersion) + "\n" + ObjectsWriter.Choices(choices.Values);
+        // Like the classes, the enums are left out under MOONWELL_LUA: they write no Lua, but a file of them would still
+        // write an empty namespace block into every map.
+        files["Choices.g.cs"] = ObjectsWriter.Header(gameVersion) + "\n#if !MOONWELL_LUA\n\n" + ObjectsWriter.Choices(choices.Values) + footer;
         foreach (var kind in Enum.GetValues<Kind>())
         {
             var objects = objectsOf[kind];

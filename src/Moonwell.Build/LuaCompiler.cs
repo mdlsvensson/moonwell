@@ -47,7 +47,7 @@ namespace Moonwell.Build
             StandardData standard,
             string? set)
         {
-            ObjectStubs.Write(project, declarations.Used);
+            ObjectStubs.Write(project, declarations.Used, declarations.Support);
             var script = Compile(project, map, targetPath, release, ObjectLua.Definitions(declarations.Used), out var files);
             var named = new Dictionary<string, string>(declarations.StandardClassIds, StringComparer.Ordinal);
             foreach (var entry in ids)

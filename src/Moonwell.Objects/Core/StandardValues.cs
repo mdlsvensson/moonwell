@@ -27,10 +27,12 @@ namespace Moonwell.Objects
                 return default!;
             }
 
+#if !MOONWELL_LUA
             if (typeof(T).IsEnum)
             {
                 return (T)Enum.ToObject(typeof(T), ChoiceTexts.Number(typeof(T), text));
             }
+#endif
 
             if (typeof(T) == typeof(int))
             {

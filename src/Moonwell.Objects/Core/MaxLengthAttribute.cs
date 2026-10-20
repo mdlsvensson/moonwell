@@ -1,3 +1,5 @@
+#if !MOONWELL_LUA
+
 using System;
 
 namespace Moonwell.Objects
@@ -17,3 +19,5 @@ namespace Moonwell.Objects
         }
     }
 }
+
+#endif

@@ -111,9 +111,9 @@ public class ObjectsWriterTests
     [Fact]
     public void every_source_is_left_out_when_moonwell_lua_is_defined()
     {
-        // CSharp.lua compiles with MOONWELL_LUA and reads the build's stubs of the used classes instead; the stubs name the enums.
+        // CSharp.lua compiles with MOONWELL_LUA and reads the build's stubs of the used classes instead; the enums are left out too.
         var lua = new CSharpParseOptions(LanguageVersion.CSharp13, preprocessorSymbols: new[] { "MOONWELL_LUA" });
-        foreach (var (path, text) in MiniFiles.Value.Where(f => f.Key.EndsWith(".cs", StringComparison.Ordinal) && f.Key != "Choices.g.cs"))
+        foreach (var (path, text) in MiniFiles.Value.Where(f => f.Key.EndsWith(".cs", StringComparison.Ordinal)))
         {
             var root = CSharpSyntaxTree.ParseText(text, lua, path).GetCompilationUnitRoot();
             Assert.Empty(root.Members);

@@ -373,6 +373,37 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void beyond_limits_and_a_choice_compile_to_lua_through_the_stubs()
+        {
+            // The library's files of the attribute and the enums are left out of CSharp.lua's compile; the stubs carry what the map names.
+            var copy = folders.TemporaryCopyOfSample();
+            File.WriteAllText(Path.Combine(copy, "Objects.cs"), """
+                namespace Sample
+                {
+                    [Moonwell.Objects.ObjectId("H001")]
+                    [Moonwell.Objects.BeyondLimits(nameof(HitPoints))]
+                    public sealed class Arthas : Moonwell.Objects.Human.Units.Paladin
+                    {
+                        public Arthas()
+                        {
+                            HitPoints = 600000;
+                            AttackType = Moonwell.Objects.AttackType.Magic;
+                        }
+                    }
+                }
+                """);
+
+            MapBuild.Run(copy, new BuildOptions(), new StringWriter());
+
+            var stubs = File.ReadAllText(Path.Combine(copy, "build", "generated", "ObjectStubs.g.cs"));
+            Assert.Contains("public sealed class BeyondLimitsAttribute : global::System.Attribute", stubs);
+            Assert.Contains("public enum AttackType\n", stubs);
+            Assert.DoesNotContain("public enum Targets", stubs);
+            var script = File.ReadAllText(Path.Combine(copy, "build", "Sample", "war3map.lua"));
+            Assert.Contains("\"Sample.Arthas\"", script);
+        }
+
+        [Fact]
         public void a_referenced_name_brings_every_overload_into_the_stubs()
         {
             // The constructor calls only Set(field, value); CSharp.lua names overloads by their order, so the stub keeps both.

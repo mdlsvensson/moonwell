@@ -32,9 +32,12 @@ namespace Moonwell.Build
         /// <param name="map">The map assembly, loaded in the build's load context.</param>
         /// <param name="objects">The map's copy of <c>Moonwell.Objects</c>, in the same context.</param>
         /// <param name="assemblyPath">The map assembly's file, whose metadata holds the type references.</param>
+        /// <param name="support">The stubs of the enums the map names and of <c>[BeyondLimits]</c> when it is named (<see cref="ObjectStubs.Support"/>).</param>
         /// <returns>The used classes.</returns>
-        internal static IReadOnlyList<UsedClass> UsedClasses(Assembly map, Assembly objects, string assemblyPath)
+        internal static IReadOnlyList<UsedClass> UsedClasses(Assembly map, Assembly objects, string assemblyPath, out string support)
         {
+            var enums = new HashSet<Type>();
+            var beyondLimits = false;
             var starts = new List<Type>();
             foreach (var type in map.GetTypes())
             {
@@ -56,6 +59,12 @@ namespace Moonwell.Build
                     if (type != null && (IsKindBase(type) || Declarations.KindBaseOf(type) != null))
                     {
                         starts.Add(type);
+                    }
+
+                    if (type != null)
+                    {
+                        ObjectStubs.AddEnums(type, enums);
+                        beyondLimits |= type.FullName == Declarations.ObjectsAssemblyName + ".BeyondLimitsAttribute";
                     }
                 }
 
@@ -89,9 +98,10 @@ namespace Moonwell.Build
             var seen = new HashSet<string>(StringComparer.Ordinal);
             foreach (var type in starts.OrderBy(MapClasses.Describe, StringComparer.Ordinal))
             {
-                Add(type, used, seen, members);
+                Add(type, used, seen, members, enums);
             }
 
+            support = ObjectStubs.Support(enums, beyondLimits);
             return used;
         }
 
@@ -335,7 +345,7 @@ namespace Moonwell.Build
             return ((id[0] * 256 + id[1]) * 256 + id[2]) * 256 + id[3];
         }
 
-        private static void Add(Type type, List<UsedClass> used, HashSet<string> seen, IReadOnlyDictionary<string, HashSet<string>> members)
+        private static void Add(Type type, List<UsedClass> used, HashSet<string> seen, IReadOnlyDictionary<string, HashSet<string>> members, ISet<Type> enums)
         {
             var name = MapClasses.Describe(type);
             if (seen.Contains(name))
@@ -347,11 +357,16 @@ namespace Moonwell.Build
             var kindBase = IsKindBase(type) ? type : Declarations.KindBaseOf(type)!;
             if (type != kindBase)
             {
-                Add(type.BaseType!, used, seen, members);
+                Add(type.BaseType!, used, seen, members, enums);
             }
 
             var inObjects = type.Assembly.GetName().Name == Declarations.ObjectsAssemblyName;
             IReadOnlySet<string> names = members.TryGetValue(name, out var referenced) ? referenced : new HashSet<string>();
+            if (inObjects)
+            {
+                ObjectStubs.AddEnums(type, names, enums);
+            }
+
             used.Add(new UsedClass(
                 name,
                 MapClasses.Describe(type.BaseType!),
