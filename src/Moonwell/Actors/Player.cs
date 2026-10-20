@@ -290,6 +290,86 @@ namespace Moonwell
             return Runtime.World.UpgradeLevel(Handle, ObjectTypes.IdOf<T>());
         }
 
+        /// <summary>Sets the level the player has of an upgrade class.</summary>
+        public void SetLevel<T>(int level) where T : Upgrade
+        {
+            Runtime.World.Research(Handle, ObjectTypes.IdOf<T>(), level);
+        }
+
+        /// <summary>How many units of a unit class the player may have, or the top level of an upgrade class it may research; int.MaxValue for a unit class without a limit.</summary>
+        [LocalSafe]
+        public int MaxAllowed<T>() where T : class
+        {
+            return Runtime.World.TechMaxOf(Handle, ObjectTypes.IdOf<T>());
+        }
+
+        /// <summary>Sets how many units of a unit class the player may have, or the top level of an upgrade class; 0 forbids it, and int.MaxValue lifts a unit limit.</summary>
+        public void SetMaxAllowed<T>(int max) where T : class
+        {
+            Runtime.World.SetTechMax(Handle, ObjectTypes.IdOf<T>(), max);
+        }
+
+        /// <summary>Makes an ability class available to the player's units or not.</summary>
+        public void SetAvailable<T>(bool available) where T : Ability
+        {
+            Runtime.World.MakeAvailable(Handle, ObjectTypes.IdOf<T>(), available);
+        }
+
+        /// <summary>The player's name.</summary>
+        [LocalSafe]
+        public string Name
+        {
+            get { return Runtime.World.NameOf(Handle); }
+            set { Runtime.World.Rename(Handle, value); }
+        }
+
+        /// <summary>The player's colour; setting it also recolours the units the player has.</summary>
+        [LocalSafe]
+        public PlayerColor Color
+        {
+            get { return (PlayerColor)Runtime.World.ColorOf(Handle); }
+            set { Runtime.World.Recolor(Handle, (int)value); }
+        }
+
+        /// <summary>The player's team.</summary>
+        [LocalSafe]
+        public int Team
+        {
+            get { return Runtime.World.TeamOf(Handle); }
+            set { Runtime.World.MoveToTeam(Handle, value); }
+        }
+
+        /// <summary>The race the player plays.</summary>
+        [LocalSafe]
+        public Race Race => (Race)Runtime.World.RaceOf(Handle);
+
+        /// <summary>What the player gives another player; the other's alliance with this one can differ.</summary>
+        [LocalSafe]
+        public Alliance AllianceWith(Player other)
+        {
+            return (Alliance)Runtime.World.AllianceOf(Handle, other.Handle);
+        }
+
+        /// <summary>Sets what the player gives another player, e.g. Alliance.Allied | Alliance.SharedVision; the other's alliance with this one stays.</summary>
+        public void SetAlliance(Player other, Alliance alliance)
+        {
+            Runtime.World.SetAllianceOf(Handle, other.Handle, (int)alliance);
+        }
+
+        /// <summary>Whether the game counts the other player as this player's ally.</summary>
+        [LocalSafe]
+        public bool IsAlly(Player other)
+        {
+            return Runtime.World.IsAllyOf(Handle, other.Handle);
+        }
+
+        /// <summary>Whether the game counts the other player as this player's enemy.</summary>
+        [LocalSafe]
+        public bool IsEnemy(Player other)
+        {
+            return Runtime.World.IsEnemyOf(Handle, other.Handle);
+        }
+
         /// <summary>Adds a component to the player, and returns it.</summary>
         public T Add<T>(T component) where T : PlayerComponent => AddComponent(component);
 

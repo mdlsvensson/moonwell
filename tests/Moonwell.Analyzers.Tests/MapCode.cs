@@ -21,7 +21,24 @@ internal static class MapCode
     /// </summary>
     public static List<string> Check(string body, string members = "")
     {
-        var (tree, diagnostics) = Analyze(body, members);
+        return Found(Analyze(Wrap(body, members)));
+    }
+
+    /// <summary>The analyzer's diagnostics for a whole file, in source order, each as "id: the code it points at".</summary>
+    public static List<string> CheckFile(string source)
+    {
+        return Found(Analyze(source));
+    }
+
+    /// <summary>The messages of the analyzer's diagnostics for a whole file, in source order.</summary>
+    public static List<string> MessagesOfFile(string source)
+    {
+        return Analyze(source).Diagnostics.OrderBy(d => d.Location.SourceSpan.Start).Select(d => d.GetMessage()).ToList();
+    }
+
+    private static List<string> Found((SyntaxTree Tree, ImmutableArray<Diagnostic> Diagnostics) analyzed)
+    {
+        var (tree, diagnostics) = analyzed;
         return diagnostics
             .OrderBy(d => d.Location.SourceSpan.Start)
             .Select(d => d.Id + ": " + tree.GetText().ToString(d.Location.SourceSpan))
@@ -31,12 +48,12 @@ internal static class MapCode
     /// <summary>The message of the only diagnostic for a body and members.</summary>
     public static string Message(string body, string members = "")
     {
-        return Assert.Single(Analyze(body, members).Diagnostics).GetMessage();
+        return Assert.Single(Analyze(Wrap(body, members)).Diagnostics).GetMessage();
     }
 
-    private static (SyntaxTree Tree, ImmutableArray<Diagnostic> Diagnostics) Analyze(string body, string members)
+    private static string Wrap(string body, string members)
     {
-        var source = $$"""
+        return $$"""
             using System;
             using System.Collections.Generic;
             using System.Linq;
@@ -55,13 +72,17 @@ internal static class MapCode
                 }
             }
             """;
-        var tree = CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.CSharp13));
+    }
+
+    private static (SyntaxTree Tree, ImmutableArray<Diagnostic> Diagnostics) Analyze(string source)
+    {
+        var tree = CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.Latest));
         var compilation = CSharpCompilation.Create("Map", new[] { tree }, References,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));
         var errors = compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
         Assert.True(errors.Count == 0, string.Join("\n", errors));
 
-        var analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(new SyncAnalyzer());
+        var analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(new SyncAnalyzer(), new LuaAnalyzer());
         return (tree, compilation.WithAnalyzers(analyzers).GetAnalyzerDiagnosticsAsync().Result);
     }
 }

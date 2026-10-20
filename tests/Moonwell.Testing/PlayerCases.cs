@@ -2,7 +2,7 @@ using Moonwell.Hosting;
 
 namespace Moonwell.Testing
 {
-    /// <summary>Cases that check what a player and the game show and hold: text on the screen, gold and food, who is playing.</summary>
+    /// <summary>Cases that check what a player and the game show and hold: text on the screen, gold and food, who is playing, names, colours, teams, alliances and tech.</summary>
     public static class PlayerCases
     {
         /// <summary>A game component that logs who left.</summary>
@@ -131,6 +131,98 @@ namespace Moonwell.Testing
             Expect.Equal(8, world.StateOf(handle, PlayerState.LumberUpkeepRate), "LumberUpkeepRate");
             Expect.Equal(8, player.LumberUpkeepRate, "a read");
             Expect.Equal(0, player.Gold, "Gold is apart");
+        }
+
+        /// <summary>A player's name is the game's: read and set.</summary>
+        public static void PlayersName(FakeWorld world)
+        {
+            Expect.Equal("Player 2", Player.Two.Name, "the game's name");
+            Player.Two.Name = "Arthas";
+
+            Expect.Equal("Arthas", Player.Two.Name, "the new name");
+            Expect.Equal("Arthas", world.NameOf(world.PlayerAt(1)), "the game's new name");
+            Expect.Equal("Player 1", Player.One.Name, "another player's name");
+        }
+
+        /// <summary>A player's colour is the game's: the slot's own until set.</summary>
+        public static void PlayersColor(FakeWorld world)
+        {
+            Expect.True(Player.Two.Color == PlayerColor.Blue, "slot 1 starts blue");
+            Player.Two.Color = PlayerColor.Peanut;
+
+            Expect.True(Player.Two.Color == PlayerColor.Peanut, "the new colour");
+            Expect.Equal(23, world.ColorOf(world.PlayerAt(1)), "the game's new colour");
+            Expect.True(Player.One.Color == PlayerColor.Red, "another player's colour");
+        }
+
+        /// <summary>A player's team is the game's: read and set.</summary>
+        public static void PlayersTeam(FakeWorld world)
+        {
+            Player.Three.Team = 1;
+
+            Expect.Equal(1, Player.Three.Team, "the new team");
+            Expect.Equal(1, world.TeamOf(world.PlayerAt(2)), "the game's team");
+            Expect.Equal(0, Player.One.Team, "another player's team");
+        }
+
+        /// <summary>A player's race is the game's.</summary>
+        public static void PlayersRace(FakeWorld world)
+        {
+            world.SetRace(1, Race.NightElf);
+
+            Expect.True(Player.Two.Race == Race.NightElf, "the race");
+            Expect.True(Player.One.Race == Race.Human, "a race not set");
+        }
+
+        /// <summary>An alliance goes one way, as the game keeps it, and decides who is an ally.</summary>
+        public static void PlayersAlliance(FakeWorld world)
+        {
+            Player.One.SetAlliance(Player.Two, Alliance.Allied | Alliance.SharedVision);
+
+            Expect.True(Player.One.AllianceWith(Player.Two) == (Alliance.Allied | Alliance.SharedVision), "one's alliance with two");
+            Expect.True(Player.Two.AllianceWith(Player.One) == Alliance.None, "two's alliance with one");
+            Expect.True(Player.One.IsAlly(Player.Two), "one is two's ally");
+            Expect.True(!Player.One.IsEnemy(Player.Two), "one is not two's enemy");
+            Expect.True(!Player.Two.IsAlly(Player.One), "two is not one's ally");
+            Expect.True(Player.Two.IsEnemy(Player.One), "two is one's enemy");
+
+            Player.One.SetAlliance(Player.Two, Alliance.None);
+            Expect.True(Player.One.AllianceWith(Player.Two) == Alliance.None, "the alliance taken back");
+        }
+
+        /// <summary>Allied is blizzard.j's "allied": passive, both helps, shared experience and spells.</summary>
+        public static void PlayersAllied(FakeWorld world)
+        {
+            Expect.True(Alliance.Allied == (Alliance.Passive | Alliance.HelpRequest | Alliance.HelpResponse | Alliance.SharedXp | Alliance.SharedSpells), "Allied");
+        }
+
+        /// <summary>An upgrade's level, and how far a unit type or an upgrade is allowed, are the game's.</summary>
+        public static void PlayersTech(FakeWorld world)
+        {
+            ObjectTypes.Id<TestForge>(ObjectTypes.FourCC("R001"));
+            ObjectTypes.Id<TestHero>(ObjectTypes.FourCC("H001"));
+
+            Player.One.SetLevel<TestForge>(2);
+            Expect.Equal(2, Player.One.LevelOf<TestForge>(), "the upgrade's level");
+            Expect.Equal(0, Player.Two.LevelOf<TestForge>(), "another player's level");
+
+            Expect.Equal(int.MaxValue, Player.One.MaxAllowed<TestHero>(), "no limit until set");
+            Player.One.SetMaxAllowed<TestHero>(1);
+            Player.One.SetMaxAllowed<TestForge>(0);
+            Expect.Equal(1, Player.One.MaxAllowed<TestHero>(), "the unit's limit");
+            Expect.Equal(0, Player.One.MaxAllowed<TestForge>(), "the upgrade's limit");
+            Expect.Equal(1, world.TechMaxOf(world.PlayerAt(0), ObjectTypes.FourCC("H001")), "the game's limit");
+        }
+
+        /// <summary>An ability is made available or not for a player.</summary>
+        public static void PlayersAbilityAvailable(FakeWorld world)
+        {
+            ObjectTypes.Id<TestBolt>(ObjectTypes.FourCC("A001"));
+
+            Player.Two.SetAvailable<TestBolt>(false);
+
+            Expect.Equal(1, world.AbilityCalls.Count, "calls");
+            Expect.Equal("available 1 " + ObjectTypes.FourCC("A001") + " off", world.AbilityCalls[0], "the call");
         }
 
         /// <summary>The game's Print shows the line to everyone.</summary>

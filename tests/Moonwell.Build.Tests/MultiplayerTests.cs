@@ -21,6 +21,8 @@ namespace Moonwell.Build.Tests
             Assert.Matches(@"Mistakes\.cs\(15,\d+\): error MW0004", output);
             Assert.Matches(@"Mistakes\.cs\(19,\d+\): error MW0005: 'long'", output);
             Assert.Matches(@"Mistakes\.cs\(20,\d+\): error MW0006: 'SelectGroupForPlayerBJ'", output);
+            Assert.Matches(@"LuaMistakes\.cs\(2,1\): error MW0008: using static Moonwell\.Natives", output);
+            Assert.Matches(@"LuaMistakes\.cs\(8,\d+\): error MW0007: CSharp\.lua drops a collection expression", output);
         }
     }
 }

@@ -3,7 +3,10 @@ using Microsoft.CodeAnalysis;
 
 namespace Moonwell.Analyzers;
 
-/// <summary>The multiplayer mistakes the analyzer rejects (decision 13). <c>[SyncUnchecked]</c> on a method turns all of them off there.</summary>
+/// <summary>
+/// The multiplayer mistakes the analyzer rejects (decision 13); <c>[SyncUnchecked]</c> on a method turns all of them off there.
+/// Then the C# CSharp.lua cannot compile, which nothing turns off.
+/// </summary>
 public static class Rules
 {
     private const string Category = "Multiplayer";
@@ -66,4 +69,27 @@ public static class Rules
 
     public static ImmutableArray<DiagnosticDescriptor> All { get; } =
         ImmutableArray.Create(StateInLocal, LocalOutside, HandleId, HashLoop, NumberType, Desyncs);
+
+    private const string LuaCategory = "Lua";
+
+    public static readonly DiagnosticDescriptor CollectionExpression = new(
+        "MW0007",
+        "Collection expression",
+        "CSharp.lua drops a collection expression or stops on it; write an initializer such as new List<int> { 1, 2 }, new() { 1, 2 } or new[] { 1, 2 }",
+        LuaCategory,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "CSharp.lua compiles a collection expression ([1, 2]) to nothing in a return or a field, and stops with \"Compiler has a bug\" in a local, an assignment or an argument.");
+
+    public static readonly DiagnosticDescriptor StaticNatives = new(
+        "MW0008",
+        "using static Moonwell.Natives",
+        "using static Moonwell.Natives makes CSharp.lua stop on a handle constant (such as ATTACK_TYPE_MAGIC) and hides Moonwell.Player behind Natives.Player; write Natives.X",
+        LuaCategory,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "A handle constant used through the import makes CSharp.lua stop with a NullReferenceException, and Player.Get(0) fails with CS0119 because Natives.Player(int) wins.");
+
+    /// <summary>The rules of C# that CSharp.lua cannot compile.</summary>
+    public static ImmutableArray<DiagnosticDescriptor> Lua { get; } = ImmutableArray.Create(CollectionExpression, StaticNatives);
 }
