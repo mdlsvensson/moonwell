@@ -18,6 +18,7 @@ namespace Moonwell.Build.Tests
             Dotnet(repository, "pack", Path.Combine("src", "Moonwell.Natives", "Moonwell.Natives.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
             Dotnet(repository, "pack", Path.Combine("src", "Moonwell", "Moonwell.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
             Dotnet(repository, "pack", Path.Combine("src", "Moonwell.Objects", "Moonwell.Objects.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
+            Dotnet(repository, "pack", Path.Combine("src", "Moonwell.Damage", "Moonwell.Damage.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
             Dotnet(repository, "pack", Path.Combine("template", "Moonwell.Templates.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
         }
 
@@ -33,6 +34,9 @@ namespace Moonwell.Build.Tests
         /// <summary>The path of the Moonwell.Objects package.</summary>
         public string ObjectsPackage => Path.Combine(Feed, "Moonwell.Objects." + Version + ".nupkg");
 
+        /// <summary>The path of the Moonwell.Damage package.</summary>
+        public string DamagePackage => Path.Combine(Feed, "Moonwell.Damage." + Version + ".nupkg");
+
         /// <summary>The path of the Moonwell.Templates package.</summary>
         public string TemplatesPackage => Path.Combine(Feed, "Moonwell.Templates." + Version + ".nupkg");
 
@@ -40,7 +44,7 @@ namespace Moonwell.Build.Tests
         public void Dispose()
         {
             var packages = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
-            foreach (var id in new[] { "moonwell", "moonwell.natives", "moonwell.objects" })
+            foreach (var id in new[] { "moonwell", "moonwell.natives", "moonwell.objects", "moonwell.damage" })
             {
                 var version = Path.Combine(packages, id, Version.ToLowerInvariant());
                 if (Directory.Exists(version))

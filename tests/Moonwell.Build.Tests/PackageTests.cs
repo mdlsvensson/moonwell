@@ -72,6 +72,24 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void damage_package_has_source_and_depends_on_objects()
+        {
+            using var archive = ZipFile.OpenRead(packed.DamagePackage);
+            var names = archive.Entries.Select(entry => entry.FullName).ToList();
+            Assert.Contains("contentFiles/cs/net10.0/Moonwell.Damage/Hit.cs", names);
+            Assert.Contains(names, name => name.StartsWith("lib/", StringComparison.Ordinal) && name.EndsWith("/Moonwell.Damage.dll", StringComparison.Ordinal));
+            Assert.DoesNotContain(names, name => name.Contains("/obj/") || name.Contains("/bin/"));
+
+            using var reader = new StreamReader(archive.Entries.Single(entry => entry.FullName == "Moonwell.Damage.nuspec").Open());
+            var nuspec = XDocument.Parse(reader.ReadToEnd());
+            var files = nuspec.Descendants().Where(element => element.Name.LocalName == "files").ToList();
+            var hit = files.Single(file => file.Attribute("include")!.Value.Replace('\\', '/') == "cs/net10.0/Moonwell.Damage/Hit.cs");
+            Assert.Equal("None", hit.Attribute("buildAction")!.Value);
+            var dependency = Assert.Single(nuspec.Descendants(), element => element.Name.LocalName == "dependency" && element.Attribute("id")!.Value == "Moonwell.Objects");
+            Assert.Equal(packed.Version, dependency.Attribute("version")!.Value);
+        }
+
+        [Fact]
         public void packaged_sample_builds()
         {
             var copy = PackagedSample(false, false);
