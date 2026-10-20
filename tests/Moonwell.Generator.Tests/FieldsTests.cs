@@ -271,6 +271,84 @@ public class FieldsTests
     }
 
     [Fact]
+    public void whole_number_limits_from_min_and_max()
+    {
+        var gold = Find(Fields.Of(MiniExport(), Kind.Item), "igol").Rules;
+        var hitPoints = Find(Fields.Of(MiniExport(), Kind.Item), "ihtp").Rules;
+
+        Assert.Equal(0, gold.Min);
+        Assert.Equal(100000, gold.Max);
+        Assert.Equal("Gold Cost", gold.Label);
+        Assert.False(gold.NonNegative);
+        Assert.False(gold.CanBeEmpty);
+        Assert.Null(gold.MaxLength);
+        Assert.Equal(1, hitPoints.Min);
+        Assert.Equal(500000, hitPoints.Max);
+        Assert.Equal("Hit Points", hitPoints.Label);
+    }
+
+    [Fact]
+    public void an_unreal_field_is_non_negative()
+    {
+        var regeneration = Find(Fields.Of(MiniExport(), Kind.Unit), "uhpr").Rules;
+
+        Assert.True(regeneration.NonNegative);
+        Assert.Equal(0, regeneration.Min);
+        Assert.Equal(1000, regeneration.Max);
+        Assert.False(Find(Fields.Of(MiniExport(), Kind.Unit), "uhpm").Rules.NonNegative);
+    }
+
+    [Fact]
+    public void force_non_negative_is_read()
+    {
+        Assert.True(Find(Fields.Of(MiniExport(), Kind.Ability), "acdn").Rules.NonNegative);
+        Assert.True(Find(Fields.Of(MiniExport(), Kind.Item), "isca").Rules.NonNegative);
+    }
+
+    [Fact]
+    public void a_bool_row_has_no_limits()
+    {
+        var hero = Find(Fields.Of(MiniExport(), Kind.Ability), "aher").Rules;
+
+        Assert.Null(hero.Min);
+        Assert.Null(hero.Max);
+        Assert.Equal("Hero Ability", hero.Label);
+    }
+
+    [Fact]
+    public void a_string_limit_is_a_length_only_when_it_is_a_number()
+    {
+        var tables = MiniExport();
+
+        // utip and unam name a text size (TTDesc, TTName), which is not a number of characters.
+        Assert.Null(Find(Fields.Of(tables, Kind.Unit), "utip").Rules.MaxLength);
+        Assert.Null(Find(Fields.Of(tables, Kind.Unit), "unam").Rules.MaxLength);
+        Assert.Null(Find(Fields.Of(tables, Kind.Unit), "unam").Rules.Max);
+        Assert.Equal(32, Find(Fields.Of(tables, Kind.Unit), "ucun").Rules.MaxLength);
+        Assert.Null(Find(Fields.Of(tables, Kind.Unit), "ucun").Rules.Max);
+    }
+
+    [Fact]
+    public void can_be_empty_is_read()
+    {
+        var tables = MiniExport();
+
+        Assert.True(Find(Fields.Of(tables, Kind.Unit), "utip").Rules.CanBeEmpty);
+        Assert.False(Find(Fields.Of(tables, Kind.Unit), "unam").Rules.CanBeEmpty);
+        Assert.False(Find(Fields.Of(tables, Kind.Unit), "ucun").Rules.CanBeEmpty);
+    }
+
+    [Fact]
+    public void a_field_made_without_rules_has_empty_ones()
+    {
+        var field = new Field(Kind.Unit, "uhpm", "Life", FieldType.Int, null, false, 0, false, Array.Empty<string>(), "HP");
+
+        Assert.Equal(FieldRules.None, field.Rules);
+        Assert.Null(field.Rules.Min);
+        Assert.Null(field.Rules.Label);
+    }
+
+    [Fact]
     public void a_hero_only_unit_field_is_marked()
     {
         var fields = Fields.Of(MiniExport(), Kind.Unit);

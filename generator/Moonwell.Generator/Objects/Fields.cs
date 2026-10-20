@@ -13,6 +13,28 @@ public enum FieldType
     ObjectRef,
 }
 
+/// <summary>What World Editor allows a field to hold, from the metadata.</summary>
+/// <param name="Min">The lowest value allowed, from <c>minVal</c>; null for a field with no lower limit.</param>
+/// <param name="Max">The highest value allowed, from <c>maxVal</c>; null for a field with no upper limit.</param>
+/// <param name="NonNegative">True when the value may not be negative: <c>forceNonNeg</c>, or an <c>unreal</c> type.</param>
+/// <param name="CanBeEmpty">True when the editor accepts an empty value (<c>canBeEmpty</c>).</param>
+/// <param name="MaxLength">
+/// For a text field, the most characters allowed, from a numeric <c>maxVal</c>; null when there is none or when the
+/// export names a text size (<c>TTName</c>, <c>TTDesc</c>, <c>TTUber</c>), which is not a number of characters.
+/// </param>
+/// <param name="Label">The field's World Editor label, or null when the export has none.</param>
+public sealed record FieldRules(
+    double? Min,
+    double? Max,
+    bool NonNegative,
+    bool CanBeEmpty,
+    int? MaxLength,
+    string? Label)
+{
+    /// <summary>The rules of a field with none.</summary>
+    public static FieldRules None { get; } = new FieldRules(null, null, false, false, null, null);
+}
+
 /// <summary>One field of one kind of object.</summary>
 /// <param name="Kind">The kind of object the field belongs to.</param>
 /// <param name="Id">The field id (<c>uhpm</c>), the metadata row's id.</param>
@@ -33,6 +55,7 @@ public enum FieldType
 /// every field of another kind.
 /// </param>
 /// <param name="Store">How an object file stores the field's value: <c>int</c>, <c>real</c>, <c>unreal</c> or <c>string</c>.</param>
+/// <param name="Rules">What World Editor allows the field to hold; <see cref="FieldRules.None"/> when not given.</param>
 public sealed record Field(
     Kind Kind,
     string Id,
@@ -45,7 +68,12 @@ public sealed record Field(
     IReadOnlyList<string> Specific,
     string Column,
     bool HeroOnly = false,
-    string Store = "string");
+    string Store = "string",
+    FieldRules? Rules = null)
+{
+    /// <summary>What World Editor allows the field to hold; never null.</summary>
+    public FieldRules Rules { get; init; } = Rules ?? FieldRules.None;
+}
 
 /// <summary>The fields of each kind of object, from the export's metadata tables.</summary>
 /// <remarks>
@@ -134,7 +162,8 @@ public static class Fields
                 specific,
                 ColumnOf(row, repeat, pointer, perField),
                 kind == Kind.Unit && Value(row, "useHero") == "1" && Value(row, "useUnit") != "1" && Value(row, "useBuilding") != "1",
-                StoreOf(Value(row, "type"))));
+                StoreOf(Value(row, "type")),
+                RulesOf(row, LabelOf(tables, row))));
             candidates.Add(new NameCandidate(row.Id, name!, listed, GroupsOf(kind, row, specific, mentioned)));
         }
 
@@ -236,6 +265,58 @@ public static class Fields
         }
 
         return type == "real" || type == "unreal" ? type : "string";
+    }
+
+    // The metadata types whose minVal and maxVal are the lowest and highest number the value may be.
+    private static readonly HashSet<string> NumberTypes = new HashSet<string>(StringComparer.Ordinal)
+    {
+        "int", "real", "unreal", "intList", "unrealList",
+    };
+
+    private static FieldRules RulesOf(MetaRow row, string label)
+    {
+        var type = Value(row, "type");
+        var nonNegative = Value(row, "forceNonNeg") == "1" || type == "unreal" || type == "unrealList";
+        double? min = null;
+        double? max = null;
+        int? maxLength = null;
+        if (NumberTypes.Contains(type))
+        {
+            min = Limit(row, "minVal");
+            max = Limit(row, "maxVal");
+        }
+        else if (type == "string" || type == "stringList")
+        {
+            var length = Limit(row, "maxVal", textSize: true);
+            if (length.HasValue)
+            {
+                maxLength = (int)length.Value;
+            }
+        }
+
+        return new FieldRules(min, max, nonNegative, Value(row, "canBeEmpty") == "1", maxLength, label.Length == 0 ? null : label);
+    }
+
+    // A limit cell as a number; null when the cell is empty, or (for a text field) names a text size such as TTDesc.
+    private static double? Limit(MetaRow row, string column, bool textSize = false)
+    {
+        var text = Value(row, column);
+        if (text.Length == 0)
+        {
+            return null;
+        }
+
+        if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var number))
+        {
+            return number;
+        }
+
+        if (textSize)
+        {
+            return null;
+        }
+
+        throw new FormatException($"metadata row {row.Id}: the {column} cell '{text}' is not a number");
     }
 
     private static string ColumnOf(MetaRow row, int repeat, int pointer, Dictionary<string, int> perField)
