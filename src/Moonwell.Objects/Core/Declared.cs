@@ -287,8 +287,9 @@ namespace Moonwell.Objects
             catch (Exception error)
             {
                 // Every generated standard class is made with no arguments; one that is not cannot be told apart from the map's puts.
-                // Plain code: CSharp.lua reads this file too, and fails on a property pattern here.
-                var cause = error.InnerException != null && error is System.Reflection.TargetInvocationException ? error.InnerException : error;
+                // A throwing constructor comes wrapped (TargetInvocationException); the cause is inside. Plain code, naming no
+                // type of System.Reflection: CSharp.lua reads this file too, and would add that namespace to the map's Lua.
+                var cause = error.InnerException ?? error;
                 throw new InvalidOperationException(
                     $"{standardClass.FullName}, a standard class, could not be made by itself to count the values its constructor sets: {cause.Message}",
                     cause);
