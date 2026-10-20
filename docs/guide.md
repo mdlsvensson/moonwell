@@ -131,6 +131,12 @@ screen, `seconds: 10f`. `Gold`, `Lumber`, `FoodUsed`, `FoodCap`, `FoodCapCeiling
 `foreach (var player in Player.Users)`. `player.SlotState` is `Empty`, `Playing` or `Left`, and `player.Controller`
 says who plays it. `OnLeave(Player player)` runs on the game's components, then the leaving player's.
 
+`Name`, `Color` and `Team` are read and set, and `Race` read; setting `Color` also recolours the player's units.
+`a.SetAlliance(b, Alliance.Allied | Alliance.SharedVision)` sets what `a` gives `b`, one way as the game keeps it, and
+`a.AllianceWith(b)`, `a.IsAlly(b)` and `a.IsEnemy(b)` read it. `LevelOf<T>()` and `SetLevel<T>(2)` take an upgrade class;
+`SetMaxAllowed<T>(1)` a unit or upgrade class, where 0 forbids it and `MaxAllowed<T>()` is -1 without a limit; and
+`SetAvailable<T>(false)` an ability class.
+
 The `Natives` class has every native of the game for what Moonwell does not cover yet.
 
 ## Multiplayer
@@ -146,6 +152,9 @@ turns the checks off in it.
 `moonwell build` builds the map in the current folder into `build\MyMap.w3x`; `moonwell run` builds it and starts the
 game with it. Both make a development build: it checks the values Moonwell receives and keeps the Lua readable.
 `--release` makes the release build. `moonwell run --game <exe>` names the game when it is not in its usual place.
+
+The build also rejects what CSharp.lua cannot compile: collection expressions, `[1, 2]` (write `new List<int> { 1, 2 }`),
+and `using static Moonwell.Natives` (write `Natives.X`).
 
 An error in a reaction shows on the screen with its C# file and line, and is written in full to
 `Documents\Warcraft III\CustomMapData\Moonwell\log.txt`. A release build leaves the message off the screen and keeps
