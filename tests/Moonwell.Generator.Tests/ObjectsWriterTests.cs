@@ -198,8 +198,14 @@ public class ObjectsWriterTests
         Assert.Contains("public class SummerTreeWall : global::Moonwell.Objects.StandardDestructable\n", destructables);
         Assert.Contains("    /// <summary>Lilypad (ZPlp).</summary>\n", doodads);
         Assert.Contains("public class Lilypad : global::Moonwell.Objects.StandardDoodad\n", doodads);
-        Assert.DoesNotContain("WESTRING", destructables);
-        Assert.DoesNotContain("WESTRING", doodads);
+        // The constructor sets the name as the tables hold it, a key the game resolves; the class and its summary have the label.
+        foreach (var source in new[] { destructables, doodads })
+        {
+            Assert.DoesNotContain("class WESTRING", source);
+            Assert.DoesNotContain("<summary>WESTRING", source);
+        }
+
+        Assert.Contains("            Name = \"WESTRING_DEST_SUMMER_TREE_WALL\";\n", destructables);
     }
 
     [Fact]

@@ -19,6 +19,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACss")]
             public class ACss : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ACss()
+                {
+                    AttackSpeedFactor = Levels(0.9f);
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.ShadowStrike>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(3f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(8f);
+                    DecayPower = Levels(2f);
+                    DecayingDamage = Levels(10f);
+                    Duration = Levels(15.1f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(15.1f);
+                    Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp";
+                    InitialDamage = Levels(75f);
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(65);
+                    MissileArc = 0f;
+                    MissileArt = "Abilities\\Spells\\NightElf\\shadowstrike\\ShadowStrikeMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1200;
+                    MovementSpeedFactor = Levels(0.9f);
+                    Order = "shadowstrike";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(350f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Shadow Strike");
+                    TooltipExtended = Levels("Hurls a poisoned dagger with incredible force at an enemy, dealing <ACss,DataE1> initial damage, and <ACss,DataA1> damage every <ACss,Cast1> seconds for <ACss,Dur1> seconds. The poison slows the attack rate and movement speed of the enemy for a short duration.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Esh1</c>.</summary>
                 [global::Moonwell.Objects.Field("Esh1", Label = "Decaying Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -75,6 +117,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACd2")]
             public class AbolishMagic : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public AbolishMagic()
+                {
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 1;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile, second position)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "B";
+                    HotkeyTurnOff = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDryadDispelMagicOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNDryadDispelMagicOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    ManaLoss = Levels(0f);
+                    Name = "Abolish Magic";
+                    Order = "autodispel";
+                    OrderStringActivate = "autodispelon";
+                    OrderStringDeactivate = "autodispeloff";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f);
+                    RequiredLevel = 0;
+                    Requires.Set<global::Moonwell.Objects.NightElf.Upgrades.AbolishMagic>();
+                    SummonedUnitDamage = Levels(250f);
+                    Target = "Abilities\\Spells\\Human\\DispelMagic\\DispelMagicTarget.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Tree | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Ward);
+                    Tooltip = Levels("Abolish Magic");
+                    TooltipExtended = Levels("Dispels positive buffs from enemy units, and negative buffs from friendly units. |n|cffffcc00Deals <ACdm,DataB1> damage to summoned units.|r");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Adm1</c>.</summary>
                 [global::Moonwell.Objects.Field("Adm1", Label = "Mana Loss")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -101,6 +185,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACdm")]
             public class AbolishMagicACdm : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public AbolishMagicACdm()
+                {
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "B";
+                    HotkeyTurnOff = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDryadDispelMagicOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNDryadDispelMagicOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    ManaLoss = Levels(0f);
+                    Name = "Abolish Magic";
+                    Order = "autodispel";
+                    OrderStringActivate = "autodispelon";
+                    OrderStringDeactivate = "autodispeloff";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f);
+                    RequiredLevel = 0;
+                    Requires.Set<global::Moonwell.Objects.NightElf.Upgrades.AbolishMagic>();
+                    SummonedUnitDamage = Levels(150f);
+                    Target = "Abilities\\Spells\\Human\\DispelMagic\\DispelMagicTarget.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Tree | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Ward);
+                    Tooltip = Levels("Abolish Magic");
+                    TooltipExtended = Levels("Dispels positive buffs from enemy units, and negative buffs from friendly units. |n|cffffcc00Deals <ACdm,DataB1> damage to summoned units.|r");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Adm1</c>.</summary>
                 [global::Moonwell.Objects.Field("Adm1", Label = "Mana Loss")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -127,6 +253,54 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANab")]
             public class AcidBomb : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public AcidBomb()
+                {
+                    AnimationNames = "Attack,two,Spell";
+                    Area = Levels(200f, 200f, 200f);
+                    ArmorPenalty = Levels(3, 4, 5);
+                    AttackSpeedReduction = Levels(0f, 0f, 0f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.AcidBomb>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(12f, 12f, 12f);
+                    DamageInterval = Levels(1f, 1f, 1f);
+                    Duration = Levels(15f, 15f, 15f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(15f, 15f, 15f);
+                    Hotkey = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAcidBomb.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNAcidBomb.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "B";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75, 75, 75);
+                    MissileArc = 0.4f;
+                    MissileArt = "Abilities\\Spells\\Other\\AcidBomb\\BottleMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 700;
+                    MovementSpeedReduction = Levels(0f, 0f, 0f);
+                    Name = "Acid Bomb";
+                    Order = "acidbomb";
+                    PrimaryDamage = Levels(5f, 10f, 17f);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f, 700f, 700f);
+                    RequiredLevel = 1;
+                    SecondaryDamage = Levels(3f, 6f, 11f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Acid Bomb - [|cffffcc00Level 1|r]", "Acid Bomb - [|cffffcc00Level 2|r]", "Acid Bomb - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Hurls a flask of acid at a target.  The flask breaks upon impact, splashing a powerful acid on nearby hostile units.|n|nDecreases armor by <ANab,DataC1>; deals <ANab,DataD1> damage per second to the primary target; deals slightly less damage to nearby targets.|nLasts <ANab,Dur1> seconds.", "Hurls a flask of acid at a target.  The flask breaks upon impact, splashing a powerful acid on nearby hostile units.|n|nDecreases armor by <ANab,DataC2>; deals <ANab,DataD2> damage per second to the primary target; deals slightly less damage to nearby targets.|nLasts <ANab,Dur2> seconds.", "Hurls a flask of acid at a target.  The flask breaks upon impact, splashing a powerful acid on nearby hostile units.|n|nDecreases armor by <ANab,DataC3>; deals <ANab,DataD3> damage per second to the primary target; deals slightly less damage to nearby targets.|nLasts <ANab,Dur3> seconds.");
+                    TooltipLearn = "Learn Acid Bomb - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Hurls a flask of acid at a target.  The flask breaks upon impact, splashing a powerful acid on nearby hostile units.|n|nDecreases armor; deals high damage over time to the primary target; deals slightly less damage over time to nearby targets.|nLasts <ANab,Dur1> seconds.|n|n|cffffcc00Level 1|r - <ANab,DataD1> max damage per second, reduces armor by <ANab,DataC1>.|n|cffffcc00Level 2|r - <ANab,DataD2> max damage per second, reduces armor by <ANab,DataC2>.|n|cffffcc00Level 3|r - <ANab,DataD3> max damage per second, reduces armor by <ANab,DataC3>.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nab1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nab1", Label = "Movement Speed Reduction (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -193,6 +367,42 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACad")]
             public class AnimateDead : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public AnimateDead()
+                {
+                    Area = Levels(900f);
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.AnimateDead>();
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(180f);
+                    Duration = Levels(40f);
+                    EditorSuffix = "(Neutral Hostile), (Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(40f);
+                    Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp";
+                    InheritUpgrades = Levels(false);
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(150);
+                    Name = "Animate Dead";
+                    NumberOfCorpsesRaised = Levels(6);
+                    Order = "animatedead";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RaisedUnitsAreInvulnerable = Levels(false);
+                    Range = Levels(400f);
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Undead\\AnimateDead\\AnimateDeadTarget.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Dead | global::Moonwell.Objects.Targets.Ground);
+                    Tooltip = Levels("Animate Dead");
+                    TooltipExtended = Levels("Raises <ACad,DataA1> dead units in an area for <ACad,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Cad1</c>.</summary>
                 [global::Moonwell.Objects.Field("Cad1", Label = "Number of Corpses Raised")]
                 [global::Moonwell.Objects.Limits(0, 999)]
@@ -225,6 +435,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Ansp")]
             public class Ansp : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Ansp()
+                {
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    DetectionTypeNsp3 = Levels(global::Moonwell.Objects.DetectionType.Invisible);
+                    Duration = Levels(10f);
+                    GoldCostPerStructure = Levels(100);
+                    HeroAbility = false;
+                    HeroDuration = Levels(10f);
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LumberCostPerUse = Levels(0);
+                    ManaCost = Levels(0);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nsp1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nsp1", Label = "Gold Cost per Structure")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -259,6 +491,42 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACam")]
             public class AntiMagicShell : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public AntiMagicShell()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.AntiMagicShellBams, global::Moonwell.Objects.Undead.Buffs.AntiMagicShell>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(90f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(90f);
+                    Hotkey = "N";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAntiMagicShell.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    MagicDamageReduction = Levels(0f);
+                    ManaCost = Levels(50);
+                    ManaLoss = Levels(0);
+                    Name = "Anti-magic Shell";
+                    Order = "antimagicshell";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f);
+                    RequiredLevel = 0;
+                    Requires.Set<global::Moonwell.Objects.Undead.Upgrades.BansheeAdeptTraining>();
+                    ShieldLife = Levels(0);
+                    SummonedUnitDamage = Levels(0f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Vulnerable);
+                    Tooltip = Levels("Anti-magic Shell");
+                    TooltipExtended = Levels("Creates a barrier that stops spells from affecting a target unit. |nLasts <ACam,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ams1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ams1", Label = "Summoned Unit Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -305,6 +573,42 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Aamk")]
             public class AttributeBonus : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public AttributeBonus()
+                {
+                    AgilityBonus = Levels(3, 6, 9, 12);
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 1;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 1;
+                    CastTime = Levels(0f, 0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f, 0f, 0f, 0f);
+                    Duration = Levels(0f, 0f, 0f, 0f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f, 0f, 0f, 0f);
+                    HideButton = Levels(false, false, false, false);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNStatUp.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNStatUp.blp";
+                    IntelligenceBonus = Levels(3, 6, 9, 12);
+                    ItemAbility = false;
+                    LearnHotkey = "B";
+                    LevelCount = 4;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0, 0, 0, 0);
+                    Name = "Attribute Bonus";
+                    Order = "attributemodskill";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    StrengthBonus = Levels(3, 6, 9, 12);
+                    Tooltip = Levels("Attribute Bonus - [|cffffcc00Level 1|r]", "Attribute Bonus - [|cffffcc00Level 2|r]", "Attribute Bonus - [|cffffcc00Level 3|r]", "Attribute Bonus - [|cffffcc00Level 4|r]");
+                    TooltipExtended = Levels("Gives a total of <Aamk,DataA1> points to Agility, Intelligence, and Strength", "Gives a total of <Aamk,DataA2> points to Agility, Intelligence, and Strength", "Gives a total of <Aamk,DataA3> points to Agility, Intelligence, and Strength", "Gives a total of <Aamk,DataA4> points to Agility, Intelligence, and Strength");
+                    TooltipLearn = "Learn Attribute Bonus - [|cffffcc00Level %d|r].";
+                    TooltipLearnExtended = "Gives a permanent bonus to Agility, Intelligence, and Strength. |n|n|cffffcc00Level 1|r - Adds three points to all stats.|n|cffffcc00Level 2|r - Adds three additional points.|n|cffffcc00Level 3|r - Adds three additional points.|n|cffffcc00Level 4|r - Adds three additional points.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Iagi</c>.</summary>
                 [global::Moonwell.Objects.Field("Iagi", Label = "Agility Bonus")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -349,6 +653,42 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Aaml")]
             public class AttributeBonusAaml : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public AttributeBonusAaml()
+                {
+                    AgilityBonus = Levels(5, 10);
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 1;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 1;
+                    CastTime = Levels(0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f, 0f);
+                    Duration = Levels(0f, 0f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f, 0f);
+                    HideButton = Levels(false, false);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNStatUp.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNStatUp.blp";
+                    IntelligenceBonus = Levels(5, 10);
+                    ItemAbility = false;
+                    LearnHotkey = "F";
+                    LevelCount = 2;
+                    LevelSkipRequirement = 6;
+                    ManaCost = Levels(0, 0);
+                    Name = "Attribute Bonus";
+                    Order = "attributemodskill";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 4;
+                    StrengthBonus = Levels(5, 10);
+                    Tooltip = Levels("Attribute Bonus - [|cffffcc00Level 1|r]", "Attribute Bonus - [|cffffcc00Level 2|r]");
+                    TooltipExtended = Levels("Gives a total of <Aaml,DataA1> points to Agility, Intelligence, and Strength", "Gives a total of <Aaml,DataA2> points to Agility, Intelligence, and Strength");
+                    TooltipLearn = "Learn Attribute Bonus - [|cffffcc00Level %d|r].";
+                    TooltipLearnExtended = "\"Gives a permanent bonus to Agility, Intelligence, and Strength. |n|n|cffffcc00Level 1|r - Grants <Aaml,DataA1> points to all stats.|n|cffffcc00Level 2|r - Grants an additional <Aaml,DataA1> points to all stats.";
+                    UseNewDefaultLevelCap = true;
+                }
+
                 /// <summary>The field <c>Iagi</c>.</summary>
                 [global::Moonwell.Objects.Field("Iagi", Label = "Agility Bonus")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -393,6 +733,39 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACbn")]
             public class Banish : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Banish()
+                {
+                    AttackSpeedReduction = Levels(0f);
+                    Buffs.Set<global::Moonwell.Objects.Human.Buffs.Banish>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(10f);
+                    Duration = Levels(24f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(6f);
+                    Hotkey = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBanish.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(50);
+                    MovementSpeedReduction = Levels(0.5f);
+                    Name = "Banish";
+                    Order = "banish";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Nonsapper | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Banish");
+                    TooltipExtended = Levels("Turns a non-mechanical unit ethereal and slows its movement speed by <ACbn,DataA1,%>% for <ACbn,Dur1> seconds. Ethereal creatures cannot attack, but they can cast spells and certain spells cast upon them will have a greater effect.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hbn1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hbn1", Label = "Movement Speed Reduction (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -419,6 +792,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACbh")]
             public class Bash : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Bash()
+                {
+                    Area = Levels(0f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stunned>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    ChanceToBash = Levels(15f);
+                    ChanceToMiss = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    DamageBonus = Levels(25f);
+                    DamageMultiplier = Levels(0f);
+                    Duration = Levels(2f);
+                    EditorSuffix = "(Neutral Hostile 1)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(2f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNBash.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Bash";
+                    NeverMiss = Levels(false);
+                    Order = "bash";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground);
+                    Tooltip = Levels("Bash");
+                    TooltipExtended = Levels("Gives a <ACbh,DataA1>% chance that an attack will do <ACbh,DataC1> bonus damage and stun the target for <ACbh,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hbh1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hbh1", Label = "Chance to Bash")]
                 [global::Moonwell.Objects.Limits(0, 100)]
@@ -473,6 +881,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANbh")]
             public class BashANbh : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BashANbh()
+                {
+                    Area = Levels(0f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stunned>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    ChanceToBash = Levels(25f);
+                    ChanceToMiss = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    DamageBonus = Levels(25f);
+                    DamageMultiplier = Levels(0f);
+                    Duration = Levels(2f);
+                    EditorSuffix = "(Neutral Hostile 2)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(1f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNBash.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Bash";
+                    NeverMiss = Levels(false);
+                    Order = "bash";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground);
+                    Tooltip = Levels("Bash");
+                    TooltipExtended = Levels("Gives a <ANbh,DataA1>% chance that an attack will do <ANbh,DataC1> bonus damage and stun the target for <ANbh,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hbh1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hbh1", Label = "Chance to Bash")]
                 [global::Moonwell.Objects.Limits(0, 100)]
@@ -527,6 +970,51 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANbr")]
             public class BattleRoar : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BattleRoar()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(650f, 650f, 650f, 650f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.BattleRoar>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f, 0f);
+                    Caster = "Abilities\\Spells\\NightElf\\BattleRoar\\RoarCaster.mdl";
+                    CheckDependencies = true;
+                    Cooldown = Levels(25f, 25f, 25f, 25f);
+                    DamageIncrease = Levels(10f, 20f, 30f, 40f);
+                    DefenseIncrease = Levels(0, 0, 0, 0);
+                    Duration = Levels(10f, 10f, 10f, 10f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(10f, 10f, 10f, 10f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBattleRoar.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNBattleRoar.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 4;
+                    LevelSkipRequirement = 0;
+                    LifeRegenerationRate = Levels(0f, 0f, 0f, 0f);
+                    ManaCost = Levels(50, 50, 50, 50);
+                    ManaRegen = Levels(0f, 0f, 0f, 0f);
+                    MaxUnits = Levels(0, 0, 0, 0);
+                    Name = "Battle Roar";
+                    Order = "battleroar";
+                    PreferFriendlies = Levels(false, false, false, false);
+                    PreferHostiles = Levels(false, false, false, false);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Battle Roar - [|cffffcc00Level 1|r]", "Battle Roar - [|cffffcc00Level 2|r]", "Battle Roar - [|cffffcc00Level 3|r]", "Battle Roar - [|cffffcc00Level 4|r]");
+                    TooltipExtended = Levels("Gives nearby friendly units <ANbr,DataA1> bonus attack damage. |nLasts <ANbr,Dur1> seconds.", "Gives nearby friendly units <ANbr,DataA2> bonus attack damage. |nLasts <ANbr,Dur2> seconds.", "Gives nearby friendly units <ANbr,DataA3> bonus attack damage. |nLasts <ANbr,Dur3> seconds.", "Gives nearby friendly units <ANbr,DataA4> bonus attack damage. |nLasts <ANbr,Dur4> seconds.");
+                    TooltipLearn = "Learn Battle Roar - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Gives nearby friendly units a bonus to attack damage. |nLasts <ANbr,Dur1> seconds. |n|n|cffffcc00Level 1|r - <ANbr,DataA1> damage. |n|cffffcc00Level 2|r - <ANbr,DataA2> damage. |n|cffffcc00Level 3|r - <ANbr,DataA3> damage. |n|cffffcc00Level 4|r - <ANbr,DataA4> damage.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nbr1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nbr1", Label = "Damage Increase")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -599,6 +1087,53 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACbk")]
             public class BlackArrow : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BlackArrow()
+                {
+                    AnimationNames = "attack";
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.BlackArrow, global::Moonwell.Objects.Other.Buffs.DarkMinion>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(2f);
+                    DamageBonus = Levels(2f);
+                    Duration = Levels(2f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(2f);
+                    Hotkey = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTheBlackArrowOnOff.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNTheBlackArrowOnOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(6);
+                    MissileArt = "Abilities\\Spells\\Other\\BlackArrow\\BlackArrowMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1050;
+                    Name = "Black Arrow";
+                    NumberOfSummonedUnits = Levels(1);
+                    Order = "blackarrow";
+                    OrderStringActivate = "blackarrowon";
+                    OrderStringDeactivate = "blackarrowoff";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f);
+                    RequiredLevel = 0;
+                    SummonedUnitDurationSeconds = Levels(80f);
+                    SummonedUnitType.Set<global::Moonwell.Objects.Other.Units.LesserDarkMinion>();
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Black Arrow");
+                    TooltipExtended = Levels("Adds <ACbk,DataA1> bonus damage to attacks. Units killed while under the effect of Black Arrow will turn into skeletons.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UnitSkinList = "ndr1";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nba1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nba1", Label = "Damage Bonus")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -642,6 +1177,58 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANba")]
             public class BlackArrowANba : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BlackArrowANba()
+                {
+                    AnimationNames = "attack";
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.BlackArrow, global::Moonwell.Objects.Other.Buffs.DarkMinion>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    ButtonPositionTurnOffX = 1;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f, 0f, 0f);
+                    DamageBonus = Levels(2f, 10f, 20f);
+                    Duration = Levels(2f, 2f, 2f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f, 0f, 0f);
+                    Hotkey = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTheBlackArrowOnOff.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNTheBlackArrow.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNTheBlackArrowOnOff.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "B";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(6, 6, 6);
+                    MissileArt = "Abilities\\Spells\\Other\\BlackArrow\\BlackArrowMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1050;
+                    Name = "Black Arrow";
+                    NumberOfSummonedUnits = Levels(1, 1, 1);
+                    Order = "blackarrow";
+                    OrderStringActivate = "blackarrowon";
+                    OrderStringDeactivate = "blackarrowoff";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f, 700f, 700f);
+                    RequiredLevel = 1;
+                    SummonedUnitDurationSeconds = Levels(80f, 80f, 80f);
+                    SummonedUnitType.Set<global::Moonwell.Objects.Other.Units.LesserDarkMinion>();
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Black Arrow - [|cffffcc00Level 1|r]", "Black Arrow - [|cffffcc00Level 2|r]", "Black Arrow - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Adds <ANba,DataA1> bonus damage to attacks. Units killed while under the effect of Black Arrow will turn into <ndr1,RealHP> hit point skeletons.", "Adds <ANba,DataA2> bonus damage to attacks. Units killed while under the effect of Black Arrow will turn into <ndr2,RealHP> hit point skeletons.", "Adds <ANba,DataA3> bonus damage to attacks. Units killed while under the effect of Black Arrow will turn into <ndr3,RealHP> hit point skeletons.");
+                    TooltipLearn = "Learn Black Arrow - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Adds extra damage to attacks. Units killed while under the effect of Black Arrow will turn into skeletons. |n|n|cffffcc00Level 1|r - <ANba,DataA1> bonus damage, <ndr1,RealHP> hit point skeleton. |n|cffffcc00Level 2|r - <ANba,DataA2> bonus damage, <ndr2,RealHP> hit point skeleton. |n|cffffcc00Level 3|r - <ANba,DataA3> bonus damage, <ndr3,RealHP> hit point skeleton.";
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UnitSkinList = "ndr1,ndr2,ndr3,ndr3";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nba1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nba1", Label = "Damage Bonus")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -685,6 +1272,44 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACbz")]
             public class Blizzard : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Blizzard()
+                {
+                    AnimationNames = "spell,looping";
+                    Area = Levels(200f);
+                    Buffs.Set<global::Moonwell.Objects.Human.Buffs.Blizzard, global::Moonwell.Objects.Human.Buffs.BlizzardCaster>();
+                    BuildingReduction = Levels(0.5f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0.599f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(12f);
+                    Damage = Levels(15f);
+                    DamagePerSecond = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    Effects = Levels("XHbz");
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBlizzard.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125);
+                    Name = "Blizzard";
+                    NumberOfShards = Levels(6);
+                    NumberOfWaves = Levels(6);
+                    Order = "blizzard";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Blizzard");
+                    TooltipExtended = Levels("Calls down <ACbz,DataA1> freezing ice shard waves; each wave deals <ACbz,DataB1> damage to units in a small area.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hbz1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hbz1", Label = "Number of Waves")]
                 [global::Moonwell.Objects.Limits(1, 99999)]
@@ -751,6 +1376,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACbb")]
             public class Bloodlust : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Bloodlust()
+                {
+                    AttackSpeedIncrease = Levels(0.4f);
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.Bloodlust>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    Duration = Levels(40f);
+                    EditorSuffix = "(Neutral Hostile 2)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(40f);
+                    Hotkey = "B";
+                    HotkeyTurnOff = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBloodLustOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNBloodLustOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(50);
+                    MovementSpeedIncrease = Levels(0.25f);
+                    Name = "Bloodlust";
+                    Order = "bloodlust";
+                    OrderStringActivate = "bloodluston";
+                    OrderStringDeactivate = "bloodlustoff";
+                    PriorityForSpellSteal = 11;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f);
+                    RequiredLevel = 0;
+                    ScalingFactor = Levels(0.3f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Bloodlust");
+                    TooltipExtended = Levels("Increases a target friendly unit's attack rate by <ACbb,DataA1,%>% and movement speed by <ACbb,DataB1,%>% for <ACbb,Dur1> seconds.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Blo1</c>.</summary>
                 [global::Moonwell.Objects.Field("Blo1", Label = "Attack Speed Increase (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -787,6 +1454,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACbl")]
             public class BloodlustACbl : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BloodlustACbl()
+                {
+                    AttackSpeedIncrease = Levels(0.4f);
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.Bloodlust>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    Duration = Levels(40f);
+                    EditorSuffix = "(Neutral Hostile 1)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(40f);
+                    Hotkey = "L";
+                    HotkeyTurnOff = "L";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBloodLustOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNBloodLustOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    MovementSpeedIncrease = Levels(0.25f);
+                    Name = "Bloodlust";
+                    Order = "bloodlust";
+                    OrderStringActivate = "bloodluston";
+                    OrderStringDeactivate = "bloodlustoff";
+                    PriorityForSpellSteal = 11;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f);
+                    RequiredLevel = 0;
+                    ScalingFactor = Levels(0.3f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Bloodlust");
+                    TooltipExtended = Levels("Increases a target friendly unit's attack rate by <ACbl,DataA1,%>% and movement speed by <ACbl,DataB1,%>% for <ACbl,Dur1> seconds.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Blo1</c>.</summary>
                 [global::Moonwell.Objects.Field("Blo1", Label = "Attack Speed Increase (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -823,6 +1532,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACbc")]
             public class BreathOfFire : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BreathOfFire()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(150f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.BreathOfFire>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(10f);
+                    Damage = Levels(150f);
+                    DamagePerSecond = Levels(21f);
+                    Distance = Levels(800f);
+                    Duration = Levels(5f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    FinalArea = Levels(150f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(5f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFireForTheCannon.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNFireForTheCannon.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125);
+                    MaxDamage = Levels(99999f);
+                    MissileArt = "Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireMissile.mdl";
+                    MissileSpeed = 1050;
+                    Name = "Breath of Fire";
+                    Order = "breathoffire";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireDamage.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground);
+                    Tooltip = Levels("Breath of Fire");
+                    TooltipExtended = Levels("Breathes a cone of fire at enemy units, dealing <ACbc,DataA1> damage.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nbf5</c>.</summary>
                 [global::Moonwell.Objects.Field("Nbf5", Label = "Damage Per Second")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -879,6 +1630,51 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANbf")]
             public class BreathOfFireANbf : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BreathOfFireANbf()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(90f, 90f, 90f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.BreathOfFire>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(10f, 10f, 10f);
+                    Damage = Levels(80f, 130f, 180f);
+                    DamagePerSecond = Levels(10f, 15f, 25f);
+                    Distance = Levels(375f, 375f, 375f);
+                    Duration = Levels(5f, 5f, 5f);
+                    FinalArea = Levels(175f, 175f, 175f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(5f, 5f, 5f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBreathOfFire.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNBreathOfFire.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "F";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75, 75, 75);
+                    MaxDamage = Levels(600f, 900f, 1200f);
+                    MissileArt = "Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireMissile.mdl";
+                    MissileSpeed = 1050;
+                    Name = "Breath of Fire";
+                    Order = "breathoffire";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(375f, 375f, 375f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Breath of Fire - [|cffffcc00Level 1|r]", "Breath of Fire - [|cffffcc00Level 2|r]", "Breath of Fire - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Breathes a cone of fire at enemy units, dealing <ANbf,DataA1> initial damage. Units that have Drunken Haze on them will ignite and burn for <ANbf,DataE1> damage per second over <ANbf,Dur1> seconds.", "Breathes a cone of fire at enemy units, dealing <ANbf,DataA2> initial damage. Units that have Drunken Haze on them will ignite and burn for <ANbf,DataE2> damage per second over <ANbf,Dur2> seconds.", "Breathes a cone of fire at enemy units, dealing <ANbf,DataA3> initial damage. Units that have Drunken Haze on them will ignite and burn for <ANbf,DataE3> damage per second over <ANbf,Dur3> seconds.");
+                    TooltipLearn = "Learn Breath of Fire - [|cffffcc00Level %d|r],\"Learn Breath of Fire - [|cffffcc00Level %d|r]\"";
+                    TooltipLearnExtended = "\"Breathes a cone of fire at enemy units which deals damage. Units that have Drunken Haze on them will ignite and take burn damage over time. |nLasts <ANbf,Dur1> seconds. |n|n|cffffcc00Level 1|r - <ANbf,DataA1> initial damage, <ANbf,DataE1> damage per second. |n|cffffcc00Level 2|r - <ANbf,DataA2> initial damage, <ANbf,DataE2> damage per second. |n|cffffcc00Level 3|r - <ANbf,DataA3> initial damage, <ANbf,DataE3> damage per second.\",\"Breathes a cone of fire at enemy units, dealing initial damage, and then damage over time. |nLasts <ANbf,Dur1> seconds. |n|n|cffffcc00Level 1|r - <ANbf,DataA1> initial damage, <ANbf,DataE1> damage per second. |n|cffffcc00Level 2|r - <ANbf,DataA2> initial damage, <ANbf,DataE2> damage per second. |n|cffffcc00Level 3|r - <ANbf,DataA3> initial damage, <ANbf,DataE3> damage per second.\"";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nbf5</c>.</summary>
                 [global::Moonwell.Objects.Field("Nbf5", Label = "Damage Per Second")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -935,6 +1731,52 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANcf")]
             public class BreathOfFireANcf : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BreathOfFireANcf()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(150f, 150f, 150f, 150f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.BreathOfFire>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(10f, 10f, 10f, 10f);
+                    Damage = Levels(50f, 100f, 150f, 225f);
+                    DamagePerSecond = Levels(7f, 14f, 21f, 30f);
+                    Distance = Levels(500f, 800f, 800f, 800f);
+                    Duration = Levels(5f, 5f, 5f, 5f);
+                    EditorSuffix = "(Chen)";
+                    FinalArea = Levels(250f, 150f, 150f, 150f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(5f, 5f, 5f, 5f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBreathOfFire.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNBreathOfFire.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "F";
+                    LevelCount = 4;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75, 75, 75, 75);
+                    MaxDamage = Levels(99999f, 99999f, 99999f, 99999f);
+                    MissileArt = "Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireMissile.mdl";
+                    MissileSpeed = 1050;
+                    Name = "Breath of Fire";
+                    Order = "breathoffire";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f, 700f, 700f, 700f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Breath of Fire - [|cffffcc00Level 1|r]", "Breath of Fire - [|cffffcc00Level 2|r]", "Breath of Fire - [|cffffcc00Level 3|r]", "Breath of Fire - [|cffffcc00Level 4|r]");
+                    TooltipExtended = Levels("Breathes a cone of fire at enemy units, dealing <ANcf,DataA1> initial damage. Units that have Drunken Haze on them will ignite and burn for <ANcf,DataE1> damage per second over <ANcf,Dur1> seconds.", "Breathes a cone of fire at enemy units, dealing <ANcf,DataA2> initial damage. Units that have Drunken Haze on them will ignite and burn for <ANcf,DataE2> damage per second over <ANcf,Dur2> seconds.", "Breathes a cone of fire at enemy units, dealing <ANcf,DataA3> initial damage. Units that have Drunken Haze on them will ignite and burn for <ANcf,DataE3> damage per second over <ANcf,Dur3> seconds.", "Breathes a cone of fire at enemy units, dealing <ANcf,DataA4> initial damage. Units that have Drunken Haze on them will ignite and burn for <ANcf,DataE4> damage per second over <ANcf,Dur4> seconds.");
+                    TooltipLearn = "Learn Breath of Fire - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Breathes a cone of fire at enemy units which deals damage. Units that have Drunken Haze on them will ignite and take burn damage over time. |nLasts <ANcf,Dur1> seconds. |n|n|cffffcc00Level 1|r - <ANcf,DataA1> initial damage, <ANcf,DataE1> damage per second. |n|cffffcc00Level 2|r - <ANcf,DataA2> initial damage, <ANcf,DataE2> damage per second. |n|cffffcc00Level 3|r - <ANcf,DataA3> initial damage, <ANcf,DataE3> damage per second. |n|cffffcc00Level 4|r - <ANcf,DataA4> initial damage, <ANcf,DataE4> damage per second.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nbf5</c>.</summary>
                 [global::Moonwell.Objects.Field("Nbf5", Label = "Damage Per Second")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -991,6 +1833,45 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACbf")]
             public class BreathOfFrost : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BreathOfFrost()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(125f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.BreathOfFrost>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(10f);
+                    Damage = Levels(50f);
+                    DamagePerSecond = Levels(7f);
+                    Distance = Levels(375f);
+                    Duration = Levels(5f);
+                    FinalArea = Levels(300f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(5f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBreathOfFrost.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125);
+                    MaxDamage = Levels(99999f);
+                    MissileArt = "Abilities\\Spells\\Other\\BreathOfFrost\\BreathOfFrostMissile.mdl";
+                    MissileSpeed = 1050;
+                    Name = "Breath of Frost";
+                    Order = "breathoffire";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(375f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground);
+                    Tooltip = Levels("Breath of Frost");
+                    TooltipExtended = Levels("Breathes a cone of frost at enemy units that deals <ACbf,DataA1> initial damage, and <ACbf,DataE1> damage per second over <ACbf,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nbf5</c>.</summary>
                 [global::Moonwell.Objects.Field("Nbf5", Label = "Damage Per Second")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -1047,6 +1928,39 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACba")]
             public class BrillianceAura : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BrillianceAura()
+                {
+                    Area = Levels(900f);
+                    Buffs.Set<global::Moonwell.Objects.Human.Buffs.BrillianceAura>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNBrilliance.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    ManaRegenerationIncrease = Levels(0.5f);
+                    Name = "Brilliance Aura";
+                    PercentBonus = Levels(false);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\Human\\Brilliance\\Brilliance.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Brilliance Aura");
+                    TooltipExtended = Levels("Gives additional mana regeneration to nearby friendly units of <ACba,DataA1,.> mana per second.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hab1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hab1", Label = "Mana Regeneration Increase")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -1071,6 +1985,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Abu5")]
             public class Burrow : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Burrow()
+                {
+                    AlternateFormUnit.Set<global::Moonwell.Objects.Creeps.Units.BurrowedBarbedArachnathid>();
+                    AltitudeAdjustmentDuration = Levels(0f);
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 3;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(1.45f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "B";
+                    HotkeyTurnOff = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCryptFiendBurrow.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNCryptFiendUnBurrow.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    MorphingFlags = Levels(global::Moonwell.Objects.MorphFlags.Uninterruptable);
+                    Name = "Burrow";
+                    NormalFormUnit.Set<global::Moonwell.Objects.Creeps.Units.BarbedArachnathidNanm>();
+                    Order = "burrow";
+                    OrderStringTurnOff = "unburrow";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Burrow");
+                    TooltipExtended = Levels("The Arachnathid digs into the ground and becomes invisible.");
+                    TooltipTurnOff = Levels("Unburrow");
+                    TooltipTurnOffExtended = Levels("The Arachnathid pops out of the ground and becomes visible again.");
+                    UnitSkinList = "nbnb";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Eme1</c>.</summary>
                 [global::Moonwell.Objects.Field("Eme1", Label = "Normal Form Unit")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> NormalFormUnit
@@ -1119,6 +2073,39 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACcn")]
             public class Cannibalize : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Cannibalize()
+                {
+                    AnimationNames = "spell,channel";
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(20f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(20f);
+                    HitPointsPerSecond = Levels(12f);
+                    Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCannibalize.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    MaxHitPoints = Levels(800f);
+                    Name = "Cannibalize";
+                    Order = "cannibalize";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(50f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Dead | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Cannibalize");
+                    TooltipExtended = Levels("Consumes a nearby corpse to heal <ACcn,DataA1> hit points per second.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Can1</c>.</summary>
                 [global::Moonwell.Objects.Field("Can1", Label = "Hit Points per Second")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -1145,6 +2132,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACca")]
             public class CarrionSwarm : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CarrionSwarm()
+                {
+                    AnimationNames = "attack,slam";
+                    Area = Levels(100f);
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.CarrionSwarmCaster>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    Damage = Levels(75f);
+                    Distance = Levels(800f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    FinalArea = Levels(300f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCarrionSwarm.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100);
+                    MaxDamage = Levels(300f);
+                    MissileArt = "Abilities\\Spells\\Undead\\CarrionSwarm\\CarrionSwarmMissile.mdl";
+                    MissileSpeed = 1100;
+                    Name = "Carrion Swarm";
+                    Order = "carrionswarm";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Undead\\CarrionSwarm\\CarrionSwarmDamage.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground);
+                    Tooltip = Levels("Carrion Swarm");
+                    TooltipExtended = Levels("Sends a horde of bats to deal <ACca,DataA1> damage to each enemy land unit in a line, up to <ACca,DataB1> max damage.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ucs1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ucs1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -1191,6 +2218,45 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACcl")]
             public class ChainLightning : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ChainLightning()
+                {
+                    AnimationNames = "spell,throw";
+                    Area = Levels(500f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(9f);
+                    DamagePerTarget = Levels(100f);
+                    DamageReductionPerTarget = Levels(0.25f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNChainLightning.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LightningEffects = "CLPB,CLSB";
+                    ManaCost = Levels(120);
+                    MissileArt = "Abilities\\Spells\\Orc\\LightningBolt\\LightningBoltMissile.mdl";
+                    MissileSpeed = 1500;
+                    Name = "Chain Lightning";
+                    NumberOfTargetsHit = Levels(4);
+                    Order = "chainlightning";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Weapons\\Bolt\\BoltImpact.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Chain Lightning");
+                    TooltipExtended = Levels("Hurls a bolt of lightning that bounces up to <ACcl,DataB1> times, dealing <ACcl,DataA1> damage to the primary target. Each jump deals less damage.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ocl1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ocl1", Label = "Damage per Target")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -1227,6 +2293,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANcl")]
             public class Channel : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Channel()
+                {
+                    AnimationNames = "spell,channel";
+                    ArtDuration = Levels(0.98f, 0.98f, 0.98f);
+                    BaseOrderID = Levels("channel");
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    Caster = "Abilities\\Spells\\Undead\\DeathPact\\DeathPactTarget.mdl";
+                    CasterAttachmentPoint1 = "origin";
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f, 0f, 0f);
+                    DisableOtherAbilities = Levels(true, true, true);
+                    Duration = Levels(0f, 0f, 0f);
+                    Effect = "Abilities\\Spells\\Undead\\DeathPact\\DeathPactTarget.mdl";
+                    FollowThroughTime = Levels(180f, 180f, 180f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f, 0f, 0f);
+                    Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDeathPact.blp";
+                    ItemAbility = false;
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0, 0, 0);
+                    Name = "Channel";
+                    Options = Levels((global::Moonwell.Objects.ChannelFlags)0, (global::Moonwell.Objects.ChannelFlags)0, (global::Moonwell.Objects.ChannelFlags)0);
+                    Order = "channel";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f, 500f, 500f);
+                    RequiredLevel = 1;
+                    Target = "Abilities\\Spells\\Undead\\DeathPact\\DeathPactTarget.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    TargetType = Levels(global::Moonwell.Objects.ChannelType.InstantNoTarget, global::Moonwell.Objects.ChannelType.InstantNoTarget, global::Moonwell.Objects.ChannelType.InstantNoTarget);
+                    Tooltip = Levels("Channel");
+                    TooltipExtended = Levels("Channels powerful warding magic.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ncl1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ncl1", Label = "Follow Through Time")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -1285,6 +2391,36 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("AAns")]
             public class ChargeGoldAndLumber : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ChargeGoldAndLumber()
+                {
+                    BaseOrderID = Levels("neutralspell");
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 0;
+                    CastTime = Levels(0f);
+                    ChargeOwningPlayer = Levels(true);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    GoldCost = Levels(50);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "G";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNReturnGoods.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LumberCost = Levels(0);
+                    ManaCost = Levels(0);
+                    Name = "Charge Gold and Lumber";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Charge Gold and Lumber");
+                    TooltipExtended = Levels("Charges the player a fixed amount of gold and lumber.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ans5</c>.</summary>
                 [global::Moonwell.Objects.Field("Ans5", Label = "Base Order ID")]
                 public global::Moonwell.Objects.Levels<string> BaseOrderID
@@ -1327,6 +2463,39 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACch")]
             public class Charm : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Charm()
+                {
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(20f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCharm.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125);
+                    MaximumCreepLevel = Levels(6);
+                    Name = "Charm";
+                    Order = "charm";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\Other\\Charm\\CharmTarget.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.NonHero);
+                    Tooltip = Levels("Charm");
+                    TooltipExtended = Levels("Takes permanent control of a target enemy unit. |nCharm cannot be used on Heroes, or creeps above level <ACch,DataA1>.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nch1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nch1", Label = "Maximum Creep Level")]
                 [global::Moonwell.Objects.Limits(0, 100)]
@@ -1343,6 +2512,44 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANch")]
             public class CharmANch : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CharmANch()
+                {
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(45f);
+                    Duration = Levels(0f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCharm.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNCharm.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "C";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(150);
+                    MaximumCreepLevel = Levels(5);
+                    Name = "Charm";
+                    Order = "charm";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 6;
+                    Target = "Abilities\\Spells\\Other\\Charm\\CharmTarget.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.NonHero | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Charm");
+                    TooltipExtended = Levels("Takes permanent control of a target enemy unit. |nCharm pierces spell immunity, but cannot be used on Heroes, or creeps above level <ANch,DataA1>.");
+                    TooltipLearn = "Learn Charm";
+                    TooltipLearnExtended = "Takes permanent control of a target enemy unit. |nCharm pierces spell immunity, but cannot be used on Heroes, or creeps above level <ANch,DataA1>.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nch1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nch1", Label = "Maximum Creep Level")]
                 [global::Moonwell.Objects.Limits(0, 100)]
@@ -1359,6 +2566,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANcr")]
             public class ChemicalRage : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ChemicalRage()
+                {
+                    AlternateFormUnit.Set<global::Moonwell.Objects.Creeps.Units.AlchemistNalm>();
+                    AltitudeAdjustmentDuration = Levels(0f, 0f, 0f);
+                    AttackSpeedBonusInfoPanelOnly = Levels(0.25f, 0.75f, 1.25f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.ChemicalRage>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(30f, 30f, 30f);
+                    Duration = Levels(0.35f, 0.35f, 0.35f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(15f, 15f, 15f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNChemicalRage.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNChemicalRage.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(25, 25, 25);
+                    MorphingFlags = Levels(global::Moonwell.Objects.MorphFlags.Uninterruptable, global::Moonwell.Objects.MorphFlags.Uninterruptable, global::Moonwell.Objects.MorphFlags.Uninterruptable);
+                    MoveSpeedBonusInfoPanelOnly = Levels(0.5f, 0.5f, 0.5f);
+                    Name = "Chemical Rage";
+                    NormalFormUnit.Set<global::Moonwell.Objects.Creeps.Units.AlchemistNalc>();
+                    Order = "chemicalrage";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Self);
+                    Tooltip = Levels("Chemical Rage - [|cffffcc00Level 1|r]", "Chemical Rage - [|cffffcc00Level 2|r]", "Chemical Rage - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("The Alchemist causes his Ogre to enter a chemically induced rage, increasing movement rate by <ANcr,DataE1,%>% and increasing attack rate by <ANcr,DataF1,%>% for <ANcr,HeroDur1> seconds.", "The Alchemist causes his Ogre to enter a chemically induced rage, increasing movement rate by <ANcr,DataE2,%>% and increasing attack rate by <ANcr,DataF2,%>% for <ANcr,HeroDur1> seconds.", "The Alchemist causes his Ogre to enter a chemically induced rage, increasing movement rate by <ANcr,DataE3,%>% and increasing attack rate by <ANcr,DataF3,%>% for <ANcr,HeroDur1> seconds.");
+                    TooltipLearn = "Learn Chemical Rage - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "The Alchemist causes his Ogre to enter a chemically induced rage, increasing movement rate by <ANcr,DataE1,%>% and increasing attack rate.|nLasts <ANcr,HeroDur1> seconds.|n|n|cffffcc00Level 1|r - <ANcr,DataF1,%>% attack rate increase.|n|cffffcc00Level 2|r - <ANcr,DataF2,%>% attack rate increase.|n|cffffcc00Level 3|r - <ANcr,DataF3,%>% attack rate increase.";
+                    UnitSkinList = "Nalm,Nal2,Nal3,Nal3";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Eme1</c>.</summary>
                 [global::Moonwell.Objects.Field("Eme1", Label = "Normal Form Unit")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> NormalFormUnit
@@ -1427,6 +2676,51 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("AHcl")]
             public class CleansingFire : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CleansingFire()
+                {
+                    AllyBuffDuration = Levels(25f);
+                    AllyDamageBonusPercentBase = Levels(25f);
+                    AllyDamageBonusPercentPerDebuffRemoved = Levels(15f);
+                    AllyHealingBase = Levels(125f);
+                    AllyHealingPerDebuffRemoved = Levels(50f);
+                    AnimationNames = "spell";
+                    Area = Levels(500f);
+                    AreaEffect = "Abilities\\Spells\\Other\\CleansingFire\\CleansingFireCaster.mdl";
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(150f);
+                    Duration = Levels(0f);
+                    EnemyStunDuration = Levels(3f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCleansingFire.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNCleansingFire.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(150);
+                    Name = "Cleansing Fire";
+                    Order = "cleansingfire";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(0f);
+                    RequiredLevel = 6;
+                    SummonedDamage = Levels(400f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground);
+                    Tooltip = Levels("Cleansing Fire");
+                    TooltipExtended = Levels("Call upon the Light, removing all debuffs from nearby friendly units and all buffs from nearby enemy units. Friendly units are healed for <AHcl,DataA1> hit points, and gain <AHcl,DataD1>% bonus to damage for <AHcl,DataC1> seconds. For each debuff removed from a friendly unit, that unit heals an additional <AHcl,DataB1> hitpoints and gains an additional <AHcl,DataE1>% bonus to damage. Enemy units are stunned for <AHcl,DataF1> seconds.|n|cffffcc00Deals <AHcl,DataG1> damage to summoned units.|r");
+                    TooltipLearn = "Learn Cleansing Fire";
+                    TooltipLearnExtended = "Call upon the Light, removing all debuffs from nearby friendly units and all buffs from nearby enemy units. Friendly units are healed for <AHcl,DataA1> hit points, and gain <AHcl,DataD1>% bonus to damage for <AHcl,DataC1> seconds. For each debuff removed from a friendly unit, that unit heals an additional <AHcl,DataB1> hitpoints and gains an additional <AHcl,DataE1>% bonus to damage.Enemy units are stunned for <AHcl,DataF1> seconds.|n|cffffcc00Deals <AHcl,DataG1> damage to summoned units.|r";
+                    UseNewDefaultLevelCap = true;
+                }
+
                 /// <summary>The field <c>hcl1</c>.</summary>
                 [global::Moonwell.Objects.Field("hcl1", Label = "Ally Healing Base")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -1503,6 +2797,37 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACce")]
             public class CleavingAttack : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CleavingAttack()
+                {
+                    Area = Levels(150f);
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    DistributedDamageFactor = Levels(0.25f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNCleavingAttack.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Cleaving Attack";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Other\\Cleave\\CleaveDamageTarget.mdl";
+                    SpecialAttachmentPoint = "chest";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Cleaving Attack");
+                    TooltipExtended = Levels("The creature strikes with such force that <ACce,DataA1,%>% of their damage strikes through to enemies near the primary attacked unit.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>nca1</c>.</summary>
                 [global::Moonwell.Objects.Field("nca1", Label = "Distributed Damage Factor")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -1519,6 +2844,42 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANca")]
             public class CleavingAttackANca : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CleavingAttackANca()
+                {
+                    Area = Levels(250f, 250f, 250f);
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f, 0f, 0f);
+                    DistributedDamageFactor = Levels(0.4f, 0.65f, 0.9f);
+                    Duration = Levels(0f, 0f, 0f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f, 0f, 0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNCleavingAttack.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNCleavingAttack.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "C";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0, 0, 0);
+                    Name = "Cleaving Attack";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    Special = "Abilities\\Spells\\Other\\Cleave\\CleaveDamageTarget.mdl";
+                    SpecialAttachmentPoint = "chest";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Ward, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Ward, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Ward);
+                    Tooltip = Levels("Cleaving Attack - [|cffffcc00Level 1|r]", "Cleaving Attack - [|cffffcc00Level 2|r]", "Cleaving Attack - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("The Pit Lord strikes with such force that <ANca,DataA1,%>% of his damage strikes through to enemies near the primary attacked unit.", "The Pit Lord strikes with such force that <ANca,DataA2,%>% of his damage strikes through to enemies near the primary attacked unit.", "The Pit Lord strikes with such force that <ANca,DataA3,%>% of his damage strikes through to enemies near the primary attacked unit.");
+                    TooltipLearn = "Learn Cleaving Attack - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "The Pit Lord strikes with such force that he damages multiple enemies with his attack. |n|n|cffffcc00Level 1|r - <ANca,DataA1,%>% damage is splash. |n|cffffcc00Level 2|r - <ANca,DataA2,%>% damage is splash. |n|cffffcc00Level 3|r - <ANca,DataA3,%>% damage is splash.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>nca1</c>.</summary>
                 [global::Moonwell.Objects.Field("nca1", Label = "Distributed Damage Factor")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -1535,6 +2896,56 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANc1")]
             public class ClusterRockets : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ClusterRockets()
+                {
+                    AnimationNames = "spell,one";
+                    Area = Levels(230f, 230f, 230f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.ClusterRockets>();
+                    BuildingDamageFactor = Levels(1f, 1f, 1f);
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(6f, 6f, 6f);
+                    DamageAmount = Levels(11.25f, 19.75f, 30.5f);
+                    DamageInterval = Levels(0.25f, 0.25f, 0.25f);
+                    Duration = Levels(1.01f, 1.01f, 1.01f);
+                    EditorSuffix = "(Upgrade Level 1)";
+                    EffectDuration = Levels(1.01f, 1.01f, 1.01f);
+                    Effects = Levels("XNcs", "XNcs", "XNcs");
+                    HeroAbility = true;
+                    HeroDuration = Levels(1.01f, 1.01f, 1.01f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNClusterRockets.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNClusterRockets.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(70, 70, 70);
+                    MaxDamage = Levels(200f, 250f, 300f);
+                    MissileArc = 0.2f;
+                    MissileArt = "Abilities\\Spells\\Other\\TinkerRocket\\TinkerRocketMissile.mdl";
+                    MissileCount = Levels(6, 12, 18);
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 700;
+                    Name = "Cluster Rockets";
+                    Order = "clusterrockets";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f, 800f, 800f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Cluster Rockets - [|cffffcc00Level 1|r]", "Cluster Rockets - [|cffffcc00Level 2|r]", "Cluster Rockets - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Bombards an area with rockets, dealing up to 45 damage to nearby enemy ground and air units and stunning them for <ANc1,Dur1> second. Also hits mechanicals and buildings", "Bombards an area with rockets, dealing up to 75 damage to nearby enemy ground and air units and stunning them for <ANc1,Dur2> second.", "Bombards an area with rockets, dealing up to 110 damage to nearby enemy units and stunning them for <ANc1,Dur3> second.");
+                    TooltipLearn = "Learn Cluster Rockets - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Bombards an area with rockets, stunning enemy ground and air units for <ANc1,Dur1> second and damaging nearby enemy units. Also hits mechanicals and buildings. |n|n|cffffcc00Level 1|r - 45 damage.|n|cffffcc00Level 2|r - 75 damage.|n|cffffcc00Level 3|r - 110 damage";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ncs1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ncs1", Label = "Damage Amount")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -1601,6 +3012,56 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANc2")]
             public class ClusterRocketsANc2 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ClusterRocketsANc2()
+                {
+                    AnimationNames = "spell,one";
+                    Area = Levels(260f, 260f, 260f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.ClusterRockets>();
+                    BuildingDamageFactor = Levels(1f, 1f, 1f);
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(6f, 6f, 6f);
+                    DamageAmount = Levels(11.25f, 19.75f, 30.5f);
+                    DamageInterval = Levels(0.25f, 0.25f, 0.25f);
+                    Duration = Levels(1.01f, 1.01f, 1.01f);
+                    EditorSuffix = "(Upgrade Level 2)";
+                    EffectDuration = Levels(1.01f, 1.01f, 1.01f);
+                    Effects = Levels("XNcs", "XNcs", "XNcs");
+                    HeroAbility = true;
+                    HeroDuration = Levels(1.01f, 1.01f, 1.01f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNClusterRockets.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNClusterRockets.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(70, 70, 70);
+                    MaxDamage = Levels(200f, 250f, 300f);
+                    MissileArc = 0.2f;
+                    MissileArt = "Abilities\\Spells\\Other\\TinkerRocket\\TinkerRocketMissile.mdl";
+                    MissileCount = Levels(6, 12, 18);
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 700;
+                    Name = "Cluster Rockets";
+                    Order = "clusterrockets";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f, 800f, 800f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Cluster Rockets - [|cffffcc00Level 1|r]", "Cluster Rockets - [|cffffcc00Level 2|r]", "Cluster Rockets - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Bombards an area with rockets, dealing up to 45 damage to nearby enemy units and stunning them for <ANc2,Dur1> second.", "Bombards an area with rockets, dealing up to 75 damage to nearby enemy units and stunning them for <ANc2,Dur2> second.", "Bombards an area with rockets, dealing up to 110 damage to nearby enemy units and stunning them for <ANc2,Dur3> second.");
+                    TooltipLearn = "Learn Cluster Rockets - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Bombards an area with rockets, stunning enemy units for <ANc2,Dur1> second and damaging nearby enemy units.|n|n|cffffcc00Level 1|r - 45 damage.|n|cffffcc00Level 2|r - 75 damage.|n|cffffcc00Level 3|r - 110 damage";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ncs1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ncs1", Label = "Damage Amount")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -1667,6 +3128,56 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANc3")]
             public class ClusterRocketsANc3 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ClusterRocketsANc3()
+                {
+                    AnimationNames = "spell,one";
+                    Area = Levels(290f, 290f, 290f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.ClusterRockets>();
+                    BuildingDamageFactor = Levels(1f, 1f, 1f);
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(6f, 6f, 6f);
+                    DamageAmount = Levels(11.25f, 19.75f, 30.5f);
+                    DamageInterval = Levels(0.25f, 0.25f, 0.25f);
+                    Duration = Levels(1.01f, 1.01f, 1.01f);
+                    EditorSuffix = "(Upgrade Level 3)";
+                    EffectDuration = Levels(1.01f, 1.01f, 1.01f);
+                    Effects = Levels("XNcs", "XNcs", "XNcs");
+                    HeroAbility = true;
+                    HeroDuration = Levels(1.01f, 1.01f, 1.01f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNClusterRockets.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNClusterRockets.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(70, 70, 70);
+                    MaxDamage = Levels(200f, 250f, 300f);
+                    MissileArc = 0.2f;
+                    MissileArt = "Abilities\\Spells\\Other\\TinkerRocket\\TinkerRocketMissile.mdl";
+                    MissileCount = Levels(6, 12, 18);
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 700;
+                    Name = "Cluster Rockets";
+                    Order = "clusterrockets";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f, 800f, 800f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Cluster Rockets - [|cffffcc00Level 1|r]", "Cluster Rockets - [|cffffcc00Level 2|r]", "Cluster Rockets - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Bombards an area with rockets, dealing up to 45 damage to nearby enemy units and stunning them for <ANc3,Dur1> second.", "Bombards an area with rockets, dealing up to 75 damage to nearby enemy units and stunning them for <ANc3,Dur2> second.", "Bombards an area with rockets, dealing up to 110 damage to nearby enemy units and stunning them for <ANc3,Dur3> second.");
+                    TooltipLearn = "Learn Cluster Rockets - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Bombards an area with rockets, stunning enemy units for <ANc3,Dur1> second and damaging nearby enemy units.|n|n|cffffcc00Level 1|r - 45 damage.|n|cffffcc00Level 2|r - 75 damage.|n|cffffcc00Level 3|r - 110 damage";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ncs1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ncs1", Label = "Damage Amount")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -1733,6 +3244,55 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANcs")]
             public class ClusterRocketsANcs : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ClusterRocketsANcs()
+                {
+                    AnimationNames = "spell,one";
+                    Area = Levels(200f, 200f, 200f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.ClusterRockets>();
+                    BuildingDamageFactor = Levels(1f, 1f, 1f);
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(6f, 6f, 6f);
+                    DamageAmount = Levels(11.25f, 19.75f, 30.5f);
+                    DamageInterval = Levels(0.25f, 0.25f, 0.25f);
+                    Duration = Levels(1.01f, 1.01f, 1.01f);
+                    EffectDuration = Levels(1.01f, 1.01f, 1.01f);
+                    Effects = Levels("XNcs", "XNcs", "XNcs");
+                    HeroAbility = true;
+                    HeroDuration = Levels(1.01f, 1.01f, 1.01f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNClusterRockets.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNClusterRockets.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(70, 70, 70);
+                    MaxDamage = Levels(200f, 250f, 300f);
+                    MissileArc = 0.2f;
+                    MissileArt = "Abilities\\Spells\\Other\\TinkerRocket\\TinkerRocketMissile.mdl";
+                    MissileCount = Levels(6, 12, 18);
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 700;
+                    Name = "Cluster Rockets";
+                    Order = "clusterrockets";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f, 800f, 800f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Cluster Rockets - [|cffffcc00Level 1|r]", "Cluster Rockets - [|cffffcc00Level 2|r]", "Cluster Rockets - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Bombards an area with rockets, dealing up to 45 damage to nearby enemy units and stunning them for <ANcs,Dur1> second. Also hits mechanicals and buildings", "Bombards an area with rockets, dealing up to 75 damage to nearby enemy units and stunning them for <ANcs,Dur2> second. Also hits mechanicals and buildings", "Bombards an area with rockets, dealing up to 110 damage to nearby enemy units and stunning them for <ANcs,Dur3> second. Also hits mechanicals and buildings");
+                    TooltipLearn = "Learn Cluster Rockets - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Bombards an area with rockets, damaging and stunning enemy ground and air units for <ANcs,Dur1> second. Also hits mechanicals and buildings.|n|n|cffffcc00Level 1|r - 45 damage.|n|cffffcc00Level 2|r - 75 damage.|n|cffffcc00Level 3|r - 110 damage.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ncs1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ncs1", Label = "Damage Amount")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -1799,6 +3359,49 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACcw")]
             public class ColdArrows : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ColdArrows()
+                {
+                    AnimationNames = "attack";
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.ColdArrows, global::Moonwell.Objects.Other.Buffs.ColdArrowsBcsd, global::Moonwell.Objects.Other.Buffs.ColdArrowsBcsi>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(3f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    ExtraDamage = Levels(1f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(1f);
+                    Hotkey = "C";
+                    HotkeyTurnOff = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNColdArrowsOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNColdArrowsOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(5);
+                    MissileArc = 0.15f;
+                    MissileArt = "Abilities\\Weapons\\ColdArrow\\ColdArrowMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1500;
+                    MovementSpeedFactor = Levels(0.25f);
+                    Name = "Cold Arrows";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Cold Arrows");
+                    TooltipExtended = Levels("Adds bonus cold damage to an attack and slows target, but drains mana with each shot fired.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hca1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hca1", Label = "Extra Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -1843,6 +3446,56 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("AHca")]
             public class ColdArrowsAHca : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ColdArrowsAHca()
+                {
+                    AnimationNames = "attack";
+                    AttackSpeedFactor = Levels(0.3f, 0.5f, 0.7f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.ColdArrows, global::Moonwell.Objects.Other.Buffs.ColdArrowsBcsd, global::Moonwell.Objects.Other.Buffs.ColdArrowsBcsi>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    ButtonPositionTurnOffX = 1;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(6f, 6f, 6f);
+                    ExtraDamage = Levels(5f, 10f, 15f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(1f, 1f, 1f);
+                    Hotkey = "C";
+                    HotkeyTurnOff = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNColdArrowsOn.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNColdArrows.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNColdArrowsOff.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "C";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(8, 8, 8);
+                    MissileArc = 0.15f;
+                    MissileArt = "Abilities\\Weapons\\ColdArrow\\ColdArrowMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1500;
+                    MovementSpeedFactor = Levels(0.3f, 0.5f, 0.7f);
+                    Name = "Cold Arrows";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f, 700f, 700f);
+                    RequiredLevel = 1;
+                    StackFlagsHca4 = Levels(global::Moonwell.Objects.StackFlags.Damage | global::Moonwell.Objects.StackFlags.Movement | global::Moonwell.Objects.StackFlags.AttackRate, global::Moonwell.Objects.StackFlags.Damage | global::Moonwell.Objects.StackFlags.Movement | global::Moonwell.Objects.StackFlags.AttackRate, global::Moonwell.Objects.StackFlags.Damage | global::Moonwell.Objects.StackFlags.Movement | global::Moonwell.Objects.StackFlags.AttackRate);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Cold Arrows - [|cffffcc00Level 1|r]", "Cold Arrows - [|cffffcc00Level 2|r]", "Cold Arrows - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Adds a cold effect to each attack, slowing a target enemy unit's attacks by <AHca,DataB1,%>% and movement by <AHca,DataC1,%>% for <AHca,Dur1> seconds.", "Adds a cold effect to each attack, slowing a target enemy unit's attacks by <AHca,DataB2,%>% and movement by <AHca,DataC2,%>% for <AHca,Dur2> seconds.", "slowing a target enemy unit's attacks by <AHca");
+                    TooltipLearn = "Learn Cold Arrows - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Adds a cold effect to each attack, slowing a target enemy unit's attacks and movement. |n|n|cffffcc00Level 1|r - <AHca,DataB1,%>% attack rate, <AHca,DataC1,%>% movement speed, lasts <AHca,Dur1> seconds. |n|cffffcc00Level 2|r - <AHca,DataB2,%>% attack rate, <AHca,DataC2,%>% movement speed, lasts <AHca,Dur2> seconds. |n|cffffcc00Level 3|r - <AHca,DataB3,%>% attack rate, <AHca,DataC3,%>% movement speed, lasts <AHca,Dur3> seconds.";
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hca1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hca1", Label = "Extra Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -1887,6 +3540,35 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACac")]
             public class CommandAura : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CommandAura()
+                {
+                    Area = Levels(900f);
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.BOac>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNGnollCommandAura.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Command Aura";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\Orc\\WarDrums\\DrumsCasterHeal.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Command Aura");
+                    TooltipExtended = Levels("Gives extra damage to the attacks of nearby friendly units.");
+                    UseNewDefaultLevelCap = false;
+                }
             }
 
             /// <summary>Consecration (AHcr).</summary>
@@ -1894,6 +3576,47 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("AHcr")]
             public class Consecration : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Consecration()
+                {
+                    AllyHealingPerSecond = Levels(15f, 25f, 35f);
+                    AnimationNames = "spell";
+                    Area = Levels(300f, 300f, 300f);
+                    AreaEffect = "Abilities\\Spells\\Other\\Consecration\\Consecration.mdl";
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(10f, 10f, 10f);
+                    Duration = Levels(10f, 10f, 10f);
+                    EnemyDamagePerSecond = Levels(15f, 20f, 25f);
+                    EnemyHealingReductionPercent = Levels(25f, 33f, 50f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(10f, 10f, 10f);
+                    Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNConsecration.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNConsecration.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "C";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100, 100, 100);
+                    Name = "Consecration";
+                    Order = "consecration";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(0f, 0f, 0f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Consecration - [|cffffcc00Level 1|r]", "Consecration - [|cffffcc00Level 2|r]", "Consecration - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Bless the ground, healing nearby friendly living units for <AHcr,DataA1> hit points per second. Enemy Undead units take <AHcr,DataB1> damage per second and have incoming healing reduced by <AHcr,DataC1>%. |nLasts <AHcr,Dur1> seconds.", "Bless the ground, healing nearby friendly living units for <AHcr,DataA2> hit points per second. Enemy Undead units take <AHcr,DataB2> damage per second and have incoming healing reduced by <AHcr,DataC2>%. |nLasts <AHcr,Dur2> seconds.", "Bless the ground, healing nearby friendly living units for <AHcr,DataA3> hit points per second. Enemy Undead units take <AHcr,DataB3> damage per second and have incoming healing reduced by <AHcr,DataC3>%. |nLasts <AHcr,Dur3> seconds.");
+                    TooltipLearn = "Learn Consecration - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Bless the ground, healing living allies and burning enemy Undead while reducing their healing received. |n|n|cffffcc00Level 1|r - Heals <AHcr,DataA1> hit points per second, deals <AHcr,DataB1> damage per second, reduces healing by <AHcr,DataC1>%. Lasts <AHcr,Dur1> seconds. |n|cffffcc00Level 2|r - Heals <AHcr,DataA2> hit points per second, deals <AHcr,DataB2> damage per second, reduces healing by <AHcr,DataC2>%. Lasts <AHcr,Dur2> seconds. |n|cffffcc00Level 3|r - Heals <AHcr,DataA3> hit points per second, deals <AHcr,DataB3> damage per second, reduces healing by <AHcr,DataC3>%. Lasts <AHcr,Dur3> seconds.";
+                    UseNewDefaultLevelCap = true;
+                }
+
                 /// <summary>The field <c>hcr1</c>.</summary>
                 [global::Moonwell.Objects.Field("hcr1", Label = "Ally Healing Per Second")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -1930,6 +3653,40 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACcr")]
             public class Cripple : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Cripple()
+                {
+                    AttackSpeedReduction = Levels(0.5f);
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.Cripple>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(10f);
+                    DamageReduction = Levels(0.5f);
+                    Duration = Levels(20f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(10f);
+                    Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCripple.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(175);
+                    MovementSpeedReduction = Levels(0.75f);
+                    Name = "Cripple";
+                    Order = "cripple";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Cripple");
+                    TooltipExtended = Levels("Reduces movement speed by <ACcr,DataA1,%>%, attack rate by <ACcr,DataB1,%>%, and damage by <ACcr,DataC1,%>% of a target enemy unit. |nLasts <ACcr,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Cri1</c>.</summary>
                 [global::Moonwell.Objects.Field("Cri1", Label = "Movement Speed Reduction (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -1966,6 +3723,39 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACct")]
             public class CriticalStrike : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CriticalStrike()
+                {
+                    Area = Levels(0f);
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    ChanceToCriticalStrike = Levels(20f);
+                    ChanceToEvade = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    DamageBonus = Levels(0f);
+                    DamageMultiplier = Levels(2f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNCriticalStrike.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Critical Strike";
+                    NeverMiss = Levels(false);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Critical Strike");
+                    TooltipExtended = Levels("Gives a <ACct,DataA1>% chance to do <ACct,DataB1> times total damage on an attack.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ocr1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ocr1", Label = "Chance to Critical Strike")]
                 [global::Moonwell.Objects.Limits(-99999, 100)]
@@ -2027,6 +3817,47 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Amrf")]
             public class CrowForm : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CrowForm()
+                {
+                    AlternateFormUnit.Set<global::Moonwell.Objects.Campaign.Units.MedivhNmdm>();
+                    AltitudeAdjustmentDuration = Levels(1f);
+                    Area = Levels(-1f);
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 3;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(1.05f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0.6f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "F";
+                    HotkeyTurnOff = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRavenForm.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNMedivh.blp";
+                    ItemAbility = false;
+                    LandingDelayTime = Levels(1f);
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    MorphingFlags = Levels(global::Moonwell.Objects.MorphFlags.Uninterruptable | global::Moonwell.Objects.MorphFlags.ImmediateTakeOff);
+                    Name = "Crow Form";
+                    NormalFormUnit.Set<global::Moonwell.Objects.Campaign.Units.MedivhNmed>();
+                    Order = "ravenform";
+                    OrderStringTurnOff = "unravenform";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Crow Form");
+                    TooltipExtended = Levels("Turn into a Crow.");
+                    TooltipTurnOff = Levels("Human Form");
+                    TooltipTurnOffExtended = Levels("Turn into a Human.");
+                    UnitSkinList = "nmdm";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Eme1</c>.</summary>
                 [global::Moonwell.Objects.Field("Eme1", Label = "Normal Form Unit")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> NormalFormUnit
@@ -2075,6 +3906,49 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACc2")]
             public class CrushingWave : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CrushingWave()
+                {
+                    AnimationNames = "attack,slam";
+                    Area = Levels(100f);
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.CarrionSwarmCaster>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    Damage = Levels(150f);
+                    Distance = Levels(800f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Lesser)";
+                    FinalArea = Levels(300f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCrushingWave.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNCrushingWave.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100);
+                    MaxDamage = Levels(900f);
+                    MissileArt = "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdl";
+                    MissileSpeed = 1100;
+                    Name = "Crushing Wave";
+                    Order = "carrionswarm";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Crushing Wave");
+                    TooltipExtended = Levels("Sends a gigantic wave which deals <ACc2,DataA1> damage to each enemy land unit in a line, up to <ACc2,DataB1> max damage.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ucs1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ucs1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -2121,6 +3995,49 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACc3")]
             public class CrushingWaveACc3 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CrushingWaveACc3()
+                {
+                    AnimationNames = "attack,slam";
+                    Area = Levels(100f);
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.CarrionSwarmCaster>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(10f);
+                    Damage = Levels(100f);
+                    Distance = Levels(800f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Lesser)";
+                    FinalArea = Levels(300f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCrushingWave.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNCrushingWave.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125);
+                    MaxDamage = Levels(300f);
+                    MissileArt = "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdl";
+                    MissileSpeed = 1100;
+                    Name = "Crushing Wave";
+                    Order = "carrionswarm";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Crushing Wave");
+                    TooltipExtended = Levels("Sends a gigantic wave which deals <ACc3,DataA1> damage to each enemy land unit in a line, up to <ACc3,DataB1> max damage.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ucs1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ucs1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -2167,6 +4084,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACcv")]
             public class CrushingWaveACcv : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CrushingWaveACcv()
+                {
+                    AnimationNames = "attack,slam";
+                    Area = Levels(100f);
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.CarrionSwarmCaster>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    Damage = Levels(150f);
+                    Distance = Levels(800f);
+                    Duration = Levels(0f);
+                    FinalArea = Levels(300f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCrushingWave.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNCrushingWave.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100);
+                    MaxDamage = Levels(900f);
+                    MissileArt = "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdl";
+                    MissileSpeed = 1100;
+                    Name = "Crushing Wave";
+                    Order = "carrionswarm";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Crushing Wave");
+                    TooltipExtended = Levels("Sends a gigantic wave which deals <ACcv,DataA1> damage to each enemy land unit in a line, up to <ACcv,DataB1> max damage.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ucs1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ucs1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -2213,6 +4172,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACcs")]
             public class Curse : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Curse()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.Curse>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    ChanceToMiss = Levels(0.33f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    Duration = Levels(30f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(15f);
+                    Hotkey = "C";
+                    HotkeyTurnOff = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCurseOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNCurseOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(40);
+                    Name = "Curse";
+                    Order = "curse";
+                    OrderStringActivate = "curseon";
+                    OrderStringDeactivate = "curseoff";
+                    PriorityForSpellSteal = 1;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Curse");
+                    TooltipExtended = Levels("Curses a target enemy unit, causing it to have a <ACcs,DataA1,%>% chance to miss on an attack. |nLasts <ACcs,Dur1> seconds.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Crs</c>.</summary>
                 [global::Moonwell.Objects.Field("Crs", Label = "Chance to Miss")]
                 [global::Moonwell.Objects.Limits(0, 1)]
@@ -2229,6 +4228,38 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACcy")]
             public class Cyclone : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Cyclone()
+                {
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.CycloneBcyc, global::Moonwell.Objects.NightElf.Buffs.Cyclone>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CanBeDispelled = Levels(true);
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    Duration = Levels(20f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(6f);
+                    Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCyclone.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(150);
+                    Name = "Cyclone";
+                    Order = "cyclone";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Cyclone");
+                    TooltipExtended = Levels("Tosses a target non-mechanical enemy unit into the air, rendering it unable to move, attack or cast spells, and stopping others from attacking or casting on it. |nLasts <ACcy,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>cyc1</c>.</summary>
                 [global::Moonwell.Objects.Field("cyc1", Label = "Can Be Dispelled")]
                 public global::Moonwell.Objects.Levels<bool> CanBeDispelled
@@ -2243,6 +4274,38 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("SCc1")]
             public class CycloneSCc1 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CycloneSCc1()
+                {
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.CycloneBcyc, global::Moonwell.Objects.NightElf.Buffs.Cyclone>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 1;
+                    CanBeDispelled = Levels(true);
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    Duration = Levels(30f);
+                    EditorSuffix = "(Cenarius)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(6f);
+                    Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCyclone.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(150);
+                    Name = "Cyclone";
+                    Order = "cyclone";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Cyclone");
+                    TooltipExtended = Levels("Tosses a target enemy unit into the air, rendering it unable to move, attack or cast spells, and stopping others from attacking or casting on it. |nLasts <SCc1,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>cyc1</c>.</summary>
                 [global::Moonwell.Objects.Field("cyc1", Label = "Can Be Dispelled")]
                 public global::Moonwell.Objects.Levels<bool> CanBeDispelled
@@ -2257,6 +4320,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANdc")]
             public class DarkConversion : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DarkConversion()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.DarkConversion>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(5f);
+                    CheckDependencies = true;
+                    ConversionUnit.Set<global::Moonwell.Objects.Campaign.Units.ZombieNzom>();
+                    Cooldown = Levels(0.1f);
+                    Duration = Levels(6f);
+                    EditorSuffix = "(Malganis)";
+                    HeroAbility = true;
+                    HeroDuration = Levels(6f);
+                    Hotkey = "K";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSleep.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSleep.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "K";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Dark Conversion";
+                    Order = "darkconversion";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RaceToConvert = Levels(global::Moonwell.Objects.UnitRace.Commoner);
+                    Range = Levels(1000f);
+                    RequiredLevel = 6;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.NonHero | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Dark Conversion");
+                    TooltipExtended = Levels("Puts a target villager to sleep and converts it into a zombie.");
+                    TooltipLearn = "Learn Dark Conversion";
+                    TooltipLearnExtended = "Puts a target villager to sleep and converts it into a zombie.";
+                    UnitSkinList = "nzom,nzom,nzom,nzom";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ndc1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ndc1", Label = "Race to Convert")]
                 public global::Moonwell.Objects.Levels<global::Moonwell.Objects.UnitRace> RaceToConvert
@@ -2278,6 +4381,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("SNdc")]
             public class DarkConversionSNdc : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DarkConversionSNdc()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.DarkConversion>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    ConversionUnit.Set<global::Moonwell.Objects.Campaign.Units.ZombieNzom>();
+                    Cooldown = Levels(0.1f);
+                    Duration = Levels(6f);
+                    EditorSuffix = "(Malganis, Fast)";
+                    HeroAbility = true;
+                    HeroDuration = Levels(6f);
+                    Hotkey = "K";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSleep.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSleep.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "K";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Dark Conversion";
+                    Order = "darkconversion";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RaceToConvert = Levels(global::Moonwell.Objects.UnitRace.Commoner);
+                    Range = Levels(1000f);
+                    RequiredLevel = 6;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.NonHero | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Dark Conversion");
+                    TooltipExtended = Levels("Puts a target villager to sleep and converts it into a zombie.");
+                    TooltipLearn = "Learn Dark Conversion";
+                    TooltipLearnExtended = "Puts a target villager to sleep and converts it into a zombie.";
+                    UnitSkinList = "nzom,nzom,nzom,nzom";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ndc1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ndc1", Label = "Race to Convert")]
                 public global::Moonwell.Objects.Levels<global::Moonwell.Objects.UnitRace> RaceToConvert
@@ -2299,6 +4442,44 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANdp")]
             public class DarkPortal : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DarkPortal()
+                {
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(100f, 100f, 100f);
+                    Duration = Levels(1f, 1f, 1f);
+                    EditorSuffix = "(Archimonde)";
+                    Effect = "Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdl";
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f, 0f, 0f);
+                    Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDizzy.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNDizzy.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "D";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0, 0, 0);
+                    MaximumNumberOfUnits = Levels(5, 6, 6);
+                    MinimumNumberOfUnits = Levels(3, 3, 5);
+                    Name = "Dark Portal";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f, 800f, 800f);
+                    RequiredLevel = 1;
+                    SpawnedUnits.Set<global::Moonwell.Objects.Demon.Units.DoomGuardNbal, global::Moonwell.Objects.Demon.Units.FelStalker>();
+                    Tooltip = Levels("Dark Portal");
+                    TooltipExtended = Levels("Opens a portal, allowing demons to step through and do Archimonde's bidding.");
+                    TooltipLearn = "Learn Dark Portal";
+                    TooltipLearnExtended = "Opens a portal, allowing demons to step through and do Archimonde's bidding.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ndp1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ndp1", Label = "Spawned Units")]
                 public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> SpawnedUnits
@@ -2332,6 +4513,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("SNdd")]
             public class DeathAndDecay : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DeathAndDecay()
+                {
+                    AnimationNames = "spell,looping";
+                    Area = Levels(300f);
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.DeathAndDecay>();
+                    BuildingReduction = Levels(1f);
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(150f);
+                    Duration = Levels(35f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    Effects = Levels("XUdd");
+                    HeroAbility = true;
+                    HeroDuration = Levels(35f);
+                    Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDeathAndDecay.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNDeathAndDecay.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "D";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(250);
+                    MaxLifeDrainedPerSecond = Levels(0.04f);
+                    Name = "Death And Decay";
+                    Order = "deathanddecay";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(1000f);
+                    RequiredLevel = 6;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward);
+                    Tooltip = Levels("Death And Decay");
+                    TooltipExtended = Levels("Damages everything in its area of effect by <SNdd,DataA1,%>% of its base hit points per second. Also destroys trees. |nLasts <SNdd,Dur1> seconds.");
+                    TooltipLearn = "Learn Death And Decay";
+                    TooltipLearnExtended = "Damages everything in its area of effect by <SNdd,DataA1,%>% of its base hit points per second. Also destroys trees.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Udd1</c>.</summary>
                 [global::Moonwell.Objects.Field("Udd1", Label = "Max Life Drained per Second (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -2358,6 +4581,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACdc")]
             public class DeathCoil : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DeathCoil()
+                {
+                    AmountHealedDamaged = Levels(400f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDeathCoil.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    MissileArt = "Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1100;
+                    Name = "Death Coil";
+                    Order = "deathcoil";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.NotSelf | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Vulnerable);
+                    Tooltip = Levels("Death Coil");
+                    TooltipExtended = Levels("A coil of death that can heal a friendly Undead unit for <ACdc,DataA1> hit points, or deal half damage to an enemy living unit.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Udc1</c>.</summary>
                 [global::Moonwell.Objects.Field("Udc1", Label = "Amount Healed/Damaged")]
                 [global::Moonwell.Objects.Limits(1, 99999)]
@@ -2374,6 +4632,38 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANd1")]
             public class Demolish : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Demolish()
+                {
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 1;
+                    CastTime = Levels(0f);
+                    ChanceToDemolish = Levels(100f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    DamageMultiplierBuildings = Levels(2.5f);
+                    DamageMultiplierHeroes = Levels(0f);
+                    DamageMultiplierUnits = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Upgrade Level 1)";
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNDemolish.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Demolish";
+                    Order = "demolish";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Demolish - Upgrade Level 1");
+                    TooltipExtended = Levels("Causes attacks to do <ANd1,DataB1> times normal damage to buildings.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nde1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nde1", Label = "Chance to Demolish")]
                 [global::Moonwell.Objects.Limits(0, 1000)]
@@ -2420,6 +4710,38 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANd2")]
             public class DemolishANd2 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DemolishANd2()
+                {
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 1;
+                    CastTime = Levels(0f);
+                    ChanceToDemolish = Levels(100f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    DamageMultiplierBuildings = Levels(3f);
+                    DamageMultiplierHeroes = Levels(0f);
+                    DamageMultiplierUnits = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Upgrade Level 2)";
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNDemolish.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Demolish";
+                    Order = "demolish";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Demolish - Upgrade Level 2");
+                    TooltipExtended = Levels("Causes attacks to do <ANd2,DataB1> times normal damage to buildings.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nde1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nde1", Label = "Chance to Demolish")]
                 [global::Moonwell.Objects.Limits(0, 1000)]
@@ -2466,6 +4788,38 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANd3")]
             public class DemolishANd3 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DemolishANd3()
+                {
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 1;
+                    CastTime = Levels(0f);
+                    ChanceToDemolish = Levels(100f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    DamageMultiplierBuildings = Levels(3.5f);
+                    DamageMultiplierHeroes = Levels(0f);
+                    DamageMultiplierUnits = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Upgrade Level 3)";
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNDemolish.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Demolish";
+                    Order = "demolish";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Demolish - Upgrade Level 3");
+                    TooltipExtended = Levels("Causes attacks to do <ANd3,DataB1> times normal damage to buildings.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nde1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nde1", Label = "Chance to Demolish")]
                 [global::Moonwell.Objects.Limits(0, 1000)]
@@ -2512,6 +4866,37 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANde")]
             public class DemolishANde : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DemolishANde()
+                {
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 1;
+                    CastTime = Levels(0f);
+                    ChanceToDemolish = Levels(100f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    DamageMultiplierBuildings = Levels(2f);
+                    DamageMultiplierHeroes = Levels(0f);
+                    DamageMultiplierUnits = Levels(0f);
+                    Duration = Levels(0f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNDemolish.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Demolish";
+                    Order = "demolish";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Demolish");
+                    TooltipExtended = Levels("Causes attacks to do <ANde,DataB1> times normal damage to buildings.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nde1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nde1", Label = "Chance to Demolish")]
                 [global::Moonwell.Objects.Limits(0, 1000)]
@@ -2558,6 +4943,39 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACav")]
             public class DevotionAura : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DevotionAura()
+                {
+                    Area = Levels(900f);
+                    ArmorBonus = Levels(3f);
+                    Buffs.Set<global::Moonwell.Objects.Human.Buffs.DevotionAura>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNDevotion.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Devotion Aura";
+                    PercentBonus = Levels(false);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\Human\\DevotionAura\\DevotionAura.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Devotion Aura");
+                    TooltipExtended = Levels("Gives <ACav,DataA1> additional armor to nearby friendly units.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Had1</c>.</summary>
                 [global::Moonwell.Objects.Field("Had1", Label = "Armor Bonus")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -2582,6 +5000,39 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACdv")]
             public class Devour : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Devour()
+                {
+                    AnimationNames = "attack,spell";
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.DevourCaster, global::Moonwell.Objects.Orc.Buffs.Devour>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRedDragonDevour.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    MaxCreepLevel = Levels(5);
+                    Name = "Devour";
+                    Order = "creepdevour";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(100f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.NonHero | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Devour");
+                    TooltipExtended = Levels("Consumes an enemy unit, slowly digesting it and dealing <Advc,DataB1> damage per second to it. If the creep is killed while the consumed unit is still digesting, the unit that was devoured will be released.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Dev1</c>.</summary>
                 [global::Moonwell.Objects.Field("Dev1", Label = "Max Creep Level")]
                 [global::Moonwell.Objects.Limits(0, 100)]
@@ -2598,6 +5049,45 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACde")]
             public class DevourMagic : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DevourMagic()
+                {
+                    Area = Levels(250f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(6f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDevourMagic.blp";
+                    IgnoreFriendlyBuffs = Levels(false);
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LifePerBuff = Levels(0f);
+                    LifePerUnit = Levels(50f);
+                    ManaCost = Levels(0);
+                    ManaPerBuff = Levels(0f);
+                    ManaPerUnit = Levels(75f);
+                    MissileArt = "Abilities\\Spells\\Undead\\DevourMagic\\DevourMagicBirthMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1500;
+                    Name = "Devour Magic";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f);
+                    RequiredLevel = 0;
+                    SummonedUnitDamage = Levels(180f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Tree | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Ward);
+                    Tooltip = Levels("Devour Magic");
+                    TooltipExtended = Levels("Consumes all magical buffs from units in an area. Each unit that is devoured of magic gives the caster <Advm,DataA1> hit points and <Advm,DataB1> mana. |n|cffffcc00Deals <Advm,DataE1> damage to summoned units.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>dvm1</c>.</summary>
                 [global::Moonwell.Objects.Field("dvm1", Label = "Life Per Unit")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -2662,6 +5152,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Aap3")]
             public class DiseaseCloud : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DiseaseCloud()
+                {
+                    Area = Levels(250f);
+                    AuraDuration = Levels(75f);
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.Disease, global::Moonwell.Objects.Undead.Buffs.DiseaseCloud>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    DamagePerSecond = Levels(1f);
+                    Duration = Levels(0f);
+                    DurationOfPlagueWard = Levels(10f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNPlagueCloud.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Disease Cloud";
+                    PlagueWardUnitType.Set<global::Moonwell.Objects.Undead.Units.DiseaseCloud>();
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Requires.Set<global::Moonwell.Objects.Undead.Upgrades.DiseaseCloud>();
+                    Target = "Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Disease Cloud");
+                    TooltipExtended = Levels("Infects nearby enemy living units with Disease Cloud. Disease Cloud deals <Aap3,DataB1> damage per second. |nLasts <Aap3,DataA1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Apl1</c>.</summary>
                 [global::Moonwell.Objects.Field("Apl1", Label = "Aura Duration")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -2704,6 +5229,40 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Aap4")]
             public class DiseaseCloudAap4 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DiseaseCloudAap4()
+                {
+                    Area = Levels(250f);
+                    AuraDuration = Levels(0f);
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.Disease, global::Moonwell.Objects.Undead.Buffs.DiseaseCloud>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    DamagePerSecond = Levels(0f);
+                    Duration = Levels(0f);
+                    DurationOfPlagueWard = Levels(-1f);
+                    EditorSuffix = "(Neutral Hostile no damage)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNPlagueCloud.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Disease Cloud";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Requires.Set<global::Moonwell.Objects.Undead.Upgrades.DiseaseCloud>();
+                    Target = "Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Disease Cloud");
+                    TooltipExtended = Levels("Infects nearby enemy living units with Disease Cloud. Disease Cloud deals <Aap4,DataB1> damage per second. |nLasts <Aap4,DataA1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Apl1</c>.</summary>
                 [global::Moonwell.Objects.Field("Apl1", Label = "Aura Duration")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -2746,6 +5305,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Adsm")]
             public class DispelMagic : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DispelMagic()
+                {
+                    Area = Levels(200f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDispelMagic.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    ManaLoss = Levels(0f);
+                    Name = "Dispel Magic";
+                    Order = "dispel";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f);
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Human\\DispelMagic\\DispelMagicTarget.mdl";
+                    SummonedUnitDamage = Levels(200f);
+                    Target = "Abilities\\Spells\\Human\\DispelMagic\\DispelMagicTarget.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Tree | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Ward);
+                    Tooltip = Levels("Dispel Magic");
+                    TooltipExtended = Levels("Removes all buffs from units in a target area. |n|cffffcc00Deals <Adsm,DataB1> damage to summoned units.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Adm1</c>.</summary>
                 [global::Moonwell.Objects.Field("Adm1", Label = "Mana Loss")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -2772,6 +5366,42 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACds")]
             public class DivineShield : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DivineShield()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Human.Buffs.DivineShield>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 1;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(60f);
+                    Duration = Levels(10f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(10f);
+                    Hotkey = "D";
+                    HotkeyTurnOff = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDivineIntervention.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNDivineShieldOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125);
+                    Name = "Divine Shield";
+                    Order = "divineshield";
+                    OrderStringTurnOff = "undivineshield";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Vulnerable);
+                    Tooltip = Levels("Activate Divine Shield");
+                    TooltipExtended = Levels("An impenetrable shield surrounds this unit, protecting it from all damage and spells for <ACds,Dur1> seconds.");
+                    TooltipTurnOff = Levels("Deactivate Divine Shield");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hds1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hds1", Label = "Can Deactivate")]
                 public global::Moonwell.Objects.Levels<bool> CanDeactivate
@@ -2786,6 +5416,49 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANdo")]
             public class Doom : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Doom()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.DoomBNdo, global::Moonwell.Objects.Other.Buffs.Doom>();
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(120f);
+                    DamagePerSecond = Levels(40f);
+                    Duration = Levels(0f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDoom.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNDoom.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "D";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(150);
+                    MaximumCreepLevel = Levels(5);
+                    MovementSpeedFactor = Levels(0.5f);
+                    Name = "Doom";
+                    NumberOfSummonedUnits = Levels(1);
+                    Order = "doom";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(650f);
+                    RequiredLevel = 6;
+                    SummonedUnitDurationSeconds = Levels(120f);
+                    SummonedUnitType.Set<global::Moonwell.Objects.Demon.Units.DoomGuard>();
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.NonHero | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Doom");
+                    TooltipExtended = Levels("Marks a target unit for the manifestation of a Demon. The afflicted unit cannot cast spells and will take <ANdo,DataA1> damage per second until it dies. Upon its death, a great Demon will spawn from its corpse. Doom cannot be dispelled or cancelled. Pierces spell immunity.");
+                    TooltipLearn = "Learn Doom";
+                    TooltipLearnExtended = "Marks a target unit for the manifestation of a Demon. The afflicted unit cannot cast spells and will take <ANdo,DataA1> damage per second until it dies. Upon its death, a great Demon will spawn from its corpse. Doom cannot be dispelled or cancelled. Pierces spell immunity.";
+                    UnitSkinList = "nba2,nba2,nba2,nba2";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ndo1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ndo1", Label = "Damage Per Second")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -2848,6 +5521,42 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANdb")]
             public class DrunkenBrawler : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DrunkenBrawler()
+                {
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    ChanceToCriticalStrike = Levels(10f, 10f, 10f);
+                    ChanceToEvade = Levels(0.07f, 0.14f, 0.21f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    DamageBonus = Levels(0f, 0f, 0f);
+                    DamageMultiplier = Levels(2f, 3f, 4f);
+                    Duration = Levels(0f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNDrunkenDodge.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNDrunkenDodge.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "B";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Drunken Brawler";
+                    NeverMiss = Levels(false, false, false);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    Tooltip = Levels("Drunken Brawler - [|cffffcc00Level 1|r]", "Drunken Brawler - [|cffffcc00Level 2|r]", "Drunken Brawler - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Gives a <ANdb,DataD1,%>% chance to dodge an attack and a <ANdb,DataA1>% chance to deal <ANdb,DataB1> times total damage.", "Gives a <ANdb,DataD2,%>% chance to dodge an attack and a <ANdb,DataA2>% chance to deal <ANdb,DataB2> times total damage.", "Gives a <ANdb,DataD3,%>% chance to dodge an attack and a <ANdb,DataA3>% chance to deal <ANdb,DataB3> times total damage.");
+                    TooltipLearn = "Learn Drunken Brawler - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Gives a percent chance to avoid attacks and a <ANdb,DataA1>% chance to deal additional damage. |n|n|cffffcc00Level 1|r - <ANdb,DataD1,%>% dodge, <ANdb,DataB1> times total damage. |n|cffffcc00Level 2|r - <ANdb,DataD2,%>% dodge, <ANdb,DataB2> times total damage. |n|cffffcc00Level 3|r - <ANdb,DataD3,%>% dodge, <ANdb,DataB3> times total damage.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ocr1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ocr1", Label = "Chance to Critical Strike")]
                 [global::Moonwell.Objects.Limits(-99999, 100)]
@@ -2909,6 +5618,42 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Acdb")]
             public class DrunkenBrawlerAcdb : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DrunkenBrawlerAcdb()
+                {
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    ChanceToCriticalStrike = Levels(10f, 10f, 10f, 10f);
+                    ChanceToEvade = Levels(0.07f, 0.14f, 0.21f, 0.3f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    DamageBonus = Levels(0f, 0f, 0f, 0f);
+                    DamageMultiplier = Levels(2f, 3f, 4f, 6f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Chen)";
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNDrunkenDodge.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNDrunkenDodge.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "B";
+                    LevelCount = 4;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Drunken Brawler";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    Tooltip = Levels("Drunken Brawler - [|cffffcc00Level 1|r]", "Drunken Brawler - [|cffffcc00Level 2|r]", "Drunken Brawler - [|cffffcc00Level 3|r]", "Drunken Brawler - [|cffffcc00Level 4|r]");
+                    TooltipExtended = Levels("Gives a <Acdb,DataD1,%>% chance to dodge an attack and a <Acdb,DataA1>% chance to deal <Acdb,DataB1> times normal damage.", "Gives a <Acdb,DataD2,%>% chance to dodge an attack and a <Acdb,DataA2>% chance to deal <Acdb,DataB2> times normal damage.", "Gives a <Acdb,DataD3,%>% chance to dodge an attack and a <Acdb,DataA3>% chance to deal <Acdb,DataB3> times normal damage.", "Gives a <Acdb,DataD4,%>% chance to dodge an attack and a <Acdb,DataA4>% chance to deal <Acdb,DataB4> times normal damage.");
+                    TooltipLearn = "Learn Drunken Brawler - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Gives a percent chance to avoid attacks and a <Acdb,DataA1>% chance to deal additional damage. |n|n|cffffcc00Level 1|r - <Acdb,DataD1,%>% dodge, <Acdb,DataB1> times normal damage. |n|cffffcc00Level 2|r - <Acdb,DataD2,%>% dodge, <Acdb,DataB2> times normal damage. |n|cffffcc00Level 3|r - <Acdb,DataD3,%>% dodge, <Acdb,DataB3> times normal damage. |n|cffffcc00Level 4|r - <Acdb,DataD4,%>% dodge, <Acdb,DataB4> times normal damage.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ocr1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ocr1", Label = "Chance to Critical Strike")]
                 [global::Moonwell.Objects.Limits(-99999, 100)]
@@ -2970,6 +5715,50 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANdh")]
             public class DrunkenHaze : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DrunkenHaze()
+                {
+                    Area = Levels(200f, 200f, 200f);
+                    AttackSpeedModifier = Levels(0f, 0f, 0f);
+                    AttacksPrevented = Levels((global::Moonwell.Objects.SilenceFlags)0, (global::Moonwell.Objects.SilenceFlags)0, (global::Moonwell.Objects.SilenceFlags)0);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.DrunkenHaze>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    ChanceToMiss = Levels(0.45f, 0.65f, 0.8f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(12f, 12f, 12f);
+                    Duration = Levels(12f, 12f, 12f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(5f, 5f, 5f);
+                    Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNStrongDrink.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNStrongDrink.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "D";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(70, 70, 70);
+                    MissileArc = 0.15f;
+                    MissileArt = "Abilities\\Spells\\Other\\StrongDrink\\BrewmasterMissile.mdl";
+                    MissileSpeed = 1500;
+                    MovementSpeedModifier = Levels(0.15f, 0.3f, 0.5f);
+                    Name = "Drunken Haze";
+                    Order = "drunkenhaze";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(550f, 550f, 550f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Drunken Haze - [|cffffcc00Level 1|r]", "Drunken Haze - [|cffffcc00Level 2|r]", "Drunken Haze - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Drenches enemy units in alcohol, causing their movement speed to be reduced by <ANdh,DataC1,%>%, and have a <ANdh,DataB1,%>% chance to miss on attacks. When units with Drunken Haze cast on them are hit by Breath of Fire, they will ignite and take burn damage. |nLasts <ANdh,Dur1> seconds.", "Drenches enemy units in alcohol, causing their movement speed to be reduced by <ANdh,DataC2,%>%, and have a <ANdh,DataB2,%>% chance to miss on attacks. When units with Drunken Haze cast on them are hit by Breath of Fire, they will ignite and take burn damage. |nLasts <ANdh,Dur2> seconds.", "Drenches enemy units in alcohol, causing their movement speed to be reduced by <ANdh,DataC3,%>%, and have a <ANdh,DataB3,%>% chance to miss on attacks. When units with Drunken Haze cast on them are hit by Breath of Fire, they will ignite and take burn damage. |nLasts <ANdh,Dur3> seconds.");
+                    TooltipLearn = "Learn Drunken Haze - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Drenches enemy units in alcohol, causing their movement speed to be reduced, and have a chance to miss on attacks. When units with Drunken Haze cast on them are hit by Breath of Fire, they will ignite and take burn damage over time. |nLasts <ANdh,Dur1> seconds |n|n|cffffcc00Level 1|r - <ANdh,DataC1,%>% movement speed reduction, <ANdh,DataB1,%>% miss chance. |n|cffffcc00Level 2|r - <ANdh,DataC2,%>% movement speed reduction, <ANdh,DataB2,%>% miss chance. |n|cffffcc00Level 3|r - <ANdh,DataC3,%>% movement speed reduction, <ANdh,DataB3,%>% miss chance.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nsi1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nsi1", Label = "Attacks Prevented")]
                 public global::Moonwell.Objects.Levels<global::Moonwell.Objects.SilenceFlags> AttacksPrevented
@@ -3014,6 +5803,51 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Acdh")]
             public class DrunkenHazeAcdh : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DrunkenHazeAcdh()
+                {
+                    Area = Levels(200f, 200f, 200f, 200f);
+                    AttackSpeedModifier = Levels(0f, 0f, 0f, 0f);
+                    AttacksPrevented = Levels((global::Moonwell.Objects.SilenceFlags)0, (global::Moonwell.Objects.SilenceFlags)0, (global::Moonwell.Objects.SilenceFlags)0, (global::Moonwell.Objects.SilenceFlags)0);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.DrunkenHaze>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f, 0f);
+                    ChanceToMiss = Levels(0.45f, 0.65f, 0.8f, 0.95f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(12f, 12f, 12f, 12f);
+                    Duration = Levels(12f, 12f, 12f, 12f);
+                    EditorSuffix = "(Chen)";
+                    HeroAbility = true;
+                    HeroDuration = Levels(5f, 5f, 5f, 5f);
+                    Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNStrongDrink.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNStrongDrink.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "D";
+                    LevelCount = 4;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75, 75, 75, 75);
+                    MissileArc = 0.15f;
+                    MissileArt = "Abilities\\Spells\\Other\\StrongDrink\\BrewmasterMissile.mdl";
+                    MissileSpeed = 1500;
+                    MovementSpeedModifier = Levels(0.5f, 0.5f, 0.5f, 0.5f);
+                    Name = "Drunken Haze";
+                    Order = "drunkenhaze";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(550f, 550f, 550f, 550f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Drunken Haze - [|cffffcc00Level 1|r]", "Drunken Haze - [|cffffcc00Level 2|r]", "Drunken Haze - [|cffffcc00Level 3|r]", "Drunken Haze - [|cffffcc00Level 4|r]");
+                    TooltipExtended = Levels("Drenches enemy units in alcohol, causing their movement speed to be reduced by <Acdh,DataC1,%>%, and have a <Acdh,DataB1,%>% chance to miss on attacks. When units with Drunken Haze cast on them are hit by Breath of Fire, they will ignite and take burn damage. |nLasts <Acdh,Dur1> seconds.", "Drenches enemy units in alcohol, causing their movement speed to be reduced by <Acdh,DataC2,%>%, and have a <Acdh,DataB2,%>% chance to miss on attacks. When units with Drunken Haze cast on them are hit by Breath of Fire, they will ignite and take burn damage. |nLasts <Acdh,Dur2> seconds.", "Drenches enemy units in alcohol, causing their movement speed to be reduced by <Acdh,DataC3,%>%, and have a <Acdh,DataB3,%>% chance to miss on attacks. When units with Drunken Haze cast on them are hit by Breath of Fire, they will ignite and take burn damage. |nLasts <Acdh,Dur3> seconds.", "Drenches enemy units in alcohol, causing their movement speed to be reduced by <Acdh,DataC4,%>%, and have a <Acdh,DataB4,%>% chance to miss on attacks. When units with Drunken Haze cast on them are hit by Breath of Fire, they will ignite and take burn damage. |nLasts <Acdh,Dur4> seconds.");
+                    TooltipLearn = "Learn Drunken Haze - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Drenches enemy units in alcohol, causing their movement speed to be reduced, and have a chance to miss on attacks. When units with Drunken Haze cast on them are hit by Breath of Fire, they will ignite and take burn damage over time. |nLasts <Acdh,Dur1> seconds |n|n|cffffcc00Level 1|r - <Acdh,DataC1,%>% movement speed, <Acdh,DataB1,%>% miss chance. |n|cffffcc00Level 2|r - <Acdh,DataC2,%>% movement speed, <Acdh,DataB2,%>% miss chance. |n|cffffcc00Level 3|r - <Acdh,DataC3,%>% movement speed, <Acdh,DataB3,%>% miss chance.|n|cffffcc00Level 4|r - <Acdh,DataC4,%>% movement speed, <Acdh,DataB4,%>% miss chance.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nsi1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nsi1", Label = "Attacks Prevented")]
                 public global::Moonwell.Objects.Levels<global::Moonwell.Objects.SilenceFlags> AttacksPrevented
@@ -3058,6 +5892,50 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("SNeq")]
             public class Earthquake : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Earthquake()
+                {
+                    AnimationNames = "spell,looping";
+                    Area = Levels(250f);
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.Earthquake>();
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(90f);
+                    DamagePerSecondToBuildings = Levels(50f);
+                    Duration = Levels(25f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    EffectDelay = Levels(0.5f);
+                    Effects = Levels("XOeq");
+                    FinalArea = Levels(250f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(20f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNEarthquake.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNEarthquake.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "E";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(150);
+                    Name = "Earthquake";
+                    Order = "earthquake";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(1000f);
+                    RequiredLevel = 6;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Tree);
+                    Tooltip = Levels("Earthquake");
+                    TooltipExtended = Levels("Makes the ground tremble and break, causing <SNeq,DataB1> damage per second to buildings and slowing units by <SNeq,DataC1,%>% within the area of effect. |nLasts <SNeq,Dur1> seconds.");
+                    TooltipLearn = "Learn Earthquake";
+                    TooltipLearnExtended = "Makes the ground tremble and break, causing <SNeq,DataB1> damage per second to buildings and slowing units by <SNeq,DataC1,%>% within the area of effect. Lasts <SNeq,Dur1> seconds.";
+                    UnitsSlowed = Levels(0.75f);
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Oeq1</c>.</summary>
                 [global::Moonwell.Objects.Field("Oeq1", Label = "Effect Delay")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -3104,6 +5982,39 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("SCae")]
             public class EnduranceAura : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public EnduranceAura()
+                {
+                    Area = Levels(900f);
+                    AttackSpeedIncrease = Levels(0.05f);
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.EnduranceAura>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNCommand.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    MovementSpeedIncrease = Levels(0.1f);
+                    Name = "Endurance Aura";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\Orc\\CommandAura\\CommandAura.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Endurance Aura");
+                    TooltipExtended = Levels("Increases nearby friendly units' movement speed by <SCae,DataA1,%>% and attack rate by <SCae,DataB1,%>%.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Oae1</c>.</summary>
                 [global::Moonwell.Objects.Field("Oae1", Label = "Movement Speed Increase (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -3130,6 +6041,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANeg")]
             public class EngineeringUpgrade : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public EngineeringUpgrade()
+                {
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Creeps.Abilities.PocketFactoryANsy, global::Moonwell.Objects.Creeps.Abilities.PocketFactory>();
+                    AbilityUpgrade2.Set<global::Moonwell.Objects.Creeps.Abilities.ClusterRocketsANcs, global::Moonwell.Objects.Creeps.Abilities.ClusterRockets>();
+                    AbilityUpgrade3.Set<global::Moonwell.Objects.Creeps.Abilities.RoboGoblinANrg, global::Moonwell.Objects.Creeps.Abilities.RoboGoblin>();
+                    AbilityUpgrade4.Set<global::Moonwell.Objects.Creeps.Abilities.DemolishANde, global::Moonwell.Objects.Creeps.Abilities.Demolish>();
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.EngineeringUpgrade>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f, 0f, 0f);
+                    DamageBonus = Levels(2f, 4f, 6f);
+                    Duration = Levels(0f, 0f, 0f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f, 0f, 0f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\PASBTNEngineeringUpgrade.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNEngineeringUpgrade.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "E";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0, 0, 0);
+                    MoveSpeedBonus = Levels(0.1f, 0.2f, 0.3f);
+                    Name = "Engineering Upgrade";
+                    Order = "engineeringupgrade";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    Tooltip = Levels("Engineering Upgrade - [|cffffcc00Level 1|r]", "Engineering Upgrade - [|cffffcc00Level 2|r]", "Engineering Upgrade - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Improves other Tinker abilities, gives <ANeg,DataB1> attack damage and increases Tinker movement speed by <ANeg,DataA1,%>%.", "Improves other Tinker abilities, gives <ANeg,DataB2> attack damage and increases Tinker movement speed by <ANeg,DataA2,%>%.", "Improves other Tinker abilities, gives <ANeg,DataB3> attack damage and increases Tinker movement speed by <ANeg,DataA3,%>%.");
+                    TooltipLearn = "Learn Engineering Upgrade - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Enhances other Tinker abilities with each level learned:|n|n|cffffcc00Cluster Rockets|r - Larger Area.|n|cffffcc00Pocket Factory|r - Builds Clockwerk Goblins more quickly.|n|cffffcc00Robo-Goblin|r - Increases armor and Strength; enhances Demolish.|n|nAlso gives bonus damage and increases the Tinker's movement speed.|n|n|cffffcc00Level 1|r - +<ANeg,DataB1> damage, +<ANeg,DataA1,%>% movement.|n|cffffcc00Level 2|r - +<ANeg,DataB2> damage, +<ANeg,DataA2,%>% movement.|n|cffffcc00Level 3|r - +<ANeg,DataB3> damage, +<ANeg,DataA3,%>% movement.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Neg1</c>.</summary>
                 [global::Moonwell.Objects.Field("Neg1", Label = "Move Speed Bonus")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -3188,6 +6139,45 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACen")]
             public class Ensnare : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Ensnare()
+                {
+                    AirUnitHeight = Levels(200f);
+                    AirUnitLowerDuration = Levels(0.6f);
+                    AnimationNames = "spell,entangle";
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.Ensnare, global::Moonwell.Objects.Orc.Buffs.EnsnareBeng>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(15f);
+                    Duration = Levels(8f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(3f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNEnsnare.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    MeleeAttackRange = Levels(128f);
+                    MissileArt = "Abilities\\Spells\\Orc\\Ensnare\\EnsnareMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1500;
+                    Name = "Ensnare";
+                    Order = "ensnare";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f);
+                    RequiredLevel = 0;
+                    Requires.Set<global::Moonwell.Objects.Orc.Upgrades.Ensnare>();
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.NonHero);
+                    Tooltip = Levels("Ensnare");
+                    TooltipExtended = Levels("Causes a target enemy unit to be bound to the ground so that it cannot move for <ACen,Dur1> seconds. Air units that are ensnared can be attacked as though they were land units.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ens1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ens1", Label = "Air Unit Lower Duration")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -3262,6 +6252,38 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Aenr")]
             public class EntanglingRoots : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public EntanglingRoots()
+                {
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.EntanglingRoots>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    DamagePerSecond = Levels(10f);
+                    Duration = Levels(6f);
+                    EditorSuffix = "(Neutral Hostile 1)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(3f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNEntanglingRoots.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    Name = "Entangling Roots";
+                    Order = "entanglingroots";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.NonHero | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Entangling Roots");
+                    TooltipExtended = Levels("Causes roots to burst from the ground, immobilizing a target enemy unit for <Aenr,Dur1> seconds, and dealing <Aenr,DataA1> damage per second.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Eer1</c>.</summary>
                 [global::Moonwell.Objects.Field("Eer1", Label = "Damage per Second")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -3278,6 +6300,38 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Aenw")]
             public class EntanglingRootsAenw : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public EntanglingRootsAenw()
+                {
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.EntanglingRoots>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    DamagePerSecond = Levels(10f);
+                    Duration = Levels(6f);
+                    EditorSuffix = "(Neutral Hostile 2)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(3f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNEntanglingRoots.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    Name = "Entangling Roots";
+                    Order = "entanglingroots";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.NonHero | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Entangling Roots");
+                    TooltipExtended = Levels("Causes roots to burst from the ground, immobilizing a target enemy unit for <Aenw,Dur1> seconds, and dealing <Aenw,DataA1> damage per second.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Eer1</c>.</summary>
                 [global::Moonwell.Objects.Field("Eer1", Label = "Damage per Second")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -3294,6 +6348,38 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACvs")]
             public class EnvenomedWeapons : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public EnvenomedWeapons()
+                {
+                    AttackSpeedFactor = Levels(0f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Poison, global::Moonwell.Objects.Other.Buffs.PoisonBpsd>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    DamagePerSecond = Levels(2f);
+                    Duration = Levels(20f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(10f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNEnvenomedSpear.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    MovementSpeedFactor = Levels(0f);
+                    Name = "Envenomed Weapons";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    StackingType = Levels(global::Moonwell.Objects.StackFlags.Damage);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Envenomed Weapons");
+                    TooltipExtended = Levels("Deals <ACvs,DataA1> poison damage per second. |nLasts <ACvs,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Poi1</c>.</summary>
                 [global::Moonwell.Objects.Field("Poi1", Label = "Damage per Second")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -3338,6 +6424,32 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACes")]
             public class Evasion : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Evasion()
+                {
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    ChanceToEvade = Levels(1f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile 100%)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNEvasion.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    Name = "Evasion";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Evasion");
+                    TooltipExtended = Levels("Gives a <ACes,DataA1,%>% percent chance to avoid an attack.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Eev1</c>.</summary>
                 [global::Moonwell.Objects.Field("Eev1", Label = "Chance to Evade")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -3354,6 +6466,32 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACev")]
             public class EvasionACev : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public EvasionACev()
+                {
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    ChanceToEvade = Levels(0.15f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNEvasion.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    Name = "Evasion";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Evasion");
+                    TooltipExtended = Levels("Gives a <ACev,DataA1,%>% percent chance to avoid an attack.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Eev1</c>.</summary>
                 [global::Moonwell.Objects.Field("Eev1", Label = "Chance to Evade")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -3370,6 +6508,37 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANfy")]
             public class Factory : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Factory()
+                {
+                    Area = Levels(200f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.ClockwerkGoblin>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(12f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(12f);
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPocketFactory.blp";
+                    ItemAbility = false;
+                    LeashRange = Levels(1100f);
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Factory";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    SpawnInterval = Levels(6f);
+                    SpawnUnitID.Set<global::Moonwell.Objects.Other.Units.ClockwerkGoblinNcgb>();
+                    Tooltip = Levels("Factory");
+                    TooltipExtended = Levels("Factory.");
+                    UnitSkinList = "ncgb";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nfy1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nfy1", Label = "Spawn Interval")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -3403,6 +6572,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACff")]
             public class FaerieFire : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FaerieFire()
+                {
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.FaerieFire>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    DefenseReduction = Levels(4);
+                    Duration = Levels(30f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(15f);
+                    Hotkey = "R";
+                    HotkeyTurnOff = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFaerieFireOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNFaerieFireOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(45);
+                    Name = "Faerie Fire";
+                    Order = "faeriefire";
+                    OrderStringActivate = "faeriefireon";
+                    OrderStringDeactivate = "faeriefireoff";
+                    PriorityForSpellSteal = 2;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Faerie Fire");
+                    TooltipExtended = Levels("Reduces a target enemy unit's armor by <ACff,DataA1> and gives vision of that unit. |nLasts <ACff,Dur1> seconds.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Fae1</c>.</summary>
                 [global::Moonwell.Objects.Field("Fae1", Label = "Defense Reduction")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -3427,6 +6636,38 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Afbb")]
             public class Feedback : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Feedback()
+                {
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    DamageRatioHeros = Levels(1f);
+                    DamageRatioUnits = Levels(1f);
+                    Duration = Levels(0f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNFeedBack.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    MaxManaDrainedHeros = Levels(6f);
+                    MaxManaDrainedUnits = Levels(20f);
+                    Name = "Feedback";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Human\\Feedback\\SpellBreakerAttack.mdl";
+                    SummonedDamage = Levels(0f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Feedback");
+                    TooltipExtended = Levels("Spirit Beast attacks destroy <Afbb,DataA1> mana per hit. The mana combusts, dealing damage to the attacked unit.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>fbk1</c>.</summary>
                 [global::Moonwell.Objects.Field("fbk1", Label = "Max Mana Drained - Units")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -3483,6 +6724,47 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACs7")]
             public class FeralSpirit : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FeralSpirit()
+                {
+                    Area = Levels(200f, 200f, 200f);
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.FeralSpirit>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    Set("acas", 1, 0f);
+                    Set("acas", 3, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(15f, 15f, 15f);
+                    Duration = Levels(60f, 60f, 60f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(60f, 60f, 60f);
+                    Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSpiritWolf.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSpiritWolf.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "T";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100, 100, 100);
+                    Name = "Feral Spirit";
+                    NumberOfSummonedUnits = Levels(2, 2, 2);
+                    Order = "spiritwolf";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f, 800f, 800f);
+                    RequiredLevel = 1;
+                    Special = "Abilities\\Spells\\Orc\\FeralSpirit\\feralspirittarget.mdl";
+                    SummonedUnit.Set<global::Moonwell.Objects.Orc.Units.SpiritWolf>();
+                    Tooltip = Levels("Feral Spirit - [|cffffcc00Level 1|r]", "Feral Spirit - [|cffffcc00Level 2|r]", "Feral Spirit - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Summons <ACs7,DataB1> Spirit Wolf companions. Each wolf has <osw1,realHP> hit points and deals <osw1,mindmg1> - <osw1,maxdmg1> damage. |nLasts <ACs7,Dur1> seconds. |n|n|cffffcc00Attacks land units.|r", "Summons <ACs7,DataB2> Spirit Wolf companions that have Critical Strike. Each wolf has <osw2,realHP> hit points and deals <osw2,mindmg1> - <osw2,maxdmg1> damage. |nLasts <ACs7,Dur2> seconds. |n|n|cffffcc00Attacks land units.|r", "Summons <ACs7,DataB3> Spirit Wolf companions that have Critical Strike and are invisible unless they are attacking. Each wolf has <osw3,realHP> hit points and deals <osw3,mindmg1> - <osw3,maxdmg1> damage. |nLasts <ACs7,Dur3> seconds. |n|n|cffffcc00Attacks land units.|r");
+                    TooltipLearn = "Learn Feral Spirit - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Summons <ACs7,DataB1> Spirit Wolves to fight the Far Seer's enemies. |nLasts <ACs7,Dur1> seconds. |n|n|cffffcc00Level 1|r - <osw1,realHP> hit points, <osw1,mindmg1> - <osw1,maxdmg1> damage. |n|cffffcc00Level 2|r - <osw2,realHP> hit points, <osw2,mindmg1> - <osw2,maxdmg1> damage and Critical Strike. |n|cffffcc00Level 3|r - <osw3,realHP> hit points, <osw3,mindmg1> - <osw3,maxdmg1> damage, Critical Strike and Invisibility.";
+                    UnitSkinList = "osw1,osw2,osw3,osw3";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Osf1</c>.</summary>
                 [global::Moonwell.Objects.Field("Osf1", Label = "Summoned Unit")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> SummonedUnit
@@ -3506,6 +6788,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACs9")]
             public class FeralSpiritACs9 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FeralSpiritACs9()
+                {
+                    Area = Levels(200f);
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.FeralSpirit>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(15f);
+                    Duration = Levels(60f);
+                    EditorSuffix = "(Neutral Hostile, Pig)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(60f);
+                    Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRazorback.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100);
+                    Name = "Feral Spirit";
+                    NumberOfSummonedUnits = Levels(2);
+                    Order = "spiritwolf";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Orc\\FeralSpirit\\feralspirittarget.mdl";
+                    SummonedUnit.Set<global::Moonwell.Objects.Creeps.Units.SpiritPig>();
+                    Tooltip = Levels("Feral Spirit");
+                    TooltipExtended = Levels("Summons <ACs9,DataB1> Spirit Pig companions. |nLasts <ACs9,Dur1> seconds. |n|n|cffffcc00Attacks land units.|r");
+                    UnitSkinList = "nspp";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Osf1</c>.</summary>
                 [global::Moonwell.Objects.Field("Osf1", Label = "Summoned Unit")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> SummonedUnit
@@ -3529,6 +6846,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACsf")]
             public class FeralSpiritACsf : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FeralSpiritACsf()
+                {
+                    Area = Levels(200f);
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.FeralSpirit>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(15f);
+                    Duration = Levels(60f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(60f);
+                    Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSpiritWolf.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100);
+                    Name = "Feral Spirit";
+                    NumberOfSummonedUnits = Levels(2);
+                    Order = "spiritwolf";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Orc\\FeralSpirit\\feralspirittarget.mdl";
+                    SummonedUnit.Set<global::Moonwell.Objects.Orc.Units.SpiritWolf>();
+                    Tooltip = Levels("Feral Spirit");
+                    TooltipExtended = Levels("Summons <ACsf,DataB1> Spirit Wolf companions. |nLasts <ACsf,Dur1> seconds. |n|n|cffffcc00Attacks land units.|r");
+                    UnitSkinList = "osw1";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Osf1</c>.</summary>
                 [global::Moonwell.Objects.Field("Osf1", Label = "Summoned Unit")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> SummonedUnit
@@ -3552,6 +6904,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANfd")]
             public class FingerOfDeath : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FingerOfDeath()
+                {
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(15f);
+                    Damage = Levels(500f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Archimonde)";
+                    GraphicDelay = Levels(0.25f);
+                    GraphicDuration = Levels(1f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCorpseExplode.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNCorpseExplode.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "F";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LightningEffects = "AFOD";
+                    ManaCost = Levels(0);
+                    Name = "Finger of Death";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 6;
+                    Target = "Abilities\\Spells\\Demon\\DemonBoltImpact\\DemonBoltImpact.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.NonHero | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ancient | global::Moonwell.Objects.Targets.NonAncient);
+                    Tooltip = Levels("Finger of Death");
+                    TooltipExtended = Levels("Instantly turns a creature or building inside-out, destroying it utterly.");
+                    TooltipLearn = "Learn Finger of Death";
+                    TooltipLearnExtended = "Instantly turns a creature or building inside-out, destroying it utterly.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nfd1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nfd1", Label = "Graphic Delay")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -3588,6 +6980,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Afod")]
             public class FingerOfDeathAfod : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FingerOfDeathAfod()
+                {
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(15f);
+                    Damage = Levels(500f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    GraphicDelay = Levels(0.25f);
+                    GraphicDuration = Levels(1f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCorpseExplode.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNCorpseExplode.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "F";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LightningEffects = "AFOD";
+                    ManaCost = Levels(0);
+                    Name = "Finger of Death";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\Demon\\DemonBoltImpact\\DemonBoltImpact.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.NonHero | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ancient | global::Moonwell.Objects.Targets.NonAncient);
+                    Tooltip = Levels("Finger of Death");
+                    TooltipExtended = Levels("Instantly turns a creature or building inside-out.");
+                    TooltipLearn = "Learn Finger of Death";
+                    TooltipLearnExtended = "Instantly turns a creature or building inside-out.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nfd1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nfd1", Label = "Graphic Delay")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -3624,6 +7056,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACf3")]
             public class FingerOfPain : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FingerOfPain()
+                {
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 1;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 1;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(5f);
+                    Damage = Levels(250f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    GraphicDelay = Levels(0.25f);
+                    GraphicDuration = Levels(1f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCorpseExplode.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNCorpseExplode.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "F";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LightningEffects = "AFOD";
+                    ManaCost = Levels(50);
+                    Name = "Finger of Pain";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\Demon\\DemonBoltImpact\\DemonBoltImpact.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.NonHero | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ancient | global::Moonwell.Objects.Targets.NonAncient);
+                    Tooltip = Levels("Finger of Pain");
+                    TooltipExtended = Levels("Horribly cripples the innards of a creature or building.");
+                    TooltipLearn = "Learn Finger of Pain";
+                    TooltipLearnExtended = "Horribly cripples the innards of a creature or building.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nfd1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nfd1", Label = "Graphic Delay")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -3660,6 +7132,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACfd")]
             public class FingerOfPainACfd : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FingerOfPainACfd()
+                {
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(5f);
+                    Damage = Levels(250f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    GraphicDelay = Levels(0.25f);
+                    GraphicDuration = Levels(1f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCorpseExplode.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNCorpseExplode.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "F";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LightningEffects = "AFOD";
+                    ManaCost = Levels(50);
+                    Name = "Finger of Pain";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\Demon\\DemonBoltImpact\\DemonBoltImpact.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.NonHero | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ancient | global::Moonwell.Objects.Targets.NonAncient);
+                    Tooltip = Levels("Finger of Pain");
+                    TooltipExtended = Levels("Horribly cripples the innards of a creature or building.");
+                    TooltipLearn = "Learn Finger of Pain";
+                    TooltipLearnExtended = "Horribly cripples the innards of a creature or building.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nfd1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nfd1", Label = "Graphic Delay")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -3696,6 +7208,40 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACfb")]
             public class Firebolt : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Firebolt()
+                {
+                    AnimationNames = "spell,throw";
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    Damage = Levels(100f);
+                    Duration = Levels(2f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(2f);
+                    Hotkey = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFireBolt.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    MissileArt = "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1000;
+                    Name = "Firebolt";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Firebolt");
+                    TooltipExtended = Levels("Hurls a fiery bolt that stuns a target enemy unit.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Htb1</c>.</summary>
                 [global::Moonwell.Objects.Field("Htb1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -3712,6 +7258,43 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANfb")]
             public class FireboltANfb : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FireboltANfb()
+                {
+                    AnimationNames = "spell,throw";
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(8f, 8f, 8f);
+                    Damage = Levels(100f, 150f, 200f);
+                    Duration = Levels(2f, 3f, 4f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = true;
+                    HeroDuration = Levels(2f, 3f, 4f);
+                    Hotkey = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFireBolt.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNFireBolt.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "B";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75, 75, 75);
+                    MissileArt = "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1000;
+                    Name = "Firebolt";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f, 800f, 800f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Firebolt");
+                    TooltipExtended = Levels("Hurls a fiery bolt that stuns a target enemy unit.");
+                    TooltipLearn = "Learn Firebolt, Level %d";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Htb1</c>.</summary>
                 [global::Moonwell.Objects.Field("Htb1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -3728,6 +7311,40 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Awfb")]
             public class FireboltAwfb : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FireboltAwfb()
+                {
+                    AnimationNames = "spell,throw";
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(8f);
+                    Damage = Levels(100f);
+                    Duration = Levels(2f);
+                    EditorSuffix = "(Warlock)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(2f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFireBolt.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    MissileArt = "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1000;
+                    Name = "Firebolt";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Firebolt");
+                    TooltipExtended = Levels("Hurls a fiery bolt that stuns a target enemy unit.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Htb1</c>.</summary>
                 [global::Moonwell.Objects.Field("Htb1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -3744,6 +7361,50 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACfs")]
             public class FlameStrike : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FlameStrike()
+                {
+                    AnimationNames = "spell,channel";
+                    Area = Levels(225f);
+                    Buffs.Set<global::Moonwell.Objects.Human.Buffs.FlameStrike>();
+                    BuildingReduction = Levels(0.75f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(1.33f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(10f);
+                    Duration = Levels(6f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    Effect = "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdl";
+                    Effects = Levels("XHfs");
+                    FullDamageDealt = Levels(15f);
+                    FullDamageInterval = Levels(0.33f);
+                    HalfDamageDealt = Levels(10f);
+                    HalfDamageInterval = Levels(1f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(1.67f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWallOfFire.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNWallOfFire.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100);
+                    Name = "Flame Strike";
+                    Order = "flamestrike";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdl,Abilities\\Spells\\Human\\FlameStrike\\FlameStrike2.mdl,Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Flame Strike");
+                    TooltipExtended = Levels("Conjures a pillar of flame that burns ground units for 45 damage a second for 2 seconds. As the pillar of flame subsides, units within the fire continue to take minor damage.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hfs1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hfs1", Label = "Full Damage Dealt")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -3810,6 +7471,50 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANfs")]
             public class FlameStrikeANfs : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FlameStrikeANfs()
+                {
+                    AnimationNames = "spell,channel";
+                    Area = Levels(250f);
+                    Buffs.Set<global::Moonwell.Objects.Human.Buffs.FlameStrike>();
+                    BuildingReduction = Levels(0.75f);
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(1.33f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(10f);
+                    Duration = Levels(8f);
+                    EditorSuffix = "(Neutral Hostile 2)";
+                    Effect = "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeTarget.mdl";
+                    Effects = Levels("XHfs");
+                    FullDamageDealt = Levels(25f);
+                    FullDamageInterval = Levels(0.33f);
+                    HalfDamageDealt = Levels(25f);
+                    HalfDamageInterval = Levels(1f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(2.67f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWallOfFire.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNWallOfFire.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100);
+                    Name = "Flame Strike";
+                    Order = "flamestrike";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdl,Abilities\\Spells\\Human\\FlameStrike\\FlameStrike2.mdl,Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Flame Strike");
+                    TooltipExtended = Levels("Conjures a pillar of flame that burns ground units for 75 damage a second for 3 seconds. As the pillar of flame subsides, units within the fire continue to take moderate damage.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hfs1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hfs1", Label = "Full Damage Dealt")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -3876,6 +7581,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACfr")]
             public class ForceOfNature : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ForceOfNature()
+                {
+                    Area = Levels(200f);
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.ForceOfNature>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(20f);
+                    Duration = Levels(60f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(60f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNEnt.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100);
+                    Name = "Force of Nature";
+                    NumberOfSummonedUnits = Levels(2);
+                    Order = "forceofnature";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    SummonedUnitType.Set<global::Moonwell.Objects.NightElf.Units.Treant>();
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Tree);
+                    Tooltip = Levels("Force of Nature");
+                    TooltipExtended = Levels("Converts a small area of trees into <ACfr,DataA1> Treants. |nLasts <ACfr,Dur1> seconds. |n|n|cffffcc00Attacks land units.|r");
+                    UnitSkinList = "efon";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Efn1</c>.</summary>
                 [global::Moonwell.Objects.Field("Efn1", Label = "Number of Summoned Units")]
                 [global::Moonwell.Objects.Limits(1, 999)]
@@ -3899,6 +7639,43 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACfl")]
             public class ForkedLightning : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ForkedLightning()
+                {
+                    Area = Levels(125f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(11f);
+                    DamagePerTarget = Levels(175f);
+                    Distance = Levels(900f);
+                    Duration = Levels(0.7f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    FinalArea = Levels(300f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMonsoon.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LightningEffects = "FORK";
+                    ManaCost = Levels(110);
+                    Name = "Forked Lightning";
+                    NumberOfTargetsHit = Levels(3);
+                    Order = "forkedlightning";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f);
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Weapons\\Bolt\\BoltImpact.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Forked Lightning");
+                    TooltipExtended = Levels("Calls forth a cone of lightning on a target enemy unit, hitting up to <ACfl,DataB1> enemy units for <ACfl,DataA1> damage.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ocl1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ocl1", Label = "Damage per Target")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -3945,6 +7722,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANfl")]
             public class ForkedLightningANfl : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ForkedLightningANfl()
+                {
+                    Area = Levels(125f, 125f, 125f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(11f, 11f, 11f);
+                    DamagePerTarget = Levels(85f, 160f, 250f);
+                    Distance = Levels(900f, 900f, 900f);
+                    Duration = Levels(0.7f, 0.7f, 0.7f);
+                    FinalArea = Levels(300f, 300f, 300f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f, 0f, 0f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMonsoon.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNMonsoon.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "F";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    LightningEffects = "FORK";
+                    ManaCost = Levels(110, 110, 110);
+                    Name = "Forked Lightning";
+                    NumberOfTargetsHit = Levels(3, 3, 3);
+                    Order = "forkedlightning";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f, 600f, 600f);
+                    RequiredLevel = 1;
+                    Special = "Abilities\\Weapons\\Bolt\\BoltImpact.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Forked Lightning - [|cffffcc00Level 1|r]", "Forked Lightning - [|cffffcc00Level 2|r]", "Forked Lightning - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Calls forth a cone of lightning on a target enemy unit, hitting up to <ANfl,DataB1> enemy units for <ANfl,DataA1> damage.", "Calls forth a cone of lightning from the Sea Witch, hitting up to <ANfl,DataB2> enemy units for <ANfl,DataA2> damage.", "Calls forth a cone of lightning from the Sea Witch, hitting up to <ANfl,DataB3> enemy units for <ANfl,DataA3> damage.");
+                    TooltipLearn = "Learn Forked Lightning - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Calls forth a cone of lightning to damage enemies. |n|n|cffffcc00Level 1|r - <ANfl,DataA1> damage per unit. |n|cffffcc00Level 2|r - <ANfl,DataA2> damage per unit. |n|cffffcc00Level 3|r - <ANfl,DataA3> damage per unit.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ocl1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ocl1", Label = "Damage per Target")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -3991,6 +7810,47 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Afzy")]
             public class Frenzy : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Frenzy()
+                {
+                    AttackSpeedIncrease = Levels(0.4f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Frenzy>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(30f);
+                    Duration = Levels(20f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(20f);
+                    Hotkey = "F";
+                    HotkeyTurnOff = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBloodLustOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNBloodLustOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    MovementSpeedIncrease = Levels(0.25f);
+                    Name = "Frenzy";
+                    Order = "frenzy";
+                    OrderStringActivate = "frenzyon";
+                    OrderStringDeactivate = "frenzyoff";
+                    PriorityForSpellSteal = 11;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    ScalingFactor = Levels(0.3f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Self);
+                    Tooltip = Levels("Frenzy");
+                    TooltipExtended = Levels("Increases the unit's attack rate by <Afzy,DataA1,%>% and movement speed by <Afzy,DataB1,%>% for <Afzy,Dur1> seconds.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Blo1</c>.</summary>
                 [global::Moonwell.Objects.Field("Blo1", Label = "Attack Speed Increase (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -4027,6 +7887,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACf2")]
             public class FrostArmor : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FrostArmor()
+                {
+                    ArmorBonus = Levels(3f);
+                    ArmorDuration = Levels(45f);
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.FrostArmor, global::Moonwell.Objects.Other.Buffs.Slowed>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 1;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(5f);
+                    Duration = Levels(3f);
+                    EditorSuffix = "(Autocast) (Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(3f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFrostArmorOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNFrostArmorOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(40);
+                    Name = "Frost Armor";
+                    Order = "frostarmor";
+                    OrderStringActivate = "frostarmoron";
+                    OrderStringDeactivate = "frostarmoroff";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Frost Armor");
+                    TooltipExtended = Levels("Creates a shield of frost around a target friendly unit. The shield adds <ACfa,DataB1> armor and slows melee units that attack it for <ACfa,Dur1> seconds. |nLasts <ACfa,DataA1> seconds.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ufa1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ufa1", Label = "Armor Duration")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -4053,6 +7953,39 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACfa")]
             public class FrostArmorACfa : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FrostArmorACfa()
+                {
+                    ArmorBonus = Levels(3f);
+                    ArmorDuration = Levels(45f);
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.FrostArmor, global::Moonwell.Objects.Other.Buffs.Slowed>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(5f);
+                    Duration = Levels(3f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(3f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFrostArmor.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(40);
+                    Name = "Frost Armor";
+                    Order = "frostarmor";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Frost Armor");
+                    TooltipExtended = Levels("Creates a shield of frost around a target friendly unit. The shield adds <ACfa,DataB1> armor and slows melee units that attack it for <ACfa,Dur1> seconds. |nLasts <ACfa,DataA1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ufa1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ufa1", Label = "Armor Duration")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -4079,6 +8012,56 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANfa")]
             public class FrostArrows : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FrostArrows()
+                {
+                    AnimationNames = "attack";
+                    AttackSpeedFactor = Levels(0.3f, 0.5f, 0.7f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.ColdArrows, global::Moonwell.Objects.Other.Buffs.ColdArrowsBcsd>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    ButtonPositionTurnOffX = 1;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(5f, 5f, 5f);
+                    ExtraDamage = Levels(5f, 10f, 15f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(1.5f, 1.5f, 1.5f);
+                    Hotkey = "R";
+                    HotkeyTurnOff = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNColdArrowsOn.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNColdArrows.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNColdArrowsOff.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(10, 10, 10);
+                    MissileArc = 0.15f;
+                    MissileArt = "Abilities\\Spells\\Other\\FrostArrows\\NagaColdArrowMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1500;
+                    MovementSpeedFactor = Levels(0.3f, 0.5f, 0.7f);
+                    Name = "Frost Arrows";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f, 600f, 600f);
+                    RequiredLevel = 1;
+                    StackFlagsHca4 = Levels(global::Moonwell.Objects.StackFlags.Damage | global::Moonwell.Objects.StackFlags.Movement | global::Moonwell.Objects.StackFlags.AttackRate, global::Moonwell.Objects.StackFlags.Damage | global::Moonwell.Objects.StackFlags.Movement | global::Moonwell.Objects.StackFlags.AttackRate, global::Moonwell.Objects.StackFlags.Damage | global::Moonwell.Objects.StackFlags.Movement | global::Moonwell.Objects.StackFlags.AttackRate);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Frost Arrows - [|cffffcc00Level 1|r]", "Frost Arrows - [|cffffcc00Level 2|r]", "Frost Arrows - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Adds a cold effect to each attack, dealing <ANfa,DataA1> bonus damage, slowing a target enemy unit's attacks by <ANfa,DataB1,%>% and movement by <ANfa,DataC1,%>% for <ANfa,Dur1> seconds.", "Adds a cold effect to each attack, dealing <ANfa,DataA2> bonus damage, slowing a target enemy unit's attacks by <ANfa,DataB2,%>% and movement by <ANfa,DataC2,%>% for <ANfa,Dur2> seconds.", "Adds a cold effect to each attack, dealing <ANfa,DataA3> bonus damage, slowing a target enemy unit's attacks by <ANfa,DataB3,%>% and movement by <ANfa,DataC3,%>% for <ANfa,Dur3> seconds.");
+                    TooltipLearn = "Learn Frost Arrows - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Adds a cold effect to each attack, causing bonus damage and slowing a target enemy unit's attacks and movement. |n|n|cffffcc00Level 1|r - <ANfa,DataB1,%>% attack rate, <ANfa,DataC1,%>% movement speed, <ANfa,DataA1> bonus damage.|n|cffffcc00Level 2|r - <ANfa,DataB2,%>% attack rate, <ANfa,DataC2,%>% movement speed, <ANfa,DataA2> bonus damage.|n|cffffcc00Level 3|r - <ANfa,DataB3,%>% attack rate, <ANfa,DataC3,%>% movement speed, <ANfa,DataA3> bonus damage.";
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hca1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hca1", Label = "Extra Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -4123,6 +8106,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACcb")]
             public class FrostBolt : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FrostBolt()
+                {
+                    AnimationNames = "spell,throw";
+                    Buffs.Add("BHtb");
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(9f);
+                    Damage = Levels(100f);
+                    Duration = Levels(5f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(3f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFrostBolt.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    MissileArt = "Abilities\\Spells\\Other\\FrostBolt\\FrostBoltMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1000;
+                    Name = "Frost Bolt";
+                    Order = "thunderbolt";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Frost Bolt");
+                    TooltipExtended = Levels("Throws a magical shard of ice at a target enemy unit, dealing <ACcb,DataA1> damage and stunning the target for <ACcb,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Htb1</c>.</summary>
                 [global::Moonwell.Objects.Field("Htb1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -4139,6 +8157,43 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACfn")]
             public class FrostNova : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FrostNova()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(200f);
+                    AreaOfEffectDamage = Levels(50f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Slowed>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    Duration = Levels(2f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    Effect = "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdl";
+                    HeroAbility = false;
+                    HeroDuration = Levels(2f);
+                    Hotkey = "N";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGlacier.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125);
+                    MaximumDamage = Levels(400f);
+                    Name = "Frost Nova";
+                    Order = "frostnova";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    SpecificTargetDamage = Levels(50f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Frost Nova");
+                    TooltipExtended = Levels("Blasts enemy units with a wave of frost that deals <ACfn,DataB1> damage to the target, and <ACfn,DataA1> nova damage. Cold damage slows units' movement and attack rate for <ACfn,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ufn1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ufn1", Label = "Area of Effect Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -4175,6 +8230,45 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Awh2")]
             public class Gather : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Gather()
+                {
+                    ArtAttachmentHeight = Levels(150f);
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 1;
+                    ButtonPositionTurnOffX = 3;
+                    ButtonPositionTurnOffY = 1;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(8f);
+                    EditorSuffix = "(Wisp Gold and Lumber - Ancient Spirits)";
+                    EffectSoundLooping = "WispHarvestLoop";
+                    HeroAbility = false;
+                    HeroDuration = Levels(8f);
+                    Hotkey = "G";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGatherGold.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNReturnGoods.blp";
+                    IntervalsBeforeChangingTrees = Levels(5);
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LumberPerInterval = Levels(5f);
+                    ManaCost = Levels(0);
+                    Name = "Gather";
+                    Order = "harvest";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(900f);
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\NightElf\\TargetArtLumber\\TargetArtLumber.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Alive | global::Moonwell.Objects.Targets.Dead | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Tree | global::Moonwell.Objects.Targets.Vulnerable);
+                    Tooltip = Levels("Gather");
+                    TooltipExtended = Levels("Mines gold from Entangled Gold Mines and harvests lumber from trees.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Wha1</c>.</summary>
                 [global::Moonwell.Objects.Field("Wha1", Label = "Lumber per Interval")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -4211,6 +8305,45 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Ahr2")]
             public class Harvest : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Harvest()
+                {
+                    Area = Levels(900f);
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 1;
+                    ButtonPositionTurnOffX = 3;
+                    ButtonPositionTurnOffY = 1;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    DamageToTree = Levels(5);
+                    Duration = Levels(1.35f);
+                    EditorSuffix = "(Archimonde's Ghouls lumber)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "G";
+                    HotkeyTurnOff = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGatherGold.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNReturnGoods.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LumberCapacity = Levels(50);
+                    ManaCost = Levels(0);
+                    Name = "Harvest";
+                    Order = "harvest";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(116f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Alive | global::Moonwell.Objects.Targets.Dead | global::Moonwell.Objects.Targets.Tree);
+                    Tooltip = Levels("Gather");
+                    TooltipExtended = Levels("Harvests lumber from trees.");
+                    TooltipTurnOff = Levels("Return Resources");
+                    TooltipTurnOffExtended = Levels("Return the carried lumber to the nearest building capable of receiving it.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Har1</c>.</summary>
                 [global::Moonwell.Objects.Field("Har1", Label = "Damage to Tree")]
                 [global::Moonwell.Objects.Limits(1, 99999)]
@@ -4237,6 +8370,45 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Ahr3")]
             public class HarvestAhr3 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public HarvestAhr3()
+                {
+                    Area = Levels(900f);
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 1;
+                    ButtonPositionTurnOffX = 3;
+                    ButtonPositionTurnOffY = 1;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    DamageToTree = Levels(10);
+                    Duration = Levels(1.35f);
+                    EditorSuffix = "(Goblin Shredders lumber)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "G";
+                    HotkeyTurnOff = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGatherGold.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNReturnGoods.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LumberCapacity = Levels(200);
+                    ManaCost = Levels(0);
+                    Name = "Harvest";
+                    Order = "harvest";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(116f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Alive | global::Moonwell.Objects.Targets.Dead | global::Moonwell.Objects.Targets.Tree);
+                    Tooltip = Levels("Gather");
+                    TooltipExtended = Levels("Harvests lumber from trees.");
+                    TooltipTurnOff = Levels("Return Resources");
+                    TooltipTurnOffExtended = Levels("Return the carried lumber to the nearest building capable of receiving it.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Har1</c>.</summary>
                 [global::Moonwell.Objects.Field("Har1", Label = "Damage to Tree")]
                 [global::Moonwell.Objects.Limits(1, 99999)]
@@ -4263,6 +8435,47 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Anh1")]
             public class Heal : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Heal()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Human.Buffs.Heal>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(1f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile 2)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    HitPointsGained = Levels(12f);
+                    Hotkey = "E";
+                    HotkeyTurnOff = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHealOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNHealOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(5);
+                    Name = "Heal";
+                    Order = "heal";
+                    OrderStringActivate = "healon";
+                    OrderStringDeactivate = "healoff";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(350f);
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\Human\\Heal\\HealTarget.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.NonAncient | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Heal");
+                    TooltipExtended = Levels("Heals a target friendly non-mechanical wounded unit.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hea1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hea1", Label = "Hit Points Gained")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -4279,6 +8492,47 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Anh2")]
             public class HealAnh2 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public HealAnh2()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Human.Buffs.Heal>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(1f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile 3)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    HitPointsGained = Levels(25f);
+                    Hotkey = "E";
+                    HotkeyTurnOff = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHealOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNHealOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(5);
+                    Name = "Heal";
+                    Order = "heal";
+                    OrderStringActivate = "healon";
+                    OrderStringDeactivate = "healoff";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(350f);
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\Human\\Heal\\HealTarget.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.NonAncient | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Heal");
+                    TooltipExtended = Levels("Heals a target friendly non-mechanical wounded unit.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hea1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hea1", Label = "Hit Points Gained")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -4295,6 +8549,47 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Anhe")]
             public class HealAnhe : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public HealAnhe()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Human.Buffs.Heal>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(1f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile 1)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    HitPointsGained = Levels(15f);
+                    Hotkey = "E";
+                    HotkeyTurnOff = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHealOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNHealOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(5);
+                    Name = "Heal";
+                    Order = "heal";
+                    OrderStringActivate = "healon";
+                    OrderStringDeactivate = "healoff";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(350f);
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\Human\\Heal\\HealTarget.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.NonAncient | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Heal");
+                    TooltipExtended = Levels("Heals a target friendly non-mechanical wounded unit.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hea1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hea1", Label = "Hit Points Gained")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -4311,6 +8606,54 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANhs")]
             public class HealingSpray : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public HealingSpray()
+                {
+                    AnimationNames = "spell,looping";
+                    Area = Levels(250f, 250f, 250f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.HealingSpray>();
+                    BuildingDamageFactor = Levels(1f, 1f, 1f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(6f, 6f, 6f);
+                    DamageAmount = Levels(30f, 45f, 60f);
+                    DamageInterval = Levels(1f, 1f, 1f);
+                    Duration = Levels(0f, 0f, 0f);
+                    Effects = Levels("XNhs", "XNhs", "XNhs");
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f, 0f, 0f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHealingSpray.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNHealingSpray.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "E";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75, 75, 75);
+                    MaxDamage = Levels(280f, 385f, 490f);
+                    MissileArc = 0.4f;
+                    MissileArt = "Abilities\\Spells\\Other\\HealingSpray\\HealBottleMissile.mdl";
+                    MissileCount = Levels(6, 6, 6);
+                    MissileSpeed = 700;
+                    Name = "Healing Spray";
+                    Order = "healingspray";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f, 800f, 800f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Healing Spray - [|cffffcc00Level 1|r]", "Healing Spray - [|cffffcc00Level 2|r]", "Healing Spray - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Sprays <ANhs,DataF1> waves of healing mist; each wave heals <ANhs,DataA1> damage to all friendly units in an area.", "Sprays <ANhs,DataF2> waves of healing mist; each wave heals <ANhs,DataA2> damage to all friendly units in an area.", "Sprays <ANhs,DataF3> waves of healing mist; each wave heals <ANhs,DataA3> damage to all friendly units in an area.");
+                    TooltipLearn = "Learn Healing Spray - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Sprays waves of healing mist that heal friendly units in a target area. |n|n|cffffcc00Level 1|r - <ANhs,DataF1> waves at <ANhs,DataA1> hit points healed each. |n|cffffcc00Level 2|r - <ANhs,DataF2> waves at <ANhs,DataA2> hit points healed each. |n|cffffcc00Level 3|r - <ANhs,DataF3> waves at <ANhs,DataA3> hit points healed each.";
+                    UseNewDefaultLevelCap = false;
+                    WaveCount = Levels(3, 4, 5);
+                }
+
                 /// <summary>The field <c>Ncs1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ncs1", Label = "Damage Amount")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -4377,6 +8720,38 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("AChw")]
             public class HealingWard : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public HealingWard()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.HealingWard>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(25f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(25f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHealingWard.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(200);
+                    Name = "Healing Ward";
+                    Order = "healingward";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f);
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Healing Ward");
+                    TooltipExtended = Levels("Summons an immovable ward that heals <Aoar,DataA1,%>% of a nearby friendly non-mechanical unit's hit points per second. |nLasts <AChw,Dur1> seconds.");
+                    UnitSkinList = "ohwd";
+                    UseNewDefaultLevelCap = false;
+                    WardUnitType.Set<global::Moonwell.Objects.Orc.Units.HealingWard>();
+                }
+
                 /// <summary>The field <c>hwdu</c>.</summary>
                 [global::Moonwell.Objects.Field("hwdu", Label = "Ward Unit Type")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> WardUnitType
@@ -4390,6 +8765,36 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("AChv")]
             public class HealingWave : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public HealingWave()
+                {
+                    Area = Levels(500f);
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(9f);
+                    DamagePerTarget = Levels(130f);
+                    DamageReductionPerTarget = Levels(0.25f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "E";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(90);
+                    Name = "Healing Wave";
+                    NumberOfTargetsHit = Levels(3);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Healing Wave");
+                    TooltipExtended = Levels("Calls forth a wave of healing energy that bounces up to <AChv,DataB1> times, healing <AChv,DataA1> damage on the primary target. Each jump heals less damage.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ocl1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ocl1", Label = "Damage per Target")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -4426,6 +8831,43 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("AChx")]
             public class Hex : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Hex()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.Hex>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(17f);
+                    Duration = Levels(15f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(5f);
+                    Hotkey = "X";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHex.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100);
+                    MaximumCreepLevel = Levels(99);
+                    MorphUnitsAir.Set<global::Moonwell.Objects.Critters.Units.Albatross, global::Moonwell.Objects.Critters.Units.Vulture, global::Moonwell.Objects.Critters.Units.SnowyOwl>();
+                    MorphUnitsAmphibious.Set<global::Moonwell.Objects.Critters.Units.Sheep, global::Moonwell.Objects.Critters.Units.Penguin>();
+                    MorphUnitsGround.Set<global::Moonwell.Objects.Critters.Units.Pig, global::Moonwell.Objects.Critters.Units.Seal, global::Moonwell.Objects.Critters.Units.Crab, global::Moonwell.Objects.Critters.Units.HermitCrab, global::Moonwell.Objects.Critters.Units.Rat>();
+                    MorphUnitsWater.Set<global::Moonwell.Objects.Critters.Units.SheepNshw, global::Moonwell.Objects.Critters.Units.PenguinNpnw>();
+                    Name = "Hex";
+                    Order = "hex";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Human\\Polymorph\\PolyMorphDoneGround.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Hex");
+                    TooltipExtended = Levels("Transforms an enemy unit into a random critter for <AChx,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ply1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ply1", Label = "Maximum Creep Level")]
                 [global::Moonwell.Objects.Limits(0, 100)]
@@ -4470,6 +8912,51 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANht")]
             public class HowlOfTerror : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public HowlOfTerror()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(500f, 500f, 500f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.HowlOfTerror>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    Caster = "Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdl";
+                    CheckDependencies = true;
+                    Cooldown = Levels(12f, 12f, 12f);
+                    DamageIncrease = Levels(0.3f, 0.4f, 0.5f);
+                    DefenseIncrease = Levels(0, 0, 0);
+                    Duration = Levels(15f, 15f, 15f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(15f, 15f, 15f);
+                    Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHowlOfTerror.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNHowlOfTerror.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "T";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    LifeRegenerationRate = Levels(0f, 0f, 0f);
+                    ManaCost = Levels(75, 75, 75);
+                    ManaRegen = Levels(0f, 0f, 0f);
+                    MaxUnits = Levels(0, 0, 0);
+                    Name = "Howl of Terror";
+                    Order = "howlofterror";
+                    PreferFriendlies = Levels(false, false, false);
+                    PreferHostiles = Levels(false, false, false);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Howl of Terror - [|cffffcc00Level 1|r]", "Howl of Terror - [|cffffcc00Level 2|r]", "Howl of Terror - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("The Pit Lord lets loose a terrifying howl that reduces nearby enemy units' attack damage by <ANht,DataA1,%>% for <ANht,Dur1> seconds.", "The Pit Lord lets loose a terrifying howl that reduces nearby enemy units' attack damage by <ANht,DataA2,%>% for <ANht,Dur2> seconds.", "The Pit Lord lets loose a terrifying howl that reduces nearby enemy units' attack damage by <ANht,DataA3,%>% for <ANht,Dur3> seconds.");
+                    TooltipLearn = "Learn Howl of Terror - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "The Pit Lord lets loose a terrifying howl that causes nearby enemy units to shiver in fear, reducing their attack damage. |nLasts <ANht,Dur1> seconds. |n|n|cffffcc00Level 1|r - <ANht,DataA1,%>% attack damage reduction. |n|cffffcc00Level 2|r - <ANht,DataA2,%>% attack damage reduction. |n|cffffcc00Level 3|r - <ANht,DataA3,%>% attack damage reduction.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Roa1</c>.</summary>
                 [global::Moonwell.Objects.Field("Roa1", Label = "Damage Increase (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -4542,6 +9029,42 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Acht")]
             public class HowlOfTerrorAcht : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public HowlOfTerrorAcht()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(800f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.HowlOfTerror>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    Caster = "Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdl";
+                    CheckDependencies = true;
+                    Cooldown = Levels(12f);
+                    DamageIncrease = Levels(0.25f);
+                    DefenseIncrease = Levels(0);
+                    Duration = Levels(10f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(10f);
+                    Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHowlOfTerror.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LifeRegenerationRate = Levels(0f);
+                    ManaCost = Levels(100);
+                    Name = "Howl of Terror";
+                    Order = "howlofterror";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Howl of Terror");
+                    TooltipExtended = Levels("Emits a terrifying howl that reduces nearby enemy units' attack damage by <Acht,DataA1,%>% for <Acht,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Roa1</c>.</summary>
                 [global::Moonwell.Objects.Field("Roa1", Label = "Damage Increase (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -4614,6 +9137,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACtb")]
             public class HurlBoulder : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public HurlBoulder()
+                {
+                    AnimationNames = "spell,throw";
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stunned>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    Damage = Levels(100f);
+                    Duration = Levels(2f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(2f);
+                    Hotkey = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGolemStormBolt.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    MissileArc = 0.3f;
+                    MissileArt = "Abilities\\Weapons\\RockBoltMissile\\RockBoltMissile.mdl";
+                    MissileSpeed = 1000;
+                    Name = "Hurl Boulder";
+                    Order = "creepthunderbolt";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Hurl Boulder");
+                    TooltipExtended = Levels("A magical boulder that is thrown at an enemy unit, causing <ACtb,DataA1> points of damage and stunning the target for <ACtb,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ctb1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ctb1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -4630,6 +9188,47 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACim")]
             public class Immolation : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Immolation()
+                {
+                    Area = Levels(220f);
+                    BufferManaRequired = Levels(10f);
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.Immolation, global::Moonwell.Objects.NightElf.Buffs.ImmolationCaster>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 1;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    DamagePerInterval = Levels(5f);
+                    Duration = Levels(1f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(1f);
+                    Hotkey = "L";
+                    HotkeyTurnOff = "L";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNImmolationOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNImmolationOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(25);
+                    ManaDrainedPerSecond = Levels(7f);
+                    Name = "Immolation";
+                    Order = "immolation";
+                    OrderStringTurnOff = "unimmolation";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Activate Immolation");
+                    TooltipExtended = Levels("Activate Immolation to engulf this unit in flames, causing <ACim,DataA1> damage per second to nearby enemy land units. |nDrains mana until deactivated.");
+                    TooltipTurnOff = Levels("Deactivate Immolation");
+                    TooltipTurnOffExtended = Levels("Deactivate Immolation to stop draining mana.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Eim1</c>.</summary>
                 [global::Moonwell.Objects.Field("Eim1", Label = "Damage per Interval")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -4666,6 +9265,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACmp")]
             public class Impale : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Impale()
+                {
+                    AirTimeSeconds = Levels(1f);
+                    AirborneTargetsVulnerable = Levels(false);
+                    Area = Levels(200f);
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.Impale>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(11f);
+                    DamageDealt = Levels(50f);
+                    Duration = Levels(2f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(1f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNImpale.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNImpale.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100);
+                    Name = "Impale";
+                    Order = "impale";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Undead\\Impale\\ImpaleMissTarget.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Impale");
+                    TooltipExtended = Levels("Slams the ground, sending a wave of force out in a straight line, dealing <ACmp,DataA1> damage and hurling enemy ground units into the air in their wake, stunning them for <ACmp,Dur1> seconds.");
+                    Uninterruptible = Levels(false);
+                    UseNewDefaultLevelCap = false;
+                    WaveDistance = Levels(600f);
+                    WaveTimeSeconds = Levels(0.3f);
+                }
+
                 /// <summary>The field <c>Uim1</c>.</summary>
                 [global::Moonwell.Objects.Field("Uim1", Label = "Wave Distance")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -4728,6 +9369,53 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANia")]
             public class Incinerate : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Incinerate()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Incinerate>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    ButtonPositionTurnOffX = 2;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f, 0f, 0f);
+                    Duration = Levels(4f, 4f, 4f);
+                    EditorSuffix = "(Arrow)";
+                    HeroAbility = true;
+                    HeroDuration = Levels(4f, 4f, 4f);
+                    Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNIncinerateOn.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNIncinerate.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNIncinerateOff.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "C";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(3, 3, 3);
+                    MissileArc = 0.35f;
+                    MissileArt = "Abilities\\Weapons\\LordofFlameMissile\\LordofFlameMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1000;
+                    Name = "Incinerate";
+                    Order = "incineratearrow";
+                    OrderStringActivate = "incineratearrowon";
+                    OrderStringDeactivate = "incineratearrowon";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(550f, 550f, 550f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.NonAncient, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.NonAncient, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.NonAncient);
+                    Tooltip = Levels("Incinerate - [|cffffcc00Level 1|r]", "Incinerate - [|cffffcc00Level 2|r]", "Incinerate - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Each attack made is enhanced with living flames that cling to the target. These flames add <ANia,DataA1> damage on the first attack, twice as much on the second attack, three times as much on the third attack, etc.|n|nIf a unit dies while under this effect, it is incinerated, causing up to <ANia,DataB1> damage to all nearby hostile units.", "Each attack made is enhanced with living flames that cling to the target. These flames add <ANia,DataA2> damage on the first attack, twice as much on the second attack, three times as much on the third attack, etc.|n|nIf a unit dies while under this effect, it is incinerated, causing up to <ANia,DataB2> damage to all nearby hostile units.", "Each attack made is enhanced with living flames that cling to the target. These flames add <ANia,DataA3> damage on the first attack, twice as much on the second attack, three times as much on the third attack, etc.|n|nIf a unit dies while under this effect, it is incinerated, causing up to <ANia,DataB3> damage to all nearby hostile units.");
+                    TooltipLearn = "Learn Incinerate - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Each attack made is enhanced with living flames that cling to the target. These flames add a small amount of damage on the first attack, twice as much on the second attack, three times as much on the third attack, etc.|n|nIf a unit dies while under this effect, it is incinerated, causing significant damage to all nearby hostile units.|n|n|cffffcc00Level 1|r - <ANia,DataA1> bonus damage, <ANia,DataB1> incineration damage.|n|cffffcc00Level 2|r - <ANia,DataA2> bonus damage, <ANia,DataB2> incineration damage.|n|cffffcc00Level 3|r - <ANia,DataA3> bonus damage, <ANia,DataB3> incineration damage.";
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
             }
 
             /// <summary>Incinerate (ANic).</summary>
@@ -4735,6 +9423,51 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANic")]
             public class IncinerateANic : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public IncinerateANic()
+                {
+                    BonusDamageMultiplier = Levels(2f, 3f, 4f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Incinerate>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f, 0f, 0f);
+                    DeathDamageDelay = Levels(0.2f, 0.2f, 0.2f);
+                    DeathDamageFullAmount = Levels(30f, 45f, 60f);
+                    DeathDamageFullArea = Levels(120f, 120f, 120f);
+                    DeathDamageHalfAmount = Levels(15f, 22f, 30f);
+                    DeathDamageHalfArea = Levels(240f, 240f, 240f);
+                    Duration = Levels(4f, 4f, 4f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(4f, 4f, 4f);
+                    Hotkey = "C";
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNIncinerate.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNIncinerate.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "C";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0, 0, 0);
+                    MissileArc = 0.35f;
+                    MissileArt = "Abilities\\Weapons\\LordofFlameMissile\\LordofFlameMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1000;
+                    Name = "Incinerate";
+                    Order = "incinerate";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.NonAncient, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.NonAncient, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.NonAncient);
+                    Tooltip = Levels("Incinerate - [|cffffcc00Level 1|r]", "Incinerate - [|cffffcc00Level 2|r]", "Incinerate - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Each attack made is enhanced with living flames that cling to the target. These flames add <ANic,DataA1> damage on the first attack, twice as much on the second attack, three times as much on the third attack, etc.|n|nIf a unit dies while under this effect, it is incinerated, causing up to <ANic,DataB1> damage to all nearby hostile units.", "Each attack made is enhanced with living flames that cling to the target. These flames add <ANic,DataA2> damage on the first attack, twice as much on the second attack, three times as much on the third attack, etc.|n|nIf a unit dies while under this effect, it is incinerated, causing up to <ANic,DataB2> damage to all nearby hostile units.", "Each attack made is enhanced with living flames that cling to the target. These flames add <ANic,DataA3> damage on the first attack, twice as much on the second attack, three times as much on the third attack, etc.|n|nIf a unit dies while under this effect, it is incinerated, causing up to <ANic,DataB3> damage to all nearby hostile units.");
+                    TooltipLearn = "Learn Incinerate - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Each attack made is enhanced with living flames that cling to the target. These flames add a small amount of damage on the first attack, twice as much on the second attack, three times as much on the third attack, etc.|n|nIf a unit dies while under this effect, it is incinerated, causing significant damage to all nearby hostile units.|n|n|cffffcc00Level 1|r - <ANic,DataA1> bonus damage, <ANic,DataB1> incineration damage.|n|cffffcc00Level 2|r - <ANic,DataA2> bonus damage, <ANic,DataB2> incineration damage.|n|cffffcc00Level 3|r - <ANic,DataA3> bonus damage, <ANic,DataB3> incineration damage.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nic1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nic1", Label = "Bonus Damage Multiplier")]
                 [global::Moonwell.Objects.Limits(0, 1000)]
@@ -4801,6 +9534,49 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANin")]
             public class Inferno : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Inferno()
+                {
+                    Area = Levels(250f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Infernal>();
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(180f);
+                    Damage = Levels(50f);
+                    Duration = Levels(4f);
+                    DurationUin2 = Levels(360f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    Effect = "Units\\Demon\\Infernal\\InfernalBirth.mdl";
+                    HeroAbility = true;
+                    HeroDuration = Levels(2f);
+                    Hotkey = "I";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNInfernal.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNInfernal.blp";
+                    ImpactDelay = Levels(1f);
+                    ItemAbility = false;
+                    LearnHotkey = "I";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(175);
+                    Name = "Inferno";
+                    Order = "inferno";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(900f);
+                    RequiredLevel = 6;
+                    SummonedUnit.Set<global::Moonwell.Objects.Demon.Units.Infernal>();
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Inferno");
+                    TooltipExtended = Levels("Summons an Infernal from the sky, causing area effect damage where it lands.");
+                    TooltipLearn = "Learn Inferno";
+                    UnitSkinList = "ninf,ninf,ninf,ninf";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Uin1</c>.</summary>
                 [global::Moonwell.Objects.Field("Uin1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -4844,6 +9620,50 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("SNin")]
             public class InfernoSNin : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public InfernoSNin()
+                {
+                    Area = Levels(250f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Infernal>();
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(30f);
+                    Damage = Levels(50f);
+                    Duration = Levels(4f);
+                    DurationUin2 = Levels(360f);
+                    EditorSuffix = "(Tichondrius)";
+                    Effect = "Units\\Demon\\Infernal\\InfernalBirth.mdl";
+                    HeroAbility = true;
+                    HeroDuration = Levels(2f);
+                    Hotkey = "N";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNInfernal.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNInfernal.blp";
+                    ImpactDelay = Levels(1f);
+                    ItemAbility = false;
+                    LearnHotkey = "N";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100);
+                    Name = "Inferno";
+                    Order = "inferno";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(900f);
+                    RequiredLevel = 6;
+                    SummonedUnit.Set<global::Moonwell.Objects.Demon.Units.Infernal>();
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Inferno");
+                    TooltipExtended = Levels("Calls an Infernal down from the sky, dealing <SNin,DataA1> damage and stunning enemy land units for <SNin,Dur1> seconds in an area. The Infernal lasts <SNin,DataB1> seconds.");
+                    TooltipLearn = "Learn Inferno";
+                    TooltipLearnExtended = "Calls an Infernal down from the sky, dealing <SNin,DataA1> damage and stunning enemy land units for <SNin,Dur1> seconds in an area. The Infernal lasts <SNin,DataB1> seconds.";
+                    UnitSkinList = "ninf,ninf,ninf,ninf";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Uin1</c>.</summary>
                 [global::Moonwell.Objects.Field("Uin1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -4887,6 +9707,50 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACif")]
             public class InnerFire : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public InnerFire()
+                {
+                    AutocastRange = Levels(500f);
+                    Buffs.Set<global::Moonwell.Objects.Human.Buffs.InnerFire>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 2;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(5f);
+                    DamageIncrease = Levels(0.1f);
+                    DefenseIncrease = Levels(5);
+                    Duration = Levels(60f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    EffectSound = "InnerFireCast";
+                    HeroAbility = false;
+                    HeroDuration = Levels(60f);
+                    Hotkey = "F";
+                    HotkeyTurnOff = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNInnerFireOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNInnerFireOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LifeRegenRate = Levels(0f);
+                    ManaCost = Levels(75);
+                    Name = "Inner Fire";
+                    Order = "innerfire";
+                    OrderStringActivate = "innerfireon";
+                    OrderStringDeactivate = "innerfireoff";
+                    PriorityForSpellSteal = 10;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Inner Fire");
+                    TooltipExtended = Levels("Increases a target friendly unit's damage by <ACif,DataA1,%>% and armor by <ACif,DataB1>. |nLasts <ACif,Dur1> seconds.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Inf1</c>.</summary>
                 [global::Moonwell.Objects.Field("Inf1", Label = "Damage Increase (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -4933,6 +9797,47 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Aomb")]
             public class ItemTotemOgreMagiBloodlust : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ItemTotemOgreMagiBloodlust()
+                {
+                    AttackSpeedIncrease = Levels(0.4f);
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.Bloodlust>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(1f);
+                    Duration = Levels(20f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(20f);
+                    Hotkey = "Q";
+                    HotkeyTurnOff = "Q";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBloodLustOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNBloodLustOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    MovementSpeedIncrease = Levels(0.25f);
+                    Name = "Item Totem Ogre Magi Bloodlust";
+                    Order = "bloodlust";
+                    OrderStringActivate = "bloodluston";
+                    OrderStringDeactivate = "bloodlustoff";
+                    PriorityForSpellSteal = 11;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(900f);
+                    RequiredLevel = 0;
+                    ScalingFactor = Levels(0.3f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Bloodlust");
+                    TooltipExtended = Levels("Increases a friendly unit's attack rate by <Aomb,DataA1,%>% and movement speed by <Aomb,DataB1,%>%. |nLasts <Aomb,Dur1> seconds.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = true;
+                }
+
                 /// <summary>The field <c>Blo1</c>.</summary>
                 [global::Moonwell.Objects.Field("Blo1", Label = "Attack Speed Increase (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -4969,6 +9874,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Asd2")]
             public class Kaboom : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Kaboom()
+                {
+                    BuildingDamageFactor = Levels(1f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0.1f);
+                    EditorSuffix = "(Clockwerk Goblin-Level 2)";
+                    ExplodesOnDeath = Levels(true);
+                    FullDamageAmount = Levels(60f);
+                    FullDamageRadius = Levels(100f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0.1f);
+                    Hotkey = "B";
+                    HotkeyTurnOff = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSelfDestructOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNSelfDestructOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Kaboom!";
+                    Order = "selfdestruct";
+                    PartialDamageAmount = Levels(22f);
+                    PartialDamageRadius = Levels(250f);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(0f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Kaboom!");
+                    TooltipExtended = Levels("Deals <Asd2,DataB1> damage in a small area.");
+                    TooltipTurnOff = Levels("|cffc3dbff|cffc3dbffRight-click to activate auto-casting.|r|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbff|cffc3dbffRight-click to deactivate auto-casting.|r|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Dda1</c>.</summary>
                 [global::Moonwell.Objects.Field("Dda1", Label = "Full Damage Radius")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5033,6 +9980,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Asd3")]
             public class KaboomAsd3 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public KaboomAsd3()
+                {
+                    BuildingDamageFactor = Levels(1f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0.1f);
+                    EditorSuffix = "(Clockwerk Goblin-Level 3)";
+                    ExplodesOnDeath = Levels(true);
+                    FullDamageAmount = Levels(80f);
+                    FullDamageRadius = Levels(100f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0.1f);
+                    Hotkey = "B";
+                    HotkeyTurnOff = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSelfDestructOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNSelfDestructOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Kaboom!";
+                    Order = "selfdestruct";
+                    PartialDamageAmount = Levels(30f);
+                    PartialDamageRadius = Levels(250f);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(0f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Kaboom!");
+                    TooltipExtended = Levels("Deals <Asd3,DataB1> damage in a small area.");
+                    TooltipTurnOff = Levels("|cffc3dbff|cffc3dbffRight-click to activate auto-casting.|r|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbff|cffc3dbffRight-click to deactivate auto-casting.|r|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Dda1</c>.</summary>
                 [global::Moonwell.Objects.Field("Dda1", Label = "Full Damage Radius")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5097,6 +10086,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Asdg")]
             public class KaboomAsdg : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public KaboomAsdg()
+                {
+                    BuildingDamageFactor = Levels(1f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0.1f);
+                    EditorSuffix = "(Clockwerk Goblin-Level 1)";
+                    ExplodesOnDeath = Levels(true);
+                    FullDamageAmount = Levels(30f);
+                    FullDamageRadius = Levels(100f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0.1f);
+                    Hotkey = "B";
+                    HotkeyTurnOff = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSelfDestructOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNSelfDestructOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Kaboom!";
+                    Order = "selfdestruct";
+                    PartialDamageAmount = Levels(12f);
+                    PartialDamageRadius = Levels(250f);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(0f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Kaboom!");
+                    TooltipExtended = Levels("Deals <Asdg,DataB1> damage in a small area.");
+                    TooltipTurnOff = Levels("|cffc3dbff|cffc3dbffRight-click to activate auto-casting.|r|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbff|cffc3dbffRight-click to deactivate auto-casting.|r|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Dda1</c>.</summary>
                 [global::Moonwell.Objects.Field("Dda1", Label = "Full Damage Radius")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5161,6 +10192,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Asds")]
             public class KaboomAsds : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public KaboomAsds()
+                {
+                    BuildingDamageFactor = Levels(3f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0.1f);
+                    EditorSuffix = "(Goblin Sapper)";
+                    ExplodesOnDeath = Levels(false);
+                    FullDamageAmount = Levels(250f);
+                    FullDamageRadius = Levels(100f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0.1f);
+                    Hotkey = "B";
+                    HotkeyTurnOff = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSelfDestructOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNSelfDestructOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Kaboom!";
+                    Order = "selfdestruct";
+                    PartialDamageAmount = Levels(100f);
+                    PartialDamageRadius = Levels(250f);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(0f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Tree | global::Moonwell.Objects.Targets.Ward);
+                    Tooltip = Levels("Kaboom!");
+                    TooltipExtended = Levels("Deals <Asds,DataB1> damage in a small area. Effective against buildings and trees.");
+                    TooltipTurnOff = Levels("|cffc3dbff|cffc3dbffRight-click to activate auto-casting.|r|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbff|cffc3dbffRight-click to deactivate auto-casting.|r|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Dda1</c>.</summary>
                 [global::Moonwell.Objects.Field("Dda1", Label = "Full Damage Radius")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5225,6 +10298,52 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACdr")]
             public class LifeDrain : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public LifeDrain()
+                {
+                    AnimationNames = "stand,channel";
+                    Area = Levels(950f);
+                    BonusLifeDecay = Levels(0f);
+                    BonusLifeFactor = Levels(0f);
+                    BonusManaDecay = Levels(0f);
+                    BonusManaFactor = Levels(0f);
+                    Buffs.Set<global::Moonwell.Objects.Human.Buffs.DrainLifeManaCaster, global::Moonwell.Objects.Human.Buffs.DrainLifeCaster, global::Moonwell.Objects.Human.Buffs.DrainManaCaster, global::Moonwell.Objects.Human.Buffs.DrainLifeManaTarget, global::Moonwell.Objects.Human.Buffs.DrainLifeTarget, global::Moonwell.Objects.Human.Buffs.DrainManaTarget>();
+                    Buffs.Add("Bdbb");
+                    Buffs.Add("Bdbl");
+                    Buffs.Add("Bdbm");
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(8f);
+                    DrainIntervalSeconds = Levels(1f);
+                    Duration = Levels(8f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    EffectSoundLooping = "DrainLoop";
+                    HeroAbility = false;
+                    HeroDuration = Levels(8f);
+                    HitPointsDrained = Levels(55f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNLifeDrain.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LifeTransferredPerSecond = Levels(0f);
+                    LightningEffects = "DRAB,DRAL,DRAM";
+                    ManaCost = Levels(75);
+                    ManaPointsDrained = Levels(0f);
+                    ManaTransferredPerSecond = Levels(0f);
+                    Name = "Life Drain";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Life Drain");
+                    TooltipExtended = Levels("Absorbs the life essence of a target enemy unit by taking <ACdr,DataA1> hit points per second from it and giving them to the caster. |nLasts <ACdr,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ndr1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ndr1", Label = "Hit Points Drained")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5321,6 +10440,57 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANdr")]
             public class LifeDrainANdr : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public LifeDrainANdr()
+                {
+                    AnimationNames = "spell,channel";
+                    Area = Levels(700f, 700f, 700f);
+                    BonusLifeDecay = Levels(0f, 0f, 0f);
+                    BonusLifeFactor = Levels(0f, 0f, 0f);
+                    BonusManaDecay = Levels(0f, 0f, 0f);
+                    BonusManaFactor = Levels(0f, 0f, 0f);
+                    Buffs.Set<global::Moonwell.Objects.Human.Buffs.DrainLifeManaCaster, global::Moonwell.Objects.Human.Buffs.DrainLifeCaster, global::Moonwell.Objects.Human.Buffs.DrainManaCaster, global::Moonwell.Objects.Human.Buffs.DrainLifeManaTarget, global::Moonwell.Objects.Human.Buffs.DrainLifeTarget, global::Moonwell.Objects.Human.Buffs.DrainManaTarget>();
+                    Buffs.Add("Bdbb");
+                    Buffs.Add("Bdbl");
+                    Buffs.Add("Bdbm");
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(8f, 8f, 8f);
+                    DrainIntervalSeconds = Levels(1f, 1f, 1f);
+                    Duration = Levels(8f, 8f, 8f);
+                    EffectSoundLooping = "DrainLoop";
+                    HeroAbility = true;
+                    HeroDuration = Levels(8f, 8f, 8f);
+                    HitPointsDrained = Levels(30f, 45f, 60f);
+                    Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNLifeDrain.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNLifeDrain.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "D";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    LifeTransferredPerSecond = Levels(30f, 45f, 60f);
+                    LightningEffects = "DRAB,DRAL,DRAM";
+                    ManaCost = Levels(30, 30, 30);
+                    ManaPointsDrained = Levels(0f, 0f, 0f);
+                    ManaTransferredPerSecond = Levels(0f, 0f, 0f);
+                    Name = "Life Drain";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f, 600f, 600f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.NotSelf | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.NotSelf | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.NotSelf | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Life Drain - [|cffffcc00Level 1|r]", "Life Drain - [|cffffcc00Level 2|r]", "Life Drain - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Absorbs the life essence of a target enemy unit by taking <ANdr,DataA1> hit points per second from it and giving them to the Dark Ranger, or transfers <ANdr,DataD1> hit points from the Dark Ranger to an ally. |n|nAlso applies the current rank of the Black Arrow debuff to the target. |nLasts <ANdr,Dur1> seconds.", "Absorbs the life essence of a target enemy unit by taking <ANdr,DataA2> hit points per second from it and giving them to the Dark Ranger, or transfers <ANdr,DataD2> hit points from the Dark Ranger to an ally. |n|nAlso applies the current rank of the Black Arrow debuff to the target. |nLasts <ANdr,Dur2> seconds.", "Absorbs the life essence of a target enemy unit by taking <ANdr,DataA3> hit points per second from it and giving them to the Dark Ranger, or transfers <ANdr,DataD3> hit points from the Dark Ranger to an ally. |n|nAlso applies the current rank of the Black Arrow debuff to the target. |nLasts <ANdr,Dur3> seconds.");
+                    TooltipLearn = "Learn Life Drain - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Absorbs the life essence of a target enemy unit by taking hit points from it every second and giving them to the Dark Ranger, or transfers hit points from the Dark Ranger to an ally. |n|nLife Drain also applies the current rank of the Black Arrow debuff to the target. |nLasts <ANdr,Dur1> seconds. |n|n|cffffcc00Level 1|r - <ANdr,DataA1> hit point drain per second, or transfers <ANdr,DataD1> hit points per second to an ally. |n|cffffcc00Level 2|r - <ANdr,DataA2> hit point drain per second, or transfers <ANdr,DataD2> hit points per second to an ally. |n|cffffcc00Level 3|r - <ANdr,DataA3> hit point drain per second, or transfers <ANdr,DataD3> hit points per second to an ally.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ndr1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ndr1", Label = "Hit Points Drained")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5417,6 +10587,32 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACnr")]
             public class LifeRegenerationAura : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public LifeRegenerationAura()
+                {
+                    AmountOfHitPointsRegenerated = Levels(0.01f);
+                    Area = Levels(500f);
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeal.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Life Regeneration Aura";
+                    Percentage = Levels(true);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Vulnerable);
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Oar1</c>.</summary>
                 [global::Moonwell.Objects.Field("Oar1", Label = "Amount of Hit Points Regenerated")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5441,6 +10637,32 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ADhr")]
             public class LifeRegenerationAuraADhr : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public LifeRegenerationAuraADhr()
+                {
+                    AmountOfHitPointsRegenerated = Levels(0.01f);
+                    Area = Levels(400f);
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Revival Altar)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeal.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Life Regeneration Aura";
+                    Percentage = Levels(true);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    UseNewDefaultLevelCap = true;
+                }
+
                 /// <summary>The field <c>Oar1</c>.</summary>
                 [global::Moonwell.Objects.Field("Oar1", Label = "Amount of Hit Points Regenerated")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5465,6 +10687,32 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("SCva")]
             public class LifeSteal : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public LifeSteal()
+                {
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Frostmourne)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFrostMourne.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LifeStolenPerAttack = Levels(0.5f);
+                    ManaCost = Levels(0);
+                    MissileArt = "Abilities\\Spells\\Items\\WandOfNeutralization\\NeutralizationMissile.mdl";
+                    Name = "Life Steal";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Undead\\VampiricAura\\VampiricAuraTarget.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground);
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ivam</c>.</summary>
                 [global::Moonwell.Objects.Field("Ivam", Label = "Life Stolen Per Attack")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5481,6 +10729,39 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACls")]
             public class LightningShield : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public LightningShield()
+                {
+                    Area = Levels(160f);
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.LightningShield, global::Moonwell.Objects.Orc.Buffs.LightningShieldCaster>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    DamagePerSecond = Levels(20f);
+                    Duration = Levels(20f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(20f);
+                    Hotkey = "L";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNLightningShield.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100);
+                    Name = "Lightning Shield";
+                    Order = "lightningshield";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Lightning Shield");
+                    TooltipExtended = Levels("Forms a shield of electricity around a target unit, dealing <ACls,DataA1> damage per second to units around it. |nLasts <ACls,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Lsh1</c>.</summary>
                 [global::Moonwell.Objects.Field("Lsh1", Label = "Damage per Second")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5497,6 +10778,45 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Ambb")]
             public class ManaBurn : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ManaBurn()
+                {
+                    Area = Levels(0f);
+                    BoltDelay = Levels(0.25f);
+                    BoltLifetime = Levels(1f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(9f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile 3)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNManaBurn.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNManaBurn.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LightningEffects = "MBUR";
+                    ManaCost = Levels(50);
+                    MaxManaDrained = Levels(50f);
+                    Name = "Mana Burn";
+                    Order = "manaburn";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(450f);
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\NightElf\\ManaBurn\\ManaBurnTarget.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Mana Burn");
+                    TooltipExtended = Levels("Sends a bolt of negative energy that burns <Ambb,DataA1> points of a target enemy unit's mana. The mana combusts, dealing damage equal to the amount of mana burned.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Emb1</c>.</summary>
                 [global::Moonwell.Objects.Field("Emb1", Label = "Max Mana Drained")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5533,6 +10853,45 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Ambd")]
             public class ManaBurnAmbd : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ManaBurnAmbd()
+                {
+                    Area = Levels(0f);
+                    BoltDelay = Levels(0.25f);
+                    BoltLifetime = Levels(1f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(9f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile 1)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "N";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNManaBurn.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNManaBurn.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LightningEffects = "MBUR";
+                    ManaCost = Levels(50);
+                    MaxManaDrained = Levels(50f);
+                    Name = "Mana Burn";
+                    Order = "manaburn";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(450f);
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\NightElf\\ManaBurn\\ManaBurnTarget.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Mana Burn");
+                    TooltipExtended = Levels("Sends a bolt of negative energy that burns <Ambd,DataA1> points of a target enemy unit's mana. The mana combusts, dealing damage equal to the amount of mana burned.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Emb1</c>.</summary>
                 [global::Moonwell.Objects.Field("Emb1", Label = "Max Mana Drained")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5569,6 +10928,45 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Amnb")]
             public class ManaBurnAmnb : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ManaBurnAmnb()
+                {
+                    Area = Levels(0f);
+                    BoltDelay = Levels(0.25f);
+                    BoltLifetime = Levels(1f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(9f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile 2)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "N";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNManaBurn.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNManaBurn.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LightningEffects = "MBUR";
+                    ManaCost = Levels(50);
+                    MaxManaDrained = Levels(50f);
+                    Name = "Mana Burn";
+                    Order = "manaburn";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(450f);
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\NightElf\\ManaBurn\\ManaBurnTarget.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Mana Burn");
+                    TooltipExtended = Levels("Sends a bolt of negative energy that burns <Amnb,DataA1> points of a target enemy unit's mana. The mana combusts, dealing damage equal to the amount of mana burned.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Emb1</c>.</summary>
                 [global::Moonwell.Objects.Field("Emb1", Label = "Max Mana Drained")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5605,6 +11003,32 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ADmr")]
             public class ManaRegenerationAura : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ManaRegenerationAura()
+                {
+                    AmountRegenerated = Levels(0.01f);
+                    Area = Levels(400f);
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Revival Altar)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeal.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Mana Regeneration Aura";
+                    Percentage = Levels(true);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    UseNewDefaultLevelCap = true;
+                }
+
                 /// <summary>The field <c>Arm1</c>.</summary>
                 [global::Moonwell.Objects.Field("Arm1", Label = "Amount Regenerated")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5629,6 +11053,33 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANre")]
             public class ManaRegenerationLifeRegenerationAura : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ManaRegenerationLifeRegenerationAura()
+                {
+                    AmountRegenerated = Levels(0.01f);
+                    Area = Levels(500f);
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral)";
+                    EffectSoundLooping = "FountainOfLifeLoop";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeal.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Mana Regeneration, Life Regeneration Aura";
+                    Percentage = Levels(true);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Vulnerable);
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Arm1</c>.</summary>
                 [global::Moonwell.Objects.Field("Arm1", Label = "Amount Regenerated")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5653,6 +11104,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACmf")]
             public class ManaShield : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ManaShield()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.ManaShield>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 1;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(10f);
+                    DamageAbsorbed = Levels(1f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    EffectSound = "ManaShieldCastSound";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "N";
+                    HotkeyTurnOff = "N";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNNeutralManaShield.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNNeutralManaShield.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNneutralManaShieldOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(25);
+                    ManaPerHitPoint = Levels(2f);
+                    Name = "Mana Shield";
+                    Order = "manashield";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(128f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Mana Shield");
+                    TooltipExtended = Levels("Activates a shield that absorbs <ACmf,DataA1> damage per point of mana.");
+                    TooltipTurnOff = Levels("Deactivate Mana Shield");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nms1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nms1", Label = "Mana per Hit Point")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -5679,6 +11170,51 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANms")]
             public class ManaShieldANms : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ManaShieldANms()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.ManaShield>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    ButtonPositionTurnOffX = 2;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(10f, 10f, 10f);
+                    DamageAbsorbed = Levels(1f, 1f, 1f);
+                    Duration = Levels(0f, 0f, 0f);
+                    EffectSound = "ManaShieldCastSound";
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f, 0f, 0f);
+                    Hotkey = "N";
+                    HotkeyTurnOff = "N";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNNeutralManaShield.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNNeutralManaShield.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNNeutralManaShieldOff.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "N";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(10, 10, 10);
+                    ManaPerHitPoint = Levels(2f, 3f, 4f);
+                    Name = "Mana Shield";
+                    OrderStringActivate = "manashieldon";
+                    OrderStringDeactivate = "manashieldoff";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(128f, 128f, 128f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Self, global::Moonwell.Objects.Targets.Self, global::Moonwell.Objects.Targets.Self);
+                    Tooltip = Levels("Activate Mana Shield - [|cffffcc00Level 1|r]", "Activate Mana Shield - [|cffffcc00Level 2|r]", "Activate Mana Shield - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Activates a shield that absorbs <ANms,DataA1> damage per point of mana. Blocked damage ignores Armor and Armor Types.", "Activates a shield that absorbs <ANms,DataA2> damage per point of mana.", "Activates a shield that absorbs <ANms,DataA3> damage per point of mana.");
+                    TooltipLearn = "Learn Mana Shield - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Creates a shield that absorbs damage by using the Sea Witch's mana. Blocked damage ignores Armor and Armor Types. |n|n|cffffcc00Level 1|r - <ANms,DataA1> damage per point of mana. |n|cffffcc00Level 2|r - <ANms,DataA2> damage per point of mana. |n|cffffcc00Level 3|r - <ANms,DataA3> damage per point of mana.";
+                    TooltipTurnOff = Levels("Deactivate Mana Shield");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nms1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nms1", Label = "Mana per Hit Point")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -5705,6 +11241,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANb2")]
             public class Maul : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Maul()
+                {
+                    Area = Levels(0f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stunned>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    ChanceToBash = Levels(35f);
+                    ChanceToMiss = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    DamageBonus = Levels(50f);
+                    DamageMultiplier = Levels(0f);
+                    Duration = Levels(2f);
+                    EditorSuffix = "(Neutral Hostile 3/Maul)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(2f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNBash.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Maul";
+                    NeverMiss = Levels(false);
+                    Order = "bash";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground);
+                    Tooltip = Levels("Maul");
+                    TooltipExtended = Levels("Gives a <ANb2,DataA1>% chance that an attack will do <ANb2,DataC1> bonus damage and stun the target for <ANb2,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hbh1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hbh1", Label = "Chance to Bash")]
                 [global::Moonwell.Objects.Limits(0, 100)]
@@ -5759,6 +11330,47 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("AEIl")]
             public class Metamorphosis : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Metamorphosis()
+                {
+                    AlternateFormHitPointBonus = Levels(500f);
+                    AlternateFormUnit.Set<global::Moonwell.Objects.Campaign.Units.IllidanEilm>();
+                    AltitudeAdjustmentDuration = Levels(0f);
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.Metamorphosis>();
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(120f);
+                    Duration = Levels(1.5f);
+                    EditorSuffix = "(Illidan)";
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMetamorphosis.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNMetamorphosis.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "T";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(150);
+                    MorphingFlags = Levels(global::Moonwell.Objects.MorphFlags.Uninterruptable);
+                    Name = "Metamorphosis";
+                    NormalFormUnit.Set<global::Moonwell.Objects.Campaign.Units.IllidanEill>();
+                    Order = "metamorphosis";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 6;
+                    Tooltip = Levels("Metamorphosis");
+                    TooltipExtended = Levels("Transforms the Demon Hunter into a powerful Demon with a ranged attack.");
+                    TooltipLearn = "Learn Metamorphosis";
+                    TooltipLearnExtended = "Transforms the Demon Hunter into a powerful Demon with a ranged attack.";
+                    UnitSkinList = "Eilm,Eilm,Eilm,Eilm";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Eme1</c>.</summary>
                 [global::Moonwell.Objects.Field("Eme1", Label = "Normal Form Unit")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> NormalFormUnit
@@ -5817,6 +11429,47 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("AEvi")]
             public class MetamorphosisAEvi : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public MetamorphosisAEvi()
+                {
+                    AlternateFormHitPointBonus = Levels(500f);
+                    AlternateFormUnit.Set<global::Moonwell.Objects.Campaign.Units.IllidanEevm>();
+                    AltitudeAdjustmentDuration = Levels(0f);
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.Metamorphosis>();
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(120f);
+                    Duration = Levels(1.5f);
+                    EditorSuffix = "(Evil Illidan)";
+                    HeroAbility = true;
+                    HeroDuration = Levels(60f);
+                    Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMetamorphosis.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNMetamorphosis.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "T";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(150);
+                    MorphingFlags = Levels(global::Moonwell.Objects.MorphFlags.Uninterruptable);
+                    Name = "Metamorphosis";
+                    NormalFormUnit.Set<global::Moonwell.Objects.Campaign.Units.IllidanEevi>();
+                    Order = "metamorphosis";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 6;
+                    Tooltip = Levels("Metamorphosis");
+                    TooltipExtended = Levels("Transforms the Demon Hunter into a powerful Demon with a ranged attack.");
+                    TooltipLearn = "Learn Metamorphosis";
+                    TooltipLearnExtended = "Transforms the Demon Hunter into a powerful Demon with a ranged attack.";
+                    UnitSkinList = "Eevm,Eevm,Eevm,Eevm";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Eme1</c>.</summary>
                 [global::Moonwell.Objects.Field("Eme1", Label = "Normal Form Unit")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> NormalFormUnit
@@ -5875,6 +11528,35 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANmr")]
             public class MindRot : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public MindRot()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.MindRot>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(30f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(10f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTemp.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    ManaDrainedPerSecond = Levels(5f);
+                    Name = "Mind Rot";
+                    Order = "mindrot";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Mind Rot");
+                    TooltipExtended = Levels("Drains <ANmr,DataA1> mana from a target enemy unit over <ANmr,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nmr1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nmr1", Label = "Mana Drained per Second")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5891,6 +11573,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACmo")]
             public class Monsoon : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Monsoon()
+                {
+                    AnimationNames = "stand,channel";
+                    Area = Levels(300f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Monsoon>();
+                    BuildingReduction = Levels(0.35f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(10f);
+                    DamageDealt = Levels(20f);
+                    DamageInterval = Levels(1.5f);
+                    Duration = Levels(15f);
+                    Effects = Levels("XNmo");
+                    HeroAbility = false;
+                    HeroDuration = Levels(15f);
+                    Hotkey = "N";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMonsoon.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNMonsoon.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "N";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    Name = "Monsoon";
+                    Order = "monsoon";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Monsoon - [|cffffcc00Level 1|r]");
+                    TooltipExtended = Levels("Calls down a storm of lightning to strike enemy units for <ACmo,DataA1> damage in a small target area. |nLasts <ACmo,Dur1> seconds.");
+                    TooltipLearn = "Learn Monsoon - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Calls a storm of lightning bolts to strike enemy units for <ANmo,DataA1> damage. |nLasts <ANmo,Dur1> seconds. |n|n|cffffcc00Level 1|r - Small area. |n|cffffcc00Level 2|r - Medium area. |n|cffffcc00Level 3|r - Large area.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Esf1</c>.</summary>
                 [global::Moonwell.Objects.Field("Esf1", Label = "Damage Dealt")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5927,6 +11651,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANmo")]
             public class MonsoonANmo : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public MonsoonANmo()
+                {
+                    AnimationNames = "stand,channel";
+                    Area = Levels(300f, 400f, 500f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Monsoon>();
+                    BuildingReduction = Levels(0.35f, 0.35f, 0.35f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(10f, 10f, 10f);
+                    DamageDealt = Levels(20f, 20f, 20f);
+                    DamageInterval = Levels(1.5f, 1.5f, 1.5f);
+                    Duration = Levels(12f, 15f, 15f);
+                    Effects = Levels("XNmo", "XNmo", "XNmo");
+                    HeroAbility = true;
+                    HeroDuration = Levels(12f, 15f, 15f);
+                    Hotkey = "N";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMonsoon.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNMonsoon.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "N";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75, 75, 75);
+                    Name = "Monsoon";
+                    Order = "monsoon";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f, 300f, 300f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Monsoon - [|cffffcc00Level 1|r]", "Monsoon - [|cffffcc00Level 2|r]", "Monsoon - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Calls down a storm of lightning to strike enemy units for <ANmo,DataA1> damage in a small target area. |nLasts <ANmo,Dur1> seconds.", "Calls down a storm of lightning to strike enemy units for <ANmo,DataA2> damage in a medium target area. |nLasts <ANmo,Dur1> seconds.", "Calls down a storm of lightning to strike enemy units for <ANmo,DataA3> damage in a large target area. |nLasts <ANmo,Dur1> seconds.");
+                    TooltipLearn = "Learn Monsoon - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Calls a storm of lightning bolts to strike enemy units for <ANmo,DataA1> damage. |nLasts <ANmo,Dur1> seconds. |n|n|cffffcc00Level 1|r - Small area. |n|cffffcc00Level 2|r - Medium area. |n|cffffcc00Level 3|r - Large area.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Esf1</c>.</summary>
                 [global::Moonwell.Objects.Field("Esf1", Label = "Damage Dealt")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -5963,6 +11729,54 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACpa")]
             public class Parasite : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Parasite()
+                {
+                    AttackSpeedFactor = Levels(0f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Parasite, global::Moonwell.Objects.Other.Buffs.ParasiteBNpm>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CheckDependencies = true;
+                    Cooldown = Levels(5f);
+                    DamagePerSecond = Levels(5f);
+                    Duration = Levels(15f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "R";
+                    HotkeyTurnOff = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNParasiteOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNParasiteOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(50);
+                    MissileArt = "Abilities\\Spells\\Other\\Parasite\\ParasiteMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1900;
+                    MovementSpeedFactor = Levels(0f);
+                    Name = "Parasite";
+                    Order = "parasite";
+                    OrderStringActivate = "parasiteon";
+                    OrderStringDeactivate = "parasiteoff";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    StackingType = Levels(global::Moonwell.Objects.StackFlags.KillUnit);
+                    SummonedUnitCount = Levels(1);
+                    SummonedUnitDuration = Levels(90f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.NonHero | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Parasite");
+                    TooltipExtended = Levels("Afflicts a target enemy unit with a deadly parasite that deals <ANpa,DataA1> damage per second for <ANpa,Dur1> seconds. If the afflicted unit dies while under the effect of Parasite, a minor minion will spawn from its corpse.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UnitSkinList = "nvdl";
+                    UnitType.Set<global::Moonwell.Objects.Creeps.Units.LesserVoidwalker>();
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Npa5</c>.</summary>
                 [global::Moonwell.Objects.Field("Npa5", Label = "Summoned Unit Count")]
                 [global::Moonwell.Objects.Limits(1, 99999)]
@@ -6034,6 +11848,54 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANs1")]
             public class PocketFactory : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public PocketFactory()
+                {
+                    AnimationNames = "spell,Slam";
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.PocketFactory, global::Moonwell.Objects.Other.Buffs.ClockwerkGoblin>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(35f, 35f, 35f);
+                    Duration = Levels(40f, 40f, 40f);
+                    EditorSuffix = "(Upgrade 1)";
+                    FactoryUnitID.Set<global::Moonwell.Objects.Other.Units.PocketFactoryNfac>();
+                    HeroAbility = true;
+                    HeroDuration = Levels(40f, 40f, 40f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPocketFactory.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNPocketFactory.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "F// Pocket Factory";
+                    LeashRange = Levels(1100f, 1100f, 1100f);
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125, 125, 125);
+                    MissileArc = 0.35f;
+                    MissileArt = "Units\\Creeps\\HeroTinkerFactory\\HeroTinkerFactoryMissle.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1000;
+                    Name = "Pocket Factory";
+                    Order = "summonfactory";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f, 500f, 500f);
+                    RequiredLevel = 1;
+                    SpawnInterval = Levels(4f, 4f, 4f);
+                    SpawnUnitDuration = Levels(12f, 12f, 12f);
+                    SpawnUnitID.Set<global::Moonwell.Objects.Other.Units.ClockwerkGoblinNcgb>();
+                    SpawnUnitOffset = Levels(200f, 200f, 200f);
+                    Tooltip = Levels("Pocket Factory - [|cffffcc00Level 1|r]", "Pocket Factory - [|cffffcc00Level 2|r]", "Pocket Factory - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Creates a factory which automatically constructs Clockwerk Goblins.|n|nClockwerk Goblins have <ncgb,realHP> hit points, deal <ncgb,mindmg1> - <ncgb,maxdmg1> damage, and explode upon death, causing up to <Asdg,DataB1> damage to nearby enemy units.|nFactory lasts <ANs1,Dur1> seconds. |n|n|cffffcc00Clockwerk Goblins attack land units only.|r", "Creates a factory which automatically constructs Clockwerk Goblins.|n|nClockwerk Goblins have <ncg2,realHP> hit points, deal <ncg2,mindmg1> - <ncg2,maxdmg1> damage, and explode upon death, causing up to <Asd2,DataB1> damage to nearby enemy units.|nFactory lasts <ANs1,Dur2> seconds. |n|n|cffffcc00Clockwerk Goblins attack land units only.|r", "Creates a factory which automatically constructs Clockwerk Goblins.|n|nClockwerk Goblins have <ncg3,realHP> hit points, deal <ncg3,mindmg1> - <ncg3,maxdmg1> damage, and explode upon death, causing up to <Asd3,DataB1> damage to nearby enemy units.|nFactory lasts <ANs1,Dur3> seconds. |n|n|cffffcc00Clockwerk Goblins attack land units only.|r");
+                    TooltipLearn = "Learn Pocket Factory - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Creates a factory which automatically constructs Clockwerk Goblins. These artificial Goblins, in addition to being potent attackers, explode upon death, causing damage to nearby enemy units. |n|n|cffffcc00Level 1|r - Explosion does <Asdg,DataB1> damage.|n|cffffcc00Level 2|r - Explosion does <Asd2,DataB1> damage.|n|cffffcc00Level 3|r - Explosion does <Asd3,DataB1> damage.|nFactory lasts <ANs1,Dur3> seconds.";
+                    UnitSkinList = "nfac,nfa1,nfa2,nfa2";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nsy1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nsy1", Label = "Spawn Interval")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -6094,6 +11956,54 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANs2")]
             public class PocketFactoryANs2 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public PocketFactoryANs2()
+                {
+                    AnimationNames = "spell,Slam";
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.PocketFactory, global::Moonwell.Objects.Other.Buffs.ClockwerkGoblin>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(35f, 35f, 35f);
+                    Duration = Levels(40f, 40f, 40f);
+                    EditorSuffix = "(Upgrade 2)";
+                    FactoryUnitID.Set<global::Moonwell.Objects.Other.Units.PocketFactoryNfac>();
+                    HeroAbility = true;
+                    HeroDuration = Levels(40f, 40f, 40f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPocketFactory.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNPocketFactory.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "F";
+                    LeashRange = Levels(1100f, 1100f, 1100f);
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125, 125, 125);
+                    MissileArc = 0.35f;
+                    MissileArt = "Units\\Creeps\\HeroTinkerFactory\\HeroTinkerFactoryMissle.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1000;
+                    Name = "Pocket Factory";
+                    Order = "summonfactory";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f, 500f, 500f);
+                    RequiredLevel = 1;
+                    SpawnInterval = Levels(3.5f, 3.5f, 3.5f);
+                    SpawnUnitDuration = Levels(12f, 12f, 12f);
+                    SpawnUnitID.Set<global::Moonwell.Objects.Other.Units.ClockwerkGoblinNcgb>();
+                    SpawnUnitOffset = Levels(200f, 200f, 200f);
+                    Tooltip = Levels("Pocket Factory - [|cffffcc00Level 1|r]", "Pocket Factory - [|cffffcc00Level 2|r]", "Pocket Factory - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Creates a factory which automatically constructs Clockwerk Goblins.|n|nClockwerk Goblins have <ncgb,realHP> hit points, deal <ncgb,mindmg1> - <ncgb,maxdmg1> damage, and explode upon death, causing up to <Asdg,DataB1> damage to nearby enemy units.|nFactory lasts <ANs2,Dur1> seconds. |n|n|cffffcc00Clockwerk Goblins attack land units only.|r", "Creates a factory which automatically constructs Clockwerk Goblins.|n|nClockwerk Goblins have <ncg2,realHP> hit points, deal <ncg2,mindmg1> - <ncg2,maxdmg1> damage, and explode upon death, causing up to <Asd2,DataB1> damage to nearby enemy units.|nFactory lasts <ANs2,Dur2> seconds. |n|n|cffffcc00Clockwerk Goblins attack land units only.|r", "Creates a factory which automatically constructs Clockwerk Goblins.|n|nClockwerk Goblins have <ncg3,realHP> hit points, deal <ncg3,mindmg1> - <ncg3,maxdmg1> damage, and explode upon death, causing up to <Asd3,DataB1> damage to nearby enemy units.|nFactory lasts <ANs2,Dur3> seconds. |n|n|cffffcc00Clockwerk Goblins attack land units only.|r");
+                    TooltipLearn = "Learn Pocket Factory - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Creates a factory which automatically constructs Clockwerk Goblins. These artificial Goblins, in addition to being potent attackers, explode upon death, causing damage to nearby enemy units. |n|n|cffffcc00Level 1|r - Explosion does <Asdg,DataB1> damage.|n|cffffcc00Level 2|r - Explosion does <Asd2,DataB1> damage.|n|cffffcc00Level 3|r - Explosion does <Asd3,DataB1> damage.|nFactory lasts <ANs2,Dur3> seconds.";
+                    UnitSkinList = "nfac,nfa1,nfa2,nfa2";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nsy1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nsy1", Label = "Spawn Interval")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -6154,6 +12064,54 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANs3")]
             public class PocketFactoryANs3 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public PocketFactoryANs3()
+                {
+                    AnimationNames = "spell,Slam";
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.PocketFactory, global::Moonwell.Objects.Other.Buffs.ClockwerkGoblin>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(35f, 35f, 35f);
+                    Duration = Levels(40f, 40f, 40f);
+                    EditorSuffix = "(Upgrade 3)";
+                    FactoryUnitID.Set<global::Moonwell.Objects.Other.Units.PocketFactoryNfac>();
+                    HeroAbility = true;
+                    HeroDuration = Levels(40f, 40f, 40f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPocketFactory.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNPocketFactory.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "F";
+                    LeashRange = Levels(1100f, 1100f, 1100f);
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125, 125, 125);
+                    MissileArc = 0.35f;
+                    MissileArt = "Units\\Creeps\\HeroTinkerFactory\\HeroTinkerFactoryMissle.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1000;
+                    Name = "Pocket Factory";
+                    Order = "summonfactory";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f, 500f, 500f);
+                    RequiredLevel = 1;
+                    SpawnInterval = Levels(3f, 3f, 3f);
+                    SpawnUnitDuration = Levels(12f, 12f, 12f);
+                    SpawnUnitID.Set<global::Moonwell.Objects.Other.Units.ClockwerkGoblinNcgb>();
+                    SpawnUnitOffset = Levels(200f, 200f, 200f);
+                    Tooltip = Levels("Pocket Factory - [|cffffcc00Level 1|r]", "Pocket Factory - [|cffffcc00Level 2|r]", "Pocket Factory - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Creates a factory which automatically constructs Clockwerk Goblins.|n|nClockwerk Goblins have <ncgb,realHP> hit points, deal <ncgb,mindmg1> - <ncgb,maxdmg1> damage, and explode upon death, causing up to <Asdg,DataB1> damage to nearby enemy units.|nFactory lasts <ANs3,Dur1> seconds. |n|n|cffffcc00Clockwerk Goblins attack land units only.|r", "Creates a factory which automatically constructs Clockwerk Goblins.|n|nClockwerk Goblins have <ncg2,realHP> hit points, deal <ncg2,mindmg1> - <ncg2,maxdmg1> damage, and explode upon death, causing up to <Asd2,DataB1> damage to nearby enemy units.|nFactory lasts <ANs3,Dur2> seconds. |n|n|cffffcc00Clockwerk Goblins attack land units only.|r", "Creates a factory which automatically constructs Clockwerk Goblins.|n|nClockwerk Goblins have <ncg3,realHP> hit points, deal <ncg3,mindmg1> - <ncg3,maxdmg1> damage, and explode upon death, causing up to <Asd3,DataB1> damage to nearby enemy units.|nFactory lasts <ANs3,Dur3> seconds. |n|n|cffffcc00Clockwerk Goblins attack land units only.|r");
+                    TooltipLearn = "Learn Pocket Factory - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Creates a factory which automatically constructs Clockwerk Goblins. These artificial Goblins, in addition to being potent attackers, explode upon death, causing damage to nearby enemy units. |n|n|cffffcc00Level 1|r - Explosion does <Asdg,DataB1> damage.|n|cffffcc00Level 2|r - Explosion does <Asd2,DataB1> damage.|n|cffffcc00Level 3|r - Explosion does <Asd3,DataB1> damage.|nFactory lasts <ANs3,Dur3> seconds.";
+                    UnitSkinList = "nfac,nfa1,nfa2,nfa2";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nsy1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nsy1", Label = "Spawn Interval")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -6214,6 +12172,53 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANsy")]
             public class PocketFactoryANsy : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public PocketFactoryANsy()
+                {
+                    AnimationNames = "spell,Slam";
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.PocketFactory, global::Moonwell.Objects.Other.Buffs.ClockwerkGoblin>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(35f, 35f, 35f);
+                    Duration = Levels(40f, 40f, 40f);
+                    FactoryUnitID.Set<global::Moonwell.Objects.Other.Units.PocketFactoryNfac>();
+                    HeroAbility = true;
+                    HeroDuration = Levels(40f, 40f, 40f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPocketFactory.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNPocketFactory.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "F";
+                    LeashRange = Levels(1100f, 1100f, 1100f);
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125, 125, 125);
+                    MissileArc = 0.35f;
+                    MissileArt = "Units\\Creeps\\HeroTinkerFactory\\HeroTinkerFactoryMissle.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1000;
+                    Name = "Pocket Factory";
+                    Order = "summonfactory";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f, 500f, 500f);
+                    RequiredLevel = 1;
+                    SpawnInterval = Levels(4.5f, 4.5f, 4.5f);
+                    SpawnUnitDuration = Levels(12f, 12f, 12f);
+                    SpawnUnitID.Set<global::Moonwell.Objects.Other.Units.ClockwerkGoblinNcgb>();
+                    SpawnUnitOffset = Levels(200f, 200f, 200f);
+                    Tooltip = Levels("Pocket Factory - [|cffffcc00Level 1|r]", "Pocket Factory - [|cffffcc00Level 2|r]", "Pocket Factory - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Creates a factory which automatically constructs Clockwerk Goblins.|n|nClockwerk Goblins have <ncgb,realHP> hit points, deal <ncgb,mindmg1> - <ncgb,maxdmg1> damage, and explode upon death, causing up to <Asdg,DataB1> damage to nearby enemy units.|nFactory lasts <ANsy,Dur1> seconds. |n|n|cffffcc00Clockwerk Goblins attack land units only.|r", "Creates a factory which automatically constructs Clockwerk Goblins.|n|nClockwerk Goblins have <ncg2,realHP> hit points, deal <ncg2,mindmg1> - <ncg2,maxdmg1> damage, and explode upon death, causing up to <Asd2,DataB1> damage to nearby enemy units.|nFactory lasts <ANsy,Dur2> seconds. |n|n|cffffcc00Clockwerk Goblins attack land units only.|r", "Creates a factory which automatically constructs Clockwerk Goblins.|n|nClockwerk Goblins have <ncg3,realHP> hit points, deal <ncg3,mindmg1> - <ncg3,maxdmg1> damage, and explode upon death, causing up to <Asd3,DataB1> damage to nearby enemy units.|nFactory lasts <ANsy,Dur3> seconds. |n|n|cffffcc00Clockwerk Goblins attack land units only.|r");
+                    TooltipLearn = "Learn Pocket Factory - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Creates a factory which automatically constructs Clockwerk Goblins. These artificial Goblins, in addition to being potent attackers, explode upon death, causing damage to nearby enemy units. |n|n|cffffcc00Level 1|r - Explosion does <Asdg,DataB1> damage.|n|cffffcc00Level 2|r - Explosion does <Asd2,DataB1> damage.|n|cffffcc00Level 3|r - Explosion does <Asd3,DataB1> damage.|nFactory lasts <ANsy,Dur3> seconds.";
+                    UnitSkinList = "nfac,nfa1,nfa2,nfa2";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nsy1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nsy1", Label = "Spawn Interval")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -6274,6 +12279,59 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("AEpa")]
             public class PoisonArrows : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public PoisonArrows()
+                {
+                    AnimationNames = "attack";
+                    AttackSpeedFactor = Levels(0f, 0f, 0f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Poison, global::Moonwell.Objects.Other.Buffs.PoisonBpsd, global::Moonwell.Objects.Other.Buffs.PoisonInfo>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    ButtonPositionTurnOffX = 1;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f, 0f, 0f);
+                    DamagePerSecond = Levels(4f, 6f, 8f);
+                    Duration = Levels(10f, 10f, 10f);
+                    ExtraDamage = Levels(10f, 20f, 30f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(10f, 10f, 10f);
+                    Hotkey = "R";
+                    HotkeyTurnOff = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSearingArrowsOn.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSearingArrows.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNSearingArrowsOff.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0, 0, 0);
+                    MissileArt = "Abilities\\Weapons\\SearingArrow\\SearingArrowMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1500;
+                    MovementSpeedFactor = Levels(0f, 0f, 0f);
+                    Name = "Poison Arrows";
+                    Order = "poisonarrowstarg";
+                    OrderStringActivate = "poisonarrows";
+                    OrderStringDeactivate = "unpoisonarrows";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 1;
+                    StackingType = Levels((global::Moonwell.Objects.StackFlags)0, (global::Moonwell.Objects.StackFlags)0, (global::Moonwell.Objects.StackFlags)0);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Poison Arrows - [|cffffcc00Level 1|r]", "Poison Arrows  - [|cffffcc00Level 2|r]", "Poison Arrows  - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Adds <AHfa,DataA1> bonus fire damage to an attack against enemies, but drains mana with each shot fired.", "Adds <AHfa,DataA2> bonus fire damage to an attack, but drains mana with each shot fired.", "Adds <AHfa,DataA3> bonus fire damage to an attack, but drains mana with each shot fired.");
+                    TooltipLearn = "Learn Poison Arrows - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Increases the damage of the Priestess' attack by adding fire. |n|n|cffffcc00Level 1|r - <AHfa,DataA1> bonus damage. |n|cffffcc00Level 2|r - <AHfa,DataA2> bonus damage. |n|cffffcc00Level 3|r - <AHfa,DataA3> bonus damage.";
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Poa1</c>.</summary>
                 [global::Moonwell.Objects.Field("Poa1", Label = "Extra Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -6328,6 +12386,44 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACpy")]
             public class Polymorph : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Polymorph()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Human.Buffs.Polymorph>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(10f);
+                    Duration = Levels(20f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    Effect = "Abilities\\Spells\\Human\\Polymorph\\PolyMorphFallingSheepArt.mdl";
+                    HeroAbility = false;
+                    HeroDuration = Levels(20f);
+                    Hotkey = "O";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPolymorph.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(200);
+                    MaximumCreepLevel = Levels(5);
+                    MorphUnitsAir.Set<global::Moonwell.Objects.Critters.Units.FlyingSheep>();
+                    MorphUnitsAmphibious.Set<global::Moonwell.Objects.Critters.Units.Sheep>();
+                    MorphUnitsGround.Set<global::Moonwell.Objects.Critters.Units.SheepNshe>();
+                    MorphUnitsWater.Set<global::Moonwell.Objects.Critters.Units.SheepNshw>();
+                    Name = "Polymorph";
+                    Order = "polymorph";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f);
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Human\\Polymorph\\PolyMorphTarget.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.NonHero | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Polymorph");
+                    TooltipExtended = Levels("Turns a target enemy unit into a sheep. The targeted unit retains its hit points and armor, but cannot attack. |nCannot be cast on Heroes or summoned units.|nLasts <ACpy,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ply1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ply1", Label = "Maximum Creep Level")]
                 [global::Moonwell.Objects.Limits(0, 100)]
@@ -6372,6 +12468,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACps")]
             public class Possession : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Possession()
+                {
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(1f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "O";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPossession.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LightningEffects = "POSS";
+                    ManaCost = Levels(250);
+                    MaximumCreepLevel = Levels(5);
+                    MissileArt = "Abilities\\Spells\\Undead\\Possession\\PossessionMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1500;
+                    Name = "Possession";
+                    Order = "possession";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(200f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.NonHero | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Possession");
+                    TooltipExtended = Levels("Displaces the soul of a target unit, giving you control of it, but destroying the caster's body. |nPossession cannot be used on flying units, Heroes, or creeps above level <ACps,DataA1>.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Pos1</c>.</summary>
                 [global::Moonwell.Objects.Field("Pos1", Label = "Maximum Creep Level")]
                 [global::Moonwell.Objects.Limits(0, 100)]
@@ -6388,6 +12519,38 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACpv")]
             public class Pulverize : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Pulverize()
+                {
+                    AnimationNames = "slam";
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    ChanceToStomp = Levels(15f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    DamageDealt = Levels(30f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    FullDamageRadius = Levels(150f);
+                    HalfDamageRadius = Levels(250f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNSeaGiantPulverize.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Pulverize";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Ward);
+                    Tooltip = Levels("Pulverize");
+                    TooltipExtended = Levels("Gives a <ACpv,DataA1>% chance that an attack will deal <ACpv,DataB1> damage to nearby units.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>War1</c>.</summary>
                 [global::Moonwell.Objects.Field("War1", Label = "Chance to Stomp (%)")]
                 [global::Moonwell.Objects.Limits(0, 1000)]
@@ -6434,6 +12597,44 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACpu")]
             public class Purge : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Purge()
+                {
+                    AttackUpdateFrequency = Levels(0);
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.Purge>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(5f);
+                    Duration = Levels(5f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(5f);
+                    HeroPauseDuration = Levels(0f);
+                    Hotkey = "G";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPurge.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    ManaLoss = Levels(0);
+                    MovementUpdateFrequency = Levels(5);
+                    Name = "Purge";
+                    Order = "purge";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    Special = "Abilities\\Spells\\Orc\\Purge\\PurgeBuffTarget.mdl";
+                    SummonedUnitDamage = Levels(200f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Tree | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Ward);
+                    Tooltip = Levels("Purge");
+                    TooltipExtended = Levels("Removes all buffs from a target unit, and slows its movement speed by a factor of <ACpu,DataA1>. Purged units will slowly regain their movement speed over <ACpu,Dur1> seconds. |n|cffffcc00Deals <ACpu,DataC1> damage to summoned units.|r");
+                    UnitPauseDuration = Levels(0f);
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Prg1</c>.</summary>
                 [global::Moonwell.Objects.Field("Prg1", Label = "Movement Update Frequency")]
                 [global::Moonwell.Objects.Limits(0, 100)]
@@ -6500,6 +12701,49 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANak")]
             public class QuillSpray : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public QuillSpray()
+                {
+                    Area = Levels(175f);
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 1;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    DamageBonus = Levels(15f);
+                    Duration = Levels(0f);
+                    FullDamageRadius = Levels(150f);
+                    HalfDamageRadius = Levels(300f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "Q";
+                    HotkeyTurnOff = "Q";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNQuillSpray.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNQuillSprayOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(15);
+                    MediumDamageFactor = Levels(0.5f);
+                    MissileArt = "Abilities\\Weapons\\QuillSprayMissile\\QuillSprayMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1500;
+                    Name = "Quill Spray";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f);
+                    RequiredLevel = 0;
+                    SmallDamageFactor = Levels(0.25f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Quill Spray");
+                    TooltipExtended = Levels("Adds <ANak,DataA1> bonus damage to the Quill Beast's attack and causes its attacks to do area of effect damage.");
+                    TooltipTurnOff = Levels("|cffc3dbff|cffc3dbffRight-click to activate auto-casting.|r|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>fak1</c>.</summary>
                 [global::Moonwell.Objects.Field("fak1", Label = "Damage Bonus")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -6556,6 +12800,45 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANr3")]
             public class RainOfChaos : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public RainOfChaos()
+                {
+                    AbilityForUnitCreation.Set<global::Moonwell.Objects.Creeps.Abilities.Inferno>();
+                    AnimationNames = "spell,slam";
+                    Area = Levels(900f, 900f, 900f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(120f, 120f, 120f);
+                    Duration = Levels(1f, 0.8f, 0.6f);
+                    EditorSuffix = "(Balnazzar)";
+                    Effects = Levels("XErc", "XErc", "XErc");
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f, 0f, 0f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNInfernalStone.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNInfernalStone.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0, 0, 0);
+                    Name = "Rain of Chaos";
+                    NumberOfUnitsCreated = Levels(2, 3, 4);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(1000f, 1000f, 1000f);
+                    RequiredLevel = 1;
+                    Tooltip = Levels("Rain of Chaos");
+                    TooltipExtended = Levels("Calls down multiple Infernals from the sky.");
+                    TooltipLearn = "Learn Rain of Chaos";
+                    TooltipLearnExtended = "Calls down multiple Infernals from the sky.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nrc1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nrc1", Label = "Ability for Unit Creation")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Ability> AbilityForUnitCreation
@@ -6579,6 +12862,45 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANrc")]
             public class RainOfChaosANrc : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public RainOfChaosANrc()
+                {
+                    AbilityForUnitCreation.Set<global::Moonwell.Objects.Creeps.Abilities.Inferno>();
+                    AnimationNames = "spell,slam";
+                    Area = Levels(900f, 900f, 900f);
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(120f, 120f, 120f);
+                    Duration = Levels(1f, 0.8f, 0.6f);
+                    EditorSuffix = "(Archimonde)";
+                    Effects = Levels("XErc", "XErc", "XErc");
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f, 0f, 0f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNInfernalStone.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNInfernalStone.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0, 0, 0);
+                    Name = "Rain of Chaos";
+                    NumberOfUnitsCreated = Levels(2, 3, 4);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(1000f, 1000f, 1000f);
+                    RequiredLevel = 1;
+                    Tooltip = Levels("Rain of Chaos");
+                    TooltipExtended = Levels("Calls down multiple Infernals from the sky.");
+                    TooltipLearn = "Learn Rain of Chaos";
+                    TooltipLearnExtended = "Calls down multiple Infernals from the sky.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nrc1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nrc1", Label = "Ability for Unit Creation")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Ability> AbilityForUnitCreation
@@ -6602,6 +12924,43 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACrf")]
             public class RainOfFire : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public RainOfFire()
+                {
+                    Area = Levels(200f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.RainOfFire, global::Moonwell.Objects.Other.Buffs.RainOfFireArea>();
+                    BuildingReduction = Levels(0.5f);
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0.599f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(12f);
+                    Damage = Levels(25f);
+                    DamagePerSecond = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile 2)";
+                    Effects = Levels("XErf");
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFire.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125);
+                    Name = "Rain of Fire";
+                    NumberOfShards = Levels(6);
+                    NumberOfWaves = Levels(6);
+                    Order = "rainoffire";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Rain of Fire");
+                    TooltipExtended = Levels("Calls down waves of fire that damage units in an area. Each wave deals <ACrf,DataB1> damage. |nLasts for <ACrf,DataA1> waves.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hbz1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hbz1", Label = "Number of Waves")]
                 [global::Moonwell.Objects.Limits(1, 99999)]
@@ -6668,6 +13027,47 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACrg")]
             public class RainOfFireACrg : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public RainOfFireACrg()
+                {
+                    AnimationNames = "spell,looping";
+                    Area = Levels(300f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.RainOfFire, global::Moonwell.Objects.Other.Buffs.RainOfFireArea>();
+                    BuildingReduction = Levels(0.75f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0.599f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(12f);
+                    Damage = Levels(50f);
+                    DamagePerSecond = Levels(20f);
+                    Duration = Levels(3f);
+                    EditorSuffix = "(Neutral Hostile 1)";
+                    Effects = Levels("XErf");
+                    HeroAbility = false;
+                    HeroDuration = Levels(3f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFire.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNFire.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125);
+                    Name = "Rain of Fire";
+                    NumberOfShards = Levels(9);
+                    NumberOfWaves = Levels(9);
+                    Order = "rainoffire";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Rain of Fire");
+                    TooltipExtended = Levels("Calls down waves of fire that damage units in an area. Each wave deals <ACrg,DataB1> initial damage and <ACrg,DataE1> damage per second for <ACrg,Dur1> seconds. |nLasts for <ACrg,DataA1> waves.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hbz1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hbz1", Label = "Number of Waves")]
                 [global::Moonwell.Objects.Limits(1, 99999)]
@@ -6734,6 +13134,50 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANrf")]
             public class RainOfFireANrf : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public RainOfFireANrf()
+                {
+                    AnimationNames = "spell,looping";
+                    Area = Levels(200f, 200f, 200f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.RainOfFire, global::Moonwell.Objects.Other.Buffs.RainOfFireArea>();
+                    BuildingReduction = Levels(0.5f, 0.5f, 0.5f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(1f, 1f, 1f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(8f, 8f, 8f);
+                    Damage = Levels(25f, 30f, 35f);
+                    DamagePerSecond = Levels(5f, 10f, 15f);
+                    Duration = Levels(3f, 3f, 3f);
+                    Effects = Levels("XErf", "XErf", "XErf");
+                    HeroAbility = true;
+                    HeroDuration = Levels(3f, 3f, 3f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFire.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNFire.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "F";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(85, 85, 85);
+                    MaximumDamagePerWave = Levels(125f, 150f, 175f);
+                    Name = "Rain of Fire";
+                    NumberOfShards = Levels(6, 7, 10);
+                    NumberOfWaves = Levels(6, 8, 10);
+                    Order = "rainoffire";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f, 800f, 800f);
+                    RequiredLevel = 1;
+                    Tooltip = Levels("Rain of Fire - [|cffffcc00Level 1|r]", "Rain of Fire - [|cffffcc00Level 2|r]", "Rain of Fire - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Calls down waves of fire that damage units in an area. Each wave deals <ANrf,DataB1> initial damage and <ANrf,DataE1> damage per second for <ANrf,Dur1> seconds. |nLasts for <ANrf,DataA1> waves.", "Calls down waves of fire that damage units in an area. Each wave deals <ANrf,DataB2> initial damage and <ANrf,DataE2> damage per second for <ANrf,Dur2> seconds. |nLasts for <ANrf,DataA2> waves.", "Calls down waves of fire that damage units in an area. Each wave deals <ANrf,DataB3> initial damage and <ANrf,DataE3> damage per second for <ANrf,Dur3> seconds. |nLasts for <ANrf,DataA3> waves.");
+                    TooltipLearn = "Learn Rain of Fire - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Calls down waves of fire that damage units in an area. Each wave deals initial damage and then burns enemies for <ANrf,Dur1> seconds. |n|n|cffffcc00Level 1|r - <ANrf,DataB1> wave damage, <ANrf,DataA1> waves, <ANrf,DataE1> damage per second. |n|cffffcc00Level 2|r - <ANrf,DataB2> wave damage, <ANrf,DataA2> waves, <ANrf,DataE2> damage per second. |n|cffffcc00Level 3|r - <ANrf,DataB3> wave damage, <ANrf,DataA3> waves, <ANrf,DataE3> damage per second.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hbz1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hbz1", Label = "Number of Waves")]
                 [global::Moonwell.Objects.Limits(1, 99999)]
@@ -6800,6 +13244,52 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACrd")]
             public class RaiseDead : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public RaiseDead()
+                {
+                    Area = Levels(900f);
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.SkeletalMinion>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(12f);
+                    Duration = Levels(40f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    Effect = "Abilities\\Spells\\Undead\\RaiseSkeletonWarrior\\RaiseSkeleton.mdl";
+                    HeroAbility = false;
+                    HeroDuration = Levels(40f);
+                    Hotkey = "R";
+                    HotkeyTurnOff = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRaiseDeadOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNRaiseDeadOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    Name = "Raise Dead";
+                    Order = "raisedead";
+                    OrderStringActivate = "raisedeadon";
+                    OrderStringDeactivate = "raisedeadoff";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Dead);
+                    Tooltip = Levels("Raise Dead");
+                    TooltipExtended = Levels("Raises <ACrd,DataA1> skeletons from a corpse.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.");
+                    UnitSkinList = "uske";
+                    UnitTypeForLimitCheck.Set<global::Moonwell.Objects.Undead.Units.SkeletonWarrior>();
+                    UnitTypeOne.Set<global::Moonwell.Objects.Undead.Units.SkeletonWarrior>();
+                    UnitsSummonedTypeOne = Levels(2);
+                    UnitsSummonedTypeTwo = Levels(0);
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Rai1</c>.</summary>
                 [global::Moonwell.Objects.Field("Rai1", Label = "Units Summoned (Type One)")]
                 [global::Moonwell.Objects.Limits(0, 999)]
@@ -6847,6 +13337,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Ache")]
             public class RayOfDisruption : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public RayOfDisruption()
+                {
+                    Area = Levels(400f);
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(15f);
+                    Duration = Levels(0f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWandOfNeutralization.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    ManaLossPerUnit = Levels(0f);
+                    MaximumDispelledUnits = Levels(8);
+                    MissileArt = "Abilities\\Spells\\Items\\WandOfNeutralization\\NeutralizationMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 900;
+                    Name = "Ray of Disruption";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    SummonedUnitDamage = Levels(0f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Cast Ray of Disruption");
+                    TooltipExtended = Levels("Conjures a stream of neutralizing magic that bounces up to <Ache,DataC1> times, dispelling units in its wake.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>idc1</c>.</summary>
                 [global::Moonwell.Objects.Field("idc1", Label = "Mana Loss Per Unit")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -6883,6 +13408,34 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACrn")]
             public class Reincarnation : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Reincarnation()
+                {
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(3f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(240f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    Effect = "Abilities\\Spells\\Orc\\Reincarnation\\ReincarnationTarget.mdl";
+                    Effects = Levels("XOre");
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNReincarnation.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    Name = "Reincarnation";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    ReincarnationDelay = Levels(7f);
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Reincarnation");
+                    TooltipExtended = Levels("When killed, this unit will come back to life. Reincarnation has a <ACrn,Cool1> second cooldown.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ore1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ore1", Label = "Reincarnation Delay")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -6899,6 +13452,39 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANr2")]
             public class ReincarnationANr2 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ReincarnationANr2()
+                {
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(3f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(240f);
+                    Duration = Levels(0f);
+                    Effect = "Abilities\\Spells\\Orc\\Reincarnation\\ReincarnationTarget.mdl";
+                    Effects = Levels("XOre");
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNReincarnation.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNReincarnation.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    Name = "Reincarnation";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    ReincarnationDelay = Levels(7f);
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Reincarnation");
+                    TooltipExtended = Levels("When killed, this Hero will come back to life. Reincarnation has a <ANr2,Cool1> second cooldown.");
+                    TooltipLearn = "Learn Reincarnation";
+                    TooltipLearnExtended = "When killed, this Hero will come back to life. Reincarnation has a <ANr2,Cool1> second cooldown.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ore1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ore1", Label = "Reincarnation Delay")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -6915,6 +13501,42 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANrn")]
             public class ReincarnationANrn : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ReincarnationANrn()
+                {
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(3f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(240f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Mannoroth)";
+                    Effect = "Abilities\\Spells\\Orc\\Reincarnation\\ReincarnationTarget.mdl";
+                    Effects = Levels("XOre");
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "R";
+                    HotkeyTurnOff = "R";
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNReincarnation.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNReincarnation.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    Name = "Reincarnation";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    ReincarnationDelay = Levels(7f);
+                    RequiredLevel = 6;
+                    Tooltip = Levels("Reincarnation");
+                    TooltipExtended = Levels("When killed, the demon will come back to life. Reincarnation has a <ANrn,Cool1> second cooldown.");
+                    TooltipLearn = "Learn Reincarnation";
+                    TooltipLearnExtended = "When killed, the demon will come back to life. Reincarnation has a <ANrn,Cool1> second cooldown.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ore1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ore1", Label = "Reincarnation Delay")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -6931,6 +13553,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACr2")]
             public class Rejuvenation : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Rejuvenation()
+                {
+                    AllowWhenFull = Levels(global::Moonwell.Objects.FullFlags.Always);
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.Rejuvenation>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(12f);
+                    EditorSuffix = "(Furbolg)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(12f);
+                    HitPointsGained = Levels(400f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRejuvenation.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(150);
+                    ManaPointsGained = Levels(0f);
+                    Name = "Rejuvenation";
+                    NoTargetRequired = Levels(false);
+                    Order = "rejuvination";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(400f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Rejuvenation");
+                    TooltipExtended = Levels("Heals a target friendly unit for <ACr2,DataA1> hit points over <ACr2,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Rej1</c>.</summary>
                 [global::Moonwell.Objects.Field("Rej1", Label = "Hit Points Gained")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -6973,6 +13630,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACrj")]
             public class RejuvenationACrj : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public RejuvenationACrj()
+                {
+                    AllowWhenFull = Levels(global::Moonwell.Objects.FullFlags.Always);
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.Rejuvenation>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(5f);
+                    Duration = Levels(12f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(12f);
+                    HitPointsGained = Levels(400f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRejuvenation.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125);
+                    ManaPointsGained = Levels(0f);
+                    Name = "Rejuvenation";
+                    NoTargetRequired = Levels(false);
+                    Order = "rejuvination";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(400f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Rejuvenation");
+                    TooltipExtended = Levels("Heals a target friendly unit for <ACrj,DataA1> hit points over <ACrj,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Rej1</c>.</summary>
                 [global::Moonwell.Objects.Field("Rej1", Label = "Hit Points Gained")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -7015,6 +13707,31 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACrk")]
             public class ResistantSkin : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ResistantSkin()
+                {
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile 1)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNThickFur.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Resistant Skin";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Resistant Skin");
+                    TooltipExtended = Levels("Reduces the duration of negative spells and renders the unit immune to certain spells.");
+                    UseNewDefaultLevelCap = false;
+                }
             }
 
             /// <summary>Resistant Skin (ACsk).</summary>
@@ -7022,6 +13739,31 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACsk")]
             public class ResistantSkinACsk : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ResistantSkinACsk()
+                {
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 1;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile 2)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNThickFur.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Resistant Skin";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Resistant Skin");
+                    TooltipExtended = Levels("Reduces the duration of negative spells and renders the unit immune to certain spells.");
+                    UseNewDefaultLevelCap = false;
+                }
             }
 
             /// <summary>Reveal (Andt).</summary>
@@ -7029,6 +13771,37 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Andt")]
             public class Reveal : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Reveal()
+                {
+                    Area = Levels(900f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    DetectionTypeNdt3 = Levels(global::Moonwell.Objects.DetectionType.Both);
+                    Duration = Levels(6f);
+                    Effects = Levels("Xbdt");
+                    GoldCost = Levels(50);
+                    HeroAbility = false;
+                    HeroDuration = Levels(6f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNReveal.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LumberCost = Levels(0);
+                    ManaCost = Levels(0);
+                    Name = "Reveal";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Reveal");
+                    TooltipExtended = Levels("Reveals an area of the map. |nDetects invisible units. |nLasts <Andt,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ndt1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ndt1", Label = "Gold Cost")]
                 [global::Moonwell.Objects.Limits(0, 1000000)]
@@ -7063,6 +13836,55 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANcp")]
             public class RighteousFury : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public RighteousFury()
+                {
+                    AnimationNames = "spell,fast";
+                    Area = Levels(100f, 100f, 100f);
+                    AttackSpeedSlow = Levels(0.4f, 0.4f, 0.4f);
+                    BonusCriticalStrike = Levels(0f, 0f, 0f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.RighteousFury>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    Caster = "Abilities\\Spells\\Other\\RighteousFury\\RighteousFury.mdl";
+                    CasterAttachmentPoint1 = "origin";
+                    CheckDependencies = true;
+                    Cooldown = Levels(10f, 10f, 10f);
+                    DashDamage = Levels(90f, 135f, 180f);
+                    DashSpeed = Levels(1000f, 1000f, 1000f);
+                    Duration = Levels(5f, 5f, 5f);
+                    HeroAbility = true;
+                    HeroBonusCriticalStrikeDuration = Levels(0f, 0f, 0f);
+                    HeroDuration = Levels(3f, 3f, 3f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRighteousFury.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNRighteousFury.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "F";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(90, 90, 90);
+                    MovementSpeedSlow = Levels(0.4f, 0.4f, 0.4f);
+                    Name = "Righteous Fury";
+                    NormalBonusCriticalStrikeDuration = Levels(0f, 0f, 0f);
+                    Order = "righteousfury";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(725f, 725f, 725f);
+                    RemoveBuffsOnAbilityStart = Levels(false, false, false);
+                    RequiredLevel = 1;
+                    TargetIntersectRadius = Levels(100f, 100f, 100f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Vulnerable);
+                    Tooltip = Levels("Righteous Fury - [|cffffcc00Level 1|r]", "Righteous Fury - [|cffffcc00Level 2|r]", "Righteous Fury - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Dashes towards a target point up to <ANcp,Rng1> range away, dealing <AHch,DataB1> damage to enemy land units hit along the way, and slowing their movement by <ANcp,DataI1,%>% and attack rate by <ANcp,DataJ1,%>%.", "Dashes towards a target point up to <ANcp,Rng2> range away, dealing <ANcp,DataB2> damage to enemy land units hit along the way, and slowing their movement by <ANcp,DataI2,%>% and attack rate by <ANcp,DataJ2,%>%.", "Dashes towards a target point up to <ANcp,Rng3> range away, dealing <ANcp,DataB3> damage to enemy land units hit along the way, and slowing their movement by <ANcp,DataI3,%>% and attack rate by <ANcp,DataJ3,%>%.");
+                    TooltipLearn = "Learn Righteous Fury - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Dash towards a target point, dealing damage to and slowing the movement speed and attack rate of enemy land units passed through.|n|n|cffffcc00Level 1|r - <ANcp,Rng1> range, <ANcp,DataB1> damage, <ANcp,DataI1,%>% movement speed, <ANcp,DataJ1,%>% attack rate. |n|cffffcc00Level 2|r - <ANcp,Rng2> range, <ANcp,DataB2> damage, <ANcp,DataI2,%>% movement speed, <ANcp,DataJ2,%>% attack rate. |n|cffffcc00Level 3|r - <ANcp,Rng3> range, <ANcp,DataB3> damage, <ANcp,DataI3,%>% movement speed, <ANcp,DataJ3,%>% attack rate.";
+                    UseNewDefaultLevelCap = true;
+                }
+
                 /// <summary>The field <c>chr1</c>.</summary>
                 [global::Moonwell.Objects.Field("chr1", Label = "Dash Speed")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -7157,6 +13979,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACr1")]
             public class Roar : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Roar()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(500f);
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.Roar>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    Caster = "Abilities\\Spells\\NightElf\\BattleRoar\\RoarCaster.mdl";
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    DamageIncrease = Levels(0.25f);
+                    DefenseIncrease = Levels(0);
+                    Duration = Levels(45f);
+                    EditorSuffix = "(Skeletal Orc Champion)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(45f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBattleRoar.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LifeRegenerationRate = Levels(0f);
+                    ManaCost = Levels(100);
+                    ManaRegen = Levels(0f);
+                    MaxUnits = Levels(0);
+                    Name = "Roar";
+                    Order = "roar";
+                    PreferFriendlies = Levels(false);
+                    PreferHostiles = Levels(false);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Roar");
+                    TooltipExtended = Levels("Gives nearby friendly units a <ACr1,DataA1,%>% bonus to damage. |nLasts <ACr1,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Roa1</c>.</summary>
                 [global::Moonwell.Objects.Field("Roa1", Label = "Damage Increase (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -7229,6 +14091,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACro")]
             public class RoarACro : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public RoarACro()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(500f);
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.Roar>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    Caster = "Abilities\\Spells\\NightElf\\BattleRoar\\RoarCaster.mdl";
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    DamageIncrease = Levels(0.25f);
+                    DefenseIncrease = Levels(0);
+                    Duration = Levels(45f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(45f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBattleRoar.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LifeRegenerationRate = Levels(0f);
+                    ManaCost = Levels(100);
+                    ManaRegen = Levels(0f);
+                    MaxUnits = Levels(0);
+                    Name = "Roar";
+                    Order = "roar";
+                    PreferFriendlies = Levels(false);
+                    PreferHostiles = Levels(false);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Roar");
+                    TooltipExtended = Levels("Gives nearby friendly units a <ACro,DataA1,%>% bonus to damage. |nLasts <ACro,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Roa1</c>.</summary>
                 [global::Moonwell.Objects.Field("Roa1", Label = "Damage Increase (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -7301,6 +14203,54 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANg1")]
             public class RoboGoblin : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public RoboGoblin()
+                {
+                    AlternateFormUnit.Set<global::Moonwell.Objects.Creeps.Units.Tinker>();
+                    AltitudeAdjustmentDuration = Levels(0f);
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    ButtonPositionTurnOffX = 3;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(1f);
+                    DefenseBonus = Levels(2);
+                    Duration = Levels(1.5f);
+                    EditorSuffix = "(Upgrade Level 1)";
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "B";
+                    HotkeyTurnOff = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNROBOGOBLIN.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNROBOGOBLIN.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNHeroTinker.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "B";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(25);
+                    MorphingFlags = Levels(global::Moonwell.Objects.MorphFlags.Uninterruptable);
+                    Name = "Robo-Goblin";
+                    NormalFormUnit.Set<global::Moonwell.Objects.Creeps.Units.TinkerNtin>();
+                    Order = "robogoblin";
+                    OrderStringTurnOff = "unrobogoblin";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 6;
+                    StrengthBonus = Levels(7);
+                    Tooltip = Levels("Robo-Goblin");
+                    TooltipExtended = Levels("Transforms the Tinker into a Robo-Goblin, a powerful armored form that has the following traits:|n|n- <ANg1,DataE1> bonus Strength and <ANg1,DataF1> bonus armor.|n- Use of the Demolish ability, which grants bonus damage against buildings.|n- The Tinker becomes mechanical, rendering him immune to most forms of stun, most offensive spells, and several beneficial spells.");
+                    TooltipLearn = "Learn Robo-Goblin";
+                    TooltipLearnExtended = "Transforms the Tinker into a Robo-Goblin, a powerful armored form that has the following traits:|n|n- Bonus Strength and armor.|n- Use of the Demolish ability, which grants bonus damage against buildings.|n- The Tinker becomes mechanical, rendering him immune to most forms of stun, most offensive spells, and several beneficial spells.";
+                    TooltipTurnOff = Levels("Revert to Tinker Form");
+                    TooltipTurnOffExtended = Levels("Returns to normal Tinker form, losing the benefits of Robo-Goblin but once again becoming organic.");
+                    UnitSkinList = "Nrob,Nrob,Nrob,Nrob";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Eme1</c>.</summary>
                 [global::Moonwell.Objects.Field("Eme1", Label = "Normal Form Unit")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> NormalFormUnit
@@ -7369,6 +14319,54 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANg2")]
             public class RoboGoblinANg2 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public RoboGoblinANg2()
+                {
+                    AlternateFormUnit.Set<global::Moonwell.Objects.Creeps.Units.Tinker>();
+                    AltitudeAdjustmentDuration = Levels(0f);
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    ButtonPositionTurnOffX = 3;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(1f);
+                    DefenseBonus = Levels(3);
+                    Duration = Levels(1.5f);
+                    EditorSuffix = "(Upgrade Level 2)";
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "B";
+                    HotkeyTurnOff = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNROBOGOBLIN.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNROBOGOBLIN.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNHeroTinker.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "B";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(25);
+                    MorphingFlags = Levels(global::Moonwell.Objects.MorphFlags.Uninterruptable);
+                    Name = "Robo-Goblin";
+                    NormalFormUnit.Set<global::Moonwell.Objects.Creeps.Units.TinkerNtin>();
+                    Order = "robogoblin";
+                    OrderStringTurnOff = "unrobogoblin";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 6;
+                    StrengthBonus = Levels(9);
+                    Tooltip = Levels("Robo-Goblin");
+                    TooltipExtended = Levels("Transforms the Tinker into a Robo-Goblin, a powerful armored form that has the following traits:|n|n- <ANg2,DataE1> bonus Strength and <ANg2,DataF1> bonus armor.|n- Use of the Demolish ability, which grants bonus damage against buildings.|n- The Tinker becomes mechanical, rendering him immune to most forms of stun, most offensive spells, and several beneficial spells.");
+                    TooltipLearn = "Learn Robo-Goblin";
+                    TooltipLearnExtended = "Transforms the Tinker into a Robo-Goblin, a powerful armored form that has the following traits:|n|n- Bonus Strength and armor.|n- Use of the Demolish ability, which grants bonus damage against buildings.|n- The Tinker becomes mechanical, rendering him immune to most forms of stun, most offensive spells, and several beneficial spells.";
+                    TooltipTurnOff = Levels("Revert to Tinker Form");
+                    TooltipTurnOffExtended = Levels("Returns to normal Tinker form, losing the benefits of Robo-Goblin but once again becoming organic.");
+                    UnitSkinList = "Nrob,Nrob,Nrob,Nrob";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Eme1</c>.</summary>
                 [global::Moonwell.Objects.Field("Eme1", Label = "Normal Form Unit")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> NormalFormUnit
@@ -7437,6 +14435,54 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANg3")]
             public class RoboGoblinANg3 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public RoboGoblinANg3()
+                {
+                    AlternateFormUnit.Set<global::Moonwell.Objects.Creeps.Units.Tinker>();
+                    AltitudeAdjustmentDuration = Levels(0f);
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    ButtonPositionTurnOffX = 3;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(1f);
+                    DefenseBonus = Levels(4);
+                    Duration = Levels(1.5f);
+                    EditorSuffix = "(Upgrade Level 3)";
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "B";
+                    HotkeyTurnOff = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNROBOGOBLIN.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNROBOGOBLIN.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNHeroTinker.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "B";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(25);
+                    MorphingFlags = Levels(global::Moonwell.Objects.MorphFlags.Uninterruptable);
+                    Name = "Robo-Goblin";
+                    NormalFormUnit.Set<global::Moonwell.Objects.Creeps.Units.TinkerNtin>();
+                    Order = "robogoblin";
+                    OrderStringTurnOff = "unrobogoblin";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 6;
+                    StrengthBonus = Levels(11);
+                    Tooltip = Levels("Robo-Goblin");
+                    TooltipExtended = Levels("Transforms the Tinker into a Robo-Goblin, a powerful armored form that has the following traits:|n|n- <ANg3,DataE1> bonus Strength and <ANg3,DataF1> bonus armor.|n- Use of the Demolish ability, which grants bonus damage against buildings.|n- The Tinker becomes mechanical, rendering him immune to most forms of stun, most offensive spells, and several beneficial spells.");
+                    TooltipLearn = "Learn Robo-Goblin";
+                    TooltipLearnExtended = "Transforms the Tinker into a Robo-Goblin, a powerful armored form that has the following traits:|n|n- Bonus Strength and armor.|n- Use of the Demolish ability, which grants bonus damage against buildings.|n- The Tinker becomes mechanical, rendering him immune to most forms of stun, most offensive spells, and several beneficial spells.";
+                    TooltipTurnOff = Levels("Revert to Tinker Form");
+                    TooltipTurnOffExtended = Levels("Returns to normal Tinker form, losing the benefits of Robo-Goblin but once again becoming organic.");
+                    UnitSkinList = "Nrob,Nrob,Nrob,Nrob";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Eme1</c>.</summary>
                 [global::Moonwell.Objects.Field("Eme1", Label = "Normal Form Unit")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> NormalFormUnit
@@ -7505,6 +14551,53 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANrg")]
             public class RoboGoblinANrg : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public RoboGoblinANrg()
+                {
+                    AlternateFormUnit.Set<global::Moonwell.Objects.Creeps.Units.Tinker>();
+                    AltitudeAdjustmentDuration = Levels(0f);
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    ButtonPositionTurnOffX = 3;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(1f);
+                    DefenseBonus = Levels(1);
+                    Duration = Levels(1.5f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "B";
+                    HotkeyTurnOff = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNROBOGOBLIN.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNROBOGOBLIN.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNHeroTinker.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "B";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(25);
+                    MorphingFlags = Levels(global::Moonwell.Objects.MorphFlags.Uninterruptable);
+                    Name = "Robo-Goblin";
+                    NormalFormUnit.Set<global::Moonwell.Objects.Creeps.Units.TinkerNtin>();
+                    Order = "robogoblin";
+                    OrderStringTurnOff = "unrobogoblin";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 6;
+                    StrengthBonus = Levels(5);
+                    Tooltip = Levels("Robo-Goblin");
+                    TooltipExtended = Levels("Transforms the Tinker into a Robo-Goblin, a powerful armored form that has the following traits:|n|n- <ANrg,DataE1> bonus Strength and <ANrg,DataF1> bonus armor.|n- Use of the Demolish ability, which grants bonus damage against buildings.|n- The Tinker becomes mechanical, rendering him immune to most forms of stun, most offensive spells, and several beneficial spells.");
+                    TooltipLearn = "Learn Robo-Goblin";
+                    TooltipLearnExtended = "Transforms the Tinker into a Robo-Goblin, a powerful armored form that has the following traits:|n|n- Bonus Strength and armor.|n- Use of the Demolish ability, which grants bonus damage against buildings.|n- The Tinker becomes mechanical, rendering him immune to most forms of stun, most offensive spells, and several beneficial spells.";
+                    TooltipTurnOff = Levels("Revert to Tinker Form");
+                    TooltipTurnOffExtended = Levels("Returns to normal Tinker form, losing the benefits of Robo-Goblin but once again becoming organic.");
+                    UnitSkinList = "Nrob,Nrob,Nrob,Nrob";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Eme1</c>.</summary>
                 [global::Moonwell.Objects.Field("Eme1", Label = "Normal Form Unit")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> NormalFormUnit
@@ -7573,6 +14666,49 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("AHpa")]
             public class SacredAura : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SacredAura()
+                {
+                    Area = Levels(900f, 900f, 900f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.SacredAura>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    CooldownIncreaseForEnemies = Levels(0f, 0f, 0f);
+                    CooldownReductionIncreaseForAllies = Levels(0f, 0f, 0f);
+                    Duration = Levels(0f);
+                    FlatManaRegenForAllies = Levels(0f, 0f, 0f);
+                    HealingDecreaseForEnemies = Levels(0f, 0f, 0f);
+                    HealingIncreaseForAllies = Levels(15f, 20f, 25f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNSacredAura.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSacredAura.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "E";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    MagicResistDecreaseForEnemies = Levels(0f, 0f, 0f);
+                    MagicResistIncreaseForAllies = Levels(0.15f, 0.2f, 0.25f);
+                    Name = "Sacred Aura";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    Target = "Abilities/Spells/Other/SacredAura/SacredAura.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Sacred Aura - [|cffffcc00Level 1|r]", "Sacred Aura - [|cffffcc00Level 2|r]", "Sacred Aura - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Gives <AHpa,DataA1,%>% Magic Resistance and <AHpa,DataB1>% increased healing received to nearby friendly units.", "Gives <AHpa,DataA2,%>% Magic Resistance and <AHpa,DataB2>% increased healing received to nearby friendly units.", "Gives <AHpa,DataA3,%>% Magic Resistance and <AHpa,DataB3>% increased healing recieved to nearby friendly units.");
+                    TooltipLearn = "Learn Sacred Aura - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Gives additional Magic Resistance and increased healing received to nearby friendly units. |n|n|cffffcc00Level 1|r - <AHpa,DataA1,%>% Magic Resistance, <AHpa,DataB1>% increased healing received. |n|cffffcc00Level 2|r - <AHpa,DataA2,%>% Magic Resistance, <AHpa,DataB2>% increased healing received. |n|cffffcc00Level 3|r - <AHpa,DataA3,%>% Magic Resistance, <AHpa,DataB3>% increased healing received.";
+                    UseNewDefaultLevelCap = true;
+                }
+
                 /// <summary>The field <c>hsa1</c>.</summary>
                 [global::Moonwell.Objects.Field("hsa1", Label = "% Magic Resist Increase for Allies")]
                 [global::Moonwell.Objects.Limits(0, 100)]
@@ -7649,6 +14785,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACsa")]
             public class SearingArrows : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SearingArrows()
+                {
+                    AnimationNames = "attack";
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 1;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    DamageBonus = Levels(10f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "R";
+                    HotkeyTurnOff = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSearingArrowsOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNSearingArrowsOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(8);
+                    MissileArt = "Abilities\\Weapons\\SearingArrow\\SearingArrowMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1500;
+                    Name = "Searing Arrows";
+                    Order = "flamingarrows";
+                    OrderStringTurnOff = "unflamingarrows";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Searing Arrows");
+                    TooltipExtended = Levels("Adds <ACsa,DataA1> bonus fire damage to an attack against enemies, but drains mana with each shot fired.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hfa1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hfa1", Label = "Damage Bonus")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -7665,6 +14843,38 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Ahid")]
             public class ShadowMeld : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ShadowMeld()
+                {
+                    ActionDuration = Levels(0.5f);
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 1;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    DayNightDuration = Levels(2.5f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Akama)";
+                    EffectSound = "ShadowMeld";
+                    FadeDuration = Levels(0.1f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "I";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAmbush.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Shadow Meld";
+                    Order = "ambush";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Hide");
+                    TooltipExtended = Levels("Stops the unit from auto-acquiring enemies, allowing it to Shadowmeld and remain unseen at night.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Shm1</c>.</summary>
                 [global::Moonwell.Objects.Field("Shm1", Label = "Fade Duration")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -7701,6 +14911,45 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACsh")]
             public class Shockwave : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Shockwave()
+                {
+                    AnimationNames = "attack,slam";
+                    Area = Levels(150f);
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.ShockwaveCaster>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    Damage = Levels(75f);
+                    Distance = Levels(800f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    FinalArea = Levels(150f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNShockWave.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100);
+                    MaximumDamage = Levels(99999f);
+                    MissileArt = "Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdl";
+                    MissileSpeed = 1050;
+                    Name = "Shockwave";
+                    Order = "shockwave";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Shockwave");
+                    TooltipExtended = Levels("A wave of force that ripples outward, causing <ACsh,DataA1> damage to land units in a line.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Osh1</c>.</summary>
                 [global::Moonwell.Objects.Field("Osh1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -7747,6 +14996,45 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACst")]
             public class ShockwaveACst : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ShockwaveACst()
+                {
+                    AnimationNames = "attack,slam";
+                    Area = Levels(150f);
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.ShockwaveCaster>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    Damage = Levels(75f);
+                    Distance = Levels(2048f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Trap)";
+                    FinalArea = Levels(150f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNShockWave.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    MaximumDamage = Levels(99999f);
+                    MissileArt = "Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdl";
+                    MissileSpeed = 1050;
+                    Name = "Shockwave";
+                    Order = "shockwave";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Shockwave");
+                    TooltipExtended = Levels("A wave of force that ripples outward, causing <ACst,DataA1> damage to land units in a line.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Osh1</c>.</summary>
                 [global::Moonwell.Objects.Field("Osh1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -7793,6 +15081,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACsi")]
             public class Silence : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Silence()
+                {
+                    Area = Levels(300f);
+                    AttackSpeedModifier = Levels(0f);
+                    AttacksPrevented = Levels(global::Moonwell.Objects.SilenceFlags.Spells);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Silence>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    ChanceToMiss = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(20f);
+                    Duration = Levels(40f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    Effect = "Abilities\\Spells\\Other\\Silence\\SilenceAreaBirth.mdl";
+                    HeroAbility = false;
+                    HeroDuration = Levels(8.5f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSilence.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSilence.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    MovementSpeedModifier = Levels(0f);
+                    Name = "Silence";
+                    Order = "silence";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Silence");
+                    TooltipExtended = Levels("Stops all enemies in a target area from casting spells for <ACsi,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nsi1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nsi1", Label = "Attacks Prevented")]
                 public global::Moonwell.Objects.Levels<global::Moonwell.Objects.SilenceFlags> AttacksPrevented
@@ -7837,6 +15165,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANsi")]
             public class SilenceANsi : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SilenceANsi()
+                {
+                    Area = Levels(200f, 275f, 350f);
+                    AttackSpeedModifier = Levels(0f, 0f, 0f);
+                    AttacksPrevented = Levels(global::Moonwell.Objects.SilenceFlags.Spells, global::Moonwell.Objects.SilenceFlags.Spells, global::Moonwell.Objects.SilenceFlags.Spells);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Silence>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    ChanceToMiss = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(15f, 15f, 15f);
+                    Duration = Levels(16f, 20f, 24f);
+                    Effect = "Abilities\\Spells\\Other\\Silence\\SilenceAreaBirth.mdl";
+                    HeroAbility = true;
+                    HeroDuration = Levels(8f, 10f, 12f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSilence.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSilence.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "E";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75, 75, 75);
+                    MovementSpeedModifier = Levels(0f, 0f, 0f);
+                    Name = "Silence";
+                    Order = "silence";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(900f, 900f, 900f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Silence - [|cffffcc00Level 1|r]", "Silence - [|cffffcc00Level 2|r]", "Silence - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Stops all enemies in a small target area from casting spells for <ANsi,Dur1> seconds.", "Stops all enemies in a medium target area from casting spells for <ANsi,Dur2> seconds.", "Stops all enemies in a large target area from casting spells for <ANsi,Dur3> seconds.");
+                    TooltipLearn = "Learn Silence - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Stops all enemies in a target area from casting spells. The area of effect and duration increase with level. |n|n|cffffcc00Level 1|r - Small area, lasts <ANsi,Dur1> seconds. |n|cffffcc00Level 2|r - Medium area, lasts <ANsi,Dur2> seconds. |n|cffffcc00Level 3|r - Large area, lasts <ANsi,Dur3> seconds.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nsi1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nsi1", Label = "Attacks Prevented")]
                 public global::Moonwell.Objects.Levels<global::Moonwell.Objects.SilenceFlags> AttacksPrevented
@@ -7881,6 +15251,52 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACsm")]
             public class SiphonMana : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SiphonMana()
+                {
+                    AnimationNames = "stand,channel";
+                    Area = Levels(850f);
+                    BonusLifeDecay = Levels(0f);
+                    BonusLifeFactor = Levels(0f);
+                    BonusManaDecay = Levels(0f);
+                    BonusManaFactor = Levels(0f);
+                    Buffs.Set<global::Moonwell.Objects.Human.Buffs.DrainLifeManaCaster, global::Moonwell.Objects.Human.Buffs.DrainLifeCaster, global::Moonwell.Objects.Human.Buffs.DrainManaCaster, global::Moonwell.Objects.Human.Buffs.DrainLifeManaTarget, global::Moonwell.Objects.Human.Buffs.DrainLifeTarget, global::Moonwell.Objects.Human.Buffs.DrainManaTarget>();
+                    Buffs.Add("Bdbb");
+                    Buffs.Add("Bdbl");
+                    Buffs.Add("Bdbm");
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(8f);
+                    DrainIntervalSeconds = Levels(1f);
+                    Duration = Levels(8f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    EffectSoundLooping = "SiphonManaLoop";
+                    HeroAbility = false;
+                    HeroDuration = Levels(8f);
+                    HitPointsDrained = Levels(0f);
+                    Hotkey = "N";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNManaDrain.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LifeTransferredPerSecond = Levels(0f);
+                    LightningEffects = "DRAB,DRAL,DRAM";
+                    ManaCost = Levels(25);
+                    ManaPointsDrained = Levels(20f);
+                    ManaTransferredPerSecond = Levels(0f);
+                    Name = "Siphon Mana";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Siphon Mana");
+                    TooltipExtended = Levels("Absorbs the magical energies of a target enemy unit by taking <ACsm,DataB1> mana per second from it and giving it to this unit. |nLasts <ACsm,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ndr1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ndr1", Label = "Hit Points Drained")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -7977,6 +15393,44 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACt2")]
             public class Slam : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Slam()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(250f);
+                    AttackSpeedReduction = Levels(0.25f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Slam>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    Caster = "Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdl";
+                    CasterAttachmentPoint1 = "origin";
+                    CheckDependencies = false;
+                    Cooldown = Levels(6f);
+                    Damage = Levels(70f);
+                    Duration = Levels(4f);
+                    EditorSuffix = "(Thunder Lizard)";
+                    ExtraDamageToTarget = Levels(0f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(2f);
+                    Hotkey = "L";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGolemThunderclap.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(90);
+                    MovementSpeedReduction = Levels(0.25f);
+                    Name = "Slam";
+                    Order = "creepthunderclap";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Slam");
+                    TooltipExtended = Levels("Slams the ground, dealing <ACt2,DataA1> points of damage and slowing the movement and attack rate of nearby enemy units.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ctc1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ctc1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -8023,6 +15477,44 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACtc")]
             public class SlamACtc : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SlamACtc()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(250f);
+                    AttackSpeedReduction = Levels(0.25f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Slam>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    Caster = "Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdl";
+                    CasterAttachmentPoint1 = "origin";
+                    CheckDependencies = false;
+                    Cooldown = Levels(6f);
+                    Damage = Levels(70f);
+                    Duration = Levels(4f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    ExtraDamageToTarget = Levels(0f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(2f);
+                    Hotkey = "L";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGolemThunderclap.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(90);
+                    MovementSpeedReduction = Levels(0.25f);
+                    Name = "Slam";
+                    Order = "creepthunderclap";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Slam");
+                    TooltipExtended = Levels("Slams the ground, dealing <ACtc,DataA1> points of damage and slowing the movement and attack rate of nearby enemy units.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ctc1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ctc1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -8069,6 +15561,39 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACsl")]
             public class Sleep : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Sleep()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.Sleep, global::Moonwell.Objects.Undead.Buffs.SleepPause>();
+                    Buffs.Add("Bust");
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    Duration = Levels(8f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(5f);
+                    Hotkey = "L";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSleep.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100);
+                    Name = "Sleep";
+                    Order = "sleep";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 0;
+                    StunDuration = Levels(2f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.NonHero | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Sleep");
+                    TooltipExtended = Levels("Puts a target enemy unit to sleep for <ACsl,Dur1> seconds. A sleeping unit can be awoken by attacking it.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Usl1</c>.</summary>
                 [global::Moonwell.Objects.Field("Usl1", Label = "Stun Duration")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -8085,6 +15610,25 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACsp")]
             public class SleepACsp : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SleepACsp()
+                {
+                    Caster = "Abilities\\Spells\\Other\\CreepSleep\\CreepSleepTarget.mdl";
+                    CasterAttachmentPoint1 = "overhead";
+                    CheckDependencies = false;
+                    EffectSoundLooping = "CreepSleepSnoreLoop";
+                    HeroAbility = false;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSleep.blp";
+                    ItemAbility = false;
+                    LevelCount = 0;
+                    LevelSkipRequirement = 0;
+                    Name = "Sleep";
+                    Order = "creepsleep";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    UseNewDefaultLevelCap = false;
+                }
             }
 
             /// <summary>Sleep Always (Asla).</summary>
@@ -8092,6 +15636,31 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Asla")]
             public class SleepAlways : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SleepAlways()
+                {
+                    CastTime = Levels(0f);
+                    Caster = "Abilities\\Spells\\Other\\CreepSleep\\CreepSleepTarget.mdl";
+                    CasterAttachmentPoint1 = "overhead";
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EffectSoundLooping = "CreepSleepSnoreLoop";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Sleep Always";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Sleep");
+                    TooltipExtended = Levels("Unit sleeps until awoken.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>sla1</c>.</summary>
                 [global::Moonwell.Objects.Field("sla1", Label = "Sleep Once")]
                 public global::Moonwell.Objects.Levels<bool> SleepOnce
@@ -8114,6 +15683,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACsw")]
             public class Slow : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Slow()
+                {
+                    AttackSpeedFactor = Levels(0.25f);
+                    Buffs.Set<global::Moonwell.Objects.Human.Buffs.Slow>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    Caster = "Abilities\\Spells\\Human\\Slow\\SlowCaster.mdl";
+                    CheckDependencies = false;
+                    Cooldown = Levels(8f);
+                    Duration = Levels(20f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(10f);
+                    Hotkey = "W";
+                    HotkeyTurnOff = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSlowOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNSlowOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(50);
+                    MovementSpeedFactor = Levels(0.6f);
+                    Name = "Slow";
+                    Order = "slow";
+                    OrderStringActivate = "slowon";
+                    OrderStringDeactivate = "slowoff";
+                    PriorityForSpellSteal = 3;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground);
+                    Tooltip = Levels("Slow");
+                    TooltipExtended = Levels("Slows enemy unit's attack rate by <ACsw,DataB1,%>% and movement speed by <ACsw,DataA1,%>%. Lasts <ACsw,Dur1> seconds.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Slo1</c>.</summary>
                 [global::Moonwell.Objects.Field("Slo1", Label = "Movement Speed Factor")]
                 [global::Moonwell.Objects.Limits(-10, 10)]
@@ -8146,6 +15757,47 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANso")]
             public class SoulBurn : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SoulBurn()
+                {
+                    AttackSpeedReduction = Levels(0f, 0f, 0f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.SoulBurn>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(12f, 12f, 12f);
+                    DamageAmount = Levels(5f, 11.11f, 17f);
+                    DamagePenalty = Levels(0.75f, 0.75f, 0.75f);
+                    DamagePeriod = Levels(1f, 1f, 1f);
+                    Duration = Levels(16f, 18f, 20f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(8f, 9f, 10f);
+                    Hotkey = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSoulBurn.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSoulBurn.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "B";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(65, 65, 65);
+                    MovementSpeedReduction = Levels(0f, 0f, 0f);
+                    Name = "Soul Burn";
+                    Order = "soulburn";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f, 700f, 700f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Soul Burn - [|cffffcc00Level 1|r]", "Soul Burn - [|cffffcc00Level 2|r]", "Soul Burn - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Wreaths an enemy unit in magical flames which cause <ANso,DataA1> damage per second, prevent the casting of spells, and reduce attack damage by <ANso,DataC1,%>%.|nLasts <ANso,Dur1> seconds.", "Wreaths an enemy unit in magical flames which cause <ANso,DataA2> damage per second, prevent the casting of spells, and reduce attack damage by <ANso,DataC2,%>%.|nLasts <ANso,Dur2> seconds.", "Wreaths an enemy unit in magical flames which cause <ANso,DataA3> damage per second, prevent the casting of spells, and reduce attack damage by <ANso,DataC3,%>%.|nLasts <ANso,Dur3> seconds.");
+                    TooltipLearn = "Learn Soul Burn - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Wreaths an enemy unit in magical flames which cause damage over time, prevent the casting of spells, and reduce attack damage by <ANso,DataC1,%>%.|n|n|cffffcc00Level 1|r - 80 damage over <ANso,Dur1> seconds.|n|cffffcc00Level 2|r - 200 damage over <ANso,Dur2> seconds.|n|cffffcc00Level 3|r - 340 damage over <ANso,Dur3> seconds.|n|nSoul Burn lasts roughly half as long on Heroes.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nso1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nso1", Label = "Damage Amount")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -8202,6 +15854,45 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANsl")]
             public class SoulPreservation : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SoulPreservation()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.SoulPreservation>();
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0.5f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0.1f);
+                    Duration = Levels(3f);
+                    EditorSuffix = "(Malganis)";
+                    HeroAbility = true;
+                    HeroDuration = Levels(3f);
+                    Hotkey = "L";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSleep.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSleep.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "L";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Soul Preservation";
+                    Order = "soulpreservation";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(1000f);
+                    RequiredLevel = 6;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.NonHero | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Soul Preservation");
+                    TooltipExtended = Levels("Puts a converted zombie into the nether-realm for later use.");
+                    TooltipLearn = "Learn Soul Preservation";
+                    TooltipLearnExtended = "Puts a converted zombie into the nether-realm for later use.";
+                    UnitSkinList = "nzom,nzom,nzom,nzom";
+                    UnitToPreserve.Set<global::Moonwell.Objects.Campaign.Units.ZombieNzom>();
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nsl1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nsl1", Label = "Unit to Preserve")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> UnitToPreserve
@@ -8215,6 +15906,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Aspy")]
             public class SpawnHydra : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpawnHydra()
+                {
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Spawn Hydra";
+                    NumberOfUnits = Levels(2);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    UnitType.Set<global::Moonwell.Objects.Creeps.Units.Hydra>();
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Sod1</c>.</summary>
                 [global::Moonwell.Objects.Field("Sod1", Label = "Number of Units")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -8238,6 +15951,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Aspt")]
             public class SpawnHydraHatchling : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpawnHydraHatchling()
+                {
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Spawn Hydra Hatchling";
+                    NumberOfUnits = Levels(2);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    UnitType.Set<global::Moonwell.Objects.Creeps.Units.HydraHatchling>();
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Sod1</c>.</summary>
                 [global::Moonwell.Objects.Field("Sod1", Label = "Number of Units")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -8261,6 +15996,29 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Asod")]
             public class SpawnSkeleton : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpawnSkeleton()
+                {
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Probably Black Arrow)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Spawn Skeleton";
+                    NumberOfUnits = Levels(1);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    UnitType.Set<global::Moonwell.Objects.Creeps.Units.SkeletonWarrior>();
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Sod1</c>.</summary>
                 [global::Moonwell.Objects.Field("Sod1", Label = "Number of Units")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -8284,6 +16042,29 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Assp")]
             public class SpawnSpiderlings : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpawnSpiderlings()
+                {
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Spawn Spiderlings";
+                    NumberOfUnits = Levels(2);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    UnitType.Set<global::Moonwell.Objects.Creeps.Units.Spiderling>();
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Sod1</c>.</summary>
                 [global::Moonwell.Objects.Field("Sod1", Label = "Number of Units")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -8307,6 +16088,29 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Aspd")]
             public class SpawnSpiders : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpawnSpiders()
+                {
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Spawn Spiders";
+                    NumberOfUnits = Levels(2);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    UnitType.Set<global::Moonwell.Objects.Creeps.Units.Spider>();
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Sod1</c>.</summary>
                 [global::Moonwell.Objects.Field("Sod1", Label = "Number of Units")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -8330,6 +16134,38 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACtn")]
             public class SpawnTentacle : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpawnTentacle()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.Ward>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(1f);
+                    Duration = Levels(180f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(180f);
+                    Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTentacle.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(5);
+                    Name = "Spawn Tentacle";
+                    Order = "Serpentward";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(900f);
+                    RequiredLevel = 0;
+                    SummonedUnitCount = Levels(1);
+                    SummonedUnitType.Set<global::Moonwell.Objects.Creeps.Units.Tentacle>();
+                    Tooltip = Levels("Spawn Tentacle");
+                    TooltipExtended = Levels("Unleashes a mighty tentacle upon the enemy.");
+                    UnitSkinList = "nfgt";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hwe1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hwe1", Label = "Summoned Unit Type")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> SummonedUnitType
@@ -8353,6 +16189,33 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACmi")]
             public class SpellImmunity : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpellImmunity()
+                {
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNGenericSpellImmunity.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    MagicDamageFactor = Levels(0f);
+                    ManaCost = Levels(0);
+                    Name = "Spell Immunity";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Spell Immunity");
+                    TooltipExtended = Levels("Renders this unit immune to magic and most spells.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>mim1</c>.</summary>
                 [global::Moonwell.Objects.Field("mim1", Label = "Magic Damage Factor")]
                 [global::Moonwell.Objects.Limits(0, 100)]
@@ -8369,6 +16232,33 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACm2")]
             public class SpellImmunitySpellImmunity : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpellImmunitySpellImmunity()
+                {
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 1;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Archimonde)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNGenericSpellImmunity.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    MagicDamageFactor = Levels(0f);
+                    ManaCost = Levels(0);
+                    Name = "Spell Immunity, Spell Immunity";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Spell Immunity");
+                    TooltipExtended = Levels("Renders this unit immune to all spells.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>mim1</c>.</summary>
                 [global::Moonwell.Objects.Field("mim1", Label = "Magic Damage Factor")]
                 [global::Moonwell.Objects.Limits(0, 100)]
@@ -8385,6 +16275,33 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACm3")]
             public class SpellImmunitySpellImmunityACm3 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpellImmunitySpellImmunityACm3()
+                {
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Dragon)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNGenericSpellImmunity.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    MagicDamageFactor = Levels(0f);
+                    ManaCost = Levels(0);
+                    Name = "Spell Immunity, Spell Immunity";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Spell Immunity");
+                    TooltipExtended = Levels("Renders this unit immune to all spells.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>mim1</c>.</summary>
                 [global::Moonwell.Objects.Field("mim1", Label = "Magic Damage Factor")]
                 [global::Moonwell.Objects.Limits(0, 100)]
@@ -8401,6 +16318,39 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANt2")]
             public class SpikedShell : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpikedShell()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.SpikedCarapace>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    DefenseBonus = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(2,2 Button Pos)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNThornShield.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNThornShield.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    Name = "Spiked Shell";
+                    Order = "Thornyshield";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    ReceivedDamageFactor = Levels(1f);
+                    RequiredLevel = 0;
+                    ReturnedDamageFactor = Levels(0.3f);
+                    Tooltip = Levels("Spiked Shell");
+                    TooltipExtended = Levels("Razor-sharp spikes on the Turtle's shell deal <ANth,DataA1,%>% of an enemy unit's melee attack damage back to it.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Uts1</c>.</summary>
                 [global::Moonwell.Objects.Field("Uts1", Label = "Returned Damage Factor")]
                 [global::Moonwell.Objects.Limits(0, 100)]
@@ -8437,6 +16387,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANth")]
             public class SpikedShellANth : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpikedShellANth()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.BUtt>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    ButtonPositionTurnOffX = 1;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    DefenseBonus = Levels(0f);
+                    Duration = Levels(0f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNThornShield.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNThornShield.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    Name = "Spiked Shell";
+                    Order = "Thornyshield";
+                    OrderStringTurnOff = "Unthornyshield";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    ReceivedDamageFactor = Levels(1f);
+                    RequiredLevel = 0;
+                    ReturnedDamageFactor = Levels(0.3f);
+                    Tooltip = Levels("Spiked Shell");
+                    TooltipExtended = Levels("Razor-sharp spikes on the Turtle's shell deal <ANth,DataA1,%>% of an enemy unit's melee attack damage back to it.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Uts1</c>.</summary>
                 [global::Moonwell.Objects.Field("Uts1", Label = "Returned Damage Factor")]
                 [global::Moonwell.Objects.Limits(0, 100)]
@@ -8473,6 +16458,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACs8")]
             public class SpiritBeast : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpiritBeast()
+                {
+                    Area = Levels(200f, 200f, 200f);
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.FeralSpirit>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(20f, 20f, 20f);
+                    Duration = Levels(60f, 60f, 60f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(60f, 60f, 60f);
+                    Hotkey = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFelHound.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNFelHound.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "B";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125, 125, 125);
+                    Name = "Spirit Beast";
+                    NumberOfSummonedUnits = Levels(2, 2, 2);
+                    Order = "spiritwolf";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f, 800f, 800f);
+                    RequiredLevel = 1;
+                    Special = "Abilities\\Spells\\Orc\\FeralSpirit\\feralspirittarget.mdl";
+                    SummonedUnit.Set<global::Moonwell.Objects.Campaign.Units.LesserSpiritBeast>();
+                    Tooltip = Levels("Spirit Beast - [|cffffcc00Level 1|r]", "Spirit Beast - [|cffffcc00Level 2|r]", "Spirit Beast - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Summons <ACs8,DataB1> Spirit Beast companions. Each beast has <nsw1,realHP> hit points and deals <nsw1,mindmg1> - <nsw1,maxdmg1> damage. |nLasts <ACs8,Dur1> seconds. |n|n|cffffcc00Attacks land units.|r", "Summons <ACs8,DataB2> Spirit Beast companions that have Feedback. Each beast has <nsw2,realHP> hit points and deals <nsw2,mindmg1> - <nsw2,maxdmg1> damage. |nLasts <ACs8,Dur2> seconds. |n|n|cffffcc00Attacks land units.|r", "Summons <ACs8,DataB3> Spirit Beast companions that have Feedback and Mana Burn. Each beast has <nsw3,realHP> hit points and deals <nsw3,mindmg1> - <nsw3,maxdmg1> damage. |nLasts <ACs8,Dur3> seconds. |n|n|cffffcc00Attacks land units.|r");
+                    TooltipLearn = "Learn Spirit Beast - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Summons <ACs8,DataB1> Spirit Beasts to fight Akama's enemies. |nLasts <ACs8,Dur1> seconds. |n|n|cffffcc00Level 1|r - <nsw1,realHP> hit points, <nsw1,mindmg1> - <nsw1,maxdmg1> damage. |n|cffffcc00Level 2|r - <nsw2,realHP> hit points, <nsw2,mindmg1> - <nsw2,maxdmg1> damage and Feedback. |n|cffffcc00Level 3|r - <nsw3,realHP> hit points, <nsw3,mindmg1> - <nsw3,maxdmg1> damage, Feedback and Mana Burn.";
+                    UnitSkinList = "nsw1,nsw2,nsw3,nsw3";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Osf1</c>.</summary>
                 [global::Moonwell.Objects.Field("Osf1", Label = "Summoned Unit")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> SummonedUnit
@@ -8496,6 +16521,54 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANst")]
             public class Stampede : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Stampede()
+                {
+                    AnimationNames = "spell,looping";
+                    Area = Levels(1000f);
+                    BeastCollisionRadius = Levels(55f);
+                    BeastsPerSecond = Levels(2);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stampede>();
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(180f);
+                    DamageAmount = Levels(60f);
+                    DamageDelay = Levels(0.2f);
+                    DamageRadius = Levels(275f);
+                    Duration = Levels(30f);
+                    EffectSound = "StampedeCast";
+                    EffectSoundLooping = "StampedeLoop";
+                    HeroAbility = true;
+                    HeroDuration = Levels(30f);
+                    Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNStampede.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNStampede.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "T";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(150);
+                    MissileArt = "Abilities\\Spells\\Other\\Stampede\\StampedeMissile.mdl";
+                    MissileSpeed = 500;
+                    Name = "Stampede";
+                    Order = "stampede";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(300f);
+                    RequiredLevel = 6;
+                    Special = "Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Stampede");
+                    TooltipExtended = Levels("Calls down hordes of rampaging thunder lizards to explode upon the Beastmaster's enemies. Each exploding lizard deals <ANst,DataC1> damage. Pierces spell immunity. |nLasts <ANst,Dur1> seconds.");
+                    TooltipLearn = "Learn Stampede";
+                    TooltipLearnExtended = "Calls down hordes of rampaging thunder lizards to explode upon the Beastmaster's enemies. Each exploding lizard deals <ANst,DataC1> damage. Pierces spell immunity. |nLasts <ANst,Dur1> seconds.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nst1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nst1", Label = "Beasts Per Second")]
                 [global::Moonwell.Objects.Limits(0, 32)]
@@ -8552,6 +16625,55 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Arsp")]
             public class StampedeArsp : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public StampedeArsp()
+                {
+                    AnimationNames = "spell,looping";
+                    Area = Levels(1000f, 1300f);
+                    BeastCollisionRadius = Levels(55f, 55f);
+                    BeastsPerSecond = Levels(2, 2);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stampede>();
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(180f, 180f);
+                    DamageAmount = Levels(80f, 130f);
+                    DamageDelay = Levels(0.2f, 0.2f);
+                    DamageRadius = Levels(275f, 275f);
+                    Duration = Levels(30f, 30f);
+                    EditorSuffix = "(Rexxar)";
+                    EffectSound = "StampedeCast";
+                    EffectSoundLooping = "StampedeLoop";
+                    HeroAbility = true;
+                    HeroDuration = Levels(30f, 30f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNStampede.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNStampede.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "E";
+                    LevelCount = 2;
+                    LevelSkipRequirement = 6;
+                    ManaCost = Levels(150, 150);
+                    MissileArt = "Abilities\\Spells\\Other\\Stampede\\StampedeMissile.mdl";
+                    MissileSpeed = 500;
+                    Name = "Stampede";
+                    Order = "stampede";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(300f, 400f);
+                    RequiredLevel = 6;
+                    Special = "Abilities\\Spells\\Other\\Stampede\\MissileDeath.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Stampede - [|cffffcc00Level 1|r]", "Stampede - [|cffffcc00Level 2|r]");
+                    TooltipExtended = Levels("Calls down hordes of rampaging thunder lizards to explode upon the Beastmaster's enemies. Each exploding lizard deals <Arsp,DataC1> damage. |nLasts <Arsp,Dur1> seconds.", "Calls down hordes of rampaging thunder lizards to explode upon the Beastmaster's enemies. Each exploding lizard deals <Arsp,DataC2> damage. |nLasts <Arsp,Dur2> seconds.");
+                    TooltipLearn = "Learn Stampede - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Calls down hordes of rampaging thunder lizards to explode upon the Beastmaster's enemies. |n|n|cffffcc00Level 1|r -  Each exploding lizard deals <Arsp,DataC1> damage. |n|cffffcc00Level 2|r -  Each exploding lizard deals <Arsp,DataC2> damage. |n|nLasts <Arsp,Dur2> seconds.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nst1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nst1", Label = "Beasts Per Second")]
                 [global::Moonwell.Objects.Limits(0, 32)]
@@ -8608,6 +16730,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("AEsb")]
             public class Starfall : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Starfall()
+                {
+                    AnimationNames = "spell,looping";
+                    Area = Levels(900f);
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.StarfallTarget>();
+                    BuildingReduction = Levels(0.35f);
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(100f);
+                    DamageDealt = Levels(50f);
+                    DamageInterval = Levels(2f);
+                    Duration = Levels(35f);
+                    EditorSuffix = "(more powerful)";
+                    Effects = Levels("XEsf");
+                    HeroAbility = true;
+                    HeroDuration = Levels(35f);
+                    Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNStarfall.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNStarfall.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "F";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(300);
+                    Name = "Starfall";
+                    Order = "starfall";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 6;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Starfall");
+                    TooltipExtended = Levels("Calls down a wave of falling stars every <AEsb,DataB1> seconds that damages nearby enemy units. Each wave deals <AEsb,DataA1> damage. |nLasts for <AEsb,Dur1> seconds.");
+                    TooltipLearn = "Learn Starfall";
+                    TooltipLearnExtended = "Calls down waves of falling stars that damage nearby enemy units. Each wave deals <AEsb,DataA1> damage. |nLasts for <AEsb,Dur1> seconds.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Esf1</c>.</summary>
                 [global::Moonwell.Objects.Field("Esf1", Label = "Damage Dealt")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -8644,6 +16808,47 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANsb")]
             public class StormBolt : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public StormBolt()
+                {
+                    AnimationNames = "spell,throw";
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stunned>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(9f, 9f, 9f, 9f);
+                    Damage = Levels(100f, 200f, 300f, 450f);
+                    Duration = Levels(5f, 7f, 9f, 12f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(3f, 4f, 5f, 6f);
+                    Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNStormBolt.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNStormBolt.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "T";
+                    LevelCount = 4;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75, 75, 75, 75);
+                    MissileArt = "Abilities\\Spells\\Human\\StormBolt\\StormBoltMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1000;
+                    Name = "Storm Bolt";
+                    Order = "thunderbolt";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(600f, 600f, 600f, 600f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Storm Bolt - [|cffffcc00Level 1|r]", "Storm Bolt - [|cffffcc00Level 2|r]", "Storm Bolt - [|cffffcc00Level 3|r]", "Storm Bolt - [|cffffcc00Level 4|r]");
+                    TooltipExtended = Levels("Throws a magical hammer at a target enemy unit, dealing <ANsb,DataA1> damage and stunning the target for <ANsb,Dur1> seconds.", "Throws a magical hammer at a target enemy unit, dealing <ANsb,DataA2> damage and stunning the target for <ANsb,Dur2> seconds.", "Throws a magical hammer at a target enemy unit, dealing <ANsb,DataA3> damage and stunning the target for <ANsb,Dur3> seconds.", "Throws a magical hammer at a target enemy unit, dealing <ANsb,DataA4> damage and stunning the target for <ANsb,Dur4> seconds.");
+                    TooltipLearn = "Learn Storm Bolt - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "A magical hammer that is thrown at an enemy unit, causing damage and stunning the target. |n|n|cffffcc00Level 1|r - <ANsb,DataA1> damage, <ANsb,Dur1> second stun. |n|cffffcc00Level 2|r - <ANsb,DataA2> damage, <ANsb,Dur2> second stun. |n|cffffcc00Level 3|r - <ANsb,DataA3> damage, <ANsb,Dur3> second stun. |n|cffffcc00Level 4|r - <ANsb,DataA4> damage, <ANsb,Dur4> second stun.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Htb1</c>.</summary>
                 [global::Moonwell.Objects.Field("Htb1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -8660,6 +16865,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANef")]
             public class StormEarthAndFire : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public StormEarthAndFire()
+                {
+                    AnimationNames = "spell,throw";
+                    Area = Levels(128f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.PandarenElemental>();
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(180f);
+                    Duration = Levels(45f);
+                    EffectSound = "StormEarthFireSound";
+                    HeroAbility = true;
+                    HeroDuration = Levels(45f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNStormEarth&Fire.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNStormEarth&Fire.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "E";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(150);
+                    MissileArc = 0.75f;
+                    MissileArt = "Units\\Creeps\\FirePandarenBrewmaster\\ChenStormstoutFire_Missile.mdl,Units\\Creeps\\StormPandarenBrewmaster\\ChenStormstoutStorm_Missile.mdl,Units\\Creeps\\EarthPandarenBrewmaster\\ChenStormstoutEarth_Missile.mdl";
+                    MissileSpeed = 150;
+                    Name = "Storm, Earth, And Fire";
+                    Order = "elementalfury";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 6;
+                    Special = "Abilities\\Spells\\Human\\Polymorph\\PolyMorphDoneGround.mdl";
+                    SummonedUnitTypes.Set<global::Moonwell.Objects.Creeps.Units.Fire, global::Moonwell.Objects.Creeps.Units.Storm, global::Moonwell.Objects.Creeps.Units.Earth>();
+                    Tooltip = Levels("Storm, Earth, And Fire");
+                    TooltipExtended = Levels("Splits the Brewmaster into elements, forming 3 specialized warriors. If any of them survive until the end of their summoned timer, the Brewmaster is reborn. |nLasts <ANef,HeroDur1> seconds.");
+                    TooltipLearn = "Learn Storm, Earth, And Fire";
+                    TooltipLearnExtended = "Splits the Brewmaster into elements, forming 3 specialized warriors. If any of them survive until the end of their summoned timer, the Brewmaster is reborn. |nLasts <ANef,HeroDur1> seconds.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nef1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nef1", Label = "Summoned Unit Types")]
                 public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> SummonedUnitTypes
@@ -8673,6 +16920,49 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Acef")]
             public class StormEarthAndFireAcef : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public StormEarthAndFireAcef()
+                {
+                    AnimationNames = "spell,throw";
+                    Area = Levels(128f, 128f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.PandarenElemental>();
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(180f, 180f);
+                    Duration = Levels(60f, 60f);
+                    EditorSuffix = "(Chen)";
+                    EffectSound = "StormEarthFireSound";
+                    HeroAbility = true;
+                    HeroDuration = Levels(60f, 60f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNStormEarth&Fire.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNStormEarth&Fire.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "E";
+                    LevelCount = 2;
+                    LevelSkipRequirement = 6;
+                    ManaCost = Levels(150, 150);
+                    MissileArc = 0.75f;
+                    MissileArt = "Units\\Creeps\\FirePandarenBrewmaster\\FirePandarenBrewmaster_Missile.mdl,Units\\Creeps\\StormPandarenBrewmaster\\StormPandarenBrewmaster_Missile.mdl,Units\\Creeps\\EarthPandarenBrewmaster\\EarthPandarenBrewmaster_Missile.mdl";
+                    MissileSpeed = 150;
+                    Name = "Storm, Earth, And Fire";
+                    Order = "elementalfury";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 6;
+                    Special = "Abilities\\Spells\\Human\\Polymorph\\PolyMorphDoneGround.mdl";
+                    SummonedUnitTypes.Set<global::Moonwell.Objects.Creeps.Units.Fire, global::Moonwell.Objects.Creeps.Units.Storm, global::Moonwell.Objects.Creeps.Units.Earth>();
+                    Tooltip = Levels("Storm, Earth, And Fire - [|cffffcc00Level 1|r]", "Storm, Earth, And Fire - [|cffffcc00Level 2|r]");
+                    TooltipExtended = Levels("Splits the Brewmaster into elements, forming 3 specialized warriors. If any of them survive until the end of their summoned timer, the Brewmaster is reborn.", "Splits the Brewmaster into elements, forming 3 specialized warriors. If any of them survive until the end of their summoned timer, the Brewmaster is reborn.");
+                    TooltipLearn = "Learn Storm, Earth, And Fire - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Splits the Brewmaster into elements, forming 3 specialized warriors. If any of them survive until the end of their summoned timer, the Brewmaster is reborn.|n|n|cffffcc00Level 1|r - Summons three mighty Pandas. |n|cffffcc00Level 2|r - Summons three even mightier Pandas.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Nef1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nef1", Label = "Summoned Unit Types")]
                 public global::Moonwell.Objects.ObjectList<global::Moonwell.Unit> SummonedUnitTypes
@@ -8686,6 +16976,43 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Asb1")]
             public class Submerge : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Submerge()
+                {
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 3;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0.67f);
+                    EditorSuffix = "(Myrmidon)";
+                    EffectSound = "SubmergeSound";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "U";
+                    HotkeyTurnOff = "U";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNNagaBurrow.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNNagaUnBurrow.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Submerge";
+                    Order = "submerge";
+                    OrderStringTurnOff = "unsubmerge";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Requires.Set<global::Moonwell.Objects.Naga.Upgrades.Submerge>();
+                    Tooltip = Levels("Submerge");
+                    TooltipExtended = Levels("Allows this unit to dive beneath water, hiding it from view.");
+                    TooltipTurnOff = Levels("Surface");
+                    TooltipTurnOffExtended = Levels("Allows this unit to emerge from the water.");
+                    UnitSkinList = "nmys";
+                    UseNewDefaultLevelCap = false;
+                }
             }
 
             /// <summary>Submerge (Asb2).</summary>
@@ -8693,6 +17020,42 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Asb2")]
             public class SubmergeAsb2 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SubmergeAsb2()
+                {
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 3;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0.7f);
+                    EditorSuffix = "(Royal Guard)";
+                    EffectSound = "SubmergeSound";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "U";
+                    HotkeyTurnOff = "U";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNNagaBurrow.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNNagaUnBurrow.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Submerge";
+                    Order = "submerge";
+                    OrderStringTurnOff = "unsubmerge";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Submerge");
+                    TooltipExtended = Levels("Allows this unit to dive beneath water, hiding it from view.");
+                    TooltipTurnOff = Levels("Surface");
+                    TooltipTurnOffExtended = Levels("Allows this unit to emerge from the water.");
+                    UnitSkinList = "nnrs";
+                    UseNewDefaultLevelCap = false;
+                }
             }
 
             /// <summary>Submerge (Asb3).</summary>
@@ -8700,6 +17063,43 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Asb3")]
             public class SubmergeAsb3 : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SubmergeAsb3()
+                {
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 3;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0.6f);
+                    EditorSuffix = "(Snap Dragon)";
+                    EffectSound = "SubmergeSound";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "U";
+                    HotkeyTurnOff = "U";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNNagaBurrow.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNNagaUnBurrow.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Submerge";
+                    Order = "submerge";
+                    OrderStringTurnOff = "unsubmerge";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Requires.Set<global::Moonwell.Objects.Naga.Upgrades.Submerge>();
+                    Tooltip = Levels("Submerge");
+                    TooltipExtended = Levels("Allows this unit to dive beneath water, hiding it from view.");
+                    TooltipTurnOff = Levels("Surface");
+                    TooltipTurnOffExtended = Levels("Allows this unit to emerge from the water.");
+                    UnitSkinList = "nsbs";
+                    UseNewDefaultLevelCap = false;
+                }
             }
 
             /// <summary>Summon Bear (ANsg).</summary>
@@ -8707,6 +17107,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANsg")]
             public class SummonBear : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SummonBear()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(200f, 200f, 200f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Bear>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(40f, 40f, 40f);
+                    Duration = Levels(70f, 70f, 70f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(70f, 70f, 70f);
+                    Hotkey = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGrizzlyBear.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNGrizzlyBear.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "B";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100, 100, 100);
+                    Name = "Summon Bear";
+                    Order = "summongrizzly";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    SummonedUnitCount = Levels(1, 1, 1);
+                    SummonedUnitType.Set<global::Moonwell.Objects.Creeps.Units.Bear>();
+                    Target = "Abilities\\Spells\\Orc\\FeralSpirit\\feralspiritdone.mdl";
+                    Tooltip = Levels("Summon Bear - [|cffffcc00Level 1|r]", "Summon Bear - [|cffffcc00Level 2|r]", "Summon Bear - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Summons a powerful <ngz1,realHP> hit point bear to attack your enemies. |nLasts <ANsg,Dur1> seconds.", "Summons a powerful <ngz2,realHP> hit point bear to attack your enemies. Has the Bash ability. |nLasts <ANsg,Dur2> seconds.", "Summons a powerful <ngz3,realHP> hit point bear to attack your enemies. Has the Bash and Blink abilities. |nLasts <ANsg,Dur3> seconds.");
+                    TooltipLearn = "Learn Summon Bear - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Summons a powerful bear to attack your enemies. |nLasts <ANsg,Dur1> seconds. |n|n|cffffcc00Level 1|r - <ngz1,realHP> hit points, <ngz1,mindmg1> to <ngz1,maxdmg1> damage. |n|cffffcc00Level 2|r - <ngz2,realHP> hit points, <ngz2,mindmg1> to <ngz2,maxdmg1> damage, has Bash. |n|cffffcc00Level 3|r - <ngz3,realHP> hit points, <ngz3,mindmg1> to <ngz3,maxdmg1> damage, has Bash and Blink.";
+                    UnitSkinList = "ngz1,ngz2,ngz3,ngz3";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hwe1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hwe1", Label = "Summoned Unit Type")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> SummonedUnitType
@@ -8730,6 +17170,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANsw")]
             public class SummonHawk : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SummonHawk()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(200f, 200f, 200f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Hawk>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(70f, 70f, 70f);
+                    Duration = Levels(70f, 70f, 70f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(70f, 70f, 70f);
+                    Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWarEagle.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNWarEagle.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "W";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(50, 50, 50);
+                    Name = "Summon Hawk";
+                    Order = "summonwareagle";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    SummonedUnitCount = Levels(1, 1, 1);
+                    SummonedUnitType.Set<global::Moonwell.Objects.Other.Units.Hawk>();
+                    Target = "Abilities\\Spells\\Orc\\FeralSpirit\\feralspiritdone.mdl";
+                    Tooltip = Levels("Summon Hawk - [|cffffcc00Level 1|r]", "Summon Hawk - [|cffffcc00Level 2|r]", "Summon Hawk - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Summons a proud <nwe1,realHP> hit point hawk to spy on your enemies. Has the True Sight ability. |nLasts <ANsw,Dur1> seconds.", "Summons a proud <nwe2,realHP> hit point hawk to attack and spy on your enemies. Has the True Sight ability. |nLasts <ANsw,Dur2> seconds.", "Summons a proud <nwe3,realHP> hit point hawk to attack and spy on your enemies. Has the True Sight and Invisibility abilities. |nLasts <ANsw,Dur3> seconds.");
+                    TooltipLearn = "Learn Summon Hawk - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Summons a proud hawk to spy on your enemies. |nLasts <ANsw,Dur1> seconds. |n|n|cffffcc00Level 1|r - <nwe1,realHP> hit points, has True Sight. |n|cffffcc00Level 2|r - <nwe2,realHP> hit points, <nwe2,mindmg1> to <nwe2,maxdmg1> damage, has True Sight. |n|cffffcc00Level 3|r - <nwe3,realHP> hit points, <nwe3,mindmg1> to <nwe3,maxdmg1> damage, has True Sight and Invisibility.";
+                    UnitSkinList = "nwe1,nwe2,nwe3,nwe3";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hwe1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hwe1", Label = "Summoned Unit Type")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> SummonedUnitType
@@ -8753,6 +17233,50 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANlm")]
             public class SummonLavaSpawn : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SummonLavaSpawn()
+                {
+                    Area = Levels(200f, 200f, 200f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.LavaSpawn>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(32f, 32f, 32f);
+                    Duration = Levels(70f, 70f, 70f);
+                    GenerationCount = Levels(3, 3, 3);
+                    HeroAbility = true;
+                    HeroDuration = Levels(70f, 70f, 70f);
+                    Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNLavaSpawn.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNLavaSpawn.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "W";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    LifeDurationSplitBonus = Levels(12f, 12f, 12f);
+                    ManaCost = Levels(150, 150, 150);
+                    MaxHitpointFactor = Levels(0.5f, 0.75f, 0.75f);
+                    Name = "Summon Lava Spawn";
+                    Order = "slimemonster";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    SplitAttackCount = Levels(13, 13, 13);
+                    SplitDelay = Levels(5f, 5f, 5f);
+                    SummonedUnitCount = Levels(1, 1, 1);
+                    SummonedUnitType.Set<global::Moonwell.Objects.Other.Units.LavaSpawn>();
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Ward, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Ward, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Ward);
+                    Tooltip = Levels("Summon Lava Spawn - [|cffffcc00Level 1|r]", "Summon Lava Spawn - [|cffffcc00Level 2|r]", "Summon Lava Spawn - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Summons a Lava Spawn, a resilient and deadly fire creature. As a Lava Spawn deals damage, it consumes the flesh of its target, thereby fueling its fires and eventually splitting into two healthy Lava Spawns.|n|nHas <nlv1,realHP> hit points and deals <nlv1,mindmg1> - <nlv1,maxdmg1> damage.|nLasts <ANlm,Dur1> seconds.|n|n|cffffcc00Attacks ground and air units.|r", "Summons a Lava Spawn, a resilient and deadly fire creature. As a Lava Spawn deals damage, it consumes the flesh of its target, thereby fueling its fires and eventually splitting into two healthy Lava Spawns.|n|nHas <nlv2,realHP> hit points and deals <nlv2,mindmg1> - <nlv2,maxdmg1> damage.|nLasts <ANlm,Dur2> seconds.|n|n|cffffcc00Attacks ground and air units.|r", "Summons a Lava Spawn, a resilient and deadly fire creature. As a Lava Spawn deals damage, it consumes the flesh of its target, thereby fueling its fires and eventually splitting into two healthy Lava Spawns.|n|nHas <nlv3,realHP> hit points and deals <nlv3,mindmg1> - <nlv3,maxdmg1> damage.|nLasts <ANlm,Dur3> seconds.|n|n|cffffcc00Attacks ground and air units.|r");
+                    TooltipLearn = "Learn Summon Lava Spawn - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "\"Summons a Lava Spawn, a resilient and deadly fire creature. As a Lava Spawn deals damage, it consumes the flesh of its target, eventually splitting into two healthy Lava Spawns.|nLasts <ANlm,Dur1> seconds.|n|n|cffffcc00Level 1|r - <nlv1,realHP> hit points, <nlv1,mindmg1> - <nlv1,maxdmg1> damage.|n|cffffcc00Level 2|r - <nlv2,realHP> hit points, <nlv2,mindmg1> - <nlv2,maxdmg1> damage.|n|cffffcc00Level 3|r - <nlv3,realHP> hit points, <nlv3,mindmg1> - <nlv3,maxdmg1> damage.|n|n|cffffcc00Attacks ground and air units.|r";
+                    UnitSkinList = "nlv1,nlv2,nlv3,nlv3";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hwe1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hwe1", Label = "Summoned Unit Type")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> SummonedUnitType
@@ -8826,6 +17350,48 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Arsg")]
             public class SummonMisha : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SummonMisha()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(200f, 200f, 200f, 200f);
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.FeralSpirit>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(30f, 30f, 30f, 30f);
+                    Duration = Levels(0f, 0f, 0f, 0f);
+                    EditorSuffix = "(Rexxar)";
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f, 0f, 0f, 0f);
+                    Hotkey = "I";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGrizzlyBear.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNGrizzlyBear.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "I";
+                    LevelCount = 4;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(150, 150, 150, 150);
+                    Name = "Summon Misha";
+                    NumberOfSummonedUnits = Levels(1, 1, 1, 1);
+                    Order = "spiritwolf";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f, 800f, 800f, 800f);
+                    RequiredLevel = 1;
+                    Special = "Abilities\\Spells\\Orc\\FeralSpirit\\feralspiritdone.mdl";
+                    SummonedUnit.Set<global::Moonwell.Objects.Other.Units.MishaNgzc>();
+                    Tooltip = Levels("Summon Misha - [|cffffcc00Level 1|r]", "Summon Misha - [|cffffcc00Level 2|r]", "Summon Misha - [|cffffcc00Level 3|r]", "Summon Misha - [|cffffcc00Level 4|r]");
+                    TooltipExtended = Levels("Summons Misha, a powerful <ngzc,realHP> hit point bear, to attack your enemies.", "Summons Misha, a powerful <ngzd,realHP> hit point bear, to attack your enemies. Has the Bash ability.", "Summons Misha, a powerful <ngza,realHP> hit point bear, to attack your enemies. Has the Maul ability.", "Summons Misha, a powerful <ngz4,realHP> hit point bear, to attack your enemies. Has the Maul ability.");
+                    TooltipLearn = "Learn Summon Misha - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Summons Misha, a powerful bear, to attack your enemies. |n|n|cffffcc00Level 1|r - <ngzc,realHP> hit points, <ngzc,mindmg1> to <ngzc,maxdmg1> damage. |n|cffffcc00Level 2|r - <ngzd,realHP> hit points, <ngzd,mindmg1> to <ngzd,maxdmg1> damage, has Bash. |n|cffffcc00Level 3|r - <ngza,realHP> hit points, <ngza,mindmg1> to <ngza,maxdmg1> damage, has Maul. |n|cffffcc00Level 4|r - <ngz4,realHP> hit points, <ngz4,mindmg1> to <ngz4,maxdmg1> damage, has Maul.";
+                    UnitSkinList = "ngzc,ngzd,ngza,ngz4";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Osf1</c>.</summary>
                 [global::Moonwell.Objects.Field("Osf1", Label = "Summoned Unit")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> SummonedUnit
@@ -8849,6 +17415,42 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Aslp")]
             public class SummonPrawns : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SummonPrawns()
+                {
+                    Area = Levels(200f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.WateryMinion>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(30f);
+                    Duration = Levels(60f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(60f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNLobstrokkRed.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNLobstrokkRed.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    Name = "Summon Prawns";
+                    Order = "wateryminion";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    SummonedUnitCount = Levels(2);
+                    SummonedUnitType.Set<global::Moonwell.Objects.Creeps.Units.SummonedPrawn>();
+                    Target = "Abilities\\Spells\\Orc\\FeralSpirit\\feralspiritdone.mdl";
+                    Tooltip = Levels("Summon Prawns");
+                    TooltipExtended = Levels("Summons <Aslp,DataA1> Makrura Prawns to do their master's bidding. |nLasts <Aslp,Dur1> seconds.");
+                    UnitSkinList = "nlps";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hwe1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hwe1", Label = "Summoned Unit Type")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> SummonedUnitType
@@ -8872,6 +17474,46 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANsq")]
             public class SummonQuilbeast : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SummonQuilbeast()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(200f, 200f, 200f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Quilbeast>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(25f, 25f, 25f);
+                    Duration = Levels(70f, 70f, 70f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(70f, 70f, 70f);
+                    Hotkey = "Q";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNQuillBeast.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNQuillBeast.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "Q";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75, 75, 75);
+                    Name = "Summon Quilbeast";
+                    Order = "summonquillbeast";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    SummonedUnitCount = Levels(1, 1, 1);
+                    SummonedUnitType.Set<global::Moonwell.Objects.Other.Units.Quilbeast>();
+                    Target = "Abilities\\Spells\\Orc\\FeralSpirit\\feralspiritdone.mdl";
+                    Tooltip = Levels("Summon Quilbeast - [|cffffcc00Level 1|r]", "Summon Quilbeast - [|cffffcc00Level 2|r]", "Summon Quilbeast - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Summons an angry <nqb1,realHP> hit point quilbeast to fling spines at your enemies. |nLasts <ANsq,Dur1> seconds.", "Summons an angry <nqb2,realHP> hit point quilbeast to fling spines at your enemies. Has the Frenzy ability. |nLasts <ANsq,Dur2> seconds.", "Summons an angry <nqb3,realHP> hit point quilbeast to fling spines at your enemies. Has the Frenzy ability and does area effect damage. |nLasts <ANsq,Dur3> seconds.");
+                    TooltipLearn = "Learn Summon Quilbeast - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Summons an angry quilbeast to attack your enemies. |nLasts <ANsq,Dur1> seconds. |n|n|cffffcc00Level 1|r - <nqb1,realHP> hit points, <nqb1,mindmg1> to <nqb1,maxdmg1> damage. |n|cffffcc00Level 2|r - <nqb2,realHP> hit points, <nqb2,mindmg1> to <nqb2,maxdmg1> damage, has Frenzy. |n|cffffcc00Level 3|r - <nqb3,realHP> hit points, <nqb3,mindmg1> to <nqb3,maxdmg1> area effect damage, has Frenzy.";
+                    UnitSkinList = "nqb1,nqb2,nqb3,nqb3";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hwe1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hwe1", Label = "Summoned Unit Type")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> SummonedUnitType
@@ -8895,6 +17537,47 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Arsq")]
             public class SummonQuilbeastArsq : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SummonQuilbeastArsq()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(200f, 200f, 200f, 200f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Quilbeast>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(20f, 20f, 20f, 20f);
+                    Duration = Levels(70f, 70f, 70f, 70f);
+                    EditorSuffix = "(Rexxar)";
+                    HeroAbility = true;
+                    HeroDuration = Levels(70f, 70f, 70f, 70f);
+                    Hotkey = "Q";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNQuillBeast.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNQuillBeast.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "Q";
+                    LevelCount = 4;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(50, 50, 50, 50);
+                    Name = "Summon Quilbeast";
+                    Order = "summonquillbeast";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    SummonedUnitCount = Levels(1, 1, 1, 1);
+                    SummonedUnitType.Set<global::Moonwell.Objects.Other.Units.Quilbeast>();
+                    Target = "Abilities\\Spells\\Orc\\FeralSpirit\\feralspiritdone.mdl";
+                    Tooltip = Levels("Summon Quilbeast - [|cffffcc00Level 1|r]", "Summon Quilbeast - [|cffffcc00Level 2|r]", "Summon Quilbeast - [|cffffcc00Level 3|r]", "Summon Quilbeast - [|cffffcc00Level 4|r]");
+                    TooltipExtended = Levels("Summons an angry <nqb1,realHP> hit point quilbeast to fling spines at your enemies. |nLasts <Arsq,Dur1> seconds.", "Summons an angry <nqb2,realHP> hit point quilbeast to fling spines at your enemies. Has the Frenzy ability. |nLasts <Arsq,Dur2> seconds.", "Summons an angry <nqb3,realHP> hit point quilbeast to fling spines at your enemies. Has the Frenzy ability and does area effect damage. |nLasts <Arsq,Dur3> seconds.", "Summons an angry <nqb4,realHP> hit point quilbeast to fling spines at your enemies. Has the Frenzy ability and does area effect damage. |nLasts <Arsq,Dur4> seconds.");
+                    TooltipLearn = "Learn Summon Quilbeast - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Summons an angry quilbeast to attack your enemies. |nLasts <Arsq,Dur1> seconds. |n|n|cffffcc00Level 1|r - <nqb1,realHP> hit points, <nqb1,mindmg1> to <nqb1,maxdmg1> damage. |n|cffffcc00Level 2|r - <nqb2,realHP> hit points, <nqb2,mindmg1> to <nqb2,maxdmg1> damage, has Frenzy. |n|cffffcc00Level 3|r - <nqb3,realHP> hit points, <nqb3,mindmg1> to <nqb3,maxdmg1> area effect damage, has Frenzy. |n|cffffcc00Level 4|r - <nqb4,realHP> hit points, <nqb4,mindmg1> to <nqb4,maxdmg1> area effect damage, has Frenzy.";
+                    UnitSkinList = "nqb1,nqb2,nqb3,nqb4";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hwe1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hwe1", Label = "Summoned Unit Type")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> SummonedUnitType
@@ -8918,6 +17601,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACwe")]
             public class SummonSeaElemental : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SummonSeaElemental()
+                {
+                    Area = Levels(200f);
+                    Buffs.Set<global::Moonwell.Objects.Human.Buffs.WaterElemental>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(30f);
+                    Duration = Levels(65f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(65f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSeaElemental.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSeaElemental.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125);
+                    Name = "Summon Sea Elemental";
+                    Order = "waterelemental";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    SummonedUnitCount = Levels(1);
+                    SummonedUnitType.Set<global::Moonwell.Objects.Creeps.Units.SeaElemental>();
+                    Tooltip = Levels("Summon Sea Elemental");
+                    TooltipExtended = Levels("Summons a powerful Sea Elemental with <nsel,realHP> hit points that does <nsel,mindmg1> - <nsel,maxdmg1> damage. |nLasts <ACwe,Dur1> seconds.");
+                    UnitSkinList = "nsel";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hwe1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hwe1", Label = "Summoned Unit Type")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> SummonedUnitType
@@ -8941,6 +17659,42 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANta")]
             public class Taunt : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Taunt()
+                {
+                    Area = Levels(450f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    Caster = "Abilities\\Spells\\NightElf\\Taunt\\TauntCaster.mdl";
+                    CheckDependencies = true;
+                    Cooldown = Levels(14f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPandaTaunt.blp";
+                    IntervalBetweenPulses = Levels(3f);
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    MaxUnits = Levels(10);
+                    Name = "Taunt";
+                    NumberOfPulses = Levels(1);
+                    Order = "taunt";
+                    PreferHostilesTau2 = Levels(0);
+                    PreferHostilesTau3 = Levels(0);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Vulnerable);
+                    Tooltip = Levels("Taunt");
+                    TooltipExtended = Levels("The closest <ANta,DataA1> enemies are forced to attack this unit.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Tau1</c>.</summary>
                 [global::Moonwell.Objects.Field("Tau1", Label = "Max Units")]
                 [global::Moonwell.Objects.Limits(0, 1)]
@@ -8997,6 +17751,38 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACah")]
             public class ThornsAura : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ThornsAura()
+                {
+                    Area = Levels(900f);
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.ThornsAura>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    DamageDealtToAttackers = Levels(0.1f);
+                    DamageIsPercentReceived = Levels(true);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNThorns.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    Name = "Thorns Aura";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\NightElf\\ThornsAura\\ThornsAura.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Thorns Aura");
+                    TooltipExtended = Levels("An aura that gives nearby friendly units a damage shield, which deals <ACah,DataA1,%>% of an enemy unit's attack damage back to it.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Eah1</c>.</summary>
                 [global::Moonwell.Objects.Field("Eah1", Label = "Damage Dealt to Attackers")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -9021,6 +17807,44 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANto")]
             public class Tornado : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Tornado()
+                {
+                    AnimationNames = "spell,channel";
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Tornado>();
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(120f);
+                    Duration = Levels(20f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(20f);
+                    Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTornado.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNTornado.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "T";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125);
+                    Name = "Tornado";
+                    Order = "tornado";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(700f);
+                    RequiredLevel = 6;
+                    SummonedUnitType.Set<global::Moonwell.Objects.Other.Units.Tornado>();
+                    Tooltip = Levels("Tornado");
+                    TooltipExtended = Levels("Summons a fierce controllable Tornado that slows enemy units' movement speed, randomly tosses enemy ground units into the air and damages enemy buildings. Pierces spell immunity. |nLasts <ANto,Dur1> seconds.");
+                    TooltipLearn = "Learn Tornado";
+                    TooltipLearnExtended = "Summons a fierce controllable Tornado that slows enemy units' movement speed, randomly tosses enemy ground units into the air and damages enemy buildings. Pierces spell immunity. |nLasts <ANto,Dur1> seconds.";
+                    UnitSkinList = "ntor,ntor,ntor,ntor";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ntou</c>.</summary>
                 [global::Moonwell.Objects.Field("Ntou", Label = "Summoned Unit Type")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> SummonedUnitType
@@ -9034,6 +17858,51 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANtm")]
             public class Transmute : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Transmute()
+                {
+                    AllowBounty = Levels(true);
+                    AnimationNames = "Attack,two,Spell";
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Transmute>();
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(45f);
+                    Duration = Levels(0f);
+                    GoldCostFactor = Levels(1f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTransmute.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNTransmute.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "T";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LumberCostFactor = Levels(0f);
+                    ManaCost = Levels(150);
+                    MaxCreepLevel = Levels(5);
+                    MissileArc = 0.4f;
+                    MissileArt = "Abilities\\Spells\\Other\\Transmute\\GoldBottleMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 700;
+                    Name = "Transmute";
+                    Order = "transmute";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(650f);
+                    RequiredLevel = 6;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.NonHero);
+                    Tooltip = Levels("Transmute");
+                    TooltipExtended = Levels("Kills a target enemy unit instantly, transforming it into gold which is added to your available gold!|nTransmute pierces spell immunity, but cannot be used on Heroes, or creeps above level <ANtm,DataC1>.");
+                    TooltipLearn = "Learn Transmute";
+                    TooltipLearnExtended = "Kills a target enemy unit instantly, transforming it into gold which is added to your available gold!|nTransmute pierces spell immunity, but cannot be used on Heroes, or creeps above level <ANtm,DataC1>.";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ntm1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ntm1", Label = "Gold Cost Factor")]
                 [global::Moonwell.Objects.Limits(0, 1000)]
@@ -9078,6 +17947,41 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACat")]
             public class TrueshotAura : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public TrueshotAura()
+                {
+                    Area = Levels(900f);
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.TrueshotAura>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    DamageBonus = Levels(0.1f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    FlatBonus = Levels(false);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNTrueShot.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    MeleeBonus = Levels(false);
+                    Name = "Trueshot Aura";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RangedBonus = Levels(true);
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\NightElf\\TrueshotAura\\TrueshotAura.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Trueshot Aura");
+                    TooltipExtended = Levels("An aura that gives nearby friendly units a <ACat,DataA1,%>% bonus damage to their ranged attacks.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ear1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ear1", Label = "Damage Bonus (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -9118,6 +18022,39 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACua")]
             public class UnholyAura : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public UnholyAura()
+                {
+                    Area = Levels(900f);
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.UnholyAura>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNUnholyAura.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LifeRegenerationIncrease = Levels(0.5f);
+                    MovementSpeedIncrease = Levels(0.1f);
+                    Name = "Unholy Aura";
+                    PercentBonus = Levels(false);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\Undead\\UnholyAura\\UnholyAura.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Unholy Aura");
+                    TooltipExtended = Levels("Increases nearby friendly units' movement speed by <ACua,DataA1,%>% and life regeneration rate by <ACua,DataB1,%>%.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Uau1</c>.</summary>
                 [global::Moonwell.Objects.Field("Uau1", Label = "Movement Speed Increase (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -9152,6 +18089,39 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACuf")]
             public class UnholyFrenzy : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public UnholyFrenzy()
+                {
+                    AttackSpeedBonus = Levels(0.75f);
+                    Buffs.Add("BUhf");
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(5f);
+                    DamagePerSecond = Levels(2f);
+                    Duration = Levels(45f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(45f);
+                    Hotkey = "U";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNUnholyFrenzy.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(50);
+                    Name = "Unholy Frenzy";
+                    Order = "unholyfrenzy";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Unholy Frenzy");
+                    TooltipExtended = Levels("Increases the attack rate of a target unit by <ACuf,DataA1,%>%, but drains <ACuf,DataB1> hit points per second. |nLasts <ACuf,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Uhf1</c>.</summary>
                 [global::Moonwell.Objects.Field("Uhf1", Label = "Attack Speed Bonus (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -9178,6 +18148,39 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Suhf")]
             public class UnholyFrenzySuhf : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public UnholyFrenzySuhf()
+                {
+                    AttackSpeedBonus = Levels(0.75f);
+                    Buffs.Add("BUhf");
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(3f);
+                    DamagePerSecond = Levels(2f);
+                    Duration = Levels(45f);
+                    EditorSuffix = "(Warlock)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(45f);
+                    Hotkey = "U";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNUnholyFrenzy.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(50);
+                    Name = "Unholy Frenzy";
+                    Order = "unholyfrenzy";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(500f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Unholy Frenzy");
+                    TooltipExtended = Levels("Increases the attack rate of a target unit by <Suhf,DataA1,%>%, but drains <Suhf,DataB1> hit points per second. |nLasts <Suhf,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Uhf1</c>.</summary>
                 [global::Moonwell.Objects.Field("Uhf1", Label = "Attack Speed Bonus (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -9204,6 +18207,37 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACvp")]
             public class VampiricAura : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public VampiricAura()
+                {
+                    Area = Levels(900f);
+                    AttackDamageStolen = Levels(0.2f);
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.VampiricAura>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNVampiricAura.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    Name = "Vampiric Aura";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\Undead\\VampiricAura\\VampiricAura.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Vampiric Aura");
+                    TooltipExtended = Levels("Nearby friendly melee units gain <ACvp,DataA1,%>% of their attack damage when they hit enemy units.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Uav1</c>.</summary>
                 [global::Moonwell.Objects.Field("Uav1", Label = "Attack Damage Stolen (%)")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -9220,6 +18254,53 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANvc")]
             public class Volcano : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Volcano()
+                {
+                    AnimationNames = "stand,channel";
+                    Area = Levels(500f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Volcano, global::Moonwell.Objects.Other.Buffs.VolcanoArea>();
+                    BuildingDamageFactor = Levels(2f);
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(180f);
+                    DestructibleID.Set("Volc");
+                    Duration = Levels(2f);
+                    Effects = Levels("XNvc");
+                    FullDamageAmount = Levels(125f);
+                    HalfDamageFactor = Levels(0.5f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(1f);
+                    Hotkey = "V";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNVolcano.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNVolcano.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "V";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(200);
+                    Name = "Volcano";
+                    Order = "volcano";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(800f);
+                    RequiredLevel = 6;
+                    RockRingCount = Levels(3);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Tree);
+                    Tooltip = Levels("Volcano");
+                    TooltipExtended = Levels("Causes the ground to erupt into a massive Volcano. Every <ANvc,DataC1> seconds, a wave of molten rocks is hurled from the Volcano at nearby ground units and buildings, causing <ANvc,DataE1> damage to each target and stunning it for <ANvc,Dur1> seconds. Buildings take <ANvc,DataD1> times more damage from molten rocks than units do.|nLasts 35 seconds.");
+                    TooltipLearn = "Learn Volcano";
+                    TooltipLearnExtended = "Causes the ground to erupt into a massive Volcano. Every <ANvc,DataC1> seconds, a wave of molten rocks is hurled from the Volcano at nearby ground units and buildings, causing <ANvc,DataE1> damage to each target and stunning it for <ANvc,Dur1> seconds. Buildings take <ANvc,DataD1> times more damage from molten rocks than units do.|nLasts 35 seconds.";
+                    UnitSkinList = "Volc,Volc,Volc,Volc";
+                    UseNewDefaultLevelCap = false;
+                    WaveCount = Levels(5);
+                    WaveInterval = Levels(3f);
+                }
+
                 /// <summary>The field <c>Nvc1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nvc1", Label = "Rock Ring Count")]
                 [global::Moonwell.Objects.Limits(0, 10)]
@@ -9293,6 +18374,40 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Awrg")]
             public class WarStomp : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public WarStomp()
+                {
+                    AnimationNames = "slam";
+                    Area = Levels(250f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stunned>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    Caster = "Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl";
+                    CheckDependencies = false;
+                    Cooldown = Levels(6f);
+                    Damage = Levels(25f);
+                    Duration = Levels(3f);
+                    EditorSuffix = "(Neutral Hostile 3), (Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(2f);
+                    Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSeaGiantWarStomp.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(90);
+                    Name = "War Stomp";
+                    Order = "stomp";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground);
+                    Tooltip = Levels("War Stomp");
+                    TooltipExtended = Levels("Slams the ground, dealing <Awrg,DataA1> damage to nearby enemy land units and stunning them for <Awrg,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Wrs1</c>.</summary>
                 [global::Moonwell.Objects.Field("Wrs1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -9309,6 +18424,40 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Awrh")]
             public class WarStompAwrh : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public WarStompAwrh()
+                {
+                    AnimationNames = "slam";
+                    Area = Levels(250f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stunned>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    Caster = "Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl";
+                    CheckDependencies = false;
+                    Cooldown = Levels(6f);
+                    Damage = Levels(25f);
+                    Duration = Levels(3f);
+                    EditorSuffix = "(Neutral Hostile 2), (Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(2f);
+                    Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHydraWarStomp.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(90);
+                    Name = "War Stomp";
+                    Order = "stomp";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground);
+                    Tooltip = Levels("War Stomp");
+                    TooltipExtended = Levels("Slams the ground, dealing <Awrh,DataA1> damage to nearby enemy land units and stunning them for <Awrh,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Wrs1</c>.</summary>
                 [global::Moonwell.Objects.Field("Wrs1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -9325,6 +18474,40 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Awrs")]
             public class WarStompAwrs : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public WarStompAwrs()
+                {
+                    AnimationNames = "slam";
+                    Area = Levels(250f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stunned>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    Caster = "Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl";
+                    CheckDependencies = false;
+                    Cooldown = Levels(6f);
+                    Damage = Levels(25f);
+                    Duration = Levels(3f);
+                    EditorSuffix = "(Neutral Hostile 1), (Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(2f);
+                    Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWarStomp.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(90);
+                    Name = "War Stomp";
+                    Order = "stomp";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground);
+                    Tooltip = Levels("War Stomp");
+                    TooltipExtended = Levels("Slams the ground, dealing <Awrs,DataA1> damage to nearby enemy land units and stunning them for <Awrs,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Wrs1</c>.</summary>
                 [global::Moonwell.Objects.Field("Wrs1", Label = "Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
@@ -9341,6 +18524,42 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANwm")]
             public class WateryMinion : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public WateryMinion()
+                {
+                    Area = Levels(200f, 200f, 200f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.WateryMinion>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(20f, 20f, 20f);
+                    Duration = Levels(60f, 60f, 60f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(60f, 60f, 60f);
+                    Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMurgulTideWarrior.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNMurgulTideWarrior.blp";
+                    ItemAbility = false;
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75, 75, 75);
+                    Name = "Watery Minion";
+                    Order = "wateryminion";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    SummonedUnitCount = Levels(2, 2, 2);
+                    SummonedUnitType.Set<global::Moonwell.Objects.Creeps.Units.WateryMinion>();
+                    Target = "Abilities\\Spells\\Orc\\FeralSpirit\\feralspiritdone.mdl";
+                    Tooltip = Levels("Watery Minion");
+                    TooltipExtended = Levels("Summons <ANwm,DataA1> minions to do their master's bidding. |nLasts <ANwm,Dur1> seconds.");
+                    UnitSkinList = "ncfs,ntws,nsns,nsns";
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Hwe1</c>.</summary>
                 [global::Moonwell.Objects.Field("Hwe1", Label = "Summoned Unit Type")]
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> SummonedUnitType
@@ -9364,6 +18583,51 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ACwb")]
             public class Web : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Web()
+                {
+                    AirUnitHeight = Levels(200f);
+                    AirUnitLowerDuration = Levels(0.6f);
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.Web, global::Moonwell.Objects.Undead.Buffs.WebBweb>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(12f);
+                    Duration = Levels(12f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(7f);
+                    Hotkey = "W";
+                    HotkeyTurnOff = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWebOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNWebOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    MeleeAttackRange = Levels(128f);
+                    MissileArt = "Abilities\\Spells\\Undead\\Web\\Webmissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1500;
+                    Name = "Web";
+                    Order = "web";
+                    OrderStringActivate = "webon";
+                    OrderStringDeactivate = "weboff";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    Range = Levels(400f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Web");
+                    TooltipExtended = Levels("Binds a target enemy air unit in webbing, forcing it to the ground. Webbed units can be hit as though they were land units. |nLasts <ACwb,Dur1> seconds.");
+                    TooltipTurnOff = Levels("|cffc3dbff|cffc3dbffRight-click to activate auto-casting.");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.");
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Ens1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ens1", Label = "Air Unit Lower Duration")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]
@@ -9438,6 +18702,43 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("ANwk")]
             public class WindWalk : global::Moonwell.Objects.StandardAbility
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public WindWalk()
+                {
+                    BackstabDamageOwk3 = Levels(50f);
+                    BackstabDamageOwk4 = Levels(true);
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.WindWalk>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(7f);
+                    Duration = Levels(20f);
+                    EditorSuffix = "(Neutral Hostile)";
+                    EffectSound = "WindWalk";
+                    HeroAbility = true;
+                    HeroDuration = Levels(20f);
+                    Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWindWalkOn.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNWindWalkOn.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75);
+                    MovementSpeedIncrease = Levels(0.1f);
+                    Name = "Wind Walk";
+                    Order = "windwalk";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 1;
+                    Tooltip = Levels("Wind Walk");
+                    TooltipExtended = Levels("Allows the Pandaren to become invisible, and move <ANwk,DataB1,%>% faster. If the Pandaren attacks a unit to break invisibility, the attack will do <ANwk,DataC1> bonus damage.");
+                    TransitionTime = Levels(0.6f);
+                    UseNewDefaultLevelCap = false;
+                }
+
                 /// <summary>The field <c>Owk1</c>.</summary>
                 [global::Moonwell.Objects.Field("Owk1", Label = "Transition Time")]
                 [global::Moonwell.Objects.Limits(0.001, 300)]

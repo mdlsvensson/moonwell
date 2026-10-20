@@ -63,9 +63,10 @@ public static class GeneratedObjects
             list.Add((obj, name));
         }
 
+        var constructors = new StandardConstructors(fieldsOf, everything.Select(obj => (obj, names[(obj.Kind, obj.Id)])));
         foreach (var (ns, classes) in byNamespace)
         {
-            files[PathOf(ns)] = header + "\n" + ObjectsWriter.Group(ns, classes, fieldsOf[Kind.Ability]) + footer;
+            files[PathOf(ns)] = header + "\n" + ObjectsWriter.Group(ns, classes, fieldsOf[Kind.Ability], constructors) + footer;
         }
 
         return files;

@@ -19,6 +19,22 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Roch")]
             public class Chaos : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Chaos()
+                {
+                    AppliesToAllUnits = true;
+                    GoldBase = 0;
+                    GoldIncrement = 0;
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNOrcMeleeUpOne.blp");
+                    LevelCount = 1;
+                    LumberBase = 0;
+                    LumberIncrement = 0;
+                    Name = Levels("Chaos");
+                    Race = global::Moonwell.Objects.UnitRace.Demon;
+                    TimeBase = 0;
+                    TimeIncrement = 0;
+                    TransferWithUnitOwnership = false;
+                }
             }
         }
     }

@@ -63,6 +63,19 @@ namespace Moonwell.Objects
             }
         }
 
+        /// <summary>
+        /// Adds the standard object of an id with no standard class of the list's kind to the end; one already there stays
+        /// where it is. A standard class's constructor writes such an entry so; a map's class names classes.
+        /// </summary>
+        internal void Add(string id)
+        {
+            if (!entries.Contains(id))
+            {
+                entries.Add(id);
+                Grew?.Invoke(entries.Count);
+            }
+        }
+
         /// <summary>Takes a class out of the list; one not there changes nothing.</summary>
         public void Remove<TObject>()
             where TObject : T

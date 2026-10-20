@@ -19,6 +19,27 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rgfo")]
             public class GlyphOfFortification : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public GlyphOfFortification()
+                {
+                    AppliesToAllUnits = false;
+                    EditorSuffix = Levels("(Upgrade 1)", "(Upgrade 2)", "(Upgrade 3)");
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rarm;
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Rhpo;
+                    Effect2Base = 0.2f;
+                    Effect2Mod = 0.2f;
+                    GoldBase = 100;
+                    GoldIncrement = 50;
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNGlyph.blp", "ReplaceableTextures\\CommandButtons\\BTNGlyph.blp", "ReplaceableTextures\\CommandButtons\\BTNGlyph.blp");
+                    LevelCount = 3;
+                    LumberBase = 100;
+                    LumberIncrement = 50;
+                    Name = Levels("Glyph of Fortification", "Glyph of Fortification", "Glyph of Fortification");
+                    Race = global::Moonwell.Objects.UnitRace.Unknown;
+                    TimeBase = 60;
+                    TimeIncrement = 15;
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Glyph of Ultravision (Rguv).</summary>
@@ -26,6 +47,24 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rguv")]
             public class GlyphOfUltravision : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public GlyphOfUltravision()
+                {
+                    AppliesToAllUnits = false;
+                    EditorSuffix = Levels("(Upgrade)");
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rauv;
+                    GoldBase = 100;
+                    GoldIncrement = 50;
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNGlyph.blp");
+                    LevelCount = 1;
+                    LumberBase = 100;
+                    LumberIncrement = 50;
+                    Name = Levels("Glyph of Ultravision");
+                    Race = global::Moonwell.Objects.UnitRace.Unknown;
+                    TimeBase = 60;
+                    TimeIncrement = 15;
+                    TransferWithUnitOwnership = true;
+                }
             }
         }
     }

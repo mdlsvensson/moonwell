@@ -19,6 +19,16 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BUan")]
             public class AnimateDead : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public AnimateDead()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Special = "Objects\\Spawnmodels\\Undead\\UndeadLargeDeathExplode\\UndeadLargeDeathExplode.mdl";
+                    Tooltip = "Animate Dead";
+                    TooltipExtended = "Summoned units take damage from dispels.";
+                }
             }
 
             /// <summary>Animate Dead (Extra) (BUad).</summary>
@@ -26,6 +36,13 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BUad")]
             public class AnimateDeadExtra : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public AnimateDeadExtra()
+                {
+                    IsAnEffect = false;
+                    Name = "Animate Dead (Extra)";
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                }
             }
 
             /// <summary>Anti-magic Shell (Bam2).</summary>
@@ -33,6 +50,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bam2")]
             public class AntiMagicShell : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public AntiMagicShell()
+                {
+                    EditorSuffix = "(Extra)";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAntiMagicShell.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Undead\\AntiMagicShell\\AntiMagicShell.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    Tooltip = "Anti-magic Shell";
+                    TooltipExtended = "This unit has Anti-magic Shell; damage spells must destroy the shell to affect the unit.";
+                }
             }
 
             /// <summary>Anti-magic Shell (Bams).</summary>
@@ -40,6 +69,17 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bams")]
             public class AntiMagicShellBams : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public AntiMagicShellBams()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAntiMagicShell.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Undead\\AntiMagicShell\\AntiMagicShell.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    Tooltip = "Anti-magic Shell";
+                    TooltipExtended = "This unit has Anti-magic Shell; it cannot be targeted by spells. It can be dispelled.";
+                }
             }
 
             /// <summary>Aura of Blight (Babr).</summary>
@@ -47,6 +87,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Babr")]
             public class AuraOfBlight : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public AuraOfBlight()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRegenerationAura.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.High;
+                    Target = "Abilities\\Spells\\Other\\GeneralAuraTarget\\GeneralAuraTarget.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    Tooltip = "Aura of Blight";
+                    TooltipExtended = "This unit is under the effects of Aura of Blight; it has a bonus to hit point regeneration.";
+                }
             }
 
             /// <summary>BUtt.</summary>
@@ -54,6 +106,17 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BUtt")]
             public class BUtt : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BUtt()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNThornShield.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Other\\SpikedShell\\SpikedShellTargetChestLeft.mdl,Abilities\\Spells\\Other\\SpikedShell\\SpikedShellTargetChestRight.mdl";
+                    TargetAttachmentPoint1 = "chest,mount,left";
+                    TargetAttachmentPoint2 = "chest,mount,right";
+                    TargetAttachments = 2;
+                }
             }
 
             /// <summary>Building Damage - Undead Large (Xful).</summary>
@@ -61,6 +124,22 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Xful")]
             public class BuildingDamageUndeadLarge : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BuildingDamageUndeadLarge()
+                {
+                    EffectSoundLooping = "UndeadFireLarge";
+                    IsAnEffect = true;
+                    Name = "Building Damage - Undead Large";
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Environment\\UndeadBuildingFire\\UndeadLargeBuildingFire1.mdl,Environment\\UndeadBuildingFire\\UndeadLargeBuildingFire0.mdl,Environment\\UndeadBuildingFire\\UndeadLargeBuildingFire0.mdl,Environment\\UndeadBuildingFire\\UndeadSmallBuildingFire1.mdl,Environment\\UndeadBuildingFire\\UndeadLargeBuildingFire2.mdl,Environment\\UndeadBuildingFire\\UndeadSmallBuildingFire0.mdl";
+                    TargetAttachmentPoint1 = "sprite,first";
+                    TargetAttachmentPoint2 = "sprite,second";
+                    TargetAttachmentPoint3 = "sprite,fifth";
+                    TargetAttachmentPoint4 = "sprite,third";
+                    TargetAttachmentPoint5 = "sprite,fourth";
+                    TargetAttachmentPoint6 = "sprite,sixth";
+                    TargetAttachments = 6;
+                }
             }
 
             /// <summary>Building Damage - Undead Medium (Xfum).</summary>
@@ -68,6 +147,20 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Xfum")]
             public class BuildingDamageUndeadMedium : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BuildingDamageUndeadMedium()
+                {
+                    EffectSoundLooping = "UndeadFireMedium";
+                    IsAnEffect = true;
+                    Name = "Building Damage - Undead Medium";
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Environment\\UndeadBuildingFire\\UndeadLargeBuildingFire2.mdl,Environment\\UndeadBuildingFire\\UndeadSmallBuildingFire1.mdl,Environment\\UndeadBuildingFire\\UndeadLargeBuildingFire0.mdl,Environment\\UndeadBuildingFire\\UndeadSmallBuildingFire2.mdl";
+                    TargetAttachmentPoint1 = "sprite,first";
+                    TargetAttachmentPoint2 = "sprite,second";
+                    TargetAttachmentPoint3 = "sprite,fourth";
+                    TargetAttachmentPoint4 = "sprite,fifth";
+                    TargetAttachments = 4;
+                }
             }
 
             /// <summary>Building Damage - Undead Small (Xfus).</summary>
@@ -75,6 +168,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Xfus")]
             public class BuildingDamageUndeadSmall : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BuildingDamageUndeadSmall()
+                {
+                    EffectSoundLooping = "UndeadFireSmall";
+                    IsAnEffect = true;
+                    Name = "Building Damage - Undead Small";
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Environment\\UndeadBuildingFire\\UndeadSmallBuildingFire2.mdl,Environment\\UndeadBuildingFire\\UndeadSmallBuildingFire1.mdl";
+                    TargetAttachmentPoint1 = "sprite,first";
+                    TargetAttachmentPoint2 = "sprite,fourth";
+                    TargetAttachments = 2;
+                }
             }
 
             /// <summary>Carrion Beetles (BUcb).</summary>
@@ -82,6 +187,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BUcb")]
             public class CarrionBeetles : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CarrionBeetles()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCarrionScarabs.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Tooltip = "Carrion Beetles";
+                    TooltipExtended = "Summoned units take damage from dispels.";
+                }
             }
 
             /// <summary>Carrion Swarm (Caster) (BUcs).</summary>
@@ -89,6 +203,13 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BUcs")]
             public class CarrionSwarmCaster : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CarrionSwarmCaster()
+                {
+                    IsAnEffect = false;
+                    Name = "Carrion Swarm (Caster)";
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                }
             }
 
             /// <summary>Cripple (Bcri).</summary>
@@ -96,6 +217,16 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bcri")]
             public class Cripple : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Cripple()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCripple.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Undead\\Cripple\\CrippleTarget.mdl";
+                    Tooltip = "Cripple";
+                    TooltipExtended = "This unit is Crippled; its movement speed, attack rate and damage have been reduced.";
+                }
             }
 
             /// <summary>Curse (Bcrs).</summary>
@@ -103,6 +234,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bcrs")]
             public class Curse : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Curse()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCurse.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.Medium;
+                    Target = "Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    Tooltip = "Curse";
+                    TooltipExtended = "This unit is Cursed; it can miss when it attacks.";
+                }
             }
 
             /// <summary>Death and Decay (BUdd).</summary>
@@ -110,6 +253,16 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BUdd")]
             public class DeathAndDecay : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DeathAndDecay()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDeathAndDecay.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Undead\\DeathandDecay\\DeathandDecayDamage.mdl";
+                    Tooltip = "Death and Decay";
+                    TooltipExtended = "This unit is under Death and Decay; it will take damage over time.";
+                }
             }
 
             /// <summary>Death And Decay (Effect) (XUdd).</summary>
@@ -117,6 +270,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("XUdd")]
             public class DeathAndDecayEffect : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DeathAndDecayEffect()
+                {
+                    Effect = "Abilities\\Spells\\Undead\\DeathandDecay\\DeathandDecayTarget.mdl";
+                    EffectSoundLooping = "DeathAndDecayLoop";
+                    IsAnEffect = true;
+                    Name = "Death And Decay (Effect)";
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                }
             }
 
             /// <summary>Disease (Bapl).</summary>
@@ -124,6 +286,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bapl")]
             public class Disease : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Disease()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPlagueCloud.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.High;
+                    Target = "Units\\Undead\\PlagueCloud\\PlagueCloudtarget.mdl";
+                    TargetAttachmentPoint1 = "head";
+                    Tooltip = "Disease";
+                    TooltipExtended = "This unit is diseased; it will take damage over time.";
+                }
             }
 
             /// <summary>Disease Cloud (Bplg).</summary>
@@ -131,6 +305,13 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bplg")]
             public class DiseaseCloud : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DiseaseCloud()
+                {
+                    IsAnEffect = false;
+                    Name = "Disease Cloud";
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                }
             }
 
             /// <summary>Essence of Blight (Brpl).</summary>
@@ -138,6 +319,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Brpl")]
             public class EssenceOfBlight : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public EssenceOfBlight()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNReplenishHealth.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Tooltip = "Essence of Blight";
+                    TooltipExtended = "This unit has been hit by Essence of Blight; some of its hit points have been restored.";
+                }
             }
 
             /// <summary>Freezing Breath (Bfrz).</summary>
@@ -145,6 +335,17 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bfrz")]
             public class FreezingBreath : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FreezingBreath()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFreezingBreath.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Undead\\FreezingBreath\\FreezingBreathTargetArt.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    Tooltip = "Freezing Breath";
+                    TooltipExtended = "This building is frozen; its abilities cannot be used and it cannot be repaired.";
+                }
             }
 
             /// <summary>Frost Armor (BUfa).</summary>
@@ -152,6 +353,20 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BUfa")]
             public class FrostArmor : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FrostArmor()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFrostArmor.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.Medium;
+                    Special = "Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorDamage.mdl";
+                    SpecialAttachmentPoint = "chest";
+                    Target = "Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorTarget.mdl";
+                    TargetAttachmentPoint1 = "chest";
+                    Tooltip = "Frost Armor";
+                    TooltipExtended = "This unit has Frost Armor; it has increased armor, and melee units that attack it will have their movement speed and attack rate reduced for a short duration.";
+                }
             }
 
             /// <summary>Impale (BUim).</summary>
@@ -159,6 +374,19 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BUim")]
             public class Impale : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Impale()
+                {
+                    Effect = "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdl";
+                    EffectAttachmentPoint = "sprite,first";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNImpale.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Human\\Thunderclap\\ThunderclapTarget.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    Tooltip = "Impale";
+                    TooltipExtended = "This unit has been impaled; it is in the air for a short duration.";
+                }
             }
 
             /// <summary>Possession (Bpos).</summary>
@@ -166,6 +394,17 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bpos")]
             public class Possession : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Possession()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPossession.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Undead\\Possession\\PossessionTarget.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    Tooltip = "Possession";
+                    TooltipExtended = "This unit is being possessed.";
+                }
             }
 
             /// <summary>Possession (Caster) (Bpoc).</summary>
@@ -173,6 +412,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bpoc")]
             public class PossessionCaster : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public PossessionCaster()
+                {
+                    IsAnEffect = false;
+                    Name = "Possession (Caster)";
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Undead\\Possession\\PossessionCaster.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                }
             }
 
             /// <summary>Replenish (Brpb).</summary>
@@ -180,6 +428,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Brpb")]
             public class Replenish : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Replenish()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNReplenishMana.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Tooltip = "Replenish";
+                    TooltipExtended = "This unit has been hit by Replenish; some of its hit points and mana have been restored.";
+                }
             }
 
             /// <summary>Skeletal Minion (Brai).</summary>
@@ -187,6 +444,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Brai")]
             public class SkeletalMinion : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SkeletalMinion()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSkeletonWarrior.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Tooltip = "Skeletal Minion";
+                    TooltipExtended = "Summoned units take damage from dispels.";
+                }
             }
 
             /// <summary>Sleep (BUsl).</summary>
@@ -194,6 +460,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BUsl")]
             public class Sleep : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Sleep()
+                {
+                    EffectSoundLooping = "CreepSleepSnoreLoop";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSleep.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Undead\\Sleep\\SleepTarget.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    Tooltip = "Sleep";
+                    TooltipExtended = "This unit is sleeping; it cannot move, attack, or cast spells. Attacking it will wake it up.";
+                }
             }
 
             /// <summary>Sleep (Pause) (BUsp).</summary>
@@ -201,6 +479,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BUsp")]
             public class SleepPause : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SleepPause()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSleep.blp";
+                    IsAnEffect = false;
+                    Name = "Sleep (Pause)";
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Undead\\Sleep\\SleepSpecialArt.mdl";
+                }
             }
 
             /// <summary>Sleep (Stun) (BUst).</summary>
@@ -208,6 +495,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BUst")]
             public class SleepStun : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SleepStun()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSleep.blp";
+                    IsAnEffect = false;
+                    Name = "Sleep (Stun)";
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Undead\\Sleep\\SleepSpecialArt.mdl";
+                }
             }
 
             /// <summary>Spiderling (Bspa).</summary>
@@ -215,6 +511,16 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bspa")]
             public class Spiderling : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Spiderling()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSpider.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Weapons\\CryptFiendMissile\\CryptFiendMissileTarget.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    Tooltip = "Spiderling";
+                }
             }
 
             /// <summary>Spiked Carapace (BUts).</summary>
@@ -222,6 +528,20 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BUts")]
             public class SpikedCarapace : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpikedCarapace()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNThornShield.blp";
+                    IsAnEffect = false;
+                    Name = "Spiked Carapace";
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Undead\\ThornyShield\\ThornyShieldTargetChestLeft.mdl,Abilities\\Spells\\Undead\\ThornyShield\\ThornyShieldTargetChestRight.mdl,Abilities\\Spells\\Undead\\ThornyShield\\ThornyShieldTargetChestMountLeft.mdl,Abilities\\Spells\\Undead\\ThornyShield\\ThornyShieldTargetChestMountRight.mdl";
+                    TargetAttachmentPoint1 = "chest,left";
+                    TargetAttachmentPoint2 = "chest,right";
+                    TargetAttachmentPoint3 = "chest,mount,left";
+                    TargetAttachmentPoint4 = "chest,mount,right";
+                    TargetAttachments = 4;
+                }
             }
 
             /// <summary>Spirit Touch (Brpm).</summary>
@@ -229,6 +549,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Brpm")]
             public class SpiritTouch : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpiritTouch()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNReplenishMana.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Tooltip = "Spirit Touch";
+                    TooltipExtended = "This unit has been hit by Spirit Touch; some of its mana has been restored.";
+                }
             }
 
             /// <summary>Unholy Aura (BUau).</summary>
@@ -236,6 +565,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BUau")]
             public class UnholyAura : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public UnholyAura()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNUnholyAura.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.High;
+                    Target = "Abilities\\Spells\\Other\\GeneralAuraTarget\\GeneralAuraTarget.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    Tooltip = "Unholy Aura";
+                    TooltipExtended = "This unit is under the effects of Unholy Aura; it has an increased movement speed and hit point regeneration.";
+                }
             }
 
             /// <summary>Unholy Frenzy (Buhf).</summary>
@@ -243,6 +584,17 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Buhf")]
             public class UnholyFrenzy : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public UnholyFrenzy()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNUnholyFrenzy.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Undead\\UnholyFrenzy\\UnholyFrenzyTarget.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    Tooltip = "Unholy Frenzy";
+                    TooltipExtended = "This unit has Unholy Frenzy; its attack rate is increased, but it takes damage over time.";
+                }
             }
 
             /// <summary>Unsummon (Buns).</summary>
@@ -250,6 +602,16 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Buns")]
             public class Unsummon : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Unsummon()
+                {
+                    EffectSoundLooping = "AcolyteUnsummonLoop";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNUnsummonBuilding.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Undead\\Unsummon\\UnsummonTarget.mdl";
+                    Tooltip = "Unsummon";
+                }
             }
 
             /// <summary>Vampiric Aura (BUav).</summary>
@@ -257,6 +619,20 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BUav")]
             public class VampiricAura : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public VampiricAura()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNVampiricAura.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.High;
+                    Special = "Abilities\\Spells\\Undead\\VampiricAura\\VampiricAuraTarget.mdl";
+                    SpecialAttachmentPoint = "origin";
+                    Target = "Abilities\\Spells\\Other\\GeneralAuraTarget\\GeneralAuraTarget.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    Tooltip = "Vampiric Aura";
+                    TooltipExtended = "This unit is under the effects of Vampiric Aura; damage it deals to enemy units will restore hit points.";
+                }
             }
 
             /// <summary>Web (Bwea).</summary>
@@ -264,6 +640,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bwea")]
             public class Web : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Web()
+                {
+                    EditorSuffix = "(Air)";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWeb.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Undead\\Web\\Web_AirTarget.mdl";
+                    TargetAttachmentPoint1 = "chest,mount";
+                    Tooltip = "Web";
+                    TooltipExtended = "This unit is webbed; it is stuck to the ground and cannot move.";
+                }
             }
 
             /// <summary>Web (Bweb).</summary>
@@ -271,6 +659,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bweb")]
             public class WebBweb : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public WebBweb()
+                {
+                    EditorSuffix = "(Ground)";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWeb.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Undead\\Web\\WebTarget.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    Tooltip = "Web";
+                    TooltipExtended = "This unit is webbed; it is stuck to the ground and cannot move.";
+                }
             }
         }
     }

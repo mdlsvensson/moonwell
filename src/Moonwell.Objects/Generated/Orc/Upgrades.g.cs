@@ -19,6 +19,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Ropm")]
             public class Backpack : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Backpack()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 3;
+                    ButtonPositionY = 0;
+                    EditorSuffix = Levels("(Orc)");
+                    GoldBase = 50;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("B");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNPackBeast.blp");
+                    LevelCount = 1;
+                    LumberBase = 25;
+                    LumberIncrement = 0;
+                    Name = Levels("Backpack");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    TimeBase = 20;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Backpack");
+                    TooltipExtended = Levels("Gives specific Orc ground units the ability to carry items.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Berserker Upgrade (Robk).</summary>
@@ -26,6 +48,34 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Robk")]
             public class BerserkerUpgrade : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BerserkerUpgrade()
+                {
+                    AppliesToAllUnits = true;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 1;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rtma;
+                    Effect1Base = 1f;
+                    Effect1Code = "ohun";
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Rtma;
+                    Effect2Base = -1f;
+                    Effect2Code = "otbk";
+                    GoldBase = 75;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("E");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNHeadHunterBerserker.blp");
+                    LevelCount = 1;
+                    LumberBase = 175;
+                    LumberIncrement = 0;
+                    Name = Levels("Berserker Upgrade");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Requires.Set<global::Moonwell.Objects.Orc.Units.Fortress, global::Moonwell.Objects.Orc.Units.WarMill>();
+                    TimeBase = 40;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Berserker Upgrade");
+                    TooltipExtended = Levels("Transforms Headhunters into Berserkers, giving them increased hit points and the Berserk ability.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Brute Strength (Robs).</summary>
@@ -33,6 +83,32 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Robs")]
             public class BruteStrength : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BruteStrength()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 2;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rhpx;
+                    Effect1Base = 125f;
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Ratx;
+                    Effect2Base = 3f;
+                    GoldBase = 50;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("B");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNBerserk.blp");
+                    LevelCount = 1;
+                    LumberBase = 150;
+                    LumberIncrement = 0;
+                    Name = Levels("Brute Strength");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Requires.Set<global::Moonwell.Objects.Orc.Units.Stronghold>();
+                    TimeBase = 40;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Brute Strength");
+                    TooltipExtended = Levels("Improves the fighting capabilities of Grunts with a <Robs,base1> hit point increase, and <Robs,base2> bonus attack damage.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Burning Oil (Robf).</summary>
@@ -40,6 +116,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Robf")]
             public class BurningOil : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BurningOil()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 2;
+                    ButtonPositionY = 1;
+                    GoldBase = 50;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("N");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNFireRocks.blp");
+                    LevelCount = 1;
+                    LumberBase = 150;
+                    LumberIncrement = 0;
+                    Name = Levels("Burning Oil");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Requires.Set<global::Moonwell.Objects.Orc.Units.Fortress>();
+                    TimeBase = 30;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Burning Oil");
+                    TooltipExtended = Levels("Upgrades Demolishers to fire rocks smothered in burning oil, which causes the ground to burn.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Ensnare (Roen).</summary>
@@ -47,6 +145,27 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Roen")]
             public class Ensnare : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Ensnare()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 2;
+                    GoldBase = 50;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("N");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNEnsnare.blp");
+                    LevelCount = 1;
+                    LumberBase = 75;
+                    LumberIncrement = 0;
+                    Name = Levels("Ensnare");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    TimeBase = 40;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Ensnare");
+                    TooltipExtended = Levels("Enables Raiders to use the Ensnare ability. Ensnare causes a target enemy unit to be bound to the ground so that it cannot move. Air units that are ensnared can be attacked as though they were land units.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Envenomed Spears (Rovs).</summary>
@@ -54,6 +173,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rovs")]
             public class EnvenomedSpears : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public EnvenomedSpears()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 2;
+                    GoldBase = 100;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("E");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNEnvenomedSpear.blp");
+                    LevelCount = 1;
+                    LumberBase = 150;
+                    LumberIncrement = 0;
+                    Name = Levels("Envenomed Spears");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Requires.Set<global::Moonwell.Objects.Orc.Units.Fortress>();
+                    TimeBase = 40;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Envenomed Spears");
+                    TooltipExtended = Levels("Adds an additional poison effect to Wind Riders' attacks. A unit poisoned by Envenomed Spears takes damage over time.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Liquid Fire (Rolf).</summary>
@@ -61,6 +202,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rolf")]
             public class LiquidFire : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public LiquidFire()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 2;
+                    ButtonPositionY = 1;
+                    GoldBase = 75;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("L");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNLiquidFire.blp");
+                    LevelCount = 1;
+                    LumberBase = 125;
+                    LumberIncrement = 0;
+                    Name = Levels("Liquid Fire");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Requires.Set<global::Moonwell.Objects.Orc.Units.Fortress, global::Moonwell.Objects.Orc.Units.VoodooLounge>();
+                    TimeBase = 75;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Liquid Fire");
+                    TooltipExtended = Levels("Gives Batriders the Liquid Fire attack, which deals damage over time to enemy buildings, reduces the repaired rate and the attack rate of enemy buildings.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Pillage (Ropg).</summary>
@@ -68,6 +231,27 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Ropg")]
             public class Pillage : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Pillage()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 2;
+                    ButtonPositionY = 0;
+                    GoldBase = 75;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("G");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNPillage.blp");
+                    LevelCount = 1;
+                    LumberBase = 25;
+                    LumberIncrement = 0;
+                    Name = Levels("Pillage");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    TimeBase = 45;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Pillage");
+                    TooltipExtended = Levels("Causes Peons', Grunts', and Raiders' attacks to gain resources when hitting enemy buildings.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Pulverize Damage Increase (Rows).</summary>
@@ -75,6 +259,32 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rows")]
             public class PulverizeDamageIncrease : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public PulverizeDamageIncrease()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 2;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rlev;
+                    Effect1Base = 1f;
+                    Effect1Code = "Awar";
+                    Effect1Mod = 1f;
+                    GoldBase = 100;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("P");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNSmash.blp");
+                    LevelCount = 1;
+                    LumberBase = 175;
+                    LumberIncrement = 0;
+                    Name = Levels("Pulverize Damage Increase");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Requires.Set<global::Moonwell.Objects.Orc.Units.WarMill, global::Moonwell.Objects.Orc.Units.Fortress>();
+                    TimeBase = 40;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Upgrade Pulverize");
+                    TooltipExtended = Levels("Upgrades the totem carried by Tauren, increasing the damage of their Pulverize ability.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Reinforced Defenses (Rorb).</summary>
@@ -82,6 +292,30 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rorb")]
             public class ReinforcedDefenses : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ReinforcedDefenses()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 2;
+                    ButtonPositionY = 1;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rart;
+                    Effect1Base = 3f;
+                    GoldBase = 75;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("D");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNReinforcedBurrows.blp");
+                    LevelCount = 1;
+                    LumberBase = 175;
+                    LumberIncrement = 0;
+                    Name = Levels("Reinforced Defenses");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Requires.Set<global::Moonwell.Objects.Orc.Units.Stronghold>();
+                    TimeBase = 60;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Reinforced Defenses");
+                    TooltipExtended = Levels("Upgrades Burrows and Watch Towers so that they have Fortified armor.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Shaman Adept Training (Rost).</summary>
@@ -89,6 +323,40 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rost")]
             public class ShamanAdeptTraining : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ShamanAdeptTraining()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 2;
+                    Class = global::Moonwell.Objects.UpgradeClass.Caster;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rmnx;
+                    Effect1Base = 100f;
+                    Effect1Mod = 100f;
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Rmnr;
+                    Effect2Base = 0.325f;
+                    Effect2Mod = 0.325f;
+                    Effect3 = global::Moonwell.Objects.UpgradeEffect.Rhpx;
+                    Effect3Base = 40f;
+                    Effect3Mod = 40f;
+                    Effect4 = global::Moonwell.Objects.UpgradeEffect.Ratd;
+                    Effect4Base = 0f;
+                    Effect4Mod = 0f;
+                    GoldBase = 100;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("M", "M");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNShamanAdept.blp", "ReplaceableTextures\\CommandButtons\\BTNShamanMaster.blp");
+                    LevelCount = 2;
+                    LumberBase = 50;
+                    LumberIncrement = 100;
+                    Name = Levels("Shaman Adept Training", "Shaman Master Training");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    TimeBase = 60;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Shaman Adept Training", "Shaman Master Training");
+                    TooltipExtended = Levels("Increases Shaman mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Lightning Shield.", "Increases Shaman mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Bloodlust.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Spiked Barricades (Rosp).</summary>
@@ -96,6 +364,37 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rosp")]
             public class SpikedBarricades : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpikedBarricades()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 2;
+                    ButtonPositionY = 0;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rspi;
+                    Effect1Base = 5f;
+                    Effect1Mod = 0f;
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Rspp;
+                    Effect2Base = 0.2f;
+                    Effect2Mod = 0.3f;
+                    Effect3 = global::Moonwell.Objects.UpgradeEffect.Rlev;
+                    Effect3Base = 1f;
+                    Effect3Code = "Aosp";
+                    Effect3Mod = 1f;
+                    GoldBase = 25;
+                    GoldIncrement = 25;
+                    Hotkey = Levels("S", "S");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNSpikedBarricades.blp", "ReplaceableTextures\\CommandButtons\\BTNImprovedSpikedBarricades.blp");
+                    LevelCount = 2;
+                    LumberBase = 75;
+                    LumberIncrement = 25;
+                    Name = Levels("Spiked Barricades", "Improved Spiked Barricades");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    TimeBase = 60;
+                    TimeIncrement = 15;
+                    Tooltip = Levels("Upgrade to Spiked Barricades", "Upgrade to Improved Spiked Barricades");
+                    TooltipExtended = Levels("Surrounds Orc buildings with spikes that damage enemy melee attackers. Deals <Rosp,base1> damage per attack plus an additional <Rosp,base2,%>% of the attacker's damage.", "Increases the additional damage by <Rosp,mod2,%>% of the attacker's damage.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Spirit Walker Adept Training (Rowt).</summary>
@@ -103,6 +402,40 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rowt")]
             public class SpiritWalkerAdeptTraining : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpiritWalkerAdeptTraining()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 2;
+                    Class = global::Moonwell.Objects.UpgradeClass.Caster;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rmnx;
+                    Effect1Base = 150f;
+                    Effect1Mod = 150f;
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Rmnr;
+                    Effect2Base = 0.42f;
+                    Effect2Mod = 0.42f;
+                    Effect3 = global::Moonwell.Objects.UpgradeEffect.Rhpx;
+                    Effect3Base = 60f;
+                    Effect3Mod = 60f;
+                    Effect4 = global::Moonwell.Objects.UpgradeEffect.Ratd;
+                    Effect4Base = 0f;
+                    Effect4Mod = 0f;
+                    GoldBase = 100;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("R", "R");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNSpiritWalkerAdeptTraining.blp", "ReplaceableTextures\\CommandButtons\\BTNSpiritWalkerMasterTraining.blp");
+                    LevelCount = 2;
+                    LumberBase = 50;
+                    LumberIncrement = 100;
+                    Name = Levels("Spirit Walker Adept Training", "Spirit Walker Master Training");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    TimeBase = 50;
+                    TimeIncrement = 10;
+                    Tooltip = Levels("Spirit Walker Adept Training", "Spirit Walker Master Training");
+                    TooltipExtended = Levels("Increases Spirit Walkers' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Disenchant.", "Increases Spirit Walkers' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Ancestral Spirit.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Steel Armor (Roar).</summary>
@@ -110,6 +443,29 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Roar")]
             public class SteelArmor : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SteelArmor()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 1;
+                    Class = global::Moonwell.Objects.UpgradeClass.Armor;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rarm;
+                    GoldBase = 150;
+                    GoldIncrement = 75;
+                    Hotkey = Levels("A", "A", "A");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNSteelArmor.blp", "ReplaceableTextures\\CommandButtons\\BTNThoriumArmor.blp", "ReplaceableTextures\\CommandButtons\\BTNArcaniteArmor.blp");
+                    LevelCount = 3;
+                    LumberBase = 75;
+                    LumberIncrement = 125;
+                    Name = Levels("Steel Armor", "Thorium Armor", "Arcanite Armor");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    TimeBase = 60;
+                    TimeIncrement = 15;
+                    Tooltip = Levels("Upgrade to Steel Unit Armor", "Upgrade to Thorium Unit Armor", "Upgrade to Arcanite Unit Armor");
+                    TooltipExtended = Levels("Increases the armor of Grunts, Raiders, Batriders, Tauren, Headhunters, Wind Riders and Demolishers.", "Further increases the armor of Grunts, Raiders, Batriders, Tauren, Headhunters, Wind Riders and Demolishers.", "Further increases the armor of Grunts, Raiders, Batriders, Tauren, Headhunters, Wind Riders and Demolishers.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Steel Melee Weapons (Rome).</summary>
@@ -117,6 +473,31 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rome")]
             public class SteelMeleeWeapons : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SteelMeleeWeapons()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 0;
+                    Class = global::Moonwell.Objects.UpgradeClass.Melee;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Ratd;
+                    Effect1Base = 1f;
+                    Effect1Mod = 1f;
+                    GoldBase = 100;
+                    GoldIncrement = 50;
+                    Hotkey = Levels("M", "M", "M");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNOrcMeleeUpOne.blp", "ReplaceableTextures\\CommandButtons\\BTNOrcMeleeUpTwo.blp", "ReplaceableTextures\\CommandButtons\\BTNOrcMeleeUpThree.blp");
+                    LevelCount = 3;
+                    LumberBase = 75;
+                    LumberIncrement = 75;
+                    Name = Levels("Steel Melee Weapons", "Thorium Melee Weapons", "Arcanite Melee Weapons");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    TimeBase = 60;
+                    TimeIncrement = 15;
+                    Tooltip = Levels("Upgrade to Steel Melee Weapons", "Upgrade to Thorium Melee Weapons", "Upgrade to Arcanite Melee Weapons");
+                    TooltipExtended = Levels("Increases the melee attack damage of Grunts, Raiders and Tauren.", "Further increases the melee attack damage of Grunts, Raiders and Tauren.", "Further increases the melee attack damage of Grunts, Raiders and Tauren.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Steel Ranged Weapons (Rora).</summary>
@@ -124,6 +505,31 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rora")]
             public class SteelRangedWeapons : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SteelRangedWeapons()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 0;
+                    Class = global::Moonwell.Objects.UpgradeClass.Ranged;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Ratd;
+                    Effect1Base = 1f;
+                    Effect1Mod = 1f;
+                    GoldBase = 100;
+                    GoldIncrement = 50;
+                    Hotkey = Levels("R", "R", "R");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNSteelRanged.blp", "ReplaceableTextures\\CommandButtons\\BTNThoriumRanged.blp", "ReplaceableTextures\\CommandButtons\\BTNArcaniteRanged.blp");
+                    LevelCount = 3;
+                    LumberBase = 100;
+                    LumberIncrement = 75;
+                    Name = Levels("Steel Ranged Weapons", "Thorium Ranged Weapons", "Arcanite Ranged Weapons");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    TimeBase = 60;
+                    TimeIncrement = 15;
+                    Tooltip = Levels("Upgrade to Steel Ranged Weapons", "Upgrade to Thorium Ranged Weapons", "Upgrade to Arcanite Ranged Weapons");
+                    TooltipExtended = Levels("Increases the ranged attack damage of Headhunters, Wind Riders, Batriders and Demolishers.", "Further increases the ranged attack damage of Headhunters, Wind Riders, Batriders and Demolishers.", "Further increases the ranged attack damage of Headhunters, Wind Riders, Batriders and Demolishers.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Troll Regeneration (Rotr).</summary>
@@ -131,6 +537,31 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rotr")]
             public class TrollRegeneration : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public TrollRegeneration()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 2;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rhpr;
+                    Effect1Base = 1f;
+                    Effect1Mod = 1f;
+                    GoldBase = 100;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("R");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNRegenerate.blp");
+                    LevelCount = 1;
+                    LumberBase = 100;
+                    LumberIncrement = 0;
+                    Name = Levels("Troll Regeneration");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Requires.Set<global::Moonwell.Objects.Orc.Units.Stronghold, global::Moonwell.Objects.Orc.Units.WarMill>();
+                    TimeBase = 35;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Troll Regeneration");
+                    TooltipExtended = Levels("Increases the hit point regeneration rate of Headhunters, Witch Doctors and Batriders.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>War Drums Damage Increase (Rwdm).</summary>
@@ -138,6 +569,32 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rwdm")]
             public class WarDrumsDamageIncrease : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public WarDrumsDamageIncrease()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 2;
+                    ButtonPositionY = 2;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Raud;
+                    Effect1Base = 0.1f;
+                    Effect1Code = "Aakb";
+                    Effect1Mod = 0.1f;
+                    GoldBase = 100;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("D");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNDrum.blp");
+                    LevelCount = 1;
+                    LumberBase = 150;
+                    LumberIncrement = 0;
+                    Name = Levels("War Drums Damage Increase");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Requires.Set<global::Moonwell.Objects.Orc.Units.Fortress, global::Moonwell.Objects.Orc.Units.WarMill>();
+                    TimeBase = 40;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Upgrade War Drums");
+                    TooltipExtended = Levels("Increases the damage bonus that the War Drums aura on the Kodo Beast gives. War Drums increases the damage of friendly units around Kodo Beasts.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Witch Doctor Adept Training (Rowd).</summary>
@@ -145,6 +602,40 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rowd")]
             public class WitchDoctorAdeptTraining : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public WitchDoctorAdeptTraining()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 2;
+                    Class = global::Moonwell.Objects.UpgradeClass.Caster;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rmnx;
+                    Effect1Base = 100f;
+                    Effect1Mod = 100f;
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Rmnr;
+                    Effect2Base = 0.325f;
+                    Effect2Mod = 0.325f;
+                    Effect3 = global::Moonwell.Objects.UpgradeEffect.Rhpx;
+                    Effect3Base = 40f;
+                    Effect3Mod = 40f;
+                    Effect4 = global::Moonwell.Objects.UpgradeEffect.Ratd;
+                    Effect4Base = 0f;
+                    Effect4Mod = 0f;
+                    GoldBase = 100;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("D", "D");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNWitchDoctorAdept.blp", "ReplaceableTextures\\CommandButtons\\BTNWitchDoctorMaster.blp");
+                    LevelCount = 2;
+                    LumberBase = 50;
+                    LumberIncrement = 100;
+                    Name = Levels("Witch Doctor Adept Training", "Witch Doctor Master Training");
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    TimeBase = 60;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Witch Doctor Adept Training", "Witch Doctor Master Training");
+                    TooltipExtended = Levels("Increases Witch Doctors' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Stasis Trap.", "Increases Witch Doctors' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Healing Ward.");
+                    TransferWithUnitOwnership = true;
+                }
             }
         }
     }

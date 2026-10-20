@@ -374,6 +374,7 @@ namespace Moonwell.Objects.Tests
         }
     }
 
+    [Collection(StandardValuesCollection.Name)]
     public class DeclaredTests : IDisposable
     {
         public DeclaredTests()

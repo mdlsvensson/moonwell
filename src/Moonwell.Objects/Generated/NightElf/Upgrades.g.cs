@@ -19,6 +19,27 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Resi")]
             public class AbolishMagic : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public AbolishMagic()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 2;
+                    GoldBase = 50;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("S");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNDryadDispelMagic.blp");
+                    LevelCount = 1;
+                    LumberBase = 50;
+                    LumberIncrement = 0;
+                    Name = Levels("Abolish Magic");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    TimeBase = 45;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Abolish Magic");
+                    TooltipExtended = Levels("Gives the Dryad the ability to dispel positive buffs from enemy units, and negative buffs from friendly units. |nDamages summoned units.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Backpack (Repm).</summary>
@@ -26,6 +47,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Repm")]
             public class Backpack : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Backpack()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 3;
+                    ButtonPositionY = 0;
+                    EditorSuffix = Levels("(Night Elf)");
+                    GoldBase = 50;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("B");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNPackBeast.blp");
+                    LevelCount = 1;
+                    LumberBase = 25;
+                    LumberIncrement = 0;
+                    Name = Levels("Backpack");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    TimeBase = 20;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Backpack");
+                    TooltipExtended = Levels("Gives specific Night Elf ground units the ability to carry items.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Corrosive Breath (Recb).</summary>
@@ -33,6 +76,29 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Recb")]
             public class CorrosiveBreath : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CorrosiveBreath()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 2;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Renw;
+                    Effect1Base = 3f;
+                    GoldBase = 125;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("B");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNCorrosiveBreath.blp");
+                    LevelCount = 1;
+                    LumberBase = 225;
+                    LumberIncrement = 0;
+                    Name = Levels("Corrosive Breath");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    TimeBase = 40;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Corrosive Breath");
+                    TooltipExtended = Levels("Gives Chimaeras the ability to hurl corrosive bile onto enemy buildings.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Druid of the Claw Adept Training (Redc).</summary>
@@ -40,6 +106,40 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Redc")]
             public class DruidOfTheClawAdeptTraining : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DruidOfTheClawAdeptTraining()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 2;
+                    Class = global::Moonwell.Objects.UpgradeClass.Caster;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rmnx;
+                    Effect1Base = 100f;
+                    Effect1Mod = 100f;
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Rmnr;
+                    Effect2Base = 0.325f;
+                    Effect2Mod = 0.325f;
+                    Effect3 = global::Moonwell.Objects.UpgradeEffect.Rhpx;
+                    Effect3Base = 75f;
+                    Effect3Mod = 75f;
+                    Effect4 = global::Moonwell.Objects.UpgradeEffect.Ratd;
+                    Effect4Base = 1f;
+                    Effect4Mod = 1f;
+                    GoldBase = 100;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("L", "L");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNDOCAdeptTraining.blp", "ReplaceableTextures\\CommandButtons\\BTNDOCMasterTraining.blp");
+                    LevelCount = 2;
+                    LumberBase = 50;
+                    LumberIncrement = 100;
+                    Name = Levels("Druid of the Claw Adept Training", "Druid of the Claw Master Training");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    TimeBase = 25;
+                    TimeIncrement = 10;
+                    Tooltip = Levels("Druid of the Claw Adept Training", "Druid of the Claw Master Training");
+                    TooltipExtended = Levels("Increases their Night Elf Form's mana capacity, mana regeneration rate, hit points, attack damage and gives them the ability Rejuvenation.", "Increases their Night Elf Form's mana capacity, mana regeneration rate, hit points, attack damage and gives them the ability Bear Form.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Druid of the Talon Adept Training (Redt).</summary>
@@ -47,6 +147,40 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Redt")]
             public class DruidOfTheTalonAdeptTraining : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DruidOfTheTalonAdeptTraining()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 2;
+                    Class = global::Moonwell.Objects.UpgradeClass.Caster;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rmnx;
+                    Effect1Base = 100f;
+                    Effect1Mod = 100f;
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Rmnr;
+                    Effect2Base = 0.325f;
+                    Effect2Mod = 0.325f;
+                    Effect3 = global::Moonwell.Objects.UpgradeEffect.Rhpx;
+                    Effect3Base = 40f;
+                    Effect3Mod = 40f;
+                    Effect4 = global::Moonwell.Objects.UpgradeEffect.Ratd;
+                    Effect4Base = 0f;
+                    Effect4Mod = 0f;
+                    GoldBase = 100;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("A", "A");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNDOTAdeptTraining.blp", "ReplaceableTextures\\CommandButtons\\BTNDOTMasterTraining.blp");
+                    LevelCount = 2;
+                    LumberBase = 50;
+                    LumberIncrement = 100;
+                    Name = Levels("Druid of the Talon Adept Training", "Druid of the Talon Master Training");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    TimeBase = 60;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Druid of the Talon Adept Training", "Druid of the Talon Master Training");
+                    TooltipExtended = Levels("Increases their Night Elf Form's mana capacity, mana regeneration rate, hit points, and gives them the ability Storm Crow Form.", "Increases their Night Elf Form's mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Cyclone.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Hardened Skin (Rehs).</summary>
@@ -54,6 +188,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rehs")]
             public class HardenedSkin : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public HardenedSkin()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 2;
+                    ButtonPositionY = 1;
+                    GoldBase = 100;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("H");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNHardenedSkin.blp");
+                    LevelCount = 1;
+                    LumberBase = 175;
+                    LumberIncrement = 0;
+                    Name = Levels("Hardened Skin");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Requires.Set<global::Moonwell.Objects.NightElf.Units.TreeOfEternity, global::Moonwell.Objects.NightElf.Units.AncientOfWonders>();
+                    TimeBase = 40;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Hardened Skin");
+                    TooltipExtended = Levels("Gives Mountain Giants increased resistance to attack damage.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Hippogryph Taming (Reht).</summary>
@@ -61,6 +217,27 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Reht")]
             public class HippogryphTaming : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public HippogryphTaming()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 2;
+                    GoldBase = 75;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("I");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNTameHippogriff.blp");
+                    LevelCount = 1;
+                    LumberBase = 75;
+                    LumberIncrement = 0;
+                    Name = Levels("Hippogryph Taming");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    TimeBase = 30;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Hippogryph Taming");
+                    TooltipExtended = Levels("Trains Hippogryphs to allow Archers to mount them. This allows them to attack both air and ground units.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Improved Bows (Reib).</summary>
@@ -68,6 +245,31 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Reib")]
             public class ImprovedBows : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ImprovedBows()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 2;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Ratr;
+                    Effect1Base = 200f;
+                    Effect1Mod = 200f;
+                    GoldBase = 50;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("I");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNImprovedBows.blp");
+                    LevelCount = 1;
+                    LumberBase = 100;
+                    LumberIncrement = 0;
+                    Name = Levels("Improved Bows");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Requires.Set<global::Moonwell.Objects.NightElf.Units.TreeOfAges>();
+                    TimeBase = 35;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Improved Bows");
+                    TooltipExtended = Levels("Increases the Archer's and Hippogryph Rider's attack range.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Mark of the Claw (Reeb).</summary>
@@ -75,6 +277,29 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Reeb")]
             public class MarkOfTheClaw : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public MarkOfTheClaw()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 1;
+                    GoldBase = 25;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("M");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNEnchantedBears.blp");
+                    LevelCount = 1;
+                    LumberBase = 100;
+                    LumberIncrement = 0;
+                    Name = Levels("Mark of the Claw");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    RequirementsLevels = Levels("2");
+                    Requires.Set<global::Moonwell.Objects.NightElf.Upgrades.DruidOfTheClawAdeptTraining>();
+                    TimeBase = 20;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Mark of the Claw");
+                    TooltipExtended = Levels("Allows Druids of the Claw to cast Roar while in Bear Form.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Mark of the Talon (Reec).</summary>
@@ -82,6 +307,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Reec")]
             public class MarkOfTheTalon : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public MarkOfTheTalon()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 1;
+                    GoldBase = 25;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("M");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNEnchantedCrows.blp");
+                    LevelCount = 1;
+                    LumberBase = 100;
+                    LumberIncrement = 0;
+                    Name = Levels("Mark of the Talon");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Requires.Set<global::Moonwell.Objects.NightElf.Upgrades.DruidOfTheTalonAdeptTraining>();
+                    TimeBase = 20;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Mark of the Talon");
+                    TooltipExtended = Levels("Allows Druids of the Talon to cast Faerie Fire while in Storm Crow Form.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Marksmanship (Remk).</summary>
@@ -89,6 +336,30 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Remk")]
             public class Marksmanship : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Marksmanship()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 1;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Ratx;
+                    Effect1Base = 4f;
+                    GoldBase = 100;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("M");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNMarksmanship.blp");
+                    LevelCount = 1;
+                    LumberBase = 175;
+                    LumberIncrement = 0;
+                    Name = Levels("Marksmanship");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Requires.Set<global::Moonwell.Objects.NightElf.Units.HuntersHall, global::Moonwell.Objects.NightElf.Units.TreeOfEternity>();
+                    TimeBase = 40;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Marksmanship");
+                    TooltipExtended = Levels("Increases damage of Archers and Hippogryph Riders by <Remk,base1>.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Moon Armor (Rema).</summary>
@@ -96,6 +367,29 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rema")]
             public class MoonArmor : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public MoonArmor()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 1;
+                    Class = global::Moonwell.Objects.UpgradeClass.Armor;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rarm;
+                    GoldBase = 150;
+                    GoldIncrement = 50;
+                    Hotkey = Levels("A", "A", "A");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNMoonArmor.blp", "ReplaceableTextures\\CommandButtons\\BTNImprovedMoonArmor.blp", "ReplaceableTextures\\CommandButtons\\BTNAdvancedMoonArmor.blp");
+                    LevelCount = 3;
+                    LumberBase = 75;
+                    LumberIncrement = 75;
+                    Name = Levels("Moon Armor", "Improved Moon Armor", "Advanced Moon Armor");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    TimeBase = 60;
+                    TimeIncrement = 15;
+                    Tooltip = Levels("Upgrade to Moon Armor", "Upgrade to Improved Moon Armor", "Upgrade to Advanced Moon Armor");
+                    TooltipExtended = Levels("Increases the armor of Archers, Huntresses, and Hippogryph Riders.", "Further increases the armor of Archers, Huntresses, and Hippogryph Riders.", "Further increases the armor of Archers, Huntresses, and Hippogryph Riders.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Nature's Blessing (Renb).</summary>
@@ -103,6 +397,31 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Renb")]
             public class NaturesBlessing : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public NaturesBlessing()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 2;
+                    ButtonPositionY = 0;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rmvx;
+                    Effect1Base = 40f;
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Rarm;
+                    GoldBase = 150;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("N");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNNaturesBlessing.blp");
+                    LevelCount = 1;
+                    LumberBase = 200;
+                    LumberIncrement = 0;
+                    Name = Levels("Nature's Blessing");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Requires.Set<global::Moonwell.Objects.NightElf.Units.TreeOfAges>();
+                    TimeBase = 60;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Nature's Blessing");
+                    TooltipExtended = Levels("Upgrades all Ancients' and Treants' movement speed and armor.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Reinforced Hides (Rerh).</summary>
@@ -110,6 +429,29 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rerh")]
             public class ReinforcedHides : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ReinforcedHides()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 1;
+                    Class = global::Moonwell.Objects.UpgradeClass.Armor;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rarm;
+                    GoldBase = 150;
+                    GoldIncrement = 50;
+                    Hotkey = Levels("R", "R", "R");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNReinforcedHides.blp", "ReplaceableTextures\\CommandButtons\\BTNImprovedReinforcedHides.blp", "ReplaceableTextures\\CommandButtons\\BTNAdvancedReinforcedHides.blp");
+                    LevelCount = 3;
+                    LumberBase = 50;
+                    LumberIncrement = 100;
+                    Name = Levels("Reinforced Hides", "Improved Reinforced Hides", "Advanced Reinforced Hides");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    TimeBase = 60;
+                    TimeIncrement = 15;
+                    Tooltip = Levels("Upgrade to Reinforced Hides", "Upgrade to Improved Reinforced Hides", "Upgrade to Advanced Reinforced Hides");
+                    TooltipExtended = Levels("Increases the armor of Druids of the Claw in Bear Form, Druids of the Talon in Storm Crow Form, Dryads, Mountain Giants, Faerie Dragons, Hippogryphs, and Chimaeras.", "Further increases the armor of Druids of the Claw in Bear Form, Druids of the Talon in Storm Crow Form, Dryads, Mountain Giants, Faerie Dragons, Hippogryphs, and Chimaeras.", "Further increases the armor of Druids of the Claw in Bear Form, Druids of the Talon in Storm Crow Form, Dryads, Mountain Giants, Faerie Dragons, Hippogryphs, and Chimaeras.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Resistant Skin (Rers).</summary>
@@ -117,6 +459,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rers")]
             public class ResistantSkin : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ResistantSkin()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 2;
+                    ButtonPositionY = 2;
+                    GoldBase = 50;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("T");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNResistantSkin.blp");
+                    LevelCount = 1;
+                    LumberBase = 100;
+                    LumberIncrement = 0;
+                    Name = Levels("Resistant Skin");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Requires.Set<global::Moonwell.Objects.NightElf.Units.TreeOfEternity, global::Moonwell.Objects.NightElf.Units.AncientOfWonders>();
+                    TimeBase = 75;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Resistant Skin");
+                    TooltipExtended = Levels("Gives Mountain Giants increased resistance to spell damage.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Sentinel (Resc).</summary>
@@ -124,6 +488,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Resc")]
             public class Sentinel : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Sentinel()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 2;
+                    GoldBase = 50;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("S");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNSentinel.blp");
+                    LevelCount = 1;
+                    LumberBase = 50;
+                    LumberIncrement = 0;
+                    Name = Levels("Sentinel");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Requires.Set<global::Moonwell.Objects.NightElf.Units.HuntersHall>();
+                    TimeBase = 20;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Sentinel");
+                    TooltipExtended = Levels("Gives the Huntress the ability to send her owl companion to a nearby tree and provide vision. |nCan see invisible units.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Strength of the Moon (Resm).</summary>
@@ -131,6 +517,31 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Resm")]
             public class StrengthOfTheMoon : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public StrengthOfTheMoon()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 0;
+                    Class = global::Moonwell.Objects.UpgradeClass.Melee;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Ratd;
+                    Effect1Base = 1f;
+                    Effect1Mod = 1f;
+                    GoldBase = 125;
+                    GoldIncrement = 50;
+                    Hotkey = Levels("M", "M", "M");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNStrengthOfTheMoon.blp", "ReplaceableTextures\\CommandButtons\\BTNImprovedStrengthOfTheMoon.blp", "ReplaceableTextures\\CommandButtons\\BTNAdvancedStrengthOfTheMoon.blp");
+                    LevelCount = 3;
+                    LumberBase = 75;
+                    LumberIncrement = 100;
+                    Name = Levels("Strength of the Moon", "Improved Strength of the Moon", "Advanced Strength of the Moon");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    TimeBase = 60;
+                    TimeIncrement = 15;
+                    Tooltip = Levels("Upgrade to Strength of the Moon", "Upgrade to Improved Strength of the Moon", "Upgrade to Advanced Strength of the Moon");
+                    TooltipExtended = Levels("Increases the damage of Archers, Huntresses, Glaive Throwers, and Hippogryph Riders.", "Further increases the damage of Archers, Huntresses, Glaive Throwers, and Hippogryph Riders.", "Further increases the damage of Archers, Huntresses, Glaive Throwers, and Hippogryph Riders.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Strength of the Wild (Resw).</summary>
@@ -138,6 +549,31 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Resw")]
             public class StrengthOfTheWild : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public StrengthOfTheWild()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 0;
+                    Class = global::Moonwell.Objects.UpgradeClass.Ranged;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Ratd;
+                    Effect1Base = 1f;
+                    Effect1Mod = 1f;
+                    GoldBase = 100;
+                    GoldIncrement = 75;
+                    Hotkey = Levels("W", "W", "W");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNStrengthOfTheWild.blp", "ReplaceableTextures\\CommandButtons\\BTNImprovedStrengthOfTheWild.blp", "ReplaceableTextures\\CommandButtons\\BTNAdvancedStrengthOfTheWild.blp");
+                    LevelCount = 3;
+                    LumberBase = 75;
+                    LumberIncrement = 100;
+                    Name = Levels("Strength of the Wild", "Improved Strength of the Wild", "Advanced Strength of the Wild");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    TimeBase = 60;
+                    TimeIncrement = 15;
+                    Tooltip = Levels("Upgrade to Strength of the Wild", "Upgrade to Improved Strength of the Wild", "Upgrade to Advanced Strength of the Wild");
+                    TooltipExtended = Levels("Increases the damage of Druids of the Claw in Bear Form, Druids of the Talon in Storm Crow Form, Dryads, Mountain Giants, Faerie Dragons, Hippogryphs, and Chimaeras.", "Further increases the damage of Druids of the Claw in Bear Form, Druids of the Talon in Storm Crow Form, Dryads, Mountain Giants, Faerie Dragons, Hippogryphs, and Chimaeras.", "Further increases the damage of Druids of the Claw in Bear Form, Druids of the Talon in Storm Crow Form, Dryads, Mountain Giants, Faerie Dragons, Hippogryphs, and Chimaeras.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Ultravision (Reuv).</summary>
@@ -145,6 +581,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Reuv")]
             public class Ultravision : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Ultravision()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 2;
+                    ButtonPositionY = 0;
+                    GoldBase = 50;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("U");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNUltravision.blp");
+                    LevelCount = 1;
+                    LumberBase = 50;
+                    LumberIncrement = 0;
+                    Name = Levels("Ultravision");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Requires.Set<global::Moonwell.Objects.NightElf.Units.TreeOfAges>();
+                    TimeBase = 45;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Upgrade to Ultravision");
+                    TooltipExtended = Levels("Gives Night Elves the ability to see as far at night as they do during the day.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Upgrade Moon Glaive (Remg).</summary>
@@ -152,6 +610,32 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Remg")]
             public class UpgradeMoonGlaive : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public UpgradeMoonGlaive()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 1;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Ratc;
+                    Effect1Base = 1f;
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Rart;
+                    Effect2Base = 2f;
+                    GoldBase = 125;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("G");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNUpgradeMoonGlaive.blp");
+                    LevelCount = 1;
+                    LumberBase = 175;
+                    LumberIncrement = 0;
+                    Name = Levels("Upgrade Moon Glaive");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Requires.Set<global::Moonwell.Objects.NightElf.Units.HuntersHall, global::Moonwell.Objects.NightElf.Units.TreeOfAges>();
+                    TimeBase = 50;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Upgrade Moon Glaive");
+                    TooltipExtended = Levels("Gives the Huntress the ability to strike additional units with her bouncing glaive attacks, and changes their armor type to Heavy.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Vorpal Blades (Repb).</summary>
@@ -159,6 +643,34 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Repb")]
             public class VorpalBlades : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public VorpalBlades()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 2;
+                    ButtonPositionY = 2;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Ratx;
+                    Effect1Base = 10f;
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Renw;
+                    Effect2Base = 0f;
+                    Effect3 = global::Moonwell.Objects.UpgradeEffect.Renw;
+                    Effect3Base = 2f;
+                    GoldBase = 125;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("P");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNVorpalBlades.blp");
+                    LevelCount = 1;
+                    LumberBase = 100;
+                    LumberIncrement = 0;
+                    Name = Levels("Vorpal Blades");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Requires.Set<global::Moonwell.Objects.NightElf.Units.TreeOfAges, global::Moonwell.Objects.NightElf.Units.HuntersHall>();
+                    TimeBase = 45;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Vorpal Blades");
+                    TooltipExtended = Levels("Increases the speed of glaives launched by the Glaive Thrower, and increases damage by <Repb,base1>. Also allows them to attack trees.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Well Spring (Rews).</summary>
@@ -166,6 +678,32 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rews")]
             public class WellSpring : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public WellSpring()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 3;
+                    ButtonPositionY = 0;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rmnx;
+                    Effect1Base = 100f;
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Rmnr;
+                    Effect2Base = 0.52f;
+                    GoldBase = 75;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("E");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNWellSpring.blp");
+                    LevelCount = 1;
+                    LumberBase = 150;
+                    LumberIncrement = 0;
+                    Name = Levels("Well Spring");
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Requires.Set<global::Moonwell.Objects.NightElf.Units.TreeOfEternity>();
+                    TimeBase = 30;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Well Spring");
+                    TooltipExtended = Levels("Increases the amount of mana that can be stored in Moon Wells by <Rews,base1>, and their rate of mana regeneration by <Rews,base2,%>%.");
+                    TransferWithUnitOwnership = true;
+                }
             }
         }
     }

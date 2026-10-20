@@ -19,6 +19,17 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bbar")]
             public class Barkskin : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Barkskin()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBarkskin.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Target = "Abilities\\Spells\\NightElf\\Barkskin\\BarkSkinTarget.mdl";
+                    TargetAttachmentPoint1 = "chest";
+                    Tooltip = "Barkskin";
+                    TooltipExtended = "This unit has Barkskin; it has increased armor.";
+                }
             }
 
             /// <summary>Bps1.</summary>
@@ -26,6 +37,12 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bps1")]
             public class Bps1 : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Bps1()
+                {
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                }
             }
 
             /// <summary>Building Damage - Night Elf Large (Xfnl).</summary>
@@ -33,6 +50,22 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Xfnl")]
             public class BuildingDamageNightElfLarge : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BuildingDamageNightElfLarge()
+                {
+                    EffectSoundLooping = "NightElfFireLarge";
+                    IsAnEffect = true;
+                    Name = "Building Damage - Night Elf Large";
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Target = "Environment\\NightElfBuildingFire\\ElfLargeBuildingFire1.mdl,Environment\\NightElfBuildingFire\\ElfLargeBuildingFire0.mdl,Environment\\NightElfBuildingFire\\ElfLargeBuildingFire0.mdl,Environment\\NightElfBuildingFire\\ElfSmallBuildingFire1.mdl,Environment\\NightElfBuildingFire\\ElfLargeBuildingFire2.mdl,Environment\\NightElfBuildingFire\\ElfSmallBuildingFire0.mdl";
+                    TargetAttachmentPoint1 = "sprite,first";
+                    TargetAttachmentPoint2 = "sprite,second";
+                    TargetAttachmentPoint3 = "sprite,fifth";
+                    TargetAttachmentPoint4 = "sprite,third";
+                    TargetAttachmentPoint5 = "sprite,fourth";
+                    TargetAttachmentPoint6 = "sprite,sixth";
+                    TargetAttachments = 6;
+                }
             }
 
             /// <summary>Building Damage - Night Elf Medium (Xfnm).</summary>
@@ -40,6 +73,20 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Xfnm")]
             public class BuildingDamageNightElfMedium : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BuildingDamageNightElfMedium()
+                {
+                    EffectSoundLooping = "NightElfFireMedium";
+                    IsAnEffect = true;
+                    Name = "Building Damage - Night Elf Medium";
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Target = "Environment\\NightElfBuildingFire\\ElfLargeBuildingFire2.mdl,Environment\\NightElfBuildingFire\\ElfSmallBuildingFire1.mdl,Environment\\NightElfBuildingFire\\ElfLargeBuildingFire0.mdl,Environment\\NightElfBuildingFire\\ElfSmallBuildingFire2.mdl";
+                    TargetAttachmentPoint1 = "sprite,first";
+                    TargetAttachmentPoint2 = "sprite,second";
+                    TargetAttachmentPoint3 = "sprite,fourth";
+                    TargetAttachmentPoint4 = "sprite,fifth";
+                    TargetAttachments = 4;
+                }
             }
 
             /// <summary>Building Damage - Night Elf Small (Xfns).</summary>
@@ -47,6 +94,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Xfns")]
             public class BuildingDamageNightElfSmall : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BuildingDamageNightElfSmall()
+                {
+                    EffectSoundLooping = "NightElfFireSmall";
+                    IsAnEffect = true;
+                    Name = "Building Damage - Night Elf Small";
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Target = "Environment\\NightElfBuildingFire\\ElfSmallBuildingFire2.mdl,Environment\\NightElfBuildingFire\\ElfSmallBuildingFire1.mdl";
+                    TargetAttachmentPoint1 = "sprite,first";
+                    TargetAttachmentPoint2 = "sprite,fourth";
+                    TargetAttachments = 2;
+                }
             }
 
             /// <summary>Corrosive Breath (Bcor).</summary>
@@ -54,6 +113,16 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bcor")]
             public class CorrosiveBreath : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CorrosiveBreath()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCorrosiveBreath.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Target = "Abilities\\Spells\\NightElf\\CorrosiveBreath\\ChimaeraAcidTargetArt.mdl";
+                    Tooltip = "Corrosive Breath";
+                    TooltipExtended = "This building was hit by Corrosive Breath; it will take damage over time.";
+                }
             }
 
             /// <summary>Cyclone (Bcy2).</summary>
@@ -61,6 +130,19 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bcy2")]
             public class Cyclone : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Cyclone()
+                {
+                    EditorSuffix = "(Extra)";
+                    Effect = "Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdl";
+                    EffectAttachmentPoint = "sprite,first";
+                    EffectSoundLooping = "CycloneLoop";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCyclone.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Tooltip = "Cyclone";
+                    TooltipExtended = "This unit is in a Cyclone; it cannot move, attack or cast spells.";
+                }
             }
 
             /// <summary>Cyclone (Bcyc).</summary>
@@ -68,6 +150,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bcyc")]
             public class CycloneBcyc : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CycloneBcyc()
+                {
+                    Effect = "Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdl";
+                    EffectSoundLooping = "CycloneLoop";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCyclone.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    TargetAttachmentPoint1 = "sprite,first";
+                    Tooltip = "Cyclone";
+                    TooltipExtended = "This unit is in a Cyclone; it cannot move, attack or cast spells.";
+                }
             }
 
             /// <summary>Eat Tree (Beat).</summary>
@@ -75,6 +169,13 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Beat")]
             public class EatTree : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public EatTree()
+                {
+                    IsAnEffect = false;
+                    Name = "Eat Tree";
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                }
             }
 
             /// <summary>Entangling Roots (BEer).</summary>
@@ -82,6 +183,17 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BEer")]
             public class EntanglingRoots : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public EntanglingRoots()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNEntanglingRoots.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Target = "Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    Tooltip = "Entangling Roots";
+                    TooltipExtended = "This unit has been hit by Entangling Roots; it cannot move and takes damage over time.";
+                }
             }
 
             /// <summary>Faerie Fire (Bfae).</summary>
@@ -89,6 +201,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bfae")]
             public class FaerieFire : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FaerieFire()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFaerieFire.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.Medium;
+                    Target = "Abilities\\Spells\\NightElf\\FaerieFire\\FaerieFireTarget.mdl";
+                    TargetAttachmentPoint1 = "head";
+                    Tooltip = "Faerie Fire";
+                    TooltipExtended = "This unit has Faerie Fire; it has reduced armor and can be seen by the enemy.";
+                }
             }
 
             /// <summary>Force of Nature (BEfn).</summary>
@@ -96,6 +220,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BEfn")]
             public class ForceOfNature : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ForceOfNature()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNEnt.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Tooltip = "Force of Nature";
+                    TooltipExtended = "Summoned units take damage from dispels.";
+                }
             }
 
             /// <summary>Immolation (BEim).</summary>
@@ -103,6 +236,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BEim")]
             public class Immolation : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Immolation()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNImmolationOn.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Special = "Abilities\\Spells\\NightElf\\Immolation\\ImmolationDamage.mdl";
+                    SpecialAttachmentPoint = "head";
+                    Target = "Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdl";
+                    Tooltip = "Immolation";
+                    TooltipExtended = "This unit has Immolation; nearby enemy ground units will take damage over time.";
+                }
             }
 
             /// <summary>Immolation (Caster) (BEia).</summary>
@@ -110,6 +255,13 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BEia")]
             public class ImmolationCaster : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ImmolationCaster()
+                {
+                    IsAnEffect = false;
+                    Name = "Immolation (Caster)";
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                }
             }
 
             /// <summary>Mana Flare (Bmfa).</summary>
@@ -117,6 +269,22 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bmfa")]
             public class ManaFlare : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ManaFlare()
+                {
+                    EditorSuffix = "(Extra)";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNManaFlare.blp";
+                    IsAnEffect = false;
+                    MissileArt = "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1000;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Special = "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareBoltImpact.mdl";
+                    Target = "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareTarget.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    Tooltip = "Mana Flare";
+                    TooltipExtended = "This unit has Mana Flare on it; nearby enemy units that cast spells will take damage.";
+                }
             }
 
             /// <summary>Mana Flare (Bmfl).</summary>
@@ -124,6 +292,19 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bmfl")]
             public class ManaFlareBmfl : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ManaFlareBmfl()
+                {
+                    EffectSoundLooping = "ManaFlareLoop";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNManaFlare.blp";
+                    IsAnEffect = false;
+                    Lightning = global::Moonwell.Objects.LightningEffect.MFPB;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Target = "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareBase.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    Tooltip = "Mana Flare";
+                    TooltipExtended = "This unit has Mana Flare on it; nearby enemy units that cast spells will take damage.";
+                }
             }
 
             /// <summary>Metamorphosis (BEme).</summary>
@@ -131,6 +312,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BEme")]
             public class Metamorphosis : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Metamorphosis()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMetamorphosis.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Tooltip = "Metamorphosis";
+                    TooltipExtended = "Transforms the Demon Hunter into a powerful Demon with a ranged attack.";
+                }
             }
 
             /// <summary>Phase Shift (Bpsh).</summary>
@@ -138,6 +328,16 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bpsh")]
             public class PhaseShift : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public PhaseShift()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPhaseShift.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Special = "Abilities\\Spells\\NightElf\\FaerieDragonInvis\\FaerieDragon_Invis.mdl";
+                    Tooltip = "Phase Shift";
+                    TooltipExtended = "This unit has shifted out of existence and cannot be harmed temporarily.";
+                }
             }
 
             /// <summary>Rejuvenation (Brej).</summary>
@@ -145,6 +345,17 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Brej")]
             public class Rejuvenation : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Rejuvenation()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRejuvenation.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Target = "Abilities\\Spells\\NightElf\\Rejuvenation\\RejuvenationTarget.mdl";
+                    TargetAttachmentPoint1 = "chest";
+                    Tooltip = "Rejuvenation";
+                    TooltipExtended = "This unit has Rejuvenation; it is healing hit points over time.";
+                }
             }
 
             /// <summary>Roar (Broa).</summary>
@@ -152,6 +363,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Broa")]
             public class Roar : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Roar()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBattleRoar.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.Medium;
+                    Target = "Abilities\\Spells\\NightElf\\BattleRoar\\RoarTarget.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    Tooltip = "Roar";
+                    TooltipExtended = "This unit has Roar; its attack damage has been increased.";
+                }
             }
 
             /// <summary>Scout (BEst).</summary>
@@ -159,6 +382,14 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BEst")]
             public class Scout : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Scout()
+                {
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Tooltip = "Scout";
+                    TooltipExtended = "Summoned units take damage from dispels.";
+                }
             }
 
             /// <summary>Shadow Strike (BEsh).</summary>
@@ -166,6 +397,17 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BEsh")]
             public class ShadowStrike : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ShadowStrike()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNShadowStrike.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Target = "Abilities\\Spells\\NightElf\\shadowstrike\\shadowstrike.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    Tooltip = "Shadow Strike";
+                    TooltipExtended = "This unit was hit by Shadow Strike; it will take damage over time and move more slowly.";
+                }
             }
 
             /// <summary>Slow Poison (Bspo).</summary>
@@ -173,6 +415,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bspo")]
             public class SlowPoison : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SlowPoison()
+                {
+                    EditorSuffix = "(Non-stacking)";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSlowPoison.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.High;
+                    Target = "Abilities\\Weapons\\PoisonSting\\PoisonStingTarget.mdl";
+                    Tooltip = "Slow Poison";
+                    TooltipExtended = "This unit was hit by Slow Poison; its movement speed and attack rate have been reduced, and it will take damage over time.";
+                }
             }
 
             /// <summary>Slow Poison (Bssd).</summary>
@@ -180,6 +434,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bssd")]
             public class SlowPoisonBssd : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SlowPoisonBssd()
+                {
+                    EditorSuffix = "(Stacking)";
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNSlowPoison.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.High;
+                    Target = "Abilities\\Weapons\\PoisonSting\\PoisonStingTarget.mdl";
+                    Tooltip = "Slow Poison";
+                    TooltipExtended = "This unit was hit by Slow Poison; its movement speed and attack rate have been reduced, and it will take damage over time.";
+                }
             }
 
             /// <summary>Slow Poison (Info) (Bssi).</summary>
@@ -187,6 +453,13 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bssi")]
             public class SlowPoisonInfo : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SlowPoisonInfo()
+                {
+                    IsAnEffect = false;
+                    Name = "Slow Poison (Info)";
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                }
             }
 
             /// <summary>Spirit of Vengeance (Bvng).</summary>
@@ -194,6 +467,16 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bvng")]
             public class SpiritOfVengeance : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpiritOfVengeance()
+                {
+                    Effect = "Abilities\\Spells\\Orc\\FeralSpirit\\feralspiritdone.mdl";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAvengingWatcher.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Tooltip = "Spirit of Vengeance";
+                    TooltipExtended = "Vengeance was here.";
+                }
             }
 
             /// <summary>Starfall (Effect) (XEsf).</summary>
@@ -201,6 +484,14 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("XEsf")]
             public class StarfallEffect : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public StarfallEffect()
+                {
+                    Effect = "Abilities\\Spells\\NightElf\\Starfall\\StarfallCaster.mdl";
+                    IsAnEffect = true;
+                    Name = "Starfall (Effect)";
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                }
             }
 
             /// <summary>Starfall (Target) (AEsd).</summary>
@@ -208,6 +499,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("AEsd")]
             public class StarfallTarget : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public StarfallTarget()
+                {
+                    IsAnEffect = false;
+                    Name = "Starfall (Target)";
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Target = "Abilities\\Spells\\NightElf\\Starfall\\StarfallTarget.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                }
             }
 
             /// <summary>Thorns Aura (BEah).</summary>
@@ -215,6 +515,20 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BEah")]
             public class ThornsAura : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ThornsAura()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNThorns.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.High;
+                    Special = "Abilities\\Spells\\NightElf\\ThornsAura\\ThornsAuraDamage.mdl";
+                    SpecialAttachmentPoint = "head";
+                    Target = "Abilities\\Spells\\Other\\GeneralAuraTarget\\GeneralAuraTarget.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    Tooltip = "Thorns Aura";
+                    TooltipExtended = "This unit is under the effects of Thorns Aura; melee units that attack it will take damage.";
+                }
             }
 
             /// <summary>Tranquility (Effect) (XEtq).</summary>
@@ -222,6 +536,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("XEtq")]
             public class TranquilityEffect : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public TranquilityEffect()
+                {
+                    Effect = "Abilities\\Spells\\NightElf\\Tranquility\\Tranquility.mdl";
+                    EffectSoundLooping = "TranquilityLoop";
+                    IsAnEffect = true;
+                    Name = "Tranquility (Effect)";
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                }
             }
 
             /// <summary>Tranquility (Target) (AEtr).</summary>
@@ -229,6 +552,14 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("AEtr")]
             public class TranquilityTarget : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public TranquilityTarget()
+                {
+                    IsAnEffect = false;
+                    Name = "Tranquility (Target)";
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Target = "Abilities\\Spells\\NightElf\\Tranquility\\TranquilityTarget.mdl";
+                }
             }
 
             /// <summary>Trueshot Aura (BEar).</summary>
@@ -236,6 +567,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BEar")]
             public class TrueshotAura : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public TrueshotAura()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTrueShot.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.High;
+                    Target = "Abilities\\Spells\\Other\\GeneralAuraTarget\\GeneralAuraTarget.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    Tooltip = "Trueshot Aura";
+                    TooltipExtended = "This unit is under the effects of Trueshot Aura; its ranged attacks will deal more damage.";
+                }
             }
 
             /// <summary>Ultravision (Bult).</summary>
@@ -243,6 +586,13 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bult")]
             public class Ultravision : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Ultravision()
+                {
+                    IsAnEffect = false;
+                    Name = "Ultravision";
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                }
             }
 
             /// <summary>Vengeance (BEsv).</summary>
@@ -250,6 +600,16 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BEsv")]
             public class Vengeance : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Vengeance()
+                {
+                    Effect = "Abilities\\Spells\\Orc\\FeralSpirit\\feralspiritdone.mdl";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSpiritOfVengeance.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Tooltip = "Vengeance";
+                    TooltipExtended = "Vengeance is angry.";
+                }
             }
 
             /// <summary>War Club (Bgra).</summary>
@@ -257,6 +617,13 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bgra")]
             public class WarClub : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public WarClub()
+                {
+                    IsAnEffect = false;
+                    Name = "War Club";
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                }
             }
 
             /// <summary>Xesn.</summary>
@@ -264,6 +631,12 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Xesn")]
             public class Xesn : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Xesn()
+                {
+                    IsAnEffect = true;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                }
             }
         }
     }

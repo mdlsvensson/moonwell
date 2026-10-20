@@ -19,6 +19,16 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BOac")]
             public class BOac : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BOac()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGnollCommandAura.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.Medium;
+                    Target = "Abilities\\Spells\\Other\\GeneralAuraTarget\\GeneralAuraTarget.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                }
             }
 
             /// <summary>Berserk (Bbsk).</summary>
@@ -26,6 +36,19 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bbsk")]
             public class Berserk : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Berserk()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBerserkForTrolls.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Target = "Abilities\\Spells\\Orc\\TrollBerserk\\HeadhunterWEAPONSLeft.mdl,Abilities\\Spells\\Orc\\TrollBerserk\\HeadhunterWEAPONSRight.mdl";
+                    TargetAttachmentPoint1 = "weapon,left";
+                    TargetAttachmentPoint2 = "weapon,right";
+                    TargetAttachments = 2;
+                    Tooltip = "Berserk";
+                    TooltipExtended = "This unit is Berserk; it will deal more damage, but also take more damage from attacks.";
+                }
             }
 
             /// <summary>Big Bad Voodoo (BOvd).</summary>
@@ -33,6 +56,17 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BOvd")]
             public class BigBadVoodoo : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BigBadVoodoo()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBigBadVoodooSpell.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Target = "Abilities\\Spells\\Orc\\Voodoo\\VoodooAuraTarget.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    Tooltip = "Big Bad Voodoo";
+                    TooltipExtended = "This unit is under the effects of Big Bad Voodoo, and is invulnerable.";
+                }
             }
 
             /// <summary>Big Bad Voodoo (Caster) (BOvc).</summary>
@@ -40,6 +74,14 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BOvc")]
             public class BigBadVoodooCaster : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BigBadVoodooCaster()
+                {
+                    IsAnEffect = false;
+                    Name = "Big Bad Voodoo (Caster)";
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Target = "Abilities\\Spells\\Orc\\Voodoo\\VoodooAura.mdl";
+                }
             }
 
             /// <summary>Bladestorm (Caster) (BOww).</summary>
@@ -47,6 +89,13 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BOww")]
             public class BladestormCaster : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BladestormCaster()
+                {
+                    IsAnEffect = false;
+                    Name = "Bladestorm (Caster)";
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                }
             }
 
             /// <summary>Bloodlust (Bblo).</summary>
@@ -54,6 +103,20 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bblo")]
             public class Bloodlust : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Bloodlust()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBloodLust.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.Medium;
+                    Target = "Abilities\\Spells\\Orc\\Bloodlust\\BloodlustTarget.mdl,Abilities\\Spells\\Orc\\Bloodlust\\BloodlustSpecial.mdl";
+                    TargetAttachmentPoint1 = "hand,left";
+                    TargetAttachmentPoint2 = "hand,right";
+                    TargetAttachments = 2;
+                    Tooltip = "Bloodlust";
+                    TooltipExtended = "This unit has Bloodlust; its attack rate and movement speed are increased.";
+                }
             }
 
             /// <summary>Building Damage - Orc Large (Xfol).</summary>
@@ -61,6 +124,22 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Xfol")]
             public class BuildingDamageOrcLarge : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BuildingDamageOrcLarge()
+                {
+                    EffectSoundLooping = "HumanFireLarge";
+                    IsAnEffect = true;
+                    Name = "Building Damage - Orc Large";
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Target = "Environment\\LargeBuildingFire\\LargeBuildingFire1.mdl,Environment\\LargeBuildingFire\\LargeBuildingFire0.mdl,Environment\\LargeBuildingFire\\LargeBuildingFire0.mdl,Environment\\SmallBuildingFire\\SmallBuildingFire1.mdl,Environment\\LargeBuildingFire\\LargeBuildingFire1.mdl,Environment\\SmallBuildingFire\\SmallBuildingFire0.mdl";
+                    TargetAttachmentPoint1 = "sprite,first";
+                    TargetAttachmentPoint2 = "sprite,second";
+                    TargetAttachmentPoint3 = "sprite,fifth";
+                    TargetAttachmentPoint4 = "sprite,third";
+                    TargetAttachmentPoint5 = "sprite,fourth";
+                    TargetAttachmentPoint6 = "sprite,sixth";
+                    TargetAttachments = 6;
+                }
             }
 
             /// <summary>Building Damage - Orc Medium (Xfom).</summary>
@@ -68,6 +147,20 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Xfom")]
             public class BuildingDamageOrcMedium : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BuildingDamageOrcMedium()
+                {
+                    EffectSoundLooping = "HumanFireMedium";
+                    IsAnEffect = true;
+                    Name = "Building Damage - Orc Medium";
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Target = "Environment\\LargeBuildingFire\\LargeBuildingFire2.mdl,Environment\\SmallBuildingFire\\SmallBuildingFire1.mdl,Environment\\LargeBuildingFire\\LargeBuildingFire0.mdl,Environment\\SmallBuildingFire\\SmallBuildingFire2.mdl";
+                    TargetAttachmentPoint1 = "sprite,first";
+                    TargetAttachmentPoint2 = "sprite,second";
+                    TargetAttachmentPoint3 = "sprite,fourth";
+                    TargetAttachmentPoint4 = "sprite,fifth";
+                    TargetAttachments = 4;
+                }
             }
 
             /// <summary>Building Damage - Orc Small (Xfos).</summary>
@@ -75,6 +168,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Xfos")]
             public class BuildingDamageOrcSmall : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BuildingDamageOrcSmall()
+                {
+                    EffectSoundLooping = "HumanFireSmall";
+                    IsAnEffect = true;
+                    Name = "Building Damage - Orc Small";
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Target = "Environment\\SmallBuildingFire\\SmallBuildingFire2.mdl,Environment\\SmallBuildingFire\\SmallBuildingFire1.mdl";
+                    TargetAttachmentPoint1 = "sprite,first";
+                    TargetAttachmentPoint2 = "sprite,fourth";
+                    TargetAttachments = 2;
+                }
             }
 
             /// <summary>Burning Oil (Bbof).</summary>
@@ -82,6 +187,16 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bbof")]
             public class BurningOil : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BurningOil()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWallOfFire.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Target = "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeDamageTarget.mdl";
+                    Tooltip = "Burning Oil";
+                    TooltipExtended = "This unit is caught in a burning oil fire; it will take damage over time.";
+                }
             }
 
             /// <summary>Burning Oil (Effect) (Xbof).</summary>
@@ -89,6 +204,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Xbof")]
             public class BurningOilEffect : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BurningOilEffect()
+                {
+                    Effect = "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdl";
+                    EffectSoundLooping = "HumanFireLarge";
+                    IsAnEffect = true;
+                    Name = "Burning Oil (Effect)";
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                }
             }
 
             /// <summary>Devour (Bdvv).</summary>
@@ -96,6 +220,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bdvv")]
             public class Devour : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Devour()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDevour.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Tooltip = "Devour";
+                    TooltipExtended = "A unit is being devoured; it will take damage while providing vision to the owner.";
+                }
             }
 
             /// <summary>Devour (Caster) (Bdig).</summary>
@@ -103,6 +236,13 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bdig")]
             public class DevourCaster : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DevourCaster()
+                {
+                    IsAnEffect = false;
+                    Name = "Devour (Caster)";
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                }
             }
 
             /// <summary>Earthquake (BOeq).</summary>
@@ -110,6 +250,17 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BOeq")]
             public class Earthquake : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Earthquake()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNEarthquake.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Target = "Abilities\\Spells\\Orc\\StasisTrap\\StasisTotemTarget.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    Tooltip = "Earthquake";
+                    TooltipExtended = "This unit is in an Earthquake; its movement speed is greatly reduced.";
+                }
             }
 
             /// <summary>Earthquake (Caster) (BOea).</summary>
@@ -117,6 +268,13 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BOea")]
             public class EarthquakeCaster : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public EarthquakeCaster()
+                {
+                    IsAnEffect = false;
+                    Name = "Earthquake (Caster)";
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                }
             }
 
             /// <summary>Earthquake (Effect) (XOeq).</summary>
@@ -124,6 +282,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("XOeq")]
             public class EarthquakeEffect : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public EarthquakeEffect()
+                {
+                    Effect = "Abilities\\Spells\\Orc\\EarthQuake\\EarthQuakeTarget.mdl";
+                    EffectSoundLooping = "EarthquakeLoop";
+                    IsAnEffect = true;
+                    Name = "Earthquake (Effect)";
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                }
             }
 
             /// <summary>Endurance Aura (BOae).</summary>
@@ -131,6 +298,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BOae")]
             public class EnduranceAura : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public EnduranceAura()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCommand.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.High;
+                    Target = "Abilities\\Spells\\Other\\GeneralAuraTarget\\GeneralAuraTarget.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    Tooltip = "Endurance Aura";
+                    TooltipExtended = "This unit is under the effects of Endurance Aura; it has an increased movement speed and attack rate.";
+                }
             }
 
             /// <summary>Ensnare (Bena).</summary>
@@ -138,6 +317,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bena")]
             public class Ensnare : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Ensnare()
+                {
+                    EditorSuffix = "(Air)";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNEnsnare.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Target = "Abilities\\Spells\\Orc\\Ensnare\\ensnare_AirTarget.mdl";
+                    TargetAttachmentPoint1 = "chest,mount";
+                    Tooltip = "Ensnare";
+                    TooltipExtended = "This unit is ensnared; it cannot move or fly.";
+                }
             }
 
             /// <summary>Ensnare (Beng).</summary>
@@ -145,6 +336,17 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Beng")]
             public class EnsnareBeng : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public EnsnareBeng()
+                {
+                    EditorSuffix = "(Ground)";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNEnsnare.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Target = "Abilities\\Spells\\Orc\\Ensnare\\ensnareTarget.mdl";
+                    Tooltip = "Ensnare";
+                    TooltipExtended = "This unit is ensnared; it cannot move or fly.";
+                }
             }
 
             /// <summary>Ensnare (General) (Bens).</summary>
@@ -152,6 +354,16 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bens")]
             public class EnsnareGeneral : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public EnsnareGeneral()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNEnsnare.blp";
+                    IsAnEffect = false;
+                    Name = "Ensnare (General)";
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Target = "Abilities\\Spells\\Orc\\Ensnare\\ensnareTarget.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                }
             }
 
             /// <summary>Feral Spirit (BOsf).</summary>
@@ -159,6 +371,16 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BOsf")]
             public class FeralSpirit : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FeralSpirit()
+                {
+                    Effect = "Abilities\\Spells\\Orc\\FeralSpirit\\feralspiritdone.mdl";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSpiritWolf.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Tooltip = "Feral Spirit";
+                    TooltipExtended = "Summoned units take damage from dispels.";
+                }
             }
 
             /// <summary>Healing Ward (Bhwd).</summary>
@@ -166,6 +388,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bhwd")]
             public class HealingWard : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public HealingWard()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHealingWard.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Tooltip = "Healing Ward";
+                    TooltipExtended = "This ward provides life regeneration for nearby friendly units.";
+                }
             }
 
             /// <summary>Healing Ward Aura (Boar).</summary>
@@ -173,6 +404,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Boar")]
             public class HealingWardAura : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public HealingWardAura()
+                {
+                    EffectSoundLooping = "FountainOfLifeLoop";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHealingWard.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.High;
+                    Target = "Abilities\\Spells\\Other\\ANrm\\ANrmTarget.mdl";
+                    Tooltip = "Healing Ward Aura";
+                    TooltipExtended = "Increases life regeneration.";
+                }
             }
 
             /// <summary>Hex (BOhx).</summary>
@@ -180,6 +423,16 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BOhx")]
             public class Hex : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Hex()
+                {
+                    Effect = "Abilities\\Spells\\Human\\Polymorph\\PolyMorphDoneGround.mdl";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHex.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Tooltip = "Hex";
+                    TooltipExtended = "This unit is Hexed; it has been transformed into a critter.";
+                }
             }
 
             /// <summary>Lightning Shield (Blsh).</summary>
@@ -187,6 +440,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Blsh")]
             public class LightningShield : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public LightningShield()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNLightningShield.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Special = "Abilities\\Spells\\Orc\\LightningShield\\LightningShieldBuff.mdl";
+                    Target = "Abilities\\Spells\\Orc\\LightningShield\\LightningShieldTarget.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    Tooltip = "Lightning Shield";
+                    TooltipExtended = "This unit has a Lightning Shield; nearby friendly and enemy units will take damage if they are next to this unit.";
+                }
             }
 
             /// <summary>Lightning Shield (Caster) (Blsa).</summary>
@@ -194,6 +459,13 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Blsa")]
             public class LightningShieldCaster : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public LightningShieldCaster()
+                {
+                    IsAnEffect = false;
+                    Name = "Lightning Shield (Caster)";
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                }
             }
 
             /// <summary>Liquid Fire (Bliq).</summary>
@@ -201,6 +473,16 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bliq")]
             public class LiquidFire : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public LiquidFire()
+                {
+                    EffectSoundLooping = "LiquidFireLoop";
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNLiquidFire.blp";
+                    IsAnEffect = false;
+                    Name = "Liquid Fire";
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Target = "Abilities\\Spells\\Orc\\LiquidFire\\Liquidfire.mdl";
+                }
             }
 
             /// <summary>Mana Regeneration Aura (Barm).</summary>
@@ -208,6 +490,17 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Barm")]
             public class ManaRegenerationAura : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ManaRegenerationAura()
+                {
+                    EffectSoundLooping = "FountainOfLifeLoop";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.Medium;
+                    Target = "Abilities\\Spells\\Other\\ANrl\\ANrlTarget.mdl";
+                    Tooltip = "Mana Regeneration Aura";
+                    TooltipExtended = "This unit is under the effects of Mana Regeneration Aura; it has an increased mana regeneration rate.";
+                }
             }
 
             /// <summary>Mirror Image (BOmi).</summary>
@@ -215,6 +508,16 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BOmi")]
             public class MirrorImage : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public MirrorImage()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMirrorImage.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Special = "Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageDeathCaster.mdl";
+                    Tooltip = "Mirror Image";
+                    TooltipExtended = "A duplicate illusion of the original Blademaster.";
+                }
             }
 
             /// <summary>Purge (Bprg).</summary>
@@ -222,6 +525,17 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bprg")]
             public class Purge : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Purge()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPurge.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Target = "Abilities\\Spells\\Orc\\Purge\\PurgeBuffTarget.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    Tooltip = "Purge";
+                    TooltipExtended = "This unit is Purged; it has had all buffs removed, and has its movement speed slowed for a short duration.";
+                }
             }
 
             /// <summary>Reincarnation (Effect) (XOre).</summary>
@@ -229,6 +543,13 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("XOre")]
             public class ReincarnationEffect : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ReincarnationEffect()
+                {
+                    IsAnEffect = true;
+                    Name = "Reincarnation (Effect)";
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                }
             }
 
             /// <summary>Sentry Ward (Beye).</summary>
@@ -236,6 +557,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Beye")]
             public class SentryWard : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SentryWard()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSentryWard.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Tooltip = "Sentry Ward";
+                    TooltipExtended = "Summoned units take damage from dispels.";
+                }
             }
 
             /// <summary>Shockwave (Caster) (BOsh).</summary>
@@ -243,6 +573,13 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BOsh")]
             public class ShockwaveCaster : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ShockwaveCaster()
+                {
+                    IsAnEffect = false;
+                    Name = "Shockwave (Caster)";
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                }
             }
 
             /// <summary>Spirit Link (Bspl).</summary>
@@ -250,6 +587,17 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bspl")]
             public class SpiritLink : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpiritLink()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSpiritLink.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Target = "Abilities\\Spells\\Orc\\SpiritLink\\SpiritLinkTarget.mdl";
+                    TargetAttachmentPoint1 = "chest";
+                    Tooltip = "Spirit Link";
+                    TooltipExtended = "This unit is Spirit Linked; it will distribute some of the damage it takes across other Spirit Linked units.";
+                }
             }
 
             /// <summary>Stasis Trap (Bstt).</summary>
@@ -257,6 +605,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bstt")]
             public class StasisTrap : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public StasisTrap()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNStasisTrap.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Tooltip = "Stasis Trap";
+                    TooltipExtended = "This ward will stun enemy land units when triggered.";
+                }
             }
 
             /// <summary>War Drums (Bakb).</summary>
@@ -264,6 +621,18 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Bakb")]
             public class WarDrums : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public WarDrums()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDrum.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.High;
+                    Target = "Abilities\\Spells\\Other\\GeneralAuraTarget\\GeneralAuraTarget.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    Tooltip = "War Drums";
+                    TooltipExtended = "This unit hears War Drums; it has increased attack damage.";
+                }
             }
 
             /// <summary>Ward (BOwd).</summary>
@@ -271,6 +640,14 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BOwd")]
             public class Ward : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Ward()
+                {
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Tooltip = "Ward";
+                    TooltipExtended = "Summoned units take damage from dispels.";
+                }
             }
 
             /// <summary>Wind Walk (BOwk).</summary>
@@ -278,6 +655,15 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("BOwk")]
             public class WindWalk : global::Moonwell.Objects.StandardBuff
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public WindWalk()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWindWalkOn.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Tooltip = "Wind Walk";
+                    TooltipExtended = "This unit is Wind Walking; it is invisible, move through units, moves faster, and the first attack it makes while invisible will deal bonus damage.";
+                }
             }
         }
     }

@@ -19,6 +19,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rupm")]
             public class Backpack : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Backpack()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 3;
+                    ButtonPositionY = 0;
+                    EditorSuffix = Levels("(Undead)");
+                    GoldBase = 50;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("B");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNPackBeast.blp");
+                    LevelCount = 1;
+                    LumberBase = 25;
+                    LumberIncrement = 0;
+                    Name = Levels("Backpack");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    TimeBase = 20;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Backpack");
+                    TooltipExtended = Levels("Gives specific Undead ground units the ability to carry items.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Banshee Adept Training (Ruba).</summary>
@@ -26,6 +48,40 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Ruba")]
             public class BansheeAdeptTraining : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BansheeAdeptTraining()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 2;
+                    Class = global::Moonwell.Objects.UpgradeClass.Caster;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rmnx;
+                    Effect1Base = 100f;
+                    Effect1Mod = 100f;
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Rmnr;
+                    Effect2Base = 0.325f;
+                    Effect2Mod = 0.325f;
+                    Effect3 = global::Moonwell.Objects.UpgradeEffect.Rhpx;
+                    Effect3Base = 40f;
+                    Effect3Mod = 40f;
+                    Effect4 = global::Moonwell.Objects.UpgradeEffect.Ratd;
+                    Effect4Base = 0f;
+                    Effect4Mod = 0f;
+                    GoldBase = 100;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("A", "A");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNBansheeAdept.blp", "ReplaceableTextures\\CommandButtons\\BTNBansheeMaster.blp");
+                    LevelCount = 2;
+                    LumberBase = 50;
+                    LumberIncrement = 100;
+                    Name = Levels("Banshee Adept Training", "Banshee Master Training");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    TimeBase = 60;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Banshee Adept Training", "Banshee Master Training");
+                    TooltipExtended = Levels("Increases Banshees' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Anti-magic Shell.", "Increases Banshees' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Possession.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Burrow (Rubu).</summary>
@@ -33,6 +89,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rubu")]
             public class Burrow : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Burrow()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 1;
+                    GoldBase = 75;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("B");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNCryptFiendBurrow.blp");
+                    LevelCount = 1;
+                    LumberBase = 75;
+                    LumberIncrement = 0;
+                    Name = Levels("Burrow");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Requires.Set<global::Moonwell.Objects.Undead.Units.HallsOfTheDead, global::Moonwell.Objects.Undead.Units.Graveyard>();
+                    TimeBase = 30;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Burrow");
+                    TooltipExtended = Levels("Crypt Fiends gain the ability to burrow. Burrowed Crypt Fiends are invisible and gain increased hit point regeneration, but cannot attack.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Cannibalize (Ruac).</summary>
@@ -40,6 +118,27 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Ruac")]
             public class Cannibalize : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Cannibalize()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 2;
+                    GoldBase = 50;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("C");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNCannibalize.blp");
+                    LevelCount = 1;
+                    LumberBase = 0;
+                    LumberIncrement = 0;
+                    Name = Levels("Cannibalize");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    TimeBase = 15;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Cannibalize");
+                    TooltipExtended = Levels("Enables Ghouls and Abominations to use the Cannibalize ability. Cannibalize consumes a nearby corpse to restore health.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Creature Attack (Rura).</summary>
@@ -47,6 +146,31 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rura")]
             public class CreatureAttack : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CreatureAttack()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 0;
+                    Class = global::Moonwell.Objects.UpgradeClass.Ranged;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Ratd;
+                    Effect1Base = 1f;
+                    Effect1Mod = 1f;
+                    GoldBase = 150;
+                    GoldIncrement = 50;
+                    Hotkey = Levels("A", "A", "A");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNCreatureAttack.blp", "ReplaceableTextures\\CommandButtons\\BTNImprovedCreatureAttack.blp", "ReplaceableTextures\\CommandButtons\\BTNAdvancedCreatureAttack.blp");
+                    LevelCount = 3;
+                    LumberBase = 50;
+                    LumberIncrement = 75;
+                    Name = Levels("Creature Attack", "Improved Creature Attack", "Advanced Creature Attack");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    TimeBase = 60;
+                    TimeIncrement = 15;
+                    Tooltip = Levels("Upgrade to Creature Attack", "Upgrade to Improved Creature Attack", "Upgrade to Advanced Creature Attack");
+                    TooltipExtended = Levels("Increases the attack damage of Crypt Fiends, Gargoyles, Destroyers, and Frost Wyrms.", "Further increases the attack damage of Crypt Fiends, Gargoyles, Destroyers, and Frost Wyrms.", "Further increases the attack damage of Crypt Fiends, Gargoyles, Destroyers, and Frost Wyrms.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Creature Carapace (Rucr).</summary>
@@ -54,6 +178,29 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rucr")]
             public class CreatureCarapace : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CreatureCarapace()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 1;
+                    Class = global::Moonwell.Objects.UpgradeClass.Armor;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rarm;
+                    GoldBase = 150;
+                    GoldIncrement = 50;
+                    Hotkey = Levels("C", "C", "C");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNCreatureCarapace.blp", "ReplaceableTextures\\CommandButtons\\BTNImprovedCreatureCarapace.blp", "ReplaceableTextures\\CommandButtons\\BTNAdvancedCreatureCarapace.blp");
+                    LevelCount = 3;
+                    LumberBase = 75;
+                    LumberIncrement = 125;
+                    Name = Levels("Creature Carapace", "Improved Creature Carapace", "Advanced Creature Carapace");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    TimeBase = 60;
+                    TimeIncrement = 15;
+                    Tooltip = Levels("Upgrade to Creature Carapace", "Upgrade to Improved Creature Carapace", "Upgrade to Advanced Creature Carapace");
+                    TooltipExtended = Levels("Increases the armor of Crypt Fiends, Gargoyles, Destroyers, and Frost Wyrms.", "Further increases the armor of Crypt Fiends, Gargoyles, Destroyers, and Frost Wyrms.", "Further increases the armor of the Crypt Fiends, Gargoyles, Destroyers, and Frost Wyrms.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Destroyer Form (Rusp).</summary>
@@ -61,6 +208,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rusp")]
             public class DestroyerForm : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DestroyerForm()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 2;
+                    ButtonPositionY = 2;
+                    GoldBase = 75;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("T");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNDestroyer.blp");
+                    LevelCount = 1;
+                    LumberBase = 150;
+                    LumberIncrement = 0;
+                    Name = Levels("Destroyer Form");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Requires.Set<global::Moonwell.Objects.Undead.Units.BlackCitadel, global::Moonwell.Objects.Undead.Units.TombOfRelics>();
+                    TimeBase = 60;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Destroyer Form");
+                    TooltipExtended = Levels("Allows the Obsidian Statue to transform into a Destroyer, a large flying unit that must devour magic to sustain its mana. The Destroyer have Magic and Spell Immunity, Devour Magic, Absorb Mana, and Orb of Annihilation. |n|n|cffffcc00Attacks land and air units.|r");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Disease Cloud (Rupc).</summary>
@@ -68,6 +237,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rupc")]
             public class DiseaseCloud : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DiseaseCloud()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 2;
+                    GoldBase = 100;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("D");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNPlagueCloud.blp");
+                    LevelCount = 1;
+                    LumberBase = 200;
+                    LumberIncrement = 0;
+                    Name = Levels("Disease Cloud");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Requires.Set<global::Moonwell.Objects.Undead.Units.BlackCitadel>();
+                    TimeBase = 45;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Disease Cloud");
+                    TooltipExtended = Levels("Gives Abominations a Disease Cloud aura that deals <Aap1,DataB1> damage per second for <Aap1,DataA1> seconds to nearby enemy units. Meat Wagons will cause Disease Clouds wherever they attack that deal <Aap2,DataB1> damage per second for <Aap2,DataA1> seconds to nearby enemy units. |nUndead are immune to Disease Cloud.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Exhume Corpses (Ruex).</summary>
@@ -75,6 +266,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Ruex")]
             public class ExhumeCorpses : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ExhumeCorpses()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 2;
+                    GoldBase = 75;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("E");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNExhumeCorpses.blp");
+                    LevelCount = 1;
+                    LumberBase = 50;
+                    LumberIncrement = 0;
+                    Name = Levels("Exhume Corpses");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Requires.Set<global::Moonwell.Objects.Undead.Units.HallsOfTheDead>();
+                    TimeBase = 20;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Exhume Corpses");
+                    TooltipExtended = Levels("Gives Meat Wagons the ability to generate corpses.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Freezing Breath (Rufb).</summary>
@@ -82,6 +295,27 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rufb")]
             public class FreezingBreath : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FreezingBreath()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 2;
+                    GoldBase = 150;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("B");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNFreezingBreath.blp");
+                    LevelCount = 1;
+                    LumberBase = 225;
+                    LumberIncrement = 0;
+                    Name = Levels("Freezing Breath");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    TimeBase = 60;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Freezing Breath");
+                    TooltipExtended = Levels("Enables Frost Wyrms to use the Freezing Breath ability. When cast on a building, temporarily stops production.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Ghoul Frenzy (Rugf).</summary>
@@ -89,6 +323,32 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rugf")]
             public class GhoulFrenzy : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public GhoulFrenzy()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 1;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rats;
+                    Effect1Base = 0.35f;
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Rmvx;
+                    Effect2Base = 60f;
+                    GoldBase = 100;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("Z");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNGhoulFrenzy.blp");
+                    LevelCount = 1;
+                    LumberBase = 150;
+                    LumberIncrement = 0;
+                    Name = Levels("Ghoul Frenzy");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Requires.Set<global::Moonwell.Objects.Undead.Units.Graveyard, global::Moonwell.Objects.Undead.Units.BlackCitadel>();
+                    TimeBase = 50;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Ghoul Frenzy");
+                    TooltipExtended = Levels("Increases the attack rate of Ghouls by <Rugf,base1,%>%, and increases their movement speed.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Necromancer Adept Training (Rune).</summary>
@@ -96,6 +356,40 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rune")]
             public class NecromancerAdeptTraining : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public NecromancerAdeptTraining()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 2;
+                    Class = global::Moonwell.Objects.UpgradeClass.Caster;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rmnx;
+                    Effect1Base = 100f;
+                    Effect1Mod = 100f;
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Rmnr;
+                    Effect2Base = 0.325f;
+                    Effect2Mod = 0.325f;
+                    Effect3 = global::Moonwell.Objects.UpgradeEffect.Rhpx;
+                    Effect3Base = 40f;
+                    Effect3Mod = 40f;
+                    Effect4 = global::Moonwell.Objects.UpgradeEffect.Ratd;
+                    Effect4Base = 0f;
+                    Effect4Mod = 0f;
+                    GoldBase = 100;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("E", "E");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNNecromancerAdept.blp", "ReplaceableTextures\\CommandButtons\\BTNNecromancerMaster.blp");
+                    LevelCount = 2;
+                    LumberBase = 50;
+                    LumberIncrement = 100;
+                    Name = Levels("Necromancer Adept Training", "Necromancer Master Training");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    TimeBase = 30;
+                    TimeIncrement = 15;
+                    Tooltip = Levels("Necromancer Adept Training", "Necromancer Master Training");
+                    TooltipExtended = Levels("Increases Necromancers' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Unholy Frenzy.", "Increases Necromancers' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Cripple.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Skeletal Longevity (Rusl).</summary>
@@ -103,6 +397,30 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rusl")]
             public class SkeletalLongevity : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SkeletalLongevity()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 2;
+                    ButtonPositionY = 1;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rrai;
+                    Effect1Base = 20f;
+                    GoldBase = 75;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("S");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNSkeletalLongevity.blp");
+                    LevelCount = 1;
+                    LumberBase = 75;
+                    LumberIncrement = 0;
+                    Name = Levels("Skeletal Longevity");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Requires.Set<global::Moonwell.Objects.Undead.Units.BlackCitadel>();
+                    TimeBase = 15;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Skeletal Longevity");
+                    TooltipExtended = Levels("Increases the duration of raised Skeleton Warriors and Skeletal Mages by <Rusl,base1> seconds.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Skeletal Mastery (Rusm).</summary>
@@ -110,6 +428,34 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rusm")]
             public class SkeletalMastery : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SkeletalMastery()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 1;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rlev;
+                    Effect1Base = 1f;
+                    Effect1Code = "Arai";
+                    Effect1Mod = 1f;
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Rrai;
+                    Effect2Base = 20f;
+                    GoldBase = 150;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("M");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNSkeletonMage.blp");
+                    LevelCount = 1;
+                    LumberBase = 100;
+                    LumberIncrement = 0;
+                    Name = Levels("Skeletal Mastery");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Requires.Set<global::Moonwell.Objects.Undead.Units.Necropolis>();
+                    TimeBase = 30;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Skeletal Mastery");
+                    TooltipExtended = Levels("Causes one of the two skeletons created by Raise Dead to be a Skeletal Mage and increases the duration of raised Skeleton Warriors and Skeletal Mages by <Rusl,base1> seconds.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Stone Form (Rusf).</summary>
@@ -117,6 +463,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rusf")]
             public class StoneForm : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public StoneForm()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 2;
+                    ButtonPositionY = 1;
+                    GoldBase = 75;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("S");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNStoneForm.blp");
+                    LevelCount = 1;
+                    LumberBase = 150;
+                    LumberIncrement = 0;
+                    Name = Levels("Stone Form");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Requires.Set<global::Moonwell.Objects.Undead.Units.Graveyard, global::Moonwell.Objects.Undead.Units.BlackCitadel>();
+                    TimeBase = 40;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Stone Form");
+                    TooltipExtended = Levels("Enables the ability for Gargoyles to assume Stone Form. Stone Form transforms the Gargoyle into a statue with high armor, spell immunity, and regeneration. The Gargoyle cannot attack in this form.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Unholy Armor (Ruar).</summary>
@@ -124,6 +492,29 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Ruar")]
             public class UnholyArmor : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public UnholyArmor()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 1;
+                    Class = global::Moonwell.Objects.UpgradeClass.Armor;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rarm;
+                    GoldBase = 125;
+                    GoldIncrement = 75;
+                    Hotkey = Levels("U", "U", "U");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNUnholyArmor.blp", "ReplaceableTextures\\CommandButtons\\BTNImprovedUnholyArmor.blp", "ReplaceableTextures\\CommandButtons\\BTNAdvancedUnholyArmor.blp");
+                    LevelCount = 3;
+                    LumberBase = 50;
+                    LumberIncrement = 100;
+                    Name = Levels("Unholy Armor", "Improved Unholy Armor", "Advanced Unholy Armor");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    TimeBase = 60;
+                    TimeIncrement = 15;
+                    Tooltip = Levels("Upgrade to Unholy Armor", "Upgrade to Improved Unholy Armor", "Upgrade to Advanced Unholy Armor");
+                    TooltipExtended = Levels("Increases the armor of Ghouls, Abominations, Skeleton Warriors, and Skeletal Mages.", "Further increases the armor of Ghouls, Abominations, Skeleton Warriors, and Skeletal Mages.", "Further increases the armor of Ghouls, Abominations, Skeleton Warriors, and Skeletal Mages.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Unholy Strength (Rume).</summary>
@@ -131,6 +522,31 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rume")]
             public class UnholyStrength : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public UnholyStrength()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 0;
+                    Class = global::Moonwell.Objects.UpgradeClass.Melee;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Ratd;
+                    Effect1Base = 1f;
+                    Effect1Mod = 1f;
+                    GoldBase = 125;
+                    GoldIncrement = 75;
+                    Hotkey = Levels("S", "S", "S");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNUnholyStrength.blp", "ReplaceableTextures\\CommandButtons\\BTNImprovedUnholyStrength.blp", "ReplaceableTextures\\CommandButtons\\BTNAdvancedUnholyStrength.blp");
+                    LevelCount = 3;
+                    LumberBase = 50;
+                    LumberIncrement = 100;
+                    Name = Levels("Unholy Strength", "Improved Unholy Strength", "Advanced Unholy Strength");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    TimeBase = 60;
+                    TimeIncrement = 15;
+                    Tooltip = Levels("Upgrade to Unholy Strength", "Upgrade to Improved Unholy Strength", "Upgrade to Advanced Unholy Strength");
+                    TooltipExtended = Levels("Increases the attack damage of Ghouls, Meat Wagons, Abominations, Skeleton Warriors, and Skeletal Mages.", "Further increases the attack damage of Ghouls, Meat Wagons, Abominations, Skeleton Warriors, and Skeletal Mages.", "Further increases the attack damage of Ghouls, Meat Wagons, Abominations, Skeleton Warriors, and Skeletal Mages.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Web (Ruwb).</summary>
@@ -138,6 +554,28 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Ruwb")]
             public class Web : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Web()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 2;
+                    GoldBase = 100;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("W");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNWeb.blp");
+                    LevelCount = 1;
+                    LumberBase = 100;
+                    LumberIncrement = 0;
+                    Name = Levels("Web");
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Requires.Set<global::Moonwell.Objects.Undead.Units.Graveyard, global::Moonwell.Objects.Undead.Units.HallsOfTheDead>();
+                    TimeBase = 30;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Web");
+                    TooltipExtended = Levels("Enables Crypt Fiends to use the Web ability. Web binds a target enemy air unit in webbing, forcing it to the ground. Webbed units can be hit as though they were land units.");
+                    TransferWithUnitOwnership = true;
+                }
             }
         }
     }

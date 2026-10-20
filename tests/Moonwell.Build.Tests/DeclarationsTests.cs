@@ -132,6 +132,33 @@ namespace Moonwell.Build.Tests
             Assert.Equal(200, arthas.Changed["uhpm"]);
         }
 
+        [Theory]
+        [InlineData(null)]
+        [InlineData("melee_v0")]
+        [InlineData("custom_v0")]
+        [InlineData("custom_v1")]
+        public void what_a_standard_class_sets_is_no_change_under_any_set(string? set)
+        {
+            // The Paladin's and the Immolation's constructors set the base tables' values; the sets differ from them
+            // (the Paladin's speed is 270 in melee_v0, 300 in the base tables), and none of it is the map's change.
+            var objects = built.Read(set).Objects;
+
+            Assert.Equal(new[] { "uabi", "ugol", "uhab", "uhpm", "unam" }, Find(objects, "Objects.Arthas").Changed.Keys);
+            Assert.Equal(new[] { "fnam" }, Find(objects, "Objects.Burn").Changed.Keys);
+            Assert.Equal(new[] { "bnam" }, Find(objects, "Objects.Gate").Changed.Keys);
+        }
+
+        [Fact]
+        public void a_standard_value_outside_world_editors_limits_builds()
+        {
+            // The Demonic Gate's build time is 0 in the base tables, which its constructor sets; World Editor allows 1 to 298.
+            Assert.Equal("0", built.Standard.Value("ATg1", "bbut", 0, null));
+
+            var gate = Find(built.Read(null).Objects, "Objects.Gate");
+
+            Assert.Equal("Gate", gate.Changed["bnam"]);
+        }
+
         [Fact]
         public void chain_merges()
         {

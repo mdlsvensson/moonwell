@@ -8,7 +8,8 @@ namespace Moonwell.Generator.Objects;
 /// <remarks>
 /// <para>
 /// A kind base (<c>StandardUnit</c>, <c>StandardHero</c>, <c>StandardItem</c>, ...) carries a property for each field
-/// of its kind that every object of the kind can have; a standard class is empty except for an ability's own fields.
+/// of its kind that every object of the kind can have; a standard class has a constructor that sets the object's values
+/// (<see cref="StandardConstructors"/>) and, for an ability, a property for each of its own fields.
 /// Every type name in the source is spelled in full (<c>global::Moonwell.Unit</c>), so that a class named like a
 /// namespace part cannot shadow it.
 /// </para>
@@ -109,12 +110,18 @@ public static class ObjectsWriter
     /// partial classes of the group and the kind (<c>Human</c>, then <c>Units</c>) in namespace <c>Moonwell.Objects</c>.
     /// The class inherits its kind base (heroes <c>StandardHero</c>), has the object's id in <c>[Standard]</c>, and for
     /// an ability has a property for each field specific to the ability's code. A property cannot be named like its
-    /// class, so such a field gets its id appended (<c>HealingModifierHem1</c>).
+    /// class, so such a field gets its id appended (<c>HealingModifierHem1</c>). With <paramref name="constructors"/>,
+    /// a class whose object has values gets a constructor that sets them, before its properties.
     /// </summary>
     /// <param name="outer">The namespace and the classes the objects are nested in, dotted (<c>Moonwell.Objects.Human.Units</c>).</param>
     /// <param name="classes">The objects and their class names; every class name's outer is <paramref name="outer"/>.</param>
     /// <param name="fields">The fields of the abilities (used only for ability classes).</param>
-    public static string Group(string outer, IEnumerable<(StandardObject Object, ClassName Name)> classes, IReadOnlyList<Field> fields)
+    /// <param name="constructors">The constructors' lines; null for classes without constructors.</param>
+    public static string Group(
+        string outer,
+        IEnumerable<(StandardObject Object, ClassName Name)> classes,
+        IReadOnlyList<Field> fields,
+        StandardConstructors? constructors = null)
     {
         var ordered = classes.OrderBy(c => c.Name.Name, StringComparer.Ordinal).ToList();
         var byCode = new Dictionary<string, List<Field>>(StringComparer.Ordinal);
@@ -171,9 +178,22 @@ public static class ObjectsWriter
             text.Append($"{indent}{Ignore}\n");
             text.Append($"{indent}[{Root}.Standard({Literal(obj.Id)})]\n");
             text.Append($"{indent}public class {name.Name} : {Root}.{KindBase(obj.Kind, obj.IsHero)}\n{indent}{{\n");
+            var lines = constructors?.Lines(obj, own) ?? Array.Empty<string>();
+            if (lines.Count > 0)
+            {
+                text.Append($"{indent}    /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>\n");
+                text.Append($"{indent}    public {name.Name}()\n{indent}    {{\n");
+                foreach (var line in lines)
+                {
+                    text.Append($"{indent}        {line}\n");
+                }
+
+                text.Append($"{indent}    }}\n");
+            }
+
             for (var p = 0; p < own.Count; p++)
             {
-                if (p > 0)
+                if (p > 0 || lines.Count > 0)
                 {
                     text.Append('\n');
                 }

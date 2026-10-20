@@ -19,6 +19,27 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rnsi")]
             public class AbolishMagic : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public AbolishMagic()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 2;
+                    GoldBase = 50;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("B");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNDryadDispelMagic.blp");
+                    LevelCount = 1;
+                    LumberBase = 50;
+                    LumberIncrement = 0;
+                    Name = Levels("Abolish Magic");
+                    Race = global::Moonwell.Objects.UnitRace.Naga;
+                    TimeBase = 45;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Abolish Magic");
+                    TooltipExtended = Levels("Gives the Couatl the ability to dispel positive buffs from enemy units, and negative buffs from friendly units. |nDamages summoned units.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Coral Blades (Rnat).</summary>
@@ -26,6 +47,31 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rnat")]
             public class CoralBlades : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CoralBlades()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 2;
+                    Class = global::Moonwell.Objects.UpgradeClass.Melee;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Ratd;
+                    Effect1Base = 1f;
+                    Effect1Mod = 1f;
+                    GoldBase = 150;
+                    GoldIncrement = 75;
+                    Hotkey = Levels("B", "B", "B");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNNagaWeaponUp1.blp", "ReplaceableTextures\\CommandButtons\\BTNNagaWeaponUp2.blp", "ReplaceableTextures\\CommandButtons\\BTNNagaWeaponUp3.blp");
+                    LevelCount = 3;
+                    LumberBase = 75;
+                    LumberIncrement = 150;
+                    Name = Levels("Coral Blades", "Chitinous Blades", "Razorspine Blades");
+                    Race = global::Moonwell.Objects.UnitRace.Naga;
+                    TimeBase = 60;
+                    TimeIncrement = 15;
+                    Tooltip = Levels("Upgrade to Coral Blades", "Upgrade to Chitinous Blades", "Upgrade to Razorspine Blades");
+                    TooltipExtended = Levels("Increases the attack damage of Naga attack units.", "Further increases the attack damage of Naga attack units.", "Further increases the attack damage of Naga attack units.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Coral Scales (Rnam).</summary>
@@ -33,6 +79,29 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rnam")]
             public class CoralScales : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CoralScales()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 1;
+                    ButtonPositionY = 2;
+                    Class = global::Moonwell.Objects.UpgradeClass.Armor;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rarm;
+                    GoldBase = 125;
+                    GoldIncrement = 100;
+                    Hotkey = Levels("C", "C", "C");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNNagaArmorUp1.blp", "ReplaceableTextures\\CommandButtons\\BTNNagaArmorUp2.blp", "ReplaceableTextures\\CommandButtons\\BTNNagaArmorUp3.blp");
+                    LevelCount = 3;
+                    LumberBase = 75;
+                    LumberIncrement = 150;
+                    Name = Levels("Coral Scales", "Chitinous Scales", "Razorspine Scales");
+                    Race = global::Moonwell.Objects.UnitRace.Naga;
+                    TimeBase = 60;
+                    TimeIncrement = 15;
+                    Tooltip = Levels("Upgrade to Coral Scales", "Upgrade to Chitinous Scales", "Upgrade to Razorspine Scales");
+                    TooltipExtended = Levels("Increases the armor of Naga attack units.", "Further increases the armor of Naga attack units.", "Further increases the the armor of Naga attack units.");
+                    TransferWithUnitOwnership = false;
+                }
             }
 
             /// <summary>Ensnare (Rnen).</summary>
@@ -40,6 +109,27 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rnen")]
             public class Ensnare : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Ensnare()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 2;
+                    GoldBase = 50;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("N");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNEnsnare.blp");
+                    LevelCount = 1;
+                    LumberBase = 75;
+                    LumberIncrement = 0;
+                    Name = Levels("Ensnare");
+                    Race = global::Moonwell.Objects.UnitRace.Naga;
+                    TimeBase = 40;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Ensnare");
+                    TooltipExtended = Levels("Enables Naga Myrmidons to use the Ensnare ability. Ensnare causes a target enemy unit to be bound to the ground so that it cannot move. Air units that are ensnared can be attacked as though they were land units.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Naga Siren Adept Training (Rnsw).</summary>
@@ -47,6 +137,40 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rnsw")]
             public class NagaSirenAdeptTraining : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public NagaSirenAdeptTraining()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 2;
+                    Class = global::Moonwell.Objects.UpgradeClass.Caster;
+                    Effect1 = global::Moonwell.Objects.UpgradeEffect.Rmnx;
+                    Effect1Base = 100f;
+                    Effect1Mod = 100f;
+                    Effect2 = global::Moonwell.Objects.UpgradeEffect.Rmnr;
+                    Effect2Base = 0.325f;
+                    Effect2Mod = 0.325f;
+                    Effect3 = global::Moonwell.Objects.UpgradeEffect.Rhpx;
+                    Effect3Base = 40f;
+                    Effect3Mod = 40f;
+                    Effect4 = global::Moonwell.Objects.UpgradeEffect.Ratd;
+                    Effect4Base = 0f;
+                    Effect4Mod = 0f;
+                    GoldBase = 100;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("N", "N");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNSirenAdept.blp", "ReplaceableTextures\\CommandButtons\\BTNSirenMaster.blp");
+                    LevelCount = 2;
+                    LumberBase = 50;
+                    LumberIncrement = 100;
+                    Name = Levels("Naga Siren Adept Training", "Naga Siren Master Training");
+                    Race = global::Moonwell.Objects.UnitRace.Naga;
+                    TimeBase = 60;
+                    TimeIncrement = 15;
+                    Tooltip = Levels("Research Naga Siren Adept Training", "Research Naga Siren Master Training");
+                    TooltipExtended = Levels("Increases Naga Sirens' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Frost Armor.", "Increases Naga Sirens' mana capacity, mana regeneration rate, hit points, and gives them the ability to cast Cyclone.");
+                    TransferWithUnitOwnership = true;
+                }
             }
 
             /// <summary>Submerge (Rnsb).</summary>
@@ -54,6 +178,27 @@ namespace Moonwell.Objects
             [global::Moonwell.Objects.Standard("Rnsb")]
             public class Submerge : global::Moonwell.Objects.StandardUpgrade
             {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Submerge()
+                {
+                    AppliesToAllUnits = false;
+                    ButtonPositionX = 2;
+                    ButtonPositionY = 2;
+                    GoldBase = 25;
+                    GoldIncrement = 0;
+                    Hotkey = Levels("U");
+                    Icon = Levels("ReplaceableTextures\\CommandButtons\\BTNNagaBurrow.blp");
+                    LevelCount = 1;
+                    LumberBase = 25;
+                    LumberIncrement = 0;
+                    Name = Levels("Submerge");
+                    Race = global::Moonwell.Objects.UnitRace.Naga;
+                    TimeBase = 20;
+                    TimeIncrement = 0;
+                    Tooltip = Levels("Research Submerge");
+                    TooltipExtended = Levels("Gives Naga Myrmidons and Snap Dragons the ability to submerge under water, hiding them from view.");
+                    TransferWithUnitOwnership = true;
+                }
             }
         }
     }
