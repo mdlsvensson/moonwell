@@ -110,6 +110,51 @@ namespace Moonwell.Hosting
         /// <summary>The level a player has of an upgrade; 0 when the player has none.</summary>
         int UpgradeLevel(player p, int upgradeId);
 
+        /// <summary>Sets the level a player has of an upgrade.</summary>
+        void Research(player player, int upgradeId, int level);
+
+        /// <summary>How many of a unit type a player may have, or the top level of an upgrade it may research; -1 for no limit.</summary>
+        int TechMaxOf(player player, int typeId);
+
+        /// <summary>Sets how many of a unit type a player may have, or the top level of an upgrade; 0 forbids it.</summary>
+        void SetTechMax(player player, int typeId, int max);
+
+        /// <summary>Makes an ability available to a player's units or not.</summary>
+        void MakeAvailable(player player, int abilityId, bool available);
+
+        /// <summary>The name of a player.</summary>
+        string NameOf(player player);
+
+        /// <summary>Sets the name of a player.</summary>
+        void Rename(player player, string name);
+
+        /// <summary>The colour of a player, as PlayerColor counts it.</summary>
+        int ColorOf(player player);
+
+        /// <summary>Sets the colour of a player and of the units it has.</summary>
+        void Recolor(player player, int color);
+
+        /// <summary>The team of a player.</summary>
+        int TeamOf(player player);
+
+        /// <summary>Sets the team of a player.</summary>
+        void MoveToTeam(player player, int team);
+
+        /// <summary>The race of a player, as Race counts it.</summary>
+        int RaceOf(player player);
+
+        /// <summary>What one player gives another, as Alliance's flags.</summary>
+        int AllianceOf(player source, player other);
+
+        /// <summary>Sets what one player gives another, as Alliance's flags; it goes one way.</summary>
+        void SetAllianceOf(player source, player other, int alliance);
+
+        /// <summary>Whether the game counts the other player as the player's ally.</summary>
+        bool IsAllyOf(player source, player other);
+
+        /// <summary>Whether the game counts the other player as the player's enemy.</summary>
+        bool IsEnemyOf(player source, player other);
+
         /// <summary>The level of an ability on a unit; 0 when the unit has none.</summary>
         int AbilityLevel(unit unit, int abilityId);
 
