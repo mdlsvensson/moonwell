@@ -10,6 +10,9 @@ namespace Moonwell
         /// <summary>The mask of each class seen, keyed by the class.</summary>
         private static readonly Dictionary<object, int> masks = new Dictionary<object, int>();
 
+        /// <summary>Set by a damage package: given the first object of each class whose mask is worked out; null without one.</summary>
+        internal static Action<object>? Seen;
+
         // Whether obj's class, below declaringBase, defines name itself. In Lua MoonwellOverrides (moonwell.lua) walks
         // the class chain; .NET asks reflection. No summary goes above this line: CSharp.lua then ignores the template.
         /// @CSharpLua.Template = "MoonwellOverrides({0}, {1}, {2})"
@@ -38,6 +41,11 @@ namespace Moonwell
             }
 
             masks[key] = mask;
+            if (Seen != null)
+            {
+                Seen(obj);
+            }
+
             return mask;
         }
 
@@ -45,6 +53,7 @@ namespace Moonwell
         internal static void Reset()
         {
             masks.Clear();
+            Seen = null;
         }
     }
 }

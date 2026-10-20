@@ -108,6 +108,24 @@ namespace Moonwell.Testing
         /// <summary>The slot of each player made.</summary>
         private readonly Dictionary<player, int> slots = new Dictionary<player, int>();
 
+        /// <summary>The names set for player slots.</summary>
+        private readonly Dictionary<int, string> names = new Dictionary<int, string>();
+
+        /// <summary>The colours set for player slots.</summary>
+        private readonly Dictionary<int, int> colors = new Dictionary<int, int>();
+
+        /// <summary>The teams set for player slots.</summary>
+        private readonly Dictionary<int, int> teams = new Dictionary<int, int>();
+
+        /// <summary>The races set for player slots.</summary>
+        private readonly Dictionary<int, int> races = new Dictionary<int, int>();
+
+        /// <summary>The alliances set, keyed by the source slot times 32 plus the other slot.</summary>
+        private readonly Dictionary<int, int> alliances = new Dictionary<int, int>();
+
+        /// <summary>The tech limits set, keyed by slot, then by type id.</summary>
+        private readonly Dictionary<int, Dictionary<int, int>> techMaxes = new Dictionary<int, Dictionary<int, int>>();
+
         /// <summary>Makes a fresh world for one case and makes it the runtime's world.</summary>
         public static FakeWorld Install()
         {
@@ -183,6 +201,13 @@ namespace Moonwell.Testing
             }
 
             levels[upgradeId] = level;
+        }
+
+        /// <summary>Sets the race of a player slot.</summary>
+        public void SetRace(int slot, Race race)
+        {
+            PlayerAt(slot);
+            races[slot] = (int)race;
         }
 
         /// <summary>Sets the start location of a player slot.</summary>
@@ -490,6 +515,110 @@ namespace Moonwell.Testing
             }
 
             return 0;
+        }
+
+        /// <summary>Sets the level a player's slot has of an upgrade.</summary>
+        public void Research(player player, int upgradeId, int level)
+        {
+            SetUpgradeLevel(SlotOf(player), upgradeId, level);
+        }
+
+        /// <summary>The tech limit set for a player's slot; int.MaxValue, the game's "no limit" for a unit type, when none was set.</summary>
+        public int TechMaxOf(player player, int typeId)
+        {
+            if (techMaxes.TryGetValue(SlotOf(player), out var maxes) && maxes.TryGetValue(typeId, out var max))
+            {
+                return max;
+            }
+
+            return int.MaxValue;
+        }
+
+        /// <summary>Sets the tech limit of a player's slot.</summary>
+        public void SetTechMax(player player, int typeId, int max)
+        {
+            var slot = SlotOf(player);
+            if (!techMaxes.TryGetValue(slot, out var maxes))
+            {
+                maxes = new Dictionary<int, int>();
+                techMaxes[slot] = maxes;
+            }
+
+            maxes[typeId] = max;
+        }
+
+        /// <summary>Records a call that makes an ability available or not, as "available slot id on|off".</summary>
+        public void MakeAvailable(player player, int abilityId, bool available)
+        {
+            AbilityCalls.Add("available " + SlotOf(player) + " " + abilityId + (available ? " on" : " off"));
+        }
+
+        /// <summary>The name set for a player's slot; "Player n", counted from 1, until one is set.</summary>
+        public string NameOf(player player)
+        {
+            var slot = SlotOf(player);
+            return names.TryGetValue(slot, out var name) ? name : "Player " + (slot + 1);
+        }
+
+        /// <summary>Sets the name of a player's slot.</summary>
+        public void Rename(player player, string name)
+        {
+            names[SlotOf(player)] = name;
+        }
+
+        /// <summary>The colour set for a player's slot; the slot's own number until one is set.</summary>
+        public int ColorOf(player player)
+        {
+            var slot = SlotOf(player);
+            return colors.TryGetValue(slot, out var color) ? color : slot;
+        }
+
+        /// <summary>Sets the colour of a player's slot.</summary>
+        public void Recolor(player player, int color)
+        {
+            colors[SlotOf(player)] = color;
+        }
+
+        /// <summary>The team set for a player's slot; 0 until one is set.</summary>
+        public int TeamOf(player player)
+        {
+            return teams.TryGetValue(SlotOf(player), out var team) ? team : 0;
+        }
+
+        /// <summary>Sets the team of a player's slot.</summary>
+        public void MoveToTeam(player player, int team)
+        {
+            teams[SlotOf(player)] = team;
+        }
+
+        /// <summary>The race set for a player's slot; Human until SetRace sets it.</summary>
+        public int RaceOf(player player)
+        {
+            return races.TryGetValue(SlotOf(player), out var race) ? race : 0;
+        }
+
+        /// <summary>The alliance set from one slot to another; None until one is set.</summary>
+        public int AllianceOf(player source, player other)
+        {
+            return alliances.TryGetValue(SlotOf(source) * 32 + SlotOf(other), out var alliance) ? alliance : 0;
+        }
+
+        /// <summary>Sets the alliance from one slot to another.</summary>
+        public void SetAllianceOf(player source, player other, int alliance)
+        {
+            alliances[SlotOf(source) * 32 + SlotOf(other)] = alliance;
+        }
+
+        /// <summary>Whether the other is an ally: the same slot, or one the source is passive to.</summary>
+        public bool IsAllyOf(player source, player other)
+        {
+            return SlotOf(source) == SlotOf(other) || (AllianceOf(source, other) & (int)Alliance.Passive) != 0;
+        }
+
+        /// <summary>Whether the other is an enemy: not an ally.</summary>
+        public bool IsEnemyOf(player source, player other)
+        {
+            return !IsAllyOf(source, other);
         }
 
         /// <summary>Records an add-ability call.</summary>

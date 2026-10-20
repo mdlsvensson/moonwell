@@ -383,6 +383,148 @@ namespace Moonwell.Engine
             return Natives.GetPlayerTechCount(p, upgradeId, true);
         }
 
+        /// <summary>Sets the level a player has of an upgrade, in the game.</summary>
+        public void Research(player player, int upgradeId, int level)
+        {
+            Natives.SetPlayerTechResearched(player, upgradeId, level);
+        }
+
+        /// <summary>How many of a unit type a player may have, or the top level of an upgrade, from the game.</summary>
+        public int TechMaxOf(player player, int typeId)
+        {
+            return Natives.GetPlayerTechMaxAllowed(player, typeId);
+        }
+
+        /// <summary>Sets how many of a unit type a player may have, or the top level of an upgrade, in the game.</summary>
+        public void SetTechMax(player player, int typeId, int max)
+        {
+            Natives.SetPlayerTechMaxAllowed(player, typeId, max);
+        }
+
+        /// <summary>Makes an ability available to a player's units or not, in the game.</summary>
+        public void MakeAvailable(player player, int abilityId, bool available)
+        {
+            Natives.SetPlayerAbilityAvailable(player, abilityId, available);
+        }
+
+        /// <summary>The name of a player, from the game.</summary>
+        public string NameOf(player player)
+        {
+            return Natives.GetPlayerName(player);
+        }
+
+        /// <summary>Sets the name of a player in the game.</summary>
+        public void Rename(player player, string name)
+        {
+            Natives.SetPlayerName(player, name);
+        }
+
+        /// <summary>The colour of a player, as its number in the game (PLAYER_COLOR_RED is 0).</summary>
+        public int ColorOf(player player)
+        {
+            var color = Natives.GetPlayerColor(player);
+            for (var i = 0; i < 24; i++)
+            {
+                if (color == Natives.ConvertPlayerColor(i))
+                {
+                    return i;
+                }
+            }
+
+            return 0;
+        }
+
+        /// <summary>Sets the colour of a player in the game, and of the units it has: the game leaves those as they were.</summary>
+        public void Recolor(player player, int color)
+        {
+            var playerColor = Natives.ConvertPlayerColor(color);
+            Natives.SetPlayerColor(player, playerColor);
+            var group = Natives.CreateGroup();
+            Natives.GroupEnumUnitsOfPlayer(group, player, null);
+            var count = Natives.BlzGroupGetSize(group);
+            for (var i = 0; i < count; i++)
+            {
+                Natives.SetUnitColor(Natives.BlzGroupUnitAt(group, i), playerColor);
+            }
+
+            Natives.DestroyGroup(group);
+        }
+
+        /// <summary>The team of a player, from the game.</summary>
+        public int TeamOf(player player)
+        {
+            return Natives.GetPlayerTeam(player);
+        }
+
+        /// <summary>Sets the team of a player in the game.</summary>
+        public void MoveToTeam(player player, int team)
+        {
+            Natives.SetPlayerTeam(player, team);
+        }
+
+        /// <summary>The race of a player, as Race counts it.</summary>
+        public int RaceOf(player player)
+        {
+            var race = Natives.GetPlayerRace(player);
+            if (race == Natives.RACE_HUMAN)
+            {
+                return 0;
+            }
+
+            if (race == Natives.RACE_ORC)
+            {
+                return 1;
+            }
+
+            if (race == Natives.RACE_UNDEAD)
+            {
+                return 2;
+            }
+
+            if (race == Natives.RACE_NIGHTELF)
+            {
+                return 3;
+            }
+
+            return race == Natives.RACE_DEMON ? 4 : 5;
+        }
+
+        /// <summary>What one player gives another, from the game: bit n is ALLIANCE type n, as Alliance's flags are.</summary>
+        public int AllianceOf(player source, player other)
+        {
+            var alliance = 0;
+            for (var i = 0; i < 10; i++)
+            {
+                if (Natives.GetPlayerAlliance(source, other, Natives.ConvertAllianceType(i)))
+                {
+                    alliance |= 1 << i;
+                }
+            }
+
+            return alliance;
+        }
+
+        /// <summary>Sets every alliance type one player gives another in the game, on or off as the flags say.</summary>
+        public void SetAllianceOf(player source, player other, int alliance)
+        {
+            for (var i = 0; i < 10; i++)
+            {
+                Natives.SetPlayerAlliance(source, other, Natives.ConvertAllianceType(i), (alliance & (1 << i)) != 0);
+            }
+        }
+
+        /// <summary>Whether the game counts the other player as the player's ally.</summary>
+        public bool IsAllyOf(player source, player other)
+        {
+            return Natives.IsPlayerAlly(source, other);
+        }
+
+        /// <summary>Whether the game counts the other player as the player's enemy.</summary>
+        public bool IsEnemyOf(player source, player other)
+        {
+            return Natives.IsPlayerEnemy(source, other);
+        }
+
         /// <summary>The level of an ability on a unit; 0 when the unit has none.</summary>
         public int AbilityLevel(unit unit, int abilityId)
         {

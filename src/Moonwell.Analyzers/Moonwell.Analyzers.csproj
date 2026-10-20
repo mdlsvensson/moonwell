@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    The multiplayer analyzer (decision 13). The compiler loads it into dotnet build, so it targets netstandard2.0.
+    The multiplayer analyzer (decision 13) and the Lua rules (C# CSharp.lua cannot compile). The compiler loads it into dotnet build, so it targets netstandard2.0.
     The Moonwell package carries it under analyzers/dotnet/cs; see Moonwell.csproj.
   -->
   <PropertyGroup>

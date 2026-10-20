@@ -30,12 +30,20 @@ namespace Moonwell.Build
         /// <returns>True when it references the library.</returns>
         public static bool UsesObjects(string assemblyPath)
         {
+            return References(assemblyPath, ObjectsAssemblyName);
+        }
+
+        /// <summary>Whether a built assembly references an assembly by name; the compiler keeps only the references the code uses.</summary>
+        /// <param name="assemblyPath">The map's built assembly.</param>
+        /// <param name="assemblyName">The name of the referenced assembly, such as <c>Moonwell.Damage</c>.</param>
+        public static bool References(string assemblyPath, string assemblyName)
+        {
             using var stream = File.OpenRead(assemblyPath);
             using var pe = new PEReader(stream);
             var metadata = pe.GetMetadataReader();
             foreach (var handle in metadata.AssemblyReferences)
             {
-                if (metadata.GetString(metadata.GetAssemblyReference(handle).Name) == ObjectsAssemblyName)
+                if (metadata.GetString(metadata.GetAssemblyReference(handle).Name) == assemblyName)
                 {
                     return true;
                 }

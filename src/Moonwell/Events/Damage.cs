@@ -1,7 +1,7 @@
 namespace Moonwell
 {
-    /// <summary>One damage dealt to a unit: its target, its source when known, its amount, and whether it is an attack.</summary>
-    public sealed class Damage
+    /// <summary>One damage dealt to a unit: its target, its source when known, its amount, and whether it is an attack. A damage package hands a class of its own that extends it.</summary>
+    public class Damage
     {
         /// <summary>Makes the damage of one event.</summary>
         internal Damage(Unit target, Unit? source, float amount, bool isAttack)

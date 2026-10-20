@@ -119,6 +119,38 @@ public sealed class KillCounter : UnitComponent
   belongs to whatever made it, and ends with it.
 - Game work starts in a reaction. Top-level code and static fields make nothing in the game.
 
+## Damage
+
+`OnDamaged` sees a hit after armor. For more, add the `Moonwell.Damage` package to the project, at the same version as
+Moonwell; the build starts it, and a map without it carries none of its code. Its reactions come through interfaces,
+which a unit's class, its components and buffs implement, writing only the methods they need as public methods:
+
+```csharp
+public sealed class Shield : Buff, IDamageTarget
+{
+    public void OnTaken(Hit hit) { hit.Amount *= 0.5f; }
+}
+```
+
+| Stage | When | `IDamageSource` | `IDamageTarget` | `IDamageWatch` |
+|---|---|---|---|---|
+| Before armor | the hit starts | `OnDealing` | `OnTaking` | `OnBeforeArmor` |
+| After armor | armor has counted | `OnDealt` | `OnTaken` | `OnAfterArmor` |
+| Lethal | the hit would kill | `OnKilling` | `OnLethal` | `OnLethal` |
+| Landed | 0 s later, the life has dropped | `OnLanded` | `OnHurt` | `OnLanded` |
+| Burst | 0 s later, once per source | `OnBurst` | | `OnBurst` |
+
+- Each stage runs the source and its components, then the target and its components, then the game's and the
+  players' components that implement `IDamageWatch`. `OnDamaged` and `OnDealtDamage` still run, first in the
+  after-armor stage.
+- A `Hit` has the amount, `Original`, `IsAttack`, `IsSpell`, `IsMelee`, `IsRanged`, `IsCode` and `Tag`. Before armor
+  a reaction may also change `DamageKind`, `WeaponSound` and the target's `Armor` for this hit. In the lethal stage
+  `hit.Spare()` keeps the target alive; `hit.Killed` tells in the landed stage.
+- `source.Damage(target, 10f, DamageKind.Fire, tag: MyTag.Firebolt)` deals damage from code and returns the `Hit`.
+- Damage dealt from a reaction belongs to the hit it reacted to; a chain of 8 such hits ends with an error, so two
+  units that hit each other back never loop.
+- A hit spell immunity stops runs before armor only.
+
 ## Players
 
 `Player.One` to `Player.TwentyFour` are the player slots, as the lobby numbers them; `Player.Get(slot)` takes the
@@ -133,6 +165,12 @@ screen, `seconds: 10f`. `Gold`, `Lumber`, `FoodUsed`, `FoodCap`, `FoodCapCeiling
 `Player.Playing` is every player in the game, people and computers, and `Player.Users` the people:
 `foreach (var player in Player.Users)`. `player.SlotState` is `Empty`, `Playing` or `Left`, and `player.Controller`
 says who plays it. `OnLeave(Player player)` runs on the game's components, then the leaving player's.
+
+`Name`, `Color` and `Team` are read and set, and `Race` read; setting `Color` also recolours the player's units.
+`a.SetAlliance(b, Alliance.Allied | Alliance.SharedVision)` sets what `a` gives `b`, one way as the game keeps it, and
+`a.AllianceWith(b)`, `a.IsAlly(b)` and `a.IsEnemy(b)` read it. `LevelOf<T>()` and `SetLevel<T>(2)` take an upgrade class;
+`SetMaxAllowed<T>(1)` a unit or upgrade class, where 0 forbids it and `int.MaxValue` is no limit; and
+`SetAvailable<T>(false)` an ability class.
 
 The `Natives` class has every native of the game for what Moonwell does not cover yet.
 
@@ -149,6 +187,9 @@ turns the checks off in it.
 `moonwell build` builds the map in the current folder into `build\MyMap.w3x`; `moonwell run` builds it and starts the
 game with it. Both make a development build: it checks the values Moonwell receives and keeps the Lua readable.
 `--release` makes the release build. `moonwell run --game <exe>` names the game when it is not in its usual place.
+
+The build also rejects what CSharp.lua cannot compile: collection expressions, `[1, 2]` (write `new List<int> { 1, 2 }`),
+and `using static Moonwell.Natives` (write `Natives.X`).
 
 An error in a reaction shows on the screen with its C# file and line, and is written in full to
 `Documents\Warcraft III\CustomMapData\Moonwell\log.txt`. A release build leaves the message off the screen and keeps

@@ -6,6 +6,7 @@
     <Project Path="src/Moonwell.Analyzers/Moonwell.Analyzers.csproj" />
     <Project Path="src/Moonwell.Build/Moonwell.Build.csproj" />
     <Project Path="src/Moonwell.Cli/Moonwell.Cli.csproj" />
+    <Project Path="src/Moonwell.Damage/Moonwell.Damage.csproj" />
     <Project Path="src/Moonwell.Natives/Moonwell.Natives.csproj" />
     <Project Path="src/Moonwell.Objects/Moonwell.Objects.csproj" />
     <Project Path="src/Moonwell/Moonwell.csproj" />

@@ -45,6 +45,46 @@ namespace Moonwell.Testing
             Expect.Equal(false, Events.Wants(Hook.OnCast), "OnCast is not wanted");
         }
 
+        /// <summary>With a damage listener set, a damage reaction calls it, and the world is not asked to deliver damage itself.</summary>
+        public static void DamageListener(FakeWorld world)
+        {
+            var calls = 0;
+            Events.DamageListener = () => calls++;
+            ObjectTypes.Unit(ObjectTypes.FourCC("h000"), () => new Dummy());
+            Expect.Equal(1, calls, "the listener is called once");
+            Expect.True(!world.Listening.Contains(GameEvent.Damage), "the world does not listen for Damage");
+        }
+
+        /// <summary>The seen hook gets the first object of each class, once per class.</summary>
+        public static void SeenOncePerClass(FakeWorld world)
+        {
+            var seen = new System.Collections.Generic.List<string>();
+            Hooks.Seen = obj => seen.Add(Names.NameOf(obj));
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("ofoo")))!;
+            unit.Add(new DummyComp());
+            unit.Add(new DummyComp());
+            var comps = 0;
+            for (var i = 0; i < seen.Count; i++)
+            {
+                if (seen[i] == "DummyComp")
+                {
+                    comps++;
+                }
+            }
+
+            Expect.Equal(1, comps, "DummyComp is seen once");
+        }
+
+        /// <summary>A fresh runtime has neither hook set.</summary>
+        public static void ResetClears(FakeWorld world)
+        {
+            Events.DamageListener = () => { };
+            Hooks.Seen = _ => { };
+            FakeWorld.Install();
+            Expect.True(Events.DamageListener == null, "the damage listener is cleared");
+            Expect.True(Hooks.Seen == null, "the seen hook is cleared");
+        }
+
         /// <summary>The table of the test classes: OnDamaged and OnKill, declared by HookBase.</summary>
         private static HookTable Table()
         {
