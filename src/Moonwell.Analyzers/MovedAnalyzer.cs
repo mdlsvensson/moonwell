@@ -46,7 +46,9 @@ public sealed class MovedAnalyzer : DiagnosticAnalyzer
                 written = access;
                 left = access.Expression;
                 break;
+            // ?.AttackType, and a name being declared: using AttackType = Moonwell.AttackType;, new { AttackType = 1 }.
             case MemberBindingExpressionSyntax:
+            case NameEqualsSyntax:
                 return;
         }
 

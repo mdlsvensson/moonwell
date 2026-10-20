@@ -65,9 +65,18 @@ public class MovedTests
         Assert.Empty(MapCode.CheckFile("""
             using Moonwell;
             using Moonwell.Objects;
+            using Attack = Moonwell.AttackType;
 
             namespace Map
             {
+                using AttackType = Moonwell.AttackType;
+                using DefenseType = Moonwell.DefenseType;
+
+                public static class Named
+                {
+                    public static object Pair => new { AttackType = Attack.Magic, DefenseType = DefenseType.Divine };
+                }
+
                 public class Mage : Human.Units.Footman
                 {
                     public Mage()

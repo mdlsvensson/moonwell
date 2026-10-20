@@ -429,6 +429,48 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_declaration_of_the_attack_type_of_moonwell_objects_fails_with_the_core_enum_named()
+        {
+            // A field's type stops the compiler before analyzers run, so the build names the core enum itself.
+            var copy = folders.TemporaryCopyOfSample();
+            File.AppendAllText(Path.Combine(copy, "Objects.cs"), """
+
+                namespace Sample
+                {
+                    public static class Kinds
+                    {
+                        public static Moonwell.Objects.AttackType Attack;
+                    }
+                }
+                """);
+            var log = new StringWriter();
+
+            var error = Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), log));
+
+            Assert.Contains("error CS0234", log.ToString());
+            Assert.Equal(
+                "dotnet build failed" + Environment.NewLine
+                + "Moonwell.Objects.AttackType is Moonwell.AttackType since Moonwell 0.2.1, which the damage package uses too: write Moonwell.AttackType, or AttackType with using Moonwell",
+                error.Message);
+        }
+
+        [Fact]
+        public void the_build_names_each_moved_enum_of_a_cs0234_once()
+        {
+            var hints = DotnetBuild.MovedHints(new[]
+            {
+                @"C:\Map\Kinds.cs(5,40): error CS0234: The type or namespace name 'DefenseType' does not exist in the namespace 'Moonwell.Objects' (are you missing an assembly reference?) [C:\Map\Map.csproj]",
+                @"C:\Map\Kinds.cs(6,40): error CS0234: The type or namespace name 'AttackType' does not exist in the namespace 'Moonwell.Objects' (are you missing an assembly reference?) [C:\Map\Map.csproj]",
+                @"C:\Map\Kinds.cs(5,40): error CS0234: The type or namespace name 'DefenseType' does not exist in the namespace 'Moonwell.Objects' (are you missing an assembly reference?) [C:\Map\Map.csproj]",
+                @"C:\Map\Kinds.cs(7,40): error CS0234: The type or namespace name 'Targetz' does not exist in the namespace 'Moonwell.Objects' (are you missing an assembly reference?) [C:\Map\Map.csproj]",
+                @"C:\Map\Kinds.cs(8,40): error CS0234: The type or namespace name 'AttackType' does not exist in the namespace 'Other' (are you missing an assembly reference?) [C:\Moonwell.Objects\Map.csproj]",
+            });
+
+            Assert.Equal(new[] { "Moonwell.Objects.DefenseType is Moonwell.DefenseType", "Moonwell.Objects.AttackType is Moonwell.AttackType" },
+                hints.Select(hint => hint.Substring(0, hint.IndexOf(" since", StringComparison.Ordinal))));
+        }
+
+        [Fact]
         public void a_referenced_name_brings_every_overload_into_the_stubs()
         {
             // The constructor calls only Set(field, value); CSharp.lua names overloads by their order, so the stub keeps both.
