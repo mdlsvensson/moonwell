@@ -110,8 +110,9 @@ public static class ObjectsWriter
     /// partial classes of the group and the kind (<c>Human</c>, then <c>Units</c>) in namespace <c>Moonwell.Objects</c>.
     /// The class inherits its kind base (heroes <c>StandardHero</c>), has the object's id in <c>[Standard]</c>, and for
     /// an ability has a property for each field specific to the ability's code. A property cannot be named like its
-    /// class, so such a field gets its id appended (<c>HealingModifierHem1</c>). With <paramref name="constructors"/>,
-    /// a class whose object has values gets a constructor that sets them, before its properties.
+    /// class, so such a field gets its id appended unless field-names.txt names it (<c>hem1</c> is <c>HealingPercent</c>).
+    /// With <paramref name="constructors"/>, a class whose object has values gets a constructor that sets them, before
+    /// its properties.
     /// </summary>
     /// <param name="outer">The namespace and the classes the objects are nested in, dotted (<c>Moonwell.Objects.Human.Units</c>).</param>
     /// <param name="classes">The objects and their class names; every class name's outer is <paramref name="outer"/>.</param>

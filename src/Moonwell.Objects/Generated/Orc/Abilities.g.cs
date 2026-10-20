@@ -4512,8 +4512,8 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public WindWalk()
                 {
-                    BackstabDamageOwk3 = Levels(40f, 70f, 100f);
-                    BackstabDamageOwk4 = Levels(true, true, true);
+                    Backstab = Levels(true, true, true);
+                    BackstabDamage = Levels(40f, 70f, 100f);
                     Buffs.Set<global::Moonwell.Objects.Orc.Buffs.WindWalk>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = 2;
@@ -4571,7 +4571,7 @@ namespace Moonwell.Objects
                 /// <summary>The field <c>Owk3</c>.</summary>
                 [global::Moonwell.Objects.Field("Owk3", Label = "Backstab Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> BackstabDamageOwk3
+                public global::Moonwell.Objects.Levels<float> BackstabDamage
                 {
                     get { return Fields.GetLevels<float>(this, "Owk3"); }
                     protected set { Fields.Put("Owk3", value); }
@@ -4579,7 +4579,7 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Owk4</c>.</summary>
                 [global::Moonwell.Objects.Field("Owk4", Label = "Backstab Damage")]
-                public global::Moonwell.Objects.Levels<bool> BackstabDamageOwk4
+                public global::Moonwell.Objects.Levels<bool> Backstab
                 {
                     get { return Fields.GetLevels<bool>(this, "Owk4"); }
                     protected set { Fields.Put("Owk4", value); }

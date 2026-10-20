@@ -70,6 +70,83 @@ public class FieldsTests
         }
     }
 
+    private static readonly System.Text.RegularExpressions.Regex ClassOrProperty = new(
+        @"public (?:sealed |abstract )?class (?<class>\w+)|public (?<type>[^\r\n(]+?) (?<name>\w+)\r?\n\s*\{\r?\n\s*get \{ return Fields\.\w+(?:<[^>]+>)?\(this, ""(?<id>\w+)""\)",
+        System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    /// <summary>Every generated field property: its class, name and field id.</summary>
+    private static List<(string Class, string Name, string Id)> GeneratedProperties()
+    {
+        var generated = "";
+        for (var folder = new DirectoryInfo(AppContext.BaseDirectory); folder != null; folder = folder.Parent)
+        {
+            var candidate = Path.Combine(folder.FullName, "src", "Moonwell.Objects", "Generated");
+            if (Directory.Exists(candidate))
+            {
+                generated = candidate;
+                break;
+            }
+        }
+
+        Assert.NotEqual("", generated);
+        var properties = new List<(string, string, string)>();
+        foreach (var file in Directory.EnumerateFiles(generated, "*.cs", SearchOption.AllDirectories))
+        {
+            var current = "";
+            foreach (System.Text.RegularExpressions.Match match in ClassOrProperty.Matches(File.ReadAllText(file)))
+            {
+                if (match.Groups["class"].Success)
+                {
+                    current = match.Groups["class"].Value;
+                }
+                else
+                {
+                    properties.Add((current, match.Groups["name"].Value, match.Groups["id"].Value));
+                }
+            }
+        }
+
+        return properties;
+    }
+
+    [Fact]
+    public void the_generated_properties_are_found()
+    {
+        // The two tests below read the generated sources; they prove nothing if the pattern finds nothing.
+        var properties = GeneratedProperties();
+
+        Assert.True(properties.Count > 5000);
+        Assert.Contains(("StormBolt", "Damage", "Htb1"), properties);
+    }
+
+    [Theory]
+    [InlineData("Inferno", "InfernalDuration", "Uin2")]
+    [InlineData("Taunt", "PreferHostiles", "Tau2")]
+    [InlineData("Taunt", "PreferFriendlies", "Tau3")]
+    [InlineData("WindWalk", "BackstabDamage", "Owk3")]
+    [InlineData("WindWalk", "Backstab", "Owk4")]
+    [InlineData("HealingModifier", "HealingPercent", "hem1")]
+    public void a_field_that_took_its_id_has_a_name_of_its_own(string className, string name, string id)
+    {
+        Assert.Contains((className, name, id), GeneratedProperties());
+        Assert.Equal(name, FieldNames.HandPicked(Kind.Ability)[id]);
+    }
+
+    [Fact]
+    public void no_generated_property_name_ends_in_its_own_field_id()
+    {
+        // A name that ends in its id (DurationUin2) is the generator's way out of two fields with one label; the game's
+        // data for such a field gets a name of its own in field-names.txt instead.
+        var ending = GeneratedProperties()
+            .Where(p => p.Name.EndsWith(p.Id, StringComparison.OrdinalIgnoreCase))
+            .Select(p => $"{p.Class}.{p.Name} ({p.Id})")
+            .Distinct()
+            .OrderBy(p => p, StringComparer.Ordinal)
+            .ToList();
+
+        Assert.Empty(ending);
+    }
+
     [Fact]
     public void types_from_metadata()
     {

@@ -9216,7 +9216,6 @@ namespace Moonwell.Objects
                     Cooldown = Levels(180f);
                     Damage = Levels(50f);
                     Duration = Levels(4f);
-                    DurationUin2 = Levels(360f);
                     EditorSuffix = "(Neutral Hostile)";
                     Effect = "Units\\Demon\\Infernal\\InfernalBirth.mdl";
                     HeroAbility = true;
@@ -9225,6 +9224,7 @@ namespace Moonwell.Objects
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNInfernal.blp";
                     IconResearch = "ReplaceableTextures\\CommandButtons\\BTNInfernal.blp";
                     ImpactDelay = Levels(1f);
+                    InfernalDuration = Levels(360f);
                     ItemAbility = false;
                     LearnHotkey = "I";
                     LevelCount = 1;
@@ -9257,7 +9257,7 @@ namespace Moonwell.Objects
                 /// <summary>The field <c>Uin2</c>.</summary>
                 [global::Moonwell.Objects.Field("Uin2", Label = "Duration")]
                 [global::Moonwell.Objects.Limits(0, 300)]
-                public global::Moonwell.Objects.Levels<float> DurationUin2
+                public global::Moonwell.Objects.Levels<float> InfernalDuration
                 {
                     get { return Fields.GetLevels<float>(this, "Uin2"); }
                     protected set { Fields.Put("Uin2", value); }
@@ -9299,7 +9299,6 @@ namespace Moonwell.Objects
                     Cooldown = Levels(30f);
                     Damage = Levels(50f);
                     Duration = Levels(4f);
-                    DurationUin2 = Levels(360f);
                     EditorSuffix = "(Tichondrius)";
                     Effect = "Units\\Demon\\Infernal\\InfernalBirth.mdl";
                     HeroAbility = true;
@@ -9308,6 +9307,7 @@ namespace Moonwell.Objects
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNInfernal.blp";
                     IconResearch = "ReplaceableTextures\\CommandButtons\\BTNInfernal.blp";
                     ImpactDelay = Levels(1f);
+                    InfernalDuration = Levels(360f);
                     ItemAbility = false;
                     LearnHotkey = "N";
                     LevelCount = 1;
@@ -9341,7 +9341,7 @@ namespace Moonwell.Objects
                 /// <summary>The field <c>Uin2</c>.</summary>
                 [global::Moonwell.Objects.Field("Uin2", Label = "Duration")]
                 [global::Moonwell.Objects.Limits(0, 300)]
-                public global::Moonwell.Objects.Levels<float> DurationUin2
+                public global::Moonwell.Objects.Levels<float> InfernalDuration
                 {
                     get { return Fields.GetLevels<float>(this, "Uin2"); }
                     protected set { Fields.Put("Uin2", value); }
@@ -17064,8 +17064,8 @@ namespace Moonwell.Objects
                     Name = "Taunt";
                     NumberOfPulses = Levels(1);
                     Order = "taunt";
-                    PreferHostilesTau2 = Levels(0);
-                    PreferHostilesTau3 = Levels(0);
+                    PreferFriendlies = Levels(0);
+                    PreferHostiles = Levels(0);
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
                     RequiredLevel = 0;
@@ -17087,7 +17087,7 @@ namespace Moonwell.Objects
                 /// <summary>The field <c>Tau2</c>.</summary>
                 [global::Moonwell.Objects.Field("Tau2", Label = "Prefer Hostiles")]
                 [global::Moonwell.Objects.Limits(0, 1)]
-                public global::Moonwell.Objects.Levels<int> PreferHostilesTau2
+                public global::Moonwell.Objects.Levels<int> PreferHostiles
                 {
                     get { return Fields.GetLevels<int>(this, "Tau2"); }
                     protected set { Fields.Put("Tau2", value); }
@@ -17096,7 +17096,7 @@ namespace Moonwell.Objects
                 /// <summary>The field <c>Tau3</c>.</summary>
                 [global::Moonwell.Objects.Field("Tau3", Label = "Prefer Hostiles")]
                 [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> PreferHostilesTau3
+                public global::Moonwell.Objects.Levels<int> PreferFriendlies
                 {
                     get { return Fields.GetLevels<int>(this, "Tau3"); }
                     protected set { Fields.Put("Tau3", value); }
@@ -18052,8 +18052,8 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public WindWalk()
                 {
-                    BackstabDamageOwk3 = Levels(50f);
-                    BackstabDamageOwk4 = Levels(true);
+                    Backstab = Levels(true);
+                    BackstabDamage = Levels(50f);
                     Buffs.Set<global::Moonwell.Objects.Orc.Buffs.WindWalk>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = 2;
@@ -18107,7 +18107,7 @@ namespace Moonwell.Objects
                 /// <summary>The field <c>Owk3</c>.</summary>
                 [global::Moonwell.Objects.Field("Owk3", Label = "Backstab Damage")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> BackstabDamageOwk3
+                public global::Moonwell.Objects.Levels<float> BackstabDamage
                 {
                     get { return Fields.GetLevels<float>(this, "Owk3"); }
                     protected set { Fields.Put("Owk3", value); }
@@ -18115,7 +18115,7 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Owk4</c>.</summary>
                 [global::Moonwell.Objects.Field("Owk4", Label = "Backstab Damage")]
-                public global::Moonwell.Objects.Levels<bool> BackstabDamageOwk4
+                public global::Moonwell.Objects.Levels<bool> Backstab
                 {
                     get { return Fields.GetLevels<bool>(this, "Owk4"); }
                     protected set { Fields.Put("Owk4", value); }

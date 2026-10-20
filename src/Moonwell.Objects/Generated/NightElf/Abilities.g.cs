@@ -4126,8 +4126,8 @@ namespace Moonwell.Objects
                     Name = "Taunt";
                     NumberOfPulses = Levels(1);
                     Order = "taunt";
-                    PreferHostilesTau2 = Levels(0);
-                    PreferHostilesTau3 = Levels(0);
+                    PreferFriendlies = Levels(0);
+                    PreferHostiles = Levels(0);
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.NightElf;
                     RequiredLevel = 0;
@@ -4149,7 +4149,7 @@ namespace Moonwell.Objects
                 /// <summary>The field <c>Tau2</c>.</summary>
                 [global::Moonwell.Objects.Field("Tau2", Label = "Prefer Hostiles")]
                 [global::Moonwell.Objects.Limits(0, 1)]
-                public global::Moonwell.Objects.Levels<int> PreferHostilesTau2
+                public global::Moonwell.Objects.Levels<int> PreferHostiles
                 {
                     get { return Fields.GetLevels<int>(this, "Tau2"); }
                     protected set { Fields.Put("Tau2", value); }
@@ -4158,7 +4158,7 @@ namespace Moonwell.Objects
                 /// <summary>The field <c>Tau3</c>.</summary>
                 [global::Moonwell.Objects.Field("Tau3", Label = "Prefer Hostiles")]
                 [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> PreferHostilesTau3
+                public global::Moonwell.Objects.Levels<int> PreferFriendlies
                 {
                     get { return Fields.GetLevels<int>(this, "Tau3"); }
                     protected set { Fields.Put("Tau3", value); }

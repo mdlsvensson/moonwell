@@ -92,6 +92,12 @@ ability arhk LearnHotkey
 ability areq Requires
 ability aord Order
 ability arlv RequiredLevel
+ability Uin2 InfernalDuration
+ability Tau2 PreferHostiles
+ability Tau3 PreferFriendlies
+ability Owk3 BackstabDamage
+ability Owk4 Backstab
+ability hem1 HealingPercent
 buff fnam Name
 buff ftip Tooltip
 buff fube TooltipExtended

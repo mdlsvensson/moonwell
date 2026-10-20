@@ -1012,13 +1012,13 @@ namespace Moonwell.Objects
                     Cooldown = Levels(20f);
                     Damage = Levels(50f);
                     Duration = Levels(4f);
-                    DurationUin2 = Levels(180f);
                     EditorSuffix = "(Item)";
                     Effect = "Units\\Demon\\Infernal\\InfernalBirth.mdl";
                     HeroAbility = false;
                     HeroDuration = Levels(2f);
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNInfernal.blp";
                     ImpactDelay = Levels(1f);
+                    InfernalDuration = Levels(180f);
                     ItemAbility = true;
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
@@ -1046,7 +1046,7 @@ namespace Moonwell.Objects
                 /// <summary>The field <c>Uin2</c>.</summary>
                 [global::Moonwell.Objects.Field("Uin2", Label = "Duration")]
                 [global::Moonwell.Objects.Limits(0, 300)]
-                public global::Moonwell.Objects.Levels<float> DurationUin2
+                public global::Moonwell.Objects.Levels<float> InfernalDuration
                 {
                     get { return Fields.GetLevels<float>(this, "Uin2"); }
                     protected set { Fields.Put("Uin2", value); }
@@ -5006,8 +5006,8 @@ namespace Moonwell.Objects
                     Name = "Challenging Call";
                     NumberOfPulses = Levels(1, 1, 1);
                     Order = "challengingcall";
-                    PreferHostilesTau2 = Levels(0, 0, 0);
-                    PreferHostilesTau3 = Levels(0, 0, 0);
+                    PreferFriendlies = Levels(0, 0, 0);
+                    PreferHostiles = Levels(0, 0, 0);
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 1;
@@ -5031,7 +5031,7 @@ namespace Moonwell.Objects
                 /// <summary>The field <c>Tau2</c>.</summary>
                 [global::Moonwell.Objects.Field("Tau2", Label = "Prefer Hostiles")]
                 [global::Moonwell.Objects.Limits(0, 1)]
-                public global::Moonwell.Objects.Levels<int> PreferHostilesTau2
+                public global::Moonwell.Objects.Levels<int> PreferHostiles
                 {
                     get { return Fields.GetLevels<int>(this, "Tau2"); }
                     protected set { Fields.Put("Tau2", value); }
@@ -5040,7 +5040,7 @@ namespace Moonwell.Objects
                 /// <summary>The field <c>Tau3</c>.</summary>
                 [global::Moonwell.Objects.Field("Tau3", Label = "Prefer Hostiles")]
                 [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> PreferHostilesTau3
+                public global::Moonwell.Objects.Levels<int> PreferFriendlies
                 {
                     get { return Fields.GetLevels<int>(this, "Tau3"); }
                     protected set { Fields.Put("Tau3", value); }
@@ -10789,7 +10789,7 @@ namespace Moonwell.Objects
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
                     Duration = Levels(0f);
-                    HealingModifierHem1 = Levels(1.3f);
+                    HealingPercent = Levels(1.3f);
                     HeroAbility = false;
                     HeroDuration = Levels(0f);
                     ItemAbility = false;
@@ -10807,7 +10807,7 @@ namespace Moonwell.Objects
                 [global::Moonwell.Objects.Field("hem1", Label = "% Healing Modifier")]
                 [global::Moonwell.Objects.Limits(0, 10)]
                 [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> HealingModifierHem1
+                public global::Moonwell.Objects.Levels<float> HealingPercent
                 {
                     get { return Fields.GetLevels<float>(this, "hem1"); }
                     protected set { Fields.Put("hem1", value); }

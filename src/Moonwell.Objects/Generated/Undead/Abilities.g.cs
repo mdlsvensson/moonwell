@@ -3235,7 +3235,6 @@ namespace Moonwell.Objects
                     Cooldown = Levels(180f);
                     Damage = Levels(50f);
                     Duration = Levels(4f);
-                    DurationUin2 = Levels(180f);
                     Effect = "Units\\Demon\\Infernal\\InfernalBirth.mdl";
                     HeroAbility = true;
                     HeroDuration = Levels(2f);
@@ -3243,6 +3242,7 @@ namespace Moonwell.Objects
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNInfernal.blp";
                     IconResearch = "ReplaceableTextures\\CommandButtons\\BTNInfernal.blp";
                     ImpactDelay = Levels(1f);
+                    InfernalDuration = Levels(180f);
                     ItemAbility = false;
                     LearnHotkey = "N";
                     LevelCount = 1;
@@ -3275,7 +3275,7 @@ namespace Moonwell.Objects
                 /// <summary>The field <c>Uin2</c>.</summary>
                 [global::Moonwell.Objects.Field("Uin2", Label = "Duration")]
                 [global::Moonwell.Objects.Limits(0, 300)]
-                public global::Moonwell.Objects.Levels<float> DurationUin2
+                public global::Moonwell.Objects.Levels<float> InfernalDuration
                 {
                     get { return Fields.GetLevels<float>(this, "Uin2"); }
                     protected set { Fields.Put("Uin2", value); }
