@@ -12,7 +12,7 @@ public class FieldRulesTests
         {
         """;
 
-    private static string File(string classes) => Header + "\n" + classes + "\n}\n";
+    internal static string File(string classes) => Header + "\n" + classes + "\n}\n";
 
     private static List<string> Messages(string classes) => MapCode.MessagesOfFile(File(classes));
 
@@ -21,7 +21,7 @@ public class FieldRulesTests
     /// <summary>A class Giant of the standard footman whose constructor runs the statements.</summary>
     private static string Footman(string statements, string attribute = "") => Class("Giant", "Moonwell.Objects.Human.Units.Footman", statements, attribute);
 
-    private static string Class(string name, string @base, string statements, string attribute = "") => $$"""
+    internal static string Class(string name, string @base, string statements, string attribute = "") => $$"""
         {{attribute}}
         public class {{name}} : {{@base}}
         {

@@ -74,14 +74,29 @@ internal static class MapCode
             """;
     }
 
-    private static (SyntaxTree Tree, ImmutableArray<Diagnostic> Diagnostics) Analyze(string source)
+    /// <summary>Compiles a whole file and loads it, to run the map code on .NET as the build does.</summary>
+    public static System.Reflection.Assembly Load(string source)
+    {
+        var (_, compilation) = Compile(source);
+        using var stream = new MemoryStream();
+        var emitted = compilation.Emit(stream);
+        Assert.True(emitted.Success, string.Join("\n", emitted.Diagnostics));
+        return System.Reflection.Assembly.Load(stream.ToArray());
+    }
+
+    private static (SyntaxTree Tree, CSharpCompilation Compilation) Compile(string source)
     {
         var tree = CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.Latest));
-        var compilation = CSharpCompilation.Create("Map", new[] { tree }, References,
+        var compilation = CSharpCompilation.Create("Map" + Guid.NewGuid().ToString("N"), new[] { tree }, References,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));
         var errors = compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
         Assert.True(errors.Count == 0, string.Join("\n", errors));
+        return (tree, compilation);
+    }
 
+    private static (SyntaxTree Tree, ImmutableArray<Diagnostic> Diagnostics) Analyze(string source)
+    {
+        var (tree, compilation) = Compile(source);
         var analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(new SyncAnalyzer(), new LuaAnalyzer(), new FieldRulesAnalyzer());
         return (tree, compilation.WithAnalyzers(analyzers).GetAnalyzerDiagnosticsAsync().Result);
     }
