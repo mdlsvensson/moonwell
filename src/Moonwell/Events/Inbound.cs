@@ -137,9 +137,18 @@ namespace Moonwell
             }
 
             Unit? from = source == null ? null : Unit.Of(source);
+            var damage = new Damage(hit, from, amount, isAttack);
+            Dispatch(damage);
+            return damage.Amount;
+        }
+
+        /// <summary>Runs a damage's reactions: the source's type and components deal it, the target's take it, then the map's and the players' reactions; a damage package calls it with its own kind of damage.</summary>
+        internal static void Dispatch(Damage damage)
+        {
+            var hit = damage.Target;
+            var from = damage.Source;
             var hitSlot = hit.Player.Slot;
             var fromSlot = from == null ? -1 : from.Player.Slot;
-            var damage = new Damage(hit, from, amount, isAttack);
             if (from != null)
             {
                 DealtDamage(from, damage);
@@ -161,8 +170,6 @@ namespace Moonwell
                     MapDamaged(second, damage);
                 }
             }
-
-            return damage.Amount;
         }
 
         /// <summary>A unit dies: its type's OnDeath and components, then the killer's OnKill and components, then the map's and the players' reactions, then the buffs a death ends end; a killer equal to the dying unit counts as none.</summary>

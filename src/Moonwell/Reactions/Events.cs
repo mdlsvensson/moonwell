@@ -1,3 +1,4 @@
+using System;
 using Moonwell.Hosting;
 
 namespace Moonwell
@@ -11,13 +12,23 @@ namespace Moonwell
         /// <summary>The reaction bits that some class overrides, once any has been needed.</summary>
         private static int wanted;
 
+        /// <summary>Set by a damage package: called in place of listening for the game's damage event; null without one.</summary>
+        internal static Action? DamageListener;
+
         /// <summary>Adds the reaction bits to the wanted ones, and listens for the event each bit needs.</summary>
         internal static void Need(int mask)
         {
             wanted |= mask;
             if ((mask & (Hook.OnDamaged | Hook.OnDealtDamage | Hook.OnUnitDamaged)) != 0)
             {
-                Listen(GameEvent.Damage);
+                if (DamageListener != null)
+                {
+                    DamageListener();
+                }
+                else
+                {
+                    Listen(GameEvent.Damage);
+                }
             }
 
             if ((mask & (Hook.OnDeath | Hook.OnKill | Hook.OnUnitDied)) != 0)
@@ -57,6 +68,7 @@ namespace Moonwell
         {
             listening = new bool[6];
             wanted = 0;
+            DamageListener = null;
         }
 
         /// <summary>Asks the world to deliver an event, once.</summary>

@@ -47,6 +47,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "timers.remaining", Run = TimerCases.Remaining });
             list.Add(new Case { Name = "hooks.overrides", Run = HookCases.Overrides });
             list.Add(new Case { Name = "hooks.cached", Run = HookCases.Cached });
+            list.Add(new Case { Name = "hooks.damage-listener", Run = HookCases.DamageListener });
+            list.Add(new Case { Name = "hooks.seen-once-per-class", Run = HookCases.SeenOncePerClass });
+            list.Add(new Case { Name = "hooks.reset-clears", Run = HookCases.ResetClears });
             list.Add(new Case { Name = "events.need-listens-once", Run = HookCases.NeedListensOnce });
             list.Add(new Case { Name = "actors.add-and-get", Run = ActorCases.AddAndGet });
             list.Add(new Case { Name = "actors.remove", Run = ActorCases.RemoveOne });
