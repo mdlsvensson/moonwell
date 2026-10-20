@@ -113,7 +113,7 @@ namespace Moonwell.Hosting
         /// <summary>Sets the level a player has of an upgrade.</summary>
         void Research(player player, int upgradeId, int level);
 
-        /// <summary>How many of a unit type a player may have, or the top level of an upgrade it may research; -1 for no limit.</summary>
+        /// <summary>How many of a unit type a player may have, or the top level of an upgrade it may research; int.MaxValue for a unit type without a limit.</summary>
         int TechMaxOf(player player, int typeId);
 
         /// <summary>Sets how many of a unit type a player may have, or the top level of an upgrade; 0 forbids it.</summary>

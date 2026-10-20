@@ -134,7 +134,7 @@ says who plays it. `OnLeave(Player player)` runs on the game's components, then 
 `Name`, `Color` and `Team` are read and set, and `Race` read; setting `Color` also recolours the player's units.
 `a.SetAlliance(b, Alliance.Allied | Alliance.SharedVision)` sets what `a` gives `b`, one way as the game keeps it, and
 `a.AllianceWith(b)`, `a.IsAlly(b)` and `a.IsEnemy(b)` read it. `LevelOf<T>()` and `SetLevel<T>(2)` take an upgrade class;
-`SetMaxAllowed<T>(1)` a unit or upgrade class, where 0 forbids it and `MaxAllowed<T>()` is -1 without a limit; and
+`SetMaxAllowed<T>(1)` a unit or upgrade class, where 0 forbids it and `int.MaxValue` is no limit; and
 `SetAvailable<T>(false)` an ability class.
 
 The `Natives` class has every native of the game for what Moonwell does not cover yet.

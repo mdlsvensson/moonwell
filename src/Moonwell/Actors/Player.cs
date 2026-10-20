@@ -296,14 +296,14 @@ namespace Moonwell
             Runtime.World.Research(Handle, ObjectTypes.IdOf<T>(), level);
         }
 
-        /// <summary>How many units of a unit class the player may have, or the top level of an upgrade class it may research; -1 for no limit.</summary>
+        /// <summary>How many units of a unit class the player may have, or the top level of an upgrade class it may research; int.MaxValue for a unit class without a limit.</summary>
         [LocalSafe]
         public int MaxAllowed<T>() where T : class
         {
             return Runtime.World.TechMaxOf(Handle, ObjectTypes.IdOf<T>());
         }
 
-        /// <summary>Sets how many units of a unit class the player may have, or the top level of an upgrade class; 0 forbids it.</summary>
+        /// <summary>Sets how many units of a unit class the player may have, or the top level of an upgrade class; 0 forbids it, and int.MaxValue lifts a unit limit.</summary>
         public void SetMaxAllowed<T>(int max) where T : class
         {
             Runtime.World.SetTechMax(Handle, ObjectTypes.IdOf<T>(), max);

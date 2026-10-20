@@ -206,7 +206,7 @@ namespace Moonwell.Testing
             Expect.Equal(2, Player.One.LevelOf<TestForge>(), "the upgrade's level");
             Expect.Equal(0, Player.Two.LevelOf<TestForge>(), "another player's level");
 
-            Expect.Equal(-1, Player.One.MaxAllowed<TestHero>(), "no limit until set");
+            Expect.Equal(int.MaxValue, Player.One.MaxAllowed<TestHero>(), "no limit until set");
             Player.One.SetMaxAllowed<TestHero>(1);
             Player.One.SetMaxAllowed<TestForge>(0);
             Expect.Equal(1, Player.One.MaxAllowed<TestHero>(), "the unit's limit");

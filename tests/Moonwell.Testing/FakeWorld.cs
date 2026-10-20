@@ -523,7 +523,7 @@ namespace Moonwell.Testing
             SetUpgradeLevel(SlotOf(player), upgradeId, level);
         }
 
-        /// <summary>The tech limit set for a player's slot; -1 when none was set.</summary>
+        /// <summary>The tech limit set for a player's slot; int.MaxValue, the game's "no limit" for a unit type, when none was set.</summary>
         public int TechMaxOf(player player, int typeId)
         {
             if (techMaxes.TryGetValue(SlotOf(player), out var maxes) && maxes.TryGetValue(typeId, out var max))
@@ -531,7 +531,7 @@ namespace Moonwell.Testing
                 return max;
             }
 
-            return -1;
+            return int.MaxValue;
         }
 
         /// <summary>Sets the tech limit of a player's slot.</summary>
