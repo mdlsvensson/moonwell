@@ -349,7 +349,7 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>gub1</c>.</summary>
         [global::Moonwell.Objects.Field("gub1")]
-        public global::Moonwell.Objects.Levels<string> ExtendedTooltip
+        public global::Moonwell.Objects.Levels<string> TooltipExtended
         {
             get { return Fields.GetLevels<string>(this, "gub1"); }
             protected set { Fields.Put("gub1", value); }

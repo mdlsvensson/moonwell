@@ -20,7 +20,7 @@ unit umdl Model
 unit usca Scale
 unit uico Icon
 unit utip Tooltip
-unit utub ExtendedTooltip
+unit utub TooltipExtended
 unit uhot Hotkey
 unit ua1t AttackType
 unit ua1b Damage
@@ -49,7 +49,7 @@ item ifil Model
 item isca Scale
 item iico Icon
 item utip Tooltip
-item utub ExtendedTooltip
+item utub TooltipExtended
 item ides Description
 item uhot Hotkey
 item ureq Requires
@@ -77,9 +77,9 @@ ability abuf Buffs
 ability atar Targets
 ability aart Icon
 ability atp1 Tooltip
-ability aub1 ExtendedTooltip
-ability aret LearnTooltip
-ability arut LearnExtendedTooltip
+ability aub1 TooltipExtended
+ability aret TooltipLearn
+ability arut TooltipLearnExtended
 ability ahky Hotkey
 ability arhk LearnHotkey
 ability areq Requires
@@ -87,11 +87,11 @@ ability aord Order
 ability arlv RequiredLevel
 buff fnam Name
 buff ftip Tooltip
-buff fube ExtendedTooltip
+buff fube TooltipExtended
 buff fart Icon
 upgrade gnam Name
 upgrade gtp1 Tooltip
-upgrade gub1 ExtendedTooltip
+upgrade gub1 TooltipExtended
 upgrade ghk1 Hotkey
 upgrade gar1 Icon
 upgrade glvl LevelCount

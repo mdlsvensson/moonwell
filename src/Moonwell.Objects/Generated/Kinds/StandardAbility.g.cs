@@ -1329,7 +1329,7 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>aret</c>.</summary>
         [global::Moonwell.Objects.Field("aret")]
-        public string LearnTooltip
+        public string TooltipLearn
         {
             get { return Fields.Get<string>(this, "aret"); }
             protected set { Fields.Put("aret", value); }
@@ -1377,7 +1377,7 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>arut</c>.</summary>
         [global::Moonwell.Objects.Field("arut")]
-        public string LearnExtendedTooltip
+        public string TooltipLearnExtended
         {
             get { return Fields.Get<string>(this, "arut"); }
             protected set { Fields.Put("arut", value); }
@@ -1489,7 +1489,7 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>aub1</c>.</summary>
         [global::Moonwell.Objects.Field("aub1")]
-        public global::Moonwell.Objects.Levels<string> ExtendedTooltip
+        public global::Moonwell.Objects.Levels<string> TooltipExtended
         {
             get { return Fields.GetLevels<string>(this, "aub1"); }
             protected set { Fields.Put("aub1", value); }

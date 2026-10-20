@@ -35,6 +35,19 @@ public class FieldsTests
         Assert.Equal(name, Find(Fields.Of(MiniExport(), kind), id).Name);
     }
 
+    [Theory]
+    [InlineData(Kind.Unit, "utub", "TooltipExtended")]
+    [InlineData(Kind.Item, "utub", "TooltipExtended")]
+    [InlineData(Kind.Ability, "aub1", "TooltipExtended")]
+    [InlineData(Kind.Ability, "aret", "TooltipLearn")]
+    [InlineData(Kind.Ability, "arut", "TooltipLearnExtended")]
+    [InlineData(Kind.Buff, "fube", "TooltipExtended")]
+    [InlineData(Kind.Upgrade, "gub1", "TooltipExtended")]
+    public void tooltip_fields_follow_world_editor_order(Kind kind, string id, string name)
+    {
+        Assert.Equal(name, FieldNames.HandPicked(kind)[id]);
+    }
+
     [Fact]
     public void every_listed_id_exists()
     {

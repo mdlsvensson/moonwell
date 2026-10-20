@@ -2155,7 +2155,7 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>utub</c>.</summary>
         [global::Moonwell.Objects.Field("utub")]
-        public string ExtendedTooltip
+        public string TooltipExtended
         {
             get { return Fields.Get<string>(this, "utub"); }
             protected set { Fields.Put("utub", value); }

@@ -260,7 +260,7 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>fube</c>.</summary>
         [global::Moonwell.Objects.Field("fube")]
-        public string ExtendedTooltip
+        public string TooltipExtended
         {
             get { return Fields.Get<string>(this, "fube"); }
             protected set { Fields.Put("fube", value); }
