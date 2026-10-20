@@ -80,7 +80,8 @@ public sealed class Champion : Human.Units.Paladin
 - A field with no name of its own is set by its id: `Set("Htb1", 2, 250f)`.
 - A constructor may compute, but must not call the game: the build fails at such a line.
 - A class with no `[ObjectId]` fails the build, which names a free id to use. A buff also names its carrier, the
-  hidden ability that shows its icon: `[ObjectId("B001", Carrier = "A002")]`.
+  hidden ability that shows its icon: `[ObjectId("B001", Carrier = "A002")]`, or `[ObjectId(Carrier = "A002")]` with
+  `[Replaces]`.
 - `[Replaces]` makes the class the game's object itself: every unit of that type is made as the class.
 - `Unit.Create<Champion>(player, x, y)` makes one in the game, facing 270 degrees unless a facing follows.
 
