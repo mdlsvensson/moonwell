@@ -6,8 +6,22 @@ namespace Moonwell
     /// <summary>A unit of the game: an object of its declared class, which holds the components the class starts with.</summary>
     public class Unit : Widget
     {
+        /// <summary>The table behind UnitHooks, made on first use. A static initializer would not do: CSharp.lua runs it when the class is first indexed, and a map's static Dictionary keyed by Unit does that while the script loads, before this file has its imports.</summary>
+        private static HookTable? unitHooks;
+
         /// <summary>The reactions of units; declared here, so that an override in a subclass is found.</summary>
-        internal static readonly HookTable UnitHooks = new HookTable(typeof(Unit), new string[] { "OnItemPickedUp", "OnItemDropped", "OnDamaged", "OnDealtDamage", "OnDeath", "OnKill", "OnCast" }, new int[] { Hook.OnItemPickedUp, Hook.OnItemDropped, Hook.OnDamaged, Hook.OnDealtDamage, Hook.OnDeath, Hook.OnKill, Hook.OnCast });
+        internal static HookTable UnitHooks
+        {
+            get
+            {
+                if (unitHooks == null)
+                {
+                    unitHooks = new HookTable(typeof(Unit), new string[] { "OnItemPickedUp", "OnItemDropped", "OnDamaged", "OnDealtDamage", "OnDeath", "OnKill", "OnCast" }, new int[] { Hook.OnItemPickedUp, Hook.OnItemDropped, Hook.OnDamaged, Hook.OnDealtDamage, Hook.OnDeath, Hook.OnKill, Hook.OnCast });
+                }
+
+                return unitHooks;
+            }
+        }
 
         /// <summary>The bit mask of the reactions this class overrides, worked out when the unit is taken in.</summary>
         internal int Mask;

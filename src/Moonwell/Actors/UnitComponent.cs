@@ -3,8 +3,22 @@ namespace Moonwell
     /// <summary>A component on a unit, which reacts to the unit's events.</summary>
     public abstract class UnitComponent : Component
     {
+        /// <summary>The table behind ComponentHooks, made on first use so that the class has no static initializer (see Unit.UnitHooks).</summary>
+        private static HookTable? componentHooks;
+
         /// <summary>The reactions of unit components, named as Unit's are.</summary>
-        internal static readonly HookTable ComponentHooks = new HookTable(typeof(UnitComponent), new string[] { "OnItemPickedUp", "OnItemDropped", "OnDamaged", "OnDealtDamage", "OnDeath", "OnKill", "OnCast" }, new int[] { Hook.OnItemPickedUp, Hook.OnItemDropped, Hook.OnDamaged, Hook.OnDealtDamage, Hook.OnDeath, Hook.OnKill, Hook.OnCast });
+        internal static HookTable ComponentHooks
+        {
+            get
+            {
+                if (componentHooks == null)
+                {
+                    componentHooks = new HookTable(typeof(UnitComponent), new string[] { "OnItemPickedUp", "OnItemDropped", "OnDamaged", "OnDealtDamage", "OnDeath", "OnKill", "OnCast" }, new int[] { Hook.OnItemPickedUp, Hook.OnItemDropped, Hook.OnDamaged, Hook.OnDealtDamage, Hook.OnDeath, Hook.OnKill, Hook.OnCast });
+                }
+
+                return componentHooks;
+            }
+        }
 
         /// <summary>The unit this component is on.</summary>
         [LocalSafe]

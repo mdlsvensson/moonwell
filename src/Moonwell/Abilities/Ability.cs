@@ -3,8 +3,22 @@ namespace Moonwell
     /// <summary>An ability of a unit: one object per unit and ability id, which owns the casts of the ability.</summary>
     public class Ability : Owner
     {
+        /// <summary>The table behind AbilityHooks, made on first use so that the class has no static initializer (see Unit.UnitHooks).</summary>
+        private static HookTable? abilityHooks;
+
         /// <summary>The reactions of abilities; declared here, so that an override in a subclass is found.</summary>
-        internal static readonly HookTable AbilityHooks = new HookTable(typeof(Ability), new string[] { "OnCast" }, new int[] { Hook.OnCast });
+        internal static HookTable AbilityHooks
+        {
+            get
+            {
+                if (abilityHooks == null)
+                {
+                    abilityHooks = new HookTable(typeof(Ability), new string[] { "OnCast" }, new int[] { Hook.OnCast });
+                }
+
+                return abilityHooks;
+            }
+        }
 
         /// <summary>The bit mask of the reactions this class overrides, worked out when the ability is made for its unit.</summary>
         internal int Mask;

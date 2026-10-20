@@ -112,6 +112,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "units.add-in-onleave", Run = UnitCases.AddInOnLeave });
             list.Add(new Case { Name = "units.enter", Run = UnitCases.Enter });
             list.Add(new Case { Name = "units.player-after-removal", Run = UnitCases.PlayerAfterRemoval });
+            list.Add(new Case { Name = "units.dictionary-key", Run = UnitCases.DictionaryKey });
             list.Add(new Case { Name = "items.registered-class", Run = ItemCases.RegisteredClass });
             list.Add(new Case { Name = "items.fallback-class", Run = ItemCases.FallbackClass });
             list.Add(new Case { Name = "items.pickup-order", Run = ItemCases.PickupOrder });

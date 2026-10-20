@@ -3,8 +3,22 @@ namespace Moonwell
     /// <summary>A component on a destructable, which reacts to the destructable's events.</summary>
     public abstract class DestructableComponent : Component
     {
+        /// <summary>The table behind ComponentHooks, made on first use so that the class has no static initializer (see Unit.UnitHooks).</summary>
+        private static HookTable? componentHooks;
+
         /// <summary>The reactions of destructable components, named as Destructable's are.</summary>
-        internal static readonly HookTable ComponentHooks = new HookTable(typeof(DestructableComponent), new string[] { "OnDeath" }, new int[] { Hook.OnDeath });
+        internal static HookTable ComponentHooks
+        {
+            get
+            {
+                if (componentHooks == null)
+                {
+                    componentHooks = new HookTable(typeof(DestructableComponent), new string[] { "OnDeath" }, new int[] { Hook.OnDeath });
+                }
+
+                return componentHooks;
+            }
+        }
 
         /// <summary>The destructable this component is on.</summary>
         [LocalSafe]

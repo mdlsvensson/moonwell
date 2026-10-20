@@ -12,8 +12,8 @@ namespace Moonwell
         /// <summary>The number of slots a person or a computer can play in, the game's bj_MAX_PLAYERS.</summary>
         public const int PlayableSlots = 24;
 
-        /// <summary>The player object of each slot, made when the slot is first asked for; null until then.</summary>
-        private static readonly Player?[] bySlot = new Player?[MaxSlots];
+        /// <summary>The player object of each slot, made when the slot is first asked for; null until then. The array is made on first use, so that the class has no static initializer (see Unit.UnitHooks).</summary>
+        private static Player?[]? bySlot;
 
         /// <summary>Makes the object of a slot, with the game's player for it.</summary>
         private Player(int slot, player handle)
@@ -34,6 +34,11 @@ namespace Moonwell
         [LocalSafe]
         public static Player Get(int slot)
         {
+            if (bySlot == null)
+            {
+                bySlot = new Player?[MaxSlots];
+            }
+
             var existing = bySlot[slot];
             if (existing != null)
             {
@@ -180,7 +185,7 @@ namespace Moonwell
         /// <summary>The player object of a slot when one has been made; null otherwise.</summary>
         internal static Player? Existing(int slot)
         {
-            if (slot < 0 || slot >= MaxSlots)
+            if (slot < 0 || slot >= MaxSlots || bySlot == null)
             {
                 return null;
             }
@@ -392,10 +397,7 @@ namespace Moonwell
         /// <summary>Forgets every player object; Runtime.Reset calls it.</summary>
         internal static void Reset()
         {
-            for (var i = 0; i < MaxSlots; i++)
-            {
-                bySlot[i] = null;
-            }
+            bySlot = null;
         }
     }
 }
