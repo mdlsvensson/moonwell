@@ -68,6 +68,8 @@ namespace Moonwell.Build
                         continue;
                     }
 
+                    parent = parent.Replace('+', '.');
+
                     var name = reader.GetString(member.Name);
                     if (name.StartsWith("get_", StringComparison.Ordinal) || name.StartsWith("set_", StringComparison.Ordinal))
                     {
@@ -361,10 +363,18 @@ namespace Moonwell.Build
                 inObjects ? ObjectStubs.Class(type, names) : string.Empty));
         }
 
-        // The full name of a type a reference names in Moonwell.Objects; null for a type of another assembly or a nested type.
+        // The reflection name of a type a reference names in Moonwell.Objects (a nested type after a +); null for a type of another assembly.
         private static string? ObjectsTypeName(MetadataReader reader, TypeReferenceHandle handle)
         {
             var reference = reader.GetTypeReference(handle);
+
+            // A nested class (Moonwell.Objects.Human+Units+Paladin) is referenced through the class it is nested in.
+            if (reference.ResolutionScope.Kind == HandleKind.TypeReference)
+            {
+                var outer = ObjectsTypeName(reader, (TypeReferenceHandle)reference.ResolutionScope);
+                return outer == null ? null : outer + "+" + reader.GetString(reference.Name);
+            }
+
             if (reference.ResolutionScope.Kind != HandleKind.AssemblyReference)
             {
                 return null;

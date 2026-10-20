@@ -105,7 +105,12 @@ namespace Moonwell.Build.Tests
 
             Assert.Contains("    public abstract class StandardHero : global::Moonwell.Hero\n", compiled.Stubs);
             Assert.Contains("        public int HitPoints\n        {\n            get { return default; }\n            protected set { }\n        }\n", compiled.Stubs);
-            Assert.Contains("    public class Paladin : global::Moonwell.Objects.StandardHero\n", compiled.Stubs);
+            Assert.Contains(
+                "namespace Moonwell.Objects\n{\n"
+                + "    /// @CSharpLua.Ignore\n    public static partial class Human\n    {\n"
+                + "        /// @CSharpLua.Ignore\n        public static partial class Units\n        {\n",
+                compiled.Stubs);
+            Assert.Contains("            /// @CSharpLua.Ignore\n            public class Paladin : global::Moonwell.Objects.StandardHero\n", compiled.Stubs);
             Assert.DoesNotContain("AnimationWalkSpeed", compiled.Stubs);
             Assert.DoesNotContain("getAnimationWalkSpeed", compiled.Script);
             Assert.DoesNotContain("Archmage", compiled.Stubs);

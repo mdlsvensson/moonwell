@@ -333,6 +333,35 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_class_nested_in_the_map_and_a_using_static_of_a_group_build()
+        {
+            var copy = folders.TemporaryCopyOfSample();
+            File.WriteAllText(Path.Combine(copy, "Objects.cs"), """
+                using static Moonwell.Objects.Human;
+
+                namespace Sample
+                {
+                    public static class Spells
+                    {
+                        public sealed class Fireball : Abilities.StormBolt
+                        {
+                            public Fireball()
+                            {
+                                Damage = Levels(10f, 20f, 30f);
+                            }
+                        }
+                    }
+                }
+                """);
+
+            MapBuild.Run(copy, new BuildOptions(), new StringWriter());
+
+            var script = File.ReadAllText(Path.Combine(copy, "build", "Sample", "war3map.lua"));
+            Assert.Contains("\"Sample.Spells.Fireball\"", script);
+            Assert.Contains("\"Moonwell.Objects.Human.Abilities.StormBolt\"", script);
+        }
+
+        [Fact]
         public void a_referenced_name_brings_every_overload_into_the_stubs()
         {
             // The constructor calls only Set(field, value); CSharp.lua names overloads by their order, so the stub keeps both.

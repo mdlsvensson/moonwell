@@ -57,7 +57,7 @@ namespace Moonwell.Build.Tests
             using var archive = ZipFile.OpenRead(packed.ObjectsPackage);
             var names = archive.Entries.Select(entry => entry.FullName).ToList();
             Assert.Contains("contentFiles/cs/net10.0/Moonwell.Objects/Core/Declared.cs", names);
-            Assert.Contains(names, name => name.StartsWith("contentFiles/cs/net10.0/Moonwell.Objects/Generated/Units/", StringComparison.Ordinal) && name.EndsWith(".cs", StringComparison.Ordinal));
+            Assert.Contains(names, name => name.StartsWith("contentFiles/cs/net10.0/Moonwell.Objects/Generated/Human/", StringComparison.Ordinal) && name.EndsWith(".cs", StringComparison.Ordinal));
             Assert.Contains(names, name => name.StartsWith("lib/", StringComparison.Ordinal) && name.EndsWith("/Moonwell.Objects.dll", StringComparison.Ordinal));
             Assert.DoesNotContain(names, name => name.Contains("/obj/") || name.Contains("/bin/"));
 
