@@ -500,11 +500,11 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
-        public void a_value_out_of_range_set_by_id_names_the_line_of_the_set()
+        public void a_value_out_of_range_set_by_id_names_the_line_of_the_set_with_forward_slashes()
         {
             AssertFails(
                 "OutOfRangeById",
-                "Objects.cs:13: Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it");
+                "Heroes/Objects.cs:13: Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it");
         }
 
         [Fact]

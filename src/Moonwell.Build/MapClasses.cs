@@ -49,7 +49,8 @@ namespace Moonwell.Build
                 var file = frame.GetFileName();
                 if (file != null && file.StartsWith(root, StringComparison.OrdinalIgnoreCase))
                 {
-                    return $"{Path.GetRelativePath(project.Folder, file)}:{frame.GetFileLineNumber()}";
+                    // The error format names the file with '/' on every system: Heroes/Arthas.cs:12.
+                    return $"{Path.GetRelativePath(project.Folder, file).Replace('\\', '/')}:{frame.GetFileLineNumber()}";
                 }
             }
 
