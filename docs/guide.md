@@ -116,6 +116,38 @@ public sealed class KillCounter : UnitComponent
   belongs to whatever made it, and ends with it.
 - Game work starts in a reaction. Top-level code and static fields make nothing in the game.
 
+## Damage
+
+`OnDamaged` sees a hit after armor. For more, add the `Moonwell.Damage` package to the project, at the same version as
+Moonwell; the build starts it, and a map without it carries none of its code. Its reactions come through interfaces,
+which a unit's class, its components and buffs implement, writing only the methods they need as public methods:
+
+```csharp
+public sealed class Shield : Buff, IDamageTarget
+{
+    public void OnTaken(Hit hit) { hit.Amount *= 0.5f; }
+}
+```
+
+| Stage | When | `IDamageSource` | `IDamageTarget` | `IDamageWatch` |
+|---|---|---|---|---|
+| Before armor | the hit starts | `OnDealing` | `OnTaking` | `OnBeforeArmor` |
+| After armor | armor has counted | `OnDealt` | `OnTaken` | `OnAfterArmor` |
+| Lethal | the hit would kill | `OnKilling` | `OnLethal` | `OnLethal` |
+| Landed | 0 s later, the life has dropped | `OnLanded` | `OnHurt` | `OnLanded` |
+| Burst | 0 s later, once per source | `OnBurst` | | `OnBurst` |
+
+- Each stage runs the source and its components, then the target and its components, then the game's and the
+  players' components that implement `IDamageWatch`. `OnDamaged` and `OnDealtDamage` still run, first in the
+  after-armor stage.
+- A `Hit` has the amount, `Original`, `IsAttack`, `IsSpell`, `IsMelee`, `IsRanged`, `IsCode` and `Tag`. Before armor
+  a reaction may also change `DamageType`, `WeaponSound` and the target's `Armor` for this hit. In the lethal stage
+  `hit.Spare()` keeps the target alive; `hit.Killed` tells in the landed stage.
+- `source.Damage(target, 10f, DamageType.Fire, tag: MyTag.Firebolt)` deals damage from code and returns the `Hit`.
+- Damage dealt from a reaction belongs to the hit it reacted to; a chain of 8 such hits ends with an error, so two
+  units that hit each other back never loop.
+- A hit spell immunity stops runs before armor only.
+
 ## Players
 
 `Player.One` to `Player.TwentyFour` are the player slots, as the lobby numbers them; `Player.Get(slot)` takes the
