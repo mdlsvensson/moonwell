@@ -8,12 +8,12 @@ namespace MoonwellMap
     {
         public override void OnGameStart()
         {
-            var player = Player.Get(0);
-            var x = Natives.GetPlayerStartLocationX(player.Handle);
-            var y = Natives.GetPlayerStartLocationY(player.Handle);
+            var player = Player.One;
+            var x = player.StartX;
+            var y = player.StartY;
             Unit.Create<Champion>(player, x, y, 270f);
 
-            var enemy = Player.Get(Natives.PLAYER_NEUTRAL_AGGRESSIVE);
+            var enemy = Player.NeutralAggressive;
             for (var i = 0; i < 3; i++)
             {
                 Unit.Create<Footman>(enemy, x - 200f + i * 200f, y + 600f, 270f);

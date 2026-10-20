@@ -15,6 +15,9 @@ namespace Moonwell.Testing
         /// <summary>The slot of the player at this machine.</summary>
         public int LocalSlot;
 
+        /// <summary>The slots the game gives the neutral players.</summary>
+        public int NeutralAggressive = 24, NeutralVictim = 25, NeutralExtra = 26, NeutralPassive = 27;
+
         /// <summary>The lines printed on the screen.</summary>
         public List<string> Printed = new List<string>();
 
@@ -74,6 +77,12 @@ namespace Moonwell.Testing
 
         /// <summary>The upgrade levels of each player slot, keyed by slot and then by upgrade id.</summary>
         private readonly Dictionary<int, Dictionary<int, int>> upgradeLevels = new Dictionary<int, Dictionary<int, int>>();
+
+        /// <summary>The x of each player slot's start location, for the slots that have one set.</summary>
+        private readonly Dictionary<int, float> startXs = new Dictionary<int, float>();
+
+        /// <summary>The y of each player slot's start location, for the slots that have one set.</summary>
+        private readonly Dictionary<int, float> startYs = new Dictionary<int, float>();
 
         /// <summary>The slot of each player made.</summary>
         private readonly Dictionary<player, int> slots = new Dictionary<player, int>();
@@ -155,6 +164,13 @@ namespace Moonwell.Testing
             levels[upgradeId] = level;
         }
 
+        /// <summary>Sets the start location of a player slot.</summary>
+        public void SetStart(int slot, float x, float y)
+        {
+            startXs[slot] = x;
+            startYs[slot] = y;
+        }
+
         /// <summary>Moves time forward by the seconds, calling Runtime.Wake at each wake request on the way.</summary>
         public void Advance(float seconds)
         {
@@ -234,6 +250,42 @@ namespace Moonwell.Testing
             }
 
             return -1;
+        }
+
+        /// <summary>The slot of the neutral hostile player, from NeutralAggressive.</summary>
+        public int NeutralAggressiveSlot()
+        {
+            return NeutralAggressive;
+        }
+
+        /// <summary>The slot of the neutral victim player, from NeutralVictim.</summary>
+        public int NeutralVictimSlot()
+        {
+            return NeutralVictim;
+        }
+
+        /// <summary>The slot of the neutral extra player, from NeutralExtra.</summary>
+        public int NeutralExtraSlot()
+        {
+            return NeutralExtra;
+        }
+
+        /// <summary>The slot of the neutral passive player, from NeutralPassive.</summary>
+        public int NeutralPassiveSlot()
+        {
+            return NeutralPassive;
+        }
+
+        /// <summary>The x of a player's start location; 0 when none is set.</summary>
+        public float StartXOf(player player)
+        {
+            return startXs.TryGetValue(SlotOf(player), out var x) ? x : 0f;
+        }
+
+        /// <summary>The y of a player's start location; 0 when none is set.</summary>
+        public float StartYOf(player player)
+        {
+            return startYs.TryGetValue(SlotOf(player), out var y) ? y : 0f;
         }
 
         /// <summary>Whether a player is the one at this machine: the player in LocalSlot.</summary>

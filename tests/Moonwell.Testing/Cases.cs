@@ -59,6 +59,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "game.start-order", Run = ActorCases.GameStartOrder });
             list.Add(new Case { Name = "game.dispatch-removal", Run = ActorCases.GameDispatchRemoval });
             list.Add(new Case { Name = "players.get", Run = ActorCases.PlayersGet });
+            list.Add(new Case { Name = "players.named", Run = ActorCases.PlayersNamed });
+            list.Add(new Case { Name = "players.neutral", Run = ActorCases.PlayersNeutral });
+            list.Add(new Case { Name = "players.start", Run = ActorCases.PlayersStart });
             list.Add(new Case { Name = "players.existing-out-of-range", Run = ActorCases.ExistingOutOfRange });
             list.Add(new Case { Name = "local.runs-for-local-player", Run = LocalCases.RunsForLocalPlayer });
             list.Add(new Case { Name = "local.skips-other-players", Run = LocalCases.SkipsOtherPlayers });

@@ -283,6 +283,36 @@ namespace Moonwell.Testing
             Expect.Same(three, Player.Of(world.PlayerAt(3)), "the player of its handle");
         }
 
+        /// <summary>The named players are the players of slots 0 to 23.</summary>
+        public static void PlayersNamed(FakeWorld world)
+        {
+            Expect.Same(Player.Get(0), Player.One, "Player.One");
+            Expect.Same(Player.Get(1), Player.Two, "Player.Two");
+            Expect.Same(Player.Get(11), Player.Twelve, "Player.Twelve");
+            Expect.Same(Player.Get(23), Player.TwentyFour, "Player.TwentyFour");
+        }
+
+        /// <summary>The neutral players are the players of the slots the game gives them.</summary>
+        public static void PlayersNeutral(FakeWorld world)
+        {
+            world.NeutralAggressive = 24;
+            world.NeutralVictim = 25;
+            world.NeutralExtra = 26;
+            world.NeutralPassive = 27;
+            Expect.Same(Player.Get(24), Player.NeutralAggressive, "Player.NeutralAggressive");
+            Expect.Same(Player.Get(25), Player.NeutralVictim, "Player.NeutralVictim");
+            Expect.Same(Player.Get(26), Player.NeutralExtra, "Player.NeutralExtra");
+            Expect.Same(Player.Get(27), Player.NeutralPassive, "Player.NeutralPassive");
+        }
+
+        /// <summary>A player's start location is the game's for its slot.</summary>
+        public static void PlayersStart(FakeWorld world)
+        {
+            world.SetStart(2, -512f, 768f);
+            Expect.True(Player.Three.StartX == -512f, "StartX");
+            Expect.True(Player.Three.StartY == 768f, "StartY");
+        }
+
         /// <summary>A slot outside the player slots has no player object, and asking for it does not fail.</summary>
         public static void ExistingOutOfRange(FakeWorld world)
         {

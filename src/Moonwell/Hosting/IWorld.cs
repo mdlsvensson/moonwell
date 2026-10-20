@@ -29,6 +29,24 @@ namespace Moonwell.Hosting
         /// <summary>The slot of a player.</summary>
         int SlotOf(player player);
 
+        /// <summary>The slot of the neutral hostile player.</summary>
+        int NeutralAggressiveSlot();
+
+        /// <summary>The slot of the neutral victim player.</summary>
+        int NeutralVictimSlot();
+
+        /// <summary>The slot of the neutral extra player.</summary>
+        int NeutralExtraSlot();
+
+        /// <summary>The slot of the neutral passive player.</summary>
+        int NeutralPassiveSlot();
+
+        /// <summary>The x of a player's start location.</summary>
+        float StartXOf(player player);
+
+        /// <summary>The y of a player's start location.</summary>
+        float StartYOf(player player);
+
         /// <summary>Whether a player is the one at this machine.</summary>
         bool IsLocal(player player);
 

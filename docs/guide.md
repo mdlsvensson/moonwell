@@ -106,6 +106,13 @@ public sealed class Fury : UnitComponent
   belongs to whatever made it, and ends with it.
 - Game work starts in a reaction. Top-level code and static fields make nothing in the game.
 
+## Players
+
+`Player.One` to `Player.TwentyFour` are the player slots, as the lobby numbers them; `Player.Get(slot)` takes the
+slot from 0, so `Player.Get(0)` is `Player.One`. A slot is not a colour: a map can recolour its players.
+`Player.NeutralAggressive`, `NeutralPassive`, `NeutralVictim` and `NeutralExtra` are the neutral players, and
+`StartX` and `StartY` a player's start location.
+
 The `Natives` class has every native of the game for what Moonwell does not cover yet.
 
 ## Multiplayer

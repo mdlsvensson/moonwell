@@ -87,6 +87,19 @@ public class LocalTests
     }
 
     [Fact]
+    public void player_reads_are_local_safe()
+    {
+        Assert.Empty(MapCode.Check("""
+            Local.For(p, () =>
+            {
+                var one = Player.One;
+                var enemy = Player.NeutralAggressive;
+                var x = one.StartX + enemy.StartY;
+            });
+            """));
+    }
+
+    [Fact]
     public void map_methods_are_followed()
     {
         var found = MapCode.Check(

@@ -134,6 +134,42 @@ namespace Moonwell.Engine
             return Natives.GetPlayerId(player);
         }
 
+        /// <summary>The slot of the neutral hostile player.</summary>
+        public int NeutralAggressiveSlot()
+        {
+            return Natives.PLAYER_NEUTRAL_AGGRESSIVE;
+        }
+
+        /// <summary>The slot of the neutral victim player.</summary>
+        public int NeutralVictimSlot()
+        {
+            return Natives.bj_PLAYER_NEUTRAL_VICTIM;
+        }
+
+        /// <summary>The slot of the neutral extra player.</summary>
+        public int NeutralExtraSlot()
+        {
+            return Natives.bj_PLAYER_NEUTRAL_EXTRA;
+        }
+
+        /// <summary>The slot of the neutral passive player.</summary>
+        public int NeutralPassiveSlot()
+        {
+            return Natives.PLAYER_NEUTRAL_PASSIVE;
+        }
+
+        /// <summary>The x of a player's start location.</summary>
+        public float StartXOf(player player)
+        {
+            return Natives.GetPlayerStartLocationX(player);
+        }
+
+        /// <summary>The y of a player's start location.</summary>
+        public float StartYOf(player player)
+        {
+            return Natives.GetPlayerStartLocationY(player);
+        }
+
         /// <summary>Whether a player is the one at this machine.</summary>
         public bool IsLocal(player player)
         {
