@@ -50,9 +50,9 @@ public static class GeneratedObjects
         foreach (var obj in everything)
         {
             var name = names[(obj.Kind, obj.Id)];
-            if (!byNamespace.TryGetValue(name.Namespace, out var list))
+            if (!byNamespace.TryGetValue(name.Outer, out var list))
             {
-                byNamespace[name.Namespace] = list = new List<(StandardObject, ClassName)>();
+                byNamespace[name.Outer] = list = new List<(StandardObject, ClassName)>();
             }
 
             list.Add((obj, name));
@@ -60,13 +60,13 @@ public static class GeneratedObjects
 
         foreach (var (ns, classes) in byNamespace)
         {
-            files[PathOf(ns)] = header + "\n" + ObjectsWriter.Namespace(ns, classes, fieldsOf[Kind.Ability]) + footer;
+            files[PathOf(ns)] = header + "\n" + ObjectsWriter.Group(ns, classes, fieldsOf[Kind.Ability]) + footer;
         }
 
         return files;
     }
 
-    /// <summary>The file of a namespace: <c>Moonwell.Objects.Units.Human</c> is <c>Units/Human.g.cs</c>.</summary>
+    /// <summary>The file of a group and kind: <c>Moonwell.Objects.Human.Units</c> is <c>Human/Units.g.cs</c>.</summary>
     private static string PathOf(string ns)
     {
         if (!ns.StartsWith(RootNamespace, StringComparison.Ordinal))

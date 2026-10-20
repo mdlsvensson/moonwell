@@ -6,7 +6,7 @@ namespace Objects
     {
     }
 
-    public class Arthas : Moonwell.Objects.Units.Human.Paladin
+    public class Arthas : Moonwell.Objects.Human.Units.Paladin
     {
         public Arthas()
         {
@@ -14,7 +14,7 @@ namespace Objects
             HitPoints = HitPoints * 2;
             GoldCost = GoldCost * 2;
             Abilities.Add<Firebolt>();
-            HeroAbilities.Remove<Moonwell.Objects.Abilities.Human.DevotionAura>();
+            HeroAbilities.Remove<Moonwell.Objects.Human.Abilities.DevotionAura>();
             Components.Add(new Rage());
         }
     }
@@ -27,7 +27,7 @@ namespace Objects
         }
     }
 
-    public class Firebolt : Moonwell.Objects.Abilities.Human.StormBolt
+    public class Firebolt : Moonwell.Objects.Human.Abilities.StormBolt
     {
         public Firebolt()
         {
@@ -47,7 +47,7 @@ namespace Objects
         }
     }
 
-    public class Elemental : Moonwell.Objects.Abilities.Human.SummonWaterElemental
+    public class Elemental : Moonwell.Objects.Human.Abilities.SummonWaterElemental
     {
         public Elemental()
         {
@@ -55,7 +55,7 @@ namespace Objects
         }
     }
 
-    public class Portal : Moonwell.Objects.Abilities.Creeps.DarkPortal
+    public class Portal : Moonwell.Objects.Creeps.Abilities.DarkPortal
     {
         public Portal()
         {
@@ -63,11 +63,11 @@ namespace Objects
         }
     }
 
-    public class Duelist : Moonwell.Objects.Units.Human.Footman
+    public class Duelist : Moonwell.Objects.Human.Units.Footman
     {
         public Duelist()
         {
-            if (Abilities.Contains<Moonwell.Objects.Abilities.Human.Defend>())
+            if (Abilities.Contains<Moonwell.Objects.Human.Abilities.Defend>())
             {
                 Name = "Defender";
             }
@@ -81,7 +81,7 @@ namespace Objects
         }
     }
 
-    public class Burn : Moonwell.Objects.Buffs.NightElf.Immolation
+    public class Burn : Moonwell.Objects.NightElf.Buffs.Immolation
     {
         public Burn()
         {
@@ -118,7 +118,7 @@ namespace Objects
         }
     }
 
-    public class Forge : Moonwell.Objects.Upgrades.Human.IronForgedSwords
+    public class Forge : Moonwell.Objects.Human.Upgrades.IronForgedSwords
     {
         public Forge()
         {
@@ -127,7 +127,7 @@ namespace Objects
     }
 
     [Moonwell.Objects.Replaces]
-    public class StrongFootman : Moonwell.Objects.Units.Human.Footman
+    public class StrongFootman : Moonwell.Objects.Human.Units.Footman
     {
         public StrongFootman()
         {

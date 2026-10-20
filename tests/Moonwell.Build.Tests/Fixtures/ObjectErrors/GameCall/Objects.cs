@@ -6,7 +6,7 @@ namespace GameCall
     {
     }
 
-    public class Lucky : Moonwell.Objects.Units.Human.Footman
+    public class Lucky : Moonwell.Objects.Human.Units.Footman
     {
         public Lucky()
         {

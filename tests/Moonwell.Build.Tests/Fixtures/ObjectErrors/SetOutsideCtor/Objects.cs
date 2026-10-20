@@ -6,7 +6,7 @@ namespace SetOutsideCtor
     {
     }
 
-    public class Reset : Moonwell.Objects.Units.Human.Footman
+    public class Reset : Moonwell.Objects.Human.Units.Footman
     {
         public Reset()
         {

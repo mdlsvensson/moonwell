@@ -4,7 +4,7 @@ using System.Text.Json;
 namespace Moonwell.Objects.Tests
 {
     /// <summary>A generated hero with the protected members of its kind base opened, as a modder's class has them.</summary>
-    public class OpenPaladin : Moonwell.Objects.Units.Human.Paladin
+    public class OpenPaladin : Moonwell.Objects.Human.Units.Paladin
     {
         public void Put(string field, object value)
         {
@@ -23,7 +23,7 @@ namespace Moonwell.Objects.Tests
     }
 
     /// <summary>A generated ability with the protected members of its kind base opened.</summary>
-    public class OpenStormBolt : Moonwell.Objects.Abilities.Human.StormBolt
+    public class OpenStormBolt : Moonwell.Objects.Human.Abilities.StormBolt
     {
         public void Put(string field, object value)
         {
@@ -59,13 +59,12 @@ namespace Moonwell.Objects.Tests
             return classes;
         }
 
-        private static int CountIn(string ns)
+        private static int CountIn(string kind)
         {
             var count = 0;
             foreach (var type in StandardClasses())
             {
-                if (type.Namespace!.StartsWith("Moonwell.Objects." + ns + ".", StringComparison.Ordinal)
-                    || type.Namespace == "Moonwell.Objects." + ns)
+                if (type.DeclaringType!.Name == kind)
                 {
                     count++;
                 }
@@ -91,7 +90,7 @@ namespace Moonwell.Objects.Tests
         [Fact]
         public void paladin_exists()
         {
-            var paladin = Objects.GetType("Moonwell.Objects.Units.Human.Paladin");
+            var paladin = Objects.GetType("Moonwell.Objects.Human+Units+Paladin");
 
             Assert.NotNull(paladin);
             Assert.Equal("Hpal", paladin!.GetCustomAttribute<StandardAttribute>(false)!.Id);
@@ -113,7 +112,7 @@ namespace Moonwell.Objects.Tests
         [Fact]
         public void storm_bolt_damage_is_per_level()
         {
-            var stormBolt = Objects.GetType("Moonwell.Objects.Abilities.Human.StormBolt")!;
+            var stormBolt = Objects.GetType("Moonwell.Objects.Human+Abilities+StormBolt")!;
 
             var damage = stormBolt.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
                 .Single(p => p.GetCustomAttribute<FieldAttribute>()!.Id == "Htb1");
@@ -193,7 +192,7 @@ namespace Moonwell.Objects.Tests
             foreach (var type in StandardClasses())
             {
                 var id = type.GetCustomAttribute<StandardAttribute>(false)!.Id;
-                var kind = type.Namespace!.Split('.')[2];
+                var kind = type.DeclaringType!.Name;
                 var expected = kind switch
                 {
                     "Units" => char.IsAsciiLetterUpper(id[0]) ? "StandardHero" : "StandardUnit",

@@ -1,5 +1,5 @@
 using Moonwell;
-using Moonwell.Objects.Abilities.Human;
+using static Moonwell.Objects.Human.Abilities;
 
 namespace MoonwellMap
 {

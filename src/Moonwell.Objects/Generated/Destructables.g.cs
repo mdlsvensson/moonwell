@@ -4,2414 +4,2419 @@
 
 #nullable enable
 
-namespace Moonwell.Objects.Destructables
+namespace Moonwell.Objects
 {
-    /// <summary>Ashenvale Canopy Tree (ATtc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ATtc")]
-    public class AshenvaleCanopyTree : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ashenvale Tree Wall (ATtr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ATtr")]
-    public class AshenvaleTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Barrel (LTbr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTbr")]
-    public class Barrel : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Barrel (LTbs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTbs")]
-    public class BarrelLTbs : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Barrel (LTbx).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTbx")]
-    public class BarrelLTbx : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Barrel of Explosives (LTex).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTex")]
-    public class BarrelOfExplosives : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Barrens Canopy Tree (BTtc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BTtc")]
-    public class BarrensCanopyTree : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Barrens Tree Wall (BTtw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BTtw")]
-    public class BarrensTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Barricade (LTba).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTba")]
-    public class Barricade : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Black Citadel Tree Wall (KTtw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("KTtw")]
-    public class BlackCitadelTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Bridge Destroyed (YSdb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSdb")]
-    public class BridgeDestroyed : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Bridge Destroyed (YSdc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSdc")]
-    public class BridgeDestroyedYSdc : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Cage (LOcg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOcg")]
-    public class Cage : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>City Entrance (YTce).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTce")]
-    public class CityEntrance : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>City Entrance (YTcx).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTcx")]
-    public class CityEntranceYTcx : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Cityscape Fall Tree Wall (YTft).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTft")]
-    public class CityscapeFallTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Cityscape Ruined Tree Wall (JTct).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("JTct")]
-    public class CityscapeRuinedTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Cityscape Snowy Tree Wall (YTst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTst")]
-    public class CityscapeSnowyTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Cityscape Summer Tree Wall (YTct).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTct")]
-    public class CityscapeSummerTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Cityscape Winter Tree Wall (YTwt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTwt")]
-    public class CityscapeWinterTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Cliff Cave Gate (DTc1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTc1")]
-    public class CliffCaveGate : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Cliff Cave Gate (DTc2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTc2")]
-    public class CliffCaveGateDTc2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Crates (LTcr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTcr")]
-    public class Crates : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Dalaran Building (XTbd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XTbd")]
-    public class DalaranBuilding : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Dalaran Ruins Tree Wall (JTtw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("JTtw")]
-    public class DalaranRuinsTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Dalaran Violet Citadel (XTvt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XTvt")]
-    public class DalaranVioletCitadel : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Demon Storm (OTds).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OTds")]
-    public class DemonStorm : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Demonic Gate (ATg1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ATg1")]
-    public class DemonicGate : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Demonic Gate (ATg2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ATg2")]
-    public class DemonicGateATg2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Demonic Gate (ATg3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ATg3")]
-    public class DemonicGateATg3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Demonic Gate (ATg4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ATg4")]
-    public class DemonicGateATg4 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Dungeon Gate (DTg1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTg1")]
-    public class DungeonGate : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Dungeon Gate (DTg2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTg2")]
-    public class DungeonGateDTg2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Dungeon Gate (DTg3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTg3")]
-    public class DungeonGateDTg3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Dungeon Gate (DTg4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTg4")]
-    public class DungeonGateDTg4 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Dungeon Spikes (DTsp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTsp")]
-    public class DungeonSpikes : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Dungeon Tree Wall (DTsh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTsh")]
-    public class DungeonTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Egg Sack (DTes).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTes")]
-    public class EggSack : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Elevator (DTrf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTrf")]
-    public class Elevator : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Elevator (DTrx).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTrx")]
-    public class ElevatorDTrx : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Elevator Wall (DTep).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTep")]
-    public class ElevatorWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Elven Bridge (YT67).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT67")]
-    public class ElvenBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Elven Gate (LTe1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTe1")]
-    public class ElvenGate : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Elven Gate (LTe2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTe2")]
-    public class ElvenGateLTe2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Elven Gate (LTe3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTe3")]
-    public class ElvenGateLTe3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Elven Gate (LTe4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTe4")]
-    public class ElvenGateLTe4 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Extra Wide Natural Bridge (YT48).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT48")]
-    public class ExtraWideNaturalBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Extra Wide Natural Bridge (YT49).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT49")]
-    public class ExtraWideNaturalBridgeYT49 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Extra Wide Natural Bridge (YT50).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT50")]
-    public class ExtraWideNaturalBridgeYT50 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Extra Wide Natural Bridge (YT51).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT51")]
-    public class ExtraWideNaturalBridgeYT51 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Fall Tree Wall (FTtw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("FTtw")]
-    public class FallTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Felwood Canopy Tree (CTtc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CTtc")]
-    public class FelwoodCanopyTree : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Felwood Tree Wall (CTtr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CTtr")]
-    public class FelwoodTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Foot Switch (DTfp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTfp")]
-    public class FootSwitch : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Foot Switch (DTfx).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTfx")]
-    public class FootSwitchDTfx : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Force Bridge (DTs0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTs0")]
-    public class ForceBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Force Bridge (DTs1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTs1")]
-    public class ForceBridgeDTs1 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Force Bridge (DTs2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTs2")]
-    public class ForceBridgeDTs2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Force Bridge (DTs3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTs3")]
-    public class ForceBridgeDTs3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>ForceWall (Dofv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("Dofv")]
-    public class ForceWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>ForceWall (Dofw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("Dofw")]
-    public class ForceWallDofw : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Frozen Throne Gate (ITtg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITtg")]
-    public class FrozenThroneGate : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Gate (LTg1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTg1")]
-    public class Gate : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Gate (LTg2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTg2")]
-    public class GateLTg2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Gate (LTg3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTg3")]
-    public class GateLTg3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Gate (LTg4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTg4")]
-    public class GateLTg4 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Green Force Wall (Dogv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("Dogv")]
-    public class GreenForceWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Green Force Wall (Dogw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("Dogw")]
-    public class GreenForceWallDogw : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ice Bridge (ITi2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITi2")]
-    public class IceBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ice Bridge (ITi3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITi3")]
-    public class IceBridgeITi3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ice Bridge (ITi4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITi4")]
-    public class IceBridgeITi4 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ice Bridge (ITib).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITib")]
-    public class IceBridgeITib : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ice Floe (ITf1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITf1")]
-    public class IceFloe : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ice Floe (ITf2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITf2")]
-    public class IceFloeITf2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ice Floe (ITf3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITf3")]
-    public class IceFloeITf3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ice Floe (ITf4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITf4")]
-    public class IceFloeITf4 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ice Rock Gate (ITx1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITx1")]
-    public class IceRockGate : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ice Rock Gate (ITx2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITx2")]
-    public class IceRockGateITx2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ice Rock Gate (ITx3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITx3")]
-    public class IceRockGateITx3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ice Rock Gate (ITx4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITx4")]
-    public class IceRockGateITx4 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Icecrown Canopy Tree (ITtc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITtc")]
-    public class IcecrownCanopyTree : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Icecrown Citadel Entrance (YTc1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTc1")]
-    public class IcecrownCitadelEntrance : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Icecrown Throne (IOt0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IOt0")]
-    public class IcecrownThrone : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Icecrown Throne (Diagonal 1) (IOt1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IOt1")]
-    public class IcecrownThroneDiagonal1 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Icecrown Throne (Diagonal 1) (IOt2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IOt2")]
-    public class IcecrownThroneDiagonal1IOt2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Icecrown Tree Wall (ITtw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITtw")]
-    public class IcecrownTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Icey Rock (ITcr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITcr")]
-    public class IceyRock : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Icy Gate (ITg1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITg1")]
-    public class IcyGate : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Icy Gate (ITg2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITg2")]
-    public class IcyGateITg2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Icy Gate (ITg3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITg3")]
-    public class IcyGateITg3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Icy Gate (ITg4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITg4")]
-    public class IcyGateITg4 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Igloo (ITig).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITig")]
-    public class Igloo : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Invisible Platform (OTip).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OTip")]
-    public class InvisiblePlatform : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Invisible Platform (small) (OTis).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OTis")]
-    public class InvisiblePlatformSmall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Iron Gate (DTg5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTg5")]
-    public class IronGate : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Iron Gate (DTg6).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTg6")]
-    public class IronGateDTg6 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Iron Gate (DTg7).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTg7")]
-    public class IronGateDTg7 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Iron Gate (DTg8).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTg8")]
-    public class IronGateDTg8 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>King's Throne (XOkt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XOkt")]
-    public class KingsThrone : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>King's Throne (Diagonal 1) (XOk1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XOk1")]
-    public class KingsThroneDiagonal1 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>King's Throne (Diagonal 1) (XOk2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XOk2")]
-    public class KingsThroneDiagonal1XOk2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Last Hope Bridge (LTtc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTtc")]
-    public class LastHopeBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Last Hope Bridge (LTtx).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTtx")]
-    public class LastHopeBridgeLTtx : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Lever (DTlv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTlv")]
-    public class Lever : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Line of Sight Blocker (YTlb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTlb")]
-    public class LineOfSightBlocker : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Line of Sight Blocker (Large) (Ytlc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("Ytlc")]
-    public class LineOfSightBlockerLarge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Lion Statue (BTs2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BTs2")]
-    public class LionStatue : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Lion Statue Destroyed (BTs3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BTs3")]
-    public class LionStatueDestroyed : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Elven Bridge (EB04).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EB04")]
-    public class LongElvenBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Elven Bridge (EB05).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EB05")]
-    public class LongElvenBridgeEB05 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Elven Bridge (EB06).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EB06")]
-    public class LongElvenBridgeEB06 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Elven Bridge (EB07).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EB07")]
-    public class LongElvenBridgeEB07 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Natural Bridge (YT04).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT04")]
-    public class LongNaturalBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Natural Bridge (YT05).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT05")]
-    public class LongNaturalBridgeYT05 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Natural Bridge (YT06).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT06")]
-    public class LongNaturalBridgeYT06 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Natural Bridge (YT07).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT07")]
-    public class LongNaturalBridgeYT07 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Natural Bridge (YT28).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT28")]
-    public class LongNaturalBridgeYT28 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Natural Bridge (YT29).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT29")]
-    public class LongNaturalBridgeYT29 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Natural Bridge (YT30).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT30")]
-    public class LongNaturalBridgeYT30 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Natural Bridge (YT31).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT31")]
-    public class LongNaturalBridgeYT31 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Night Elven Wooden Bridge (NB04).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NB04")]
-    public class LongNightElvenWoodenBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Night Elven Wooden Bridge (NB05).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NB05")]
-    public class LongNightElvenWoodenBridgeNB05 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Night Elven Wooden Bridge (NB06).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NB06")]
-    public class LongNightElvenWoodenBridgeNB06 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Night Elven Wooden Bridge (NB07).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NB07")]
-    public class LongNightElvenWoodenBridgeNB07 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Overgrown Bridge (OG04).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OG04")]
-    public class LongOvergrownBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Overgrown Bridge (OG05).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OG05")]
-    public class LongOvergrownBridgeOG05 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Overgrown Bridge (OG06).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OG06")]
-    public class LongOvergrownBridgeOG06 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Overgrown Bridge (OG07).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OG07")]
-    public class LongOvergrownBridgeOG07 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Rickety Wooden Bridge (RW04).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("RW04")]
-    public class LongRicketyWoodenBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Rickety Wooden Bridge (RW05).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("RW05")]
-    public class LongRicketyWoodenBridgeRW05 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Rickety Wooden Bridge (RW06).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("RW06")]
-    public class LongRicketyWoodenBridgeRW06 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Rickety Wooden Bridge (RW07).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("RW07")]
-    public class LongRicketyWoodenBridgeRW07 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Stone Bridge (YT16).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT16")]
-    public class LongStoneBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Stone Bridge (YT17).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT17")]
-    public class LongStoneBridgeYT17 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Stone Bridge (YT18).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT18")]
-    public class LongStoneBridgeYT18 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Stone Bridge (YT19).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT19")]
-    public class LongStoneBridgeYT19 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Stone Bridge (YT40).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT40")]
-    public class LongStoneBridgeYT40 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Stone Bridge (YT41).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT41")]
-    public class LongStoneBridgeYT41 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Stone Bridge (YT42).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT42")]
-    public class LongStoneBridgeYT42 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Stone Bridge (YT43).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT43")]
-    public class LongStoneBridgeYT43 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Stratholme Bridge (YY16).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YY16")]
-    public class LongStratholmeBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Stratholme Bridge (YY17).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YY17")]
-    public class LongStratholmeBridgeYY17 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Stratholme Bridge (YY18).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YY18")]
-    public class LongStratholmeBridgeYY18 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Stratholme Bridge (YY19).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YY19")]
-    public class LongStratholmeBridgeYY19 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Undercity Bridge (UB01).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UB01")]
-    public class LongUndercityBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Undercity Bridge (UB02).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UB02")]
-    public class LongUndercityBridgeUB02 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Undercity Bridge (UB03).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UB03")]
-    public class LongUndercityBridgeUB03 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Undercity Bridge (UB04).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UB04")]
-    public class LongUndercityBridgeUB04 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Wooden Bridge (LT04).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LT04")]
-    public class LongWoodenBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Wooden Bridge (LT05).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LT05")]
-    public class LongWoodenBridgeLT05 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Wooden Bridge (LT06).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LT06")]
-    public class LongWoodenBridgeLT06 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Long Wooden Bridge (LT07).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LT07")]
-    public class LongWoodenBridgeLT07 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Lordaeron City Dome (XTv1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XTv1")]
-    public class LordaeronCityDome : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Lordaeron City Dome Destroyed (XTv2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XTv2")]
-    public class LordaeronCityDomeDestroyed : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Lordaeron City Main Building (XTv3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XTv3")]
-    public class LordaeronCityMainBuilding : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Lordaeron City Main Building Destroyed (XTv4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XTv4")]
-    public class LordaeronCityMainBuildingDestroyed : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Lordaeron City Main Gate (YTc2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTc2")]
-    public class LordaeronCityMainGate : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Lordaeron City Main Gate Column (BTsk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BTsk")]
-    public class LordaeronCityMainGateColumn : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Lordaeron City Main Gate Column Destroyed (BTs1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BTs1")]
-    public class LordaeronCityMainGateColumnDestroyed : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Lordaeron City Main Gate Destroyed (YTc4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTc4")]
-    public class LordaeronCityMainGateDestroyed : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Lordaeron City Spire (BTs4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BTs4")]
-    public class LordaeronCitySpire : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Lordaeron City Spire Destroyed (BTs5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BTs5")]
-    public class LordaeronCitySpireDestroyed : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Magical Pen (XTm5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XTm5")]
-    public class MagicalPen : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Magical Pen Wall (XTmx).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XTmx")]
-    public class MagicalPenWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Magical Pen Wall (XTx5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XTx5")]
-    public class MagicalPenWallXTx5 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Magical Pen (XTmp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XTmp")]
-    public class MagicalPenXTmp : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Massive Ruined Gate (ZTsg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTsg")]
-    public class MassiveRuinedGate : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Massive Ruined Gate (ZTsx).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTsx")]
-    public class MassiveRuinedGateZTsx : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Northrend Canopy Tree (NTtc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NTtc")]
-    public class NorthrendCanopyTree : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Northrend Icy Tree Wall (NTiw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NTiw")]
-    public class NorthrendIcyTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Northrend Tree Wall (NTtw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NTtw")]
-    public class NorthrendTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Orgrimmar Gate (YTcn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTcn")]
-    public class OrgrimmarGate : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Orgrimmar Tower Completed (XTv8).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XTv8")]
-    public class OrgrimmarTowerCompleted : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Orgrimmar Tower Under Construction (XTv7).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XTv7")]
-    public class OrgrimmarTowerUnderConstruction : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Orgrimmar Wall Segment Completed (XTv6).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XTv6")]
-    public class OrgrimmarWallSegmentCompleted : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Orgrimmar Wall Segment Under Construction (XTv5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XTv5")]
-    public class OrgrimmarWallSegmentUnderConstruction : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Outland Tree Wall (OTtw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OTtw")]
-    public class OutlandTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Pathing Blocker (Air) (YTab).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTab")]
-    public class PathingBlockerAir : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Pathing Blocker (Air) (Large) (YTac).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTac")]
-    public class PathingBlockerAirLarge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Pathing Blocker (Both) (YTfb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTfb")]
-    public class PathingBlockerBoth : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Pathing Blocker (Both) (Large) (YTfc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTfc")]
-    public class PathingBlockerBothLarge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Pathing Blocker (Ground) (YTpb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTpb")]
-    public class PathingBlockerGround : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Pathing Blocker (Ground) (Large) (YTpc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTpc")]
-    public class PathingBlockerGroundLarge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Pathing Blocker (Ground) (YTpl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTpl")]
-    public class PathingBlockerGroundYTpl : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Pathing Blocker (Ground) (YTps).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YTps")]
-    public class PathingBlockerGroundYTps : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ramp Naga Small (Bottom) (ZTr3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTr3")]
-    public class RampNagaSmallBottom : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ramp Naga Small (Left) (ZTr0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTr0")]
-    public class RampNagaSmallLeft : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ramp Naga Small (Right) (ZTr2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTr2")]
-    public class RampNagaSmallRight : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ramp Naga Small (Top) (ZTr1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTr1")]
-    public class RampNagaSmallTop : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Resurrection Stone (BTrs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BTrs")]
-    public class ResurrectionStone : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Resurrection Stone (BTrx).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BTrx")]
-    public class ResurrectionStoneBTrx : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Rock Chunks (DTrc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DTrc")]
-    public class RockChunks : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Rock Chunks (LTrc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTrc")]
-    public class RockChunksLTrc : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Rock Chunks (LTrt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTrt")]
-    public class RockChunksLTrt : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Rockin Arthas (ITag).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITag")]
-    public class RockinArthas : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Rolling Stone Door (ITd1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITd1")]
-    public class RollingStoneDoor : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Rolling Stone Door (ITd2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITd2")]
-    public class RollingStoneDoorITd2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Rolling Stone Door (ITd3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITd3")]
-    public class RollingStoneDoorITd3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Rolling Stone Door (ITd4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITd4")]
-    public class RollingStoneDoorITd4 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Rolling Stone Door (ZTd1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTd1")]
-    public class RollingStoneDoorZTd1 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Rolling Stone Door (ZTd2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTd2")]
-    public class RollingStoneDoorZTd2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Rolling Stone Door (ZTd3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTd3")]
-    public class RollingStoneDoorZTd3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Rolling Stone Door (ZTd4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTd4")]
-    public class RollingStoneDoorZTd4 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Rolling Stone Door (ZTd5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTd5")]
-    public class RollingStoneDoorZTd5 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Rolling Stone Door (ZTd6).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTd6")]
-    public class RollingStoneDoorZTd6 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Rolling Stone Door (ZTd7).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTd7")]
-    public class RollingStoneDoorZTd7 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Rolling Stone Door (ZTd8).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTd8")]
-    public class RollingStoneDoorZTd8 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ruined Gate (ZTg1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTg1")]
-    public class RuinedGate : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ruined Gate (ZTg2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTg2")]
-    public class RuinedGateZTg2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ruined Gate (ZTg3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTg3")]
-    public class RuinedGateZTg3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ruined Gate (ZTg4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTg4")]
-    public class RuinedGateZTg4 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ruins Canopy Tree (ZTtc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTtc")]
-    public class RuinsCanopyTree : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ruins Naga Circle (ZTnc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTnc")]
-    public class RuinsNagaCircle : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ruins Tree Wall (ZTtw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTtw")]
-    public class RuinsTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Scorched Tree Wall (Ytsc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("Ytsc")]
-    public class ScorchedTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Shimmering Portal (OTsp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OTsp")]
-    public class ShimmeringPortal : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Ship (NTbd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NTbd")]
-    public class Ship : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Elven Bridge (EB00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EB00")]
-    public class ShortElvenBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Elven Bridge (EB01).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EB01")]
-    public class ShortElvenBridgeEB01 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Elven Bridge (EB02).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EB02")]
-    public class ShortElvenBridgeEB02 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Elven Bridge (EB03).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EB03")]
-    public class ShortElvenBridgeEB03 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Natural Bridge (YT00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT00")]
-    public class ShortNaturalBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Natural Bridge (YT01).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT01")]
-    public class ShortNaturalBridgeYT01 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Natural Bridge (YT02).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT02")]
-    public class ShortNaturalBridgeYT02 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Natural Bridge (YT03).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT03")]
-    public class ShortNaturalBridgeYT03 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Natural Bridge (YT24).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT24")]
-    public class ShortNaturalBridgeYT24 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Natural Bridge (YT25).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT25")]
-    public class ShortNaturalBridgeYT25 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Natural Bridge (YT26).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT26")]
-    public class ShortNaturalBridgeYT26 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Natural Bridge (YT27).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT27")]
-    public class ShortNaturalBridgeYT27 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Night Elven Wooden Bridge (NB00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NB00")]
-    public class ShortNightElvenWoodenBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Night Elven Wooden Bridge (NB01).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NB01")]
-    public class ShortNightElvenWoodenBridgeNB01 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Night Elven Wooden Bridge (NB02).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NB02")]
-    public class ShortNightElvenWoodenBridgeNB02 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Night Elven Wooden Bridge (NB03).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NB03")]
-    public class ShortNightElvenWoodenBridgeNB03 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Overgrown Bridge (OG00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OG00")]
-    public class ShortOvergrownBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Overgrown Bridge (OG01).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OG01")]
-    public class ShortOvergrownBridgeOG01 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Overgrown Bridge (OG02).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OG02")]
-    public class ShortOvergrownBridgeOG02 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Overgrown Bridge (OG03).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OG03")]
-    public class ShortOvergrownBridgeOG03 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Rickety Wooden Bridge (RW00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("RW00")]
-    public class ShortRicketyWoodenBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Rickety Wooden Bridge (RW01).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("RW01")]
-    public class ShortRicketyWoodenBridgeRW01 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Rickety Wooden Bridge (RW02).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("RW02")]
-    public class ShortRicketyWoodenBridgeRW02 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Rickety Wooden Bridge (RW03).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("RW03")]
-    public class ShortRicketyWoodenBridgeRW03 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Stone Bridge (YT12).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT12")]
-    public class ShortStoneBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Stone Bridge (YT13).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT13")]
-    public class ShortStoneBridgeYT13 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Stone Bridge (YT14).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT14")]
-    public class ShortStoneBridgeYT14 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Stone Bridge (YT15).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT15")]
-    public class ShortStoneBridgeYT15 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Stone Bridge (YT36).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT36")]
-    public class ShortStoneBridgeYT36 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Stone Bridge (YT37).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT37")]
-    public class ShortStoneBridgeYT37 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Stone Bridge (YT38).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT38")]
-    public class ShortStoneBridgeYT38 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Stone Bridge (YT39).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT39")]
-    public class ShortStoneBridgeYT39 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Stratholme Bridge (YY12).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YY12")]
-    public class ShortStratholmeBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Stratholme Bridge (YY13).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YY13")]
-    public class ShortStratholmeBridgeYY13 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Stratholme Bridge (YY14).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YY14")]
-    public class ShortStratholmeBridgeYY14 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Stratholme Bridge (YY15).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YY15")]
-    public class ShortStratholmeBridgeYY15 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Wooden Bridge (LT00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LT00")]
-    public class ShortWoodenBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Wooden Bridge (LT01).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LT01")]
-    public class ShortWoodenBridgeLT01 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Wooden Bridge (LT02).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LT02")]
-    public class ShortWoodenBridgeLT02 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Short Wooden Bridge (LT03).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LT03")]
-    public class ShortWoodenBridgeLT03 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Silvermoon Tree (Yts1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("Yts1")]
-    public class SilvermoonTree : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Snowy Tree Wall (WTst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("WTst")]
-    public class SnowyTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Special Ice Bridge (YT66).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT66")]
-    public class SpecialIceBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Ramp (LTr1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTr1")]
-    public class StoneRamp : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Ramp (LTr2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTr2")]
-    public class StoneRampLTr2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Ramp (LTr3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTr3")]
-    public class StoneRampLTr3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Ramp (LTr4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTr4")]
-    public class StoneRampLTr4 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Ramp (LTr5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTr5")]
-    public class StoneRampLTr5 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Ramp (LTr6).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTr6")]
-    public class StoneRampLTr6 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Ramp (LTr7).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTr7")]
-    public class StoneRampLTr7 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Ramp (LTr8).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTr8")]
-    public class StoneRampLTr8 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Ramp (LTs1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTs1")]
-    public class StoneRampLTs1 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Ramp (LTs2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTs2")]
-    public class StoneRampLTs2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Ramp (LTs3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTs3")]
-    public class StoneRampLTs3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Ramp (LTs4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTs4")]
-    public class StoneRampLTs4 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Ramp (LTs5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTs5")]
-    public class StoneRampLTs5 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Ramp (LTs6).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTs6")]
-    public class StoneRampLTs6 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Ramp (LTs7).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTs7")]
-    public class StoneRampLTs7 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Ramp (LTs8).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTs8")]
-    public class StoneRampLTs8 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Wall (ITw0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITw0")]
-    public class StoneWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Wall (ITw1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITw1")]
-    public class StoneWallITw1 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Wall (ITw2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITw2")]
-    public class StoneWallITw2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Wall (ITw3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ITw3")]
-    public class StoneWallITw3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Wall (LTw0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTw0")]
-    public class StoneWallLTw0 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Wall (LTw1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTw1")]
-    public class StoneWallLTw1 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Wall (LTw2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTw2")]
-    public class StoneWallLTw2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Wall (LTw3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTw3")]
-    public class StoneWallLTw3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Wall (ZTw0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTw0")]
-    public class StoneWallZTw0 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Wall (ZTw1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTw1")]
-    public class StoneWallZTw1 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Wall (ZTw2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTw2")]
-    public class StoneWallZTw2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Stone Wall (ZTw3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZTw3")]
-    public class StoneWallZTw3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Summer Tree Wall (LTlt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTlt")]
-    public class SummerTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Support Column (BTsc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BTsc")]
-    public class SupportColumn : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Tree Bridge (ATt0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ATt0")]
-    public class TreeBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Tree Bridge (ATt1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ATt1")]
-    public class TreeBridgeATt1 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Tree Bridge (LTt0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTt0")]
-    public class TreeBridgeLTt0 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Tree Bridge (LTt1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTt1")]
-    public class TreeBridgeLTt1 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Tree Bridge (LTt2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTt2")]
-    public class TreeBridgeLTt2 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Tree Bridge (LTt3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTt3")]
-    public class TreeBridgeLTt3 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Tree Bridge (LTt4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTt4")]
-    public class TreeBridgeLTt4 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Tree Bridge (LTt5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LTt5")]
-    public class TreeBridgeLTt5 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Underground Tree Wall (GTsh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("GTsh")]
-    public class UndergroundTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Village Tree Wall (VTlt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("VTlt")]
-    public class VillageTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Volcano (Volc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("Volc")]
-    public class Volcano : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Waygate Ramp (WGTR).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("WGTR")]
-    public class WaygateRamp : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wharf (ATwf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ATwf")]
-    public class Wharf : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Elven Bridge (EB08).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EB08")]
-    public class WideElvenBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Elven Bridge (EB09).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EB09")]
-    public class WideElvenBridgeEB09 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Elven Bridge (EB10).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EB10")]
-    public class WideElvenBridgeEB10 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Elven Bridge (EB11).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EB11")]
-    public class WideElvenBridgeEB11 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Natural Bridge (YT08).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT08")]
-    public class WideNaturalBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Natural Bridge (YT09).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT09")]
-    public class WideNaturalBridgeYT09 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Natural Bridge (YT10).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT10")]
-    public class WideNaturalBridgeYT10 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Natural Bridge (YT11).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT11")]
-    public class WideNaturalBridgeYT11 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Natural Bridge (YT32).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT32")]
-    public class WideNaturalBridgeYT32 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Natural Bridge (YT33).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT33")]
-    public class WideNaturalBridgeYT33 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Natural Bridge (YT34).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT34")]
-    public class WideNaturalBridgeYT34 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Natural Bridge (YT35).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT35")]
-    public class WideNaturalBridgeYT35 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Night Elven Wooden Bridge (NB08).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NB08")]
-    public class WideNightElvenWoodenBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Night Elven Wooden Bridge (NB09).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NB09")]
-    public class WideNightElvenWoodenBridgeNB09 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Night Elven Wooden Bridge (NB10).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NB10")]
-    public class WideNightElvenWoodenBridgeNB10 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Night Elven Wooden Bridge (NB11).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NB11")]
-    public class WideNightElvenWoodenBridgeNB11 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Overgrown Bridge (OG08).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OG08")]
-    public class WideOvergrownBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Overgrown Bridge (OG09).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OG09")]
-    public class WideOvergrownBridgeOG09 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Overgrown Bridge (OG10).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OG10")]
-    public class WideOvergrownBridgeOG10 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Overgrown Bridge (OG11).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OG11")]
-    public class WideOvergrownBridgeOG11 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Rickety Wooden Bridge (RW08).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("RW08")]
-    public class WideRicketyWoodenBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Rickety Wooden Bridge (RW09).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("RW09")]
-    public class WideRicketyWoodenBridgeRW09 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Rickety Wooden Bridge (RW10).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("RW10")]
-    public class WideRicketyWoodenBridgeRW10 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Rickety Wooden Bridge (RW11).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("RW11")]
-    public class WideRicketyWoodenBridgeRW11 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Stone Bridge (YT20).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT20")]
-    public class WideStoneBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Stone Bridge (YT21).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT21")]
-    public class WideStoneBridgeYT21 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Stone Bridge (YT22).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT22")]
-    public class WideStoneBridgeYT22 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Stone Bridge (YT23).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT23")]
-    public class WideStoneBridgeYT23 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Stone Bridge (YT44).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT44")]
-    public class WideStoneBridgeYT44 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Stone Bridge (YT45).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT45")]
-    public class WideStoneBridgeYT45 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Stone Bridge (YT46).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT46")]
-    public class WideStoneBridgeYT46 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Stone Bridge (YT47).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YT47")]
-    public class WideStoneBridgeYT47 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Stratholme Bridge (YY20).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YY20")]
-    public class WideStratholmeBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Stratholme Bridge (YY21).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YY21")]
-    public class WideStratholmeBridgeYY21 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Stratholme Bridge (YY22).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YY22")]
-    public class WideStratholmeBridgeYY22 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Stratholme Bridge (YY23).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YY23")]
-    public class WideStratholmeBridgeYY23 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Wooden Bridge (LT08).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LT08")]
-    public class WideWoodenBridge : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Wooden Bridge (LT09).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LT09")]
-    public class WideWoodenBridgeLT09 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Wooden Bridge (LT10).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LT10")]
-    public class WideWoodenBridgeLT10 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Wide Wooden Bridge (LT11).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LT11")]
-    public class WideWoodenBridgeLT11 : global::Moonwell.Objects.StandardDestructable
-    {
-    }
-
-    /// <summary>Winter Tree Wall (WTtw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("WTtw")]
-    public class WinterTreeWall : global::Moonwell.Objects.StandardDestructable
-    {
+    /// <summary>The standard destructables.</summary>
+    /// @CSharpLua.Ignore
+    public static partial class Destructables
+    {
+        /// <summary>Ashenvale Canopy Tree (ATtc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ATtc")]
+        public class AshenvaleCanopyTree : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ashenvale Tree Wall (ATtr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ATtr")]
+        public class AshenvaleTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Barrel (LTbr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTbr")]
+        public class Barrel : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Barrel (LTbs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTbs")]
+        public class BarrelLTbs : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Barrel (LTbx).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTbx")]
+        public class BarrelLTbx : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Barrel of Explosives (LTex).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTex")]
+        public class BarrelOfExplosives : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Barrens Canopy Tree (BTtc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BTtc")]
+        public class BarrensCanopyTree : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Barrens Tree Wall (BTtw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BTtw")]
+        public class BarrensTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Barricade (LTba).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTba")]
+        public class Barricade : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Black Citadel Tree Wall (KTtw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("KTtw")]
+        public class BlackCitadelTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Bridge Destroyed (YSdb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSdb")]
+        public class BridgeDestroyed : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Bridge Destroyed (YSdc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSdc")]
+        public class BridgeDestroyedYSdc : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Cage (LOcg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOcg")]
+        public class Cage : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>City Entrance (YTce).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTce")]
+        public class CityEntrance : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>City Entrance (YTcx).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTcx")]
+        public class CityEntranceYTcx : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Cityscape Fall Tree Wall (YTft).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTft")]
+        public class CityscapeFallTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Cityscape Ruined Tree Wall (JTct).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("JTct")]
+        public class CityscapeRuinedTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Cityscape Snowy Tree Wall (YTst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTst")]
+        public class CityscapeSnowyTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Cityscape Summer Tree Wall (YTct).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTct")]
+        public class CityscapeSummerTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Cityscape Winter Tree Wall (YTwt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTwt")]
+        public class CityscapeWinterTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Cliff Cave Gate (DTc1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTc1")]
+        public class CliffCaveGate : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Cliff Cave Gate (DTc2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTc2")]
+        public class CliffCaveGateDTc2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Crates (LTcr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTcr")]
+        public class Crates : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Dalaran Building (XTbd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XTbd")]
+        public class DalaranBuilding : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Dalaran Ruins Tree Wall (JTtw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("JTtw")]
+        public class DalaranRuinsTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Dalaran Violet Citadel (XTvt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XTvt")]
+        public class DalaranVioletCitadel : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Demon Storm (OTds).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OTds")]
+        public class DemonStorm : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Demonic Gate (ATg1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ATg1")]
+        public class DemonicGate : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Demonic Gate (ATg2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ATg2")]
+        public class DemonicGateATg2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Demonic Gate (ATg3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ATg3")]
+        public class DemonicGateATg3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Demonic Gate (ATg4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ATg4")]
+        public class DemonicGateATg4 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Dungeon Gate (DTg1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTg1")]
+        public class DungeonGate : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Dungeon Gate (DTg2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTg2")]
+        public class DungeonGateDTg2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Dungeon Gate (DTg3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTg3")]
+        public class DungeonGateDTg3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Dungeon Gate (DTg4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTg4")]
+        public class DungeonGateDTg4 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Dungeon Spikes (DTsp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTsp")]
+        public class DungeonSpikes : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Dungeon Tree Wall (DTsh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTsh")]
+        public class DungeonTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Egg Sack (DTes).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTes")]
+        public class EggSack : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Elevator (DTrf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTrf")]
+        public class Elevator : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Elevator (DTrx).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTrx")]
+        public class ElevatorDTrx : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Elevator Wall (DTep).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTep")]
+        public class ElevatorWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Elven Bridge (YT67).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT67")]
+        public class ElvenBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Elven Gate (LTe1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTe1")]
+        public class ElvenGate : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Elven Gate (LTe2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTe2")]
+        public class ElvenGateLTe2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Elven Gate (LTe3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTe3")]
+        public class ElvenGateLTe3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Elven Gate (LTe4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTe4")]
+        public class ElvenGateLTe4 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Extra Wide Natural Bridge (YT48).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT48")]
+        public class ExtraWideNaturalBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Extra Wide Natural Bridge (YT49).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT49")]
+        public class ExtraWideNaturalBridgeYT49 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Extra Wide Natural Bridge (YT50).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT50")]
+        public class ExtraWideNaturalBridgeYT50 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Extra Wide Natural Bridge (YT51).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT51")]
+        public class ExtraWideNaturalBridgeYT51 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Fall Tree Wall (FTtw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("FTtw")]
+        public class FallTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Felwood Canopy Tree (CTtc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CTtc")]
+        public class FelwoodCanopyTree : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Felwood Tree Wall (CTtr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CTtr")]
+        public class FelwoodTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Foot Switch (DTfp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTfp")]
+        public class FootSwitch : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Foot Switch (DTfx).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTfx")]
+        public class FootSwitchDTfx : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Force Bridge (DTs0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTs0")]
+        public class ForceBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Force Bridge (DTs1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTs1")]
+        public class ForceBridgeDTs1 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Force Bridge (DTs2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTs2")]
+        public class ForceBridgeDTs2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Force Bridge (DTs3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTs3")]
+        public class ForceBridgeDTs3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>ForceWall (Dofv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("Dofv")]
+        public class ForceWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>ForceWall (Dofw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("Dofw")]
+        public class ForceWallDofw : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Frozen Throne Gate (ITtg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITtg")]
+        public class FrozenThroneGate : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Gate (LTg1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTg1")]
+        public class Gate : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Gate (LTg2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTg2")]
+        public class GateLTg2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Gate (LTg3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTg3")]
+        public class GateLTg3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Gate (LTg4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTg4")]
+        public class GateLTg4 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Green Force Wall (Dogv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("Dogv")]
+        public class GreenForceWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Green Force Wall (Dogw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("Dogw")]
+        public class GreenForceWallDogw : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ice Bridge (ITi2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITi2")]
+        public class IceBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ice Bridge (ITi3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITi3")]
+        public class IceBridgeITi3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ice Bridge (ITi4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITi4")]
+        public class IceBridgeITi4 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ice Bridge (ITib).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITib")]
+        public class IceBridgeITib : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ice Floe (ITf1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITf1")]
+        public class IceFloe : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ice Floe (ITf2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITf2")]
+        public class IceFloeITf2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ice Floe (ITf3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITf3")]
+        public class IceFloeITf3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ice Floe (ITf4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITf4")]
+        public class IceFloeITf4 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ice Rock Gate (ITx1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITx1")]
+        public class IceRockGate : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ice Rock Gate (ITx2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITx2")]
+        public class IceRockGateITx2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ice Rock Gate (ITx3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITx3")]
+        public class IceRockGateITx3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ice Rock Gate (ITx4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITx4")]
+        public class IceRockGateITx4 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Icecrown Canopy Tree (ITtc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITtc")]
+        public class IcecrownCanopyTree : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Icecrown Citadel Entrance (YTc1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTc1")]
+        public class IcecrownCitadelEntrance : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Icecrown Throne (IOt0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IOt0")]
+        public class IcecrownThrone : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Icecrown Throne (Diagonal 1) (IOt1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IOt1")]
+        public class IcecrownThroneDiagonal1 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Icecrown Throne (Diagonal 1) (IOt2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IOt2")]
+        public class IcecrownThroneDiagonal1IOt2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Icecrown Tree Wall (ITtw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITtw")]
+        public class IcecrownTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Icey Rock (ITcr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITcr")]
+        public class IceyRock : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Icy Gate (ITg1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITg1")]
+        public class IcyGate : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Icy Gate (ITg2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITg2")]
+        public class IcyGateITg2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Icy Gate (ITg3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITg3")]
+        public class IcyGateITg3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Icy Gate (ITg4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITg4")]
+        public class IcyGateITg4 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Igloo (ITig).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITig")]
+        public class Igloo : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Invisible Platform (OTip).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OTip")]
+        public class InvisiblePlatform : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Invisible Platform (small) (OTis).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OTis")]
+        public class InvisiblePlatformSmall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Iron Gate (DTg5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTg5")]
+        public class IronGate : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Iron Gate (DTg6).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTg6")]
+        public class IronGateDTg6 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Iron Gate (DTg7).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTg7")]
+        public class IronGateDTg7 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Iron Gate (DTg8).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTg8")]
+        public class IronGateDTg8 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>King's Throne (XOkt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XOkt")]
+        public class KingsThrone : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>King's Throne (Diagonal 1) (XOk1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XOk1")]
+        public class KingsThroneDiagonal1 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>King's Throne (Diagonal 1) (XOk2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XOk2")]
+        public class KingsThroneDiagonal1XOk2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Last Hope Bridge (LTtc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTtc")]
+        public class LastHopeBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Last Hope Bridge (LTtx).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTtx")]
+        public class LastHopeBridgeLTtx : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Lever (DTlv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTlv")]
+        public class Lever : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Line of Sight Blocker (YTlb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTlb")]
+        public class LineOfSightBlocker : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Line of Sight Blocker (Large) (Ytlc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("Ytlc")]
+        public class LineOfSightBlockerLarge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Lion Statue (BTs2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BTs2")]
+        public class LionStatue : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Lion Statue Destroyed (BTs3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BTs3")]
+        public class LionStatueDestroyed : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Elven Bridge (EB04).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EB04")]
+        public class LongElvenBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Elven Bridge (EB05).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EB05")]
+        public class LongElvenBridgeEB05 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Elven Bridge (EB06).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EB06")]
+        public class LongElvenBridgeEB06 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Elven Bridge (EB07).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EB07")]
+        public class LongElvenBridgeEB07 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Natural Bridge (YT04).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT04")]
+        public class LongNaturalBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Natural Bridge (YT05).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT05")]
+        public class LongNaturalBridgeYT05 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Natural Bridge (YT06).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT06")]
+        public class LongNaturalBridgeYT06 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Natural Bridge (YT07).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT07")]
+        public class LongNaturalBridgeYT07 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Natural Bridge (YT28).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT28")]
+        public class LongNaturalBridgeYT28 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Natural Bridge (YT29).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT29")]
+        public class LongNaturalBridgeYT29 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Natural Bridge (YT30).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT30")]
+        public class LongNaturalBridgeYT30 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Natural Bridge (YT31).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT31")]
+        public class LongNaturalBridgeYT31 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Night Elven Wooden Bridge (NB04).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NB04")]
+        public class LongNightElvenWoodenBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Night Elven Wooden Bridge (NB05).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NB05")]
+        public class LongNightElvenWoodenBridgeNB05 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Night Elven Wooden Bridge (NB06).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NB06")]
+        public class LongNightElvenWoodenBridgeNB06 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Night Elven Wooden Bridge (NB07).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NB07")]
+        public class LongNightElvenWoodenBridgeNB07 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Overgrown Bridge (OG04).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OG04")]
+        public class LongOvergrownBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Overgrown Bridge (OG05).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OG05")]
+        public class LongOvergrownBridgeOG05 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Overgrown Bridge (OG06).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OG06")]
+        public class LongOvergrownBridgeOG06 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Overgrown Bridge (OG07).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OG07")]
+        public class LongOvergrownBridgeOG07 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Rickety Wooden Bridge (RW04).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("RW04")]
+        public class LongRicketyWoodenBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Rickety Wooden Bridge (RW05).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("RW05")]
+        public class LongRicketyWoodenBridgeRW05 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Rickety Wooden Bridge (RW06).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("RW06")]
+        public class LongRicketyWoodenBridgeRW06 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Rickety Wooden Bridge (RW07).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("RW07")]
+        public class LongRicketyWoodenBridgeRW07 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Stone Bridge (YT16).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT16")]
+        public class LongStoneBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Stone Bridge (YT17).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT17")]
+        public class LongStoneBridgeYT17 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Stone Bridge (YT18).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT18")]
+        public class LongStoneBridgeYT18 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Stone Bridge (YT19).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT19")]
+        public class LongStoneBridgeYT19 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Stone Bridge (YT40).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT40")]
+        public class LongStoneBridgeYT40 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Stone Bridge (YT41).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT41")]
+        public class LongStoneBridgeYT41 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Stone Bridge (YT42).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT42")]
+        public class LongStoneBridgeYT42 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Stone Bridge (YT43).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT43")]
+        public class LongStoneBridgeYT43 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Stratholme Bridge (YY16).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YY16")]
+        public class LongStratholmeBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Stratholme Bridge (YY17).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YY17")]
+        public class LongStratholmeBridgeYY17 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Stratholme Bridge (YY18).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YY18")]
+        public class LongStratholmeBridgeYY18 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Stratholme Bridge (YY19).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YY19")]
+        public class LongStratholmeBridgeYY19 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Undercity Bridge (UB01).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UB01")]
+        public class LongUndercityBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Undercity Bridge (UB02).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UB02")]
+        public class LongUndercityBridgeUB02 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Undercity Bridge (UB03).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UB03")]
+        public class LongUndercityBridgeUB03 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Undercity Bridge (UB04).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UB04")]
+        public class LongUndercityBridgeUB04 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Wooden Bridge (LT04).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LT04")]
+        public class LongWoodenBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Wooden Bridge (LT05).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LT05")]
+        public class LongWoodenBridgeLT05 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Wooden Bridge (LT06).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LT06")]
+        public class LongWoodenBridgeLT06 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Long Wooden Bridge (LT07).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LT07")]
+        public class LongWoodenBridgeLT07 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Lordaeron City Dome (XTv1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XTv1")]
+        public class LordaeronCityDome : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Lordaeron City Dome Destroyed (XTv2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XTv2")]
+        public class LordaeronCityDomeDestroyed : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Lordaeron City Main Building (XTv3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XTv3")]
+        public class LordaeronCityMainBuilding : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Lordaeron City Main Building Destroyed (XTv4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XTv4")]
+        public class LordaeronCityMainBuildingDestroyed : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Lordaeron City Main Gate (YTc2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTc2")]
+        public class LordaeronCityMainGate : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Lordaeron City Main Gate Column (BTsk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BTsk")]
+        public class LordaeronCityMainGateColumn : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Lordaeron City Main Gate Column Destroyed (BTs1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BTs1")]
+        public class LordaeronCityMainGateColumnDestroyed : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Lordaeron City Main Gate Destroyed (YTc4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTc4")]
+        public class LordaeronCityMainGateDestroyed : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Lordaeron City Spire (BTs4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BTs4")]
+        public class LordaeronCitySpire : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Lordaeron City Spire Destroyed (BTs5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BTs5")]
+        public class LordaeronCitySpireDestroyed : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Magical Pen (XTm5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XTm5")]
+        public class MagicalPen : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Magical Pen Wall (XTmx).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XTmx")]
+        public class MagicalPenWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Magical Pen Wall (XTx5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XTx5")]
+        public class MagicalPenWallXTx5 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Magical Pen (XTmp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XTmp")]
+        public class MagicalPenXTmp : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Massive Ruined Gate (ZTsg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTsg")]
+        public class MassiveRuinedGate : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Massive Ruined Gate (ZTsx).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTsx")]
+        public class MassiveRuinedGateZTsx : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Northrend Canopy Tree (NTtc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NTtc")]
+        public class NorthrendCanopyTree : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Northrend Icy Tree Wall (NTiw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NTiw")]
+        public class NorthrendIcyTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Northrend Tree Wall (NTtw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NTtw")]
+        public class NorthrendTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Orgrimmar Gate (YTcn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTcn")]
+        public class OrgrimmarGate : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Orgrimmar Tower Completed (XTv8).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XTv8")]
+        public class OrgrimmarTowerCompleted : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Orgrimmar Tower Under Construction (XTv7).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XTv7")]
+        public class OrgrimmarTowerUnderConstruction : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Orgrimmar Wall Segment Completed (XTv6).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XTv6")]
+        public class OrgrimmarWallSegmentCompleted : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Orgrimmar Wall Segment Under Construction (XTv5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XTv5")]
+        public class OrgrimmarWallSegmentUnderConstruction : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Outland Tree Wall (OTtw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OTtw")]
+        public class OutlandTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Pathing Blocker (Air) (YTab).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTab")]
+        public class PathingBlockerAir : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Pathing Blocker (Air) (Large) (YTac).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTac")]
+        public class PathingBlockerAirLarge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Pathing Blocker (Both) (YTfb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTfb")]
+        public class PathingBlockerBoth : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Pathing Blocker (Both) (Large) (YTfc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTfc")]
+        public class PathingBlockerBothLarge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Pathing Blocker (Ground) (YTpb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTpb")]
+        public class PathingBlockerGround : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Pathing Blocker (Ground) (Large) (YTpc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTpc")]
+        public class PathingBlockerGroundLarge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Pathing Blocker (Ground) (YTpl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTpl")]
+        public class PathingBlockerGroundYTpl : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Pathing Blocker (Ground) (YTps).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YTps")]
+        public class PathingBlockerGroundYTps : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ramp Naga Small (Bottom) (ZTr3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTr3")]
+        public class RampNagaSmallBottom : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ramp Naga Small (Left) (ZTr0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTr0")]
+        public class RampNagaSmallLeft : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ramp Naga Small (Right) (ZTr2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTr2")]
+        public class RampNagaSmallRight : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ramp Naga Small (Top) (ZTr1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTr1")]
+        public class RampNagaSmallTop : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Resurrection Stone (BTrs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BTrs")]
+        public class ResurrectionStone : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Resurrection Stone (BTrx).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BTrx")]
+        public class ResurrectionStoneBTrx : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Rock Chunks (DTrc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DTrc")]
+        public class RockChunks : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Rock Chunks (LTrc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTrc")]
+        public class RockChunksLTrc : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Rock Chunks (LTrt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTrt")]
+        public class RockChunksLTrt : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Rockin Arthas (ITag).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITag")]
+        public class RockinArthas : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Rolling Stone Door (ITd1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITd1")]
+        public class RollingStoneDoor : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Rolling Stone Door (ITd2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITd2")]
+        public class RollingStoneDoorITd2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Rolling Stone Door (ITd3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITd3")]
+        public class RollingStoneDoorITd3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Rolling Stone Door (ITd4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITd4")]
+        public class RollingStoneDoorITd4 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Rolling Stone Door (ZTd1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTd1")]
+        public class RollingStoneDoorZTd1 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Rolling Stone Door (ZTd2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTd2")]
+        public class RollingStoneDoorZTd2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Rolling Stone Door (ZTd3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTd3")]
+        public class RollingStoneDoorZTd3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Rolling Stone Door (ZTd4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTd4")]
+        public class RollingStoneDoorZTd4 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Rolling Stone Door (ZTd5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTd5")]
+        public class RollingStoneDoorZTd5 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Rolling Stone Door (ZTd6).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTd6")]
+        public class RollingStoneDoorZTd6 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Rolling Stone Door (ZTd7).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTd7")]
+        public class RollingStoneDoorZTd7 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Rolling Stone Door (ZTd8).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTd8")]
+        public class RollingStoneDoorZTd8 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ruined Gate (ZTg1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTg1")]
+        public class RuinedGate : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ruined Gate (ZTg2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTg2")]
+        public class RuinedGateZTg2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ruined Gate (ZTg3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTg3")]
+        public class RuinedGateZTg3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ruined Gate (ZTg4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTg4")]
+        public class RuinedGateZTg4 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ruins Canopy Tree (ZTtc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTtc")]
+        public class RuinsCanopyTree : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ruins Naga Circle (ZTnc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTnc")]
+        public class RuinsNagaCircle : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ruins Tree Wall (ZTtw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTtw")]
+        public class RuinsTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Scorched Tree Wall (Ytsc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("Ytsc")]
+        public class ScorchedTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Shimmering Portal (OTsp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OTsp")]
+        public class ShimmeringPortal : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Ship (NTbd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NTbd")]
+        public class Ship : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Elven Bridge (EB00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EB00")]
+        public class ShortElvenBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Elven Bridge (EB01).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EB01")]
+        public class ShortElvenBridgeEB01 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Elven Bridge (EB02).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EB02")]
+        public class ShortElvenBridgeEB02 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Elven Bridge (EB03).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EB03")]
+        public class ShortElvenBridgeEB03 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Natural Bridge (YT00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT00")]
+        public class ShortNaturalBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Natural Bridge (YT01).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT01")]
+        public class ShortNaturalBridgeYT01 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Natural Bridge (YT02).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT02")]
+        public class ShortNaturalBridgeYT02 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Natural Bridge (YT03).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT03")]
+        public class ShortNaturalBridgeYT03 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Natural Bridge (YT24).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT24")]
+        public class ShortNaturalBridgeYT24 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Natural Bridge (YT25).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT25")]
+        public class ShortNaturalBridgeYT25 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Natural Bridge (YT26).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT26")]
+        public class ShortNaturalBridgeYT26 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Natural Bridge (YT27).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT27")]
+        public class ShortNaturalBridgeYT27 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Night Elven Wooden Bridge (NB00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NB00")]
+        public class ShortNightElvenWoodenBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Night Elven Wooden Bridge (NB01).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NB01")]
+        public class ShortNightElvenWoodenBridgeNB01 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Night Elven Wooden Bridge (NB02).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NB02")]
+        public class ShortNightElvenWoodenBridgeNB02 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Night Elven Wooden Bridge (NB03).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NB03")]
+        public class ShortNightElvenWoodenBridgeNB03 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Overgrown Bridge (OG00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OG00")]
+        public class ShortOvergrownBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Overgrown Bridge (OG01).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OG01")]
+        public class ShortOvergrownBridgeOG01 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Overgrown Bridge (OG02).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OG02")]
+        public class ShortOvergrownBridgeOG02 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Overgrown Bridge (OG03).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OG03")]
+        public class ShortOvergrownBridgeOG03 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Rickety Wooden Bridge (RW00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("RW00")]
+        public class ShortRicketyWoodenBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Rickety Wooden Bridge (RW01).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("RW01")]
+        public class ShortRicketyWoodenBridgeRW01 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Rickety Wooden Bridge (RW02).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("RW02")]
+        public class ShortRicketyWoodenBridgeRW02 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Rickety Wooden Bridge (RW03).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("RW03")]
+        public class ShortRicketyWoodenBridgeRW03 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Stone Bridge (YT12).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT12")]
+        public class ShortStoneBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Stone Bridge (YT13).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT13")]
+        public class ShortStoneBridgeYT13 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Stone Bridge (YT14).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT14")]
+        public class ShortStoneBridgeYT14 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Stone Bridge (YT15).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT15")]
+        public class ShortStoneBridgeYT15 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Stone Bridge (YT36).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT36")]
+        public class ShortStoneBridgeYT36 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Stone Bridge (YT37).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT37")]
+        public class ShortStoneBridgeYT37 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Stone Bridge (YT38).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT38")]
+        public class ShortStoneBridgeYT38 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Stone Bridge (YT39).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT39")]
+        public class ShortStoneBridgeYT39 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Stratholme Bridge (YY12).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YY12")]
+        public class ShortStratholmeBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Stratholme Bridge (YY13).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YY13")]
+        public class ShortStratholmeBridgeYY13 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Stratholme Bridge (YY14).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YY14")]
+        public class ShortStratholmeBridgeYY14 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Stratholme Bridge (YY15).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YY15")]
+        public class ShortStratholmeBridgeYY15 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Wooden Bridge (LT00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LT00")]
+        public class ShortWoodenBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Wooden Bridge (LT01).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LT01")]
+        public class ShortWoodenBridgeLT01 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Wooden Bridge (LT02).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LT02")]
+        public class ShortWoodenBridgeLT02 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Short Wooden Bridge (LT03).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LT03")]
+        public class ShortWoodenBridgeLT03 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Silvermoon Tree (Yts1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("Yts1")]
+        public class SilvermoonTree : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Snowy Tree Wall (WTst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("WTst")]
+        public class SnowyTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Special Ice Bridge (YT66).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT66")]
+        public class SpecialIceBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Ramp (LTr1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTr1")]
+        public class StoneRamp : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Ramp (LTr2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTr2")]
+        public class StoneRampLTr2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Ramp (LTr3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTr3")]
+        public class StoneRampLTr3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Ramp (LTr4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTr4")]
+        public class StoneRampLTr4 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Ramp (LTr5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTr5")]
+        public class StoneRampLTr5 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Ramp (LTr6).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTr6")]
+        public class StoneRampLTr6 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Ramp (LTr7).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTr7")]
+        public class StoneRampLTr7 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Ramp (LTr8).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTr8")]
+        public class StoneRampLTr8 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Ramp (LTs1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTs1")]
+        public class StoneRampLTs1 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Ramp (LTs2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTs2")]
+        public class StoneRampLTs2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Ramp (LTs3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTs3")]
+        public class StoneRampLTs3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Ramp (LTs4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTs4")]
+        public class StoneRampLTs4 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Ramp (LTs5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTs5")]
+        public class StoneRampLTs5 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Ramp (LTs6).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTs6")]
+        public class StoneRampLTs6 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Ramp (LTs7).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTs7")]
+        public class StoneRampLTs7 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Ramp (LTs8).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTs8")]
+        public class StoneRampLTs8 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Wall (ITw0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITw0")]
+        public class StoneWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Wall (ITw1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITw1")]
+        public class StoneWallITw1 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Wall (ITw2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITw2")]
+        public class StoneWallITw2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Wall (ITw3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ITw3")]
+        public class StoneWallITw3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Wall (LTw0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTw0")]
+        public class StoneWallLTw0 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Wall (LTw1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTw1")]
+        public class StoneWallLTw1 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Wall (LTw2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTw2")]
+        public class StoneWallLTw2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Wall (LTw3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTw3")]
+        public class StoneWallLTw3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Wall (ZTw0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTw0")]
+        public class StoneWallZTw0 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Wall (ZTw1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTw1")]
+        public class StoneWallZTw1 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Wall (ZTw2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTw2")]
+        public class StoneWallZTw2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Stone Wall (ZTw3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZTw3")]
+        public class StoneWallZTw3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Summer Tree Wall (LTlt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTlt")]
+        public class SummerTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Support Column (BTsc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BTsc")]
+        public class SupportColumn : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Tree Bridge (ATt0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ATt0")]
+        public class TreeBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Tree Bridge (ATt1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ATt1")]
+        public class TreeBridgeATt1 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Tree Bridge (LTt0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTt0")]
+        public class TreeBridgeLTt0 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Tree Bridge (LTt1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTt1")]
+        public class TreeBridgeLTt1 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Tree Bridge (LTt2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTt2")]
+        public class TreeBridgeLTt2 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Tree Bridge (LTt3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTt3")]
+        public class TreeBridgeLTt3 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Tree Bridge (LTt4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTt4")]
+        public class TreeBridgeLTt4 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Tree Bridge (LTt5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LTt5")]
+        public class TreeBridgeLTt5 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Underground Tree Wall (GTsh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("GTsh")]
+        public class UndergroundTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Village Tree Wall (VTlt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("VTlt")]
+        public class VillageTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Volcano (Volc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("Volc")]
+        public class Volcano : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Waygate Ramp (WGTR).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("WGTR")]
+        public class WaygateRamp : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wharf (ATwf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ATwf")]
+        public class Wharf : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Elven Bridge (EB08).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EB08")]
+        public class WideElvenBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Elven Bridge (EB09).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EB09")]
+        public class WideElvenBridgeEB09 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Elven Bridge (EB10).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EB10")]
+        public class WideElvenBridgeEB10 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Elven Bridge (EB11).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EB11")]
+        public class WideElvenBridgeEB11 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Natural Bridge (YT08).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT08")]
+        public class WideNaturalBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Natural Bridge (YT09).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT09")]
+        public class WideNaturalBridgeYT09 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Natural Bridge (YT10).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT10")]
+        public class WideNaturalBridgeYT10 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Natural Bridge (YT11).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT11")]
+        public class WideNaturalBridgeYT11 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Natural Bridge (YT32).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT32")]
+        public class WideNaturalBridgeYT32 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Natural Bridge (YT33).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT33")]
+        public class WideNaturalBridgeYT33 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Natural Bridge (YT34).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT34")]
+        public class WideNaturalBridgeYT34 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Natural Bridge (YT35).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT35")]
+        public class WideNaturalBridgeYT35 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Night Elven Wooden Bridge (NB08).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NB08")]
+        public class WideNightElvenWoodenBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Night Elven Wooden Bridge (NB09).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NB09")]
+        public class WideNightElvenWoodenBridgeNB09 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Night Elven Wooden Bridge (NB10).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NB10")]
+        public class WideNightElvenWoodenBridgeNB10 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Night Elven Wooden Bridge (NB11).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NB11")]
+        public class WideNightElvenWoodenBridgeNB11 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Overgrown Bridge (OG08).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OG08")]
+        public class WideOvergrownBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Overgrown Bridge (OG09).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OG09")]
+        public class WideOvergrownBridgeOG09 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Overgrown Bridge (OG10).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OG10")]
+        public class WideOvergrownBridgeOG10 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Overgrown Bridge (OG11).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OG11")]
+        public class WideOvergrownBridgeOG11 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Rickety Wooden Bridge (RW08).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("RW08")]
+        public class WideRicketyWoodenBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Rickety Wooden Bridge (RW09).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("RW09")]
+        public class WideRicketyWoodenBridgeRW09 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Rickety Wooden Bridge (RW10).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("RW10")]
+        public class WideRicketyWoodenBridgeRW10 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Rickety Wooden Bridge (RW11).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("RW11")]
+        public class WideRicketyWoodenBridgeRW11 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Stone Bridge (YT20).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT20")]
+        public class WideStoneBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Stone Bridge (YT21).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT21")]
+        public class WideStoneBridgeYT21 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Stone Bridge (YT22).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT22")]
+        public class WideStoneBridgeYT22 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Stone Bridge (YT23).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT23")]
+        public class WideStoneBridgeYT23 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Stone Bridge (YT44).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT44")]
+        public class WideStoneBridgeYT44 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Stone Bridge (YT45).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT45")]
+        public class WideStoneBridgeYT45 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Stone Bridge (YT46).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT46")]
+        public class WideStoneBridgeYT46 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Stone Bridge (YT47).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YT47")]
+        public class WideStoneBridgeYT47 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Stratholme Bridge (YY20).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YY20")]
+        public class WideStratholmeBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Stratholme Bridge (YY21).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YY21")]
+        public class WideStratholmeBridgeYY21 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Stratholme Bridge (YY22).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YY22")]
+        public class WideStratholmeBridgeYY22 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Stratholme Bridge (YY23).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YY23")]
+        public class WideStratholmeBridgeYY23 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Wooden Bridge (LT08).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LT08")]
+        public class WideWoodenBridge : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Wooden Bridge (LT09).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LT09")]
+        public class WideWoodenBridgeLT09 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Wooden Bridge (LT10).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LT10")]
+        public class WideWoodenBridgeLT10 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Wide Wooden Bridge (LT11).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LT11")]
+        public class WideWoodenBridgeLT11 : global::Moonwell.Objects.StandardDestructable
+        {
+        }
+
+        /// <summary>Winter Tree Wall (WTtw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("WTtw")]
+        public class WinterTreeWall : global::Moonwell.Objects.StandardDestructable
+        {
+        }
     }
 }
 

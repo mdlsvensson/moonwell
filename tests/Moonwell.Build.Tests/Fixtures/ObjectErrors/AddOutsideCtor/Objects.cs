@@ -6,11 +6,11 @@ namespace AddOutsideCtor
     {
     }
 
-    public class Grow : Moonwell.Objects.Units.Human.Footman
+    public class Grow : Moonwell.Objects.Human.Units.Footman
     {
         public void Learn()
         {
-            Abilities.Add<Moonwell.Objects.Abilities.Human.Defend>();
+            Abilities.Add<Moonwell.Objects.Human.Abilities.Defend>();
         }
     }
 }

@@ -1,18 +1,30 @@
 namespace Moonwell.Generator.Objects;
 
-/// <summary>The C# namespace and class name of one standard object.</summary>
-/// <param name="Namespace">The namespace (<c>Moonwell.Objects.Units.Human</c>).</param>
+/// <summary>The class name of one standard object: a class nested in the classes of its group and kind.</summary>
+/// <param name="Outer">
+/// The namespace <c>Moonwell.Objects</c> and the classes the class is nested in, dotted (<c>Moonwell.Objects.Human.Units</c>,
+/// <c>Moonwell.Objects.Items</c>).
+/// </param>
 /// <param name="Name">The class name (<c>Paladin</c>).</param>
-public sealed record ClassName(string Namespace, string Name)
+public sealed record ClassName(string Outer, string Name)
 {
-    /// <summary>The namespace and the name, joined (<c>Moonwell.Objects.Units.Human.Paladin</c>).</summary>
-    public string FullName => Namespace + "." + Name;
+    /// <summary>The namespace of every standard class.</summary>
+    public const string Root = "Moonwell.Objects";
+
+    /// <summary>The name as C# and CSharp.lua write it (<c>Moonwell.Objects.Human.Units.Paladin</c>).</summary>
+    public string FullName => Outer + "." + Name;
+
+    /// <summary>The name as reflection writes it, nested classes after a plus (<c>Moonwell.Objects.Human+Units+Paladin</c>).</summary>
+    public string ReflectionName => Root + "." + (Outer.Substring(Root.Length + 1) + "." + Name).Replace('.', '+');
+
+    /// <summary>The classes the class is nested in, outermost first (<c>Human</c>, <c>Units</c>).</summary>
+    public IReadOnlyList<string> Containers => Outer.Substring(Root.Length + 1).Split('.');
 }
 
-/// <summary>The class name of every standard object: the namespace by kind and race, the name from the in-game name.</summary>
+/// <summary>The class name of every standard object: nested in its group (race) and kind, named from the in-game name.</summary>
 public static class ClassNames
 {
-    private const string Root = "Moonwell.Objects";
+    private const string Root = ClassName.Root;
     private const string CampaignPart = "Campaign";
     private const string OtherPart = "Other";
     private const string ProperNamesId = "upro";
@@ -53,13 +65,13 @@ public static class ClassNames
     };
 
     /// <summary>
-    /// The class name of each of <paramref name="objects"/>, keyed by kind and id. The namespace is
-    /// <c>Moonwell.Objects.</c> and the kind's plural, then the race for a unit, ability, buff or upgrade
-    /// (<c>Campaign</c> for a campaign unit). The name is the in-game name as <see cref="FieldNames.FromLabel"/>
+    /// The class name of each of <paramref name="objects"/>, keyed by kind and id. A unit, ability, buff or upgrade is
+    /// nested in its race (<c>Campaign</c> for a campaign unit), then the kind's plural (<c>Moonwell.Objects.Human.Units</c>);
+    /// an item, destructable or doodad in the kind's plural only (<c>Moonwell.Objects.Items</c>). The name is the in-game name as <see cref="FieldNames.FromLabel"/>
     /// writes it, or the id when there is none; a hero with exactly one proper name (<c>Arthas</c>) is named by it.
     /// </summary>
     /// <remarks>
-    /// A name that is a C# keyword, the last part of its namespace or a type of <see cref="TakenByTypes"/> gets the
+    /// A name that is a C# keyword, one of the classes it is nested in or a type of <see cref="TakenByTypes"/> gets the
     /// id appended. Where several objects of a namespace share a name, each gets the id appended, except the one
     /// with the first id (ordinal) when it is not a campaign object.
     /// </remarks>
@@ -159,7 +171,7 @@ public static class ClassNames
 
     private static bool IsReserved(string name, string space)
     {
-        return Keywords.Contains(name) || TakenByTypes.Contains(name) || name == space.Substring(space.LastIndexOf('.') + 1);
+        return Keywords.Contains(name) || TakenByTypes.Contains(name) || space.Split('.').Skip(2).Contains(name, StringComparer.Ordinal);
     }
 
     private static string NamespaceOf(StandardObject o)
@@ -183,10 +195,10 @@ public static class ClassNames
         };
         if (o.Kind == Kind.Unit && o.Campaign)
         {
-            return Root + "." + kind + "." + CampaignPart;
+            return Root + "." + CampaignPart + "." + kind;
         }
 
-        return Root + "." + kind + "." + (Races.TryGetValue(o.Race.Trim(), out var race) ? race : OtherPart);
+        return Root + "." + (Races.TryGetValue(o.Race.Trim(), out var race) ? race : OtherPart) + "." + kind;
     }
 
     private static string Capitalize(string text)

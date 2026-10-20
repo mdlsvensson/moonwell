@@ -72,7 +72,7 @@ namespace Moonwell.Objects.Tests
     {
         public Barracks()
         {
-            Trains.Remove<Moonwell.Objects.Units.Human.Footman>();
+            Trains.Remove<Moonwell.Objects.Human.Units.Footman>();
             Trains.Add<Arthas>();
         }
     }
@@ -204,10 +204,10 @@ namespace Moonwell.Objects.Tests
             var trains = new Paladin().Trains;
 
             Assert.Equal(3, trains.Count);
-            Assert.Equal(new object[] { typeof(Moonwell.Objects.Units.Human.Footman), "zzzz", typeof(Moonwell.Objects.Units.Human.Paladin) }, trains.Entries);
+            Assert.Equal(new object[] { typeof(Moonwell.Objects.Human.Units.Footman), "zzzz", typeof(Moonwell.Objects.Human.Units.Paladin) }, trains.Entries);
             Assert.Equal(trains.Entries, trains.Standard);
-            Assert.Equal(new[] { typeof(Moonwell.Objects.Units.Human.Footman), typeof(Moonwell.Objects.Units.Human.Paladin) }, trains.Types);
-            Assert.True(trains.Contains<Moonwell.Objects.Units.Human.Footman>());
+            Assert.Equal(new[] { typeof(Moonwell.Objects.Human.Units.Footman), typeof(Moonwell.Objects.Human.Units.Paladin) }, trains.Types);
+            Assert.True(trains.Contains<Moonwell.Objects.Human.Units.Footman>());
         }
 
         [Fact]
@@ -218,8 +218,8 @@ namespace Moonwell.Objects.Tests
             var trains = new Barracks().Trains;
 
             Assert.Equal(new object[] { "zzzz", typeof(Arthas) }, trains.Entries);
-            Assert.Equal(new object[] { typeof(Moonwell.Objects.Units.Human.Footman), "zzzz" }, trains.Standard);
-            Assert.False(trains.Contains<Moonwell.Objects.Units.Human.Footman>());
+            Assert.Equal(new object[] { typeof(Moonwell.Objects.Human.Units.Footman), "zzzz" }, trains.Standard);
+            Assert.False(trains.Contains<Moonwell.Objects.Human.Units.Footman>());
         }
 
         [Fact]
@@ -229,7 +229,7 @@ namespace Moonwell.Objects.Tests
 
             var trains = new Paladin().Trains;
 
-            Assert.Equal(new object[] { typeof(Moonwell.Objects.Units.Human.Footman) }, trains.Entries);
+            Assert.Equal(new object[] { typeof(Moonwell.Objects.Human.Units.Footman) }, trains.Entries);
         }
 
         [Fact]

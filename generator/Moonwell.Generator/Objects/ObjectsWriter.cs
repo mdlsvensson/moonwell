@@ -105,15 +105,16 @@ public static class ObjectsWriter
     }
 
     /// <summary>
-    /// The source of one namespace: a class for each standard object in it, ordered by name. The class inherits its
-    /// kind base (heroes <c>StandardHero</c>), has the object's id in <c>[Standard]</c>, and for an ability has a
-    /// property for each field specific to the ability's code. A property cannot be named like its class, so such a
-    /// field gets its id appended (<c>HealingModifierHem1</c>).
+    /// The source of one group and kind: a class for each standard object in it, ordered by name, nested in static
+    /// partial classes of the group and the kind (<c>Human</c>, then <c>Units</c>) in namespace <c>Moonwell.Objects</c>.
+    /// The class inherits its kind base (heroes <c>StandardHero</c>), has the object's id in <c>[Standard]</c>, and for
+    /// an ability has a property for each field specific to the ability's code. A property cannot be named like its
+    /// class, so such a field gets its id appended (<c>HealingModifierHem1</c>).
     /// </summary>
-    /// <param name="ns">The namespace.</param>
-    /// <param name="classes">The objects and their class names; every class name's namespace is <paramref name="ns"/>.</param>
+    /// <param name="outer">The namespace and the classes the objects are nested in, dotted (<c>Moonwell.Objects.Human.Units</c>).</param>
+    /// <param name="classes">The objects and their class names; every class name's outer is <paramref name="outer"/>.</param>
     /// <param name="fields">The fields of the abilities (used only for ability classes).</param>
-    public static string Namespace(string ns, IEnumerable<(StandardObject Object, ClassName Name)> classes, IReadOnlyList<Field> fields)
+    public static string Group(string outer, IEnumerable<(StandardObject Object, ClassName Name)> classes, IReadOnlyList<Field> fields)
     {
         var ordered = classes.OrderBy(c => c.Name.Name, StringComparer.Ordinal).ToList();
         var byCode = new Dictionary<string, List<Field>>(StringComparer.Ordinal);
@@ -136,13 +137,23 @@ public static class ObjectsWriter
             text.Append("#pragma warning disable CS8981 // a type name of lower-case letters only is the id of an object with no name\n\n");
         }
 
-        text.Append($"namespace {ns}\n{{\n");
+        var containers = new ClassName(outer, "_").Containers;
+        text.Append($"namespace {ClassName.Root}\n{{\n");
+        for (var c = 0; c < containers.Count; c++)
+        {
+            var at = new string(' ', 4 * (c + 1));
+            text.Append($"{at}/// <summary>{ContainerSummary(containers, c)}</summary>\n");
+            text.Append($"{at}{Ignore}\n");
+            text.Append($"{at}public static partial class {containers[c]}\n{at}{{\n");
+        }
+
+        var indent = new string(' ', 4 * (containers.Count + 1));
         for (var i = 0; i < ordered.Count; i++)
         {
             var (obj, name) = ordered[i];
-            if (name.Namespace != ns)
+            if (name.Outer != outer)
             {
-                throw new ArgumentException($"{name.FullName} is not in namespace {ns}", nameof(classes));
+                throw new ArgumentException($"{name.FullName} is not in {outer}", nameof(classes));
             }
 
             if (i > 0)
@@ -156,10 +167,10 @@ public static class ObjectsWriter
             own = own.Select(f => f.Name == name.Name ? f with { Name = f.Name + Capitalize(f.Id) } : f).ToList();
             CheckNames(name.FullName, own);
 
-            text.Append($"    /// <summary>{Xml(Summary(obj))}</summary>\n");
-            text.Append($"    {Ignore}\n");
-            text.Append($"    [{Root}.Standard({Literal(obj.Id)})]\n");
-            text.Append($"    public class {name.Name} : {Root}.{KindBase(obj.Kind, obj.IsHero)}\n    {{\n");
+            text.Append($"{indent}/// <summary>{Xml(Summary(obj))}</summary>\n");
+            text.Append($"{indent}{Ignore}\n");
+            text.Append($"{indent}[{Root}.Standard({Literal(obj.Id)})]\n");
+            text.Append($"{indent}public class {name.Name} : {Root}.{KindBase(obj.Kind, obj.IsHero)}\n{indent}{{\n");
             for (var p = 0; p < own.Count; p++)
             {
                 if (p > 0)
@@ -167,14 +178,32 @@ public static class ObjectsWriter
                     text.Append('\n');
                 }
 
-                AppendProperty(text, own[p], "        ");
+                AppendProperty(text, own[p], indent + "    ");
             }
 
-            text.Append("    }\n");
+            text.Append($"{indent}}}\n");
+        }
+
+        for (var c = containers.Count - 1; c >= 0; c--)
+        {
+            text.Append(new string(' ', 4 * (c + 1))).Append("}\n");
         }
 
         text.Append("}\n");
         return text.ToString();
+    }
+
+    // "The standard objects of the group Human.", "The standard units of the group Human.", "The standard items."
+    private static string ContainerSummary(IReadOnlyList<string> containers, int at)
+    {
+        if (containers.Count == 1)
+        {
+            return $"The standard {containers[0].ToLowerInvariant()}.";
+        }
+
+        return at == 0
+            ? $"The standard objects of the group {containers[0]}."
+            : $"The standard {containers[at].ToLowerInvariant()} of the group {containers[0]}.";
     }
 
     /// <summary>

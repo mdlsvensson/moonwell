@@ -223,7 +223,7 @@ namespace Moonwell.Build.Tests
             SetData(copy, "Custom", "ReignOfChaos");
             File.WriteAllText(
                 Path.Combine(copy, "Illidan.cs"),
-                "namespace Sample\n{\n    public sealed class Illidan : Moonwell.Objects.Units.Campaign.IllidanEevi\n    {\n    }\n}\n");
+                "namespace Sample\n{\n    public sealed class Illidan : Moonwell.Objects.Campaign.Units.IllidanEevi\n    {\n    }\n}\n");
 
             var error = Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), TextWriter.Null));
 
@@ -239,7 +239,7 @@ namespace Moonwell.Build.Tests
 
             var error = Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), TextWriter.Null));
 
-            Assert.Equal("Moonwell.Objects.Units.Campaign.IllidanEevi: Eevi does not exist under Melee / Reign of Chaos", error.Message);
+            Assert.Equal("Moonwell.Objects.Campaign.Units.IllidanEevi: Eevi does not exist under Melee / Reign of Chaos", error.Message);
         }
 
         [Fact]
@@ -267,7 +267,7 @@ namespace Moonwell.Build.Tests
             var copy = folders.TemporaryCopyOfSample();
             File.WriteAllText(
                 Path.Combine(copy, "Poisoner.cs"),
-                "namespace Sample\n{\n    public sealed class Poisoner : Moonwell.Objects.Units.Campaign.Apothecary\n    {\n    }\n}\n");
+                "namespace Sample\n{\n    public sealed class Poisoner : Moonwell.Objects.Campaign.Units.Apothecary\n    {\n    }\n}\n");
             SetData(copy, "Melee", "ForsakenKingdom");
             Assert.True(File.Exists(MapBuild.Run(copy, new BuildOptions(), TextWriter.Null)));
 
@@ -340,7 +340,7 @@ namespace Moonwell.Build.Tests
             File.WriteAllText(Path.Combine(copy, "Objects.cs"), """
                 namespace Sample
                 {
-                    public sealed class Arthas : Moonwell.Objects.Units.Human.Paladin
+                    public sealed class Arthas : Moonwell.Objects.Human.Units.Paladin
                     {
                         public Arthas()
                         {
@@ -373,7 +373,7 @@ namespace Moonwell.Build.Tests
                 {
                     public static class Names
                     {
-                        public static readonly string Life = nameof(Moonwell.Objects.Units.Human.Paladin.HitPoints);
+                        public static readonly string Life = nameof(Moonwell.Objects.Human.Units.Paladin.HitPoints);
                     }
                 }
                 """);
@@ -461,7 +461,7 @@ namespace Moonwell.Build.Tests
                 Path.Combine(folder, "Spawn.cs"),
                 "using Moonwell;\n\nnamespace Sample\n{\n    public sealed class Spawn : GameComponent\n    {\n"
                 + "        public override void OnUnitDied(Unit dying, Unit? killer)\n        {\n"
-                + "            Unit.Create<Moonwell.Objects.Units.Campaign.IllidanEevi>(Player.Get(0), 0f, 0f, 0f);\n        }\n    }\n}\n");
+                + "            Unit.Create<Moonwell.Objects.Campaign.Units.IllidanEevi>(Player.Get(0), 0f, 0f, 0f);\n        }\n    }\n}\n");
             ReplaceInFile(Path.Combine(folder, "Map.cs"), "Components.Add(new Hello());", "Components.Add(new Hello());\n            Components.Add(new Spawn());");
         }
 

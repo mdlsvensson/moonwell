@@ -26,25 +26,25 @@ namespace Moonwell.Build.Tests
             Assert.Equal(2 * BaseInt("Hpal", "uhpm"), arthas.Changed["uhpm"]);
             Assert.Equal(2 * BaseInt("Hpal", "ugol"), arthas.Changed["ugol"]);
             Assert.Equal(
-                new[] { "Moonwell.Objects.Abilities.Other.Inventory", "Objects.Firebolt" },
+                new[] { "Moonwell.Objects.Other.Abilities.Inventory", "Objects.Firebolt" },
                 Assert.IsAssignableFrom<IReadOnlyList<string>>(arthas.Changed["uabi"]));
             // The Paladin's hero abilities without the one Arthas removed; it stands in the standard list before.
             var heroAbilities = Assert.IsAssignableFrom<IReadOnlyList<string>>(arthas.Changed["uhab"]);
             Assert.Equal(
                 new[]
                 {
-                    "Moonwell.Objects.Abilities.Human.HolyLight",
-                    "Moonwell.Objects.Abilities.Human.DivineShield",
-                    "Moonwell.Objects.Abilities.Human.Resurrection",
+                    "Moonwell.Objects.Human.Abilities.HolyLight",
+                    "Moonwell.Objects.Human.Abilities.DivineShield",
+                    "Moonwell.Objects.Human.Abilities.Resurrection",
                 },
                 heroAbilities);
             Assert.Equal(
                 new[]
                 {
-                    "Moonwell.Objects.Abilities.Human.DivineShield",
-                    "Moonwell.Objects.Abilities.Human.HolyLight",
-                    "Moonwell.Objects.Abilities.Human.Resurrection",
-                    "Moonwell.Objects.Abilities.Other.Inventory",
+                    "Moonwell.Objects.Human.Abilities.DivineShield",
+                    "Moonwell.Objects.Human.Abilities.HolyLight",
+                    "Moonwell.Objects.Human.Abilities.Resurrection",
+                    "Moonwell.Objects.Other.Abilities.Inventory",
                     "Objects.Firebolt",
                 },
                 arthas.References);
@@ -59,7 +59,7 @@ namespace Moonwell.Build.Tests
             Assert.Equal("Defender", duelist.Changed["unam"]);
             var abilities = Assert.IsAssignableFrom<IReadOnlyList<string>>(duelist.Changed["uabi"]);
             Assert.Equal(3, abilities.Count);
-            Assert.Equal("Moonwell.Objects.Abilities.Human.Defend", abilities[0]);
+            Assert.Equal("Moonwell.Objects.Human.Abilities.Defend", abilities[0]);
             Assert.Equal("Objects.Firebolt", abilities[2]);
         }
 
@@ -217,11 +217,11 @@ namespace Moonwell.Build.Tests
         {
             var ids = built.Read(null).StandardClassIds;
 
-            Assert.Equal("AHhb", ids["Moonwell.Objects.Abilities.Human.HolyLight"]);
-            Assert.Equal("AHds", ids["Moonwell.Objects.Abilities.Human.DivineShield"]);
-            Assert.Equal("Adef", ids["Moonwell.Objects.Abilities.Human.Defend"]);
+            Assert.Equal("AHhb", ids["Moonwell.Objects.Human.Abilities.HolyLight"]);
+            Assert.Equal("AHds", ids["Moonwell.Objects.Human.Abilities.DivineShield"]);
+            Assert.Equal("Adef", ids["Moonwell.Objects.Human.Abilities.Defend"]);
             Assert.DoesNotContain("Objects.Firebolt", ids.Keys);
-            Assert.DoesNotContain("Moonwell.Objects.Units.Human.Paladin", ids.Keys);
+            Assert.DoesNotContain("Moonwell.Objects.Human.Units.Paladin", ids.Keys);
         }
 
         [Fact]
@@ -334,7 +334,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void two_replaces()
         {
-            AssertFails("TwoReplaces", "TwoReplaces.A and TwoReplaces.B both replace Moonwell.Objects.Units.Human.Footman");
+            AssertFails("TwoReplaces", "TwoReplaces.A and TwoReplaces.B both replace Moonwell.Objects.Human.Units.Footman");
         }
 
         [Fact]

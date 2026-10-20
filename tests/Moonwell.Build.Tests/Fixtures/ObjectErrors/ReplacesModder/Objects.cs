@@ -6,7 +6,7 @@ namespace ReplacesModder
     {
     }
 
-    public class Captain : Moonwell.Objects.Units.Human.Footman
+    public class Captain : Moonwell.Objects.Human.Units.Footman
     {
     }
 

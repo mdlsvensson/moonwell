@@ -6,7 +6,7 @@ namespace SetByIdOutsideCtor
     {
     }
 
-    public class Grow : Moonwell.Objects.Units.Human.Footman
+    public class Grow : Moonwell.Objects.Human.Units.Footman
     {
         public void Retune()
         {

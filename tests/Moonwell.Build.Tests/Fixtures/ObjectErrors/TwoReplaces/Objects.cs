@@ -7,12 +7,12 @@ namespace TwoReplaces
     }
 
     [Moonwell.Objects.Replaces]
-    public class A : Moonwell.Objects.Units.Human.Footman
+    public class A : Moonwell.Objects.Human.Units.Footman
     {
     }
 
     [Moonwell.Objects.Replaces]
-    public class B : Moonwell.Objects.Units.Human.Footman
+    public class B : Moonwell.Objects.Human.Units.Footman
     {
     }
 }

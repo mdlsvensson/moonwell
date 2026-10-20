@@ -4,5403 +4,5408 @@
 
 #nullable enable
 
-namespace Moonwell.Objects.Doodads
+namespace Moonwell.Objects
 {
-    /// <summary>Alchemy Set (YOac).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOac")]
-    public class AlchemySet : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Alonsus Chapel (YOsb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOsb")]
-    public class AlonsusChapel : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Altar (OOal).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OOal")]
-    public class Altar : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Androhal Clock Tower (ACt0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ACt0")]
-    public class AndrohalClockTower : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Androhal Clock Tower (Destroyed) (ACtd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ACtd")]
-    public class AndrohalClockTowerDestroyed : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Arch (LCar).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCar")]
-    public class Arch : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Arch Large (UCal).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCal")]
-    public class ArchLarge : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Arch with Pillar (LCap).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCap")]
-    public class ArchWithPillar : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archery Target (LOar).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOar")]
-    public class ArcheryTarget : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway (CSra).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CSra")]
-    public class Archway : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Angled (CSr1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CSr1")]
-    public class ArchwayAngled : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Angled (DSa1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DSa1")]
-    public class ArchwayAngledDSa1 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Angled (GSa1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("GSa1")]
-    public class ArchwayAngledGSa1 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Angled Icecrown Stone (ISs1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ISs1")]
-    public class ArchwayAngledIcecrownStone : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Angled Icy (ISa1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ISa1")]
-    public class ArchwayAngledIcy : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Angled (NSr1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NSr1")]
-    public class ArchwayAngledNSr1 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Angled Natural (ZSa1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZSa1")]
-    public class ArchwayAngledNatural : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Angled Outland (OSa1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OSa1")]
-    public class ArchwayAngledOutland : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Angled Stone (DSa2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DSa2")]
-    public class ArchwayAngledStone : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Angled Stone (GSa2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("GSa2")]
-    public class ArchwayAngledStoneGSa2 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Angled (YSa1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSa1")]
-    public class ArchwayAngledYSa1 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Angled (ZSb1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZSb1")]
-    public class ArchwayAngledZSb1 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Angled (ZSs1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZSs1")]
-    public class ArchwayAngledZSs1 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway (DSar).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DSar")]
-    public class ArchwayDSar : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Entrance (YSa2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSa2")]
-    public class ArchwayEntrance : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Entrance (Angled) (YSa3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSa3")]
-    public class ArchwayEntranceAngled : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway (GSar).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("GSar")]
-    public class ArchwayGSar : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Icecrown Stone (ISsr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ISsr")]
-    public class ArchwayIcecrownStone : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Icy (ISar).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ISar")]
-    public class ArchwayIcy : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway (NSr0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NSr0")]
-    public class ArchwayNSr0 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Natural (ZSar).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZSar")]
-    public class ArchwayNatural : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Outland (OSar).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OSar")]
-    public class ArchwayOutland : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Ruined (JSar).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("JSar")]
-    public class ArchwayRuined : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Ruined (JSax).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("JSax")]
-    public class ArchwayRuinedJSax : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway (Standard Dimension) (ASd0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ASd0")]
-    public class ArchwayStandardDimension : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Stone (DSah).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DSah")]
-    public class ArchwayStone : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway Stone (GSah).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("GSah")]
-    public class ArchwayStoneGSah : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway (YSaw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSaw")]
-    public class ArchwayYSaw : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway (ZSab).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZSab")]
-    public class ArchwayZSab : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Archway (ZSas).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZSas")]
-    public class ArchwayZSas : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Banner Human (LOh1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOh1")]
-    public class BannerHuman : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Banner Long Blue (YObb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YObb")]
-    public class BannerLongBlue : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Banner Long White (YOwb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOwb")]
-    public class BannerLongWhite : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Banner Orc (LOo1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOo1")]
-    public class BannerOrc : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Banner Tutorial Orc (LOo2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOo2")]
-    public class BannerTutorialOrc : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Barn (LSba).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSba")]
-    public class Barn : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Barn Scorched (LSsb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSsb")]
-    public class BarnScorched : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Barrens Tree (Indestructible) (BPtw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BPtw")]
-    public class BarrensTreeIndestructible : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bats (NObt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NObt")]
-    public class Bats : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bench (DObh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DObh")]
-    public class Bench : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bench Angled Stone (YOsa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOsa")]
-    public class BenchAngledStone : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bench Angled Wood (YOwa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOwa")]
-    public class BenchAngledWood : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bench Stone (YObs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YObs")]
-    public class BenchStone : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bench Wood (YObw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YObw")]
-    public class BenchWood : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Birds (AObd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("AObd")]
-    public class Birds : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Black Box (UObb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UObb")]
-    public class BlackBox : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Blighted Mist (CObl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CObl")]
-    public class BlightedMist : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Blocks Ruined (ASHB).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ASHB")]
-    public class BlocksRuined : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Blocks Ruined (CSbl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CSbl")]
-    public class BlocksRuinedCSbl : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Blood Decals (YCbd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCbd")]
-    public class BloodDecals : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bones (BObo).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BObo")]
-    public class Bones : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bones (NObo).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NObo")]
-    public class BonesNObo : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bones Rib (LOrb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOrb")]
-    public class BonesRib : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bones (YObo).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YObo")]
-    public class BonesYObo : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Books (YObk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YObk")]
-    public class Books : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bookshelf (DObk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DObk")]
-    public class Bookshelf : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bookshelf Angled (DOab).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOab")]
-    public class BookshelfAngled : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bookshelf Large (DOkb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOkb")]
-    public class BookshelfLarge : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bookshelf Long (DObw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DObw")]
-    public class BookshelfLong : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Brazier (LObr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LObr")]
-    public class Brazier : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Brazier Glowing (LObz).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LObz")]
-    public class BrazierGlowing : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Brazier Skull (AObr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("AObr")]
-    public class BrazierSkull : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Brick Debris (YCbr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCbr")]
-    public class BrickDebris : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Brill Clock Tower (BCt0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BCt0")]
-    public class BrillClockTower : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Broken Column (ASbc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ASbc")]
-    public class BrokenColumn : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Broken Column (CSbc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CSbc")]
-    public class BrokenColumnCSbc : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Broken Floor Decals (YCbf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCbf")]
-    public class BrokenFloorDecals : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bubbles (ZWbg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZWbg")]
-    public class Bubbles : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bubbles Steam (IWbg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IWbg")]
-    public class BubblesSteam : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Building (VSvb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("VSvb")]
-    public class Building : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Building A (BA00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BA00")]
-    public class BuildingA : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Building B (BB00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BB00")]
-    public class BuildingB : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Building C (BC00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BC00")]
-    public class BuildingC : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bush (APbs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("APbs")]
-    public class Bush : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bush (CPbs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CPbs")]
-    public class BushCPbs : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Bush (YPbs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YPbs")]
-    public class BushYPbs : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cactus (BPca).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BPca")]
-    public class Cactus : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cage Empty (LOce).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOce")]
-    public class CageEmpty : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cage Trashed (LOct).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOct")]
-    public class CageTrashed : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Camera Prop (YOcp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOcp")]
-    public class CameraProp : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Capital Bridge (LCcb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCcb")]
-    public class CapitalBridge : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Capital Bridge Large (LClb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LClb")]
-    public class CapitalBridgeLarge : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Capital Door Ornate (LCcd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCcd")]
-    public class CapitalDoorOrnate : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Capital Door Plain (LCcp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCcp")]
-    public class CapitalDoorPlain : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Capital Entrance (Lccn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("Lccn")]
-    public class CapitalEntrance : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Capital Tower (LCct).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCct")]
-    public class CapitalTower : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Capital Tower Large (LClt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LClt")]
-    public class CapitalTowerLarge : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cathedral (YSca).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSca")]
-    public class Cathedral : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cathedral Ruined (YScr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YScr")]
-    public class CathedralRuined : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cattail (APct).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("APct")]
-    public class Cattail : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cattail (CPct).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CPct")]
-    public class CattailCPct : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cattail (ZPru).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZPru")]
-    public class CattailZPru : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cauldron with heads (LOca).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOca")]
-    public class CauldronWithHeads : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cave City Cliff (East) (YCc4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCc4")]
-    public class CaveCityCliffEast : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cave City Cliff (North Left) (YCc2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCc2")]
-    public class CaveCityCliffNorthLeft : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cave City Cliff (North Right) (YCc1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCc1")]
-    public class CaveCityCliffNorthRight : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cave City Cliff (West) (YCc3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCc3")]
-    public class CaveCityCliffWest : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cave Natural Cliff (East) (YCr4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCr4")]
-    public class CaveNaturalCliffEast : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cave Natural Cliff (North Left) (YCr2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCr2")]
-    public class CaveNaturalCliffNorthLeft : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cave Natural Cliff (North Right) (YCr1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCr1")]
-    public class CaveNaturalCliffNorthRight : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cave Natural Cliff (West) (YCr3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCr3")]
-    public class CaveNaturalCliffWest : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ceiling Chain (YOch).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOch")]
-    public class CeilingChain : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cell Door (UCcd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCcd")]
-    public class CellDoor : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Chain Post (DOcp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOcp")]
-    public class ChainPost : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Chains (DOch).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOch")]
-    public class Chains : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Chair (DOcr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOcr")]
-    public class Chair : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Chair (IOch).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IOch")]
-    public class ChairIOch : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Chair Icey (IOic).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IOic")]
-    public class ChairIcey : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cinematic Altar of Darkness (USad).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("USad")]
-    public class CinematicAltarOfDarkness : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Base Ruined (JSr6).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("JSr6")]
-    public class CityBuildingBaseRuined : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building (Diagonal 1, Green) (YS01).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YS01")]
-    public class CityBuildingDiagonal1Green : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building (Diagonal 1, Purple) (YS02).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YS02")]
-    public class CityBuildingDiagonal1Purple : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building (Diagonal 1, Red) (YS00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YS00")]
-    public class CityBuildingDiagonal1Red : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building (Diagonal 2, Blue) (YS08).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YS08")]
-    public class CityBuildingDiagonal2Blue : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building (Diagonal 2, Green) (YS07).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YS07")]
-    public class CityBuildingDiagonal2Green : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building (Diagonal 2, Purple) (YS06).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YS06")]
-    public class CityBuildingDiagonal2Purple : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building (Horizontal, Blue) (YS03).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YS03")]
-    public class CityBuildingHorizontalBlue : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building (Horizontal, Green) (YS04).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YS04")]
-    public class CityBuildingHorizontalGreen : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building (Horizontal, Red) (YS05).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YS05")]
-    public class CityBuildingHorizontalRed : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Large Base Ruined (JSrc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("JSrc")]
-    public class CityBuildingLargeBaseRuined : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Large (Diagonal 1, Red) (YS13).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YS13")]
-    public class CityBuildingLargeDiagonal1Red : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Large (Diagonal 2, Blue) (YS15).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YS15")]
-    public class CityBuildingLargeDiagonal2Blue : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Large (Horizontal, Green) (YS14).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YS14")]
-    public class CityBuildingLargeHorizontalGreen : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Large Ruined (Diagonal 1, Red) (YSrd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSrd")]
-    public class CityBuildingLargeRuinedDiagonal1Red : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Large Ruined (Diagonal 2, Blue) (YSrf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSrf")]
-    public class CityBuildingLargeRuinedDiagonal2Blue : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Large Ruined (Horizontal, Green) (YSre).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSre")]
-    public class CityBuildingLargeRuinedHorizontalGreen : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Large Ruined (Vertical, Purple) (YSrc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSrc")]
-    public class CityBuildingLargeRuinedVerticalPurple : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Large (Vertical, Purple) (YS12).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YS12")]
-    public class CityBuildingLargeVerticalPurple : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Row (Group 1) (YSbr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSbr")]
-    public class CityBuildingRowGroup1 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Row (Group 2) (YSb1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSb1")]
-    public class CityBuildingRowGroup2 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Row (Group 3) (YSb2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSb2")]
-    public class CityBuildingRowGroup3 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Ruined (Diagonal 1, Green) (YSr1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSr1")]
-    public class CityBuildingRuinedDiagonal1Green : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Ruined (Diagonal 1, Purple) (YSr2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSr2")]
-    public class CityBuildingRuinedDiagonal1Purple : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Ruined (Diagonal 1, Red) (YSr0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSr0")]
-    public class CityBuildingRuinedDiagonal1Red : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Ruined (Diagonal 2, Blue) (YSr8).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSr8")]
-    public class CityBuildingRuinedDiagonal2Blue : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Ruined (Diagonal 2, Green) (YSr7).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSr7")]
-    public class CityBuildingRuinedDiagonal2Green : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Ruined (Diagonal 2, Purple) (YSr6).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSr6")]
-    public class CityBuildingRuinedDiagonal2Purple : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Ruined (Horizontal, Blue) (YSr3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSr3")]
-    public class CityBuildingRuinedHorizontalBlue : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Ruined (Horizontal, Green) (YSr4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSr4")]
-    public class CityBuildingRuinedHorizontalGreen : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Ruined (Horizontal, Red) (YSr5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSr5")]
-    public class CityBuildingRuinedHorizontalRed : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Ruined (Vertical, Blue) (YSrb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSrb")]
-    public class CityBuildingRuinedVerticalBlue : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Ruined (Vertical, Green) (YSr9).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSr9")]
-    public class CityBuildingRuinedVerticalGreen : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building Ruined (Vertical, Red) (YSra).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSra")]
-    public class CityBuildingRuinedVerticalRed : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building (Vertical, Blue) (YS11).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YS11")]
-    public class CityBuildingVerticalBlue : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building (Vertical, Green) (YS09).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YS09")]
-    public class CityBuildingVerticalGreen : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Building (Vertical, Red) (YS10).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YS10")]
-    public class CityBuildingVerticalRed : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>City Tower (YOmb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOmb")]
-    public class CityTower : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cliff Cave (LCc0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCc0")]
-    public class CliffCave : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Cliff Cave 2 (LCc2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCc2")]
-    public class CliffCave2 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Column Angled Double (YSc5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSc5")]
-    public class ColumnAngledDouble : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Column Broken (NObc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NObc")]
-    public class ColumnBroken : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Column Double (YScd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YScd")]
-    public class ColumnDouble : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Column Ruined (JSco).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("JSco")]
-    public class ColumnRuined : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Column Ruined with Cap (JScx).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("JScx")]
-    public class ColumnRuinedWithCap : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Column Semi Circle (YSc2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSc2")]
-    public class ColumnSemiCircle : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Column Semi Circle Ruined (JSc2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("JSc2")]
-    public class ColumnSemiCircleRuined : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Column Semi Circle Ruined (JSc3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("JSc3")]
-    public class ColumnSemiCircleRuinedJSc3 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Column Semi Circle Ruined (JSc4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("JSc4")]
-    public class ColumnSemiCircleRuinedJSc4 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Column Semi Circle Ruined (JScs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("JScs")]
-    public class ColumnSemiCircleRuinedJScs : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Column Semi Circle (YSc3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSc3")]
-    public class ColumnSemiCircleYSc3 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Column Semi Circle (YSc4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSc4")]
-    public class ColumnSemiCircleYSc4 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Column Semi Circle (YScs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YScs")]
-    public class ColumnSemiCircleYScs : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Column Single (YSco).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSco")]
-    public class ColumnSingle : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Coral (ZWcl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZWcl")]
-    public class Coral : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Coral Arch (ZWca).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZWca")]
-    public class CoralArch : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Corn (LPcr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LPcr")]
-    public class Corn : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Corpse Impaled (LOic).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOic")]
-    public class CorpseImpaled : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Corpse of Gul Dan (CGd0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CGd0")]
-    public class CorpseOfGulDan : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Corpse Sitting (LOsc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOsc")]
-    public class CorpseSitting : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Crater (BRcr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BRcr")]
-    public class Crater : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Crater Fiery (DRfc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DRfc")]
-    public class CraterFiery : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Crater Fiery (GRfc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("GRfc")]
-    public class CraterFieryGRfc : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Crater Wall (LCcr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCcr")]
-    public class CraterWall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Crates Empty (YOec).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOec")]
-    public class CratesEmpty : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Crypt (NSct).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NSct")]
-    public class Crypt : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Crystal (IRcy).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IRcy")]
-    public class Crystal : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Dalaran Violet Citadel Ruined (ZOvr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOvr")]
-    public class DalaranVioletCitadelRuined : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Dark Pipe Divider Horizontal (UCdc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCdc")]
-    public class DarkPipeDividerHorizontal : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Dark Pipe Divider Vertical (UCdd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCdd")]
-    public class DarkPipeDividerVertical : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Dark Pipe Horizontal Straight (UCdi).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCdi")]
-    public class DarkPipeHorizontalStraight : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Dark Pipe Long Horizontal 01 (UCdg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCdg")]
-    public class DarkPipeLongHorizontal01 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Dark Pipe Long Horizontal 02 (UCdh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCdh")]
-    public class DarkPipeLongHorizontal02 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Dark Pipe Long Vertical 01 (UCde).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCde")]
-    public class DarkPipeLongVertical01 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Dark Pipe Long Vertical 02 (UCdf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCdf")]
-    public class DarkPipeLongVertical02 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Dark Pipe Vertical Straight (UCdj).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCdj")]
-    public class DarkPipeVerticalStraight : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Detonator (YOdt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOdt")]
-    public class Detonator : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Draw Bridge (UCbr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCbr")]
-    public class DrawBridge : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Dust (ZZcd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZZcd")]
-    public class Dust : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Elven Building (LSeb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSeb")]
-    public class ElvenBuilding : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Enclave House (EH00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EH00")]
-    public class EnclaveHouse : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Enclave House B (EHb0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EHb0")]
-    public class EnclaveHouseB : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Enclave Main Structure (EMs0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EMs0")]
-    public class EnclaveMainStructure : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Enclave Spire (ES00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ES00")]
-    public class EnclaveSpire : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Enclave Turret (ET01).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ET01")]
-    public class EnclaveTurret : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Energy Field (YZef).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YZef")]
-    public class EnergyField : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Explosives (YOex).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOex")]
-    public class Explosives : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Exterior Gate (EG00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EG00")]
-    public class ExteriorGate : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Exterior Main Tower (EMt0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EMt0")]
-    public class ExteriorMainTower : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Exterior Tower (ET00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ET00")]
-    public class ExteriorTower : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Exterior Wall (EW00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EW00")]
-    public class ExteriorWall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Eye of Sargeras (ZZys).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZZys")]
-    public class EyeOfSargeras : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fall Grass (LFgs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LFgs")]
-    public class FallGrass : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Farm Scorched (LSsf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSsf")]
-    public class FarmScorched : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fence (NOfl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NOfl")]
-    public class Fence : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fence Angled (NOal).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NOal")]
-    public class FenceAngled : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fence Angled Long (VOal).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("VOal")]
-    public class FenceAngledLong : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fence Angled Short (VOas).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("VOas")]
-    public class FenceAngledShort : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fence Long (VOfl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("VOfl")]
-    public class FenceLong : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fence Short (VOfs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("VOfs")]
-    public class FenceShort : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fire (YOtf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOtf")]
-    public class Fire : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fire Blue (YOfb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOfb")]
-    public class FireBlue : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fire Gust (YOf3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOf3")]
-    public class FireGust : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fire Pit (NOfp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NOfp")]
-    public class FirePit : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fire Pit Trashed (NOft).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NOft")]
-    public class FirePitTrashed : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fire Pit with Pig (NOfg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NOfg")]
-    public class FirePitWithPig : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fire Small (YOfs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOfs")]
-    public class FireSmall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fish (AWfs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("AWfs")]
-    public class Fish : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fish Dead (COdf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("COdf")]
-    public class FishDead : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fish Green (ZWfs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZWfs")]
-    public class FishGreen : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fish School (ZWsf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZWsf")]
-    public class FishSchool : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fissure (BRfs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BRfs")]
-    public class Fissure : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fissure (CRfs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CRfs")]
-    public class FissureCRfs : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fissure (NRfs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NRfs")]
-    public class FissureNRfs : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Flame Grate (OOgr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OOgr")]
-    public class FlameGrate : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Flies (LOfl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOfl")]
-    public class Flies : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Floating Barrel (NWfl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NWfl")]
-    public class FloatingBarrel : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Floating Box (NWfb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NWfb")]
-    public class FloatingBox : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Floating Panel (NWpa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NWpa")]
-    public class FloatingPanel : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Floating Plank (NWfp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NWfp")]
-    public class FloatingPlank : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Flower Bed Angled (YPfa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YPfa")]
-    public class FlowerBedAngled : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Flower Bed Straight (YPfs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YPfs")]
-    public class FlowerBedStraight : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Flowers (ZPfw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZPfw")]
-    public class Flowers : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Footprints Demonic (ZZdt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZZdt")]
-    public class FootprintsDemonic : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>ForsakenBanner (UCbn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCbn")]
-    public class ForsakenBanner : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Forsaken Standing Banners (FSsb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("FSsb")]
-    public class ForsakenStandingBanners : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fountain (YOfn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOfn")]
-    public class Fountain : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Fountain Ruined (YOfr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOfr")]
-    public class FountainRuined : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>General Decals (Ycgd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("Ycgd")]
-    public class GeneralDecals : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Geyser (BRgs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BRgs")]
-    public class Geyser : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Glacier (IRgc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IRgc")]
-    public class Glacier : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Glowing Runes (JOgr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("JOgr")]
-    public class GlowingRunes : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Goblin Racing arrow post (GLap).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("GLap")]
-    public class GoblinRacingArrowPost : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>GoblinRacing CheckerBanner (GLcb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("GLcb")]
-    public class GoblinRacingCheckerBanner : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>GoblinRacing Sign (GLsg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("GLsg")]
-    public class GoblinRacingSign : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Gold (YOgo).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOgo")]
-    public class Gold : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Grain Scorched (LPcw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LPcw")]
-    public class GrainScorched : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Granary (LSgr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSgr")]
-    public class Granary : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Granary Scorched (LSgs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSgs")]
-    public class GranaryScorched : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Grass Patch (LPgp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LPgp")]
-    public class GrassPatch : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Grate (EOgr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EOgr")]
-    public class Grate : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Grave (LOgr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOgr")]
-    public class Grave : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Grave (Cityscape) (YOgr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOgr")]
-    public class GraveCityscape : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Grave Peasant (LOpg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOpg")]
-    public class GravePeasant : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Grave Stone (NOgv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NOgv")]
-    public class GraveStone : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Green Pipe Corner 01 (UCgc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCgc")]
-    public class GreenPipeCorner01 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Green Pipe Corner 02 (UCgo).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCgo")]
-    public class GreenPipeCorner02 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Green Pipe Divider (UCgd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCgd")]
-    public class GreenPipeDivider : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Green Pipe Grate Long (UCpg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCpg")]
-    public class GreenPipeGrateLong : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Green Pipe Grate Short (UCpx).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCpx")]
-    public class GreenPipeGrateShort : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Green Pipe Straight 01 (UCgs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCgs")]
-    public class GreenPipeStraight01 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Green Pipe Straight 02 (UCgx).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCgx")]
-    public class GreenPipeStraight02 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Green Pipe Straight 03 (UCgy).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCgy")]
-    public class GreenPipeStraight03 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ground Grate Round (UCgr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCgr")]
-    public class GroundGrateRound : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ground Grate Square (UCgg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCgg")]
-    public class GroundGrateSquare : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ground Tile (UCgt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCgt")]
-    public class GroundTile : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ground Tile Decal (UCtd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCtd")]
-    public class GroundTileDecal : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Gul'dan's Runes (ZZgr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZZgr")]
-    public class GuldansRunes : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Hay (LOhb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOhb")]
-    public class Hay : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Hay Cart (LOch).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOch")]
-    public class HayCart : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Hay Cart Broken (LOcb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOcb")]
-    public class HayCartBroken : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Hay Cart Broken (Infected) (LOxx).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOxx")]
-    public class HayCartBrokenInfected : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Hay Cart (Infected) (LOrc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOrc")]
-    public class HayCartInfected : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Hay Clump (LOhc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOhc")]
-    public class HayClump : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Hay (Infected) (LOrh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOrh")]
-    public class HayInfected : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Haze (YOhz).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOhz")]
-    public class Haze : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Head on Spear (LOsh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOsh")]
-    public class HeadOnSpear : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Hearthglen Abbey (HA00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("HA00")]
-    public class HearthglenAbbey : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>High Elf Crest Hanging Banners (HEch).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("HEch")]
-    public class HighElfCrestHangingBanners : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>High Elf Crest Standing Banners (HEcs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("HEcs")]
-    public class HighElfCrestStandingBanners : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ice Block (IRic).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IRic")]
-    public class IceBlock : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ice Claws (NRic).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NRic")]
-    public class IceClaws : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ice Floating (IWie).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IWie")]
-    public class IceFloating : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ice Floe (NWf1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NWf1")]
-    public class IceFloe : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ice Floe (NWf2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NWf2")]
-    public class IceFloeNWf2 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ice Floe (NWf3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NWf3")]
-    public class IceFloeNWf3 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ice Floe (NWf4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NWf4")]
-    public class IceFloeNWf4 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ice Spider on Pedestal (IOss).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IOss")]
-    public class IceSpiderOnPedestal : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Iceberg (NWi1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NWi1")]
-    public class Iceberg : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Iceberg (NWi2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NWi2")]
-    public class IcebergNWi2 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Iceberg (NWi3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NWi3")]
-    public class IcebergNWi3 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Iceberg (NWi4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NWi4")]
-    public class IcebergNWi4 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Icy Waterfall (IWw0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IWw0")]
-    public class IcyWaterfall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Inn (LSin).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSin")]
-    public class Inn : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Inn Scorched (LSsi).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSsi")]
-    public class InnScorched : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Invulnerability Field (JZif).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("JZif")]
-    public class InvulnerabilityField : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Iron Gate (A) (YOig).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOig")]
-    public class IronGateA : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Iron Gate (B) (YOi1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOi1")]
-    public class IronGateB : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Iron Maiden (DOim).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOim")]
-    public class IronMaiden : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>King Terenas Statue (YOss).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOss")]
-    public class KingTerenasStatue : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lava Cracks (DOlc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOlc")]
-    public class LavaCracks : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lava Cracks (GOlc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("GOlc")]
-    public class LavaCracksGOlc : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lightning Bolt (YOlb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOlb")]
-    public class LightningBolt : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lily Pad (CPlp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CPlp")]
-    public class LilyPad : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lily Pad (LPlp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LPlp")]
-    public class LilyPadLPlp : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lily Pad (ZPlp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZPlp")]
-    public class LilyPadZPlp : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lily Pads (AWlp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("AWlp")]
-    public class LilyPads : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lily Pads Floating (AWfl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("AWfl")]
-    public class LilyPadsFloating : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lily Pads Floating (LPfp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LPfp")]
-    public class LilyPadsFloatingLPfp : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Log Angled (AOla).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("AOla")]
-    public class LogAngled : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Log Angled (COla).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("COla")]
-    public class LogAngledCOla : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Log Straight (AOlg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("AOlg")]
-    public class LogStraight : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Log Straight (COlg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("COlg")]
-    public class LogStraightCOlg : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lordaeron Banner Medium 01 (LCb4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCb4")]
-    public class LordaeronBannerMedium01 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lordaeron Banner Medium 02 (LCb5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCb5")]
-    public class LordaeronBannerMedium02 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lordaeron Banner Small (LCb7).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCb7")]
-    public class LordaeronBannerSmall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lordaeron Bookshelf (LObs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LObs")]
-    public class LordaeronBookshelf : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lordaeron Carpet (LOcp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOcp")]
-    public class LordaeronCarpet : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>LordaeronCathedral Fence (LOcf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOcf")]
-    public class LordaeronCathedralFence : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>LordaeronCathedral Pillar (LOcl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOcl")]
-    public class LordaeronCathedralPillar : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>LordaeronCathedral Stair (LOsa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOsa")]
-    public class LordaeronCathedralStair : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>LordaeronCathedral Wall (LOcw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOcw")]
-    public class LordaeronCathedralWall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lordaeron Entrance (LCet).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCet")]
-    public class LordaeronEntrance : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lordaeron Furniture (LOfn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOfn")]
-    public class LordaeronFurniture : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>LordaeronStanding Banners (LRsb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LRsb")]
-    public class LordaeronStandingBanners : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lordaeron Throne (LCth).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCth")]
-    public class LordaeronThrone : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lordaeron Wall Deco (LOwd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOwd")]
-    public class LordaeronWallDeco : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lordaeron Window (LCwd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCwd")]
-    public class LordaeronWindow : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Lordearon Planter (LCtp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCtp")]
-    public class LordearonPlanter : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Magical Lantern (XOcl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XOcl")]
-    public class MagicalLantern : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Magical Runes (XOmr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XOmr")]
-    public class MagicalRunes : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Magus Conservatory (MC00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("MC00")]
-    public class MagusConservatory : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Magus Highrise (MH00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("MH00")]
-    public class MagusHighrise : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Magus Turret (MT00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("MT00")]
-    public class MagusTurret : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Manhole (EOmh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EOmh")]
-    public class Manhole : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Market Item Baubles (YOm2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOm2")]
-    public class MarketItemBaubles : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Market Item Baubles (Alt) (YOm3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOm3")]
-    public class MarketItemBaublesAlt : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Market Item Produce (YOm4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOm4")]
-    public class MarketItemProduce : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Market Item Produce (Alt) (YOm5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOm5")]
-    public class MarketItemProduceAlt : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Market Item Textiles (YOm6).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOm6")]
-    public class MarketItemTextiles : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Market Item Textiles (Alt) (YOm7).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOm7")]
-    public class MarketItemTextilesAlt : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Market Stall (Large) (YOms).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOms")]
-    public class MarketStallLarge : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Market Stall (Small) (YOm1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOm1")]
-    public class MarketStallSmall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Meatwagon Corpse (YOcr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOcr")]
-    public class MeatwagonCorpse : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Mine Cart (DOmc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOmc")]
-    public class MineCart : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Mine Cart Empty (DOme).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOme")]
-    public class MineCartEmpty : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Mine Hole (UEmh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UEmh")]
-    public class MineHole : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Mine Rock Wall (UErw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UErw")]
-    public class MineRockWall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Mine Track (UOmt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UOmt")]
-    public class MineTrack : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Misc Props (LOmp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOmp")]
-    public class MiscProps : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Modular House Kit (YSmh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSmh")]
-    public class ModularHouseKit : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Modular House Kit 2 (YSmt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSmt")]
-    public class ModularHouseKit2 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Modular Stair (LCms).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCms")]
-    public class ModularStair : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Mushroom Blue (GPsh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("GPsh")]
-    public class MushroomBlue : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Mushrooms (APms).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("APms")]
-    public class Mushrooms : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Mushrooms (CPms).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CPms")]
-    public class MushroomsCPms : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Mushrooms (ZPms).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZPms")]
-    public class MushroomsZPms : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Naxx Arch (UCna).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCna")]
-    public class NaxxArch : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Naxx Cinematic (YOna).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOna")]
-    public class NaxxCinematic : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Naxx Crystal (UCnc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCnc")]
-    public class NaxxCrystal : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Naxx Deco (UCnd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCnd")]
-    public class NaxxDeco : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Naxx Fence (UCnf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCnf")]
-    public class NaxxFence : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Naxx Generator (UCng).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCng")]
-    public class NaxxGenerator : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Naxx Pillar (UCnp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCnp")]
-    public class NaxxPillar : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Naxx Spidergate (UCsg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCsg")]
-    public class NaxxSpidergate : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Naxx Stair (UCns).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCns")]
-    public class NaxxStair : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Naxx Wall A (UCnw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCnw")]
-    public class NaxxWallA : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Naxx Wall B (UCnb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCnb")]
-    public class NaxxWallB : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Naxx WallDeco (UCwd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCwd")]
-    public class NaxxWallDeco : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Night Elf Fishing Village (ASv0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ASv0")]
-    public class NightElfFishingVillage : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Night Elf Fishing Village (ASv1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ASv1")]
-    public class NightElfFishingVillageASv1 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Night Elf Fishing Village (ASv2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ASv2")]
-    public class NightElfFishingVillageASv2 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Night Elf Fishing Village (ASv3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ASv3")]
-    public class NightElfFishingVillageASv3 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Night Elf Fishing Village (ASv4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ASv4")]
-    public class NightElfFishingVillageASv4 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Night Elf Fishing Village Ruined (ASx0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ASx0")]
-    public class NightElfFishingVillageRuined : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Night Elf Fishing Village Ruined (ASx1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ASx1")]
-    public class NightElfFishingVillageRuinedASx1 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Night Elf Fishing Village Ruined (ASx2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ASx2")]
-    public class NightElfFishingVillageRuinedASx2 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Obelisk (AOsk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("AOsk")]
-    public class Obelisk : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Obelisk Broken (AObo).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("AObo")]
-    public class ObeliskBroken : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Obelisk Broken (CObo).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CObo")]
-    public class ObeliskBrokenCObo : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Obelisk Broken (NObk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NObk")]
-    public class ObeliskBrokenNObk : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Obelisk (COob).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("COob")]
-    public class ObeliskCOob : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Obelisk (DOob).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOob")]
-    public class ObeliskDOob : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Obelisk (GOob).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("GOob")]
-    public class ObeliskGOob : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Obelisk Glowing (AOob).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("AOob")]
-    public class ObeliskGlowing : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Obelisk (IOob).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IOob")]
-    public class ObeliskIOob : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Obelisk (NOok).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NOok")]
-    public class ObeliskNOok : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Obelisk (YOob).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOob")]
-    public class ObeliskYOob : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Obstacle (OOob).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OOob")]
-    public class Obstacle : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Omni Light Orange (YOol).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOol")]
-    public class OmniLightOrange : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Outland Plants (OPop).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OPop")]
-    public class OutlandPlants : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Palace Arch (LCpa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCpa")]
-    public class PalaceArch : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Palace Doorway (LCpd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCpd")]
-    public class PalaceDoorway : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Palace Pillar (LCpr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCpr")]
-    public class PalacePillar : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Palace Wall Interior (LCwi).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCwi")]
-    public class PalaceWallInterior : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Palace Wall Short (LCws).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCws")]
-    public class PalaceWallShort : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Palace Wall Statue (LCwv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCwv")]
-    public class PalaceWallStatue : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Palace Wall Tall (LCwt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCwt")]
-    public class PalaceWallTall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Palisade (LSpl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSpl")]
-    public class Palisade : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Path End Large (UCel).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCel")]
-    public class PathEndLarge : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Path End Small (UCes).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCes")]
-    public class PathEndSmall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pathway Corner Left (UCpc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCpc")]
-    public class PathwayCornerLeft : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pathway Corner Right (UCpr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCpr")]
-    public class PathwayCornerRight : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pathway Straight (UCps).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCps")]
-    public class PathwayStraight : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pier, Pier (ASpr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ASpr")]
-    public class PierPier : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pier Ruined (ASpt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ASpt")]
-    public class PierRuined : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pile of Junk (DOjp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOjp")]
-    public class PileOfJunk : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pile of Treasure (DOtp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOtp")]
-    public class PileOfTreasure : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pillar (IOpr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IOpr")]
-    public class Pillar : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pillar Endcap (LCpe).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCpe")]
-    public class PillarEndcap : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pillar Interior (LCpi).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCpi")]
-    public class PillarInterior : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pillar Short (LCps).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCps")]
-    public class PillarShort : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pillar Tall (LCpt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCpt")]
-    public class PillarTall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pillar (UCpl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCpl")]
-    public class PillarUCpl : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pipe Console Closed (UCda).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCda")]
-    public class PipeConsoleClosed : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pipe Console Open (UCdb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCdb")]
-    public class PipeConsoleOpen : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pirate Booty (YOpb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOpb")]
-    public class PirateBooty : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Plague Cauldron (UCca).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCca")]
-    public class PlagueCauldron : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Post Hitching (LOhp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOhp")]
-    public class PostHitching : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Post Lantern (LOlp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOlp")]
-    public class PostLantern : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Post Lantern (YOlp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOlp")]
-    public class PostLanternYOlp : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Post Sign (LOsp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOsp")]
-    public class PostSign : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Potted Plant (YPpp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YPpp")]
-    public class PottedPlant : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Power Generator (XOcs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("XOcs")]
-    public class PowerGenerator : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pulley System (ZOps).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOps")]
-    public class PulleySystem : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Pyrewood Village Clock Tower (Destroyed) (PVct).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("PVct")]
-    public class PyrewoodVillageClockTowerDestroyed : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rack Armor (LOam).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOam")]
-    public class RackArmor : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rack Weapon (LOwp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOwp")]
-    public class RackWeapon : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Remains Scorched (AOsr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("AOsr")]
-    public class RemainsScorched : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rising Water (IZrw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IZrw")]
-    public class RisingWater : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rising Water Wide (IZww).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IZww")]
-    public class RisingWaterWide : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>River Rushes (LPrs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LPrs")]
-    public class RiverRushes : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rock Archway (ASra).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ASra")]
-    public class RockArchway : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rock Archway (BSra).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BSra")]
-    public class RockArchwayBSra : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rock Archway Diagonal (ASr1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ASr1")]
-    public class RockArchwayDiagonal : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rock Archway Diagonal (BSr1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BSr1")]
-    public class RockArchwayDiagonalBSr1 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rock Archway Diagonal (LSr1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSr1")]
-    public class RockArchwayDiagonalLSr1 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rock Archway (LSra).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSra")]
-    public class RockArchwayLSra : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rock Magma (ORmk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ORmk")]
-    public class RockMagma : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rock Pillar (BRrp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BRrp")]
-    public class RockPillar : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rock Spires (BRrs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BRrs")]
-    public class RockSpires : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rock Spires (CRrs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CRrs")]
-    public class RockSpiresCRrs : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rock Spires (Cinematic) (BRrc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BRrc")]
-    public class RockSpiresCinematic : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rock Spires (ORrs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ORrs")]
-    public class RockSpiresORrs : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rock Spires Small (BRsp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BRsp")]
-    public class RockSpiresSmall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rock Spires Small (ZRsp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZRsp")]
-    public class RockSpiresSmallZRsp : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rock Spires (ZRrs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZRrs")]
-    public class RockSpiresZRrs : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rocks (ARrk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ARrk")]
-    public class Rocks : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rocks (BRrk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BRrk")]
-    public class RocksBRrk : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rocks (CRrk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CRrk")]
-    public class RocksCRrk : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rocks Cluster Floating (OZfc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OZfc")]
-    public class RocksClusterFloating : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rocks (DRrk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DRrk")]
-    public class RocksDRrk : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rocks Floating (ORfk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ORfk")]
-    public class RocksFloating : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rocks (GRrk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("GRrk")]
-    public class RocksGRrk : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rocks (IRrk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IRrk")]
-    public class RocksIRrk : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rocks (LRrk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LRrk")]
-    public class RocksLRrk : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rocks (NRrk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NRrk")]
-    public class RocksNRrk : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rocks (ORrk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ORrk")]
-    public class RocksORrk : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rocks Webbed (NRwr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NRwr")]
-    public class RocksWebbed : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rocks (ZRrk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZRrk")]
-    public class RocksZRrk : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rope Bridge (UCrb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCrb")]
-    public class RopeBridge : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rowboat (NWrw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NWrw")]
-    public class Rowboat : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rowboat Destroyed (NWrd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NWrd")]
-    public class RowboatDestroyed : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rubble (ASbr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ASbr")]
-    public class Rubble : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rubble (CSbr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CSbr")]
-    public class RubbleCSbr : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rubble (ISrb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ISrb")]
-    public class RubbleISrb : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rubble Large (ZRbd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZRbd")]
-    public class RubbleLarge : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rubble (NSrb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NSrb")]
-    public class RubbleNSrb : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rubble (ORrr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ORrr")]
-    public class RubbleORrr : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Rubble Small (ZRbs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZRbs")]
-    public class RubbleSmall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Arch (BSar).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BSar")]
-    public class RuinedArch : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Chunk (BSrc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BSrc")]
-    public class RuinedChunk : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined City Cliff (East) (YCd2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCd2")]
-    public class RuinedCityCliffEast : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined City Cliff (North) (YCd1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCd1")]
-    public class RuinedCityCliffNorth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined City Cliff Short (East) (YCt2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCt2")]
-    public class RuinedCityCliffShortEast : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined City Cliff Short (North) (YCt1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCt1")]
-    public class RuinedCityCliffShortNorth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined City Cliff Short (South) (YCt3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCt3")]
-    public class RuinedCityCliffShortSouth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined City Cliff Short (West) (YCt4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCt4")]
-    public class RuinedCityCliffShortWest : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined City Cliff (South) (YCd3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCd3")]
-    public class RuinedCityCliffSouth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined City Cliff (West) (YCd4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCd4")]
-    public class RuinedCityCliffWest : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Crystal Tower (ZOrc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOrc")]
-    public class RuinedCrystalTower : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Curved Wall (BSrv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BSrv")]
-    public class RuinedCurvedWall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Double Base (ZOt2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOt2")]
-    public class RuinedDoubleBase : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Double Base (ZOtb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOtb")]
-    public class RuinedDoubleBaseZOtb : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Goblin Shipyard (LSrg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSrg")]
-    public class RuinedGoblinShipyard : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Ground (2x2) (YCx1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCx1")]
-    public class RuinedGround2x2 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Ground (2x2) (YCx2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCx2")]
-    public class RuinedGround2x2YCx2 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Ground (2x2) (YCx3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCx3")]
-    public class RuinedGround2x2YCx3 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Ground (2x2) (YCx4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCx4")]
-    public class RuinedGround2x2YCx4 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Ground (4x2) (YCx7).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCx7")]
-    public class RuinedGround4x2 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Ground (4x2) (YCx8).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCx8")]
-    public class RuinedGround4x2YCx8 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Ground (4x4) (YCx5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCx5")]
-    public class RuinedGround4x4 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Ground (4x4) (YCx6).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCx6")]
-    public class RuinedGround4x4YCx6 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined House (UFrh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UFrh")]
-    public class RuinedHouse : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Natural Cliff (East) (YCp2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCp2")]
-    public class RuinedNaturalCliffEast : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Natural Cliff (North) (YCp1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCp1")]
-    public class RuinedNaturalCliffNorth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Natural Cliff Short (East) (YCl2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCl2")]
-    public class RuinedNaturalCliffShortEast : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Natural Cliff Short (North) (YCl1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCl1")]
-    public class RuinedNaturalCliffShortNorth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Natural Cliff Short (South) (YCl3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCl3")]
-    public class RuinedNaturalCliffShortSouth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Natural Cliff Short (West) (YCl4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCl4")]
-    public class RuinedNaturalCliffShortWest : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Natural Cliff (South) (YCp3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCp3")]
-    public class RuinedNaturalCliffSouth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Natural Cliff (West) (YCp4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCp4")]
-    public class RuinedNaturalCliffWest : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Ship (AZrf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("AZrf")]
-    public class RuinedShip : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Tower (ZOd2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOd2")]
-    public class RuinedTower : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Tower Base (ZOrb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOrb")]
-    public class RuinedTowerBase : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Tower (ZOdt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOdt")]
-    public class RuinedTowerZOdt : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruined Wall (BSrw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BSrw")]
-    public class RuinedWall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruins (ZSrb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZSrb")]
-    public class Ruins : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruins Bloody Altar (ZOba).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOba")]
-    public class RuinsBloodyAltar : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruins Brazier (ZObz).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZObz")]
-    public class RuinsBrazier : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruins Broken Statue (ZOsb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOsb")]
-    public class RuinsBrokenStatue : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruins Firepot (ZOfp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOfp")]
-    public class RuinsFirepot : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruins Fountain (ZOfo).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOfo")]
-    public class RuinsFountain : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruins Library Shelf (ZOls).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOls")]
-    public class RuinsLibraryShelf : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruins Obelisk (ZOob).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOob")]
-    public class RuinsObelisk : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruins Pillars (ZOrp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOrp")]
-    public class RuinsPillars : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruins Statue (ZOst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOst")]
-    public class RuinsStatue : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruins Stones (ZOss).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOss")]
-    public class RuinsStones : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruins Throne (ZOrt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOrt")]
-    public class RuinsThrone : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ruins Trash (ZOtr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOtr")]
-    public class RuinsTrash : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Runes (KOdr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("KOdr")]
-    public class Runes : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Runeweaver Square Fountain (RSf0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("RSf0")]
-    public class RuneweaverSquareFountain : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Scaffolding (EOcr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EOcr")]
-    public class Scaffolding : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Scarecrow (YOsc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOsc")]
-    public class Scarecrow : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>ScarletCrusadeStandingBanners (SCsb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SCsb")]
-    public class ScarletCrusadeStandingBanners : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Seaweed (ZWsw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZWsw")]
-    public class Seaweed : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Sewer Vents (DOsv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOsv")]
-    public class SewerVents : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Sewer Wallpipes (DOsw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOsw")]
-    public class SewerWallpipes : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Shadow Blocker (Yosh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("Yosh")]
-    public class ShadowBlocker : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Shells (ZOsh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZOsh")]
-    public class Shells : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Shimmering Portal (OZsp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OZsp")]
-    public class ShimmeringPortal : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ship (NWsp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NWsp")]
-    public class Ship : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Ship Destroyed (NWsd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NWsd")]
-    public class ShipDestroyed : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Shipyard Crane (EOsk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EOsk")]
-    public class ShipyardCrane : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Shrub (ZPsh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZPsh")]
-    public class Shrub : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Sign Bob's Guns (YObg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YObg")]
-    public class SignBobsGuns : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Sign Tavern (YOts).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOts")]
-    public class SignTavern : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Sign Tracey's Armory (YOta).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOta")]
-    public class SignTraceysArmory : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>SilverHandStandingBanners (SHsb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SHsb")]
-    public class SilverHandStandingBanners : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Archway (SA00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SA00")]
-    public class SilvermoonArchway : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Archway (45) (SA01).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SA01")]
-    public class SilvermoonArchway45 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Archway Entrance (SAe0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SAe0")]
-    public class SilvermoonArchwayEntrance : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Archway Entrance (45) (SAe1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SAe1")]
-    public class SilvermoonArchwayEntrance45 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Buildings (Diagonal 1) (SRbc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SRbc")]
-    public class SilvermoonBuildingsDiagonal1 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Buildings (Diagonal 2) (SRbe).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SRbe")]
-    public class SilvermoonBuildingsDiagonal2 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Buildings (Horizontal) (SRbh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SRbh")]
-    public class SilvermoonBuildingsHorizontal : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Buildings (Vertical) (SRbv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SRbv")]
-    public class SilvermoonBuildingsVertical : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Tower (Large) (STdl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("STdl")]
-    public class SilvermoonTowerLarge : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Tower (Medium) (STdm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("STdm")]
-    public class SilvermoonTowerMedium : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Tower (Small) (STds).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("STds")]
-    public class SilvermoonTowerSmall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Tower (X-Large) (LSt0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSt0")]
-    public class SilvermoonTowerXLarge : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Wall (SWs0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SWs0")]
-    public class SilvermoonWall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Wall Corner (SWc0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SWc0")]
-    public class SilvermoonWallCorner : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Wall Door (SWsd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SWsd")]
-    public class SilvermoonWallDoor : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Wall Door (Short) (SWse).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SWse")]
-    public class SilvermoonWallDoorShort : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Wall Endcap (SWe0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SWe0")]
-    public class SilvermoonWallEndcap : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Wall (Long) (SWsl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SWsl")]
-    public class SilvermoonWallLong : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Wall (Short) (SWss).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SWss")]
-    public class SilvermoonWallShort : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Silvermoon Wall_T (SWt0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SWt0")]
-    public class SilvermoonWallT : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Simple Rocks (LRsr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LRsr")]
-    public class SimpleRocks : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Skull (OOsk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OOsk")]
-    public class Skull : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Skull Pile (LOsk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOsk")]
-    public class SkullPile : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Skull Torch (IOst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IOst")]
-    public class SkullTorch : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Skulls on Sticks (LOss).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOss")]
-    public class SkullsOnSticks : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Slide City Cliff (East) (YCs2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCs2")]
-    public class SlideCityCliffEast : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Slide City Cliff (North) (YCs1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCs1")]
-    public class SlideCityCliffNorth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Slide City Cliff Short (East) (YCo2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCo2")]
-    public class SlideCityCliffShortEast : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Slide City Cliff Short (North) (YCo1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCo1")]
-    public class SlideCityCliffShortNorth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Slide City Cliff Short (South) (YCo3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCo3")]
-    public class SlideCityCliffShortSouth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Slide City Cliff Short (West) (YCo4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCo4")]
-    public class SlideCityCliffShortWest : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Slide City Cliff (South) (YCs3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCs3")]
-    public class SlideCityCliffSouth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Slide City Cliff (West) (YCs4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCs4")]
-    public class SlideCityCliffWest : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Slide Natural Cliff (East) (YCg2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCg2")]
-    public class SlideNaturalCliffEast : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Slide Natural Cliff (North) (YCg1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCg1")]
-    public class SlideNaturalCliffNorth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Slide Natural Cliff Short (East) (YCu2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCu2")]
-    public class SlideNaturalCliffShortEast : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Slide Natural Cliff Short (North) (YCu1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCu1")]
-    public class SlideNaturalCliffShortNorth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Slide Natural Cliff Short (South) (YCu3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCu3")]
-    public class SlideNaturalCliffShortSouth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Slide Natural Cliff Short (West) (YCu4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCu4")]
-    public class SlideNaturalCliffShortWest : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Slide Natural Cliff (South) (YCg3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCg3")]
-    public class SlideNaturalCliffSouth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Slide Natural Cliff (West) (YCg4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCg4")]
-    public class SlideNaturalCliffWest : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Smithy Tools (EOst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("EOst")]
-    public class SmithyTools : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Smoke Smudge (LOsm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOsm")]
-    public class SmokeSmudge : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Snowman (IOsm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IOsm")]
-    public class Snowman : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Snowy Rock (IRrs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IRrs")]
-    public class SnowyRock : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Spider Web (YOsp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOsp")]
-    public class SpiderWeb : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Stair (LCst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCst")]
-    public class Stair : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Stairsteps (LOst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOst")]
-    public class Stairsteps : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Stake (OOst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OOst")]
-    public class Stake : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Stalagmite (DRst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DRst")]
-    public class Stalagmite : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Stalagmite (GRst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("GRst")]
-    public class StalagmiteGRst : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Standard (OOsd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("OOsd")]
-    public class Standard : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Statue (YOst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOst")]
-    public class Statue : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Statue Black Citadel (KOst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("KOst")]
-    public class StatueBlackCitadel : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Statue Broken (LCsb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCsb")]
-    public class StatueBroken : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Statue Guardian of Aszune (AOgs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("AOgs")]
-    public class StatueGuardianOfAszune : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Statue Ice Spider (IOsl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IOsl")]
-    public class StatueIceSpider : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Statue Keeper (AOks).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("AOks")]
-    public class StatueKeeper : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Statue of Azshara (DOas).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOas")]
-    public class StatueOfAzshara : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Statue of Azshara (SA02).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SA02")]
-    public class StatueOfAzsharaSA02 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Statue Shield (LCsd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCsd")]
-    public class StatueShield : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Statue Shield Base (Lcsy).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("Lcsy")]
-    public class StatueShieldBase : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Statue Shieldless (YOks).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOks")]
-    public class StatueShieldless : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Statue Sword (LCss).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCss")]
-    public class StatueSword : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Statue Sword Base (LCsx).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCsx")]
-    public class StatueSwordBase : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Statue White (YOws).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOws")]
-    public class StatueWhite : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Strahnbrad Clock Tower (SCt0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SCt0")]
-    public class StrahnbradClockTower : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Strahnbrad Large Tree (SLt0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SLt0")]
-    public class StrahnbradLargeTree : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Stump Hollow (AOhs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("AOhs")]
-    public class StumpHollow : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Stump Hollow (COhs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("COhs")]
-    public class StumpHollowCOhs : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Summer Grass (LSga).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSga")]
-    public class SummerGrass : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Sun Well (YOsw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOsw")]
-    public class SunWell : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Sunfury Spire Main Tower (SSmt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SSmt")]
-    public class SunfurySpireMainTower : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Sunfury Spire Side Tower (SSst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SSst")]
-    public class SunfurySpireSideTower : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Sunken Ruins Tree (Indestructible) (ZPtw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZPtw")]
-    public class SunkenRuinsTreeIndestructible : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Sunreaver Archway (SA03).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SA03")]
-    public class SunreaverArchway : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Sunreaver Dome (SD00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SD00")]
-    public class SunreaverDome : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Sunreaver Dome (Small) (SDs0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SDs0")]
-    public class SunreaverDomeSmall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Sunreaver Spire (SS00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("SS00")]
-    public class SunreaverSpire : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Table (DOtb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOtb")]
-    public class Table : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Table and Chair (DOtc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOtc")]
-    public class TableAndChair : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Table Torture (DOtt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DOtt")]
-    public class TableTorture : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Tavern (YSta).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSta")]
-    public class Tavern : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Team Color Standing Banners (TCsb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("TCsb")]
-    public class TeamColorStandingBanners : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Terenas (LCtr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCtr")]
-    public class Terenas : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Terenas Crown (LCtc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCtc")]
-    public class TerenasCrown : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>The Frozen Throne (IZft).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("IZft")]
-    public class TheFrozenThrone : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Thrall's Hut (LZth).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LZth")]
-    public class ThrallsHut : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Throne (BOth).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BOth")]
-    public class Throne : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>ThroneRoom Hero Floor (LChf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LChf")]
-    public class ThroneRoomHeroFloor : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Throne (YOth).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOth")]
-    public class ThroneYOth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Throneroom Banner Large (LCb1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCb1")]
-    public class ThroneroomBannerLarge : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Throneroom Banner Large Half (LCb8).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCb8")]
-    public class ThroneroomBannerLargeHalf : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Throneroom Banner Medium 01 (LCb2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCb2")]
-    public class ThroneroomBannerMedium01 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Throneroom Banner Medium 02 (LCb3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCb3")]
-    public class ThroneroomBannerMedium02 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Throneroom Banner Small (LCb6).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCb6")]
-    public class ThroneroomBannerSmall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Throneroom Sculpture (LCsc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCsc")]
-    public class ThroneroomSculpture : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Throneroom Wall BackEnd (LCtb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCtb")]
-    public class ThroneroomWallBackEnd : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Throneroom Wall Balcony (LCtw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCtw")]
-    public class ThroneroomWallBalcony : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Throneroom Wall Entrance (LCte).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LCte")]
-    public class ThroneroomWallEntrance : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Tombstone (NOtb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NOtb")]
-    public class Tombstone : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Torch (LOth).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOth")]
-    public class Torch : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Torch Glowing (LOtz).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOtz")]
-    public class TorchGlowing : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Totem Centaur (BOct).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BOct")]
-    public class TotemCentaur : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Totem Lantern (AOnt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("AOnt")]
-    public class TotemLantern : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Totem Tauren (BOtt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("BOtt")]
-    public class TotemTauren : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Tower Scorched (LSst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSst")]
-    public class TowerScorched : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Trap Fire (YOf2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOf2")]
-    public class TrapFire : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Trap Frost (YOr2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOr2")]
-    public class TrapFrost : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Trap Side Fire (YOf1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOf1")]
-    public class TrapSideFire : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Trap Side Frost (YOr1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOr1")]
-    public class TrapSideFrost : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Trap Side Steam (YOs1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOs1")]
-    public class TrapSideSteam : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Trap Steam (YOs2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOs2")]
-    public class TrapSteam : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Trash (LOt1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOt1")]
-    public class Trash : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Treasure Chest (YOtc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YOtc")]
-    public class TreasureChest : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Tree Planter (YPtp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YPtp")]
-    public class TreePlanter : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Trough (LOtr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOtr")]
-    public class Trough : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Tulips (ZPf0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZPf0")]
-    public class Tulips : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undead Lab (UCul).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCul")]
-    public class UndeadLab : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Arch A (UCaa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCaa")]
-    public class UndercityArchA : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Bone Deco (UObd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UObd")]
-    public class UndercityBoneDeco : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Bridge A (USba).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("USba")]
-    public class UndercityBridgeA : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Chair (UOch).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UOch")]
-    public class UndercityChair : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Deco (UOdc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UOdc")]
-    public class UndercityDeco : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Door (UOdo).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UOdo")]
-    public class UndercityDoor : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Door B (UOdt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UOdt")]
-    public class UndercityDoorB : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Doorway A (UOda).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UOda")]
-    public class UndercityDoorwayA : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Floor A (USfa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("USfa")]
-    public class UndercityFloorA : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Floor B (USfb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("USfb")]
-    public class UndercityFloorB : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Floor Deco (UOfd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UOfd")]
-    public class UndercityFloorDeco : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Gate A (UOga).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UOga")]
-    public class UndercityGateA : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Grate Door (UOgd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UOgd")]
-    public class UndercityGrateDoor : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Grate Floor (UOgr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UOgr")]
-    public class UndercityGrateFloor : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Lantern (UClt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UClt")]
-    public class UndercityLantern : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Outer Ring (USta).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("USta")]
-    public class UndercityOuterRing : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Pillar A (UOpa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UOpa")]
-    public class UndercityPillarA : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Pillar B (UOpb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UOpb")]
-    public class UndercityPillarB : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Pillar C (UOpc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UOpc")]
-    public class UndercityPillarC : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Pillar D (UOpd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UOpd")]
-    public class UndercityPillarD : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Tower B (UStb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UStb")]
-    public class UndercityTowerB : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Trap Floor (UStf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UStf")]
-    public class UndercityTrapFloor : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Undercity Wall A (USwa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("USwa")]
-    public class UndercityWallA : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Underground Dome (JZud).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("JZud")]
-    public class UndergroundDome : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Underground Simple Rock (UGsr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UGsr")]
-    public class UndergroundSimpleRock : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>UtherTome (CNut).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CNut")]
-    public class UtherTome : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>UtherTomeClosed (CNuc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("CNuc")]
-    public class UtherTomeClosed : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Vines Cliffside (ZCv1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZCv1")]
-    public class VinesCliffside : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Vines Cliffside (ZCv2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZCv2")]
-    public class VinesCliffsideZCv2 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Vines Thorny (APtv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("APtv")]
-    public class VinesThorny : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Vines Thorny (NPth).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NPth")]
-    public class VinesThornyNPth : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Viny Plant (ZPvp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ZPvp")]
-    public class VinyPlant : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Violet Hold Archway Endpiece (VHae).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("VHae")]
-    public class VioletHoldArchwayEndpiece : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>VioletHoldMainStructure (VHms).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("VHms")]
-    public class VioletHoldMainStructure : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Violet Hold Spire (VHs0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("VHs0")]
-    public class VioletHoldSpire : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Violet Hold Spire (Small) (VHss).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("VHss")]
-    public class VioletHoldSpireSmall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Volumetric Fog (UOvf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UOvf")]
-    public class VolumetricFog : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall 90 Degree (WD00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("WD00")]
-    public class Wall90Degree : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Barred Large (DSp9).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DSp9")]
-    public class WallBarredLarge : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Barred Large (GSp9).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("GSp9")]
-    public class WallBarredLargeGSp9 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Barred Small (DSp0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("DSp0")]
-    public class WallBarredSmall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Barred Small (GSp0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("GSp0")]
-    public class WallBarredSmallGSp0 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Corner (YSw4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSw4")]
-    public class WallCorner : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Corner 2nd Floor (YSs1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSs1")]
-    public class WallCorner2ndFloor : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Corner (Alt) (YSw7).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSw7")]
-    public class WallCornerAlt : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Corner Alt 2nd Floor (YSs2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSs2")]
-    public class WallCornerAlt2ndFloor : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Curve (UCwc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCwc")]
-    public class WallCurve : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Door (YSwD).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSwD")]
-    public class WallDoor : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Door (Short) (YSwE).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSwE")]
-    public class WallDoorShort : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall End Lantern (YSll).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSll")]
-    public class WallEndLantern : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall End Lantern No Light (YSlx).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSlx")]
-    public class WallEndLanternNoLight : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall End Short (YSls).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSls")]
-    public class WallEndShort : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall End Tall (YSlt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSlt")]
-    public class WallEndTall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Endcap (WE00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("WE00")]
-    public class WallEndcap : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Endcap (Entrance) (YSwC).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSwC")]
-    public class WallEndcapEntrance : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Endcap (YSw5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSw5")]
-    public class WallEndcapYSw5 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Entrance Grateless (YSsd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSsd")]
-    public class WallEntranceGrateless : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Fountain (LOwf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOwf")]
-    public class WallFountain : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Low (Diagonal 1) (YSw1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSw1")]
-    public class WallLowDiagonal1 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Low (Diagonal 2) (YSw3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSw3")]
-    public class WallLowDiagonal2 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Low (Horizontal) (YSw0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSw0")]
-    public class WallLowHorizontal : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Low (Vertical) (YSw2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSw2")]
-    public class WallLowVertical : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Spire (WS01).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("WS01")]
-    public class WallSpire : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Spire Alt (WSa0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("WSa0")]
-    public class WallSpireAlt : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Stone (LOsw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOsw")]
-    public class WallStone : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Straight (UCws).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCws")]
-    public class WallStraight : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Straight 2nd Floor (YSs3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSs3")]
-    public class WallStraight2ndFloor : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Straight Broken (YSs6).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSs6")]
-    public class WallStraightBroken : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Straight Broken 2nd Floor (YSs7).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSs7")]
-    public class WallStraightBroken2ndFloor : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Straight Half (UCwh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCwh")]
-    public class WallStraightHalf : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Straight Long (WSl0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("WSl0")]
-    public class WallStraightLong : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Straight Long 2nd Floor (YSs4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSs4")]
-    public class WallStraightLong2ndFloor : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Straight Long Half (UCwx).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCwx")]
-    public class WallStraightLongHalf : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Straight (Long) (YSw8).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSw8")]
-    public class WallStraightLongYSw8 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Straight Short (WSs0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("WSs0")]
-    public class WallStraightShort : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Straight Short 2nd Floor (YSs5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSs5")]
-    public class WallStraightShort2ndFloor : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Straight Short Half (UCwy).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UCwy")]
-    public class WallStraightShortHalf : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Straight (Short) (YSw9).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSw9")]
-    public class WallStraightShortYSw9 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Straight (Tee) (YSwA).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSwA")]
-    public class WallStraightTee : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Straight (Tee Alt) (YSwB).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSwB")]
-    public class WallStraightTeeAlt : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Straight (WS00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("WS00")]
-    public class WallStraightWS00 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall Straight (YSw6).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YSw6")]
-    public class WallStraightYSw6 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall T (WT00).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("WT00")]
-    public class WallT : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wall T Alt (WTa0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("WTa0")]
-    public class WallTAlt : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Water (YCwa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCwa")]
-    public class Water : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Waterfall (LWw0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LWw0")]
-    public class Waterfall : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Well (LSwl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSwl")]
-    public class Well : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Whale (NWwh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("NWwh")]
-    public class Whale : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wheat (LPwh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LPwh")]
-    public class Wheat : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wheat Bunch (LPwb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LPwb")]
-    public class WheatBunch : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wheelbarrow (LOwb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOwb")]
-    public class Wheelbarrow : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wheelbarrow Broken (LOwr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LOwr")]
-    public class WheelbarrowBroken : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>White Box (UOwb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UOwb")]
-    public class WhiteBox : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Windmill (LSwm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSwm")]
-    public class Windmill : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Windmill Burned (LSwb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("LSwb")]
-    public class WindmillBurned : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wood Debris 01 (YCda).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCda")]
-    public class WoodDebris01 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wood Debris 02 (YCdb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCdb")]
-    public class WoodDebris02 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wood Debris 03 (YCdc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCdc")]
-    public class WoodDebris03 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wood Debris 04 (YCdd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCdd")]
-    public class WoodDebris04 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wood Debris Barrels 01 (YCde).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCde")]
-    public class WoodDebrisBarrels01 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wood Debris Barrels 02 (YCdf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCdf")]
-    public class WoodDebrisBarrels02 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wood Debris Barrels 03 (YCdg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("YCdg")]
-    public class WoodDebrisBarrels03 : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>Wooden Coffin (UOcw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("UOcw")]
-    public class WoodenCoffin : global::Moonwell.Objects.StandardDoodad
-    {
-    }
-
-    /// <summary>World Tree (ASwt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ASwt")]
-    public class WorldTree : global::Moonwell.Objects.StandardDoodad
-    {
+    /// <summary>The standard doodads.</summary>
+    /// @CSharpLua.Ignore
+    public static partial class Doodads
+    {
+        /// <summary>Alchemy Set (YOac).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOac")]
+        public class AlchemySet : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Alonsus Chapel (YOsb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOsb")]
+        public class AlonsusChapel : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Altar (OOal).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OOal")]
+        public class Altar : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Androhal Clock Tower (ACt0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ACt0")]
+        public class AndrohalClockTower : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Androhal Clock Tower (Destroyed) (ACtd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ACtd")]
+        public class AndrohalClockTowerDestroyed : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Arch (LCar).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCar")]
+        public class Arch : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Arch Large (UCal).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCal")]
+        public class ArchLarge : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Arch with Pillar (LCap).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCap")]
+        public class ArchWithPillar : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archery Target (LOar).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOar")]
+        public class ArcheryTarget : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway (CSra).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CSra")]
+        public class Archway : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Angled (CSr1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CSr1")]
+        public class ArchwayAngled : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Angled (DSa1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DSa1")]
+        public class ArchwayAngledDSa1 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Angled (GSa1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("GSa1")]
+        public class ArchwayAngledGSa1 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Angled Icecrown Stone (ISs1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ISs1")]
+        public class ArchwayAngledIcecrownStone : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Angled Icy (ISa1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ISa1")]
+        public class ArchwayAngledIcy : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Angled (NSr1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NSr1")]
+        public class ArchwayAngledNSr1 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Angled Natural (ZSa1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZSa1")]
+        public class ArchwayAngledNatural : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Angled Outland (OSa1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OSa1")]
+        public class ArchwayAngledOutland : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Angled Stone (DSa2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DSa2")]
+        public class ArchwayAngledStone : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Angled Stone (GSa2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("GSa2")]
+        public class ArchwayAngledStoneGSa2 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Angled (YSa1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSa1")]
+        public class ArchwayAngledYSa1 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Angled (ZSb1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZSb1")]
+        public class ArchwayAngledZSb1 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Angled (ZSs1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZSs1")]
+        public class ArchwayAngledZSs1 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway (DSar).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DSar")]
+        public class ArchwayDSar : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Entrance (YSa2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSa2")]
+        public class ArchwayEntrance : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Entrance (Angled) (YSa3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSa3")]
+        public class ArchwayEntranceAngled : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway (GSar).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("GSar")]
+        public class ArchwayGSar : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Icecrown Stone (ISsr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ISsr")]
+        public class ArchwayIcecrownStone : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Icy (ISar).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ISar")]
+        public class ArchwayIcy : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway (NSr0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NSr0")]
+        public class ArchwayNSr0 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Natural (ZSar).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZSar")]
+        public class ArchwayNatural : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Outland (OSar).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OSar")]
+        public class ArchwayOutland : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Ruined (JSar).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("JSar")]
+        public class ArchwayRuined : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Ruined (JSax).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("JSax")]
+        public class ArchwayRuinedJSax : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway (Standard Dimension) (ASd0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ASd0")]
+        public class ArchwayStandardDimension : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Stone (DSah).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DSah")]
+        public class ArchwayStone : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway Stone (GSah).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("GSah")]
+        public class ArchwayStoneGSah : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway (YSaw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSaw")]
+        public class ArchwayYSaw : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway (ZSab).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZSab")]
+        public class ArchwayZSab : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Archway (ZSas).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZSas")]
+        public class ArchwayZSas : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Banner Human (LOh1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOh1")]
+        public class BannerHuman : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Banner Long Blue (YObb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YObb")]
+        public class BannerLongBlue : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Banner Long White (YOwb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOwb")]
+        public class BannerLongWhite : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Banner Orc (LOo1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOo1")]
+        public class BannerOrc : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Banner Tutorial Orc (LOo2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOo2")]
+        public class BannerTutorialOrc : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Barn (LSba).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSba")]
+        public class Barn : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Barn Scorched (LSsb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSsb")]
+        public class BarnScorched : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Barrens Tree (Indestructible) (BPtw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BPtw")]
+        public class BarrensTreeIndestructible : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bats (NObt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NObt")]
+        public class Bats : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bench (DObh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DObh")]
+        public class Bench : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bench Angled Stone (YOsa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOsa")]
+        public class BenchAngledStone : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bench Angled Wood (YOwa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOwa")]
+        public class BenchAngledWood : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bench Stone (YObs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YObs")]
+        public class BenchStone : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bench Wood (YObw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YObw")]
+        public class BenchWood : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Birds (AObd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("AObd")]
+        public class Birds : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Black Box (UObb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UObb")]
+        public class BlackBox : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Blighted Mist (CObl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CObl")]
+        public class BlightedMist : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Blocks Ruined (ASHB).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ASHB")]
+        public class BlocksRuined : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Blocks Ruined (CSbl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CSbl")]
+        public class BlocksRuinedCSbl : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Blood Decals (YCbd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCbd")]
+        public class BloodDecals : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bones (BObo).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BObo")]
+        public class Bones : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bones (NObo).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NObo")]
+        public class BonesNObo : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bones Rib (LOrb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOrb")]
+        public class BonesRib : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bones (YObo).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YObo")]
+        public class BonesYObo : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Books (YObk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YObk")]
+        public class Books : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bookshelf (DObk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DObk")]
+        public class Bookshelf : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bookshelf Angled (DOab).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOab")]
+        public class BookshelfAngled : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bookshelf Large (DOkb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOkb")]
+        public class BookshelfLarge : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bookshelf Long (DObw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DObw")]
+        public class BookshelfLong : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Brazier (LObr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LObr")]
+        public class Brazier : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Brazier Glowing (LObz).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LObz")]
+        public class BrazierGlowing : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Brazier Skull (AObr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("AObr")]
+        public class BrazierSkull : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Brick Debris (YCbr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCbr")]
+        public class BrickDebris : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Brill Clock Tower (BCt0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BCt0")]
+        public class BrillClockTower : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Broken Column (ASbc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ASbc")]
+        public class BrokenColumn : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Broken Column (CSbc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CSbc")]
+        public class BrokenColumnCSbc : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Broken Floor Decals (YCbf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCbf")]
+        public class BrokenFloorDecals : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bubbles (ZWbg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZWbg")]
+        public class Bubbles : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bubbles Steam (IWbg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IWbg")]
+        public class BubblesSteam : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Building (VSvb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("VSvb")]
+        public class Building : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Building A (BA00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BA00")]
+        public class BuildingA : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Building B (BB00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BB00")]
+        public class BuildingB : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Building C (BC00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BC00")]
+        public class BuildingC : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bush (APbs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("APbs")]
+        public class Bush : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bush (CPbs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CPbs")]
+        public class BushCPbs : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Bush (YPbs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YPbs")]
+        public class BushYPbs : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cactus (BPca).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BPca")]
+        public class Cactus : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cage Empty (LOce).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOce")]
+        public class CageEmpty : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cage Trashed (LOct).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOct")]
+        public class CageTrashed : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Camera Prop (YOcp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOcp")]
+        public class CameraProp : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Capital Bridge (LCcb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCcb")]
+        public class CapitalBridge : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Capital Bridge Large (LClb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LClb")]
+        public class CapitalBridgeLarge : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Capital Door Ornate (LCcd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCcd")]
+        public class CapitalDoorOrnate : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Capital Door Plain (LCcp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCcp")]
+        public class CapitalDoorPlain : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Capital Entrance (Lccn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("Lccn")]
+        public class CapitalEntrance : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Capital Tower (LCct).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCct")]
+        public class CapitalTower : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Capital Tower Large (LClt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LClt")]
+        public class CapitalTowerLarge : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cathedral (YSca).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSca")]
+        public class Cathedral : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cathedral Ruined (YScr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YScr")]
+        public class CathedralRuined : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cattail (APct).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("APct")]
+        public class Cattail : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cattail (CPct).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CPct")]
+        public class CattailCPct : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cattail (ZPru).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZPru")]
+        public class CattailZPru : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cauldron with heads (LOca).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOca")]
+        public class CauldronWithHeads : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cave City Cliff (East) (YCc4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCc4")]
+        public class CaveCityCliffEast : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cave City Cliff (North Left) (YCc2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCc2")]
+        public class CaveCityCliffNorthLeft : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cave City Cliff (North Right) (YCc1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCc1")]
+        public class CaveCityCliffNorthRight : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cave City Cliff (West) (YCc3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCc3")]
+        public class CaveCityCliffWest : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cave Natural Cliff (East) (YCr4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCr4")]
+        public class CaveNaturalCliffEast : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cave Natural Cliff (North Left) (YCr2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCr2")]
+        public class CaveNaturalCliffNorthLeft : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cave Natural Cliff (North Right) (YCr1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCr1")]
+        public class CaveNaturalCliffNorthRight : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cave Natural Cliff (West) (YCr3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCr3")]
+        public class CaveNaturalCliffWest : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ceiling Chain (YOch).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOch")]
+        public class CeilingChain : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cell Door (UCcd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCcd")]
+        public class CellDoor : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Chain Post (DOcp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOcp")]
+        public class ChainPost : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Chains (DOch).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOch")]
+        public class Chains : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Chair (DOcr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOcr")]
+        public class Chair : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Chair (IOch).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IOch")]
+        public class ChairIOch : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Chair Icey (IOic).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IOic")]
+        public class ChairIcey : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cinematic Altar of Darkness (USad).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("USad")]
+        public class CinematicAltarOfDarkness : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Base Ruined (JSr6).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("JSr6")]
+        public class CityBuildingBaseRuined : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building (Diagonal 1, Green) (YS01).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YS01")]
+        public class CityBuildingDiagonal1Green : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building (Diagonal 1, Purple) (YS02).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YS02")]
+        public class CityBuildingDiagonal1Purple : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building (Diagonal 1, Red) (YS00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YS00")]
+        public class CityBuildingDiagonal1Red : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building (Diagonal 2, Blue) (YS08).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YS08")]
+        public class CityBuildingDiagonal2Blue : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building (Diagonal 2, Green) (YS07).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YS07")]
+        public class CityBuildingDiagonal2Green : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building (Diagonal 2, Purple) (YS06).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YS06")]
+        public class CityBuildingDiagonal2Purple : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building (Horizontal, Blue) (YS03).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YS03")]
+        public class CityBuildingHorizontalBlue : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building (Horizontal, Green) (YS04).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YS04")]
+        public class CityBuildingHorizontalGreen : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building (Horizontal, Red) (YS05).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YS05")]
+        public class CityBuildingHorizontalRed : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Large Base Ruined (JSrc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("JSrc")]
+        public class CityBuildingLargeBaseRuined : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Large (Diagonal 1, Red) (YS13).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YS13")]
+        public class CityBuildingLargeDiagonal1Red : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Large (Diagonal 2, Blue) (YS15).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YS15")]
+        public class CityBuildingLargeDiagonal2Blue : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Large (Horizontal, Green) (YS14).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YS14")]
+        public class CityBuildingLargeHorizontalGreen : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Large Ruined (Diagonal 1, Red) (YSrd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSrd")]
+        public class CityBuildingLargeRuinedDiagonal1Red : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Large Ruined (Diagonal 2, Blue) (YSrf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSrf")]
+        public class CityBuildingLargeRuinedDiagonal2Blue : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Large Ruined (Horizontal, Green) (YSre).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSre")]
+        public class CityBuildingLargeRuinedHorizontalGreen : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Large Ruined (Vertical, Purple) (YSrc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSrc")]
+        public class CityBuildingLargeRuinedVerticalPurple : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Large (Vertical, Purple) (YS12).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YS12")]
+        public class CityBuildingLargeVerticalPurple : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Row (Group 1) (YSbr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSbr")]
+        public class CityBuildingRowGroup1 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Row (Group 2) (YSb1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSb1")]
+        public class CityBuildingRowGroup2 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Row (Group 3) (YSb2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSb2")]
+        public class CityBuildingRowGroup3 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Ruined (Diagonal 1, Green) (YSr1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSr1")]
+        public class CityBuildingRuinedDiagonal1Green : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Ruined (Diagonal 1, Purple) (YSr2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSr2")]
+        public class CityBuildingRuinedDiagonal1Purple : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Ruined (Diagonal 1, Red) (YSr0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSr0")]
+        public class CityBuildingRuinedDiagonal1Red : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Ruined (Diagonal 2, Blue) (YSr8).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSr8")]
+        public class CityBuildingRuinedDiagonal2Blue : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Ruined (Diagonal 2, Green) (YSr7).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSr7")]
+        public class CityBuildingRuinedDiagonal2Green : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Ruined (Diagonal 2, Purple) (YSr6).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSr6")]
+        public class CityBuildingRuinedDiagonal2Purple : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Ruined (Horizontal, Blue) (YSr3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSr3")]
+        public class CityBuildingRuinedHorizontalBlue : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Ruined (Horizontal, Green) (YSr4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSr4")]
+        public class CityBuildingRuinedHorizontalGreen : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Ruined (Horizontal, Red) (YSr5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSr5")]
+        public class CityBuildingRuinedHorizontalRed : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Ruined (Vertical, Blue) (YSrb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSrb")]
+        public class CityBuildingRuinedVerticalBlue : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Ruined (Vertical, Green) (YSr9).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSr9")]
+        public class CityBuildingRuinedVerticalGreen : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building Ruined (Vertical, Red) (YSra).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSra")]
+        public class CityBuildingRuinedVerticalRed : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building (Vertical, Blue) (YS11).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YS11")]
+        public class CityBuildingVerticalBlue : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building (Vertical, Green) (YS09).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YS09")]
+        public class CityBuildingVerticalGreen : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Building (Vertical, Red) (YS10).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YS10")]
+        public class CityBuildingVerticalRed : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>City Tower (YOmb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOmb")]
+        public class CityTower : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cliff Cave (LCc0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCc0")]
+        public class CliffCave : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Cliff Cave 2 (LCc2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCc2")]
+        public class CliffCave2 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Column Angled Double (YSc5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSc5")]
+        public class ColumnAngledDouble : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Column Broken (NObc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NObc")]
+        public class ColumnBroken : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Column Double (YScd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YScd")]
+        public class ColumnDouble : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Column Ruined (JSco).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("JSco")]
+        public class ColumnRuined : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Column Ruined with Cap (JScx).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("JScx")]
+        public class ColumnRuinedWithCap : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Column Semi Circle (YSc2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSc2")]
+        public class ColumnSemiCircle : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Column Semi Circle Ruined (JSc2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("JSc2")]
+        public class ColumnSemiCircleRuined : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Column Semi Circle Ruined (JSc3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("JSc3")]
+        public class ColumnSemiCircleRuinedJSc3 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Column Semi Circle Ruined (JSc4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("JSc4")]
+        public class ColumnSemiCircleRuinedJSc4 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Column Semi Circle Ruined (JScs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("JScs")]
+        public class ColumnSemiCircleRuinedJScs : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Column Semi Circle (YSc3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSc3")]
+        public class ColumnSemiCircleYSc3 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Column Semi Circle (YSc4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSc4")]
+        public class ColumnSemiCircleYSc4 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Column Semi Circle (YScs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YScs")]
+        public class ColumnSemiCircleYScs : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Column Single (YSco).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSco")]
+        public class ColumnSingle : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Coral (ZWcl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZWcl")]
+        public class Coral : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Coral Arch (ZWca).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZWca")]
+        public class CoralArch : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Corn (LPcr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LPcr")]
+        public class Corn : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Corpse Impaled (LOic).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOic")]
+        public class CorpseImpaled : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Corpse of Gul Dan (CGd0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CGd0")]
+        public class CorpseOfGulDan : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Corpse Sitting (LOsc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOsc")]
+        public class CorpseSitting : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Crater (BRcr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BRcr")]
+        public class Crater : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Crater Fiery (DRfc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DRfc")]
+        public class CraterFiery : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Crater Fiery (GRfc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("GRfc")]
+        public class CraterFieryGRfc : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Crater Wall (LCcr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCcr")]
+        public class CraterWall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Crates Empty (YOec).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOec")]
+        public class CratesEmpty : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Crypt (NSct).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NSct")]
+        public class Crypt : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Crystal (IRcy).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IRcy")]
+        public class Crystal : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Dalaran Violet Citadel Ruined (ZOvr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOvr")]
+        public class DalaranVioletCitadelRuined : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Dark Pipe Divider Horizontal (UCdc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCdc")]
+        public class DarkPipeDividerHorizontal : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Dark Pipe Divider Vertical (UCdd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCdd")]
+        public class DarkPipeDividerVertical : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Dark Pipe Horizontal Straight (UCdi).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCdi")]
+        public class DarkPipeHorizontalStraight : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Dark Pipe Long Horizontal 01 (UCdg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCdg")]
+        public class DarkPipeLongHorizontal01 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Dark Pipe Long Horizontal 02 (UCdh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCdh")]
+        public class DarkPipeLongHorizontal02 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Dark Pipe Long Vertical 01 (UCde).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCde")]
+        public class DarkPipeLongVertical01 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Dark Pipe Long Vertical 02 (UCdf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCdf")]
+        public class DarkPipeLongVertical02 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Dark Pipe Vertical Straight (UCdj).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCdj")]
+        public class DarkPipeVerticalStraight : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Detonator (YOdt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOdt")]
+        public class Detonator : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Draw Bridge (UCbr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCbr")]
+        public class DrawBridge : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Dust (ZZcd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZZcd")]
+        public class Dust : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Elven Building (LSeb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSeb")]
+        public class ElvenBuilding : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Enclave House (EH00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EH00")]
+        public class EnclaveHouse : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Enclave House B (EHb0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EHb0")]
+        public class EnclaveHouseB : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Enclave Main Structure (EMs0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EMs0")]
+        public class EnclaveMainStructure : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Enclave Spire (ES00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ES00")]
+        public class EnclaveSpire : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Enclave Turret (ET01).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ET01")]
+        public class EnclaveTurret : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Energy Field (YZef).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YZef")]
+        public class EnergyField : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Explosives (YOex).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOex")]
+        public class Explosives : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Exterior Gate (EG00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EG00")]
+        public class ExteriorGate : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Exterior Main Tower (EMt0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EMt0")]
+        public class ExteriorMainTower : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Exterior Tower (ET00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ET00")]
+        public class ExteriorTower : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Exterior Wall (EW00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EW00")]
+        public class ExteriorWall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Eye of Sargeras (ZZys).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZZys")]
+        public class EyeOfSargeras : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fall Grass (LFgs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LFgs")]
+        public class FallGrass : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Farm Scorched (LSsf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSsf")]
+        public class FarmScorched : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fence (NOfl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NOfl")]
+        public class Fence : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fence Angled (NOal).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NOal")]
+        public class FenceAngled : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fence Angled Long (VOal).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("VOal")]
+        public class FenceAngledLong : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fence Angled Short (VOas).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("VOas")]
+        public class FenceAngledShort : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fence Long (VOfl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("VOfl")]
+        public class FenceLong : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fence Short (VOfs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("VOfs")]
+        public class FenceShort : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fire (YOtf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOtf")]
+        public class Fire : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fire Blue (YOfb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOfb")]
+        public class FireBlue : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fire Gust (YOf3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOf3")]
+        public class FireGust : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fire Pit (NOfp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NOfp")]
+        public class FirePit : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fire Pit Trashed (NOft).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NOft")]
+        public class FirePitTrashed : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fire Pit with Pig (NOfg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NOfg")]
+        public class FirePitWithPig : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fire Small (YOfs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOfs")]
+        public class FireSmall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fish (AWfs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("AWfs")]
+        public class Fish : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fish Dead (COdf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("COdf")]
+        public class FishDead : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fish Green (ZWfs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZWfs")]
+        public class FishGreen : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fish School (ZWsf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZWsf")]
+        public class FishSchool : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fissure (BRfs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BRfs")]
+        public class Fissure : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fissure (CRfs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CRfs")]
+        public class FissureCRfs : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fissure (NRfs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NRfs")]
+        public class FissureNRfs : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Flame Grate (OOgr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OOgr")]
+        public class FlameGrate : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Flies (LOfl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOfl")]
+        public class Flies : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Floating Barrel (NWfl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NWfl")]
+        public class FloatingBarrel : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Floating Box (NWfb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NWfb")]
+        public class FloatingBox : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Floating Panel (NWpa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NWpa")]
+        public class FloatingPanel : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Floating Plank (NWfp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NWfp")]
+        public class FloatingPlank : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Flower Bed Angled (YPfa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YPfa")]
+        public class FlowerBedAngled : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Flower Bed Straight (YPfs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YPfs")]
+        public class FlowerBedStraight : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Flowers (ZPfw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZPfw")]
+        public class Flowers : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Footprints Demonic (ZZdt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZZdt")]
+        public class FootprintsDemonic : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>ForsakenBanner (UCbn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCbn")]
+        public class ForsakenBanner : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Forsaken Standing Banners (FSsb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("FSsb")]
+        public class ForsakenStandingBanners : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fountain (YOfn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOfn")]
+        public class Fountain : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Fountain Ruined (YOfr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOfr")]
+        public class FountainRuined : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>General Decals (Ycgd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("Ycgd")]
+        public class GeneralDecals : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Geyser (BRgs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BRgs")]
+        public class Geyser : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Glacier (IRgc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IRgc")]
+        public class Glacier : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Glowing Runes (JOgr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("JOgr")]
+        public class GlowingRunes : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Goblin Racing arrow post (GLap).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("GLap")]
+        public class GoblinRacingArrowPost : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>GoblinRacing CheckerBanner (GLcb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("GLcb")]
+        public class GoblinRacingCheckerBanner : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>GoblinRacing Sign (GLsg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("GLsg")]
+        public class GoblinRacingSign : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Gold (YOgo).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOgo")]
+        public class Gold : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Grain Scorched (LPcw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LPcw")]
+        public class GrainScorched : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Granary (LSgr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSgr")]
+        public class Granary : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Granary Scorched (LSgs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSgs")]
+        public class GranaryScorched : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Grass Patch (LPgp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LPgp")]
+        public class GrassPatch : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Grate (EOgr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EOgr")]
+        public class Grate : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Grave (LOgr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOgr")]
+        public class Grave : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Grave (Cityscape) (YOgr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOgr")]
+        public class GraveCityscape : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Grave Peasant (LOpg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOpg")]
+        public class GravePeasant : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Grave Stone (NOgv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NOgv")]
+        public class GraveStone : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Green Pipe Corner 01 (UCgc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCgc")]
+        public class GreenPipeCorner01 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Green Pipe Corner 02 (UCgo).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCgo")]
+        public class GreenPipeCorner02 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Green Pipe Divider (UCgd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCgd")]
+        public class GreenPipeDivider : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Green Pipe Grate Long (UCpg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCpg")]
+        public class GreenPipeGrateLong : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Green Pipe Grate Short (UCpx).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCpx")]
+        public class GreenPipeGrateShort : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Green Pipe Straight 01 (UCgs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCgs")]
+        public class GreenPipeStraight01 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Green Pipe Straight 02 (UCgx).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCgx")]
+        public class GreenPipeStraight02 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Green Pipe Straight 03 (UCgy).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCgy")]
+        public class GreenPipeStraight03 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ground Grate Round (UCgr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCgr")]
+        public class GroundGrateRound : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ground Grate Square (UCgg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCgg")]
+        public class GroundGrateSquare : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ground Tile (UCgt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCgt")]
+        public class GroundTile : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ground Tile Decal (UCtd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCtd")]
+        public class GroundTileDecal : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Gul'dan's Runes (ZZgr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZZgr")]
+        public class GuldansRunes : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Hay (LOhb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOhb")]
+        public class Hay : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Hay Cart (LOch).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOch")]
+        public class HayCart : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Hay Cart Broken (LOcb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOcb")]
+        public class HayCartBroken : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Hay Cart Broken (Infected) (LOxx).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOxx")]
+        public class HayCartBrokenInfected : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Hay Cart (Infected) (LOrc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOrc")]
+        public class HayCartInfected : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Hay Clump (LOhc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOhc")]
+        public class HayClump : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Hay (Infected) (LOrh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOrh")]
+        public class HayInfected : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Haze (YOhz).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOhz")]
+        public class Haze : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Head on Spear (LOsh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOsh")]
+        public class HeadOnSpear : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Hearthglen Abbey (HA00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("HA00")]
+        public class HearthglenAbbey : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>High Elf Crest Hanging Banners (HEch).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("HEch")]
+        public class HighElfCrestHangingBanners : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>High Elf Crest Standing Banners (HEcs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("HEcs")]
+        public class HighElfCrestStandingBanners : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ice Block (IRic).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IRic")]
+        public class IceBlock : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ice Claws (NRic).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NRic")]
+        public class IceClaws : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ice Floating (IWie).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IWie")]
+        public class IceFloating : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ice Floe (NWf1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NWf1")]
+        public class IceFloe : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ice Floe (NWf2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NWf2")]
+        public class IceFloeNWf2 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ice Floe (NWf3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NWf3")]
+        public class IceFloeNWf3 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ice Floe (NWf4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NWf4")]
+        public class IceFloeNWf4 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ice Spider on Pedestal (IOss).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IOss")]
+        public class IceSpiderOnPedestal : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Iceberg (NWi1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NWi1")]
+        public class Iceberg : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Iceberg (NWi2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NWi2")]
+        public class IcebergNWi2 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Iceberg (NWi3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NWi3")]
+        public class IcebergNWi3 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Iceberg (NWi4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NWi4")]
+        public class IcebergNWi4 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Icy Waterfall (IWw0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IWw0")]
+        public class IcyWaterfall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Inn (LSin).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSin")]
+        public class Inn : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Inn Scorched (LSsi).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSsi")]
+        public class InnScorched : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Invulnerability Field (JZif).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("JZif")]
+        public class InvulnerabilityField : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Iron Gate (A) (YOig).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOig")]
+        public class IronGateA : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Iron Gate (B) (YOi1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOi1")]
+        public class IronGateB : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Iron Maiden (DOim).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOim")]
+        public class IronMaiden : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>King Terenas Statue (YOss).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOss")]
+        public class KingTerenasStatue : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lava Cracks (DOlc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOlc")]
+        public class LavaCracks : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lava Cracks (GOlc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("GOlc")]
+        public class LavaCracksGOlc : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lightning Bolt (YOlb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOlb")]
+        public class LightningBolt : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lily Pad (CPlp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CPlp")]
+        public class LilyPad : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lily Pad (LPlp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LPlp")]
+        public class LilyPadLPlp : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lily Pad (ZPlp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZPlp")]
+        public class LilyPadZPlp : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lily Pads (AWlp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("AWlp")]
+        public class LilyPads : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lily Pads Floating (AWfl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("AWfl")]
+        public class LilyPadsFloating : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lily Pads Floating (LPfp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LPfp")]
+        public class LilyPadsFloatingLPfp : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Log Angled (AOla).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("AOla")]
+        public class LogAngled : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Log Angled (COla).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("COla")]
+        public class LogAngledCOla : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Log Straight (AOlg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("AOlg")]
+        public class LogStraight : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Log Straight (COlg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("COlg")]
+        public class LogStraightCOlg : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lordaeron Banner Medium 01 (LCb4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCb4")]
+        public class LordaeronBannerMedium01 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lordaeron Banner Medium 02 (LCb5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCb5")]
+        public class LordaeronBannerMedium02 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lordaeron Banner Small (LCb7).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCb7")]
+        public class LordaeronBannerSmall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lordaeron Bookshelf (LObs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LObs")]
+        public class LordaeronBookshelf : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lordaeron Carpet (LOcp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOcp")]
+        public class LordaeronCarpet : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>LordaeronCathedral Fence (LOcf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOcf")]
+        public class LordaeronCathedralFence : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>LordaeronCathedral Pillar (LOcl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOcl")]
+        public class LordaeronCathedralPillar : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>LordaeronCathedral Stair (LOsa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOsa")]
+        public class LordaeronCathedralStair : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>LordaeronCathedral Wall (LOcw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOcw")]
+        public class LordaeronCathedralWall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lordaeron Entrance (LCet).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCet")]
+        public class LordaeronEntrance : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lordaeron Furniture (LOfn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOfn")]
+        public class LordaeronFurniture : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>LordaeronStanding Banners (LRsb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LRsb")]
+        public class LordaeronStandingBanners : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lordaeron Throne (LCth).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCth")]
+        public class LordaeronThrone : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lordaeron Wall Deco (LOwd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOwd")]
+        public class LordaeronWallDeco : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lordaeron Window (LCwd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCwd")]
+        public class LordaeronWindow : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Lordearon Planter (LCtp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCtp")]
+        public class LordearonPlanter : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Magical Lantern (XOcl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XOcl")]
+        public class MagicalLantern : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Magical Runes (XOmr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XOmr")]
+        public class MagicalRunes : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Magus Conservatory (MC00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("MC00")]
+        public class MagusConservatory : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Magus Highrise (MH00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("MH00")]
+        public class MagusHighrise : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Magus Turret (MT00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("MT00")]
+        public class MagusTurret : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Manhole (EOmh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EOmh")]
+        public class Manhole : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Market Item Baubles (YOm2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOm2")]
+        public class MarketItemBaubles : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Market Item Baubles (Alt) (YOm3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOm3")]
+        public class MarketItemBaublesAlt : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Market Item Produce (YOm4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOm4")]
+        public class MarketItemProduce : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Market Item Produce (Alt) (YOm5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOm5")]
+        public class MarketItemProduceAlt : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Market Item Textiles (YOm6).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOm6")]
+        public class MarketItemTextiles : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Market Item Textiles (Alt) (YOm7).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOm7")]
+        public class MarketItemTextilesAlt : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Market Stall (Large) (YOms).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOms")]
+        public class MarketStallLarge : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Market Stall (Small) (YOm1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOm1")]
+        public class MarketStallSmall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Meatwagon Corpse (YOcr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOcr")]
+        public class MeatwagonCorpse : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Mine Cart (DOmc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOmc")]
+        public class MineCart : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Mine Cart Empty (DOme).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOme")]
+        public class MineCartEmpty : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Mine Hole (UEmh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UEmh")]
+        public class MineHole : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Mine Rock Wall (UErw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UErw")]
+        public class MineRockWall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Mine Track (UOmt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UOmt")]
+        public class MineTrack : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Misc Props (LOmp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOmp")]
+        public class MiscProps : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Modular House Kit (YSmh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSmh")]
+        public class ModularHouseKit : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Modular House Kit 2 (YSmt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSmt")]
+        public class ModularHouseKit2 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Modular Stair (LCms).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCms")]
+        public class ModularStair : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Mushroom Blue (GPsh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("GPsh")]
+        public class MushroomBlue : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Mushrooms (APms).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("APms")]
+        public class Mushrooms : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Mushrooms (CPms).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CPms")]
+        public class MushroomsCPms : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Mushrooms (ZPms).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZPms")]
+        public class MushroomsZPms : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Naxx Arch (UCna).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCna")]
+        public class NaxxArch : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Naxx Cinematic (YOna).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOna")]
+        public class NaxxCinematic : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Naxx Crystal (UCnc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCnc")]
+        public class NaxxCrystal : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Naxx Deco (UCnd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCnd")]
+        public class NaxxDeco : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Naxx Fence (UCnf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCnf")]
+        public class NaxxFence : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Naxx Generator (UCng).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCng")]
+        public class NaxxGenerator : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Naxx Pillar (UCnp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCnp")]
+        public class NaxxPillar : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Naxx Spidergate (UCsg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCsg")]
+        public class NaxxSpidergate : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Naxx Stair (UCns).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCns")]
+        public class NaxxStair : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Naxx Wall A (UCnw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCnw")]
+        public class NaxxWallA : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Naxx Wall B (UCnb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCnb")]
+        public class NaxxWallB : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Naxx WallDeco (UCwd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCwd")]
+        public class NaxxWallDeco : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Night Elf Fishing Village (ASv0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ASv0")]
+        public class NightElfFishingVillage : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Night Elf Fishing Village (ASv1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ASv1")]
+        public class NightElfFishingVillageASv1 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Night Elf Fishing Village (ASv2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ASv2")]
+        public class NightElfFishingVillageASv2 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Night Elf Fishing Village (ASv3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ASv3")]
+        public class NightElfFishingVillageASv3 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Night Elf Fishing Village (ASv4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ASv4")]
+        public class NightElfFishingVillageASv4 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Night Elf Fishing Village Ruined (ASx0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ASx0")]
+        public class NightElfFishingVillageRuined : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Night Elf Fishing Village Ruined (ASx1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ASx1")]
+        public class NightElfFishingVillageRuinedASx1 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Night Elf Fishing Village Ruined (ASx2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ASx2")]
+        public class NightElfFishingVillageRuinedASx2 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Obelisk (AOsk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("AOsk")]
+        public class Obelisk : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Obelisk Broken (AObo).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("AObo")]
+        public class ObeliskBroken : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Obelisk Broken (CObo).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CObo")]
+        public class ObeliskBrokenCObo : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Obelisk Broken (NObk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NObk")]
+        public class ObeliskBrokenNObk : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Obelisk (COob).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("COob")]
+        public class ObeliskCOob : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Obelisk (DOob).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOob")]
+        public class ObeliskDOob : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Obelisk (GOob).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("GOob")]
+        public class ObeliskGOob : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Obelisk Glowing (AOob).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("AOob")]
+        public class ObeliskGlowing : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Obelisk (IOob).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IOob")]
+        public class ObeliskIOob : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Obelisk (NOok).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NOok")]
+        public class ObeliskNOok : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Obelisk (YOob).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOob")]
+        public class ObeliskYOob : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Obstacle (OOob).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OOob")]
+        public class Obstacle : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Omni Light Orange (YOol).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOol")]
+        public class OmniLightOrange : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Outland Plants (OPop).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OPop")]
+        public class OutlandPlants : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Palace Arch (LCpa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCpa")]
+        public class PalaceArch : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Palace Doorway (LCpd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCpd")]
+        public class PalaceDoorway : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Palace Pillar (LCpr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCpr")]
+        public class PalacePillar : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Palace Wall Interior (LCwi).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCwi")]
+        public class PalaceWallInterior : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Palace Wall Short (LCws).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCws")]
+        public class PalaceWallShort : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Palace Wall Statue (LCwv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCwv")]
+        public class PalaceWallStatue : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Palace Wall Tall (LCwt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCwt")]
+        public class PalaceWallTall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Palisade (LSpl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSpl")]
+        public class Palisade : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Path End Large (UCel).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCel")]
+        public class PathEndLarge : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Path End Small (UCes).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCes")]
+        public class PathEndSmall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pathway Corner Left (UCpc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCpc")]
+        public class PathwayCornerLeft : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pathway Corner Right (UCpr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCpr")]
+        public class PathwayCornerRight : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pathway Straight (UCps).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCps")]
+        public class PathwayStraight : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pier, Pier (ASpr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ASpr")]
+        public class PierPier : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pier Ruined (ASpt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ASpt")]
+        public class PierRuined : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pile of Junk (DOjp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOjp")]
+        public class PileOfJunk : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pile of Treasure (DOtp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOtp")]
+        public class PileOfTreasure : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pillar (IOpr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IOpr")]
+        public class Pillar : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pillar Endcap (LCpe).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCpe")]
+        public class PillarEndcap : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pillar Interior (LCpi).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCpi")]
+        public class PillarInterior : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pillar Short (LCps).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCps")]
+        public class PillarShort : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pillar Tall (LCpt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCpt")]
+        public class PillarTall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pillar (UCpl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCpl")]
+        public class PillarUCpl : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pipe Console Closed (UCda).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCda")]
+        public class PipeConsoleClosed : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pipe Console Open (UCdb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCdb")]
+        public class PipeConsoleOpen : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pirate Booty (YOpb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOpb")]
+        public class PirateBooty : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Plague Cauldron (UCca).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCca")]
+        public class PlagueCauldron : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Post Hitching (LOhp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOhp")]
+        public class PostHitching : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Post Lantern (LOlp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOlp")]
+        public class PostLantern : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Post Lantern (YOlp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOlp")]
+        public class PostLanternYOlp : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Post Sign (LOsp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOsp")]
+        public class PostSign : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Potted Plant (YPpp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YPpp")]
+        public class PottedPlant : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Power Generator (XOcs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("XOcs")]
+        public class PowerGenerator : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pulley System (ZOps).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOps")]
+        public class PulleySystem : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Pyrewood Village Clock Tower (Destroyed) (PVct).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("PVct")]
+        public class PyrewoodVillageClockTowerDestroyed : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rack Armor (LOam).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOam")]
+        public class RackArmor : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rack Weapon (LOwp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOwp")]
+        public class RackWeapon : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Remains Scorched (AOsr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("AOsr")]
+        public class RemainsScorched : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rising Water (IZrw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IZrw")]
+        public class RisingWater : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rising Water Wide (IZww).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IZww")]
+        public class RisingWaterWide : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>River Rushes (LPrs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LPrs")]
+        public class RiverRushes : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rock Archway (ASra).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ASra")]
+        public class RockArchway : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rock Archway (BSra).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BSra")]
+        public class RockArchwayBSra : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rock Archway Diagonal (ASr1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ASr1")]
+        public class RockArchwayDiagonal : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rock Archway Diagonal (BSr1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BSr1")]
+        public class RockArchwayDiagonalBSr1 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rock Archway Diagonal (LSr1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSr1")]
+        public class RockArchwayDiagonalLSr1 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rock Archway (LSra).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSra")]
+        public class RockArchwayLSra : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rock Magma (ORmk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ORmk")]
+        public class RockMagma : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rock Pillar (BRrp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BRrp")]
+        public class RockPillar : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rock Spires (BRrs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BRrs")]
+        public class RockSpires : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rock Spires (CRrs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CRrs")]
+        public class RockSpiresCRrs : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rock Spires (Cinematic) (BRrc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BRrc")]
+        public class RockSpiresCinematic : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rock Spires (ORrs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ORrs")]
+        public class RockSpiresORrs : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rock Spires Small (BRsp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BRsp")]
+        public class RockSpiresSmall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rock Spires Small (ZRsp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZRsp")]
+        public class RockSpiresSmallZRsp : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rock Spires (ZRrs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZRrs")]
+        public class RockSpiresZRrs : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rocks (ARrk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ARrk")]
+        public class Rocks : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rocks (BRrk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BRrk")]
+        public class RocksBRrk : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rocks (CRrk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CRrk")]
+        public class RocksCRrk : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rocks Cluster Floating (OZfc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OZfc")]
+        public class RocksClusterFloating : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rocks (DRrk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DRrk")]
+        public class RocksDRrk : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rocks Floating (ORfk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ORfk")]
+        public class RocksFloating : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rocks (GRrk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("GRrk")]
+        public class RocksGRrk : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rocks (IRrk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IRrk")]
+        public class RocksIRrk : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rocks (LRrk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LRrk")]
+        public class RocksLRrk : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rocks (NRrk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NRrk")]
+        public class RocksNRrk : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rocks (ORrk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ORrk")]
+        public class RocksORrk : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rocks Webbed (NRwr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NRwr")]
+        public class RocksWebbed : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rocks (ZRrk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZRrk")]
+        public class RocksZRrk : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rope Bridge (UCrb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCrb")]
+        public class RopeBridge : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rowboat (NWrw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NWrw")]
+        public class Rowboat : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rowboat Destroyed (NWrd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NWrd")]
+        public class RowboatDestroyed : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rubble (ASbr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ASbr")]
+        public class Rubble : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rubble (CSbr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CSbr")]
+        public class RubbleCSbr : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rubble (ISrb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ISrb")]
+        public class RubbleISrb : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rubble Large (ZRbd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZRbd")]
+        public class RubbleLarge : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rubble (NSrb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NSrb")]
+        public class RubbleNSrb : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rubble (ORrr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ORrr")]
+        public class RubbleORrr : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Rubble Small (ZRbs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZRbs")]
+        public class RubbleSmall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Arch (BSar).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BSar")]
+        public class RuinedArch : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Chunk (BSrc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BSrc")]
+        public class RuinedChunk : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined City Cliff (East) (YCd2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCd2")]
+        public class RuinedCityCliffEast : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined City Cliff (North) (YCd1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCd1")]
+        public class RuinedCityCliffNorth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined City Cliff Short (East) (YCt2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCt2")]
+        public class RuinedCityCliffShortEast : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined City Cliff Short (North) (YCt1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCt1")]
+        public class RuinedCityCliffShortNorth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined City Cliff Short (South) (YCt3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCt3")]
+        public class RuinedCityCliffShortSouth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined City Cliff Short (West) (YCt4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCt4")]
+        public class RuinedCityCliffShortWest : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined City Cliff (South) (YCd3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCd3")]
+        public class RuinedCityCliffSouth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined City Cliff (West) (YCd4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCd4")]
+        public class RuinedCityCliffWest : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Crystal Tower (ZOrc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOrc")]
+        public class RuinedCrystalTower : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Curved Wall (BSrv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BSrv")]
+        public class RuinedCurvedWall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Double Base (ZOt2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOt2")]
+        public class RuinedDoubleBase : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Double Base (ZOtb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOtb")]
+        public class RuinedDoubleBaseZOtb : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Goblin Shipyard (LSrg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSrg")]
+        public class RuinedGoblinShipyard : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Ground (2x2) (YCx1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCx1")]
+        public class RuinedGround2x2 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Ground (2x2) (YCx2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCx2")]
+        public class RuinedGround2x2YCx2 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Ground (2x2) (YCx3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCx3")]
+        public class RuinedGround2x2YCx3 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Ground (2x2) (YCx4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCx4")]
+        public class RuinedGround2x2YCx4 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Ground (4x2) (YCx7).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCx7")]
+        public class RuinedGround4x2 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Ground (4x2) (YCx8).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCx8")]
+        public class RuinedGround4x2YCx8 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Ground (4x4) (YCx5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCx5")]
+        public class RuinedGround4x4 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Ground (4x4) (YCx6).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCx6")]
+        public class RuinedGround4x4YCx6 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined House (UFrh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UFrh")]
+        public class RuinedHouse : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Natural Cliff (East) (YCp2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCp2")]
+        public class RuinedNaturalCliffEast : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Natural Cliff (North) (YCp1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCp1")]
+        public class RuinedNaturalCliffNorth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Natural Cliff Short (East) (YCl2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCl2")]
+        public class RuinedNaturalCliffShortEast : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Natural Cliff Short (North) (YCl1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCl1")]
+        public class RuinedNaturalCliffShortNorth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Natural Cliff Short (South) (YCl3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCl3")]
+        public class RuinedNaturalCliffShortSouth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Natural Cliff Short (West) (YCl4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCl4")]
+        public class RuinedNaturalCliffShortWest : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Natural Cliff (South) (YCp3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCp3")]
+        public class RuinedNaturalCliffSouth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Natural Cliff (West) (YCp4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCp4")]
+        public class RuinedNaturalCliffWest : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Ship (AZrf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("AZrf")]
+        public class RuinedShip : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Tower (ZOd2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOd2")]
+        public class RuinedTower : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Tower Base (ZOrb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOrb")]
+        public class RuinedTowerBase : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Tower (ZOdt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOdt")]
+        public class RuinedTowerZOdt : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruined Wall (BSrw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BSrw")]
+        public class RuinedWall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruins (ZSrb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZSrb")]
+        public class Ruins : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruins Bloody Altar (ZOba).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOba")]
+        public class RuinsBloodyAltar : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruins Brazier (ZObz).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZObz")]
+        public class RuinsBrazier : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruins Broken Statue (ZOsb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOsb")]
+        public class RuinsBrokenStatue : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruins Firepot (ZOfp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOfp")]
+        public class RuinsFirepot : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruins Fountain (ZOfo).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOfo")]
+        public class RuinsFountain : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruins Library Shelf (ZOls).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOls")]
+        public class RuinsLibraryShelf : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruins Obelisk (ZOob).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOob")]
+        public class RuinsObelisk : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruins Pillars (ZOrp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOrp")]
+        public class RuinsPillars : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruins Statue (ZOst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOst")]
+        public class RuinsStatue : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruins Stones (ZOss).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOss")]
+        public class RuinsStones : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruins Throne (ZOrt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOrt")]
+        public class RuinsThrone : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ruins Trash (ZOtr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOtr")]
+        public class RuinsTrash : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Runes (KOdr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("KOdr")]
+        public class Runes : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Runeweaver Square Fountain (RSf0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("RSf0")]
+        public class RuneweaverSquareFountain : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Scaffolding (EOcr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EOcr")]
+        public class Scaffolding : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Scarecrow (YOsc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOsc")]
+        public class Scarecrow : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>ScarletCrusadeStandingBanners (SCsb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SCsb")]
+        public class ScarletCrusadeStandingBanners : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Seaweed (ZWsw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZWsw")]
+        public class Seaweed : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Sewer Vents (DOsv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOsv")]
+        public class SewerVents : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Sewer Wallpipes (DOsw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOsw")]
+        public class SewerWallpipes : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Shadow Blocker (Yosh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("Yosh")]
+        public class ShadowBlocker : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Shells (ZOsh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZOsh")]
+        public class Shells : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Shimmering Portal (OZsp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OZsp")]
+        public class ShimmeringPortal : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ship (NWsp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NWsp")]
+        public class Ship : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Ship Destroyed (NWsd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NWsd")]
+        public class ShipDestroyed : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Shipyard Crane (EOsk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EOsk")]
+        public class ShipyardCrane : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Shrub (ZPsh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZPsh")]
+        public class Shrub : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Sign Bob's Guns (YObg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YObg")]
+        public class SignBobsGuns : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Sign Tavern (YOts).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOts")]
+        public class SignTavern : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Sign Tracey's Armory (YOta).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOta")]
+        public class SignTraceysArmory : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>SilverHandStandingBanners (SHsb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SHsb")]
+        public class SilverHandStandingBanners : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Archway (SA00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SA00")]
+        public class SilvermoonArchway : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Archway (45) (SA01).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SA01")]
+        public class SilvermoonArchway45 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Archway Entrance (SAe0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SAe0")]
+        public class SilvermoonArchwayEntrance : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Archway Entrance (45) (SAe1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SAe1")]
+        public class SilvermoonArchwayEntrance45 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Buildings (Diagonal 1) (SRbc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SRbc")]
+        public class SilvermoonBuildingsDiagonal1 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Buildings (Diagonal 2) (SRbe).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SRbe")]
+        public class SilvermoonBuildingsDiagonal2 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Buildings (Horizontal) (SRbh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SRbh")]
+        public class SilvermoonBuildingsHorizontal : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Buildings (Vertical) (SRbv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SRbv")]
+        public class SilvermoonBuildingsVertical : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Tower (Large) (STdl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("STdl")]
+        public class SilvermoonTowerLarge : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Tower (Medium) (STdm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("STdm")]
+        public class SilvermoonTowerMedium : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Tower (Small) (STds).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("STds")]
+        public class SilvermoonTowerSmall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Tower (X-Large) (LSt0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSt0")]
+        public class SilvermoonTowerXLarge : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Wall (SWs0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SWs0")]
+        public class SilvermoonWall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Wall Corner (SWc0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SWc0")]
+        public class SilvermoonWallCorner : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Wall Door (SWsd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SWsd")]
+        public class SilvermoonWallDoor : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Wall Door (Short) (SWse).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SWse")]
+        public class SilvermoonWallDoorShort : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Wall Endcap (SWe0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SWe0")]
+        public class SilvermoonWallEndcap : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Wall (Long) (SWsl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SWsl")]
+        public class SilvermoonWallLong : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Wall (Short) (SWss).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SWss")]
+        public class SilvermoonWallShort : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Silvermoon Wall_T (SWt0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SWt0")]
+        public class SilvermoonWallT : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Simple Rocks (LRsr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LRsr")]
+        public class SimpleRocks : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Skull (OOsk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OOsk")]
+        public class Skull : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Skull Pile (LOsk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOsk")]
+        public class SkullPile : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Skull Torch (IOst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IOst")]
+        public class SkullTorch : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Skulls on Sticks (LOss).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOss")]
+        public class SkullsOnSticks : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Slide City Cliff (East) (YCs2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCs2")]
+        public class SlideCityCliffEast : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Slide City Cliff (North) (YCs1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCs1")]
+        public class SlideCityCliffNorth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Slide City Cliff Short (East) (YCo2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCo2")]
+        public class SlideCityCliffShortEast : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Slide City Cliff Short (North) (YCo1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCo1")]
+        public class SlideCityCliffShortNorth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Slide City Cliff Short (South) (YCo3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCo3")]
+        public class SlideCityCliffShortSouth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Slide City Cliff Short (West) (YCo4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCo4")]
+        public class SlideCityCliffShortWest : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Slide City Cliff (South) (YCs3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCs3")]
+        public class SlideCityCliffSouth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Slide City Cliff (West) (YCs4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCs4")]
+        public class SlideCityCliffWest : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Slide Natural Cliff (East) (YCg2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCg2")]
+        public class SlideNaturalCliffEast : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Slide Natural Cliff (North) (YCg1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCg1")]
+        public class SlideNaturalCliffNorth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Slide Natural Cliff Short (East) (YCu2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCu2")]
+        public class SlideNaturalCliffShortEast : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Slide Natural Cliff Short (North) (YCu1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCu1")]
+        public class SlideNaturalCliffShortNorth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Slide Natural Cliff Short (South) (YCu3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCu3")]
+        public class SlideNaturalCliffShortSouth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Slide Natural Cliff Short (West) (YCu4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCu4")]
+        public class SlideNaturalCliffShortWest : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Slide Natural Cliff (South) (YCg3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCg3")]
+        public class SlideNaturalCliffSouth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Slide Natural Cliff (West) (YCg4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCg4")]
+        public class SlideNaturalCliffWest : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Smithy Tools (EOst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("EOst")]
+        public class SmithyTools : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Smoke Smudge (LOsm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOsm")]
+        public class SmokeSmudge : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Snowman (IOsm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IOsm")]
+        public class Snowman : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Snowy Rock (IRrs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IRrs")]
+        public class SnowyRock : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Spider Web (YOsp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOsp")]
+        public class SpiderWeb : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Stair (LCst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCst")]
+        public class Stair : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Stairsteps (LOst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOst")]
+        public class Stairsteps : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Stake (OOst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OOst")]
+        public class Stake : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Stalagmite (DRst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DRst")]
+        public class Stalagmite : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Stalagmite (GRst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("GRst")]
+        public class StalagmiteGRst : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Standard (OOsd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("OOsd")]
+        public class Standard : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Statue (YOst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOst")]
+        public class Statue : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Statue Black Citadel (KOst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("KOst")]
+        public class StatueBlackCitadel : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Statue Broken (LCsb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCsb")]
+        public class StatueBroken : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Statue Guardian of Aszune (AOgs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("AOgs")]
+        public class StatueGuardianOfAszune : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Statue Ice Spider (IOsl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IOsl")]
+        public class StatueIceSpider : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Statue Keeper (AOks).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("AOks")]
+        public class StatueKeeper : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Statue of Azshara (DOas).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOas")]
+        public class StatueOfAzshara : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Statue of Azshara (SA02).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SA02")]
+        public class StatueOfAzsharaSA02 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Statue Shield (LCsd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCsd")]
+        public class StatueShield : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Statue Shield Base (Lcsy).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("Lcsy")]
+        public class StatueShieldBase : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Statue Shieldless (YOks).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOks")]
+        public class StatueShieldless : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Statue Sword (LCss).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCss")]
+        public class StatueSword : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Statue Sword Base (LCsx).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCsx")]
+        public class StatueSwordBase : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Statue White (YOws).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOws")]
+        public class StatueWhite : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Strahnbrad Clock Tower (SCt0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SCt0")]
+        public class StrahnbradClockTower : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Strahnbrad Large Tree (SLt0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SLt0")]
+        public class StrahnbradLargeTree : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Stump Hollow (AOhs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("AOhs")]
+        public class StumpHollow : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Stump Hollow (COhs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("COhs")]
+        public class StumpHollowCOhs : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Summer Grass (LSga).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSga")]
+        public class SummerGrass : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Sun Well (YOsw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOsw")]
+        public class SunWell : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Sunfury Spire Main Tower (SSmt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SSmt")]
+        public class SunfurySpireMainTower : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Sunfury Spire Side Tower (SSst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SSst")]
+        public class SunfurySpireSideTower : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Sunken Ruins Tree (Indestructible) (ZPtw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZPtw")]
+        public class SunkenRuinsTreeIndestructible : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Sunreaver Archway (SA03).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SA03")]
+        public class SunreaverArchway : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Sunreaver Dome (SD00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SD00")]
+        public class SunreaverDome : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Sunreaver Dome (Small) (SDs0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SDs0")]
+        public class SunreaverDomeSmall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Sunreaver Spire (SS00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("SS00")]
+        public class SunreaverSpire : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Table (DOtb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOtb")]
+        public class Table : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Table and Chair (DOtc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOtc")]
+        public class TableAndChair : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Table Torture (DOtt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DOtt")]
+        public class TableTorture : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Tavern (YSta).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSta")]
+        public class Tavern : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Team Color Standing Banners (TCsb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("TCsb")]
+        public class TeamColorStandingBanners : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Terenas (LCtr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCtr")]
+        public class Terenas : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Terenas Crown (LCtc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCtc")]
+        public class TerenasCrown : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>The Frozen Throne (IZft).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("IZft")]
+        public class TheFrozenThrone : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Thrall's Hut (LZth).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LZth")]
+        public class ThrallsHut : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Throne (BOth).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BOth")]
+        public class Throne : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>ThroneRoom Hero Floor (LChf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LChf")]
+        public class ThroneRoomHeroFloor : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Throne (YOth).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOth")]
+        public class ThroneYOth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Throneroom Banner Large (LCb1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCb1")]
+        public class ThroneroomBannerLarge : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Throneroom Banner Large Half (LCb8).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCb8")]
+        public class ThroneroomBannerLargeHalf : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Throneroom Banner Medium 01 (LCb2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCb2")]
+        public class ThroneroomBannerMedium01 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Throneroom Banner Medium 02 (LCb3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCb3")]
+        public class ThroneroomBannerMedium02 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Throneroom Banner Small (LCb6).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCb6")]
+        public class ThroneroomBannerSmall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Throneroom Sculpture (LCsc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCsc")]
+        public class ThroneroomSculpture : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Throneroom Wall BackEnd (LCtb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCtb")]
+        public class ThroneroomWallBackEnd : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Throneroom Wall Balcony (LCtw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCtw")]
+        public class ThroneroomWallBalcony : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Throneroom Wall Entrance (LCte).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LCte")]
+        public class ThroneroomWallEntrance : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Tombstone (NOtb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NOtb")]
+        public class Tombstone : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Torch (LOth).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOth")]
+        public class Torch : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Torch Glowing (LOtz).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOtz")]
+        public class TorchGlowing : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Totem Centaur (BOct).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BOct")]
+        public class TotemCentaur : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Totem Lantern (AOnt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("AOnt")]
+        public class TotemLantern : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Totem Tauren (BOtt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("BOtt")]
+        public class TotemTauren : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Tower Scorched (LSst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSst")]
+        public class TowerScorched : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Trap Fire (YOf2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOf2")]
+        public class TrapFire : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Trap Frost (YOr2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOr2")]
+        public class TrapFrost : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Trap Side Fire (YOf1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOf1")]
+        public class TrapSideFire : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Trap Side Frost (YOr1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOr1")]
+        public class TrapSideFrost : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Trap Side Steam (YOs1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOs1")]
+        public class TrapSideSteam : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Trap Steam (YOs2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOs2")]
+        public class TrapSteam : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Trash (LOt1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOt1")]
+        public class Trash : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Treasure Chest (YOtc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YOtc")]
+        public class TreasureChest : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Tree Planter (YPtp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YPtp")]
+        public class TreePlanter : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Trough (LOtr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOtr")]
+        public class Trough : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Tulips (ZPf0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZPf0")]
+        public class Tulips : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undead Lab (UCul).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCul")]
+        public class UndeadLab : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Arch A (UCaa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCaa")]
+        public class UndercityArchA : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Bone Deco (UObd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UObd")]
+        public class UndercityBoneDeco : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Bridge A (USba).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("USba")]
+        public class UndercityBridgeA : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Chair (UOch).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UOch")]
+        public class UndercityChair : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Deco (UOdc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UOdc")]
+        public class UndercityDeco : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Door (UOdo).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UOdo")]
+        public class UndercityDoor : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Door B (UOdt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UOdt")]
+        public class UndercityDoorB : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Doorway A (UOda).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UOda")]
+        public class UndercityDoorwayA : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Floor A (USfa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("USfa")]
+        public class UndercityFloorA : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Floor B (USfb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("USfb")]
+        public class UndercityFloorB : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Floor Deco (UOfd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UOfd")]
+        public class UndercityFloorDeco : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Gate A (UOga).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UOga")]
+        public class UndercityGateA : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Grate Door (UOgd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UOgd")]
+        public class UndercityGrateDoor : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Grate Floor (UOgr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UOgr")]
+        public class UndercityGrateFloor : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Lantern (UClt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UClt")]
+        public class UndercityLantern : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Outer Ring (USta).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("USta")]
+        public class UndercityOuterRing : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Pillar A (UOpa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UOpa")]
+        public class UndercityPillarA : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Pillar B (UOpb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UOpb")]
+        public class UndercityPillarB : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Pillar C (UOpc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UOpc")]
+        public class UndercityPillarC : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Pillar D (UOpd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UOpd")]
+        public class UndercityPillarD : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Tower B (UStb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UStb")]
+        public class UndercityTowerB : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Trap Floor (UStf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UStf")]
+        public class UndercityTrapFloor : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Undercity Wall A (USwa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("USwa")]
+        public class UndercityWallA : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Underground Dome (JZud).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("JZud")]
+        public class UndergroundDome : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Underground Simple Rock (UGsr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UGsr")]
+        public class UndergroundSimpleRock : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>UtherTome (CNut).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CNut")]
+        public class UtherTome : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>UtherTomeClosed (CNuc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("CNuc")]
+        public class UtherTomeClosed : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Vines Cliffside (ZCv1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZCv1")]
+        public class VinesCliffside : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Vines Cliffside (ZCv2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZCv2")]
+        public class VinesCliffsideZCv2 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Vines Thorny (APtv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("APtv")]
+        public class VinesThorny : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Vines Thorny (NPth).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NPth")]
+        public class VinesThornyNPth : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Viny Plant (ZPvp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ZPvp")]
+        public class VinyPlant : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Violet Hold Archway Endpiece (VHae).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("VHae")]
+        public class VioletHoldArchwayEndpiece : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>VioletHoldMainStructure (VHms).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("VHms")]
+        public class VioletHoldMainStructure : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Violet Hold Spire (VHs0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("VHs0")]
+        public class VioletHoldSpire : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Violet Hold Spire (Small) (VHss).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("VHss")]
+        public class VioletHoldSpireSmall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Volumetric Fog (UOvf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UOvf")]
+        public class VolumetricFog : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall 90 Degree (WD00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("WD00")]
+        public class Wall90Degree : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Barred Large (DSp9).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DSp9")]
+        public class WallBarredLarge : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Barred Large (GSp9).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("GSp9")]
+        public class WallBarredLargeGSp9 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Barred Small (DSp0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("DSp0")]
+        public class WallBarredSmall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Barred Small (GSp0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("GSp0")]
+        public class WallBarredSmallGSp0 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Corner (YSw4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSw4")]
+        public class WallCorner : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Corner 2nd Floor (YSs1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSs1")]
+        public class WallCorner2ndFloor : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Corner (Alt) (YSw7).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSw7")]
+        public class WallCornerAlt : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Corner Alt 2nd Floor (YSs2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSs2")]
+        public class WallCornerAlt2ndFloor : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Curve (UCwc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCwc")]
+        public class WallCurve : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Door (YSwD).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSwD")]
+        public class WallDoor : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Door (Short) (YSwE).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSwE")]
+        public class WallDoorShort : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall End Lantern (YSll).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSll")]
+        public class WallEndLantern : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall End Lantern No Light (YSlx).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSlx")]
+        public class WallEndLanternNoLight : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall End Short (YSls).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSls")]
+        public class WallEndShort : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall End Tall (YSlt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSlt")]
+        public class WallEndTall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Endcap (WE00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("WE00")]
+        public class WallEndcap : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Endcap (Entrance) (YSwC).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSwC")]
+        public class WallEndcapEntrance : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Endcap (YSw5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSw5")]
+        public class WallEndcapYSw5 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Entrance Grateless (YSsd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSsd")]
+        public class WallEntranceGrateless : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Fountain (LOwf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOwf")]
+        public class WallFountain : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Low (Diagonal 1) (YSw1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSw1")]
+        public class WallLowDiagonal1 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Low (Diagonal 2) (YSw3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSw3")]
+        public class WallLowDiagonal2 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Low (Horizontal) (YSw0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSw0")]
+        public class WallLowHorizontal : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Low (Vertical) (YSw2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSw2")]
+        public class WallLowVertical : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Spire (WS01).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("WS01")]
+        public class WallSpire : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Spire Alt (WSa0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("WSa0")]
+        public class WallSpireAlt : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Stone (LOsw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOsw")]
+        public class WallStone : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Straight (UCws).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCws")]
+        public class WallStraight : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Straight 2nd Floor (YSs3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSs3")]
+        public class WallStraight2ndFloor : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Straight Broken (YSs6).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSs6")]
+        public class WallStraightBroken : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Straight Broken 2nd Floor (YSs7).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSs7")]
+        public class WallStraightBroken2ndFloor : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Straight Half (UCwh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCwh")]
+        public class WallStraightHalf : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Straight Long (WSl0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("WSl0")]
+        public class WallStraightLong : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Straight Long 2nd Floor (YSs4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSs4")]
+        public class WallStraightLong2ndFloor : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Straight Long Half (UCwx).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCwx")]
+        public class WallStraightLongHalf : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Straight (Long) (YSw8).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSw8")]
+        public class WallStraightLongYSw8 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Straight Short (WSs0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("WSs0")]
+        public class WallStraightShort : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Straight Short 2nd Floor (YSs5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSs5")]
+        public class WallStraightShort2ndFloor : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Straight Short Half (UCwy).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UCwy")]
+        public class WallStraightShortHalf : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Straight (Short) (YSw9).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSw9")]
+        public class WallStraightShortYSw9 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Straight (Tee) (YSwA).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSwA")]
+        public class WallStraightTee : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Straight (Tee Alt) (YSwB).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSwB")]
+        public class WallStraightTeeAlt : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Straight (WS00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("WS00")]
+        public class WallStraightWS00 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall Straight (YSw6).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YSw6")]
+        public class WallStraightYSw6 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall T (WT00).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("WT00")]
+        public class WallT : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wall T Alt (WTa0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("WTa0")]
+        public class WallTAlt : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Water (YCwa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCwa")]
+        public class Water : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Waterfall (LWw0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LWw0")]
+        public class Waterfall : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Well (LSwl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSwl")]
+        public class Well : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Whale (NWwh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("NWwh")]
+        public class Whale : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wheat (LPwh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LPwh")]
+        public class Wheat : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wheat Bunch (LPwb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LPwb")]
+        public class WheatBunch : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wheelbarrow (LOwb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOwb")]
+        public class Wheelbarrow : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wheelbarrow Broken (LOwr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LOwr")]
+        public class WheelbarrowBroken : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>White Box (UOwb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UOwb")]
+        public class WhiteBox : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Windmill (LSwm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSwm")]
+        public class Windmill : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Windmill Burned (LSwb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("LSwb")]
+        public class WindmillBurned : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wood Debris 01 (YCda).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCda")]
+        public class WoodDebris01 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wood Debris 02 (YCdb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCdb")]
+        public class WoodDebris02 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wood Debris 03 (YCdc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCdc")]
+        public class WoodDebris03 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wood Debris 04 (YCdd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCdd")]
+        public class WoodDebris04 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wood Debris Barrels 01 (YCde).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCde")]
+        public class WoodDebrisBarrels01 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wood Debris Barrels 02 (YCdf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCdf")]
+        public class WoodDebrisBarrels02 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wood Debris Barrels 03 (YCdg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("YCdg")]
+        public class WoodDebrisBarrels03 : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>Wooden Coffin (UOcw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("UOcw")]
+        public class WoodenCoffin : global::Moonwell.Objects.StandardDoodad
+        {
+        }
+
+        /// <summary>World Tree (ASwt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ASwt")]
+        public class WorldTree : global::Moonwell.Objects.StandardDoodad
+        {
+        }
     }
 }
 

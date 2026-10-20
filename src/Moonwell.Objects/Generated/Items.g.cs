@@ -6,4556 +6,4561 @@
 
 #pragma warning disable CS8981 // a type name of lower-case letters only is the id of an object with no name
 
-namespace Moonwell.Objects.Items
+namespace Moonwell.Objects
 {
-    /// <summary>Alleria's Flute of Accuracy (afac).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("afac")]
-    public class AlleriasFluteOfAccuracy : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Amulet of Recall (amrc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("amrc")]
-    public class AmuletOfRecall : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Amulet of Spell Shield (spsh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("spsh")]
-    public class AmuletOfSpellShield : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Amulet of the Wild (wild).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("wild")]
-    public class AmuletOfTheWild : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ancestral Staff (axas).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("axas")]
-    public class AncestralStaff : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ancient Figurine (anfg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("anfg")]
-    public class AncientFigurine : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ancient Janggo of Endurance (ajen).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ajen")]
-    public class AncientJanggoOfEndurance : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ankh of Reincarnation (ankh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ankh")]
-    public class AnkhOfReincarnation : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Anti-magic Potion (pams).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("pams")]
-    public class AntiMagicPotion : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Arcane Scroll (arsc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("arsc")]
-    public class ArcaneScroll : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Arcanite Shield (arsh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("arsh")]
-    public class ArcaniteShield : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Assassin's Blade (asbl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("asbl")]
-    public class AssassinsBlade : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Battle Standard (btst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("btst")]
-    public class BattleStandard : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Belt of Giant Strength +6 (bgst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("bgst")]
-    public class BeltOfGiantStrength6 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Bladebane Armor (blba).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("blba")]
-    public class BladebaneArmor : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Blood Key (kybl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("kybl")]
-    public class BloodKey : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Bloodfeather's Heart (bfhr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("bfhr")]
-    public class BloodfeathersHeart : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Blue Drake Egg (fgbd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("fgbd")]
-    public class BlueDrakeEgg : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Book of the Dead (fgsk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("fgsk")]
-    public class BookOfTheDead : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Boots of Quel'Thalas +6 (belv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("belv")]
-    public class BootsOfQuelThalas6 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Boots of Speed (bspd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("bspd")]
-    public class BootsOfSpeed : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Bracer of Agility (brag).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("brag")]
-    public class BracerOfAgility : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Bundle of Lumber (lmbr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("lmbr")]
-    public class BundleOfLumber : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Celestial Orb of Souls (cosl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cosl")]
-    public class CelestialOrbOfSouls : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Abomination's Hook|r (epah).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epah")]
-    public class Cff40da00AbominationsHookR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Agus's Shambling Hand|r (eash).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eash")]
-    public class Cff40da00AgussShamblingHandR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Ancient Bronze Helmet|r (eabh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eabh")]
-    public class Cff40da00AncientBronzeHelmetR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Anya's Backpack|r (ebua).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebua")]
-    public class Cff40da00AnyasBackpackR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Armor of the Scarlet Crusade|r (easc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("easc")]
-    public class Cff40da00ArmorOfTheScarletCrusadeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Backpack|r (ebac).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebac")]
-    public class Cff40da00BackpackR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Bandit Mask|r (ehbm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehbm")]
-    public class Cff40da00BanditMaskR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Blacksmith's Apron|r (eaba).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eaba")]
-    public class Cff40da00BlacksmithsApronR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Blade Dancer's Greaves|r (ebdg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebdg")]
-    public class Cff40da00BladeDancersGreavesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Blightweaver Boots|r (ebwb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebwb")]
-    public class Cff40da00BlightweaverBootsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Blue Dragon Figurine|r (ebdf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebdf")]
-    public class Cff40da00BlueDragonFigurineR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Bone Cage Breastplate|r (ebcb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebcb")]
-    public class Cff40da00BoneCageBreastplateR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Bone Staff|r (esbs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("esbs")]
-    public class Cff40da00BoneStaffR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Boots of Haste|r (rcdr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rcdr")]
-    public class Cff40da00BootsOfHasteR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Boots of the Forsaken|r (ebof).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebof")]
-    public class Cff40da00BootsOfTheForsakenR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Boots of the Warm Hearth|r (ebwh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebwh")]
-    public class Cff40da00BootsOfTheWarmHearthR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Bramblethorn Vestments|r (ebtv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebtv")]
-    public class Cff40da00BramblethornVestmentsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Caged Soul|r (ercs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ercs")]
-    public class Cff40da00CagedSoulR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Citrine Adorned Boots|r (ecab).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecab")]
-    public class Cff40da00CitrineAdornedBootsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Crusader's Gauntlets|r (egcg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egcg")]
-    public class Cff40da00CrusadersGauntletsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Dalaran Sapphire Robes|r (edsr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edsr")]
-    public class Cff40da00DalaranSapphireRobesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Dalaran Signet Ring|r (rspa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rspa")]
-    public class Cff40da00DalaranSignetRingR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Desecrated Tower Shield|r (edts).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edts")]
-    public class Cff40da00DesecratedTowerShieldR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Diamond Staff of Dalaran|r (edds).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edds")]
-    public class Cff40da00DiamondStaffOfDalaranR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Dreaded Chestplate|r (ecdc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecdc")]
-    public class Cff40da00DreadedChestplateR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Elixir of Cunning|r (ccec).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ccec")]
-    public class Cff40da00ElixirOfCunningR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Elixir of Lesser Intelligence|r (celi).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("celi")]
-    public class Cff40da00ElixirOfLesserIntelligenceR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Elixir of the Monster Hunter|r (ccem).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ccem")]
-    public class Cff40da00ElixirOfTheMonsterHunterR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Endless Flask of Restoration|r (eefr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eefr")]
-    public class Cff40da00EndlessFlaskOfRestorationR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Essence of the Spider Queen|r (eesq).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eesq")]
-    public class Cff40da00EssenceOfTheSpiderQueenR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Farstrider's Amulet|r (eaaa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eaaa")]
-    public class Cff40da00FarstridersAmuletR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Flesh Golem Ribcage|r (efgh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("efgh")]
-    public class Cff40da00FleshGolemRibcageR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Forest Ranger's Gloves|r (efrg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("efrg")]
-    public class Cff40da00ForestRangersGlovesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Forsaken Champion's Helm|r (efch).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("efch")]
-    public class Cff40da00ForsakenChampionsHelmR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Forsaken Fangs|r (etff).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("etff")]
-    public class Cff40da00ForsakenFangsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Forsaken Gauntlets|r (egfg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egfg")]
-    public class Cff40da00ForsakenGauntletsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Forsaken Plaguebow|r (efpb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("efpb")]
-    public class Cff40da00ForsakenPlaguebowR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Garek's Backpack|r (ebhg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebhg")]
-    public class Cff40da00GareksBackpackR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Garek's Backpack|r (ebug).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebug")]
-    public class Cff40da00GareksBackpackREbug : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Ghoulish Claw|r (epfc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epfc")]
-    public class Cff40da00GhoulishClawR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Giant Skeleton Bone|r (egsb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egsb")]
-    public class Cff40da00GiantSkeletonBoneR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Gift of Greed|r (ergg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ergg")]
-    public class Cff40da00GiftOfGreedR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Gift of the Wilds|r (egow).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egow")]
-    public class Cff40da00GiftOfTheWildsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Gilnean Battleaxe|r (epgb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epgb")]
-    public class Cff40da00GilneanBattleaxeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Gilnean Headpiece|r (ehgh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehgh")]
-    public class Cff40da00GilneanHeadpieceR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Gloves of Necromancy|r (eggn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eggn")]
-    public class Cff40da00GlovesOfNecromancyR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Gloves of the Battlemage|r (egob).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egob")]
-    public class Cff40da00GlovesOfTheBattlemageR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Gloves of the Phoenix|r (eggp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eggp")]
-    public class Cff40da00GlovesOfThePhoenixR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Gloves of the Scarlet Crusade|r (egsc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egsc")]
-    public class Cff40da00GlovesOfTheScarletCrusadeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Gnoll Warlord Hide|r (egwh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egwh")]
-    public class Cff40da00GnollWarlordHideR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Grieving Blade|r (eogb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eogb")]
-    public class Cff40da00GrievingBladeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Hammer of the Silver Hand|r (ehsh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehsh")]
-    public class Cff40da00HammerOfTheSilverHandR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Heart of the Firelord|r (erhf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("erhf")]
-    public class Cff40da00HeartOfTheFirelordR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Honed Edge|r (erhe).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("erhe")]
-    public class Cff40da00HonedEdgeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Huge Flail|r (ephf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ephf")]
-    public class Cff40da00HugeFlailR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Ilastar's Backpack|r (ebhi).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebhi")]
-    public class Cff40da00IlastarsBackpackR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Intricate Emerald Pendant|r (eiep).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eiep")]
-    public class Cff40da00IntricateEmeraldPendantR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Ironforge Defender|r (eoid).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eoid")]
-    public class Cff40da00IronforgeDefenderR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Jagged Jade Ring|r (ejjr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ejjr")]
-    public class Cff40da00JaggedJadeRingR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Kobold Mining Helm|r (ekmh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ekmh")]
-    public class Cff40da00KoboldMiningHelmR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Landen's Backpack|r (ebhl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebhl")]
-    public class Cff40da00LandensBackpackR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Leonid's Backpack|r (ebul).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebul")]
-    public class Cff40da00LeonidsBackpackR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Lesser Engineering Goggles|r (eeh1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eeh1")]
-    public class Cff40da00LesserEngineeringGogglesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Lion's Heart|r (rrsl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rrsl")]
-    public class Cff40da00LionsHeartR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Magister's Handguards|r (egos).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egos")]
-    public class Cff40da00MagistersHandguardsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Malachite Shortsword|r (eoms).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eoms")]
-    public class Cff40da00MalachiteShortswordR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Mana Bauble|r (etmb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("etmb")]
-    public class Cff40da00ManaBaubleR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Mantle of the Highborne|r (emoh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("emoh")]
-    public class Cff40da00MantleOfTheHighborneR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Mark of the Phoenix|r (etmp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("etmp")]
-    public class Cff40da00MarkOfThePhoenixR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Moonstone Circlet|r (ehmc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehmc")]
-    public class Cff40da00MoonstoneCircletR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Murloc Costume Gloves|r (emcg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("emcg")]
-    public class Cff40da00MurlocCostumeGlovesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Mutated Rat's Whiptail|r (emrw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("emrw")]
-    public class Cff40da00MutatedRatsWhiptailR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Necromancer's Plaguegreaves|r (ebnp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebnp")]
-    public class Cff40da00NecromancersPlaguegreavesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Nevermelting Ice|r (enmi).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("enmi")]
-    public class Cff40da00NevermeltingIceR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Ogre Gauntlets|r (erog).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("erog")]
-    public class Cff40da00OgreGauntletsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Overlord's Sabatons|r (ebos).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebos")]
-    public class Cff40da00OverlordsSabatonsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Phalanx Shield|r (eops).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eops")]
-    public class Cff40da00PhalanxShieldR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Plaguebearer Cuirass|r (epbc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epbc")]
-    public class Cff40da00PlaguebearerCuirassR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Plaguebearer Shortsword|r (epbs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epbs")]
-    public class Cff40da00PlaguebearerShortswordR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Primal Ring of Magic|r (eprm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eprm")]
-    public class Cff40da00PrimalRingOfMagicR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Quarry Pickaxe|r (epqp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epqp")]
-    public class Cff40da00QuarryPickaxeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Ring of Evasion|r (eroe).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eroe")]
-    public class Cff40da00RingOfEvasionR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Ring of Leeching|r (rspv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rspv")]
-    public class Cff40da00RingOfLeechingR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Ring of Mana Efficiency|r (rmef).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rmef")]
-    public class Cff40da00RingOfManaEfficiencyR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Ring of Stone Fortitude|r (ersf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ersf")]
-    public class Cff40da00RingOfStoneFortitudeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Ring of the Runeweaver|r (errw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("errw")]
-    public class Cff40da00RingOfTheRuneweaverR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Robes of the Kirin Tor|r (erkt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("erkt")]
-    public class Cff40da00RobesOfTheKirinTorR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Ruby Necklace of Power|r (ernp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ernp")]
-    public class Cff40da00RubyNecklaceOfPowerR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Rune of Fire|r (erof).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("erof")]
-    public class Cff40da00RuneOfFireR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Seal of Sylvanas|r (esos).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("esos")]
-    public class Cff40da00SealOfSylvanasR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Shamanistic Headwear|r (etbh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("etbh")]
-    public class Cff40da00ShamanisticHeadwearR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Signet of Decay|r (ersd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ersd")]
-    public class Cff40da00SignetOfDecayR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Silverpine Forest Shiv|r (esfs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("esfs")]
-    public class Cff40da00SilverpineForestShivR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Spell Parrying Buckler|r (espb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("espb")]
-    public class Cff40da00SpellParryingBucklerR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Spellbreaker Circlet|r (esbt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("esbt")]
-    public class Cff40da00SpellbreakerCircletR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Spellbreaker's Necklace|r (ersn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ersn")]
-    public class Cff40da00SpellbreakersNecklaceR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Staff of Arcane Hunger|r (esah).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("esah")]
-    public class Cff40da00StaffOfArcaneHungerR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Sticky Slime Ring|r (essr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("essr")]
-    public class Cff40da00StickySlimeRingR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Sucker Punch Gauntlets|r (espg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("espg")]
-    public class Cff40da00SuckerPunchGauntletsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Suspicious Concoction|r (epoa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epoa")]
-    public class Cff40da00SuspiciousConcoctionR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Tactician's Boots|r (ebtb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebtb")]
-    public class Cff40da00TacticiansBootsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Talisman of Nightmares|r (eton).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eton")]
-    public class Cff40da00TalismanOfNightmaresR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Talisman of Willpower|r (etow).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("etow")]
-    public class Cff40da00TalismanOfWillpowerR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Tigerskin Helmet of Precision|r (elhp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("elhp")]
-    public class Cff40da00TigerskinHelmetOfPrecisionR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Tome of Agility|r (ctoa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ctoa")]
-    public class Cff40da00TomeOfAgilityR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Tome of Intelligence|r (ctoi).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ctoi")]
-    public class Cff40da00TomeOfIntelligenceR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Tome of Strength|r (ctos).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ctos")]
-    public class Cff40da00TomeOfStrengthR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Twilight Opal Orb|r (etoo).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("etoo")]
-    public class Cff40da00TwilightOpalOrbR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Undercity Chain Robes|r (eucr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eucr")]
-    public class Cff40da00UndercityChainRobesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Ursoc's Gift|r (erug).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("erug")]
-    public class Cff40da00UrsocsGiftR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Wand of the Battlemage|r (ewob).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ewob")]
-    public class Cff40da00WandOfTheBattlemageR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Wayfarer Greaves|r (ebwg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebwg")]
-    public class Cff40da00WayfarerGreavesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Webweaver's Gloves|r (ewwg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ewwg")]
-    public class Cff40da00WebweaversGlovesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Wicked Fang Blade|r (ewfb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ewfb")]
-    public class Cff40da00WickedFangBladeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff40da00Wildhammer Breastplate|r (esib).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("esib")]
-    public class Cff40da00WildhammerBreastplateR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Aegis|r (elae).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("elae")]
-    public class Cff6295E3AegisR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Agitating Totem|r (eagt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eagt")]
-    public class Cff6295E3AgitatingTotemR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Arcane Spellblade|r (easb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("easb")]
-    public class Cff6295E3ArcaneSpellbladeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Band of the Sin'dorei|r (ebsd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebsd")]
-    public class Cff6295E3BandOfTheSindoreiR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Blade of Corruption|r (eboc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eboc")]
-    public class Cff6295E3BladeOfCorruptionR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Blade of Frozen Hunger|r (ebfh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebfh")]
-    public class Cff6295E3BladeOfFrozenHungerR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Bone Commander's Skull|r (ebcs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebcs")]
-    public class Cff6295E3BoneCommandersSkullR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Boots of the Icewalker|r (eboi).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eboi")]
-    public class Cff6295E3BootsOfTheIcewalkerR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Boots of the Scarlet Crusade|r (ebsc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebsc")]
-    public class Cff6295E3BootsOfTheScarletCrusadeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Bottled Storm|r (etbs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("etbs")]
-    public class Cff6295E3BottledStormR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Breastplate of the Scarlet Paladin|r (ebsp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebsp")]
-    public class Cff6295E3BreastplateOfTheScarletPaladinR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Butcher's Cleaver|r (ebut).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebut")]
-    public class Cff6295E3ButchersCleaverR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Captain's Helmet of Bravery|r (elvl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("elvl")]
-    public class Cff6295E3CaptainsHelmetOfBraveryR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Coldbringer's Reach|r (ecbr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecbr")]
-    public class Cff6295E3ColdbringersReachR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Corrupted Greatsword|r (epcg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epcg")]
-    public class Cff6295E3CorruptedGreatswordR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Crimson Helm of Opportunity|r (ehco).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehco")]
-    public class Cff6295E3CrimsonHelmOfOpportunityR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Crown of the Resolute Monarch|r (ecrm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecrm")]
-    public class Cff6295E3CrownOfTheResoluteMonarchR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Cursed Golden Ring|r (ecgr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecgr")]
-    public class Cff6295E3CursedGoldenRingR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Dark Iron Breastplate|r (edib).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edib")]
-    public class Cff6295E3DarkIronBreastplateR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Dark Iron Gauntlets|r (edig).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edig")]
-    public class Cff6295E3DarkIronGauntletsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Dark Iron Greaves|r (edif).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edif")]
-    public class Cff6295E3DarkIronGreavesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Dark Iron Helm|r (edih).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edih")]
-    public class Cff6295E3DarkIronHelmR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Dark Iron Shield|r (edis).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edis")]
-    public class Cff6295E3DarkIronShieldR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Dark Ranger's Bracers|r (edrb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edrb")]
-    public class Cff6295E3DarkRangersBracersR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Dark Ranger's Chestguard|r (edrc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edrc")]
-    public class Cff6295E3DarkRangersChestguardR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Dark Ranger's Hood|r (edrh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edrh")]
-    public class Cff6295E3DarkRangersHoodR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Dark Ranger's Insignia|r (edri).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edri")]
-    public class Cff6295E3DarkRangersInsigniaR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Dark Ranger's Shadows|r (edrs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edrs")]
-    public class Cff6295E3DarkRangersShadowsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Deathbloom Leaves|r (edbl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edbl")]
-    public class Cff6295E3DeathbloomLeavesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Deathbringer's Boots|r (edbb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edbb")]
-    public class Cff6295E3DeathbringersBootsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Deathwalkers|r (ebdw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebdw")]
-    public class Cff6295E3DeathwalkersR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Deathwhisper|r (epdw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epdw")]
-    public class Cff6295E3DeathwhisperR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Deepsea Bag|r (edbw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edbw")]
-    public class Cff6295E3DeepseaBagR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Demonic Warglaives|r (edwg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edwg")]
-    public class Cff6295E3DemonicWarglaivesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Drained Bloodstone|r (edbs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edbs")]
-    public class Cff6295E3DrainedBloodstoneR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Druidic Leafguard|r (ecdl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecdl")]
-    public class Cff6295E3DruidicLeafguardR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Echoes of the Fallen|r (eref).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eref")]
-    public class Cff6295E3EchoesOfTheFallenR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Elixir of Greater Intelligence|r (cegi).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cegi")]
-    public class Cff6295E3ElixirOfGreaterIntelligenceR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Enchanted Inscription Tools|r (eeit).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eeit")]
-    public class Cff6295E3EnchantedInscriptionToolsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Energy Band|r (ereb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ereb")]
-    public class Cff6295E3EnergyBandR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Frenzied Ghoul Claws|r (efgc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("efgc")]
-    public class Cff6295E3FrenziedGhoulClawsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Gift of Sloth|r (ergs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ergs")]
-    public class Cff6295E3GiftOfSlothR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Gift of Wrath|r (ergw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ergw")]
-    public class Cff6295E3GiftOfWrathR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Gloves of Perfection|r (egop).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egop")]
-    public class Cff6295E3GlovesOfPerfectionR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Gloves of the Deathbringer|r (egdb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egdb")]
-    public class Cff6295E3GlovesOfTheDeathbringerR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Gnomish Zapper X-4000|r (egzx).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egzx")]
-    public class Cff6295E3GnomishZapperX4000R : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Greater Engineering Goggles|r (eeh2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eeh2")]
-    public class Cff6295E3GreaterEngineeringGogglesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Heart of the Lake|r (ehol).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehol")]
-    public class Cff6295E3HeartOfTheLakeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Helm of the Cenarion Circle|r (ehcc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehcc")]
-    public class Cff6295E3HelmOfTheCenarionCircleR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Helm of the Iron Guardian|r (ehig).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehig")]
-    public class Cff6295E3HelmOfTheIronGuardianR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Helm of the Rimelord|r (ehrl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehrl")]
-    public class Cff6295E3HelmOfTheRimelordR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Helm of the Scarlet Captain|r (ehsc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehsc")]
-    public class Cff6295E3HelmOfTheScarletCaptainR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Horn of the Lost Spirits|r (ehls).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehls")]
-    public class Cff6295E3HornOfTheLostSpiritsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Huge Citrine of the Fierce|r (ehcf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehcf")]
-    public class Cff6295E3HugeCitrineOfTheFierceR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Ice Cold Diamond|r (eicd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eicd")]
-    public class Cff6295E3IceColdDiamondR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Immortal Guardian's Chestplate|r (ecig).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecig")]
-    public class Cff6295E3ImmortalGuardiansChestplateR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Infectious Ghoul Charm|r (eigc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eigc")]
-    public class Cff6295E3InfectiousGhoulCharmR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Knight's Javelin|r (etkj).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("etkj")]
-    public class Cff6295E3KnightsJavelinR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Kris, the Everburning|r (eske).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eske")]
-    public class Cff6295E3KrisTheEverburningR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Lance of the Dawn|r (elod).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("elod")]
-    public class Cff6295E3LanceOfTheDawnR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Lich Orb|r (eslo).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eslo")]
-    public class Cff6295E3LichOrbR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Lordaeron Shield|r (esls).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("esls")]
-    public class Cff6295E3LordaeronShieldR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Lost Forsaken Quiver|r (elfq).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("elfq")]
-    public class Cff6295E3LostForsakenQuiverR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Manuscript of the Forsaken|r (emof).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("emof")]
-    public class Cff6295E3ManuscriptOfTheForsakenR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Mograine's Might|r (epmb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epmb")]
-    public class Cff6295E3MograinesMightR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Monastery Mace|r (epmm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epmm")]
-    public class Cff6295E3MonasteryMaceR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Mordo's Club|r (ewbl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ewbl")]
-    public class Cff6295E3MordosClubR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Mysterious Twilight Opal|r (emto).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("emto")]
-    public class Cff6295E3MysteriousTwilightOpalR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Necrolyte's March|r (esnm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("esnm")]
-    public class Cff6295E3NecrolytesMarchR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Nerubian Necklace|r (ernn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ernn")]
-    public class Cff6295E3NerubianNecklaceR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Nexus Shiv|r (esns).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("esns")]
-    public class Cff6295E3NexusShivR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Overlord's Dreadplate|r (eodp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eodp")]
-    public class Cff6295E3OverlordsDreadplateR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Pirate Hat|r (ehph).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehph")]
-    public class Cff6295E3PirateHatR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Poison Nettle|r (espn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("espn")]
-    public class Cff6295E3PoisonNettleR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Protector of the Silver Hand|r (epsh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epsh")]
-    public class Cff6295E3ProtectorOfTheSilverHandR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Purifier Blade|r (erpb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("erpb")]
-    public class Cff6295E3PurifierBladeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Restorative Balm|r (etrb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("etrb")]
-    public class Cff6295E3RestorativeBalmR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Ring of Assassination|r (eroa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eroa")]
-    public class Cff6295E3RingOfAssassinationR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Ring of Greater Mana Efficiency|r (ergm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ergm")]
-    public class Cff6295E3RingOfGreaterManaEfficiencyR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Ring of Sacred Magic|r (ersm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ersm")]
-    public class Cff6295E3RingOfSacredMagicR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Ring of the Firelands|r (erfl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("erfl")]
-    public class Cff6295E3RingOfTheFirelandsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Ring of the Sacred Grove|r (ersg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ersg")]
-    public class Cff6295E3RingOfTheSacredGroveR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Robes of the Battlemage|r (erbm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("erbm")]
-    public class Cff6295E3RobesOfTheBattlemageR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Sage's Gloves|r (egsg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egsg")]
-    public class Cff6295E3SagesGlovesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Sharpened Cleaver|r (epsc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epsc")]
-    public class Cff6295E3SharpenedCleaverR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Shepherd's Curse|r (eshc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eshc")]
-    public class Cff6295E3ShepherdsCurseR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Shredder's Left Arm|r (esla).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("esla")]
-    public class Cff6295E3ShreddersLeftArmR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Signet of Blood|r (ersb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ersb")]
-    public class Cff6295E3SignetOfBloodR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Signet of the Crypt Lord|r (escl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("escl")]
-    public class Cff6295E3SignetOfTheCryptLordR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Skeletal Bow|r (epsb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epsb")]
-    public class Cff6295E3SkeletalBowR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Staff of the Scarlet Inquisitor|r (essi).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("essi")]
-    public class Cff6295E3StaffOfTheScarletInquisitorR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Star of Elune|r (erse).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("erse")]
-    public class Cff6295E3StarOfEluneR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Sword of the Ghostlands|r (epsg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epsg")]
-    public class Cff6295E3SwordOfTheGhostlandsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3The Impenetrable Fortress|r (etif).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("etif")]
-    public class Cff6295E3TheImpenetrableFortressR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Thornguard Rapier|r (eptr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eptr")]
-    public class Cff6295E3ThornguardRapierR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Tiara of the Kirin Tor|r (etkt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("etkt")]
-    public class Cff6295E3TiaraOfTheKirinTorR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Tome of Azjol-Nerub|r (ersk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ersk")]
-    public class Cff6295E3TomeOfAzjolNerubR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Vampiric Robes|r (eavr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eavr")]
-    public class Cff6295E3VampiricRobesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff6295E3Vestments of the Wavespeaker|r (evow).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("evow")]
-    public class Cff6295E3VestmentsOfTheWavespeakerR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbArcane Cleaver|r (epac).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epac")]
-    public class Cff7c2abbArcaneCleaverR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbArmor of Reanimation|r (eaor).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eaor")]
-    public class Cff7c2abbArmorOfReanimationR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbAviana's Talons|r (egat).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egat")]
-    public class Cff7c2abbAvianasTalonsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbBindings of Helya|r (eboh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eboh")]
-    public class Cff7c2abbBindingsOfHelyaR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbBlackrock Chain Helm|r (ebr1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebr1")]
-    public class Cff7c2abbBlackrockChainHelmR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbBlackrock Steel Plate|r (ebrp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebrp")]
-    public class Cff7c2abbBlackrockSteelPlateR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbBlade of Inferno|r (einf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("einf")]
-    public class Cff7c2abbBladeOfInfernoR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbBlade of the Crimson Heart|r (ech2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ech2")]
-    public class Cff7c2abbBladeOfTheCrimsonHeartR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbBlade of the Scarlet Crusade|r (essc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("essc")]
-    public class Cff7c2abbBladeOfTheScarletCrusadeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbBlademaster's Greatsword|r (ebr2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebr2")]
-    public class Cff7c2abbBlademastersGreatswordR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbBracers of the Ogre Magi|r (ebom).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebom")]
-    public class Cff7c2abbBracersOfTheOgreMagiR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbCardinal Ruby of the Necrolyte|r (ecrn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecrn")]
-    public class Cff7c2abbCardinalRubyOfTheNecrolyteR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbChronomaster's Gloves|r (ecmg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecmg")]
-    public class Cff7c2abbChronomastersGlovesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbColossal Battleaxe|r (ecba).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecba")]
-    public class Cff7c2abbColossalBattleaxeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbConsecrated Mixture|r (cccm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cccm")]
-    public class Cff7c2abbConsecratedMixtureR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbConvergence of Fates|r (ecof).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecof")]
-    public class Cff7c2abbConvergenceOfFatesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbCrystal Sword|r (epcs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epcs")]
-    public class Cff7c2abbCrystalSwordR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbDaybreaker|r (epdb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epdb")]
-    public class Cff7c2abbDaybreakerR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbDiamond Adorned Chestplate|r (edac).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edac")]
-    public class Cff7c2abbDiamondAdornedChestplateR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbDiamond Ring|r (erdr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("erdr")]
-    public class Cff7c2abbDiamondRingR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbDiamond Tiara|r (ehdt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehdt")]
-    public class Cff7c2abbDiamondTiaraR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbEarthen Signet|r (eres).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eres")]
-    public class Cff7c2abbEarthenSignetR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbEdge of the Ruined City|r (eerc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eerc")]
-    public class Cff7c2abbEdgeOfTheRuinedCityR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbForgotten Frost Lotus|r (effl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("effl")]
-    public class Cff7c2abbForgottenFrostLotusR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbGift of Pride|r (ergp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ergp")]
-    public class Cff7c2abbGiftOfPrideR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbGlacial Shard|r (egsh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egsh")]
-    public class Cff7c2abbGlacialShardR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbGloves of the Flamewalker|r (egfw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egfw")]
-    public class Cff7c2abbGlovesOfTheFlamewalkerR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbGloves of Ultimate Vampirism|r (eguv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eguv")]
-    public class Cff7c2abbGlovesOfUltimateVampirismR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbGolden Necklace of Serenity|r (egns).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egns")]
-    public class Cff7c2abbGoldenNecklaceOfSerenityR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbGuardian of the Crimson Heart|r (ech3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ech3")]
-    public class Cff7c2abbGuardianOfTheCrimsonHeartR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbHeadpiece of the High Inquisitor|r (ehhi).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehhi")]
-    public class Cff7c2abbHeadpieceOfTheHighInquisitorR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbHelm of the Dark Rider|r (ehdr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehdr")]
-    public class Cff7c2abbHelmOfTheDarkRiderR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbHigh Templar's Conqueror|r (ehtc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehtc")]
-    public class Cff7c2abbHighTemplarsConquerorR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbHigh Templar's Flame|r (ehtf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehtf")]
-    public class Cff7c2abbHighTemplarsFlameR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbHigh Templar's Judgment|r (ehtj).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehtj")]
-    public class Cff7c2abbHighTemplarsJudgmentR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbHigh Templar's March|r (ehtm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehtm")]
-    public class Cff7c2abbHighTemplarsMarchR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbHigh Templar's Visage|r (ehtv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehtv")]
-    public class Cff7c2abbHighTemplarsVisageR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbIcecrown Ring|r (eicc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eicc")]
-    public class Cff7c2abbIcecrownRingR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbKaldorei Moonglaive|r (ekmg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ekmg")]
-    public class Cff7c2abbKaldoreiMoonglaiveR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbLance of the Frozen Phoenix|r (elfp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("elfp")]
-    public class Cff7c2abbLanceOfTheFrozenPhoenixR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbMaster Engineering Goggles|r (eeh3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eeh3")]
-    public class Cff7c2abbMasterEngineeringGogglesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbNightfall|r (epnf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epnf")]
-    public class Cff7c2abbNightfallR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbOgre Warclub|r (epow).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epow")]
-    public class Cff7c2abbOgreWarclubR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbPlaguewrought, Blight Incarnate|r (epwb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epwb")]
-    public class Cff7c2abbPlaguewroughtBlightIncarnateR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbPortable Lightning Rod|r (eplr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eplr")]
-    public class Cff7c2abbPortableLightningRodR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbRing of Holy Fire|r (ehfi).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehfi")]
-    public class Cff7c2abbRingOfHolyFireR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbRing of the Archdruid|r (erad).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("erad")]
-    public class Cff7c2abbRingOfTheArchdruidR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbRobes of Revenge|r (earr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("earr")]
-    public class Cff7c2abbRobesOfRevengeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbSanctified Chestplate|r (esa1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("esa1")]
-    public class Cff7c2abbSanctifiedChestplateR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbSanctified Gauntlets|r (esa2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("esa2")]
-    public class Cff7c2abbSanctifiedGauntletsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbScepter of Darkness|r (esod).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("esod")]
-    public class Cff7c2abbScepterOfDarknessR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbScythe of Frost|r (esof).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("esof")]
-    public class Cff7c2abbScytheOfFrostR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbSeal of the Red Court|r (esrc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("esrc")]
-    public class Cff7c2abbSealOfTheRedCourtR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbShield of the Scarlet Crusade|r (eosc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eosc")]
-    public class Cff7c2abbShieldOfTheScarletCrusadeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbShield of the Titans|r (esot).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("esot")]
-    public class Cff7c2abbShieldOfTheTitansR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbSoulstealer|r (epss).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epss")]
-    public class Cff7c2abbSoulstealerR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbStaff of Jordan|r (epsj).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epsj")]
-    public class Cff7c2abbStaffOfJordanR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbStaff of the Crimson Heart|r (ech1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ech1")]
-    public class Cff7c2abbStaffOfTheCrimsonHeartR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbStormwalkers|r (ebsw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebsw")]
-    public class Cff7c2abbStormwalkersR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbThe Kingbreaker|r (eptk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eptk")]
-    public class Cff7c2abbTheKingbreakerR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbThe Screecher|r (escr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("escr")]
-    public class Cff7c2abbTheScreecherR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbTotem of the Ogre Magi|r (etom).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("etom")]
-    public class Cff7c2abbTotemOfTheOgreMagiR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbVampiric Gargoyle Mask|r (evgm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("evgm")]
-    public class Cff7c2abbVampiricGargoyleMaskR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbVestments of the Storm King|r (evsk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("evsk")]
-    public class Cff7c2abbVestmentsOfTheStormKingR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cff7c2abbZandalari Giantcrusher|r (ezgc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ezgc")]
-    public class Cff7c2abbZandalariGiantcrusherR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeAlicia's Favor|r (ebtf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebtf")]
-    public class CffaeaeaeAliciasFavorR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeAmulet of Minor Endurance|r (eame).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eame")]
-    public class CffaeaeaeAmuletOfMinorEnduranceR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeAmulet of Vitality|r (ecav).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecav")]
-    public class CffaeaeaeAmuletOfVitalityR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeBag of Dust|r (etbd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("etbd")]
-    public class CffaeaeaeBagOfDustR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeBand of the Skeletal Mage|r (ebsm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebsm")]
-    public class CffaeaeaeBandOfTheSkeletalMageR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeBone Buckler|r (eobb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eobb")]
-    public class CffaeaeaeBoneBucklerR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeBroken Skinning Knife|r (ebsk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebsk")]
-    public class CffaeaeaeBrokenSkinningKnifeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeChestpiece of Lesser Cunning|r (eclc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eclc")]
-    public class CffaeaeaeChestpieceOfLesserCunningR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeChipped Circlet of Clarity|r (eccc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eccc")]
-    public class CffaeaeaeChippedCircletOfClarityR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeChipped Shield|r (eocs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eocs")]
-    public class CffaeaeaeChippedShieldR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeCork Shooter|r (escs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("escs")]
-    public class CffaeaeaeCorkShooterR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeDamaged Spellbreaker Helmet|r (edsh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edsh")]
-    public class CffaeaeaeDamagedSpellbreakerHelmetR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeDecrepit Sorcerer's Mantle|r (edsm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("edsm")]
-    public class CffaeaeaeDecrepitSorcerersMantleR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeDeerskin Gloves|r (eclg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eclg")]
-    public class CffaeaeaeDeerskinGlovesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeEdric's Eye|r (etee).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("etee")]
-    public class CffaeaeaeEdricsEyeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeFractured Skull|r (eofs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eofs")]
-    public class CffaeaeaeFracturedSkullR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeFrail Leather Armor|r (efla).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("efla")]
-    public class CffaeaeaeFrailLeatherArmorR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeFrayed Headwear of the Magehunter|r (efhm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("efhm")]
-    public class CffaeaeaeFrayedHeadwearOfTheMagehunterR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeFrayed Sorcerer's Handwraps|r (efsh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("efsh")]
-    public class CffaeaeaeFrayedSorcerersHandwrapsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeGloves of Lesser Cunning|r (eglc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eglc")]
-    public class CffaeaeaeGlovesOfLesserCunningR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeGuardsman Boots|r (ecgb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecgb")]
-    public class CffaeaeaeGuardsmanBootsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeGuardsman Chestplate|r (ecgc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecgc")]
-    public class CffaeaeaeGuardsmanChestplateR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeGuardsman Dagger|r (epgd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epgd")]
-    public class CffaeaeaeGuardsmanDaggerR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeGuardsman Helmet|r (ecgh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecgh")]
-    public class CffaeaeaeGuardsmanHelmetR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeGuardsman Longsword|r (epgl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epgl")]
-    public class CffaeaeaeGuardsmanLongswordR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeHandful of Throwing Knives|r (ehtk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ehtk")]
-    public class CffaeaeaeHandfulOfThrowingKnivesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeHeavyduty Boots|r (ebhb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebhb")]
-    public class CffaeaeaeHeavydutyBootsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeIron Grip Gauntlets|r (eigg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eigg")]
-    public class CffaeaeaeIronGripGauntletsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeLesser Band of the Paladin|r (elbp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("elbp")]
-    public class CffaeaeaeLesserBandOfThePaladinR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeLesser Blade of the Cultist|r (elbc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("elbc")]
-    public class CffaeaeaeLesserBladeOfTheCultistR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeLesser Mark of the Forsaken|r (elmf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("elmf")]
-    public class CffaeaeaeLesserMarkOfTheForsakenR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeLesser Mark of Time|r (elmt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("elmt")]
-    public class CffaeaeaeLesserMarkOfTimeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeMundane Wand|r (epmw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epmw")]
-    public class CffaeaeaeMundaneWandR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeNovice Rags|r (ecnr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecnr")]
-    public class CffaeaeaeNoviceRagsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaePainted Wooden Sword|r (epws).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("epws")]
-    public class CffaeaeaePaintedWoodenSwordR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeRing of Agitated Fervor|r (eraf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eraf")]
-    public class CffaeaeaeRingOfAgitatedFervorR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeRing of Lesser Restoration|r (erlr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("erlr")]
-    public class CffaeaeaeRingOfLesserRestorationR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeRing of Regeneration|r (ecrr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecrr")]
-    public class CffaeaeaeRingOfRegenerationR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeRing of the Fortunate Adventurer|r (erfa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("erfa")]
-    public class CffaeaeaeRingOfTheFortunateAdventurerR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeRusty Bronze Gauntlets|r (erbg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("erbg")]
-    public class CffaeaeaeRustyBronzeGauntletsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeRusty Plated Boots|r (brpb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("brpb")]
-    public class CffaeaeaeRustyPlatedBootsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeShattered Scourgelord's Crown|r (eslc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eslc")]
-    public class CffaeaeaeShatteredScourgelordsCrownR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeShoddy Cap|r (ecap).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecap")]
-    public class CffaeaeaeShoddyCapR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeSkeletal Mage Mask|r (hsmm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("hsmm")]
-    public class CffaeaeaeSkeletalMageMaskR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeSteel Sword|r (ecss).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ecss")]
-    public class CffaeaeaeSteelSwordR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeTalisman of Minor Insight|r (etmi).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("etmi")]
-    public class CffaeaeaeTalismanOfMinorInsightR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeTalisman of the Northern Winds|r (etnw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("etnw")]
-    public class CffaeaeaeTalismanOfTheNorthernWindsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeWand of the Apprentice|r (ewoa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ewoa")]
-    public class CffaeaeaeWandOfTheApprenticeR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeWorn Adventurer's Outfit|r (ewao).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ewao")]
-    public class CffaeaeaeWornAdventurersOutfitR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeWorn Sandals|r (ebws).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ebws")]
-    public class CffaeaeaeWornSandalsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeWorn Steel Plate|r (ews1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ews1")]
-    public class CffaeaeaeWornSteelPlateR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeWorn Thief's Boots|r (ewtb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ewtb")]
-    public class CffaeaeaeWornThiefsBootsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffaeaeaeZombie Arm|r (ezba).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ezba")]
-    public class CffaeaeaeZombieArmR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffed6de0Garithos's Head|r (cgah).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cgah")]
-    public class Cffed6de0GarithossHeadR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cfff28302Borelgore, the Corpulent One|r (eymo).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eymo")]
-    public class Cfff28302BorelgoreTheCorpulentOneR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cfff28302Essencium, the Gathering of Elements|r (eege).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eege")]
-    public class Cfff28302EssenciumTheGatheringOfElementsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cfff28302Flame of Al'ar|r (efoa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("efoa")]
-    public class Cfff28302FlameOfAlarR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cfff28302Gravelight, the Echoing Flames|r (egef).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egef")]
-    public class Cfff28302GravelightTheEchoingFlamesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cfff28302Ravage, Herald of Obliteration|r (erho).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("erho")]
-    public class Cfff28302RavageHeraldOfObliterationR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cfff28302Razorice, Harbinger of Winter|r (erhw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("erhw")]
-    public class Cfff28302RazoriceHarbingerOfWinterR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cfff28302Selene, Grand Scepter of Elune|r (egse).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("egse")]
-    public class Cfff28302SeleneGrandScepterOfEluneR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cfff28302Untakable Candle|r (eauc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("eauc")]
-    public class Cfff28302UntakableCandleR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Bandit Lord's Limbs|r (cabl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cabl")]
-    public class Cffffff00BanditLordsLimbsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Broodmother Venom|r (cbmv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cbmv")]
-    public class Cffffff00BroodmotherVenomR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Captured Ghoul|r (cccg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cccg")]
-    public class Cffffff00CapturedGhoulR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Darkhound Blood|r (cdhb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cdhb")]
-    public class Cffffff00DarkhoundBloodR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Dungeon Key|r (ckdk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ckdk")]
-    public class Cffffff00DungeonKeyR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Experimental Serum|r (cese).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cese")]
-    public class Cffffff00ExperimentalSerumR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Explosive Barrel|r (cexp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cexp")]
-    public class Cffffff00ExplosiveBarrelR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Garithos's Head|r (cagh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cagh")]
-    public class Cffffff00GarithossHeadR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Key to the Chamber of Mysteries|r (ckcm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ckcm")]
-    public class Cffffff00KeyToTheChamberOfMysteriesR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Lump of Meat|r (clom).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("clom")]
-    public class Cffffff00LumpOfMeatR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Magical Key|r (cmag).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cmag")]
-    public class Cffffff00MagicalKeyR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Paladin's Torso|r (cptz).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cptz")]
-    public class Cffffff00PaladinsTorsoR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Portal Orb|r (cpor).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cpor")]
-    public class Cffffff00PortalOrbR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Prison Key|r (cprk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cprk")]
-    public class Cffffff00PrisonKeyR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00The Artifact|r (ctat).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ctat")]
-    public class Cffffff00TheArtifactR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Valve Wheel|r (ccvw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ccvw")]
-    public class Cffffff00ValveWheelR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Very Very Deep Thoughts|r (cvdt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cvdt")]
-    public class Cffffff00VeryVeryDeepThoughtsR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Vial of Plague Essence|r (cvpe).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cvpe")]
-    public class Cffffff00VialOfPlagueEssenceR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Vial of Vampire Bat Blood|r (cvvb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cvvb")]
-    public class Cffffff00VialOfVampireBatBloodR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>|cffffff00Vile Fin Scale|r (cvfs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cvfs")]
-    public class Cffffff00VileFinScaleR : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Cheese (ches).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ches")]
-    public class Cheese : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Circlet of Nobility (cnob).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cnob")]
-    public class CircletOfNobility : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Clarity Potion (pclr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("pclr")]
-    public class ClarityPotion : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Claws of Attack +12 (ratc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ratc")]
-    public class ClawsOfAttack12 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Claws of Attack +15 (ratf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ratf")]
-    public class ClawsOfAttack15 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Claws of Attack +3 (rat3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rat3")]
-    public class ClawsOfAttack3 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Claws of Attack +5 (rat6).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rat6")]
-    public class ClawsOfAttack5 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Claws of Attack +8 (rat9).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rat9")]
-    public class ClawsOfAttack8 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Cloak of Flames (clfm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("clfm")]
-    public class CloakOfFlames : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Cloak of Shadows (clsd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("clsd")]
-    public class CloakOfShadows : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Clockwork Penguin (stpg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("stpg")]
-    public class ClockworkPenguin : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Crown of Kings +5 (ckng).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ckng")]
-    public class CrownOfKings5 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Crown of the Deathlord (crdt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("crdt")]
-    public class CrownOfTheDeathlord : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Crystal Ball (crys).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("crys")]
-    public class CrystalBall : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Demonic Figurine (fgdg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("fgdg")]
-    public class DemonicFigurine : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Diamond of Summoning (dsum).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("dsum")]
-    public class DiamondOfSummoning : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Drek'thar's Spellbook (dtsb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("dtsb")]
-    public class DrektharsSpellbook : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Druid Pouch (drph).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("drph")]
-    public class DruidPouch : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Dust of Appearance (dust).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("dust")]
-    public class DustOfAppearance : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Empty Vial (bzbe).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("bzbe")]
-    public class EmptyVial : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Enchanted Gemstone (engs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("engs")]
-    public class EnchantedGemstone : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Enchanted Shield (shen).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("shen")]
-    public class EnchantedShield : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Enchanted Vial (envl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("envl")]
-    public class EnchantedVial : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Engraved Scale (engr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("engr")]
-    public class EngravedScale : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Essence of Aszune (esaz).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("esaz")]
-    public class EssenceOfAszune : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Essence of Undeath (peou).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("peou")]
-    public class EssenceOfUndeath : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Firehand Gauntlets (frhg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("frhg")]
-    public class FirehandGauntlets : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Flare Gun (fgun).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("fgun")]
-    public class FlareGun : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Frost Wyrm Skull Shield (fwss).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("fwss")]
-    public class FrostWyrmSkullShield : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Frostguard (frgd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("frgd")]
-    public class Frostguard : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Full Vial (bzbf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("bzbf")]
-    public class FullVial : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Gauntlets of Ogre Strength +3 (rst1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rst1")]
-    public class GauntletsOfOgreStrength3 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Gem Fragment (gmfr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("gmfr")]
-    public class GemFragment : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Gem of True Seeing (gemt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("gemt")]
-    public class GemOfTrueSeeing : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Gerard's Lost Ledger (ledg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ledg")]
-    public class GerardsLostLedger : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ghost Key (kygh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("kygh")]
-    public class GhostKey : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Glix's Special (glxb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("glxb")]
-    public class GlixsSpecial : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Gloves of Haste (gcel).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("gcel")]
-    public class GlovesOfHaste : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Gloves of Spell Mastery (gvsm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("gvsm")]
-    public class GlovesOfSpellMastery : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Glyph of Fortification (gfor).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("gfor")]
-    public class GlyphOfFortification : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Glyph of Omniscience (gomn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("gomn")]
-    public class GlyphOfOmniscience : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Glyph of Purification (gopr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("gopr")]
-    public class GlyphOfPurification : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Glyph of Ultravision (guvi).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("guvi")]
-    public class GlyphOfUltravision : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Goblin Land Mines (gobm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("gobm")]
-    public class GoblinLandMines : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Goblin Night Scope (tels).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tels")]
-    public class GoblinNightScope : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Gold Coins (gold).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("gold")]
-    public class GoldCoins : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Greater Replenishment Potion (rej4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rej4")]
-    public class GreaterReplenishmentPotion : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Greater Scroll of Replenishment (rej6).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rej6")]
-    public class GreaterScrollOfReplenishment : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Grimoire of Souls (grsl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("grsl")]
-    public class GrimoireOfSouls : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Healing Salve (hslv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("hslv")]
-    public class HealingSalve : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Healing Wards (whwd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("whwd")]
-    public class HealingWards : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Health Stone (hlst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("hlst")]
-    public class HealthStone : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Heart of Aszune (azhr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("azhr")]
-    public class HeartOfAszune : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Helm of Battlethirst (hbth).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("hbth")]
-    public class HelmOfBattlethirst : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Helm of Valor (hval).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("hval")]
-    public class HelmOfValor : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Hood of Cunning (hcun).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("hcun")]
-    public class HoodOfCunning : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Horn of Cenarius (cnhn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("cnhn")]
-    public class HornOfCenarius : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Horn of the Clouds (sfog).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sfog")]
-    public class HornOfTheClouds : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Human Flag (flag).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("flag")]
-    public class HumanFlag : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ice Shard (shar).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("shar")]
-    public class IceShard : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Idol of the Wild (iotw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("iotw")]
-    public class IdolOfTheWild : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Inferno Stone (infs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("infs")]
-    public class InfernoStone : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ironwood Branch (iwbr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("iwbr")]
-    public class IronwoodBranch : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ivory Tower (tsct).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tsct")]
-    public class IvoryTower : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Jade Ring (jdrn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("jdrn")]
-    public class JadeRing : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Keg of Ale (kgal).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("kgal")]
-    public class KegOfAle : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Keg of Thunderwater (dkfw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("dkfw")]
-    public class KegOfThunderwater : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Kelen's Dagger of Escape (desc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("desc")]
-    public class KelensDaggerOfEscape : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Key of Three Moons (k3m3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("k3m3")]
-    public class KeyOfThreeMoons : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Khadgar's Gem of Health (rhth).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rhth")]
-    public class KhadgarsGemOfHealth : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Khadgar's Pipe of Insight (kpin).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("kpin")]
-    public class KhadgarsPipeOfInsight : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Killmaim (klmm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("klmm")]
-    public class Killmaim : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Legion Doom-Horn (lgdh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("lgdh")]
-    public class LegionDoomHorn : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Lesser Clarity Potion (plcl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("plcl")]
-    public class LesserClarityPotion : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Lesser Replenishment Potion (rej2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rej2")]
-    public class LesserReplenishmentPotion : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Lesser Scroll of Replenishment (rej5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rej5")]
-    public class LesserScrollOfReplenishment : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Lion's Ring (lnrn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("lnrn")]
-    public class LionsRing : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Magic Key Chain (mgtk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("mgtk")]
-    public class MagicKeyChain : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Mana Stone (mnst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("mnst")]
-    public class ManaStone : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Mantle of Intelligence +3 (rin1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rin1")]
-    public class MantleOfIntelligence3 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Manual of Health (manh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("manh")]
-    public class ManualOfHealth : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Mask of Death (modt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("modt")]
-    public class MaskOfDeath : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Maul of Strength (mlst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("mlst")]
-    public class MaulOfStrength : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Mechanical Critter (mcri).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("mcri")]
-    public class MechanicalCritter : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Medallion of Courage (mcou).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("mcou")]
-    public class MedallionOfCourage : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Mindstaff (mnsf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("mnsf")]
-    public class Mindstaff : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Minor Replenishment Potion (rej1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rej1")]
-    public class MinorReplenishmentPotion : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Mogrin's Report (mort).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("mort")]
-    public class MogrinsReport : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Monster Lure (lure).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("lure")]
-    public class MonsterLure : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Moon Key (kymn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("kymn")]
-    public class MoonKey : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Mooncrystal (k3m1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("k3m1")]
-    public class Mooncrystal : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Moonstone (moon).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("moon")]
-    public class Moonstone : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Necklace of Spell Immunity (nspi).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("nspi")]
-    public class NecklaceOfSpellImmunity : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Night Elf Flag (nflg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("nflg")]
-    public class NightElfFlag : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Note to Jaina Proudmoore (jpnt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("jpnt")]
-    public class NoteToJainaProudmoore : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Orb of Corruption (ocor).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ocor")]
-    public class OrbOfCorruption : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Orb of Darkness (odef).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("odef")]
-    public class OrbOfDarkness : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Orb of Fire (ofir).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ofir")]
-    public class OrbOfFire : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Orb of Fire (ofr2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ofr2")]
-    public class OrbOfFireOfr2 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Orb of Frost (ofro).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ofro")]
-    public class OrbOfFrost : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Orb of Kil'jaeden (gldo).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("gldo")]
-    public class OrbOfKiljaeden : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Orb of Lightning (oli2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("oli2")]
-    public class OrbOfLightning : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Orb of Lightning (olig).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("olig")]
-    public class OrbOfLightningOlig : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Orb of Slow (oslo).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("oslo")]
-    public class OrbOfSlow : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Orb of Venom (oven).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("oven")]
-    public class OrbOfVenom : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Orc Flag (oflg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("oflg")]
-    public class OrcFlag : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Partial Key of the Three Moons (k3m2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("k3m2")]
-    public class PartialKeyOfTheThreeMoons : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Pendant of Energy (penr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("penr")]
-    public class PendantOfEnergy : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Pendant of Mana (pmna).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("pmna")]
-    public class PendantOfMana : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Periapt of Vitality (prvt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("prvt")]
-    public class PeriaptOfVitality : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Phat Lewt (phlt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("phlt")]
-    public class PhatLewt : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Potion of Divinity (pdi2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("pdi2")]
-    public class PotionOfDivinity : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Potion of Divinity (pdiv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("pdiv")]
-    public class PotionOfDivinityPdiv : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Potion of Greater Healing (pghe).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("pghe")]
-    public class PotionOfGreaterHealing : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Potion of Greater Invisibility (pgin).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("pgin")]
-    public class PotionOfGreaterInvisibility : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Potion of Greater Mana (pgma).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("pgma")]
-    public class PotionOfGreaterMana : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Potion of Healing (phea).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("phea")]
-    public class PotionOfHealing : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Potion of Invisibility (pinv).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("pinv")]
-    public class PotionOfInvisibility : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Potion of Invulnerability (pnvu).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("pnvu")]
-    public class PotionOfInvulnerability : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Potion of Lesser Invulnerability (pnvl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("pnvl")]
-    public class PotionOfLesserInvulnerability : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Potion of Mana (pman).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("pman")]
-    public class PotionOfMana : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Potion of Omniscience (pomn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("pomn")]
-    public class PotionOfOmniscience : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Potion of Restoration (pres).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("pres")]
-    public class PotionOfRestoration : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Potion of Speed (pspd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("pspd")]
-    public class PotionOfSpeed : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Potion of Ultimate Healing (puhe).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("puhe")]
-    public class PotionOfUltimateHealing : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Potion of Ultimate Mana (puma).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("puma")]
-    public class PotionOfUltimateMana : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Red Drake Egg (fgrd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("fgrd")]
-    public class RedDrakeEgg : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Replenishment Potion (rej3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rej3")]
-    public class ReplenishmentPotion : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ring of Protection +1 (rde0).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rde0")]
-    public class RingOfProtection1 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ring of Protection +2 (rde1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rde1")]
-    public class RingOfProtection2 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ring of Protection +3 (rde2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rde2")]
-    public class RingOfProtection3 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ring of Protection +4 (rde3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rde3")]
-    public class RingOfProtection4 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ring of Protection +5 (rde4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rde4")]
-    public class RingOfProtection5 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ring of Regeneration (rlif).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rlif")]
-    public class RingOfRegeneration : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ring of Superiority (rnsp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rnsp")]
-    public class RingOfSuperiority : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ring of the Archmagi (ram1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ram1")]
-    public class RingOfTheArchmagi : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ring of the Archmagi (ram2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ram2")]
-    public class RingOfTheArchmagiRam2 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ring of the Archmagi (ram3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ram3")]
-    public class RingOfTheArchmagiRam3 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ring of the Archmagi (ram4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ram4")]
-    public class RingOfTheArchmagiRam4 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Ritual Dagger (ritd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ritd")]
-    public class RitualDagger : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Robe of the Magi +6 (ciri).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ciri")]
-    public class RobeOfTheMagi6 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Rod of Necromancy (rnec).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rnec")]
-    public class RodOfNecromancy : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Rune of Dispel Magic (rdis).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rdis")]
-    public class RuneOfDispelMagic : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Rune of Greater Healing (rhe3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rhe3")]
-    public class RuneOfGreaterHealing : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Rune of Greater Mana (rma2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rma2")]
-    public class RuneOfGreaterMana : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Rune of Greater Resurrection (rre2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rre2")]
-    public class RuneOfGreaterResurrection : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Rune of Healing (rhe2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rhe2")]
-    public class RuneOfHealing : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Rune of Lesser Healing (rhe1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rhe1")]
-    public class RuneOfLesserHealing : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Rune of Lesser Resurrection (rre1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rre1")]
-    public class RuneOfLesserResurrection : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Rune of Mana (rman).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rman")]
-    public class RuneOfMana : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Rune of Rebirth (rreb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rreb")]
-    public class RuneOfRebirth : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Rune of Restoration (rres).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rres")]
-    public class RuneOfRestoration : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Rune of Shielding (rsps).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rsps")]
-    public class RuneOfShielding : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Rune of Speed (rspd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rspd")]
-    public class RuneOfSpeed : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Rune of Spirit Link (rspl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rspl")]
-    public class RuneOfSpiritLink : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Rune of the Watcher (rwat).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rwat")]
-    public class RuneOfTheWatcher : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Runed Bracers (brac).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("brac")]
-    public class RunedBracers : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Runed Gauntlets (rugt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rugt")]
-    public class RunedGauntlets : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Rusty Mining Pick (rump).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rump")]
-    public class RustyMiningPick : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Sacred Relic (horl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("horl")]
-    public class SacredRelic : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Sacrificial Skull (skul).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("skul")]
-    public class SacrificialSkull : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Scepter of Avarice (scav).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("scav")]
-    public class ScepterOfAvarice : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Scepter of Healing (schl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("schl")]
-    public class ScepterOfHealing : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Scepter of Mastery (ccmd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ccmd")]
-    public class ScepterOfMastery : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Scepter of the Sea (rots).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rots")]
-    public class ScepterOfTheSea : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Scourge Bone Chimes (sbch).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sbch")]
-    public class ScourgeBoneChimes : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Scroll of Animate Dead (sand).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sand")]
-    public class ScrollOfAnimateDead : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Scroll of Healing (shea).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("shea")]
-    public class ScrollOfHealing : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Scroll of Mana (sman).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sman")]
-    public class ScrollOfMana : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Scroll of Protection (spro).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("spro")]
-    public class ScrollOfProtection : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Scroll of Regeneration (sreg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sreg")]
-    public class ScrollOfRegeneration : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Scroll of Restoration (sres).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sres")]
-    public class ScrollOfRestoration : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Scroll of Resurrection (srrc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("srrc")]
-    public class ScrollOfResurrection : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Scroll of Speed (shas).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("shas")]
-    public class ScrollOfSpeed : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Scroll of the Beast (sror).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sror")]
-    public class ScrollOfTheBeast : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Scroll of the Unholy Legion (scul).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("scul")]
-    public class ScrollOfTheUnholyLegion : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Scroll of Town Portal (stwp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("stwp")]
-    public class ScrollOfTownPortal : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Searing Blade (srbd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("srbd")]
-    public class SearingBlade : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Secret Level Powerup (sclp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sclp")]
-    public class SecretLevelPowerup : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Seed of Expulsion (sxpl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sxpl")]
-    public class SeedOfExpulsion : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Sentry Wards (wswd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("wswd")]
-    public class SentryWards : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Serathil (srtl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("srtl")]
-    public class Serathil : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Shadow Orb +1 (sor1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sor1")]
-    public class ShadowOrb1 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Shadow Orb +10 (sora).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sora")]
-    public class ShadowOrb10 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Shadow Orb +2 (sor2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sor2")]
-    public class ShadowOrb2 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Shadow Orb +3 (sor3).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sor3")]
-    public class ShadowOrb3 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Shadow Orb +4 (sor4).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sor4")]
-    public class ShadowOrb4 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Shadow Orb +5 (sor5).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sor5")]
-    public class ShadowOrb5 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Shadow Orb +6 (sor6).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sor6")]
-    public class ShadowOrb6 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Shadow Orb +7 (sor7).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sor7")]
-    public class ShadowOrb7 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Shadow Orb +8 (sor8).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sor8")]
-    public class ShadowOrb8 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Shadow Orb +9 (sor9).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sor9")]
-    public class ShadowOrb9 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Shadow Orb Fragment (sorf).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sorf")]
-    public class ShadowOrbFragment : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Shaman Claws (shcw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("shcw")]
-    public class ShamanClaws : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Shamanic Totem (shtm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("shtm")]
-    public class ShamanicTotem : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Shield of Honor (shhn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("shhn")]
-    public class ShieldOfHonor : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Shield of the Deathlord (shdt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("shdt")]
-    public class ShieldOfTheDeathlord : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Shimmerglaze Roast (shrs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("shrs")]
-    public class ShimmerglazeRoast : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Shimmerweed (shwd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("shwd")]
-    public class Shimmerweed : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Skeletal Artifact (skrt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("skrt")]
-    public class SkeletalArtifact : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Skull of Gul'dan (glsk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("glsk")]
-    public class SkullOfGuldan : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Skull Shield (sksh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sksh")]
-    public class SkullShield : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Slippers of Agility +3 (rag1).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rag1")]
-    public class SlippersOfAgility3 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Sobi Mask (rwiz).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("rwiz")]
-    public class SobiMask : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Soul (soul).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("soul")]
-    public class Soul : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Soul Gem (gsou).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("gsou")]
-    public class SoulGem : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Spell Book (sbok).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sbok")]
-    public class SpellBook : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Spider Ring (sprn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sprn")]
-    public class SpiderRing : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Spider Silk Broach (silk).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("silk")]
-    public class SpiderSilkBroach : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Spiked Collar (fgfh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("fgfh")]
-    public class SpikedCollar : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Staff of Negation (sneg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sneg")]
-    public class StaffOfNegation : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Staff of Preservation (spre).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("spre")]
-    public class StaffOfPreservation : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Staff of Reanimation (stre).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("stre")]
-    public class StaffOfReanimation : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Staff of Sanctuary (ssan).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ssan")]
-    public class StaffOfSanctuary : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Staff of Silence (ssil).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ssil")]
-    public class StaffOfSilence : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Staff of Teleportation (stel).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("stel")]
-    public class StaffOfTeleportation : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Stone Token (fgrg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("fgrg")]
-    public class StoneToken : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Sturdy War Axe (stwa).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("stwa")]
-    public class SturdyWarAxe : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Sun Key (kysn).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("kysn")]
-    public class SunKey : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Talisman of Evasion (evtl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("evtl")]
-    public class TalismanOfEvasion : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Talisman of the Wild (totw).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("totw")]
-    public class TalismanOfTheWild : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>The Heart of Searinox (sehr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("sehr")]
-    public class TheHeartOfSearinox : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>The Lion Horn of Stormwind (lhst).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("lhst")]
-    public class TheLionHornOfStormwind : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Thunder Lizard Egg (thle).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("thle")]
-    public class ThunderLizardEgg : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Thunder Phoenix Egg (dphe).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("dphe")]
-    public class ThunderPhoenixEgg : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Thunderbloom Bulb (dthb).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("dthb")]
-    public class ThunderbloomBulb : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Thunderlizard Diamond (thdm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("thdm")]
-    public class ThunderlizardDiamond : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tiny Altar of Kings (tbak).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tbak")]
-    public class TinyAltarOfKings : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tiny Barracks (tbar).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tbar")]
-    public class TinyBarracks : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tiny Blacksmith (tbsm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tbsm")]
-    public class TinyBlacksmith : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tiny Castle (tcas).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tcas")]
-    public class TinyCastle : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tiny Farm (tfar).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tfar")]
-    public class TinyFarm : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tiny Great Hall (tgrh).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tgrh")]
-    public class TinyGreatHall : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tiny Lumber Mill (tlum).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tlum")]
-    public class TinyLumberMill : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tome of Agility (tdex).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tdex")]
-    public class TomeOfAgility : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tome of Agility +2 (tdx2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tdx2")]
-    public class TomeOfAgility2 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tome of Experience (texp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("texp")]
-    public class TomeOfExperience : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tome of Greater Experience (tgxp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tgxp")]
-    public class TomeOfGreaterExperience : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tome of Intelligence (tint).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tint")]
-    public class TomeOfIntelligence : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tome of Intelligence +2 (tin2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tin2")]
-    public class TomeOfIntelligence2 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tome of Knowledge (tpow).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tpow")]
-    public class TomeOfKnowledge : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tome of Power (tkno).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tkno")]
-    public class TomeOfPower : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tome of Retraining (tret).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tret")]
-    public class TomeOfRetraining : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tome of Sacrifices (tmsc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tmsc")]
-    public class TomeOfSacrifices : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tome of Strength (tstr).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tstr")]
-    public class TomeOfStrength : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tome of Strength +2 (tst2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tst2")]
-    public class TomeOfStrength2 : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Tome of Talent (ttal).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ttal")]
-    public class TomeOfTalent : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Totem of Might (tmmt).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("tmmt")]
-    public class TotemOfMight : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Undead Flag (uflg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("uflg")]
-    public class UndeadFlag : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Urn of King Terenas (ktrm).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ktrm")]
-    public class UrnOfKingTerenas : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Vampiric Potion (vamp).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("vamp")]
-    public class VampiricPotion : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Vine of Purification (vpur).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("vpur")]
-    public class VineOfPurification : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Voodoo Doll (vddl).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("vddl")]
-    public class VoodooDoll : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Wand of Illusion (will).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("will")]
-    public class WandOfIllusion : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Wand of Lightning Shield (wlsd).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("wlsd")]
-    public class WandOfLightningShield : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Wand of Mana Stealing (woms).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("woms")]
-    public class WandOfManaStealing : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Wand of Negation (wneg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("wneg")]
-    public class WandOfNegation : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Wand of Neutralization (wneu).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("wneu")]
-    public class WandOfNeutralization : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Wand of Shadowsight (wshs).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("wshs")]
-    public class WandOfShadowsight : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Wand of the Wind (wcyc).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("wcyc")]
-    public class WandOfTheWind : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Warsong Battle Drums (war2).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("war2")]
-    public class WarsongBattleDrums : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Warsong Battle Drums (ward).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("ward")]
-    public class WarsongBattleDrumsWard : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Wirt's Leg (wtlg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("wtlg")]
-    public class WirtsLeg : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>Wirt's Other Leg (wolg).</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("wolg")]
-    public class WirtsOtherLeg : global::Moonwell.Objects.StandardItem
-    {
-    }
-
-    /// <summary>spur.</summary>
-    /// @CSharpLua.Ignore
-    [global::Moonwell.Objects.Standard("spur")]
-    public class spur : global::Moonwell.Objects.StandardItem
-    {
+    /// <summary>The standard items.</summary>
+    /// @CSharpLua.Ignore
+    public static partial class Items
+    {
+        /// <summary>Alleria's Flute of Accuracy (afac).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("afac")]
+        public class AlleriasFluteOfAccuracy : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Amulet of Recall (amrc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("amrc")]
+        public class AmuletOfRecall : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Amulet of Spell Shield (spsh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("spsh")]
+        public class AmuletOfSpellShield : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Amulet of the Wild (wild).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("wild")]
+        public class AmuletOfTheWild : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ancestral Staff (axas).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("axas")]
+        public class AncestralStaff : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ancient Figurine (anfg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("anfg")]
+        public class AncientFigurine : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ancient Janggo of Endurance (ajen).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ajen")]
+        public class AncientJanggoOfEndurance : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ankh of Reincarnation (ankh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ankh")]
+        public class AnkhOfReincarnation : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Anti-magic Potion (pams).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("pams")]
+        public class AntiMagicPotion : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Arcane Scroll (arsc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("arsc")]
+        public class ArcaneScroll : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Arcanite Shield (arsh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("arsh")]
+        public class ArcaniteShield : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Assassin's Blade (asbl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("asbl")]
+        public class AssassinsBlade : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Battle Standard (btst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("btst")]
+        public class BattleStandard : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Belt of Giant Strength +6 (bgst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("bgst")]
+        public class BeltOfGiantStrength6 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Bladebane Armor (blba).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("blba")]
+        public class BladebaneArmor : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Blood Key (kybl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("kybl")]
+        public class BloodKey : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Bloodfeather's Heart (bfhr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("bfhr")]
+        public class BloodfeathersHeart : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Blue Drake Egg (fgbd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("fgbd")]
+        public class BlueDrakeEgg : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Book of the Dead (fgsk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("fgsk")]
+        public class BookOfTheDead : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Boots of Quel'Thalas +6 (belv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("belv")]
+        public class BootsOfQuelThalas6 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Boots of Speed (bspd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("bspd")]
+        public class BootsOfSpeed : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Bracer of Agility (brag).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("brag")]
+        public class BracerOfAgility : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Bundle of Lumber (lmbr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("lmbr")]
+        public class BundleOfLumber : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Celestial Orb of Souls (cosl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cosl")]
+        public class CelestialOrbOfSouls : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Abomination's Hook|r (epah).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epah")]
+        public class Cff40da00AbominationsHookR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Agus's Shambling Hand|r (eash).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eash")]
+        public class Cff40da00AgussShamblingHandR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Ancient Bronze Helmet|r (eabh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eabh")]
+        public class Cff40da00AncientBronzeHelmetR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Anya's Backpack|r (ebua).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebua")]
+        public class Cff40da00AnyasBackpackR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Armor of the Scarlet Crusade|r (easc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("easc")]
+        public class Cff40da00ArmorOfTheScarletCrusadeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Backpack|r (ebac).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebac")]
+        public class Cff40da00BackpackR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Bandit Mask|r (ehbm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehbm")]
+        public class Cff40da00BanditMaskR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Blacksmith's Apron|r (eaba).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eaba")]
+        public class Cff40da00BlacksmithsApronR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Blade Dancer's Greaves|r (ebdg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebdg")]
+        public class Cff40da00BladeDancersGreavesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Blightweaver Boots|r (ebwb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebwb")]
+        public class Cff40da00BlightweaverBootsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Blue Dragon Figurine|r (ebdf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebdf")]
+        public class Cff40da00BlueDragonFigurineR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Bone Cage Breastplate|r (ebcb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebcb")]
+        public class Cff40da00BoneCageBreastplateR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Bone Staff|r (esbs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("esbs")]
+        public class Cff40da00BoneStaffR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Boots of Haste|r (rcdr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rcdr")]
+        public class Cff40da00BootsOfHasteR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Boots of the Forsaken|r (ebof).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebof")]
+        public class Cff40da00BootsOfTheForsakenR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Boots of the Warm Hearth|r (ebwh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebwh")]
+        public class Cff40da00BootsOfTheWarmHearthR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Bramblethorn Vestments|r (ebtv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebtv")]
+        public class Cff40da00BramblethornVestmentsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Caged Soul|r (ercs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ercs")]
+        public class Cff40da00CagedSoulR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Citrine Adorned Boots|r (ecab).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecab")]
+        public class Cff40da00CitrineAdornedBootsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Crusader's Gauntlets|r (egcg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egcg")]
+        public class Cff40da00CrusadersGauntletsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Dalaran Sapphire Robes|r (edsr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edsr")]
+        public class Cff40da00DalaranSapphireRobesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Dalaran Signet Ring|r (rspa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rspa")]
+        public class Cff40da00DalaranSignetRingR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Desecrated Tower Shield|r (edts).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edts")]
+        public class Cff40da00DesecratedTowerShieldR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Diamond Staff of Dalaran|r (edds).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edds")]
+        public class Cff40da00DiamondStaffOfDalaranR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Dreaded Chestplate|r (ecdc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecdc")]
+        public class Cff40da00DreadedChestplateR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Elixir of Cunning|r (ccec).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ccec")]
+        public class Cff40da00ElixirOfCunningR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Elixir of Lesser Intelligence|r (celi).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("celi")]
+        public class Cff40da00ElixirOfLesserIntelligenceR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Elixir of the Monster Hunter|r (ccem).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ccem")]
+        public class Cff40da00ElixirOfTheMonsterHunterR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Endless Flask of Restoration|r (eefr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eefr")]
+        public class Cff40da00EndlessFlaskOfRestorationR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Essence of the Spider Queen|r (eesq).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eesq")]
+        public class Cff40da00EssenceOfTheSpiderQueenR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Farstrider's Amulet|r (eaaa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eaaa")]
+        public class Cff40da00FarstridersAmuletR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Flesh Golem Ribcage|r (efgh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("efgh")]
+        public class Cff40da00FleshGolemRibcageR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Forest Ranger's Gloves|r (efrg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("efrg")]
+        public class Cff40da00ForestRangersGlovesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Forsaken Champion's Helm|r (efch).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("efch")]
+        public class Cff40da00ForsakenChampionsHelmR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Forsaken Fangs|r (etff).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("etff")]
+        public class Cff40da00ForsakenFangsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Forsaken Gauntlets|r (egfg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egfg")]
+        public class Cff40da00ForsakenGauntletsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Forsaken Plaguebow|r (efpb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("efpb")]
+        public class Cff40da00ForsakenPlaguebowR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Garek's Backpack|r (ebhg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebhg")]
+        public class Cff40da00GareksBackpackR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Garek's Backpack|r (ebug).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebug")]
+        public class Cff40da00GareksBackpackREbug : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Ghoulish Claw|r (epfc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epfc")]
+        public class Cff40da00GhoulishClawR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Giant Skeleton Bone|r (egsb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egsb")]
+        public class Cff40da00GiantSkeletonBoneR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Gift of Greed|r (ergg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ergg")]
+        public class Cff40da00GiftOfGreedR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Gift of the Wilds|r (egow).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egow")]
+        public class Cff40da00GiftOfTheWildsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Gilnean Battleaxe|r (epgb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epgb")]
+        public class Cff40da00GilneanBattleaxeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Gilnean Headpiece|r (ehgh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehgh")]
+        public class Cff40da00GilneanHeadpieceR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Gloves of Necromancy|r (eggn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eggn")]
+        public class Cff40da00GlovesOfNecromancyR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Gloves of the Battlemage|r (egob).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egob")]
+        public class Cff40da00GlovesOfTheBattlemageR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Gloves of the Phoenix|r (eggp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eggp")]
+        public class Cff40da00GlovesOfThePhoenixR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Gloves of the Scarlet Crusade|r (egsc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egsc")]
+        public class Cff40da00GlovesOfTheScarletCrusadeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Gnoll Warlord Hide|r (egwh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egwh")]
+        public class Cff40da00GnollWarlordHideR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Grieving Blade|r (eogb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eogb")]
+        public class Cff40da00GrievingBladeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Hammer of the Silver Hand|r (ehsh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehsh")]
+        public class Cff40da00HammerOfTheSilverHandR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Heart of the Firelord|r (erhf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("erhf")]
+        public class Cff40da00HeartOfTheFirelordR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Honed Edge|r (erhe).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("erhe")]
+        public class Cff40da00HonedEdgeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Huge Flail|r (ephf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ephf")]
+        public class Cff40da00HugeFlailR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Ilastar's Backpack|r (ebhi).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebhi")]
+        public class Cff40da00IlastarsBackpackR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Intricate Emerald Pendant|r (eiep).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eiep")]
+        public class Cff40da00IntricateEmeraldPendantR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Ironforge Defender|r (eoid).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eoid")]
+        public class Cff40da00IronforgeDefenderR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Jagged Jade Ring|r (ejjr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ejjr")]
+        public class Cff40da00JaggedJadeRingR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Kobold Mining Helm|r (ekmh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ekmh")]
+        public class Cff40da00KoboldMiningHelmR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Landen's Backpack|r (ebhl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebhl")]
+        public class Cff40da00LandensBackpackR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Leonid's Backpack|r (ebul).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebul")]
+        public class Cff40da00LeonidsBackpackR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Lesser Engineering Goggles|r (eeh1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eeh1")]
+        public class Cff40da00LesserEngineeringGogglesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Lion's Heart|r (rrsl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rrsl")]
+        public class Cff40da00LionsHeartR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Magister's Handguards|r (egos).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egos")]
+        public class Cff40da00MagistersHandguardsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Malachite Shortsword|r (eoms).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eoms")]
+        public class Cff40da00MalachiteShortswordR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Mana Bauble|r (etmb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("etmb")]
+        public class Cff40da00ManaBaubleR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Mantle of the Highborne|r (emoh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("emoh")]
+        public class Cff40da00MantleOfTheHighborneR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Mark of the Phoenix|r (etmp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("etmp")]
+        public class Cff40da00MarkOfThePhoenixR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Moonstone Circlet|r (ehmc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehmc")]
+        public class Cff40da00MoonstoneCircletR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Murloc Costume Gloves|r (emcg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("emcg")]
+        public class Cff40da00MurlocCostumeGlovesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Mutated Rat's Whiptail|r (emrw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("emrw")]
+        public class Cff40da00MutatedRatsWhiptailR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Necromancer's Plaguegreaves|r (ebnp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebnp")]
+        public class Cff40da00NecromancersPlaguegreavesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Nevermelting Ice|r (enmi).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("enmi")]
+        public class Cff40da00NevermeltingIceR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Ogre Gauntlets|r (erog).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("erog")]
+        public class Cff40da00OgreGauntletsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Overlord's Sabatons|r (ebos).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebos")]
+        public class Cff40da00OverlordsSabatonsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Phalanx Shield|r (eops).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eops")]
+        public class Cff40da00PhalanxShieldR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Plaguebearer Cuirass|r (epbc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epbc")]
+        public class Cff40da00PlaguebearerCuirassR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Plaguebearer Shortsword|r (epbs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epbs")]
+        public class Cff40da00PlaguebearerShortswordR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Primal Ring of Magic|r (eprm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eprm")]
+        public class Cff40da00PrimalRingOfMagicR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Quarry Pickaxe|r (epqp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epqp")]
+        public class Cff40da00QuarryPickaxeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Ring of Evasion|r (eroe).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eroe")]
+        public class Cff40da00RingOfEvasionR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Ring of Leeching|r (rspv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rspv")]
+        public class Cff40da00RingOfLeechingR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Ring of Mana Efficiency|r (rmef).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rmef")]
+        public class Cff40da00RingOfManaEfficiencyR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Ring of Stone Fortitude|r (ersf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ersf")]
+        public class Cff40da00RingOfStoneFortitudeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Ring of the Runeweaver|r (errw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("errw")]
+        public class Cff40da00RingOfTheRuneweaverR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Robes of the Kirin Tor|r (erkt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("erkt")]
+        public class Cff40da00RobesOfTheKirinTorR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Ruby Necklace of Power|r (ernp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ernp")]
+        public class Cff40da00RubyNecklaceOfPowerR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Rune of Fire|r (erof).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("erof")]
+        public class Cff40da00RuneOfFireR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Seal of Sylvanas|r (esos).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("esos")]
+        public class Cff40da00SealOfSylvanasR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Shamanistic Headwear|r (etbh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("etbh")]
+        public class Cff40da00ShamanisticHeadwearR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Signet of Decay|r (ersd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ersd")]
+        public class Cff40da00SignetOfDecayR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Silverpine Forest Shiv|r (esfs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("esfs")]
+        public class Cff40da00SilverpineForestShivR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Spell Parrying Buckler|r (espb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("espb")]
+        public class Cff40da00SpellParryingBucklerR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Spellbreaker Circlet|r (esbt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("esbt")]
+        public class Cff40da00SpellbreakerCircletR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Spellbreaker's Necklace|r (ersn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ersn")]
+        public class Cff40da00SpellbreakersNecklaceR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Staff of Arcane Hunger|r (esah).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("esah")]
+        public class Cff40da00StaffOfArcaneHungerR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Sticky Slime Ring|r (essr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("essr")]
+        public class Cff40da00StickySlimeRingR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Sucker Punch Gauntlets|r (espg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("espg")]
+        public class Cff40da00SuckerPunchGauntletsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Suspicious Concoction|r (epoa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epoa")]
+        public class Cff40da00SuspiciousConcoctionR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Tactician's Boots|r (ebtb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebtb")]
+        public class Cff40da00TacticiansBootsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Talisman of Nightmares|r (eton).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eton")]
+        public class Cff40da00TalismanOfNightmaresR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Talisman of Willpower|r (etow).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("etow")]
+        public class Cff40da00TalismanOfWillpowerR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Tigerskin Helmet of Precision|r (elhp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("elhp")]
+        public class Cff40da00TigerskinHelmetOfPrecisionR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Tome of Agility|r (ctoa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ctoa")]
+        public class Cff40da00TomeOfAgilityR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Tome of Intelligence|r (ctoi).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ctoi")]
+        public class Cff40da00TomeOfIntelligenceR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Tome of Strength|r (ctos).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ctos")]
+        public class Cff40da00TomeOfStrengthR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Twilight Opal Orb|r (etoo).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("etoo")]
+        public class Cff40da00TwilightOpalOrbR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Undercity Chain Robes|r (eucr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eucr")]
+        public class Cff40da00UndercityChainRobesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Ursoc's Gift|r (erug).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("erug")]
+        public class Cff40da00UrsocsGiftR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Wand of the Battlemage|r (ewob).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ewob")]
+        public class Cff40da00WandOfTheBattlemageR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Wayfarer Greaves|r (ebwg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebwg")]
+        public class Cff40da00WayfarerGreavesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Webweaver's Gloves|r (ewwg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ewwg")]
+        public class Cff40da00WebweaversGlovesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Wicked Fang Blade|r (ewfb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ewfb")]
+        public class Cff40da00WickedFangBladeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff40da00Wildhammer Breastplate|r (esib).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("esib")]
+        public class Cff40da00WildhammerBreastplateR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Aegis|r (elae).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("elae")]
+        public class Cff6295E3AegisR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Agitating Totem|r (eagt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eagt")]
+        public class Cff6295E3AgitatingTotemR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Arcane Spellblade|r (easb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("easb")]
+        public class Cff6295E3ArcaneSpellbladeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Band of the Sin'dorei|r (ebsd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebsd")]
+        public class Cff6295E3BandOfTheSindoreiR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Blade of Corruption|r (eboc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eboc")]
+        public class Cff6295E3BladeOfCorruptionR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Blade of Frozen Hunger|r (ebfh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebfh")]
+        public class Cff6295E3BladeOfFrozenHungerR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Bone Commander's Skull|r (ebcs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebcs")]
+        public class Cff6295E3BoneCommandersSkullR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Boots of the Icewalker|r (eboi).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eboi")]
+        public class Cff6295E3BootsOfTheIcewalkerR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Boots of the Scarlet Crusade|r (ebsc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebsc")]
+        public class Cff6295E3BootsOfTheScarletCrusadeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Bottled Storm|r (etbs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("etbs")]
+        public class Cff6295E3BottledStormR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Breastplate of the Scarlet Paladin|r (ebsp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebsp")]
+        public class Cff6295E3BreastplateOfTheScarletPaladinR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Butcher's Cleaver|r (ebut).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebut")]
+        public class Cff6295E3ButchersCleaverR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Captain's Helmet of Bravery|r (elvl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("elvl")]
+        public class Cff6295E3CaptainsHelmetOfBraveryR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Coldbringer's Reach|r (ecbr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecbr")]
+        public class Cff6295E3ColdbringersReachR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Corrupted Greatsword|r (epcg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epcg")]
+        public class Cff6295E3CorruptedGreatswordR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Crimson Helm of Opportunity|r (ehco).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehco")]
+        public class Cff6295E3CrimsonHelmOfOpportunityR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Crown of the Resolute Monarch|r (ecrm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecrm")]
+        public class Cff6295E3CrownOfTheResoluteMonarchR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Cursed Golden Ring|r (ecgr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecgr")]
+        public class Cff6295E3CursedGoldenRingR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Dark Iron Breastplate|r (edib).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edib")]
+        public class Cff6295E3DarkIronBreastplateR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Dark Iron Gauntlets|r (edig).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edig")]
+        public class Cff6295E3DarkIronGauntletsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Dark Iron Greaves|r (edif).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edif")]
+        public class Cff6295E3DarkIronGreavesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Dark Iron Helm|r (edih).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edih")]
+        public class Cff6295E3DarkIronHelmR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Dark Iron Shield|r (edis).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edis")]
+        public class Cff6295E3DarkIronShieldR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Dark Ranger's Bracers|r (edrb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edrb")]
+        public class Cff6295E3DarkRangersBracersR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Dark Ranger's Chestguard|r (edrc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edrc")]
+        public class Cff6295E3DarkRangersChestguardR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Dark Ranger's Hood|r (edrh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edrh")]
+        public class Cff6295E3DarkRangersHoodR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Dark Ranger's Insignia|r (edri).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edri")]
+        public class Cff6295E3DarkRangersInsigniaR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Dark Ranger's Shadows|r (edrs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edrs")]
+        public class Cff6295E3DarkRangersShadowsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Deathbloom Leaves|r (edbl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edbl")]
+        public class Cff6295E3DeathbloomLeavesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Deathbringer's Boots|r (edbb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edbb")]
+        public class Cff6295E3DeathbringersBootsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Deathwalkers|r (ebdw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebdw")]
+        public class Cff6295E3DeathwalkersR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Deathwhisper|r (epdw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epdw")]
+        public class Cff6295E3DeathwhisperR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Deepsea Bag|r (edbw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edbw")]
+        public class Cff6295E3DeepseaBagR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Demonic Warglaives|r (edwg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edwg")]
+        public class Cff6295E3DemonicWarglaivesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Drained Bloodstone|r (edbs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edbs")]
+        public class Cff6295E3DrainedBloodstoneR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Druidic Leafguard|r (ecdl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecdl")]
+        public class Cff6295E3DruidicLeafguardR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Echoes of the Fallen|r (eref).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eref")]
+        public class Cff6295E3EchoesOfTheFallenR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Elixir of Greater Intelligence|r (cegi).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cegi")]
+        public class Cff6295E3ElixirOfGreaterIntelligenceR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Enchanted Inscription Tools|r (eeit).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eeit")]
+        public class Cff6295E3EnchantedInscriptionToolsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Energy Band|r (ereb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ereb")]
+        public class Cff6295E3EnergyBandR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Frenzied Ghoul Claws|r (efgc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("efgc")]
+        public class Cff6295E3FrenziedGhoulClawsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Gift of Sloth|r (ergs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ergs")]
+        public class Cff6295E3GiftOfSlothR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Gift of Wrath|r (ergw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ergw")]
+        public class Cff6295E3GiftOfWrathR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Gloves of Perfection|r (egop).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egop")]
+        public class Cff6295E3GlovesOfPerfectionR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Gloves of the Deathbringer|r (egdb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egdb")]
+        public class Cff6295E3GlovesOfTheDeathbringerR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Gnomish Zapper X-4000|r (egzx).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egzx")]
+        public class Cff6295E3GnomishZapperX4000R : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Greater Engineering Goggles|r (eeh2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eeh2")]
+        public class Cff6295E3GreaterEngineeringGogglesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Heart of the Lake|r (ehol).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehol")]
+        public class Cff6295E3HeartOfTheLakeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Helm of the Cenarion Circle|r (ehcc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehcc")]
+        public class Cff6295E3HelmOfTheCenarionCircleR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Helm of the Iron Guardian|r (ehig).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehig")]
+        public class Cff6295E3HelmOfTheIronGuardianR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Helm of the Rimelord|r (ehrl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehrl")]
+        public class Cff6295E3HelmOfTheRimelordR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Helm of the Scarlet Captain|r (ehsc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehsc")]
+        public class Cff6295E3HelmOfTheScarletCaptainR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Horn of the Lost Spirits|r (ehls).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehls")]
+        public class Cff6295E3HornOfTheLostSpiritsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Huge Citrine of the Fierce|r (ehcf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehcf")]
+        public class Cff6295E3HugeCitrineOfTheFierceR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Ice Cold Diamond|r (eicd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eicd")]
+        public class Cff6295E3IceColdDiamondR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Immortal Guardian's Chestplate|r (ecig).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecig")]
+        public class Cff6295E3ImmortalGuardiansChestplateR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Infectious Ghoul Charm|r (eigc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eigc")]
+        public class Cff6295E3InfectiousGhoulCharmR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Knight's Javelin|r (etkj).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("etkj")]
+        public class Cff6295E3KnightsJavelinR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Kris, the Everburning|r (eske).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eske")]
+        public class Cff6295E3KrisTheEverburningR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Lance of the Dawn|r (elod).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("elod")]
+        public class Cff6295E3LanceOfTheDawnR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Lich Orb|r (eslo).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eslo")]
+        public class Cff6295E3LichOrbR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Lordaeron Shield|r (esls).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("esls")]
+        public class Cff6295E3LordaeronShieldR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Lost Forsaken Quiver|r (elfq).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("elfq")]
+        public class Cff6295E3LostForsakenQuiverR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Manuscript of the Forsaken|r (emof).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("emof")]
+        public class Cff6295E3ManuscriptOfTheForsakenR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Mograine's Might|r (epmb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epmb")]
+        public class Cff6295E3MograinesMightR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Monastery Mace|r (epmm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epmm")]
+        public class Cff6295E3MonasteryMaceR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Mordo's Club|r (ewbl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ewbl")]
+        public class Cff6295E3MordosClubR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Mysterious Twilight Opal|r (emto).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("emto")]
+        public class Cff6295E3MysteriousTwilightOpalR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Necrolyte's March|r (esnm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("esnm")]
+        public class Cff6295E3NecrolytesMarchR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Nerubian Necklace|r (ernn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ernn")]
+        public class Cff6295E3NerubianNecklaceR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Nexus Shiv|r (esns).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("esns")]
+        public class Cff6295E3NexusShivR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Overlord's Dreadplate|r (eodp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eodp")]
+        public class Cff6295E3OverlordsDreadplateR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Pirate Hat|r (ehph).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehph")]
+        public class Cff6295E3PirateHatR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Poison Nettle|r (espn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("espn")]
+        public class Cff6295E3PoisonNettleR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Protector of the Silver Hand|r (epsh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epsh")]
+        public class Cff6295E3ProtectorOfTheSilverHandR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Purifier Blade|r (erpb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("erpb")]
+        public class Cff6295E3PurifierBladeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Restorative Balm|r (etrb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("etrb")]
+        public class Cff6295E3RestorativeBalmR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Ring of Assassination|r (eroa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eroa")]
+        public class Cff6295E3RingOfAssassinationR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Ring of Greater Mana Efficiency|r (ergm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ergm")]
+        public class Cff6295E3RingOfGreaterManaEfficiencyR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Ring of Sacred Magic|r (ersm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ersm")]
+        public class Cff6295E3RingOfSacredMagicR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Ring of the Firelands|r (erfl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("erfl")]
+        public class Cff6295E3RingOfTheFirelandsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Ring of the Sacred Grove|r (ersg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ersg")]
+        public class Cff6295E3RingOfTheSacredGroveR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Robes of the Battlemage|r (erbm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("erbm")]
+        public class Cff6295E3RobesOfTheBattlemageR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Sage's Gloves|r (egsg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egsg")]
+        public class Cff6295E3SagesGlovesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Sharpened Cleaver|r (epsc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epsc")]
+        public class Cff6295E3SharpenedCleaverR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Shepherd's Curse|r (eshc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eshc")]
+        public class Cff6295E3ShepherdsCurseR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Shredder's Left Arm|r (esla).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("esla")]
+        public class Cff6295E3ShreddersLeftArmR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Signet of Blood|r (ersb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ersb")]
+        public class Cff6295E3SignetOfBloodR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Signet of the Crypt Lord|r (escl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("escl")]
+        public class Cff6295E3SignetOfTheCryptLordR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Skeletal Bow|r (epsb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epsb")]
+        public class Cff6295E3SkeletalBowR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Staff of the Scarlet Inquisitor|r (essi).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("essi")]
+        public class Cff6295E3StaffOfTheScarletInquisitorR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Star of Elune|r (erse).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("erse")]
+        public class Cff6295E3StarOfEluneR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Sword of the Ghostlands|r (epsg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epsg")]
+        public class Cff6295E3SwordOfTheGhostlandsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3The Impenetrable Fortress|r (etif).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("etif")]
+        public class Cff6295E3TheImpenetrableFortressR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Thornguard Rapier|r (eptr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eptr")]
+        public class Cff6295E3ThornguardRapierR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Tiara of the Kirin Tor|r (etkt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("etkt")]
+        public class Cff6295E3TiaraOfTheKirinTorR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Tome of Azjol-Nerub|r (ersk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ersk")]
+        public class Cff6295E3TomeOfAzjolNerubR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Vampiric Robes|r (eavr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eavr")]
+        public class Cff6295E3VampiricRobesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff6295E3Vestments of the Wavespeaker|r (evow).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("evow")]
+        public class Cff6295E3VestmentsOfTheWavespeakerR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbArcane Cleaver|r (epac).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epac")]
+        public class Cff7c2abbArcaneCleaverR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbArmor of Reanimation|r (eaor).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eaor")]
+        public class Cff7c2abbArmorOfReanimationR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbAviana's Talons|r (egat).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egat")]
+        public class Cff7c2abbAvianasTalonsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbBindings of Helya|r (eboh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eboh")]
+        public class Cff7c2abbBindingsOfHelyaR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbBlackrock Chain Helm|r (ebr1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebr1")]
+        public class Cff7c2abbBlackrockChainHelmR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbBlackrock Steel Plate|r (ebrp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebrp")]
+        public class Cff7c2abbBlackrockSteelPlateR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbBlade of Inferno|r (einf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("einf")]
+        public class Cff7c2abbBladeOfInfernoR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbBlade of the Crimson Heart|r (ech2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ech2")]
+        public class Cff7c2abbBladeOfTheCrimsonHeartR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbBlade of the Scarlet Crusade|r (essc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("essc")]
+        public class Cff7c2abbBladeOfTheScarletCrusadeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbBlademaster's Greatsword|r (ebr2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebr2")]
+        public class Cff7c2abbBlademastersGreatswordR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbBracers of the Ogre Magi|r (ebom).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebom")]
+        public class Cff7c2abbBracersOfTheOgreMagiR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbCardinal Ruby of the Necrolyte|r (ecrn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecrn")]
+        public class Cff7c2abbCardinalRubyOfTheNecrolyteR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbChronomaster's Gloves|r (ecmg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecmg")]
+        public class Cff7c2abbChronomastersGlovesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbColossal Battleaxe|r (ecba).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecba")]
+        public class Cff7c2abbColossalBattleaxeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbConsecrated Mixture|r (cccm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cccm")]
+        public class Cff7c2abbConsecratedMixtureR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbConvergence of Fates|r (ecof).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecof")]
+        public class Cff7c2abbConvergenceOfFatesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbCrystal Sword|r (epcs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epcs")]
+        public class Cff7c2abbCrystalSwordR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbDaybreaker|r (epdb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epdb")]
+        public class Cff7c2abbDaybreakerR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbDiamond Adorned Chestplate|r (edac).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edac")]
+        public class Cff7c2abbDiamondAdornedChestplateR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbDiamond Ring|r (erdr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("erdr")]
+        public class Cff7c2abbDiamondRingR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbDiamond Tiara|r (ehdt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehdt")]
+        public class Cff7c2abbDiamondTiaraR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbEarthen Signet|r (eres).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eres")]
+        public class Cff7c2abbEarthenSignetR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbEdge of the Ruined City|r (eerc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eerc")]
+        public class Cff7c2abbEdgeOfTheRuinedCityR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbForgotten Frost Lotus|r (effl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("effl")]
+        public class Cff7c2abbForgottenFrostLotusR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbGift of Pride|r (ergp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ergp")]
+        public class Cff7c2abbGiftOfPrideR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbGlacial Shard|r (egsh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egsh")]
+        public class Cff7c2abbGlacialShardR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbGloves of the Flamewalker|r (egfw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egfw")]
+        public class Cff7c2abbGlovesOfTheFlamewalkerR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbGloves of Ultimate Vampirism|r (eguv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eguv")]
+        public class Cff7c2abbGlovesOfUltimateVampirismR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbGolden Necklace of Serenity|r (egns).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egns")]
+        public class Cff7c2abbGoldenNecklaceOfSerenityR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbGuardian of the Crimson Heart|r (ech3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ech3")]
+        public class Cff7c2abbGuardianOfTheCrimsonHeartR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbHeadpiece of the High Inquisitor|r (ehhi).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehhi")]
+        public class Cff7c2abbHeadpieceOfTheHighInquisitorR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbHelm of the Dark Rider|r (ehdr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehdr")]
+        public class Cff7c2abbHelmOfTheDarkRiderR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbHigh Templar's Conqueror|r (ehtc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehtc")]
+        public class Cff7c2abbHighTemplarsConquerorR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbHigh Templar's Flame|r (ehtf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehtf")]
+        public class Cff7c2abbHighTemplarsFlameR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbHigh Templar's Judgment|r (ehtj).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehtj")]
+        public class Cff7c2abbHighTemplarsJudgmentR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbHigh Templar's March|r (ehtm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehtm")]
+        public class Cff7c2abbHighTemplarsMarchR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbHigh Templar's Visage|r (ehtv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehtv")]
+        public class Cff7c2abbHighTemplarsVisageR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbIcecrown Ring|r (eicc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eicc")]
+        public class Cff7c2abbIcecrownRingR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbKaldorei Moonglaive|r (ekmg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ekmg")]
+        public class Cff7c2abbKaldoreiMoonglaiveR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbLance of the Frozen Phoenix|r (elfp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("elfp")]
+        public class Cff7c2abbLanceOfTheFrozenPhoenixR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbMaster Engineering Goggles|r (eeh3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eeh3")]
+        public class Cff7c2abbMasterEngineeringGogglesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbNightfall|r (epnf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epnf")]
+        public class Cff7c2abbNightfallR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbOgre Warclub|r (epow).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epow")]
+        public class Cff7c2abbOgreWarclubR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbPlaguewrought, Blight Incarnate|r (epwb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epwb")]
+        public class Cff7c2abbPlaguewroughtBlightIncarnateR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbPortable Lightning Rod|r (eplr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eplr")]
+        public class Cff7c2abbPortableLightningRodR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbRing of Holy Fire|r (ehfi).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehfi")]
+        public class Cff7c2abbRingOfHolyFireR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbRing of the Archdruid|r (erad).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("erad")]
+        public class Cff7c2abbRingOfTheArchdruidR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbRobes of Revenge|r (earr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("earr")]
+        public class Cff7c2abbRobesOfRevengeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbSanctified Chestplate|r (esa1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("esa1")]
+        public class Cff7c2abbSanctifiedChestplateR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbSanctified Gauntlets|r (esa2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("esa2")]
+        public class Cff7c2abbSanctifiedGauntletsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbScepter of Darkness|r (esod).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("esod")]
+        public class Cff7c2abbScepterOfDarknessR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbScythe of Frost|r (esof).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("esof")]
+        public class Cff7c2abbScytheOfFrostR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbSeal of the Red Court|r (esrc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("esrc")]
+        public class Cff7c2abbSealOfTheRedCourtR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbShield of the Scarlet Crusade|r (eosc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eosc")]
+        public class Cff7c2abbShieldOfTheScarletCrusadeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbShield of the Titans|r (esot).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("esot")]
+        public class Cff7c2abbShieldOfTheTitansR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbSoulstealer|r (epss).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epss")]
+        public class Cff7c2abbSoulstealerR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbStaff of Jordan|r (epsj).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epsj")]
+        public class Cff7c2abbStaffOfJordanR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbStaff of the Crimson Heart|r (ech1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ech1")]
+        public class Cff7c2abbStaffOfTheCrimsonHeartR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbStormwalkers|r (ebsw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebsw")]
+        public class Cff7c2abbStormwalkersR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbThe Kingbreaker|r (eptk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eptk")]
+        public class Cff7c2abbTheKingbreakerR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbThe Screecher|r (escr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("escr")]
+        public class Cff7c2abbTheScreecherR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbTotem of the Ogre Magi|r (etom).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("etom")]
+        public class Cff7c2abbTotemOfTheOgreMagiR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbVampiric Gargoyle Mask|r (evgm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("evgm")]
+        public class Cff7c2abbVampiricGargoyleMaskR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbVestments of the Storm King|r (evsk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("evsk")]
+        public class Cff7c2abbVestmentsOfTheStormKingR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cff7c2abbZandalari Giantcrusher|r (ezgc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ezgc")]
+        public class Cff7c2abbZandalariGiantcrusherR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeAlicia's Favor|r (ebtf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebtf")]
+        public class CffaeaeaeAliciasFavorR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeAmulet of Minor Endurance|r (eame).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eame")]
+        public class CffaeaeaeAmuletOfMinorEnduranceR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeAmulet of Vitality|r (ecav).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecav")]
+        public class CffaeaeaeAmuletOfVitalityR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeBag of Dust|r (etbd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("etbd")]
+        public class CffaeaeaeBagOfDustR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeBand of the Skeletal Mage|r (ebsm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebsm")]
+        public class CffaeaeaeBandOfTheSkeletalMageR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeBone Buckler|r (eobb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eobb")]
+        public class CffaeaeaeBoneBucklerR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeBroken Skinning Knife|r (ebsk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebsk")]
+        public class CffaeaeaeBrokenSkinningKnifeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeChestpiece of Lesser Cunning|r (eclc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eclc")]
+        public class CffaeaeaeChestpieceOfLesserCunningR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeChipped Circlet of Clarity|r (eccc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eccc")]
+        public class CffaeaeaeChippedCircletOfClarityR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeChipped Shield|r (eocs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eocs")]
+        public class CffaeaeaeChippedShieldR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeCork Shooter|r (escs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("escs")]
+        public class CffaeaeaeCorkShooterR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeDamaged Spellbreaker Helmet|r (edsh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edsh")]
+        public class CffaeaeaeDamagedSpellbreakerHelmetR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeDecrepit Sorcerer's Mantle|r (edsm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("edsm")]
+        public class CffaeaeaeDecrepitSorcerersMantleR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeDeerskin Gloves|r (eclg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eclg")]
+        public class CffaeaeaeDeerskinGlovesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeEdric's Eye|r (etee).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("etee")]
+        public class CffaeaeaeEdricsEyeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeFractured Skull|r (eofs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eofs")]
+        public class CffaeaeaeFracturedSkullR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeFrail Leather Armor|r (efla).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("efla")]
+        public class CffaeaeaeFrailLeatherArmorR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeFrayed Headwear of the Magehunter|r (efhm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("efhm")]
+        public class CffaeaeaeFrayedHeadwearOfTheMagehunterR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeFrayed Sorcerer's Handwraps|r (efsh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("efsh")]
+        public class CffaeaeaeFrayedSorcerersHandwrapsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeGloves of Lesser Cunning|r (eglc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eglc")]
+        public class CffaeaeaeGlovesOfLesserCunningR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeGuardsman Boots|r (ecgb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecgb")]
+        public class CffaeaeaeGuardsmanBootsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeGuardsman Chestplate|r (ecgc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecgc")]
+        public class CffaeaeaeGuardsmanChestplateR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeGuardsman Dagger|r (epgd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epgd")]
+        public class CffaeaeaeGuardsmanDaggerR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeGuardsman Helmet|r (ecgh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecgh")]
+        public class CffaeaeaeGuardsmanHelmetR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeGuardsman Longsword|r (epgl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epgl")]
+        public class CffaeaeaeGuardsmanLongswordR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeHandful of Throwing Knives|r (ehtk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ehtk")]
+        public class CffaeaeaeHandfulOfThrowingKnivesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeHeavyduty Boots|r (ebhb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebhb")]
+        public class CffaeaeaeHeavydutyBootsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeIron Grip Gauntlets|r (eigg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eigg")]
+        public class CffaeaeaeIronGripGauntletsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeLesser Band of the Paladin|r (elbp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("elbp")]
+        public class CffaeaeaeLesserBandOfThePaladinR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeLesser Blade of the Cultist|r (elbc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("elbc")]
+        public class CffaeaeaeLesserBladeOfTheCultistR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeLesser Mark of the Forsaken|r (elmf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("elmf")]
+        public class CffaeaeaeLesserMarkOfTheForsakenR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeLesser Mark of Time|r (elmt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("elmt")]
+        public class CffaeaeaeLesserMarkOfTimeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeMundane Wand|r (epmw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epmw")]
+        public class CffaeaeaeMundaneWandR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeNovice Rags|r (ecnr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecnr")]
+        public class CffaeaeaeNoviceRagsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaePainted Wooden Sword|r (epws).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("epws")]
+        public class CffaeaeaePaintedWoodenSwordR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeRing of Agitated Fervor|r (eraf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eraf")]
+        public class CffaeaeaeRingOfAgitatedFervorR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeRing of Lesser Restoration|r (erlr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("erlr")]
+        public class CffaeaeaeRingOfLesserRestorationR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeRing of Regeneration|r (ecrr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecrr")]
+        public class CffaeaeaeRingOfRegenerationR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeRing of the Fortunate Adventurer|r (erfa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("erfa")]
+        public class CffaeaeaeRingOfTheFortunateAdventurerR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeRusty Bronze Gauntlets|r (erbg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("erbg")]
+        public class CffaeaeaeRustyBronzeGauntletsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeRusty Plated Boots|r (brpb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("brpb")]
+        public class CffaeaeaeRustyPlatedBootsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeShattered Scourgelord's Crown|r (eslc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eslc")]
+        public class CffaeaeaeShatteredScourgelordsCrownR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeShoddy Cap|r (ecap).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecap")]
+        public class CffaeaeaeShoddyCapR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeSkeletal Mage Mask|r (hsmm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("hsmm")]
+        public class CffaeaeaeSkeletalMageMaskR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeSteel Sword|r (ecss).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ecss")]
+        public class CffaeaeaeSteelSwordR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeTalisman of Minor Insight|r (etmi).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("etmi")]
+        public class CffaeaeaeTalismanOfMinorInsightR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeTalisman of the Northern Winds|r (etnw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("etnw")]
+        public class CffaeaeaeTalismanOfTheNorthernWindsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeWand of the Apprentice|r (ewoa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ewoa")]
+        public class CffaeaeaeWandOfTheApprenticeR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeWorn Adventurer's Outfit|r (ewao).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ewao")]
+        public class CffaeaeaeWornAdventurersOutfitR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeWorn Sandals|r (ebws).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ebws")]
+        public class CffaeaeaeWornSandalsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeWorn Steel Plate|r (ews1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ews1")]
+        public class CffaeaeaeWornSteelPlateR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeWorn Thief's Boots|r (ewtb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ewtb")]
+        public class CffaeaeaeWornThiefsBootsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffaeaeaeZombie Arm|r (ezba).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ezba")]
+        public class CffaeaeaeZombieArmR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffed6de0Garithos's Head|r (cgah).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cgah")]
+        public class Cffed6de0GarithossHeadR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cfff28302Borelgore, the Corpulent One|r (eymo).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eymo")]
+        public class Cfff28302BorelgoreTheCorpulentOneR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cfff28302Essencium, the Gathering of Elements|r (eege).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eege")]
+        public class Cfff28302EssenciumTheGatheringOfElementsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cfff28302Flame of Al'ar|r (efoa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("efoa")]
+        public class Cfff28302FlameOfAlarR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cfff28302Gravelight, the Echoing Flames|r (egef).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egef")]
+        public class Cfff28302GravelightTheEchoingFlamesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cfff28302Ravage, Herald of Obliteration|r (erho).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("erho")]
+        public class Cfff28302RavageHeraldOfObliterationR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cfff28302Razorice, Harbinger of Winter|r (erhw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("erhw")]
+        public class Cfff28302RazoriceHarbingerOfWinterR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cfff28302Selene, Grand Scepter of Elune|r (egse).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("egse")]
+        public class Cfff28302SeleneGrandScepterOfEluneR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cfff28302Untakable Candle|r (eauc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("eauc")]
+        public class Cfff28302UntakableCandleR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Bandit Lord's Limbs|r (cabl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cabl")]
+        public class Cffffff00BanditLordsLimbsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Broodmother Venom|r (cbmv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cbmv")]
+        public class Cffffff00BroodmotherVenomR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Captured Ghoul|r (cccg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cccg")]
+        public class Cffffff00CapturedGhoulR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Darkhound Blood|r (cdhb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cdhb")]
+        public class Cffffff00DarkhoundBloodR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Dungeon Key|r (ckdk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ckdk")]
+        public class Cffffff00DungeonKeyR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Experimental Serum|r (cese).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cese")]
+        public class Cffffff00ExperimentalSerumR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Explosive Barrel|r (cexp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cexp")]
+        public class Cffffff00ExplosiveBarrelR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Garithos's Head|r (cagh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cagh")]
+        public class Cffffff00GarithossHeadR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Key to the Chamber of Mysteries|r (ckcm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ckcm")]
+        public class Cffffff00KeyToTheChamberOfMysteriesR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Lump of Meat|r (clom).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("clom")]
+        public class Cffffff00LumpOfMeatR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Magical Key|r (cmag).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cmag")]
+        public class Cffffff00MagicalKeyR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Paladin's Torso|r (cptz).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cptz")]
+        public class Cffffff00PaladinsTorsoR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Portal Orb|r (cpor).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cpor")]
+        public class Cffffff00PortalOrbR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Prison Key|r (cprk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cprk")]
+        public class Cffffff00PrisonKeyR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00The Artifact|r (ctat).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ctat")]
+        public class Cffffff00TheArtifactR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Valve Wheel|r (ccvw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ccvw")]
+        public class Cffffff00ValveWheelR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Very Very Deep Thoughts|r (cvdt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cvdt")]
+        public class Cffffff00VeryVeryDeepThoughtsR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Vial of Plague Essence|r (cvpe).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cvpe")]
+        public class Cffffff00VialOfPlagueEssenceR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Vial of Vampire Bat Blood|r (cvvb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cvvb")]
+        public class Cffffff00VialOfVampireBatBloodR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>|cffffff00Vile Fin Scale|r (cvfs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cvfs")]
+        public class Cffffff00VileFinScaleR : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Cheese (ches).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ches")]
+        public class Cheese : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Circlet of Nobility (cnob).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cnob")]
+        public class CircletOfNobility : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Clarity Potion (pclr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("pclr")]
+        public class ClarityPotion : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Claws of Attack +12 (ratc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ratc")]
+        public class ClawsOfAttack12 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Claws of Attack +15 (ratf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ratf")]
+        public class ClawsOfAttack15 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Claws of Attack +3 (rat3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rat3")]
+        public class ClawsOfAttack3 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Claws of Attack +5 (rat6).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rat6")]
+        public class ClawsOfAttack5 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Claws of Attack +8 (rat9).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rat9")]
+        public class ClawsOfAttack8 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Cloak of Flames (clfm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("clfm")]
+        public class CloakOfFlames : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Cloak of Shadows (clsd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("clsd")]
+        public class CloakOfShadows : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Clockwork Penguin (stpg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("stpg")]
+        public class ClockworkPenguin : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Crown of Kings +5 (ckng).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ckng")]
+        public class CrownOfKings5 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Crown of the Deathlord (crdt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("crdt")]
+        public class CrownOfTheDeathlord : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Crystal Ball (crys).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("crys")]
+        public class CrystalBall : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Demonic Figurine (fgdg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("fgdg")]
+        public class DemonicFigurine : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Diamond of Summoning (dsum).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("dsum")]
+        public class DiamondOfSummoning : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Drek'thar's Spellbook (dtsb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("dtsb")]
+        public class DrektharsSpellbook : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Druid Pouch (drph).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("drph")]
+        public class DruidPouch : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Dust of Appearance (dust).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("dust")]
+        public class DustOfAppearance : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Empty Vial (bzbe).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("bzbe")]
+        public class EmptyVial : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Enchanted Gemstone (engs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("engs")]
+        public class EnchantedGemstone : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Enchanted Shield (shen).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("shen")]
+        public class EnchantedShield : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Enchanted Vial (envl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("envl")]
+        public class EnchantedVial : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Engraved Scale (engr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("engr")]
+        public class EngravedScale : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Essence of Aszune (esaz).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("esaz")]
+        public class EssenceOfAszune : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Essence of Undeath (peou).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("peou")]
+        public class EssenceOfUndeath : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Firehand Gauntlets (frhg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("frhg")]
+        public class FirehandGauntlets : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Flare Gun (fgun).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("fgun")]
+        public class FlareGun : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Frost Wyrm Skull Shield (fwss).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("fwss")]
+        public class FrostWyrmSkullShield : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Frostguard (frgd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("frgd")]
+        public class Frostguard : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Full Vial (bzbf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("bzbf")]
+        public class FullVial : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Gauntlets of Ogre Strength +3 (rst1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rst1")]
+        public class GauntletsOfOgreStrength3 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Gem Fragment (gmfr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("gmfr")]
+        public class GemFragment : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Gem of True Seeing (gemt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("gemt")]
+        public class GemOfTrueSeeing : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Gerard's Lost Ledger (ledg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ledg")]
+        public class GerardsLostLedger : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ghost Key (kygh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("kygh")]
+        public class GhostKey : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Glix's Special (glxb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("glxb")]
+        public class GlixsSpecial : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Gloves of Haste (gcel).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("gcel")]
+        public class GlovesOfHaste : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Gloves of Spell Mastery (gvsm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("gvsm")]
+        public class GlovesOfSpellMastery : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Glyph of Fortification (gfor).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("gfor")]
+        public class GlyphOfFortification : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Glyph of Omniscience (gomn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("gomn")]
+        public class GlyphOfOmniscience : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Glyph of Purification (gopr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("gopr")]
+        public class GlyphOfPurification : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Glyph of Ultravision (guvi).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("guvi")]
+        public class GlyphOfUltravision : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Goblin Land Mines (gobm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("gobm")]
+        public class GoblinLandMines : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Goblin Night Scope (tels).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tels")]
+        public class GoblinNightScope : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Gold Coins (gold).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("gold")]
+        public class GoldCoins : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Greater Replenishment Potion (rej4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rej4")]
+        public class GreaterReplenishmentPotion : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Greater Scroll of Replenishment (rej6).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rej6")]
+        public class GreaterScrollOfReplenishment : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Grimoire of Souls (grsl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("grsl")]
+        public class GrimoireOfSouls : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Healing Salve (hslv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("hslv")]
+        public class HealingSalve : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Healing Wards (whwd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("whwd")]
+        public class HealingWards : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Health Stone (hlst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("hlst")]
+        public class HealthStone : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Heart of Aszune (azhr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("azhr")]
+        public class HeartOfAszune : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Helm of Battlethirst (hbth).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("hbth")]
+        public class HelmOfBattlethirst : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Helm of Valor (hval).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("hval")]
+        public class HelmOfValor : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Hood of Cunning (hcun).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("hcun")]
+        public class HoodOfCunning : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Horn of Cenarius (cnhn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("cnhn")]
+        public class HornOfCenarius : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Horn of the Clouds (sfog).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sfog")]
+        public class HornOfTheClouds : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Human Flag (flag).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("flag")]
+        public class HumanFlag : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ice Shard (shar).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("shar")]
+        public class IceShard : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Idol of the Wild (iotw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("iotw")]
+        public class IdolOfTheWild : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Inferno Stone (infs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("infs")]
+        public class InfernoStone : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ironwood Branch (iwbr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("iwbr")]
+        public class IronwoodBranch : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ivory Tower (tsct).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tsct")]
+        public class IvoryTower : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Jade Ring (jdrn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("jdrn")]
+        public class JadeRing : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Keg of Ale (kgal).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("kgal")]
+        public class KegOfAle : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Keg of Thunderwater (dkfw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("dkfw")]
+        public class KegOfThunderwater : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Kelen's Dagger of Escape (desc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("desc")]
+        public class KelensDaggerOfEscape : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Key of Three Moons (k3m3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("k3m3")]
+        public class KeyOfThreeMoons : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Khadgar's Gem of Health (rhth).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rhth")]
+        public class KhadgarsGemOfHealth : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Khadgar's Pipe of Insight (kpin).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("kpin")]
+        public class KhadgarsPipeOfInsight : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Killmaim (klmm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("klmm")]
+        public class Killmaim : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Legion Doom-Horn (lgdh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("lgdh")]
+        public class LegionDoomHorn : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Lesser Clarity Potion (plcl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("plcl")]
+        public class LesserClarityPotion : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Lesser Replenishment Potion (rej2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rej2")]
+        public class LesserReplenishmentPotion : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Lesser Scroll of Replenishment (rej5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rej5")]
+        public class LesserScrollOfReplenishment : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Lion's Ring (lnrn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("lnrn")]
+        public class LionsRing : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Magic Key Chain (mgtk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("mgtk")]
+        public class MagicKeyChain : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Mana Stone (mnst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("mnst")]
+        public class ManaStone : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Mantle of Intelligence +3 (rin1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rin1")]
+        public class MantleOfIntelligence3 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Manual of Health (manh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("manh")]
+        public class ManualOfHealth : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Mask of Death (modt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("modt")]
+        public class MaskOfDeath : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Maul of Strength (mlst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("mlst")]
+        public class MaulOfStrength : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Mechanical Critter (mcri).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("mcri")]
+        public class MechanicalCritter : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Medallion of Courage (mcou).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("mcou")]
+        public class MedallionOfCourage : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Mindstaff (mnsf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("mnsf")]
+        public class Mindstaff : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Minor Replenishment Potion (rej1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rej1")]
+        public class MinorReplenishmentPotion : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Mogrin's Report (mort).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("mort")]
+        public class MogrinsReport : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Monster Lure (lure).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("lure")]
+        public class MonsterLure : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Moon Key (kymn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("kymn")]
+        public class MoonKey : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Mooncrystal (k3m1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("k3m1")]
+        public class Mooncrystal : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Moonstone (moon).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("moon")]
+        public class Moonstone : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Necklace of Spell Immunity (nspi).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("nspi")]
+        public class NecklaceOfSpellImmunity : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Night Elf Flag (nflg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("nflg")]
+        public class NightElfFlag : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Note to Jaina Proudmoore (jpnt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("jpnt")]
+        public class NoteToJainaProudmoore : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Orb of Corruption (ocor).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ocor")]
+        public class OrbOfCorruption : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Orb of Darkness (odef).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("odef")]
+        public class OrbOfDarkness : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Orb of Fire (ofir).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ofir")]
+        public class OrbOfFire : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Orb of Fire (ofr2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ofr2")]
+        public class OrbOfFireOfr2 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Orb of Frost (ofro).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ofro")]
+        public class OrbOfFrost : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Orb of Kil'jaeden (gldo).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("gldo")]
+        public class OrbOfKiljaeden : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Orb of Lightning (oli2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("oli2")]
+        public class OrbOfLightning : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Orb of Lightning (olig).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("olig")]
+        public class OrbOfLightningOlig : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Orb of Slow (oslo).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("oslo")]
+        public class OrbOfSlow : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Orb of Venom (oven).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("oven")]
+        public class OrbOfVenom : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Orc Flag (oflg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("oflg")]
+        public class OrcFlag : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Partial Key of the Three Moons (k3m2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("k3m2")]
+        public class PartialKeyOfTheThreeMoons : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Pendant of Energy (penr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("penr")]
+        public class PendantOfEnergy : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Pendant of Mana (pmna).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("pmna")]
+        public class PendantOfMana : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Periapt of Vitality (prvt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("prvt")]
+        public class PeriaptOfVitality : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Phat Lewt (phlt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("phlt")]
+        public class PhatLewt : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Potion of Divinity (pdi2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("pdi2")]
+        public class PotionOfDivinity : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Potion of Divinity (pdiv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("pdiv")]
+        public class PotionOfDivinityPdiv : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Potion of Greater Healing (pghe).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("pghe")]
+        public class PotionOfGreaterHealing : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Potion of Greater Invisibility (pgin).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("pgin")]
+        public class PotionOfGreaterInvisibility : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Potion of Greater Mana (pgma).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("pgma")]
+        public class PotionOfGreaterMana : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Potion of Healing (phea).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("phea")]
+        public class PotionOfHealing : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Potion of Invisibility (pinv).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("pinv")]
+        public class PotionOfInvisibility : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Potion of Invulnerability (pnvu).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("pnvu")]
+        public class PotionOfInvulnerability : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Potion of Lesser Invulnerability (pnvl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("pnvl")]
+        public class PotionOfLesserInvulnerability : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Potion of Mana (pman).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("pman")]
+        public class PotionOfMana : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Potion of Omniscience (pomn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("pomn")]
+        public class PotionOfOmniscience : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Potion of Restoration (pres).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("pres")]
+        public class PotionOfRestoration : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Potion of Speed (pspd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("pspd")]
+        public class PotionOfSpeed : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Potion of Ultimate Healing (puhe).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("puhe")]
+        public class PotionOfUltimateHealing : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Potion of Ultimate Mana (puma).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("puma")]
+        public class PotionOfUltimateMana : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Red Drake Egg (fgrd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("fgrd")]
+        public class RedDrakeEgg : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Replenishment Potion (rej3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rej3")]
+        public class ReplenishmentPotion : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ring of Protection +1 (rde0).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rde0")]
+        public class RingOfProtection1 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ring of Protection +2 (rde1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rde1")]
+        public class RingOfProtection2 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ring of Protection +3 (rde2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rde2")]
+        public class RingOfProtection3 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ring of Protection +4 (rde3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rde3")]
+        public class RingOfProtection4 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ring of Protection +5 (rde4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rde4")]
+        public class RingOfProtection5 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ring of Regeneration (rlif).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rlif")]
+        public class RingOfRegeneration : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ring of Superiority (rnsp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rnsp")]
+        public class RingOfSuperiority : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ring of the Archmagi (ram1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ram1")]
+        public class RingOfTheArchmagi : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ring of the Archmagi (ram2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ram2")]
+        public class RingOfTheArchmagiRam2 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ring of the Archmagi (ram3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ram3")]
+        public class RingOfTheArchmagiRam3 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ring of the Archmagi (ram4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ram4")]
+        public class RingOfTheArchmagiRam4 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Ritual Dagger (ritd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ritd")]
+        public class RitualDagger : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Robe of the Magi +6 (ciri).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ciri")]
+        public class RobeOfTheMagi6 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Rod of Necromancy (rnec).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rnec")]
+        public class RodOfNecromancy : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Rune of Dispel Magic (rdis).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rdis")]
+        public class RuneOfDispelMagic : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Rune of Greater Healing (rhe3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rhe3")]
+        public class RuneOfGreaterHealing : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Rune of Greater Mana (rma2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rma2")]
+        public class RuneOfGreaterMana : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Rune of Greater Resurrection (rre2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rre2")]
+        public class RuneOfGreaterResurrection : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Rune of Healing (rhe2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rhe2")]
+        public class RuneOfHealing : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Rune of Lesser Healing (rhe1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rhe1")]
+        public class RuneOfLesserHealing : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Rune of Lesser Resurrection (rre1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rre1")]
+        public class RuneOfLesserResurrection : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Rune of Mana (rman).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rman")]
+        public class RuneOfMana : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Rune of Rebirth (rreb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rreb")]
+        public class RuneOfRebirth : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Rune of Restoration (rres).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rres")]
+        public class RuneOfRestoration : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Rune of Shielding (rsps).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rsps")]
+        public class RuneOfShielding : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Rune of Speed (rspd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rspd")]
+        public class RuneOfSpeed : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Rune of Spirit Link (rspl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rspl")]
+        public class RuneOfSpiritLink : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Rune of the Watcher (rwat).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rwat")]
+        public class RuneOfTheWatcher : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Runed Bracers (brac).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("brac")]
+        public class RunedBracers : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Runed Gauntlets (rugt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rugt")]
+        public class RunedGauntlets : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Rusty Mining Pick (rump).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rump")]
+        public class RustyMiningPick : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Sacred Relic (horl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("horl")]
+        public class SacredRelic : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Sacrificial Skull (skul).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("skul")]
+        public class SacrificialSkull : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Scepter of Avarice (scav).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("scav")]
+        public class ScepterOfAvarice : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Scepter of Healing (schl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("schl")]
+        public class ScepterOfHealing : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Scepter of Mastery (ccmd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ccmd")]
+        public class ScepterOfMastery : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Scepter of the Sea (rots).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rots")]
+        public class ScepterOfTheSea : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Scourge Bone Chimes (sbch).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sbch")]
+        public class ScourgeBoneChimes : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Scroll of Animate Dead (sand).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sand")]
+        public class ScrollOfAnimateDead : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Scroll of Healing (shea).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("shea")]
+        public class ScrollOfHealing : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Scroll of Mana (sman).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sman")]
+        public class ScrollOfMana : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Scroll of Protection (spro).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("spro")]
+        public class ScrollOfProtection : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Scroll of Regeneration (sreg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sreg")]
+        public class ScrollOfRegeneration : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Scroll of Restoration (sres).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sres")]
+        public class ScrollOfRestoration : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Scroll of Resurrection (srrc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("srrc")]
+        public class ScrollOfResurrection : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Scroll of Speed (shas).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("shas")]
+        public class ScrollOfSpeed : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Scroll of the Beast (sror).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sror")]
+        public class ScrollOfTheBeast : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Scroll of the Unholy Legion (scul).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("scul")]
+        public class ScrollOfTheUnholyLegion : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Scroll of Town Portal (stwp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("stwp")]
+        public class ScrollOfTownPortal : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Searing Blade (srbd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("srbd")]
+        public class SearingBlade : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Secret Level Powerup (sclp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sclp")]
+        public class SecretLevelPowerup : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Seed of Expulsion (sxpl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sxpl")]
+        public class SeedOfExpulsion : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Sentry Wards (wswd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("wswd")]
+        public class SentryWards : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Serathil (srtl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("srtl")]
+        public class Serathil : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Shadow Orb +1 (sor1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sor1")]
+        public class ShadowOrb1 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Shadow Orb +10 (sora).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sora")]
+        public class ShadowOrb10 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Shadow Orb +2 (sor2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sor2")]
+        public class ShadowOrb2 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Shadow Orb +3 (sor3).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sor3")]
+        public class ShadowOrb3 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Shadow Orb +4 (sor4).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sor4")]
+        public class ShadowOrb4 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Shadow Orb +5 (sor5).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sor5")]
+        public class ShadowOrb5 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Shadow Orb +6 (sor6).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sor6")]
+        public class ShadowOrb6 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Shadow Orb +7 (sor7).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sor7")]
+        public class ShadowOrb7 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Shadow Orb +8 (sor8).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sor8")]
+        public class ShadowOrb8 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Shadow Orb +9 (sor9).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sor9")]
+        public class ShadowOrb9 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Shadow Orb Fragment (sorf).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sorf")]
+        public class ShadowOrbFragment : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Shaman Claws (shcw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("shcw")]
+        public class ShamanClaws : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Shamanic Totem (shtm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("shtm")]
+        public class ShamanicTotem : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Shield of Honor (shhn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("shhn")]
+        public class ShieldOfHonor : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Shield of the Deathlord (shdt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("shdt")]
+        public class ShieldOfTheDeathlord : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Shimmerglaze Roast (shrs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("shrs")]
+        public class ShimmerglazeRoast : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Shimmerweed (shwd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("shwd")]
+        public class Shimmerweed : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Skeletal Artifact (skrt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("skrt")]
+        public class SkeletalArtifact : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Skull of Gul'dan (glsk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("glsk")]
+        public class SkullOfGuldan : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Skull Shield (sksh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sksh")]
+        public class SkullShield : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Slippers of Agility +3 (rag1).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rag1")]
+        public class SlippersOfAgility3 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Sobi Mask (rwiz).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("rwiz")]
+        public class SobiMask : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Soul (soul).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("soul")]
+        public class Soul : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Soul Gem (gsou).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("gsou")]
+        public class SoulGem : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Spell Book (sbok).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sbok")]
+        public class SpellBook : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Spider Ring (sprn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sprn")]
+        public class SpiderRing : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Spider Silk Broach (silk).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("silk")]
+        public class SpiderSilkBroach : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Spiked Collar (fgfh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("fgfh")]
+        public class SpikedCollar : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Staff of Negation (sneg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sneg")]
+        public class StaffOfNegation : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Staff of Preservation (spre).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("spre")]
+        public class StaffOfPreservation : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Staff of Reanimation (stre).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("stre")]
+        public class StaffOfReanimation : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Staff of Sanctuary (ssan).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ssan")]
+        public class StaffOfSanctuary : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Staff of Silence (ssil).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ssil")]
+        public class StaffOfSilence : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Staff of Teleportation (stel).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("stel")]
+        public class StaffOfTeleportation : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Stone Token (fgrg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("fgrg")]
+        public class StoneToken : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Sturdy War Axe (stwa).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("stwa")]
+        public class SturdyWarAxe : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Sun Key (kysn).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("kysn")]
+        public class SunKey : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Talisman of Evasion (evtl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("evtl")]
+        public class TalismanOfEvasion : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Talisman of the Wild (totw).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("totw")]
+        public class TalismanOfTheWild : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>The Heart of Searinox (sehr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("sehr")]
+        public class TheHeartOfSearinox : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>The Lion Horn of Stormwind (lhst).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("lhst")]
+        public class TheLionHornOfStormwind : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Thunder Lizard Egg (thle).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("thle")]
+        public class ThunderLizardEgg : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Thunder Phoenix Egg (dphe).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("dphe")]
+        public class ThunderPhoenixEgg : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Thunderbloom Bulb (dthb).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("dthb")]
+        public class ThunderbloomBulb : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Thunderlizard Diamond (thdm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("thdm")]
+        public class ThunderlizardDiamond : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tiny Altar of Kings (tbak).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tbak")]
+        public class TinyAltarOfKings : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tiny Barracks (tbar).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tbar")]
+        public class TinyBarracks : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tiny Blacksmith (tbsm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tbsm")]
+        public class TinyBlacksmith : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tiny Castle (tcas).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tcas")]
+        public class TinyCastle : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tiny Farm (tfar).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tfar")]
+        public class TinyFarm : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tiny Great Hall (tgrh).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tgrh")]
+        public class TinyGreatHall : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tiny Lumber Mill (tlum).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tlum")]
+        public class TinyLumberMill : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tome of Agility (tdex).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tdex")]
+        public class TomeOfAgility : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tome of Agility +2 (tdx2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tdx2")]
+        public class TomeOfAgility2 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tome of Experience (texp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("texp")]
+        public class TomeOfExperience : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tome of Greater Experience (tgxp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tgxp")]
+        public class TomeOfGreaterExperience : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tome of Intelligence (tint).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tint")]
+        public class TomeOfIntelligence : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tome of Intelligence +2 (tin2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tin2")]
+        public class TomeOfIntelligence2 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tome of Knowledge (tpow).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tpow")]
+        public class TomeOfKnowledge : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tome of Power (tkno).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tkno")]
+        public class TomeOfPower : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tome of Retraining (tret).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tret")]
+        public class TomeOfRetraining : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tome of Sacrifices (tmsc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tmsc")]
+        public class TomeOfSacrifices : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tome of Strength (tstr).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tstr")]
+        public class TomeOfStrength : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tome of Strength +2 (tst2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tst2")]
+        public class TomeOfStrength2 : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Tome of Talent (ttal).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ttal")]
+        public class TomeOfTalent : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Totem of Might (tmmt).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("tmmt")]
+        public class TotemOfMight : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Undead Flag (uflg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("uflg")]
+        public class UndeadFlag : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Urn of King Terenas (ktrm).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ktrm")]
+        public class UrnOfKingTerenas : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Vampiric Potion (vamp).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("vamp")]
+        public class VampiricPotion : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Vine of Purification (vpur).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("vpur")]
+        public class VineOfPurification : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Voodoo Doll (vddl).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("vddl")]
+        public class VoodooDoll : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Wand of Illusion (will).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("will")]
+        public class WandOfIllusion : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Wand of Lightning Shield (wlsd).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("wlsd")]
+        public class WandOfLightningShield : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Wand of Mana Stealing (woms).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("woms")]
+        public class WandOfManaStealing : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Wand of Negation (wneg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("wneg")]
+        public class WandOfNegation : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Wand of Neutralization (wneu).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("wneu")]
+        public class WandOfNeutralization : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Wand of Shadowsight (wshs).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("wshs")]
+        public class WandOfShadowsight : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Wand of the Wind (wcyc).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("wcyc")]
+        public class WandOfTheWind : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Warsong Battle Drums (war2).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("war2")]
+        public class WarsongBattleDrums : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Warsong Battle Drums (ward).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("ward")]
+        public class WarsongBattleDrumsWard : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Wirt's Leg (wtlg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("wtlg")]
+        public class WirtsLeg : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>Wirt's Other Leg (wolg).</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("wolg")]
+        public class WirtsOtherLeg : global::Moonwell.Objects.StandardItem
+        {
+        }
+
+        /// <summary>spur.</summary>
+        /// @CSharpLua.Ignore
+        [global::Moonwell.Objects.Standard("spur")]
+        public class spur : global::Moonwell.Objects.StandardItem
+        {
+        }
     }
 }
 

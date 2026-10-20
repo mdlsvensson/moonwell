@@ -6,7 +6,7 @@ namespace FormulaThrows
     {
     }
 
-    public class Bolt : Moonwell.Objects.Abilities.Human.StormBolt
+    public class Bolt : Moonwell.Objects.Human.Abilities.StormBolt
     {
         public Bolt()
         {

@@ -80,7 +80,9 @@ public class ObjectsWriterTests
     {
         var start = source.IndexOf($" class {name} ", StringComparison.Ordinal);
         Assert.True(start >= 0, $"no class {name} in:\n{source}");
-        var end = source.IndexOf("\n    }\n", start, StringComparison.Ordinal);
+        var lineStart = source.LastIndexOf('\n', start) + 1;
+        var indent = new string(' ', source.Substring(lineStart).TakeWhile(ch => ch == ' ').Count());
+        var end = source.IndexOf("\n" + indent + "}\n", start, StringComparison.Ordinal);
         return source.Substring(start, end + 1 - start);
     }
 
@@ -120,15 +122,17 @@ public class ObjectsWriterTests
     }
 
     [Fact]
-    public void files_are_a_base_per_kind_a_file_per_namespace_and_values_per_kind()
+    public void files_are_a_base_per_kind_a_file_per_group_and_kind_and_values_per_kind()
     {
         Assert.Equal(
             new[]
             {
-                "Abilities/Human.g.cs",
-                "Buffs/Human.g.cs",
                 "Destructables.g.cs",
                 "Doodads.g.cs",
+                "Human/Abilities.g.cs",
+                "Human/Buffs.g.cs",
+                "Human/Units.g.cs",
+                "Human/Upgrades.g.cs",
                 "Items.g.cs",
                 "Kinds/StandardAbility.g.cs",
                 "Kinds/StandardBuff.g.cs",
@@ -138,8 +142,6 @@ public class ObjectsWriterTests
                 "Kinds/StandardItem.g.cs",
                 "Kinds/StandardUnit.g.cs",
                 "Kinds/StandardUpgrade.g.cs",
-                "Units/Human.g.cs",
-                "Upgrades/Human.g.cs",
                 "Values/ability.json",
                 "Values/buff.json",
                 "Values/destructable.json",
@@ -154,17 +156,35 @@ public class ObjectsWriterTests
     [Fact]
     public void class_has_ignore_and_standard()
     {
-        var human = MiniFiles.Value["Units/Human.g.cs"];
+        var human = MiniFiles.Value["Human/Units.g.cs"];
 
-        var paladin = human.Substring(human.IndexOf("    /// <summary>Paladin (Hpal).</summary>", StringComparison.Ordinal));
+        var paladin = human.Substring(human.IndexOf("            /// <summary>Paladin (Hpal).</summary>", StringComparison.Ordinal));
         Assert.StartsWith(
-            "    /// <summary>Paladin (Hpal).</summary>\n"
-            + "    /// @CSharpLua.Ignore\n"
-            + "    [global::Moonwell.Objects.Standard(\"Hpal\")]\n"
-            + "    public class Paladin : global::Moonwell.Objects.StandardHero\n",
+            "            /// <summary>Paladin (Hpal).</summary>\n"
+            + "            /// @CSharpLua.Ignore\n"
+            + "            [global::Moonwell.Objects.Standard(\"Hpal\")]\n"
+            + "            public class Paladin : global::Moonwell.Objects.StandardHero\n",
             paladin);
         Assert.Contains("public class Footman : global::Moonwell.Objects.StandardUnit\n", human);
-        Assert.Contains("namespace Moonwell.Objects.Units.Human\n{\n", human);
+    }
+
+    [Fact]
+    public void a_group_is_nested_static_partial_classes()
+    {
+        var human = MiniFiles.Value["Human/Units.g.cs"];
+
+        Assert.Contains(
+            "namespace Moonwell.Objects\n{\n"
+            + "    /// <summary>The standard objects of the group Human.</summary>\n"
+            + "    /// @CSharpLua.Ignore\n"
+            + "    public static partial class Human\n    {\n"
+            + "        /// <summary>The standard units of the group Human.</summary>\n"
+            + "        /// @CSharpLua.Ignore\n"
+            + "        public static partial class Units\n        {\n",
+            human);
+        Assert.Contains(
+            "namespace Moonwell.Objects\n{\n    /// <summary>The standard items.</summary>\n    /// @CSharpLua.Ignore\n    public static partial class Items\n    {\n",
+            MiniFiles.Value["Items.g.cs"]);
     }
 
     [Fact]
@@ -207,18 +227,18 @@ public class ObjectsWriterTests
     [Fact]
     public void ability_specific_property()
     {
-        var stormBolt = Class(MiniFiles.Value["Abilities/Human.g.cs"], "StormBolt");
+        var stormBolt = Class(MiniFiles.Value["Human/Abilities.g.cs"], "StormBolt");
 
         Assert.Contains(
             "[global::Moonwell.Objects.Field(\"Htb1\")]\n"
-            + "        public global::Moonwell.Objects.Levels<float> Damage\n"
-            + "        {\n"
-            + "            get { return Fields.GetLevels<float>(this, \"Htb1\"); }\n"
-            + "            protected set { Fields.Put(\"Htb1\", value); }\n"
-            + "        }\n",
+            + "                public global::Moonwell.Objects.Levels<float> Damage\n"
+            + "                {\n"
+            + "                    get { return Fields.GetLevels<float>(this, \"Htb1\"); }\n"
+            + "                    protected set { Fields.Put(\"Htb1\", value); }\n"
+            + "                }\n",
             stormBolt);
         Assert.DoesNotContain("AmountHealedDamaged", stormBolt);
-        Assert.Contains("Hhb1", Class(MiniFiles.Value["Abilities/Human.g.cs"], "HolyLight"));
+        Assert.Contains("Hhb1", Class(MiniFiles.Value["Human/Abilities.g.cs"], "HolyLight"));
         Assert.DoesNotContain("Levels<float> Damage", MiniFiles.Value["Kinds/StandardAbility.g.cs"]);
     }
 
@@ -310,7 +330,7 @@ public class ObjectsWriterTests
         var objects = StandardObjects.Of(tables, Kind.Item, Fields.Of(tables, Kind.Item));
         var item = Find(objects, "ratf");
 
-        var named = ObjectsWriter.Namespace(
+        var named = ObjectsWriter.Group(
             "Moonwell.Objects.Items",
             new[]
             {
@@ -330,7 +350,7 @@ public class ObjectsWriterTests
         var tables = MiniExport();
         var item = Find(StandardObjects.Of(tables, Kind.Item, Fields.Of(tables, Kind.Item)), "ratf");
 
-        var text = ObjectsWriter.Namespace(
+        var text = ObjectsWriter.Group(
             "Moonwell.Objects.Items",
             new[]
             {
@@ -349,20 +369,20 @@ public class ObjectsWriterTests
         var fields = Fields.Of(tables, Kind.Ability);
         var storm = Find(StandardObjects.Of(tables, Kind.Ability, fields), "AHtb");
 
-        var text = ObjectsWriter.Namespace(
-            "Moonwell.Objects.Abilities.Human", new[] { (storm, new ClassName("Moonwell.Objects.Abilities.Human", "Damage")) }, fields);
+        var text = ObjectsWriter.Group(
+            "Moonwell.Objects.Human.Abilities", new[] { (storm, new ClassName("Moonwell.Objects.Human.Abilities", "Damage")) }, fields);
 
         Assert.Contains("public global::Moonwell.Objects.Levels<float> DamageHtb1\n", text);
         Assert.Empty(Compile(new[] { MiniFiles.Value["Kinds/StandardAbility.g.cs"], text }));
     }
 
     [Fact]
-    public void a_class_outside_the_namespace_is_an_error()
+    public void a_class_outside_the_group_is_an_error()
     {
         var tables = MiniExport();
         var item = Find(StandardObjects.Of(tables, Kind.Item, Fields.Of(tables, Kind.Item)), "ratf");
 
-        Assert.Throws<ArgumentException>(() => ObjectsWriter.Namespace(
+        Assert.Throws<ArgumentException>(() => ObjectsWriter.Group(
             "Moonwell.Objects.Items", new[] { (item, new ClassName("Moonwell.Objects.Doodads", "Rock")) }, Array.Empty<Field>()));
     }
 

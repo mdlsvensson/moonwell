@@ -21,8 +21,8 @@ namespace Objects
         public override void OnUnitDied(Unit dying, Unit? killer)
         {
             // Standard classes used only inside a reaction.
-            Unit.Create<Moonwell.Objects.Units.Human.Footman>(Player.Get(0), 0f, 0f, 0f);
-            Unit.Create<Moonwell.Objects.Units.Human.Rifleman>(Player.Get(0), 0f, 0f, 0f);
+            Unit.Create<Moonwell.Objects.Human.Units.Footman>(Player.Get(0), 0f, 0f, 0f);
+            Unit.Create<Moonwell.Objects.Human.Units.Rifleman>(Player.Get(0), 0f, 0f, 0f);
         }
     }
 }

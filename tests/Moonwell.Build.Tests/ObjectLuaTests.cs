@@ -31,17 +31,17 @@ namespace Moonwell.Build.Tests
             // Footman is also the base of declared classes; Rifleman is used only inside a reaction.
             foreach (var (name, id) in new[] { ("Footman", "hfoo"), ("Rifleman", "hrif") })
             {
-                var full = "Moonwell.Objects.Units.Human." + name;
+                var full = "Moonwell.Objects.Human.Units." + name;
                 Assert.Contains($"namespace.class(\"{name}\"", compiled.Script);
                 Assert.Contains(full, compiled.InitTypes());
                 Assert.Contains($"global::{full}>(global::Moonwell.ObjectTypes.FourCC(\"{id}\")", compiled.Registry);
             }
 
             using var lua = compiled.Start();
-            Assert.True(Truth(lua, "local made = Moonwell.ObjectTypes.UnitMaker(Moonwell.ObjectTypes.FourCC('hrif'))(); return System.is(made, Moonwell.Objects.Units.Human.Rifleman)"));
+            Assert.True(Truth(lua, "local made = Moonwell.ObjectTypes.UnitMaker(Moonwell.ObjectTypes.FourCC('hrif'))(); return System.is(made, Moonwell.Objects.Human.Units.Rifleman)"));
             Assert.Equal(
                 "hrif",
-                Query(lua, "local id = Moonwell.ObjectTypes.IdOf(Moonwell.Objects.Units.Human.Rifleman); return string.char(id >> 24, (id >> 16) & 255, (id >> 8) & 255, id & 255)"));
+                Query(lua, "local id = Moonwell.ObjectTypes.IdOf(Moonwell.Objects.Human.Units.Rifleman); return string.char(id >> 24, (id >> 16) & 255, (id >> 8) & 255, id & 255)"));
         }
 
         [Fact]
@@ -74,12 +74,12 @@ namespace Moonwell.Build.Tests
             using var lua = compiled.Start();
 
             Assert.True(Truth(lua, "return Objects.Duelist():getAbilities():Contains(Objects.Firebolt)"));
-            Assert.True(Truth(lua, "return Objects.Duelist():getAbilities():Contains(Moonwell.Objects.Abilities.Human.Defend)"));
-            Assert.False(Truth(lua, "return Objects.Arthas():getHeroAbilities():Contains(Moonwell.Objects.Abilities.Human.DevotionAura)"));
+            Assert.True(Truth(lua, "return Objects.Duelist():getAbilities():Contains(Moonwell.Objects.Human.Abilities.Defend)"));
+            Assert.False(Truth(lua, "return Objects.Arthas():getHeroAbilities():Contains(Moonwell.Objects.Human.Abilities.DevotionAura)"));
             // Arthas's hero abilities hold the ids of the standard objects in the order the declaration left them.
             Assert.True(Truth(lua, "local list = Objects.Arthas():getHeroAbilities(); return list:getCount() == 3 and list[1] == Moonwell.ObjectTypes.FourCC('AHhb')"));
             Assert.True(Truth(lua, "return Objects.Duelist():getDefaultActiveAbility():Is(Objects.Firebolt)"));
-            Assert.False(Truth(lua, "return Objects.Duelist():getDefaultActiveAbility():Is(Moonwell.Objects.Abilities.Human.Defend)"));
+            Assert.False(Truth(lua, "return Objects.Duelist():getDefaultActiveAbility():Is(Moonwell.Objects.Human.Abilities.Defend)"));
             Assert.Equal("3", Query(lua, "return tostring(Objects.Duelist():getAbilities():getCount())"));
         }
 
@@ -114,8 +114,8 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void unused_generated_namespace_leaves_nothing_in_the_script()
         {
-            Assert.DoesNotContain("Moonwell.Objects.Units.Campaign", compiled.Script);
-            Assert.DoesNotContain("Moonwell.Objects.Abilities.Other", compiled.Script);
+            Assert.DoesNotContain("Moonwell.Objects.Campaign.Units", compiled.Script);
+            Assert.DoesNotContain("Moonwell.Objects.Other.Abilities", compiled.Script);
         }
 
         [Fact]
@@ -135,9 +135,9 @@ namespace Moonwell.Build.Tests
                 pairs.Add((used.FullName, used.BaseFullName));
             }
 
-            pairs.Add(("Objects.Arthas", "Moonwell.Objects.Units.Human.Paladin"));
+            pairs.Add(("Objects.Arthas", "Moonwell.Objects.Human.Units.Paladin"));
             pairs.Add(("Objects.DarkArthas", "Objects.Arthas"));
-            pairs.Add(("Objects.Duelist", "Moonwell.Objects.Units.Human.Footman"));
+            pairs.Add(("Objects.Duelist", "Moonwell.Objects.Human.Units.Footman"));
             pairs.Add(("Objects.Tuned", "Objects.Firebolt"));
             foreach (var (name, parent) in pairs)
             {
@@ -237,8 +237,8 @@ namespace Moonwell.Build.Tests
 
             // StrongFootman replaces Footman: it is made at hfoo, and Footman only has the id.
             Assert.Contains("global::Moonwell.ObjectTypes.Unit<global::Objects.StrongFootman>(global::Moonwell.ObjectTypes.FourCC(\"hfoo\"), () => new global::Objects.StrongFootman());", registry);
-            Assert.DoesNotContain("Unit<global::Moonwell.Objects.Units.Human.Footman>", registry);
-            Assert.Contains("global::Moonwell.ObjectTypes.Id<global::Moonwell.Objects.Units.Human.Footman>(global::Moonwell.ObjectTypes.FourCC(\"hfoo\"));", registry);
+            Assert.DoesNotContain("Unit<global::Moonwell.Objects.Human.Units.Footman>", registry);
+            Assert.Contains("global::Moonwell.ObjectTypes.Id<global::Moonwell.Objects.Human.Units.Footman>(global::Moonwell.ObjectTypes.FourCC(\"hfoo\"));", registry);
 
             // The kind bases have no object.
             Assert.DoesNotContain("StandardHero", registry);

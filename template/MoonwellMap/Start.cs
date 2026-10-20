@@ -1,5 +1,5 @@
 using Moonwell;
-using Moonwell.Objects.Units.Human;
+using static Moonwell.Objects.Human.Units;
 
 namespace MoonwellMap
 {
