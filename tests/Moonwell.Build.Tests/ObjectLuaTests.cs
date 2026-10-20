@@ -237,8 +237,35 @@ namespace Moonwell.Build.Tests
 
             // The enums are ignored: CSharp.lua writes their members as numbers (a debug build names them in a comment) and no Lua of their own.
             Assert.Contains("33 --[[Moonwell.Objects.Targets.Air | Moonwell.Objects.Targets.Enemies]]", compiled.Script);
-            Assert.DoesNotMatch("(?<![gs]et)AttackType", compiled.ReleaseScript);
+            // Report's enum methods name the type (MoonwellObjects.AttackType, a nil in the game); nothing defines it.
+            Assert.DoesNotMatch(@"(?<![gs]et|MoonwellObjects\.)AttackType", compiled.ReleaseScript);
             Assert.DoesNotContain("Moonwell.Objects.Targets", compiled.ReleaseScript);
+        }
+
+        [Fact]
+        public void enum_methods_on_a_choice_in_game_code()
+        {
+            using var lua = compiled.Start();
+
+            // The enums are ignored, so the Lua has no type of theirs: a name is the number (on .NET it is "Magic"), and
+            // Enum.GetValues stops. HasFlag needs only the numbers. MW0010 rejects the first two in map code.
+            Assert.Equal("6", Outcome(lua, "return Objects.Report.Named(Objects.Mage())"));
+            Assert.Equal("attack 6 6", Outcome(lua, "return Objects.Report.Joined(Objects.Mage())"));
+            Assert.Equal("True", Outcome(lua, "return Objects.Report.Flagged(Objects.Mage())"));
+            Assert.StartsWith("error: ", Outcome(lua, "return Objects.Report.Counted()"));
+        }
+
+        // What a chunk returns, or "error: " and the error it raises.
+        private static string Outcome(NLua.Lua lua, string chunk)
+        {
+            try
+            {
+                return Query(lua, chunk);
+            }
+            catch (NLua.Exceptions.LuaException error)
+            {
+                return "error: " + error.Message;
+            }
         }
 
         [Fact]

@@ -28,6 +28,30 @@ namespace Objects
             return (declared ? "yes" : "no") + " " + (standard ? "yes" : "no") + " " + (int)zap.TargetsAllowed[3];
         }
 
+        // The methods C# gives an enum, on a choice in game code: the enums are ignored, so the Lua has no type of theirs.
+        // The analyzer rejects them (MW0010); the Lua tests show what they do without it.
+#pragma warning disable MW0010
+        public static string Named(Mage mage)
+        {
+            return mage.AttackType.ToString();
+        }
+
+        public static string Joined(Mage mage)
+        {
+            return "attack " + mage.AttackType + " " + $"{mage.AttackType}";
+        }
+
+        public static bool Flagged(Mage mage)
+        {
+            return mage.Attack1TargetsAllowed.HasFlag(Moonwell.Objects.Targets.Enemies);
+        }
+
+        public static int Counted()
+        {
+            return System.Enum.GetValues(typeof(Moonwell.Objects.AttackType)).Length;
+        }
+#pragma warning restore MW0010
+
         public override void OnUnitDied(Unit dying, Unit? killer)
         {
             // Standard classes used only inside a reaction.

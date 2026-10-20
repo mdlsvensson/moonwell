@@ -1,6 +1,6 @@
 namespace Moonwell.Analyzers.Tests;
 
-/// <summary>MW0007 and MW0008: C# that CSharp.lua cannot compile.</summary>
+/// <summary>MW0007, MW0008 and MW0010: C# that CSharp.lua cannot compile, or compiles to Lua that does not do what .NET does.</summary>
 public class LuaTests
 {
     [Fact]
@@ -87,6 +87,51 @@ public class LuaTests
             {
                 public static float Run() => Max(1f, 2f) + Natives.GetRandomInt(1, 2);
             }
+            """));
+    }
+
+    [Fact]
+    public void a_name_of_a_choice_enum_is_rejected()
+    {
+        // In the game's Lua the enums of Moonwell.Objects are numbers only: ToString and a joined or interpolated string give 6, Enum.GetValues stops.
+        Assert.Equal(new[]
+        {
+            "MW0010: attack.ToString()",
+            "MW0010: attack",
+            "MW0010: {attack}",
+            "MW0010: Enum.GetValues(typeof(Moonwell.Objects.AttackType))",
+            "MW0010: Enum.GetNames<Moonwell.Objects.Targets>()",
+            "MW0010: Enum.IsDefined(attack)",
+            "MW0010: Enum.TryParse(\"magic\", out attack)",
+        }, MapCode.Check("""
+            var attack = Moonwell.Objects.AttackType.Magic;
+            var a = attack.ToString();
+            var b = "attack " + attack;
+            var c = $"{attack}";
+            var d = Enum.GetValues(typeof(Moonwell.Objects.AttackType));
+            var e = Enum.GetNames<Moonwell.Objects.Targets>();
+            var f = Enum.IsDefined(attack);
+            var g = Enum.TryParse("magic", out attack);
+            """));
+    }
+
+    [Fact]
+    public void a_choice_enum_message_says_why_and_what_to_write()
+    {
+        Assert.Equal(
+            "'attack.ToString()' needs the names of AttackType, which the game's Lua does not have: there a choice is only its number (AttackType.Magic shows as 6) and Enum.GetValues stops; compare with its members, or show (int) of it",
+            MapCode.Message("var attack = Moonwell.Objects.AttackType.Magic; var a = attack.ToString();"));
+    }
+
+    [Fact]
+    public void comparing_combining_and_has_flag_on_a_choice_enum_and_names_of_other_enums_are_accepted()
+    {
+        Assert.Empty(MapCode.Check("""
+            var attack = Moonwell.Objects.AttackType.Magic;
+            var targets = Moonwell.Objects.Targets.Air | Moonwell.Objects.Targets.Enemies;
+            var a = attack == Moonwell.Objects.AttackType.Hero || targets.HasFlag(Moonwell.Objects.Targets.Air) || (targets & Moonwell.Objects.Targets.Enemies) != 0;
+            var b = "attack " + (int)attack + $"{(int)targets}";
+            var c = DayOfWeek.Monday.ToString() + Enum.GetNames(typeof(DayOfWeek)).Length;
             """));
     }
 }
