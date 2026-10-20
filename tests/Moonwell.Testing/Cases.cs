@@ -120,6 +120,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "damage.nested", Run = DamageCases.Nested });
             list.Add(new Case { Name = "damage.actor-ends-mid-dispatch", Run = DamageCases.ActorEndsMidDispatch });
             list.Add(new Case { Name = "damage.error-isolated", Run = DamageCases.ErrorIsolated });
+            list.Add(new Case { Name = "damage-package.no-trigger-without-need", Run = InstallCases.NoTriggerWithoutNeed });
+            list.Add(new Case { Name = "damage-package.listens-for-an-interface", Run = InstallCases.ListensForAnInterface });
+            list.Add(new Case { Name = "damage-package.listens-for-on-damaged", Run = InstallCases.ListensForOnDamaged });
             list.Add(new Case { Name = "death.order", Run = DeathCases.Order });
             list.Add(new Case { Name = "death.self", Run = DeathCases.Self });
             list.Add(new Case { Name = "death.not-an-end", Run = DeathCases.NotAnEnd });

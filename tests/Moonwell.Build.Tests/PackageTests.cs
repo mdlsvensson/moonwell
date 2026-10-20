@@ -72,7 +72,7 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
-        public void damage_package_has_source_and_depends_on_objects()
+        public void damage_package_has_source_and_depends_on_moonwell()
         {
             using var archive = ZipFile.OpenRead(packed.DamagePackage);
             var names = archive.Entries.Select(entry => entry.FullName).ToList();
@@ -85,7 +85,7 @@ namespace Moonwell.Build.Tests
             var files = nuspec.Descendants().Where(element => element.Name.LocalName == "files").ToList();
             var hit = files.Single(file => file.Attribute("include")!.Value.Replace('\\', '/') == "cs/net10.0/Moonwell.Damage/Hit.cs");
             Assert.Equal("None", hit.Attribute("buildAction")!.Value);
-            var dependency = Assert.Single(nuspec.Descendants(), element => element.Name.LocalName == "dependency" && element.Attribute("id")!.Value == "Moonwell.Objects");
+            var dependency = Assert.Single(nuspec.Descendants(), element => element.Name.LocalName == "dependency" && element.Attribute("id")!.Value == "Moonwell");
             Assert.Equal(packed.Version, dependency.Attribute("version")!.Value);
         }
 

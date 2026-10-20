@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <!-- PrivateAssets none, so that a map that references only Moonwell.Damage still gets Moonwell's analyzer. -->
-    <ProjectReference Include="..\Moonwell.Objects\Moonwell.Objects.csproj" PrivateAssets="none" />
+    <ProjectReference Include="..\Moonwell\Moonwell.csproj" PrivateAssets="none" />
   </ItemGroup>
 
   <!--
