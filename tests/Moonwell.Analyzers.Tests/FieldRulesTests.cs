@@ -226,19 +226,29 @@ public class FieldRulesTests
     }
 
     [Fact]
-    public void beyond_limits_never_lifts_a_negative()
+    public void beyond_limits_never_lifts_a_negative_the_game_forbids()
     {
         Assert.Equal(
-            new[] { "Giant.HitPoints is -5; Hit Points Maximum (Base) (uhpm) allows 0 or more, even with [BeyondLimits]" },
-            Messages(Footman("HitPoints = -5;", "[BeyondLimits(nameof(HitPoints))]")));
+            new[] { "Giant.CollisionSize is -5; Collision Size (ucol) allows 0 or more, even with [BeyondLimits]" },
+            Messages(Footman("CollisionSize = -5f;", "[BeyondLimits(nameof(CollisionSize))]")));
     }
 
     [Fact]
-    public void a_negative_that_is_not_lifted_names_the_range_without_the_hint()
+    public void a_negative_the_game_forbids_that_is_not_lifted_names_the_range_without_the_hint()
     {
         Assert.Equal(
-            new[] { "Giant.HitPoints is -5; Hit Points Maximum (Base) (uhpm) allows 1 to 500000" },
+            new[] { "Giant.CollisionSize is -5; Collision Size (ucol) allows 0 to 1024" },
+            Messages(Footman("CollisionSize = -5f;")));
+    }
+
+    [Fact]
+    public void a_negative_below_a_minimum_is_part_of_the_range_beyond_limits_lifts()
+    {
+        // uhpm's minimum is 1 and the game does not force it: a negative is past the range, like 600000.
+        Assert.Equal(
+            new[] { "Giant.HitPoints is -5; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it" },
             Messages(Footman("HitPoints = -5;")));
+        Assert.Empty(Found(Footman("HitPoints = -5;", "[BeyondLimits(nameof(HitPoints))]")));
     }
 
     [Fact]

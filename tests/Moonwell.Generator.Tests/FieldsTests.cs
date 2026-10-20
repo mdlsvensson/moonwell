@@ -28,6 +28,13 @@ public class FieldsTests
     [InlineData(Kind.Ability, "anam", "Name")]
     [InlineData(Kind.Ability, "abuf", "Buffs")]
     [InlineData(Kind.Ability, "atar", "TargetsAllowed")]
+    [InlineData(Kind.Ability, "Det1", "Detects")]
+    [InlineData(Kind.Ability, "Fla1", "Detects")]
+    [InlineData(Kind.Ability, "Ifa1", "Detects")]
+    [InlineData(Kind.Ability, "Ndt3", "Detects")]
+    [InlineData(Kind.Ability, "Nsp3", "Detects")]
+    [InlineData(Kind.Ability, "Ofs1", "Detects")]
+    [InlineData(Kind.Ability, "Hca4", "StackingType")]
     [InlineData(Kind.Item, "iabi", "Abilities")]
     public void hand_picked_names(Kind kind, string id, string name)
     {
@@ -288,11 +295,13 @@ public class FieldsTests
     }
 
     [Fact]
-    public void an_unreal_field_is_non_negative()
+    public void an_unreal_field_is_non_negative_only_when_the_metadata_forces_it()
     {
+        // uhpr is unreal with forceNonNeg 0: its minimum of 0 is part of its range, and the Phoenix's standard -25 is below it.
         var regeneration = Find(Fields.Of(MiniExport(), Kind.Unit), "uhpr").Rules;
 
-        Assert.True(regeneration.NonNegative);
+        Assert.False(regeneration.NonNegative);
+        Assert.False(regeneration.NoNegative);
         Assert.Equal(0, regeneration.Min);
         Assert.Equal(1000, regeneration.Max);
         Assert.False(Find(Fields.Of(MiniExport(), Kind.Unit), "uhpm").Rules.NonNegative);
@@ -363,16 +372,59 @@ public class FieldsTests
     }
 
     [Theory]
-    [InlineData(1d, null, false, true)]
-    [InlineData(0d, 10d, false, true)]
-    [InlineData(-1000d, 1000d, true, false)]
-    [InlineData(null, 9d, false, false)]
-    [InlineData(null, null, true, true)]
-    public void no_negative_when_the_minimum_is_not_below_zero_or_none_is_given_and_the_field_says_so(double? min, double? max, bool nonNegative, bool expected)
+    [InlineData(1d, null, false, false, false)]
+    [InlineData(0d, 10d, false, false, false)]
+    [InlineData(0d, 10d, true, false, true)]
+    [InlineData(0d, 10d, true, true, false)]
+    [InlineData(-1000d, 1000d, true, false, false)]
+    [InlineData(null, 9d, false, false, false)]
+    [InlineData(null, null, true, false, true)]
+    [InlineData(null, null, true, true, false)]
+    public void no_negative_only_when_the_metadata_forces_it_and_no_standard_value_is_negative(double? min, double? max, bool nonNegative, bool standardNegative, bool expected)
     {
-        var rules = new FieldRules(min, max, nonNegative, false, null, null);
+        var rules = new FieldRules(min, max, nonNegative, false, null, null, StandardNegative: standardNegative);
 
         Assert.Equal(expected, rules.NoNegative);
+    }
+
+    [Fact]
+    public void a_negative_standard_value_in_the_base_tables_or_a_balance_set_lets_the_field_hold_negatives()
+    {
+        var forced = new FieldRules(0, 10, true, false, null, null);
+        Field Number(string id, FieldType type = FieldType.Int)
+        {
+            return new Field(Kind.Unit, id, id, type, null, false, 0, false, Array.Empty<string>(), id, Rules: forced);
+        }
+
+        var fields = new[]
+        {
+            Number("zab1"), Number("zab2"), Number("zab3", FieldType.Float), Number("zab4", FieldType.String), Number("zab5"),
+            Number("zab6") with { Rules = FieldRules.None },
+        };
+        IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> NoSets() => new Dictionary<string, IReadOnlyDictionary<string, string>>();
+        var objects = new[]
+        {
+            new StandardObject(Kind.Unit, "h000", "", "", false, false, null,
+                new Dictionary<string, string> { ["zab1"] = "-11", ["zab2"] = "3", ["zab4"] = "1,-2", ["zab5:2"] = "4", ["zab6"] = "-1" },
+                NoSets(), Array.Empty<string>()),
+            new StandardObject(Kind.Unit, "h001", "", "", false, false, null,
+                new Dictionary<string, string> { ["zab2"] = "4", ["zab5:1"] = "0" },
+                new Dictionary<string, IReadOnlyDictionary<string, string>>
+                {
+                    ["custom_v1"] = new Dictionary<string, string> { ["zab3"] = "-0.6", ["zab2"] = "" },
+                },
+                Array.Empty<string>()),
+        };
+
+        var result = Fields.WithStandardNegatives(fields, objects).ToDictionary(field => field.Id);
+
+        Assert.False(result["zab1"].Rules.NoNegative);
+        Assert.True(result["zab1"].Rules.StandardNegative);
+        Assert.True(result["zab2"].Rules.NoNegative);
+        Assert.False(result["zab3"].Rules.NoNegative);
+        Assert.False(result["zab4"].Rules.NoNegative);
+        Assert.True(result["zab5"].Rules.NoNegative);
+        Assert.Same(FieldRules.None, result["zab6"].Rules);
     }
 
     [Fact]

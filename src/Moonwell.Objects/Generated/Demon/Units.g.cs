@@ -117,7 +117,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Doom Guard";
                     NameEditorSuffix = "(Summoned)";
                     NormalSkin = "ACcr,Adsm,Awrs,ACrf,ACsk";
@@ -280,7 +280,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\demon\\DoomGuard\\DoomGuard";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Doom Guard";
                     NameEditorSuffix = "(Standard)";
                     NormalSkin = "ACcr,Adsm,Awrs,ACrf,ACsk";
@@ -423,7 +423,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\demon\\felhound\\felhound";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)6;
+                    ModelFileExtraVersions = global::Moonwell.Objects.VersionFlags.TheFrozenThrone | global::Moonwell.Objects.VersionFlags.Unlisted4;
                     Name = "Fel Stalker";
                     NormalSkin = "Ambb";
                     OccluderHeight = 0f;
@@ -562,7 +562,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\demon\\Infernal\\Infernal";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Infernal";
                     NormalSkin = "ACmi,ANpi,ACrk";
                     OccluderHeight = 0f;

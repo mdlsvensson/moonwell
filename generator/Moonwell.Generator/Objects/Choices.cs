@@ -142,6 +142,72 @@ public static class Choices
         return new ChoiceType(type, EnumName(type), form, store, members);
     }
 
+    /// <summary>
+    /// The choice types with a member added for each bit that a standard value of a type stored as bits
+    /// (<see cref="ChoiceForm.Bits"/>) holds and World Editor's list lacks: the game's own data uses it, so a map may
+    /// write it too (<c>versionFlags</c> 6 on 20 units is The Frozen Throne and bit 4). The member is named
+    /// <c>Unlisted</c> and its number (<c>Unlisted4</c>) and comes after the listed ones. Other types are returned as
+    /// they are.
+    /// </summary>
+    /// <param name="choices">The choice types by type.</param>
+    /// <param name="kinds">Each kind's fields and standard objects.</param>
+    /// <exception cref="InvalidOperationException">A standard value needs bit 31 or more.</exception>
+    public static IReadOnlyDictionary<string, ChoiceType> WithStandardBits(
+        IReadOnlyDictionary<string, ChoiceType> choices,
+        IEnumerable<(IReadOnlyList<Field> Fields, IReadOnlyList<StandardObject> Objects)> kinds)
+    {
+        var unlisted = new Dictionary<string, int>(StringComparer.Ordinal);
+        foreach (var (fields, objects) in kinds)
+        {
+            var bits = fields.Where(f => f.Choice is { Form: ChoiceForm.Bits }).ToDictionary(f => f.Id, f => f.Choice!, StringComparer.Ordinal);
+            foreach (var obj in objects)
+            {
+                foreach (var values in new[] { obj.Values }.Concat(obj.Sets.Values))
+                {
+                    foreach (var (key, value) in values)
+                    {
+                        var colon = key.IndexOf(':');
+                        if (bits.TryGetValue(colon < 0 ? key : key.Substring(0, colon), out var choice)
+                            && int.TryParse(value.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var number))
+                        {
+                            var listed = choice.Members.Aggregate(0, (all, member) => all | member.Value);
+                            var left = number & ~listed;
+                            if (left != 0)
+                            {
+                                unlisted[choice.Type] = unlisted.GetValueOrDefault(choice.Type) | left;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        var result = new SortedDictionary<string, ChoiceType>(StringComparer.Ordinal);
+        foreach (var (type, choice) in choices)
+        {
+            if (!unlisted.TryGetValue(type, out var left))
+            {
+                result[type] = choice;
+                continue;
+            }
+
+            var members = choice.Members.ToList();
+            for (var n = 0; n < 32; n++)
+            {
+                if ((left & (1 << n)) != 0)
+                {
+                    var value = Bit(type, n);
+                    var text = value.ToString(CultureInfo.InvariantCulture);
+                    members.Add(new ChoiceMember("Unlisted" + text, value, text, Array.Empty<string>(), "A bit World Editor does not list, which the game's standard data uses"));
+                }
+            }
+
+            result[type] = choice with { Members = members };
+        }
+
+        return result;
+    }
+
     /// <summary>The enum's name: the type's in PascalCase, and a type ending in List names its values in the plural (<c>targetList</c> is <c>Targets</c>).</summary>
     public static string EnumName(string type)
     {

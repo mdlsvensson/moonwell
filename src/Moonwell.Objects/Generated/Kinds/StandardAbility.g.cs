@@ -1004,7 +1004,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>aare</c>.</summary>
         [global::Moonwell.Objects.Field("aare", Label = "Area of Effect")]
         [global::Moonwell.Objects.Limits(0, 99999)]
-        [global::Moonwell.Objects.NonNegative]
         public global::Moonwell.Objects.Levels<float> Area
         {
             get { return Fields.GetLevels<float>(this, "aare"); }
@@ -1022,7 +1021,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>abpx</c>.</summary>
         [global::Moonwell.Objects.Field("abpx", Label = "Button Position - Normal (X)")]
         [global::Moonwell.Objects.Limits(0, 3)]
-        [global::Moonwell.Objects.NonNegative]
         public int ButtonPositionNormalX
         {
             get { return Fields.Get<int>(this, "abpx"); }
@@ -1032,7 +1030,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>abpy</c>.</summary>
         [global::Moonwell.Objects.Field("abpy", Label = "Button Position - Normal (Y)")]
         [global::Moonwell.Objects.Limits(0, 2)]
-        [global::Moonwell.Objects.NonNegative]
         public int ButtonPositionNormalY
         {
             get { return Fields.Get<int>(this, "abpy"); }
@@ -1058,7 +1055,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>acac</c>.</summary>
         [global::Moonwell.Objects.Field("acac", Label = "Caster Attachments")]
         [global::Moonwell.Objects.Limits(0, 2)]
-        [global::Moonwell.Objects.NonNegative]
         public int CasterAttachments
         {
             get { return Fields.Get<int>(this, "acac"); }
@@ -1197,7 +1193,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>alev</c>.</summary>
         [global::Moonwell.Objects.Field("alev", Label = "Levels")]
         [global::Moonwell.Objects.Limits(1, 100)]
-        [global::Moonwell.Objects.NonNegative]
         public int LevelCount
         {
             get { return Fields.Get<int>(this, "alev"); }
@@ -1215,7 +1210,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>alsk</c>.</summary>
         [global::Moonwell.Objects.Field("alsk", Label = "Level Skip Requirement")]
         [global::Moonwell.Objects.Limits(0, 10000)]
-        [global::Moonwell.Objects.NonNegative]
         public int LevelSkipRequirement
         {
             get { return Fields.Get<int>(this, "alsk"); }
@@ -1225,7 +1219,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>amac</c>.</summary>
         [global::Moonwell.Objects.Field("amac", Label = "Missile Arc")]
         [global::Moonwell.Objects.Limits(0, 1)]
-        [global::Moonwell.Objects.NonNegative]
         public float MissileArc
         {
             get { return Fields.Get<float>(this, "amac"); }
@@ -1243,7 +1236,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>amcs</c>.</summary>
         [global::Moonwell.Objects.Field("amcs", Label = "Mana Cost")]
         [global::Moonwell.Objects.Limits(0, 1000)]
-        [global::Moonwell.Objects.NonNegative]
         public global::Moonwell.Objects.Levels<int> ManaCost
         {
             get { return Fields.GetLevels<int>(this, "amcs"); }
@@ -1261,7 +1253,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>amsp</c>.</summary>
         [global::Moonwell.Objects.Field("amsp", Label = "Missile Speed")]
         [global::Moonwell.Objects.Limits(0, 10000)]
-        [global::Moonwell.Objects.NonNegative]
         public int MissileSpeed
         {
             get { return Fields.Get<int>(this, "amsp"); }
@@ -1321,7 +1312,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>apri</c>.</summary>
         [global::Moonwell.Objects.Field("apri", Label = "Priority for Spell Steal")]
         [global::Moonwell.Objects.Limits(0, 100)]
-        [global::Moonwell.Objects.NonNegative]
         public int PriorityForSpellSteal
         {
             get { return Fields.Get<int>(this, "apri"); }
@@ -1380,7 +1370,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>arlv</c>.</summary>
         [global::Moonwell.Objects.Field("arlv", Label = "Required Level")]
         [global::Moonwell.Objects.Limits(1, 10000)]
-        [global::Moonwell.Objects.NonNegative]
         public int RequiredLevel
         {
             get { return Fields.Get<int>(this, "arlv"); }
@@ -1390,7 +1379,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>arpx</c>.</summary>
         [global::Moonwell.Objects.Field("arpx", Label = "Button Position - Research (X)")]
         [global::Moonwell.Objects.Limits(0, 3)]
-        [global::Moonwell.Objects.NonNegative]
         public int ButtonPositionResearchX
         {
             get { return Fields.Get<int>(this, "arpx"); }
@@ -1400,7 +1388,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>arpy</c>.</summary>
         [global::Moonwell.Objects.Field("arpy", Label = "Button Position - Research (Y)")]
         [global::Moonwell.Objects.Limits(0, 2)]
-        [global::Moonwell.Objects.NonNegative]
         public int ButtonPositionResearchY
         {
             get { return Fields.Get<int>(this, "arpy"); }
@@ -1498,7 +1485,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>atac</c>.</summary>
         [global::Moonwell.Objects.Field("atac", Label = "Target Attachments")]
         [global::Moonwell.Objects.Limits(0, 6)]
-        [global::Moonwell.Objects.NonNegative]
         public int TargetAttachments
         {
             get { return Fields.Get<int>(this, "atac"); }
@@ -1548,7 +1534,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>aubx</c>.</summary>
         [global::Moonwell.Objects.Field("aubx", Label = "Button Position - Turn Off (X)")]
         [global::Moonwell.Objects.Limits(0, 3)]
-        [global::Moonwell.Objects.NonNegative]
         public int ButtonPositionTurnOffX
         {
             get { return Fields.Get<int>(this, "aubx"); }
@@ -1558,7 +1543,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>auby</c>.</summary>
         [global::Moonwell.Objects.Field("auby", Label = "Button Position - Turn Off (Y)")]
         [global::Moonwell.Objects.Limits(0, 2)]
-        [global::Moonwell.Objects.NonNegative]
         public int ButtonPositionTurnOffY
         {
             get { return Fields.Get<int>(this, "auby"); }

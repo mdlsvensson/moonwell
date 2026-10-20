@@ -111,7 +111,7 @@ namespace Moonwell.Objects.Tests
     {
         public Ghost()
         {
-            HitPoints = -5;
+            CollisionSize = -5f;
         }
     }
 
@@ -124,12 +124,14 @@ namespace Moonwell.Objects.Tests
         }
     }
 
-    [BeyondLimits(nameof(HitPoints))]
+    // Hit points have a minimum of 1, a range [BeyondLimits] lifts; collision size (ucol) is forced by the game never to go below 0.
+    [BeyondLimits(nameof(HitPoints), nameof(CollisionSize))]
     public class NegativeTitan : Moonwell.Objects.Human.Units.Footman
     {
         public NegativeTitan()
         {
             HitPoints = -5;
+            CollisionSize = -5f;
         }
     }
 
@@ -693,7 +695,7 @@ namespace Moonwell.Objects.Tests
         {
             var error = Assert.Throws<FieldRuleException>(() => new Ghost());
 
-            Assert.Equal("Ghost.HitPoints is -5; Hit Points Maximum (Base) (uhpm) allows 1 to 500000", error.Message);
+            Assert.Equal("Ghost.CollisionSize is -5; Collision Size (ucol) allows 0 to 1024", error.Message);
         }
 
         [Fact]
@@ -703,7 +705,7 @@ namespace Moonwell.Objects.Tests
             Assert.Equal(700000, new TitanChild().HitPoints);
 
             var error = Assert.Throws<FieldRuleException>(() => new NegativeTitan());
-            Assert.Equal("NegativeTitan.HitPoints is -5; Hit Points Maximum (Base) (uhpm) allows 0 or more, even with [BeyondLimits]", error.Message);
+            Assert.Equal("NegativeTitan.CollisionSize is -5; Collision Size (ucol) allows 0 or more, even with [BeyondLimits]", error.Message);
         }
 
         [Fact]
@@ -778,7 +780,7 @@ namespace Moonwell.Objects.Tests
             Assert.Equal("SlowBolt.Cooldown at level 3 is 5000; Cooldown (acdn) allows 0 to 3600; [BeyondLimits] goes past it", error.Message);
             Assert.Equal(3, error.Level);
             Assert.Equal(
-                "DamageBolt.Damage at level 2 is -1; Damage (Htb1) allows 0 to 99999",
+                "DamageBolt.Damage at level 2 is -1; Damage (Htb1) allows 0 to 99999; [BeyondLimits] goes past it",
                 Assert.Throws<FieldRuleException>(() => new DamageBolt()).Message);
         }
 

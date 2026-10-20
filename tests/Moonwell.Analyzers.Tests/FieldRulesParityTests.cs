@@ -70,6 +70,9 @@ public class FieldRulesParityTests
         yield return new object[] { "at most, in range", StormBolt, "", "RequirementsLevels = \"-5,100\";" };
         yield return new object[] { "negative", Footman, "", "HitPoints = -5;" };
         yield return new object[] { "negative, lifted", Footman, "[BeyondLimits(nameof(HitPoints))]", "HitPoints = -5;" };
+        yield return new object[] { "negative the game forbids", Footman, "", "CollisionSize = -5f;" };
+        yield return new object[] { "negative the game forbids, lifted", Footman, "[BeyondLimits(nameof(CollisionSize))]", "CollisionSize = -5f;" };
+        yield return new object[] { "negative a standard object holds, lifted", Footman, "[BeyondLimits(nameof(ButtonPositionY))]", "ButtonPositionY = -11;" };
         yield return new object[] { "negative, no limits", "Probe", "", "NotNegative = -1f;" };
         yield return new object[] { "negative, no limits, lifted", "Probe", "[BeyondLimits(nameof(NotNegative))]", "NotNegative = -1f;" };
         yield return new object[] { "negative, no limits, zero", "Probe", "", "NotNegative = 0f;" };

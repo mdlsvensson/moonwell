@@ -219,7 +219,8 @@ public class ChoicesTests
         var source = ObjectsWriter.Choices(Choices.All(MiniExport(), null).Values);
 
         Assert.Contains(
-            "    /// <summary>A value of the metadata type <c>attackType</c>, as World Editor offers it.</summary>\n"
+            "    /// <summary>A value of the metadata type <c>attackType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, "
+            + "not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>\n"
             + "    /// @CSharpLua.Ignore\n"
             + "    public enum AttackType\n"
             + "    {\n"
@@ -238,6 +239,46 @@ public class ChoicesTests
             + "        Alive = 2,\n",
             source);
         Assert.True(source.IndexOf("enum AttackType", StringComparison.Ordinal) < source.IndexOf("enum AttributeType", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void a_flags_member_named_none_says_it_is_not_0()
+    {
+        var targets = Choices.Make("targetList", "string", new[] { Entry(0, "air", "Air"), Entry(1, "none", "None") }, Label);
+
+        var source = ObjectsWriter.Choices(new[] { targets });
+
+        Assert.Contains("and 0 is none of them.", source);
+        Assert.Contains(
+            "        /// <summary>None. World Editor's \"none\", a value of its own: no values at all is 0, not this.</summary>\n"
+            + "        [global::Moonwell.Objects.GameValue(\"none\")]\n"
+            + "        None = 2,\n",
+            source);
+    }
+
+    [Fact]
+    public void a_bit_the_standard_data_uses_that_world_editor_does_not_list_is_a_member()
+    {
+        var versions = Choices.Make("versionFlags", "int", new[] { Entry(0, "0", "Reign of Chaos"), Entry(1, "1", "The Frozen Throne") }, Label);
+        var attack = Choices.Make("attackType", "string", new[] { Entry(0, "normal", "Normal") }, Label);
+        var choices = new Dictionary<string, ChoiceType> { ["versionFlags"] = versions, ["attackType"] = attack };
+        var fields = new[]
+        {
+            new Field(Kind.Unit, "uver", "Versions", FieldType.Choice, null, false, 0, false, Array.Empty<string>(), "uver", Choice: versions),
+        };
+        var objects = new[]
+        {
+            new StandardObject(Kind.Unit, "hfoo", "", "", false, false, null, new Dictionary<string, string> { ["uver"] = "6" },
+                new Dictionary<string, IReadOnlyDictionary<string, string>> { ["custom_v1"] = new Dictionary<string, string> { ["uver"] = "16" } },
+                Array.Empty<string>()),
+        };
+
+        var result = Choices.WithStandardBits(choices, new[] { ((IReadOnlyList<Field>)fields, (IReadOnlyList<StandardObject>)objects) });
+
+        Assert.Equal(new[] { "ReignOfChaos", "TheFrozenThrone", "Unlisted4", "Unlisted16" }, result["versionFlags"].Members.Select(m => m.Name));
+        Assert.Equal(new[] { 1, 2, 4, 16 }, result["versionFlags"].Members.Select(m => m.Value));
+        Assert.Equal("4", result["versionFlags"].Members[2].Text);
+        Assert.Same(attack, result["attackType"]);
     }
 
     [Fact]

@@ -256,7 +256,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ua1b</c>.</summary>
         [global::Moonwell.Objects.Field("ua1b", Label = "Attack 1 - Damage Base")]
         [global::Moonwell.Objects.Limits(0, 500000)]
-        [global::Moonwell.Objects.NonNegative]
         public int Damage
         {
             get { return Fields.Get<int>(this, "ua1b"); }
@@ -276,7 +275,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ua1d</c>.</summary>
         [global::Moonwell.Objects.Field("ua1d", Label = "Attack 1 - Damage Number of Dice")]
         [global::Moonwell.Objects.Limits(0, 100)]
-        [global::Moonwell.Objects.NonNegative]
         public int DamageDice
         {
             get { return Fields.Get<int>(this, "ua1d"); }
@@ -286,7 +284,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ua1f</c>.</summary>
         [global::Moonwell.Objects.Field("ua1f", Label = "Attack 1 - Area of Effect (Full Damage)")]
         [global::Moonwell.Objects.Limits(0, 1000)]
-        [global::Moonwell.Objects.NonNegative]
         public int Attack1AreaOfEffectFullDamage
         {
             get { return Fields.Get<int>(this, "ua1f"); }
@@ -304,7 +301,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ua1h</c>.</summary>
         [global::Moonwell.Objects.Field("ua1h", Label = "Attack 1 - Area of Effect (Medium Damage)")]
         [global::Moonwell.Objects.Limits(0, 1000)]
-        [global::Moonwell.Objects.NonNegative]
         public int Attack1AreaOfEffectMediumDamage
         {
             get { return Fields.Get<int>(this, "ua1h"); }
@@ -330,7 +326,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ua1q</c>.</summary>
         [global::Moonwell.Objects.Field("ua1q", Label = "Attack 1 - Area of Effect (Small Damage)")]
         [global::Moonwell.Objects.Limits(0, 1000)]
-        [global::Moonwell.Objects.NonNegative]
         public int Attack1AreaOfEffectSmallDamage
         {
             get { return Fields.Get<int>(this, "ua1q"); }
@@ -340,7 +335,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ua1r</c>.</summary>
         [global::Moonwell.Objects.Field("ua1r", Label = "Attack 1 - Range")]
         [global::Moonwell.Objects.Limits(0, 20000)]
-        [global::Moonwell.Objects.NonNegative]
         public int AttackRange
         {
             get { return Fields.Get<int>(this, "ua1r"); }
@@ -350,7 +344,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ua1s</c>.</summary>
         [global::Moonwell.Objects.Field("ua1s", Label = "Attack 1 - Damage Sides per Die")]
         [global::Moonwell.Objects.Limits(0, 100)]
-        [global::Moonwell.Objects.NonNegative]
         public int DamageSides
         {
             get { return Fields.Get<int>(this, "ua1s"); }
@@ -376,7 +369,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ua1z</c>.</summary>
         [global::Moonwell.Objects.Field("ua1z", Label = "Attack 1 - Projectile Speed")]
         [global::Moonwell.Objects.Limits(0, 10000)]
-        [global::Moonwell.Objects.NonNegative]
         public int Attack1ProjectileSpeed
         {
             get { return Fields.Get<int>(this, "ua1z"); }
@@ -386,7 +378,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ua2b</c>.</summary>
         [global::Moonwell.Objects.Field("ua2b", Label = "Attack 2 - Damage Base")]
         [global::Moonwell.Objects.Limits(0, 500000)]
-        [global::Moonwell.Objects.NonNegative]
         public int Attack2DamageBase
         {
             get { return Fields.Get<int>(this, "ua2b"); }
@@ -406,7 +397,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ua2d</c>.</summary>
         [global::Moonwell.Objects.Field("ua2d", Label = "Attack 2 - Damage Number of Dice")]
         [global::Moonwell.Objects.Limits(0, 100)]
-        [global::Moonwell.Objects.NonNegative]
         public int Attack2DamageNumberOfDice
         {
             get { return Fields.Get<int>(this, "ua2d"); }
@@ -416,7 +406,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ua2f</c>.</summary>
         [global::Moonwell.Objects.Field("ua2f", Label = "Attack 2 - Area of Effect (Full Damage)")]
         [global::Moonwell.Objects.Limits(0, 1000)]
-        [global::Moonwell.Objects.NonNegative]
         public int Attack2AreaOfEffectFullDamage
         {
             get { return Fields.Get<int>(this, "ua2f"); }
@@ -434,7 +423,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ua2h</c>.</summary>
         [global::Moonwell.Objects.Field("ua2h", Label = "Attack 2 - Area of Effect (Medium Damage)")]
         [global::Moonwell.Objects.Limits(0, 1000)]
-        [global::Moonwell.Objects.NonNegative]
         public int Attack2AreaOfEffectMediumDamage
         {
             get { return Fields.Get<int>(this, "ua2h"); }
@@ -460,7 +448,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ua2q</c>.</summary>
         [global::Moonwell.Objects.Field("ua2q", Label = "Attack 2 - Area of Effect (Small Damage)")]
         [global::Moonwell.Objects.Limits(0, 1000)]
-        [global::Moonwell.Objects.NonNegative]
         public int Attack2AreaOfEffectSmallDamage
         {
             get { return Fields.Get<int>(this, "ua2q"); }
@@ -470,7 +457,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ua2r</c>.</summary>
         [global::Moonwell.Objects.Field("ua2r", Label = "Attack 2 - Range")]
         [global::Moonwell.Objects.Limits(0, 20000)]
-        [global::Moonwell.Objects.NonNegative]
         public int Attack2Range
         {
             get { return Fields.Get<int>(this, "ua2r"); }
@@ -480,7 +466,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ua2s</c>.</summary>
         [global::Moonwell.Objects.Field("ua2s", Label = "Attack 2 - Damage Sides per Die")]
         [global::Moonwell.Objects.Limits(0, 100)]
-        [global::Moonwell.Objects.NonNegative]
         public int Attack2DamageSidesPerDie
         {
             get { return Fields.Get<int>(this, "ua2s"); }
@@ -506,7 +491,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ua2z</c>.</summary>
         [global::Moonwell.Objects.Field("ua2z", Label = "Attack 2 - Projectile Speed")]
         [global::Moonwell.Objects.Limits(0, 10000)]
-        [global::Moonwell.Objects.NonNegative]
         public int Attack2ProjectileSpeed
         {
             get { return Fields.Get<int>(this, "ua2z"); }
@@ -585,7 +569,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>uamn</c>.</summary>
         [global::Moonwell.Objects.Field("uamn", Label = "Minimum Attack Range")]
         [global::Moonwell.Objects.Limits(0, 20000)]
-        [global::Moonwell.Objects.NonNegative]
         public int MinimumAttackRange
         {
             get { return Fields.Get<int>(this, "uamn"); }
@@ -620,7 +603,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ubba</c>.</summary>
         [global::Moonwell.Objects.Field("ubba", Label = "Gold Bounty Awarded - Base")]
         [global::Moonwell.Objects.Limits(0, 10000)]
-        [global::Moonwell.Objects.NonNegative]
         public int GoldBountyAwardedBase
         {
             get { return Fields.Get<int>(this, "ubba"); }
@@ -638,7 +620,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ubdi</c>.</summary>
         [global::Moonwell.Objects.Field("ubdi", Label = "Gold Bounty Awarded - Number of Dice")]
         [global::Moonwell.Objects.Limits(0, 100)]
-        [global::Moonwell.Objects.NonNegative]
         public int GoldBountyAwardedNumberOfDice
         {
             get { return Fields.Get<int>(this, "ubdi"); }
@@ -648,7 +629,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ubld</c>.</summary>
         [global::Moonwell.Objects.Field("ubld", Label = "Build Time")]
         [global::Moonwell.Objects.Limits(1, 298)]
-        [global::Moonwell.Objects.NonNegative]
         public int BuildTime
         {
             get { return Fields.Get<int>(this, "ubld"); }
@@ -658,7 +638,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>uble</c>.</summary>
         [global::Moonwell.Objects.Field("uble", Label = "Animation - Blend Time (seconds)")]
         [global::Moonwell.Objects.Limits(0, 1)]
-        [global::Moonwell.Objects.NonNegative]
         public float AnimationBlendTimeSeconds
         {
             get { return Fields.Get<float>(this, "uble"); }
@@ -677,7 +656,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ubpx</c>.</summary>
         [global::Moonwell.Objects.Field("ubpx", Label = "Button Position (X)")]
         [global::Moonwell.Objects.Limits(0, 3)]
-        [global::Moonwell.Objects.NonNegative]
         public int ButtonPositionX
         {
             get { return Fields.Get<int>(this, "ubpx"); }
@@ -687,7 +665,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ubpy</c>.</summary>
         [global::Moonwell.Objects.Field("ubpy", Label = "Button Position (Y)")]
         [global::Moonwell.Objects.Limits(0, 2)]
-        [global::Moonwell.Objects.NonNegative]
         public int ButtonPositionY
         {
             get { return Fields.Get<int>(this, "ubpy"); }
@@ -717,7 +694,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ubsi</c>.</summary>
         [global::Moonwell.Objects.Field("ubsi", Label = "Gold Bounty Awarded - Sides per Die")]
         [global::Moonwell.Objects.Limits(0, 100)]
-        [global::Moonwell.Objects.NonNegative]
         public int GoldBountyAwardedSidesPerDie
         {
             get { return Fields.Get<int>(this, "ubsi"); }
@@ -750,7 +726,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ucar</c>.</summary>
         [global::Moonwell.Objects.Field("ucar", Label = "Transported Size")]
         [global::Moonwell.Objects.Limits(0, 8)]
-        [global::Moonwell.Objects.NonNegative]
         public int TransportedSize
         {
             get { return Fields.Get<int>(this, "ucar"); }
@@ -778,7 +753,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>uclb</c>.</summary>
         [global::Moonwell.Objects.Field("uclb", Label = "Tinting Color 3 (Blue)")]
         [global::Moonwell.Objects.Limits(0, 255)]
-        [global::Moonwell.Objects.NonNegative]
         public int TintingColor3Blue
         {
             get { return Fields.Get<int>(this, "uclb"); }
@@ -788,7 +762,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>uclg</c>.</summary>
         [global::Moonwell.Objects.Field("uclg", Label = "Tinting Color 2 (Green)")]
         [global::Moonwell.Objects.Limits(0, 255)]
-        [global::Moonwell.Objects.NonNegative]
         public int TintingColor2Green
         {
             get { return Fields.Get<int>(this, "uclg"); }
@@ -798,7 +771,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>uclr</c>.</summary>
         [global::Moonwell.Objects.Field("uclr", Label = "Tinting Color 1 (Red)")]
         [global::Moonwell.Objects.Limits(0, 255)]
-        [global::Moonwell.Objects.NonNegative]
         public int TintingColor1Red
         {
             get { return Fields.Get<int>(this, "uclr"); }
@@ -884,7 +856,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>udef</c>.</summary>
         [global::Moonwell.Objects.Field("udef", Label = "Defense Base")]
         [global::Moonwell.Objects.Limits(0, 1000)]
-        [global::Moonwell.Objects.NonNegative]
         public int Armor
         {
             get { return Fields.Get<int>(this, "udef"); }
@@ -901,7 +872,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>udl1</c>.</summary>
         [global::Moonwell.Objects.Field("udl1", Label = "Attack 1 - Damage Loss Factor")]
         [global::Moonwell.Objects.Limits(0, 10)]
-        [global::Moonwell.Objects.NonNegative]
         public float Attack1DamageLossFactor
         {
             get { return Fields.Get<float>(this, "udl1"); }
@@ -911,7 +881,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>udl2</c>.</summary>
         [global::Moonwell.Objects.Field("udl2", Label = "Attack 2 - Damage Loss Factor")]
         [global::Moonwell.Objects.Limits(0, 10)]
-        [global::Moonwell.Objects.NonNegative]
         public float Attack2DamageLossFactor
         {
             get { return Fields.Get<float>(this, "udl2"); }
@@ -967,7 +936,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>udu1</c>.</summary>
         [global::Moonwell.Objects.Field("udu1", Label = "Attack 1 - Damage Upgrade Amount")]
         [global::Moonwell.Objects.Limits(0, 1000)]
-        [global::Moonwell.Objects.NonNegative]
         public int Attack1DamageUpgradeAmount
         {
             get { return Fields.Get<int>(this, "udu1"); }
@@ -977,7 +945,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>udu2</c>.</summary>
         [global::Moonwell.Objects.Field("udu2", Label = "Attack 2 - Damage Upgrade Amount")]
         [global::Moonwell.Objects.Limits(0, 1000)]
-        [global::Moonwell.Objects.NonNegative]
         public int Attack2DamageUpgradeAmount
         {
             get { return Fields.Get<int>(this, "udu2"); }
@@ -987,7 +954,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>udup</c>.</summary>
         [global::Moonwell.Objects.Field("udup", Label = "Defense Upgrade Bonus")]
         [global::Moonwell.Objects.Limits(0, 1000)]
-        [global::Moonwell.Objects.NonNegative]
         public int DefenseUpgradeBonus
         {
             get { return Fields.Get<int>(this, "udup"); }
@@ -1005,7 +971,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>uept</c>.</summary>
         [global::Moonwell.Objects.Field("uept", Label = "Elevation - Sample Points")]
         [global::Moonwell.Objects.Limits(0, 4)]
-        [global::Moonwell.Objects.NonNegative]
         public int ElevationSamplePoints
         {
             get { return Fields.Get<int>(this, "uept"); }
@@ -1049,7 +1014,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ufma</c>.</summary>
         [global::Moonwell.Objects.Field("ufma", Label = "Food Produced")]
         [global::Moonwell.Objects.Limits(0, 300)]
-        [global::Moonwell.Objects.NonNegative]
         public int FoodProduced
         {
             get { return Fields.Get<int>(this, "ufma"); }
@@ -1059,7 +1023,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ufoo</c>.</summary>
         [global::Moonwell.Objects.Field("ufoo", Label = "Food Cost")]
         [global::Moonwell.Objects.Limits(0, 300)]
-        [global::Moonwell.Objects.NonNegative]
         public int Food
         {
             get { return Fields.Get<int>(this, "ufoo"); }
@@ -1069,7 +1032,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ufor</c>.</summary>
         [global::Moonwell.Objects.Field("ufor", Label = "Formation Rank")]
         [global::Moonwell.Objects.Limits(0, 9)]
-        [global::Moonwell.Objects.NonNegative]
         public int FormationRank
         {
             get { return Fields.Get<int>(this, "ufor"); }
@@ -1089,7 +1051,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ugol</c>.</summary>
         [global::Moonwell.Objects.Field("ugol", Label = "Gold Cost")]
         [global::Moonwell.Objects.Limits(0, 100000)]
-        [global::Moonwell.Objects.NonNegative]
         public int GoldCost
         {
             get { return Fields.Get<int>(this, "ugol"); }
@@ -1099,7 +1060,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ugor</c>.</summary>
         [global::Moonwell.Objects.Field("ugor", Label = "Repair Gold Cost")]
         [global::Moonwell.Objects.Limits(0, 100000)]
-        [global::Moonwell.Objects.NonNegative]
         public int RepairGoldCost
         {
             get { return Fields.Get<int>(this, "ugor"); }
@@ -1117,7 +1077,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>uhd1</c>.</summary>
         [global::Moonwell.Objects.Field("uhd1", Label = "Attack 1 - Damage Factor - Medium")]
         [global::Moonwell.Objects.Limits(0, 10)]
-        [global::Moonwell.Objects.NonNegative]
         public float Attack1DamageFactorMedium
         {
             get { return Fields.Get<float>(this, "uhd1"); }
@@ -1127,7 +1086,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>uhd2</c>.</summary>
         [global::Moonwell.Objects.Field("uhd2", Label = "Attack 2 - Damage Factor - Medium")]
         [global::Moonwell.Objects.Limits(0, 10)]
-        [global::Moonwell.Objects.NonNegative]
         public float Attack2DamageFactorMedium
         {
             get { return Fields.Get<float>(this, "uhd2"); }
@@ -1161,7 +1119,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>uhpm</c>.</summary>
         [global::Moonwell.Objects.Field("uhpm", Label = "Hit Points Maximum (Base)")]
         [global::Moonwell.Objects.Limits(1, 500000)]
-        [global::Moonwell.Objects.NonNegative]
         public int HitPoints
         {
             get { return Fields.Get<int>(this, "uhpm"); }
@@ -1171,7 +1128,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>uhpr</c>.</summary>
         [global::Moonwell.Objects.Field("uhpr", Label = "Hit Points Regeneration Rate")]
         [global::Moonwell.Objects.Limits(0, 1000)]
-        [global::Moonwell.Objects.NonNegative]
         public float HitPointRegen
         {
             get { return Fields.Get<float>(this, "uhpr"); }
@@ -1231,7 +1187,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ulba</c>.</summary>
         [global::Moonwell.Objects.Field("ulba", Label = "Lumber Bounty Awarded - Base")]
         [global::Moonwell.Objects.Limits(0, 10000)]
-        [global::Moonwell.Objects.NonNegative]
         public int LumberBountyAwardedBase
         {
             get { return Fields.Get<int>(this, "ulba"); }
@@ -1241,7 +1196,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ulbd</c>.</summary>
         [global::Moonwell.Objects.Field("ulbd", Label = "Lumber Bounty Awarded - Number of Dice")]
         [global::Moonwell.Objects.Limits(0, 100)]
-        [global::Moonwell.Objects.NonNegative]
         public int LumberBountyAwardedNumberOfDice
         {
             get { return Fields.Get<int>(this, "ulbd"); }
@@ -1251,7 +1205,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ulbs</c>.</summary>
         [global::Moonwell.Objects.Field("ulbs", Label = "Lumber Bounty Awarded - Sides per Die")]
         [global::Moonwell.Objects.Limits(0, 100)]
-        [global::Moonwell.Objects.NonNegative]
         public int LumberBountyAwardedSidesPerDie
         {
             get { return Fields.Get<int>(this, "ulbs"); }
@@ -1261,7 +1214,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ulev</c>.</summary>
         [global::Moonwell.Objects.Field("ulev", Label = "Level")]
         [global::Moonwell.Objects.Limits(1, 100)]
-        [global::Moonwell.Objects.NonNegative]
         public int Level
         {
             get { return Fields.Get<int>(this, "ulev"); }
@@ -1271,7 +1223,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ulfi</c>.</summary>
         [global::Moonwell.Objects.Field("ulfi", Label = "Looping Fade In Rate")]
         [global::Moonwell.Objects.Limits(0, 12700)]
-        [global::Moonwell.Objects.NonNegative]
         public int LoopingFadeInRate
         {
             get { return Fields.Get<int>(this, "ulfi"); }
@@ -1281,7 +1232,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ulfo</c>.</summary>
         [global::Moonwell.Objects.Field("ulfo", Label = "Looping Fade Out Rate")]
         [global::Moonwell.Objects.Limits(0, 12700)]
-        [global::Moonwell.Objects.NonNegative]
         public int LoopingFadeOutRate
         {
             get { return Fields.Get<int>(this, "ulfo"); }
@@ -1335,7 +1285,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ulum</c>.</summary>
         [global::Moonwell.Objects.Field("ulum", Label = "Lumber Cost")]
         [global::Moonwell.Objects.Limits(0, 100000)]
-        [global::Moonwell.Objects.NonNegative]
         public int LumberCost
         {
             get { return Fields.Get<int>(this, "ulum"); }
@@ -1345,7 +1294,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ulur</c>.</summary>
         [global::Moonwell.Objects.Field("ulur", Label = "Repair Lumber Cost")]
         [global::Moonwell.Objects.Limits(0, 100000)]
-        [global::Moonwell.Objects.NonNegative]
         public int RepairLumberCost
         {
             get { return Fields.Get<int>(this, "ulur"); }
@@ -1355,7 +1303,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>uma1</c>.</summary>
         [global::Moonwell.Objects.Field("uma1", Label = "Attack 1 - Projectile Arc")]
         [global::Moonwell.Objects.Limits(0, 1)]
-        [global::Moonwell.Objects.NonNegative]
         public float Attack1ProjectileArc
         {
             get { return Fields.Get<float>(this, "uma1"); }
@@ -1365,7 +1312,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>uma2</c>.</summary>
         [global::Moonwell.Objects.Field("uma2", Label = "Attack 2 - Projectile Arc")]
         [global::Moonwell.Objects.Limits(0, 1)]
-        [global::Moonwell.Objects.NonNegative]
         public float Attack2ProjectileArc
         {
             get { return Fields.Get<float>(this, "uma2"); }
@@ -1375,7 +1321,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>umas</c>.</summary>
         [global::Moonwell.Objects.Field("umas", Label = "Speed Maximum")]
         [global::Moonwell.Objects.Limits(0, 522)]
-        [global::Moonwell.Objects.NonNegative]
         public int SpeedMaximum
         {
             get { return Fields.Get<int>(this, "umas"); }
@@ -1425,7 +1370,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>umis</c>.</summary>
         [global::Moonwell.Objects.Field("umis", Label = "Speed Minimum")]
         [global::Moonwell.Objects.Limits(0, 522)]
-        [global::Moonwell.Objects.NonNegative]
         public int SpeedMinimum
         {
             get { return Fields.Get<int>(this, "umis"); }
@@ -1443,7 +1387,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>umpi</c>.</summary>
         [global::Moonwell.Objects.Field("umpi", Label = "Mana Initial Amount")]
         [global::Moonwell.Objects.Limits(0, 100000)]
-        [global::Moonwell.Objects.NonNegative]
         public int ManaInitialAmount
         {
             get { return Fields.Get<int>(this, "umpi"); }
@@ -1453,7 +1396,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>umpm</c>.</summary>
         [global::Moonwell.Objects.Field("umpm", Label = "Mana Maximum")]
         [global::Moonwell.Objects.Limits(0, 100000)]
-        [global::Moonwell.Objects.NonNegative]
         public int Mana
         {
             get { return Fields.Get<int>(this, "umpm"); }
@@ -1463,7 +1405,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>umpr</c>.</summary>
         [global::Moonwell.Objects.Field("umpr", Label = "Mana Regeneration")]
         [global::Moonwell.Objects.Limits(0, 1000)]
-        [global::Moonwell.Objects.NonNegative]
         public float ManaRegen
         {
             get { return Fields.Get<float>(this, "umpr"); }
@@ -1509,7 +1450,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>umvs</c>.</summary>
         [global::Moonwell.Objects.Field("umvs", Label = "Speed Base")]
         [global::Moonwell.Objects.Limits(0, 522)]
-        [global::Moonwell.Objects.NonNegative]
         public int Speed
         {
             get { return Fields.Get<int>(this, "umvs"); }
@@ -1581,7 +1521,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>uocc</c>.</summary>
         [global::Moonwell.Objects.Field("uocc", Label = "Occluder Height")]
         [global::Moonwell.Objects.Limits(0, 2048)]
-        [global::Moonwell.Objects.NonNegative]
         public float OccluderHeight
         {
             get { return Fields.Get<float>(this, "uocc"); }
@@ -1599,7 +1538,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>uori</c>.</summary>
         [global::Moonwell.Objects.Field("uori", Label = "Orientation Interpolation")]
         [global::Moonwell.Objects.Limits(0, 8)]
-        [global::Moonwell.Objects.NonNegative]
         public int OrientationInterpolation
         {
             get { return Fields.Get<int>(this, "uori"); }
@@ -1650,7 +1588,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>upoi</c>.</summary>
         [global::Moonwell.Objects.Field("upoi", Label = "Point Value")]
         [global::Moonwell.Objects.Limits(0, 100000)]
-        [global::Moonwell.Objects.NonNegative]
         public int PointValue
         {
             get { return Fields.Get<int>(this, "upoi"); }
@@ -1668,7 +1605,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>upri</c>.</summary>
         [global::Moonwell.Objects.Field("upri", Label = "Priority")]
         [global::Moonwell.Objects.Limits(0, 20)]
-        [global::Moonwell.Objects.NonNegative]
         public int Priority
         {
             get { return Fields.Get<int>(this, "upri"); }
@@ -1688,7 +1624,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>uqd1</c>.</summary>
         [global::Moonwell.Objects.Field("uqd1", Label = "Attack 1 - Damage Factor - Small")]
         [global::Moonwell.Objects.Limits(0, 10)]
-        [global::Moonwell.Objects.NonNegative]
         public float Attack1DamageFactorSmall
         {
             get { return Fields.Get<float>(this, "uqd1"); }
@@ -1698,7 +1633,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>uqd2</c>.</summary>
         [global::Moonwell.Objects.Field("uqd2", Label = "Attack 2 - Damage Factor - Small")]
         [global::Moonwell.Objects.Limits(0, 10)]
-        [global::Moonwell.Objects.NonNegative]
         public float Attack2DamageFactorSmall
         {
             get { return Fields.Get<float>(this, "uqd2"); }
@@ -1716,7 +1650,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>urb1</c>.</summary>
         [global::Moonwell.Objects.Field("urb1", Label = "Attack 1 - Range Motion Buffer")]
         [global::Moonwell.Objects.Limits(0, 2000)]
-        [global::Moonwell.Objects.NonNegative]
         public float Attack1RangeMotionBuffer
         {
             get { return Fields.Get<float>(this, "urb1"); }
@@ -1726,7 +1659,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>urb2</c>.</summary>
         [global::Moonwell.Objects.Field("urb2", Label = "Attack 2 - Range Motion Buffer")]
         [global::Moonwell.Objects.Limits(0, 2000)]
-        [global::Moonwell.Objects.NonNegative]
         public float Attack2RangeMotionBuffer
         {
             get { return Fields.Get<float>(this, "urb2"); }
@@ -1758,7 +1690,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>urpg</c>.</summary>
         [global::Moonwell.Objects.Field("urpg", Label = "Group Separation - Group Number")]
         [global::Moonwell.Objects.Limits(0, 1024)]
-        [global::Moonwell.Objects.NonNegative]
         public int GroupSeparationGroupNumber
         {
             get { return Fields.Get<int>(this, "urpg"); }
@@ -1776,7 +1707,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>urpp</c>.</summary>
         [global::Moonwell.Objects.Field("urpp", Label = "Group Separation - Parameter")]
         [global::Moonwell.Objects.Limits(0, 4)]
-        [global::Moonwell.Objects.NonNegative]
         public int GroupSeparationParameter
         {
             get { return Fields.Get<int>(this, "urpp"); }
@@ -1786,7 +1716,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>urpr</c>.</summary>
         [global::Moonwell.Objects.Field("urpr", Label = "Group Separation - Priority")]
         [global::Moonwell.Objects.Limits(0, 10000)]
-        [global::Moonwell.Objects.NonNegative]
         public int GroupSeparationPriority
         {
             get { return Fields.Get<int>(this, "urpr"); }
@@ -1812,7 +1741,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>urtm</c>.</summary>
         [global::Moonwell.Objects.Field("urtm", Label = "Repair Time")]
         [global::Moonwell.Objects.Limits(1, 10000)]
-        [global::Moonwell.Objects.NonNegative]
         public int RepairTime
         {
             get { return Fields.Get<int>(this, "urtm"); }
@@ -1958,7 +1886,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>usid</c>.</summary>
         [global::Moonwell.Objects.Field("usid", Label = "Sight Radius (Day)")]
         [global::Moonwell.Objects.Limits(0, 1800)]
-        [global::Moonwell.Objects.NonNegative]
         public int SightRange
         {
             get { return Fields.Get<int>(this, "usid"); }
@@ -1968,7 +1895,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>usin</c>.</summary>
         [global::Moonwell.Objects.Field("usin", Label = "Sight Radius (Night)")]
         [global::Moonwell.Objects.Limits(0, 1800)]
-        [global::Moonwell.Objects.NonNegative]
         public int SightRadiusNight
         {
             get { return Fields.Get<int>(this, "usin"); }
@@ -1978,7 +1904,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>usit</c>.</summary>
         [global::Moonwell.Objects.Field("usit", Label = "Stock Initial After Start Delay")]
         [global::Moonwell.Objects.Limits(1, 32)]
-        [global::Moonwell.Objects.NonNegative]
         public int StockInitialAfterStartDelay
         {
             get { return Fields.Get<int>(this, "usit"); }
@@ -1996,7 +1921,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>uslz</c>.</summary>
         [global::Moonwell.Objects.Field("uslz", Label = "Selection Circle - Height")]
         [global::Moonwell.Objects.Limits(0, 2048)]
-        [global::Moonwell.Objects.NonNegative]
         public float SelectionCircleHeight
         {
             get { return Fields.Get<float>(this, "uslz"); }
@@ -2006,7 +1930,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>usma</c>.</summary>
         [global::Moonwell.Objects.Field("usma", Label = "Stock Maximum")]
         [global::Moonwell.Objects.Limits(0, 32)]
-        [global::Moonwell.Objects.NonNegative]
         public int StockMaximum
         {
             get { return Fields.Get<int>(this, "usma"); }
@@ -2060,7 +1983,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>usrg</c>.</summary>
         [global::Moonwell.Objects.Field("usrg", Label = "Stock Replenish Interval")]
         [global::Moonwell.Objects.Limits(0, 3600)]
-        [global::Moonwell.Objects.NonNegative]
         public int StockReplenishInterval
         {
             get { return Fields.Get<int>(this, "usrg"); }
@@ -2088,7 +2010,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>usst</c>.</summary>
         [global::Moonwell.Objects.Field("usst", Label = "Stock Start Delay")]
         [global::Moonwell.Objects.Limits(0, 3600)]
-        [global::Moonwell.Objects.NonNegative]
         public int StockStartDelay
         {
             get { return Fields.Get<int>(this, "usst"); }
@@ -2114,7 +2035,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>utc1</c>.</summary>
         [global::Moonwell.Objects.Field("utc1", Label = "Attack 1 - Maximum Number of Targets")]
         [global::Moonwell.Objects.Limits(0, 100)]
-        [global::Moonwell.Objects.NonNegative]
         public int Attack1MaximumNumberOfTargets
         {
             get { return Fields.Get<int>(this, "utc1"); }
@@ -2124,7 +2044,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>utc2</c>.</summary>
         [global::Moonwell.Objects.Field("utc2", Label = "Attack 2 - Maximum Number of Targets")]
         [global::Moonwell.Objects.Limits(0, 100)]
-        [global::Moonwell.Objects.NonNegative]
         public int Attack2MaximumNumberOfTargets
         {
             get { return Fields.Get<int>(this, "utc2"); }

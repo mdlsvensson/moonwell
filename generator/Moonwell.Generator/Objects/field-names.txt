@@ -75,6 +75,13 @@ ability ahdu HeroDuration
 ability acas CastTime
 ability abuf Buffs
 ability atar TargetsAllowed
+ability Det1 Detects
+ability Fla1 Detects
+ability Ifa1 Detects
+ability Ndt3 Detects
+ability Nsp3 Detects
+ability Ofs1 Detects
+ability Hca4 StackingType
 ability aart Icon
 ability atp1 Tooltip
 ability aub1 TooltipExtended

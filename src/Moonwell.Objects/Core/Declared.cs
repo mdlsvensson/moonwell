@@ -284,15 +284,14 @@ namespace Moonwell.Objects
                 Activator.CreateInstance(standardClass, true);
                 count = counted;
             }
-            catch (MissingMethodException)
+            catch (Exception error)
             {
-                // A standard class with no constructor without parameters puts nothing a map's class could inherit.
-                count = 0;
-            }
-            catch (MemberAccessException)
-            {
-                // An abstract standard class is made by no map's class directly; its constructors put nothing here.
-                count = 0;
+                // Every generated standard class is made with no arguments; one that is not cannot be told apart from the map's puts.
+                // Plain code: CSharp.lua reads this file too, and fails on a property pattern here.
+                var cause = error.InnerException != null && error is System.Reflection.TargetInvocationException ? error.InnerException : error;
+                throw new InvalidOperationException(
+                    $"{standardClass.FullName}, a standard class, could not be made by itself to count the values its constructor sets: {cause.Message}",
+                    cause);
             }
             finally
             {

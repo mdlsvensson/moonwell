@@ -201,7 +201,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>dmmb</c>.</summary>
         [global::Moonwell.Objects.Field("dmmb", Label = "Minimap Color 3 (Blue)")]
         [global::Moonwell.Objects.Limits(0, 255)]
-        [global::Moonwell.Objects.NonNegative]
         public int MinimapColor3Blue
         {
             get { return Fields.Get<int>(this, "dmmb"); }
@@ -211,7 +210,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>dmmg</c>.</summary>
         [global::Moonwell.Objects.Field("dmmg", Label = "Minimap Color 2 (Green)")]
         [global::Moonwell.Objects.Limits(0, 255)]
-        [global::Moonwell.Objects.NonNegative]
         public int MinimapColor2Green
         {
             get { return Fields.Get<int>(this, "dmmg"); }
@@ -221,7 +219,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>dmmr</c>.</summary>
         [global::Moonwell.Objects.Field("dmmr", Label = "Minimap Color 1 (Red)")]
         [global::Moonwell.Objects.Limits(0, 255)]
-        [global::Moonwell.Objects.NonNegative]
         public int MinimapColor1Red
         {
             get { return Fields.Get<int>(this, "dmmr"); }
@@ -378,7 +375,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>dvar</c>.</summary>
         [global::Moonwell.Objects.Field("dvar", Label = "Variations")]
         [global::Moonwell.Objects.Limits(1, 10)]
-        [global::Moonwell.Objects.NonNegative]
         public int Variations
         {
             get { return Fields.Get<int>(this, "dvar"); }
@@ -388,7 +384,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>dvb1</c>.</summary>
         [global::Moonwell.Objects.Field("dvb1", Label = "Tinting Color 3 (Blue)")]
         [global::Moonwell.Objects.Limits(0, 255)]
-        [global::Moonwell.Objects.NonNegative]
         public global::Moonwell.Objects.Levels<int> TintingColor3Blue
         {
             get { return Fields.GetLevels<int>(this, "dvb1"); }
@@ -398,7 +393,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>dvg1</c>.</summary>
         [global::Moonwell.Objects.Field("dvg1", Label = "Tinting Color 2 (Green)")]
         [global::Moonwell.Objects.Limits(0, 255)]
-        [global::Moonwell.Objects.NonNegative]
         public global::Moonwell.Objects.Levels<int> TintingColor2Green
         {
             get { return Fields.GetLevels<int>(this, "dvg1"); }
@@ -418,7 +412,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>dvr1</c>.</summary>
         [global::Moonwell.Objects.Field("dvr1", Label = "Tinting Color 1 (Red)")]
         [global::Moonwell.Objects.Limits(0, 255)]
-        [global::Moonwell.Objects.NonNegative]
         public global::Moonwell.Objects.Levels<int> TintingColor1Red
         {
             get { return Fields.GetLevels<int>(this, "dvr1"); }

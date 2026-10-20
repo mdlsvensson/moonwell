@@ -19,7 +19,7 @@ public enum FieldType
 /// <summary>What World Editor allows a field to hold, from the metadata.</summary>
 /// <param name="Min">The lowest value allowed, from <c>minVal</c>; null for a field with no lower limit.</param>
 /// <param name="Max">The highest value allowed, from <c>maxVal</c>; null for a field with no upper limit.</param>
-/// <param name="NonNegative">True when the metadata says the value may not be negative: <c>forceNonNeg</c>, or an <c>unreal</c> type. See <see cref="NoNegative"/> for what is checked.</param>
+/// <param name="NonNegative">True when the metadata forces the value not to be negative (<c>forceNonNeg</c> 1). See <see cref="NoNegative"/> for what is checked.</param>
 /// <param name="CanBeEmpty">True when the editor accepts an empty value (<c>canBeEmpty</c>).</param>
 /// <param name="MaxLength">
 /// For a <c>string</c> field, the most characters allowed, from a numeric <c>maxVal</c>; null when there is none or
@@ -35,6 +35,11 @@ public enum FieldType
 /// empty. Other fields with <c>canBeEmpty</c> 0 are not: standard objects leave them empty (267 units have no
 /// abilities).
 /// </param>
+/// <param name="StandardNegative">
+/// True when a standard value of the field, in the base tables or a balance set, is below 0: the game's own data holds
+/// negatives there (a button at -11 is hidden, an item's bonus of -2), so a map may too. Set by
+/// <see cref="Fields.WithStandardNegatives"/>.
+/// </param>
 public sealed record FieldRules(
     double? Min,
     double? Max,
@@ -43,17 +48,18 @@ public sealed record FieldRules(
     int? MaxLength,
     string? Label,
     int? MaxEntries = null,
-    bool Required = false)
+    bool Required = false,
+    bool StandardNegative = false)
 {
     /// <summary>The rules of a field with none.</summary>
     public static FieldRules None { get; } = new FieldRules(null, null, false, false, null, null);
 
     /// <summary>
-    /// True when a number below 0 is never allowed, even past the limits: when <see cref="Min"/> is 0 or more, or when
-    /// there is no <see cref="Min"/> and <see cref="NonNegative"/> is set. An explicit negative <see cref="Min"/>
-    /// allows negatives down to it.
+    /// True when a number below 0 is never allowed, even past the limits: the metadata forces it
+    /// (<see cref="NonNegative"/>), no standard value is negative (<see cref="StandardNegative"/>) and <see cref="Min"/>
+    /// is not below 0. Otherwise a minimum of 0 is one end of the range, which <c>[BeyondLimits]</c> lifts.
     /// </summary>
-    public bool NoNegative => Min.HasValue ? Min.Value >= 0 : NonNegative;
+    public bool NoNegative => NonNegative && !StandardNegative && !(Min < 0);
 }
 
 /// <summary>One field of one kind of object.</summary>
@@ -278,6 +284,47 @@ public static class Fields
         return name + char.ToUpperInvariant(id[0]) + id.Substring(1);
     }
 
+    /// <summary>
+    /// The fields with <see cref="FieldRules.StandardNegative"/> set on each field the metadata forces not to be negative
+    /// (<see cref="FieldRules.NonNegative"/>) that a standard object holds a negative in: a value under the base tables
+    /// or any balance set, any level, or any number of a number list held as text. Other fields are returned as they are.
+    /// </summary>
+    public static IReadOnlyList<Field> WithStandardNegatives(IReadOnlyList<Field> fields, IReadOnlyList<StandardObject> objects)
+    {
+        var forced = new HashSet<string>(fields.Where(f => f.Rules.NonNegative).Select(f => f.Id), StringComparer.Ordinal);
+        var negative = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var obj in objects)
+        {
+            foreach (var values in new[] { obj.Values }.Concat(obj.Sets.Values))
+            {
+                foreach (var (key, value) in values)
+                {
+                    var colon = key.IndexOf(':');
+                    var id = colon < 0 ? key : key.Substring(0, colon);
+                    if (forced.Contains(id) && !negative.Contains(id) && HasNegative(value))
+                    {
+                        negative.Add(id);
+                    }
+                }
+            }
+        }
+
+        return fields.Select(f => negative.Contains(f.Id) ? f with { Rules = f.Rules with { StandardNegative = true } } : f).ToList();
+    }
+
+    private static bool HasNegative(string value)
+    {
+        foreach (var part in value.Split(','))
+        {
+            if (double.TryParse(part.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var number) && number < 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static (FieldType, string?) TypeOf(string type)
     {
         switch (type)
@@ -344,7 +391,7 @@ public static class Fields
     private static FieldRules RulesOf(MetaRow row, string label)
     {
         var type = Value(row, "type");
-        var nonNegative = Value(row, "forceNonNeg") == "1" || type == "unreal" || type == "unrealList";
+        var nonNegative = Value(row, "forceNonNeg") == "1";
         double? min = null;
         double? max = null;
         int? maxLength = null;

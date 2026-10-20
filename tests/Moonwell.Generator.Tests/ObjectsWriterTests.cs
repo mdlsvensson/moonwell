@@ -240,7 +240,6 @@ public class ObjectsWriterTests
         Assert.Contains(
             "[global::Moonwell.Objects.Field(\"Htb1\", Label = \"Damage\")]\n"
             + "                [global::Moonwell.Objects.Limits(0, 99999)]\n"
-            + "                [global::Moonwell.Objects.NonNegative]\n"
             + "                public global::Moonwell.Objects.Levels<float> Damage\n"
             + "                {\n"
             + "                    get { return Fields.GetLevels<float>(this, \"Htb1\"); }\n"
@@ -260,7 +259,6 @@ public class ObjectsWriterTests
         Assert.Contains(
             "        [global::Moonwell.Objects.Field(\"uhpm\", Label = \"Hit Points Maximum (Base)\")]\n"
             + "        [global::Moonwell.Objects.Limits(1, 500000)]\n"
-            + "        [global::Moonwell.Objects.NonNegative]\n"
             + "        public int HitPoints\n"
             + "        {\n"
             + "            get { return Fields.Get<int>(this, \"uhpm\"); }\n"
@@ -314,6 +312,18 @@ public class ObjectsWriterTests
         Assert.Equal("[global::Moonwell.Objects.Limits(0.01, 2.5E+20)]", ObjectsWriter.LimitsAttribute(0.01, 2.5e20));
         Assert.Equal("[global::Moonwell.Objects.Limits(double.NegativeInfinity, 9)]", ObjectsWriter.LimitsAttribute(null, 9));
         Assert.Equal("[global::Moonwell.Objects.Limits(-1000, double.PositiveInfinity)]", ObjectsWriter.LimitsAttribute(-1000, null));
+    }
+
+    [Fact]
+    public void a_field_the_metadata_forces_not_to_be_negative_carries_non_negative()
+    {
+        // acdn has forceNonNeg 1 and no standard negative; uhpm and Htb1 (forceNonNeg 0) have only their range.
+        Assert.Contains(
+            "        [global::Moonwell.Objects.Field(\"acdn\", Label = \"Cooldown\")]\n"
+            + "        [global::Moonwell.Objects.Limits(0, 3600)]\n"
+            + "        [global::Moonwell.Objects.NonNegative]\n"
+            + "        public global::Moonwell.Objects.Levels<float> Cooldown\n",
+            MiniFiles.Value["Kinds/StandardAbility.g.cs"]);
     }
 
     [Fact]

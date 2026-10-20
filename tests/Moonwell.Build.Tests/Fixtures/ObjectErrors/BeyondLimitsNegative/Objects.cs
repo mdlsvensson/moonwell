@@ -7,12 +7,12 @@ namespace BeyondLimitsNegative
     {
     }
 
-    [BeyondLimits(nameof(HitPoints))]
+    [BeyondLimits(nameof(CollisionSize))]
     public class Hollow : Moonwell.Objects.Human.Units.Footman
     {
         public Hollow()
         {
-            HitPoints = -5;
+            CollisionSize = -5f;
         }
     }
 }

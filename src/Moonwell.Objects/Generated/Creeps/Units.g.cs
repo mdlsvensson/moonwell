@@ -122,7 +122,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\HeroGoblinAlchemist\\HeroGoblinAlchemist";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Alchemist";
                     NameEditorSuffix = "(Morph level 2)";
                     NormalSkin = "AInv";
@@ -303,7 +303,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\HeroGoblinAlchemist\\HeroGoblinAlchemist";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Alchemist";
                     NameEditorSuffix = "(Morph level 3)";
                     NormalSkin = "AInv";
@@ -486,7 +486,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\HeroGoblinAlchemist\\HeroGoblinAlchemist";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Alchemist";
                     NormalSkin = "AInv";
                     OccluderHeight = 0f;
@@ -666,7 +666,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\HeroGoblinAlchemist\\HeroGoblinAlchemist";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Alchemist";
                     NameEditorSuffix = "(Morph level 1)";
                     NormalSkin = "AInv";
@@ -831,7 +831,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Ancient Hydra";
                     NormalSkin = "Aspo,Awrh,ACdv,Advc,Aspy";
                     OccluderHeight = 0f;
@@ -971,7 +971,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Ancient Sasquatch";
                     NormalSkin = "ACtc,ACfr,ACrn";
                     OccluderHeight = 0f;
@@ -1107,7 +1107,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Ancient Wendigo";
                     NormalSkin = "Awrs,ACbh,ACrn";
                     OccluderHeight = 0f;
@@ -1247,7 +1247,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\HumanMage\\HumanMage";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Apprentice Wizard";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -1388,7 +1388,7 @@ namespace Moonwell.Objects
                     LumberCost = 10;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Arachnathid Earth-borer";
                     NormalSkin = "ACvs,ACss";
                     OccluderHeight = 0f;
@@ -1530,7 +1530,7 @@ namespace Moonwell.Objects
                     LumberCost = 30;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Assassin";
                     NormalSkin = "Ashm,ACvs";
                     OccluderHeight = 0f;
@@ -1666,7 +1666,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\Bandit\\Bandit";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Bandit";
                     NormalSkin = "Ashm";
                     OccluderHeight = 0f;
@@ -1805,7 +1805,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\BanditLord\\BanditLord";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Bandit Lord";
                     NormalSkin = "ACav,ACds";
                     OccluderHeight = 0f;
@@ -1948,7 +1948,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "Units\\Creeps\\Archnathid\\Archnathid";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Barbed Arachnathid";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -2088,7 +2088,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "Units\\Creeps\\Archnathid\\Archnathid";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Barbed Arachnathid";
                     NormalSkin = "Abu5";
                     OccluderHeight = 0f;
@@ -2223,7 +2223,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\GolemStatue\\GolemStatue";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Battle Golem";
                     NormalSkin = "ACmi";
                     OccluderHeight = 0f;
@@ -2355,7 +2355,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\GrizzlyBear\\GrizzlyBear";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Bear";
                     NameEditorSuffix = "(Level 1)";
                     OccluderHeight = 0f;
@@ -2517,7 +2517,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\Beastmaster\\Beastmaster";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Beastmaster";
                     NormalSkin = "AInv";
                     OccluderHeight = 0f;
@@ -2679,7 +2679,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Berserk Elemental";
                     NormalSkin = "ACmi,ACfn";
                     OccluderHeight = 0f;
@@ -2816,7 +2816,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Berserk Wildkin";
                     NormalSkin = "ACbh,Awrs";
                     OccluderHeight = 0f;
@@ -2973,7 +2973,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\creeps\\BlackDragon\\BlackDragon";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Black Dragon";
                     NormalSkin = "Advc,ACdv,ACmi";
                     OccluderHeight = 0f;
@@ -3121,7 +3121,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\creeps\\BlackDragonWelp\\BlackDragonWelp";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Black Dragon Whelp";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -3266,7 +3266,7 @@ namespace Moonwell.Objects
                     LumberCost = 80;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Black Drake";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -3399,7 +3399,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\creeps\\SpiderBlack\\SpiderBlack";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Black Spider";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -3544,7 +3544,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Blood Wizard";
                     NormalSkin = "ACbl";
                     OccluderHeight = 0f;
@@ -3679,7 +3679,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Bloodfiend";
                     NormalSkin = "ACce";
                     OccluderHeight = 0f;
@@ -3837,7 +3837,7 @@ namespace Moonwell.Objects
                     LumberCost = 200;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Blue Dragon";
                     NormalSkin = "Advc,ACdv,Afrb,ACmi";
                     OccluderHeight = 0f;
@@ -3986,7 +3986,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\creeps\\AzureDragonWelp\\AzureDragonWelp";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Blue Dragon Whelp";
                     NormalSkin = "Afrb";
                     OccluderHeight = 0f;
@@ -4130,7 +4130,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\DragonSpawnGreen\\DragonSpawnGreen";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Blue Dragonspawn Apprentice";
                     NormalSkin = "ACrj,ACev";
                     OccluderHeight = 0f;
@@ -4269,7 +4269,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\DragonSpawnBlue\\DragonSpawnBlue";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Blue Dragonspawn Meddler";
                     NormalSkin = "ACev";
                     OccluderHeight = 0f;
@@ -4408,7 +4408,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Blue Dragonspawn Overseer";
                     NormalSkin = "ACev,ACav,ACbf";
                     OccluderHeight = 0f;
@@ -4554,7 +4554,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Blue Dragonspawn Sorcerer";
                     NormalSkin = "ACfn,ACev";
                     OccluderHeight = 0f;
@@ -4694,7 +4694,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\DragonSpawnPurple\\DragonSpawnPurple";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Blue Dragonspawn Warrior";
                     NormalSkin = "ACev";
                     OccluderHeight = 0f;
@@ -4842,7 +4842,7 @@ namespace Moonwell.Objects
                     LumberCost = 80;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Blue Drake";
                     NormalSkin = "Afrb";
                     OccluderHeight = 0f;
@@ -5005,7 +5005,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\PandarenBrewmaster\\PandarenBrewmaster";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Brewmaster";
                     NormalSkin = "AInv";
                     OccluderHeight = 0f;
@@ -5158,7 +5158,7 @@ namespace Moonwell.Objects
                     LumberCost = 10;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Brigand";
                     NormalSkin = "Ashm";
                     OccluderHeight = 0f;
@@ -5313,7 +5313,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\creeps\\BronzeDragon\\BronzeDragon";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Bronze Dragon";
                     NormalSkin = "Advc,ACdv,Alit,ACmi";
                     OccluderHeight = 0f;
@@ -5462,7 +5462,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\creeps\\BronzeDragonWelp\\BronzeDragonWelp";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Bronze Dragon Whelp";
                     NormalSkin = "Alit";
                     OccluderHeight = 0f;
@@ -5609,7 +5609,7 @@ namespace Moonwell.Objects
                     LumberCost = 80;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Bronze Drake";
                     NormalSkin = "Alit";
                     OccluderHeight = 0f;
@@ -5745,7 +5745,7 @@ namespace Moonwell.Objects
                     LumberCost = 80;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Brood Mother";
                     NormalSkin = "ACvs,ACen,Aspd";
                     OccluderHeight = 0f;
@@ -5887,7 +5887,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Burning Archer";
                     NormalSkin = "ACsa";
                     OccluderHeight = 0f;
@@ -6018,7 +6018,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "Units\\Creeps\\Archnathid\\Archnathid";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Burrowed Barbed Arachnathid";
                     NormalSkin = "Abu5";
                     OccluderHeight = 0f;
@@ -6155,7 +6155,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\CentaurArcher\\CentaurArcher";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Centaur Archer";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -6289,7 +6289,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\Centaur\\Centaur";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Centaur Drudge";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -6432,7 +6432,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Centaur Impaler";
                     NormalSkin = "ACsa";
                     OccluderHeight = 0f;
@@ -6570,7 +6570,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\CentaurKhan\\CentaurKhan";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Centaur Khan";
                     NormalSkin = "SCae,ACrn,Awrs";
                     OccluderHeight = 0f;
@@ -6709,7 +6709,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Centaur Outrunner";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -6849,7 +6849,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Centaur Sorcerer";
                     NormalSkin = "ACbl,ACdm";
                     OccluderHeight = 0f;
@@ -6983,7 +6983,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Corrupted Treant";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -7119,7 +7119,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "Units\\Creeps\\ArchnathidGreen\\ArchnathidGreen";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Crystal Arachnathid";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -7254,7 +7254,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\other\\DalaranMutant\\DalaranMutant";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Dalaran Mutant";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -7389,7 +7389,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\other\\DalaranReject\\DalaranReject";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Dalaran Reject";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -7548,7 +7548,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\BansheeRanger\\BansheeRanger";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Dark Ranger";
                     NormalSkin = "AInv";
                     OccluderHeight = 0f;
@@ -7705,7 +7705,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\DarkTroll\\DarkTroll";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Dark Troll";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -7841,7 +7841,7 @@ namespace Moonwell.Objects
                     LumberCost = 30;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Dark Troll Berserker";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -7983,7 +7983,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Dark Troll High Priest";
                     NormalSkin = "Anh2,ACsl";
                     OccluderHeight = 0f;
@@ -8128,7 +8128,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\DarkTrollShadowPriest\\DarkTrollShadowPriest";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Dark Troll Shadow Priest";
                     NormalSkin = "Anh1";
                     OccluderHeight = 0f;
@@ -8269,7 +8269,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\DarkTrollTrapper\\DarkTrollTrapper";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Dark Troll Trapper";
                     NormalSkin = "ACen";
                     OccluderHeight = 0f;
@@ -8405,7 +8405,7 @@ namespace Moonwell.Objects
                     LumberCost = 80;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Dark Troll Warlord";
                     NormalSkin = "ACat";
                     OccluderHeight = 0f;
@@ -8546,7 +8546,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\BanditMage\\BanditMage";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Dark Wizard";
                     NormalSkin = "ACrd,ACba,ACpy";
                     OccluderHeight = 0f;
@@ -8687,7 +8687,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Death Revenant";
                     NormalSkin = "ACrd,ACdc,ACad";
                     OccluderHeight = 0f;
@@ -8831,7 +8831,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Deceiver";
                     NormalSkin = "ACcs";
                     OccluderHeight = 0f;
@@ -8971,7 +8971,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Deeplord Revenant";
                     NormalSkin = "ACcv,ACf2";
                     OccluderHeight = 0f;
@@ -9123,7 +9123,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Defender Golem";
                     NormalSkin = "ACmi,ACtb";
                     OccluderHeight = 0f;
@@ -9257,7 +9257,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Dire Frost Wolf";
                     NormalSkin = "ACct,ACro";
                     OccluderHeight = 0f;
@@ -9393,7 +9393,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\MammothBlack\\MammothBlack";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Dire Mammoth";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -9534,7 +9534,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Dire Wolf";
                     NormalSkin = "ACct,ACro";
                     OccluderHeight = 0f;
@@ -9673,7 +9673,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Draenei Darkslayer";
                     NormalSkin = "ACim";
                     OccluderHeight = 0f;
@@ -9821,7 +9821,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\other\\DranaiMage\\DranaiMage";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Draenei Disciple";
                     NormalSkin = "Anh1";
                     OccluderHeight = 0f;
@@ -9957,7 +9957,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Draenei Guardian";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -10099,7 +10099,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Draenei Harbinger";
                     NormalSkin = "Ache,ACbb";
                     OccluderHeight = 0f;
@@ -10235,7 +10235,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\other\\DranaiWhite\\DranaiWhite";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Draenei Protector";
                     NormalSkin = "ACen";
                     OccluderHeight = 0f;
@@ -10377,7 +10377,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Draenei Seer";
                     NormalSkin = "ACsw,ACba,AChv";
                     OccluderHeight = 0f;
@@ -10511,7 +10511,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Draenei Watcher";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -10659,7 +10659,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "Units\\Creeps\\DragonSeaTurtle\\DragonSeaTurtle";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Dragon Turtle";
                     NormalSkin = "ACc2,ACdv,Advc,ANt2";
                     OccluderHeight = 0f;
@@ -10798,7 +10798,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\EarthPandarenBrewmaster\\EarthPandarenBrewmaster";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Earth";
                     NormalSkin = "ACmi,ACpv,ANta,ACrk";
                     OccluderHeight = 0f;
@@ -10932,7 +10932,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Earth";
                     NormalSkin = "ACmi,ACpv,ANta,ACrk";
                     OccluderHeight = 0f;
@@ -11076,7 +11076,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Elder Hydra";
                     NormalSkin = "ACff";
                     OccluderHeight = 0f;
@@ -11209,7 +11209,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Elder Jungle Stalker";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -11350,7 +11350,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\SasquatchShaman\\SasquatchShaman";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Elder Sasquatch";
                     NormalSkin = "ACbh,ACfr";
                     OccluderHeight = 0f;
@@ -11489,7 +11489,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Elder Voidwalker";
                     NormalSkin = "ACfl,ACde";
                     OccluderHeight = 0f;
@@ -11623,7 +11623,7 @@ namespace Moonwell.Objects
                     LumberCost = 80;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Elder Wendigo";
                     NormalSkin = "ACbh";
                     OccluderHeight = 0f;
@@ -11758,7 +11758,7 @@ namespace Moonwell.Objects
                     LumberCost = 20;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Enforcer";
                     NormalSkin = "ACev";
                     OccluderHeight = 0f;
@@ -11902,7 +11902,7 @@ namespace Moonwell.Objects
                     LumberCost = 30;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Enraged Elemental";
                     NormalSkin = "ACmi";
                     OccluderHeight = 0f;
@@ -12039,7 +12039,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Enraged Jungle Stalker";
                     NormalSkin = "ACtc";
                     OccluderHeight = 0f;
@@ -12175,7 +12175,7 @@ namespace Moonwell.Objects
                     LumberCost = 80;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Enraged Wildkin";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -12321,7 +12321,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\demon\\EredarWarlockPurple\\EredarWarlockPurple";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Eredar Diabolist";
                     NormalSkin = "ACpa,ANfb";
                     OccluderHeight = 0f;
@@ -12470,7 +12470,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Eredar Sorcerer";
                     NormalSkin = "ACdm,ACsl";
                     OccluderHeight = 0f;
@@ -12619,7 +12619,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\demon\\EredarWarlock\\EredarWarlock";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Eredar Warlock";
                     NormalSkin = "ACbh,ACfd,ACmf";
                     OccluderHeight = 0f;
@@ -12781,7 +12781,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Faceless One Deathbringer";
                     NormalSkin = "ACad,ACsi";
                     OccluderHeight = 0f;
@@ -12943,7 +12943,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Faceless One Terror";
                     NormalSkin = "ACsl,ACmf";
                     OccluderHeight = 0f;
@@ -13084,7 +13084,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\FacelessOne\\FacelessOne";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Faceless One Trickster";
                     NormalSkin = "ACcs,ACpu";
                     OccluderHeight = 0f;
@@ -13219,7 +13219,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Fallen Priest";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -13354,7 +13354,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Fel Beast";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -13491,7 +13491,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\FelstalkerPurple\\FelstalkerPurple";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Fel Ravager";
                     NormalSkin = "ACbk,ACde";
                     OccluderHeight = 0f;
@@ -13627,7 +13627,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\demon\\Felgaurd\\Felgaurd";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Felguard";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -13761,7 +13761,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\FirePandarenBrewmaster\\FirePandarenBrewmaster";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Fire";
                     NormalSkin = "Apig,ACrk";
                     OccluderHeight = 0f;
@@ -13895,7 +13895,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Fire";
                     NormalSkin = "Apig,ACrk";
                     OccluderHeight = 0f;
@@ -14031,7 +14031,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\Revenant\\Revenant";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Fire Revenant";
                     NormalSkin = "ACim";
                     OccluderHeight = 0f;
@@ -14195,7 +14195,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\HeroFlameLord\\HeroFlameLord";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Firelord";
                     NormalSkin = "AInv";
                     OccluderHeight = 0f;
@@ -14346,7 +14346,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\creeps\\SpiderGreen\\SpiderGreen";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Forest Spider";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -14487,7 +14487,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\ForestTroll\\ForestTroll";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Forest Troll";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -14625,7 +14625,7 @@ namespace Moonwell.Objects
                     LumberCost = 30;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Forest Troll Berserker";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -14767,7 +14767,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Forest Troll High Priest";
                     NormalSkin = "Anh2,ACif,ACd2";
                     OccluderHeight = 0f;
@@ -14914,7 +14914,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\ForestTrollShadowPriest\\ForestTrollShadowPriest";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Forest Troll Shadow Priest";
                     NormalSkin = "Anh1,ACdm";
                     OccluderHeight = 0f;
@@ -15054,7 +15054,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\ForestTrollTrapper\\ForestTrollTrapper";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Forest Troll Trapper";
                     NormalSkin = "ACen";
                     OccluderHeight = 0f;
@@ -15193,7 +15193,7 @@ namespace Moonwell.Objects
                     LumberCost = 80;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Forest Troll Warlord";
                     NormalSkin = "ACat";
                     OccluderHeight = 0f;
@@ -15345,7 +15345,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\ForgottenOne\\ForgottenOne";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Forgotten One";
                     NormalSkin = "ACfb,ACch,ACtn";
                     OccluderHeight = 0f;
@@ -15506,7 +15506,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Forsaken Paladin";
                     NormalSkin = "AInv";
                     OccluderHeight = 0f;
@@ -15664,7 +15664,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Frost Revenant";
                     NormalSkin = "ACbz";
                     OccluderHeight = 0f;
@@ -15798,7 +15798,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\WhiteWolf\\WhiteWolf";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Frost Wolf";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -15936,7 +15936,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\Furbolg\\Furbolg";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Furbolg";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -16073,7 +16073,7 @@ namespace Moonwell.Objects
                     LumberCost = 100;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Furbolg Champion";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -16214,7 +16214,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Furbolg Elder Shaman";
                     NormalSkin = "ACr2,ACls";
                     OccluderHeight = 0f;
@@ -16359,7 +16359,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\FurbolgShaman\\FurbolgShaman";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Furbolg Shaman";
                     NormalSkin = "ACr2";
                     OccluderHeight = 0f;
@@ -16504,7 +16504,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\FurbolgTracker\\FurbolgTracker";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Furbolg Tracker";
                     NormalSkin = "ACff";
                     OccluderHeight = 0f;
@@ -16647,7 +16647,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Furbolg Ursa Warrior";
                     NormalSkin = "Awrs,ACac";
                     OccluderHeight = 0f;
@@ -16788,7 +16788,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "Units\\Creeps\\GiantSeaTurtle\\GiantSeaTurtle";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Gargantuan Sea Turtle";
                     NormalSkin = "ANth";
                     OccluderHeight = 0f;
@@ -16933,7 +16933,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
                     Model = "units\\creeps\\BansheeGhost\\BansheeGhost";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Ghost";
                     NormalSkin = "ACps";
                     OccluderHeight = 0f;
@@ -17066,7 +17066,7 @@ namespace Moonwell.Objects
                     LumberCost = 30;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Giant Frost Wolf";
                     NormalSkin = "ACct";
                     OccluderHeight = 0f;
@@ -17200,7 +17200,7 @@ namespace Moonwell.Objects
                     LumberCost = 80;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Giant Polar Bear";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -17340,7 +17340,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "Units\\Creeps\\GiantSeaTurtleRange\\GiantSeaTurtleRange";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Giant Sea Turtle";
                     NormalSkin = "ANth";
                     OccluderHeight = 0f;
@@ -17473,7 +17473,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Giant Skeleton Warrior";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -17605,7 +17605,7 @@ namespace Moonwell.Objects
                     LumberCost = 30;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Giant Spider";
                     NormalSkin = "ACvs,ACen";
                     OccluderHeight = 0f;
@@ -17741,7 +17741,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Giant Wolf";
                     NormalSkin = "ACct";
                     OccluderHeight = 0f;
@@ -17897,7 +17897,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Other\\Glix\\Glix";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Merchant";
                     NormalSkin = "AInv";
                     OccluderHeight = 0f;
@@ -18044,7 +18044,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\Gnoll\\Gnoll";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Gnoll";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -18184,7 +18184,7 @@ namespace Moonwell.Objects
                     LumberCost = 20;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Gnoll Assassin";
                     NormalSkin = "ACvs";
                     OccluderHeight = 0f;
@@ -18319,7 +18319,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Gnoll Brute";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -18456,7 +18456,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\GnollOverseer\\GnollOverseer";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Gnoll Overseer";
                     NormalSkin = "ACac";
                     OccluderHeight = 0f;
@@ -18598,7 +18598,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\GnollArcher\\GnollArcher";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Gnoll Poacher";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -18744,7 +18744,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\GnollWarden\\GnollWarden";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Gnoll Warden";
                     NormalSkin = "ACpu";
                     OccluderHeight = 0f;
@@ -18887,7 +18887,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\GnollOverseer\\GnollOverseer";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Gnoll Warlord";
                     NormalSkin = "ANbh,ACbl,ACro";
                     OccluderHeight = 0f;
@@ -19034,7 +19034,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Granite Golem";
                     NormalSkin = "ACmi,ACtb,ACtc";
                     OccluderHeight = 0f;
@@ -19177,7 +19177,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Greater Voidwalker";
                     NormalSkin = "ACf2,ACcl";
                     OccluderHeight = 0f;
@@ -19333,7 +19333,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\creeps\\GreenDragon\\GreenDragon";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Green Dragon";
                     NormalSkin = "Advc,ACdv,ACmi";
                     OccluderHeight = 0f;
@@ -19481,7 +19481,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\creeps\\GreenDragonWelp\\GreenDragonWelp";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Green Dragon Whelp";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -19626,7 +19626,7 @@ namespace Moonwell.Objects
                     LumberCost = 80;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Green Drake";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -19776,7 +19776,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Guardian Golem";
                     NormalSkin = "ACmi,ACtb,ACtc";
                     OccluderHeight = 0f;
@@ -19922,7 +19922,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\creeps\\HarpyQueen\\HarpyQueen";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Harpy Queen";
                     NormalSkin = "ACr2,ACcy";
                     OccluderHeight = 0f;
@@ -20062,7 +20062,7 @@ namespace Moonwell.Objects
                     LumberCost = 20;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Harpy Rogue";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -20198,7 +20198,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\creeps\\Harpy\\Harpy";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Harpy Scout";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -20336,7 +20336,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Harpy Storm-hag";
                     NormalSkin = "ACcs,ACsl";
                     OccluderHeight = 0f;
@@ -20481,7 +20481,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\creeps\\HarpyWitch\\HarpyWitch";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Harpy Windwitch";
                     NormalSkin = "ACff";
                     OccluderHeight = 0f;
@@ -20624,7 +20624,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Heretic";
                     NormalSkin = "ACrd,ACca";
                     OccluderHeight = 0f;
@@ -20763,7 +20763,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\Hydra\\Hydra";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Hydra";
                     NormalSkin = "Aspo, Aspt";
                     OccluderHeight = 0f;
@@ -20905,7 +20905,7 @@ namespace Moonwell.Objects
                     LumberCost = 30;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Hydra Hatchling";
                     NormalSkin = "Aspo";
                     OccluderHeight = 0f;
@@ -21042,7 +21042,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Ice Revenant";
                     NormalSkin = "ACvp,ACfn";
                     OccluderHeight = 0f;
@@ -21181,7 +21181,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\IceTroll\\IceTroll";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Ice Troll";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -21318,7 +21318,7 @@ namespace Moonwell.Objects
                     LumberCost = 30;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Ice Troll Berserker";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -21458,7 +21458,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Ice Troll High Priest";
                     NormalSkin = "Anh2,ACf2,ACd2";
                     OccluderHeight = 0f;
@@ -21601,7 +21601,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Ice Troll Priest";
                     NormalSkin = "Anh1";
                     OccluderHeight = 0f;
@@ -21741,7 +21741,7 @@ namespace Moonwell.Objects
                     LumberCost = 20;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Ice Troll Trapper";
                     NormalSkin = "ACen";
                     OccluderHeight = 0f;
@@ -21876,7 +21876,7 @@ namespace Moonwell.Objects
                     LumberCost = 80;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Ice Troll Warlord";
                     NormalSkin = "ACat";
                     OccluderHeight = 0f;
@@ -22013,7 +22013,7 @@ namespace Moonwell.Objects
                     LumberCost = 30;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Icetusk Mammoth";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -22155,7 +22155,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
                     Model = "units\\creeps\\InfernalCannonCannon\\InfernalCannonCannon";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Infernal Contraption";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -22305,7 +22305,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
                     Model = "units\\creeps\\InfernalCannonFlame\\InfernalCannonFlame";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Infernal Juggernaut";
                     NormalSkin = "ANin";
                     OccluderHeight = 0f;
@@ -22453,7 +22453,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.875f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Infernal Machine";
                     NormalSkin = "ACbc";
                     OccluderHeight = 0f;
@@ -22589,7 +22589,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\JungleBeast\\JungleBeast";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Jungle Stalker";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -22727,7 +22727,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\Kobold\\Kobold";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Kobold";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -22871,7 +22871,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\KoboldGeomancer\\KoboldGeomancer";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Kobold Geomancer";
                     NormalSkin = "ACsw,ACdm";
                     OccluderHeight = 0f;
@@ -23007,7 +23007,7 @@ namespace Moonwell.Objects
                     LumberCost = 50;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Kobold Taskmaster";
                     NormalSkin = "ACac,ACbh";
                     OccluderHeight = 0f;
@@ -23145,7 +23145,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Kobold Tunneler";
                     NormalSkin = "ACbh";
                     OccluderHeight = 0f;
@@ -23280,7 +23280,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Lesser Voidwalker";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -23427,7 +23427,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Lightning Lizard";
                     NormalSkin = "Alit,ACpu";
                     OccluderHeight = 0f;
@@ -23564,7 +23564,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Lightning Revenant";
                     NormalSkin = "ACpu,ACcl";
                     OccluderHeight = 0f;
@@ -23718,7 +23718,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\MagnataurBlue\\MagnataurBlue";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Magnataur Destroyer";
                     NormalSkin = "ACmi,ACcb,ACtc";
                     OccluderHeight = 0f;
@@ -23875,7 +23875,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\Magnataur\\Magnataur";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Magnataur Reaver";
                     NormalSkin = "ACmi,ACcb";
                     OccluderHeight = 0f;
@@ -24017,7 +24017,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\MagnataurBrown\\MagnataurBrown";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Magnataur Warrior";
                     NormalSkin = "ACmi";
                     OccluderHeight = 0f;
@@ -24161,7 +24161,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\demon\\DemonessBlue\\DemonessBlue";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Maiden of Pain";
                     NormalSkin = "ACdr,ACss";
                     OccluderHeight = 0f;
@@ -24306,7 +24306,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Makrura Deepseer";
                     NormalSkin = "Aenw,Aslp";
                     OccluderHeight = 0f;
@@ -24441,7 +24441,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Makrura Pooldweller";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -24577,7 +24577,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
                     Model = "Units\\Creeps\\Lobstrokkred\\Lobstrokkred";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Makrura Prawn";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -24715,7 +24715,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Makrura Snapper";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -24852,7 +24852,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
                     Model = "Units\\Creeps\\Lobstrokkgreen\\Lobstrokkgreen";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Makrura Tidal Lord";
                     NormalSkin = "ACce,ACav";
                     OccluderHeight = 0f;
@@ -25000,7 +25000,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
                     Model = "Units\\Creeps\\Lobstrokkblue\\Lobstrokkblue";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Makrura Tidecaller";
                     NormalSkin = "Anh1,ACf2";
                     OccluderHeight = 0f;
@@ -25137,7 +25137,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\Mammoth\\Mammoth";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Mammoth";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -25259,7 +25259,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 25f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "Units\\Creeps\\MonsterLure\\MonsterLure";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Monster Lure";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -25410,7 +25410,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Moss Covered Granite Golem";
                     NormalSkin = "ACmi,ACtb,ACtc";
                     OccluderHeight = 0f;
@@ -25549,7 +25549,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Mud Golem";
                     NormalSkin = "ACmi,ACsw";
                     OccluderHeight = 0f;
@@ -25693,7 +25693,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\MurgulBloodGill\\MurgulBloodGill";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Mur'gul Blood-Gill";
                     NormalSkin = "Anh1";
                     OccluderHeight = 0f;
@@ -25830,7 +25830,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Mur'gul Cliffrunner";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -25964,7 +25964,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Mur'gul Marauder";
                     NormalSkin = "ACac";
                     OccluderHeight = 0f;
@@ -26111,7 +26111,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\MurgulShadowCaster\\MurgulShadowCaster";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Mur'gul Shadowcaster";
                     NormalSkin = "AChx,ACcs";
                     OccluderHeight = 0f;
@@ -26257,7 +26257,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Mur'gul Snarecaster";
                     NormalSkin = "ACsw,ACdm";
                     OccluderHeight = 0f;
@@ -26393,7 +26393,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\MurgulTideWarrior\\MurgulTideWarrior";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Mur'gul Tidewarrior";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -26533,7 +26533,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\MurlocFlesheater\\MurlocFlesheater";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)6;
+                    ModelFileExtraVersions = global::Moonwell.Objects.VersionFlags.TheFrozenThrone | global::Moonwell.Objects.VersionFlags.Unlisted4;
                     Name = "Murloc Flesheater";
                     NormalSkin = "ACcn";
                     OccluderHeight = 0f;
@@ -26671,7 +26671,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\MurlocWarrior\\MurlocWarrior";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)6;
+                    ModelFileExtraVersions = global::Moonwell.Objects.VersionFlags.TheFrozenThrone | global::Moonwell.Objects.VersionFlags.Unlisted4;
                     Name = "Murloc Huntsman";
                     NormalSkin = "ACen";
                     OccluderHeight = 0f;
@@ -26812,7 +26812,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\MurlocMutant\\MurlocMutant";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)6;
+                    ModelFileExtraVersions = global::Moonwell.Objects.VersionFlags.TheFrozenThrone | global::Moonwell.Objects.VersionFlags.Unlisted4;
                     Name = "Murloc Mutant";
                     NormalSkin = "ACcr";
                     OccluderHeight = 0f;
@@ -26950,7 +26950,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\MurlocNightcrawler\\MurlocNightcrawler";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)6;
+                    ModelFileExtraVersions = global::Moonwell.Objects.VersionFlags.TheFrozenThrone | global::Moonwell.Objects.VersionFlags.Unlisted4;
                     Name = "Murloc Nightcrawler";
                     NormalSkin = "ACvs,Ashm";
                     OccluderHeight = 0f;
@@ -27083,7 +27083,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)6;
+                    ModelFileExtraVersions = global::Moonwell.Objects.VersionFlags.TheFrozenThrone | global::Moonwell.Objects.VersionFlags.Unlisted4;
                     Name = "Murloc Plaguebearer";
                     NormalSkin = "Aap3";
                     OccluderHeight = 0f;
@@ -27245,7 +27245,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Murloc Sorcerer";
                     NormalSkin = "AInv";
                     OccluderHeight = 0f;
@@ -27387,7 +27387,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\Murloc\\Murloc";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)6;
+                    ModelFileExtraVersions = global::Moonwell.Objects.VersionFlags.TheFrozenThrone | global::Moonwell.Objects.VersionFlags.Unlisted4;
                     Name = "Murloc Tiderunner";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -27527,7 +27527,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\creeps\\NerubianQueen\\NerubianQueen";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Nerubian Queen";
                     NormalSkin = "ACua,ACca,ACrd,Aspa";
                     OccluderHeight = 0f;
@@ -27670,7 +27670,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Nerubian Seer";
                     NormalSkin = "ACrd,ACdm,Aspa";
                     OccluderHeight = 0f;
@@ -27806,7 +27806,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\creeps\\NerubianSpiderLord\\NerubianSpiderLord";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Nerubian Spider Lord";
                     NormalSkin = "Assp";
                     OccluderHeight = 0f;
@@ -27942,7 +27942,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Nerubian Warrior";
                     NormalSkin = "Assp";
                     OccluderHeight = 0f;
@@ -28085,7 +28085,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Nerubian Webspinner";
                     NormalSkin = "ACwb,ACrd,Aspa";
                     OccluderHeight = 0f;
@@ -28244,7 +28244,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Nether Dragon";
                     NormalSkin = "ACmi,ACcr";
                     OccluderHeight = 0f;
@@ -28392,7 +28392,7 @@ namespace Moonwell.Objects
                     LumberCost = 20;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Nether Dragon Hatchling";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -28537,7 +28537,7 @@ namespace Moonwell.Objects
                     LumberCost = 80;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Nether Drake";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -28679,7 +28679,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Ogre Lord";
                     NormalSkin = "ACav,ACsh";
                     OccluderHeight = 0f;
@@ -28825,7 +28825,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\OgreMagi\\OgreMagi";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Ogre Magi";
                     NormalSkin = "ACbb";
                     OccluderHeight = 0f;
@@ -28964,7 +28964,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Ogre Mauler";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -29101,7 +29101,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\Ogre\\Ogre";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Ogre Warrior";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -29242,7 +29242,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\demon\\FelgaurdBlue\\FelgaurdBlue";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Overlord";
                     NormalSkin = "Acht,ACce,ACvp";
                     OccluderHeight = 0f;
@@ -29384,7 +29384,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "Units\\Creeps\\Archnathidpurple\\Archnathidpurple";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Overlord Arachnathid";
                     NormalSkin = "ACac";
                     OccluderHeight = 0f;
@@ -29549,7 +29549,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\demon\\HeroPitLord\\HeroPitLord";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Pit Lord";
                     NormalSkin = "AInv";
                     OccluderHeight = 0f;
@@ -29704,7 +29704,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Plague Treant";
                     NormalSkin = "Aenr,Aap3";
                     OccluderHeight = 0f;
@@ -29837,7 +29837,7 @@ namespace Moonwell.Objects
                     LumberCost = 20;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Poison Treant";
                     NormalSkin = "Aenr,ACvs";
                     OccluderHeight = 0f;
@@ -29972,7 +29972,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\PolarBear\\PolarBear";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Polar Bear";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -30111,7 +30111,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\PolarFurbolg\\PolarFurbolg";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Polar Furbolg";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -30248,7 +30248,7 @@ namespace Moonwell.Objects
                     LumberCost = 100;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Polar Furbolg Champion";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -30389,7 +30389,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Polar Furbolg Elder Shaman";
                     NormalSkin = "AChv,ACfn";
                     OccluderHeight = 0f;
@@ -30534,7 +30534,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Polar Furbolg Shaman";
                     NormalSkin = "ACf2,ACdm";
                     OccluderHeight = 0f;
@@ -30679,7 +30679,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\PolarFurbolgTracker\\PolarFurbolgTracker";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Polar Furbolg Tracker";
                     NormalSkin = "ACsw";
                     OccluderHeight = 0f;
@@ -30822,7 +30822,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Polar Furbolg Ursa Warrior";
                     NormalSkin = "Awrs,ACac";
                     OccluderHeight = 0f;
@@ -30960,7 +30960,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\FurbolgPanda\\FurbolgPanda";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Primal Pandaren";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -31103,7 +31103,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Queen of Suffering";
                     NormalSkin = "ACdc,ACua,ACch";
                     OccluderHeight = 0f;
@@ -31240,7 +31240,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Quillboar";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -31374,7 +31374,7 @@ namespace Moonwell.Objects
                     LumberCost = 20;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Quillboar Hunter";
                     NormalSkin = "ACev";
                     OccluderHeight = 0f;
@@ -31505,7 +31505,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Raging Bear";
                     NameEditorSuffix = "(Level 2)";
                     NormalSkin = "ANbh";
@@ -31640,7 +31640,7 @@ namespace Moonwell.Objects
                     LumberCost = 20;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Razormane Brute";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -31777,7 +31777,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Razormane Chieftain";
                     NormalSkin = "ACah,ACtb";
                     OccluderHeight = 0f;
@@ -31916,7 +31916,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Razormane Medicine Man";
                     NormalSkin = "AChw,ACs9";
                     OccluderHeight = 0f;
@@ -32049,7 +32049,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Razormane Scout";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -32202,7 +32202,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\creeps\\RedDragon\\RedDragon";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Red Dragon";
                     NormalSkin = "Advc,ACdv,ACmi";
                     OccluderHeight = 0f;
@@ -32352,7 +32352,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\creeps\\RedDragonWelp\\RedDragonWelp";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Red Dragon Whelp";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -32497,7 +32497,7 @@ namespace Moonwell.Objects
                     LumberCost = 80;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Red Drake";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -32630,7 +32630,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Reef Elemental";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -32772,7 +32772,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Renegade Wizard";
                     NormalSkin = "ACpu,ACls";
                     OccluderHeight = 0f;
@@ -32911,7 +32911,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Revenant of the Depths";
                     NormalSkin = "ACwe";
                     OccluderHeight = 0f;
@@ -33049,7 +33049,7 @@ namespace Moonwell.Objects
                     LumberCost = 30;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Revenant of the Seas";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -33183,7 +33183,7 @@ namespace Moonwell.Objects
                     LumberCost = 30;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Revenant of the Tides";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -33334,7 +33334,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\RockGolem\\RockGolem";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Rock Golem";
                     NormalSkin = "ACmi,ACtb";
                     OccluderHeight = 0f;
@@ -33471,7 +33471,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Rogue";
                     NormalSkin = "Ashm";
                     OccluderHeight = 0f;
@@ -33611,7 +33611,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Rogue Wizard";
                     NormalSkin = "ACf2";
                     OccluderHeight = 0f;
@@ -33757,7 +33757,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Salamander";
                     NormalSkin = "ACim,ACfb";
                     OccluderHeight = 0f;
@@ -33898,7 +33898,7 @@ namespace Moonwell.Objects
                     LumberCost = 20;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Salamander Hatchling";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -34042,7 +34042,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\ThunderLizardSalamander\\ThunderLizardSalamander";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Salamander Lord";
                     NormalSkin = "ACim,ACrf,Advc,ACdv";
                     OccluderHeight = 0f;
@@ -34193,7 +34193,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\ThunderLizardVizier\\ThunderLizardVizier";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Salamander Vizier";
                     NormalSkin = "ACbl,Ambd,ACdm";
                     OccluderHeight = 0f;
@@ -34322,7 +34322,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\GoblinSapper\\GoblinSapper";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Sapper";
                     NormalSkin = "Asds";
                     OccluderHeight = 0f;
@@ -34459,7 +34459,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\Sasquatch\\Sasquatch";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Sasquatch";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -34597,7 +34597,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Sasquatch Oracle";
                     NormalSkin = "ACrj,ACro";
                     OccluderHeight = 0f;
@@ -34731,7 +34731,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\Satyr\\Satyr";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Satyr";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -34870,7 +34870,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Satyr Hellcaller";
                     NormalSkin = "ACbl,ACua,ACad";
                     OccluderHeight = 0f;
@@ -35014,7 +35014,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Satyr Shadowdancer";
                     NormalSkin = "ACcs,Ashm";
                     OccluderHeight = 0f;
@@ -35153,7 +35153,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Satyr Soulstealer";
                     NormalSkin = "Ambd,ACrd";
                     OccluderHeight = 0f;
@@ -35294,7 +35294,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\SatyrTrickster\\SatyrTrickster";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Satyr Trickster";
                     NormalSkin = "ACpu";
                     OccluderHeight = 0f;
@@ -35431,7 +35431,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\SeaElemental\\SeaElemental";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Sea Elemental";
                     NormalSkin = "ACbh";
                     OccluderHeight = 0f;
@@ -35570,7 +35570,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\SeaGiant\\SeaGiant";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Sea Giant";
                     NormalSkin = "ACpv";
                     OccluderHeight = 0f;
@@ -35714,7 +35714,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Sea Giant Behemoth";
                     NormalSkin = "ACpv,Awrs,ACtb";
                     OccluderHeight = 0f;
@@ -35855,7 +35855,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\SeaGiantGreen\\SeaGiantGreen";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Sea Giant Hunter";
                     NormalSkin = "ACpv,ACen";
                     OccluderHeight = 0f;
@@ -35997,7 +35997,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "Units\\Creeps\\SeaTurtle\\SeaTurtle";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Sea Turtle";
                     NormalSkin = "ANth";
                     OccluderHeight = 0f;
@@ -36137,7 +36137,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "Units\\Creeps\\SeaTurtleRange\\SeaTurtleRange";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Sea Turtle Hatchling";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -36299,7 +36299,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\naga\\HeroNagaSeawitch\\HeroNagaSeawitch";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Sea Witch";
                     NormalSkin = "AInv";
                     OccluderHeight = 0f;
@@ -36477,7 +36477,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\naga\\HeroNagaSeawitch\\HeroNagaSeawitch";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Sea Witch";
                     NormalSkin = "AInv";
                     OccluderHeight = 0f;
@@ -36630,7 +36630,7 @@ namespace Moonwell.Objects
                     LumberCost = 100;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Shredder";
                     NormalSkin = "Ahr3";
                     OccluderHeight = 0f;
@@ -36768,7 +36768,7 @@ namespace Moonwell.Objects
                     LumberCost = 150;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Siege Golem";
                     NormalSkin = "ACmi";
                     OccluderHeight = 0f;
@@ -36907,7 +36907,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Skeletal Marksman";
                     NormalSkin = "ACcw";
                     OccluderHeight = 0f;
@@ -37043,7 +37043,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\SkeletonOrc\\SkeletonOrc";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Skeletal Orc";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -37184,7 +37184,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Skeletal Orc Champion";
                     NormalSkin = "ACdc";
                     OccluderHeight = 0f;
@@ -37319,7 +37319,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Skeletal Orc Grunt";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -37454,7 +37454,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\SkeletonArcher\\SkeletonArcher";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Skeleton Archer";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -37594,7 +37594,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\SkeletonArcher\\SkeletonArcher";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Skeleton Archer";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -37732,7 +37732,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\undead\\Skeleton\\Skeleton";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Skeleton Warrior";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -37868,7 +37868,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\undead\\Skeleton\\Skeleton";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Skeleton Warrior";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -38013,7 +38013,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Sludge Flinger";
                     NormalSkin = "ACsw";
                     OccluderHeight = 0f;
@@ -38152,7 +38152,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\creeps\\SludgeMonster\\SludgeMonster";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Sludge Minion";
                     NormalSkin = "ACsw";
                     OccluderHeight = 0f;
@@ -38294,7 +38294,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Sludge Monstrosity";
                     NormalSkin = "ACsw";
                     OccluderHeight = 0f;
@@ -38436,7 +38436,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Snarlmane the Bloodgorger";
                     NormalSkin = "ACbl,Ansk,Awrs,ACac";
                     OccluderHeight = 0f;
@@ -38568,7 +38568,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\creeps\\Spider\\Spider";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Spider";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -38703,7 +38703,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Spider Crab Behemoth";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -38837,7 +38837,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Spider Crab Limbripper";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -38973,7 +38973,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "Units\\Creeps\\SpiderCrabCreep\\SpiderCrabCreep";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Spider Crab Shorecrawler";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -39106,7 +39106,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\creeps\\Nerubian\\Nerubian";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Spiderling";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -39237,7 +39237,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Spirit Bear";
                     NameEditorSuffix = "(Level 3)";
                     NormalSkin = "ANbh,ANbl";
@@ -39373,7 +39373,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\SpiritPig\\SpiritPig";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Spirit Pig";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -39511,7 +39511,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\creeps\\SpiderBlue\\SpiderBlue";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Spitting Spider";
                     NormalSkin = "ACvs";
                     OccluderHeight = 0f;
@@ -39652,7 +39652,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\StormPandarenBrewmaster\\StormPandarenBrewmaster";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Storm";
                     NormalSkin = "Adsm,ACcy,ACrk,ANwk";
                     OccluderHeight = 0f;
@@ -39792,7 +39792,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Storm";
                     NormalSkin = "Adsm,ACcy,ACrk,ANwk";
                     OccluderHeight = 0f;
@@ -39935,7 +39935,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1.5f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Storm Wyrm";
                     NormalSkin = "Alit,ACls,ACcl,Advc,ACdv";
                     OccluderHeight = 0f;
@@ -40076,7 +40076,7 @@ namespace Moonwell.Objects
                     LumberCost = 5;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Stormreaver Apprentice";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -40216,7 +40216,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Stormreaver Hermit";
                     NormalSkin = "ACpu";
                     OccluderHeight = 0f;
@@ -40362,7 +40362,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.875f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Stormreaver Necrolyte";
                     NormalSkin = "ACbl,ACcl";
                     OccluderHeight = 0f;
@@ -40505,7 +40505,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\OrcWarlock\\OrcWarlock";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Stormreaver Warlock";
                     NormalSkin = "ACmo,ACad";
                     OccluderHeight = 0f;
@@ -40642,7 +40642,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\demon\\Demoness\\Demoness";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Succubus";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -40780,7 +40780,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
                     Model = "Units\\Creeps\\Lobstrokkred\\Lobstrokkred";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Summoned Prawn";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -40915,7 +40915,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 25f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "Units\\Creeps\\ForgottenOne\\ForgottenOneTent";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Tentacle";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -41062,7 +41062,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\ThunderLizard\\ThunderLizard";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Thunder Lizard";
                     NameEditorSuffix = "2";
                     NormalSkin = "Alit,ACt2";
@@ -41201,7 +41201,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\TimberWolf\\TimberWolf";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Timber Wolf";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -41365,7 +41365,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\HeroTinker\\HeroTinker";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Tinker";
                     NormalSkin = "AInv,ANde";
                     OccluderHeight = 0f;
@@ -41549,7 +41549,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "Units\\Creeps\\HeroTinker\\HeroTinker";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Tinker";
                     NormalSkin = "AInv";
                     OccluderHeight = 0f;
@@ -41688,7 +41688,7 @@ namespace Moonwell.Objects
                     LumberCost = 50;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Transport Ship";
                     NormalSkin = "Sch5,Slo3,Sdro";
                     OccluderHeight = 0f;
@@ -41828,7 +41828,7 @@ namespace Moonwell.Objects
                     LumberCost = 100;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Tuskarr Chieftain";
                     NormalSkin = "ACac";
                     OccluderHeight = 0f;
@@ -41966,7 +41966,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Tuskarr Fighter";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -42109,7 +42109,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Tuskarr Healer";
                     NormalSkin = "ACdm,Anh1";
                     OccluderHeight = 0f;
@@ -42251,7 +42251,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Tuskarr Sorcerer";
                     NormalSkin = "ACif";
                     OccluderHeight = 0f;
@@ -42388,7 +42388,7 @@ namespace Moonwell.Objects
                     LumberCost = 10;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Tuskarr Spearman";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -42528,7 +42528,7 @@ namespace Moonwell.Objects
                     LumberCost = 40;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Tuskarr Trapper";
                     NormalSkin = "ACen";
                     OccluderHeight = 0f;
@@ -42663,7 +42663,7 @@ namespace Moonwell.Objects
                     LumberCost = 30;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Tuskarr Warrior";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -42798,7 +42798,7 @@ namespace Moonwell.Objects
                     LumberCost = 10;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Unbroken Darkhunter";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -42939,7 +42939,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Unbroken Darkweaver";
                     NormalSkin = "ACuf";
                     OccluderHeight = 0f;
@@ -43075,7 +43075,7 @@ namespace Moonwell.Objects
                     LumberCost = 30;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Unbroken Rager";
                     NormalSkin = "ACen";
                     OccluderHeight = 0f;
@@ -43216,7 +43216,7 @@ namespace Moonwell.Objects
                     LumberCost = 40;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Vile Temptress";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -43358,7 +43358,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Vile Tormentor";
                     NormalSkin = "ACsi";
                     OccluderHeight = 0f;
@@ -43504,7 +43504,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\VoidWalker\\VoidWalker";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Voidwalker";
                     NormalSkin = "ACcw";
                     OccluderHeight = 0f;
@@ -43638,7 +43638,7 @@ namespace Moonwell.Objects
                     LumberCost = 80;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "War Golem";
                     NormalSkin = "ACmi";
                     OccluderHeight = 0f;
@@ -43776,7 +43776,7 @@ namespace Moonwell.Objects
                     LumberCost = 20;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Warrior Arachnathid";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -43912,7 +43912,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Watery Minion";
                     NameEditorSuffix = "(Level 1)";
                     OccluderHeight = 0f;
@@ -44054,7 +44054,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Watery Minion";
                     NameEditorSuffix = "(Level 3)";
                     NormalSkin = "ACsw,ACdm";
@@ -44189,7 +44189,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Watery Minion";
                     NameEditorSuffix = "(Level 2)";
                     OccluderHeight = 0f;
@@ -44326,7 +44326,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\Wendigo\\Wendigo";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Wendigo";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -44466,7 +44466,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\WendigoShaman\\WendigoShaman";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Wendigo Shaman";
                     NormalSkin = "ACrj,ACro";
                     OccluderHeight = 0f;
@@ -44603,7 +44603,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\Owlbear\\Owlbear";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Wildkin";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -44742,7 +44742,7 @@ namespace Moonwell.Objects
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Wraith";
                     NormalSkin = "ACps,ACcs";
                     OccluderHeight = 0f;
@@ -44874,7 +44874,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\creeps\\GoblinZeppelin\\GoblinZeppelin";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Movement = "GoblinZeppelinMovement";
                     Name = "Zeppelin";
                     NormalSkin = "Sch3,Achd,Aloa,Adro";

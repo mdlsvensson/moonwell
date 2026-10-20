@@ -253,7 +253,7 @@ public static class ObjectsWriter
                 var member = choice.Members[m];
                 var texts = string.Join(", ", new[] { member.Text }.Concat(member.Alternates).Select(Literal));
                 text.Append(m > 0 ? "\n" : "");
-                text.Append($"        /// <summary>{Xml(member.Label.Length > 0 ? member.Label : member.Text)}.</summary>\n");
+                text.Append($"        /// <summary>{MemberSummary(choice, member)}</summary>\n");
                 text.Append($"        [{Root}.GameValue({texts})]\n");
                 text.Append($"        {member.Name} = {member.Value.ToString(CultureInfo.InvariantCulture)},\n");
             }
@@ -265,17 +265,33 @@ public static class ObjectsWriter
         return text.ToString();
     }
 
+    // Ruling R15: an enum's numbers are Moonwell's (World Editor's list), not the natives'.
+    private const string NotNatives =
+        " Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.";
+
     private static string ChoiceSummary(ChoiceType choice)
     {
         switch (choice.Form)
         {
             case ChoiceForm.List:
-                return $"Any of the values of the metadata type <c>{Xml(choice.Type)}</c>, as World Editor offers them; the object file holds a comma list of their texts.";
+                return $"Any of the values of the metadata type <c>{Xml(choice.Type)}</c>, as World Editor offers them; the object file holds a comma list of their texts, and 0 is none of them.{NotNatives}";
             case ChoiceForm.Bits:
-                return $"Any of the values of the metadata type <c>{Xml(choice.Type)}</c>, as World Editor offers them; the object file holds the number whose bits they are.";
+                return $"Any of the values of the metadata type <c>{Xml(choice.Type)}</c>, as World Editor offers them; the object file holds the number whose bits they are, and 0 is none of them.{NotNatives}";
             default:
-                return $"A value of the metadata type <c>{Xml(choice.Type)}</c>, as World Editor offers it.";
+                return $"A value of the metadata type <c>{Xml(choice.Type)}</c>, as World Editor offers it.{NotNatives}";
         }
+    }
+
+    private static string MemberSummary(ChoiceType choice, ChoiceMember member)
+    {
+        var shown = Xml(member.Label.Length > 0 ? member.Label : member.Text) + ".";
+        if (choice.Flags && member.Value != 0 && member.Name == "None")
+        {
+            // Targets.None is World Editor's target "none", one of the values; no flags at all is 0.
+            return $"{shown} World Editor's \"{Xml(member.Text)}\", a value of its own: no values at all is 0, not this.";
+        }
+
+        return shown;
     }
 
     /// <summary>

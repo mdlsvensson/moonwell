@@ -110,7 +110,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>fmac</c>.</summary>
         [global::Moonwell.Objects.Field("fmac", Label = "Missile Arc")]
         [global::Moonwell.Objects.Limits(0, 1)]
-        [global::Moonwell.Objects.NonNegative]
         public float MissileArc
         {
             get { return Fields.Get<float>(this, "fmac"); }
@@ -136,7 +135,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>fmsp</c>.</summary>
         [global::Moonwell.Objects.Field("fmsp", Label = "Missile Speed")]
         [global::Moonwell.Objects.Limits(0, 10000)]
-        [global::Moonwell.Objects.NonNegative]
         public int MissileSpeed
         {
             get { return Fields.Get<int>(this, "fmsp"); }
@@ -250,7 +248,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ftac</c>.</summary>
         [global::Moonwell.Objects.Field("ftac", Label = "Target Attachments")]
         [global::Moonwell.Objects.Limits(0, 6)]
-        [global::Moonwell.Objects.NonNegative]
         public int TargetAttachments
         {
             get { return Fields.Get<int>(this, "ftac"); }

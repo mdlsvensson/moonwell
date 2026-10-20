@@ -119,7 +119,10 @@ public sealed class StandardConstructors
         {
             if (obj.Values.TryGetValue(field.Id, out var text))
             {
-                lines.Add($"{field.Name} = {Value(field, text)};");
+                // A flags choice of no flags is 0, which C# converts to any enum; in Levels(...) or Set the cast stays, as it gives the type.
+                var value = field.Type == FieldType.Choice && field.Choice!.Flags && ChoiceNumber(field.Choice, text) == 0
+                    && !field.Choice.Members.Any(member => member.Value == 0) ? "0" : Value(field, text);
+                lines.Add($"{field.Name} = {value};");
             }
 
             return;

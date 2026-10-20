@@ -17,7 +17,7 @@ namespace Moonwell.Objects.Tests
         }
     }
 
-    /// <summary>A Phoenix of a map's own: the Phoenix's standard regeneration, -25, is a negative where World Editor allows none.</summary>
+    /// <summary>A Phoenix of a map's own: the Phoenix's standard regeneration, -25, is below World Editor's range of 0 to 1000.</summary>
     public class Firebird : Moonwell.Objects.Human.Units.Phoenix
     {
         public Firebird()
@@ -33,6 +33,27 @@ namespace Moonwell.Objects.Tests
         {
             HitPointRegen = -25f;
         }
+    }
+
+    /// <summary>A Phoenix of a map's own that puts the Phoenix's own regeneration past World Editor's range on purpose.</summary>
+    [BeyondLimits(nameof(HitPointRegen))]
+    public class WarmFirebird : Moonwell.Objects.Human.Units.Phoenix
+    {
+        public WarmFirebird()
+        {
+            HitPointRegen = -25f;
+        }
+    }
+
+    /// <summary>A standard class that cannot be made by itself: no class of Moonwell.Objects is one.</summary>
+    [Standard("Hmkg")]
+    public abstract class Unmade : TestUnitBase
+    {
+    }
+
+    /// <summary>A class of a map's own on a standard class that cannot be made by itself.</summary>
+    public class FromUnmade : Unmade
+    {
     }
 
     /// <summary>A Druid of the Talon of a map's own that sets nothing.</summary>
@@ -158,7 +179,121 @@ namespace Moonwell.Objects.Tests
         {
             var error = Assert.Throws<FieldRuleException>(() => new ColdFirebird());
 
-            Assert.StartsWith("ColdFirebird.HitPointRegen is -25; ", error.Message);
+            Assert.Equal("ColdFirebird.HitPointRegen is -25; Hit Points Regeneration Rate (uhpr) allows 0 to 1000; [BeyondLimits] goes past it", error.Message);
+        }
+
+        [Fact]
+        public void the_same_value_put_past_the_limits_on_purpose_builds()
+        {
+            // The game's own Phoenix holds -25, so a negative there is part of the range [BeyondLimits] lifts (ruling R14).
+            Assert.Equal(-25f, new WarmFirebird().HitPointRegen);
+        }
+
+        [Fact]
+        public void a_standard_class_that_cannot_be_made_by_itself_is_an_error_that_names_it()
+        {
+            var error = Assert.Throws<InvalidOperationException>(() => new FromUnmade().HitPoints);
+
+            Assert.StartsWith("Moonwell.Objects.Tests.Unmade, a standard class, could not be made by itself to count the values its constructor sets: ", error.Message);
+        }
+
+        /// <summary>
+        /// Guards every rule [BeyondLimits] never lifts (no negative, a name, a choice): the game's own data must fit them, or a
+        /// map could not write a standard value even on purpose. Each value of each standard class, under the base tables and
+        /// every balance set, is checked by the build's own checks as a map class on it that lifts the property would put it.
+        /// </summary>
+        [Fact]
+        public void every_standard_value_put_by_a_map_class_that_lifts_every_limit_is_allowed()
+        {
+            var parse = typeof(StandardValues).GetMethod("Parse", BindingFlags.Static | BindingFlags.NonPublic)!;
+            var rulesType = typeof(RuleChecks).GetNestedType("Rules", BindingFlags.NonPublic)!;
+            var check = typeof(RuleChecks).GetMethod("Check", BindingFlags.Static | BindingFlags.NonPublic)!;
+            var rulesOf = new Dictionary<PropertyInfo, object>();
+            var broken = new List<string>();
+            var checkedValues = 0;
+            foreach (var type in Objects.GetTypes().Where(type => type.GetCustomAttribute<StandardAttribute>(false) != null))
+            {
+                var id = type.GetCustomAttribute<StandardAttribute>(false)!.Id;
+                var properties = new Dictionary<string, (PropertyInfo Property, FieldAttribute Field)>(StringComparer.Ordinal);
+                for (var chain = type; chain != null; chain = chain.BaseType)
+                {
+                    foreach (var property in chain.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly))
+                    {
+                        if (property.GetCustomAttribute<FieldAttribute>(false) is { } field)
+                        {
+                            properties.TryAdd(field.Id, (property, field));
+                        }
+                    }
+                }
+
+                foreach (var (key, text) in AllValues.Value[id])
+                {
+                    var colon = key.IndexOf(':');
+                    var (property, field) = properties[colon < 0 ? key : key.Substring(0, colon)];
+                    int? level = colon < 0 ? null : int.Parse(key.Substring(colon + 1));
+                    var generic = property.PropertyType.IsGenericType ? property.PropertyType.GetGenericTypeDefinition() : null;
+                    if (generic == typeof(ObjectList<>) || generic == typeof(ObjectRef<>))
+                    {
+                        // A list's only rule is its count, which [BeyondLimits] lifts.
+                        continue;
+                    }
+
+                    if (!rulesOf.TryGetValue(property, out var rules))
+                    {
+                        // The rules as a class that lifts the property has them (lifted: true).
+                        rulesOf[property] = rules = Activator.CreateInstance(rulesType, "Lifted", property, field, true)!;
+                    }
+
+                    var element = generic == typeof(Levels<>) ? property.PropertyType.GetGenericArguments()[0] : property.PropertyType;
+                    var value = parse.MakeGenericMethod(element).Invoke(null, new object?[] { text });
+                    try
+                    {
+                        check.Invoke(null, new[] { rules, level, value, null });
+                    }
+                    catch (TargetInvocationException error) when (error.InnerException is FieldRuleException rule)
+                    {
+                        broken.Add($"{id} {key} \"{text}\": {rule.Message}");
+                    }
+
+                    checkedValues++;
+                }
+            }
+
+            Assert.True(broken.Count == 0, broken.Count + " standard values break a rule [BeyondLimits] does not lift:\n" + string.Join("\n", broken.Take(40)));
+            Assert.True(checkedValues > 100000, checkedValues + " values");
+        }
+
+        // Every value of every standard object, under the base tables and each balance set (a set's empty text is no value), by id.
+        private static readonly Lazy<Dictionary<string, List<(string Key, string Text)>>> AllValues = new Lazy<Dictionary<string, List<(string Key, string Text)>>>(ReadAllValues);
+
+        private static Dictionary<string, List<(string Key, string Text)>> ReadAllValues()
+        {
+            var all = new Dictionary<string, List<(string Key, string Text)>>(StringComparer.Ordinal);
+            foreach (var kind in new[] { "unit", "item", "destructable", "doodad", "ability", "buff", "upgrade" })
+            {
+                using var stream = Objects.GetManifestResourceStream($"Moonwell.Objects.Values.{kind}.json")!;
+                using var document = JsonDocument.Parse(stream);
+                foreach (var entry in document.RootElement.GetProperty("objects").EnumerateObject())
+                {
+                    var values = new List<(string Key, string Text)>();
+                    var sets = entry.Value.TryGetProperty("sets", out var found) ? found.EnumerateObject().Select(set => set.Value) : Enumerable.Empty<JsonElement>();
+                    foreach (var group in new[] { entry.Value.GetProperty("values") }.Concat(sets))
+                    {
+                        foreach (var value in group.EnumerateObject())
+                        {
+                            var text = value.Value.GetString()!;
+                            if (text.Length > 0)
+                            {
+                                values.Add((value.Name, text));
+                            }
+                        }
+                    }
+
+                    all[entry.Name] = values;
+                }
+            }
+
+            return all;
         }
 
         [Fact]

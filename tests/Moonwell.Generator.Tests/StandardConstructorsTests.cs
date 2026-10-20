@@ -207,13 +207,19 @@ public class StandardConstructorsTests
     }
 
     [Fact]
-    public void a_choice_with_no_member_of_its_number_is_cast()
+    public void a_choice_with_no_member_of_its_number_is_cast_and_no_flags_is_0()
     {
         var lines = UnitLines(new Dictionary<string, string> { ["ua1t"] = "-3", ["ua1g"] = "debris" });
 
-        Assert.Equal(
-            new[] { "AttackType = (global::Moonwell.Objects.AttackType)(-3);", "TargetsAllowed = (global::Moonwell.Objects.Targets)0;" },
-            lines);
+        Assert.Equal(new[] { "AttackType = (global::Moonwell.Objects.AttackType)(-3);", "TargetsAllowed = 0;" }, lines);
+    }
+
+    [Fact]
+    public void no_flags_in_levels_keeps_its_cast_which_gives_the_type()
+    {
+        var lines = Constructors().Lines(Object(Kind.Ability, "A000", new Dictionary<string, string> { ["atar:1"] = "debris", ["atar:2"] = "air" }), AbilityFields);
+
+        Assert.Contains("AbilityTargets = Levels((global::Moonwell.Objects.Targets)0, global::Moonwell.Objects.Targets.Air);", lines);
     }
 
     [Fact]

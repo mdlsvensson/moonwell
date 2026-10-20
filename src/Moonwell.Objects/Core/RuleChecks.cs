@@ -35,6 +35,8 @@ namespace Moonwell.Objects
     /// @CSharpLua.Ignore
     internal static class RuleChecks
     {
+        // The analyzer (MW0009, FieldRulesAnalyzer in Moonwell.Analyzers) repeats these rules and messages, and
+        // FieldRulesParityTests holds the two to one text: a rule or wording added or changed here gets a row there.
         private const string Lift = "; [BeyondLimits] goes past it";
 
         // A Dictionary under a lock, as in FieldChecks: the Lua runtime has no System.Collections.Concurrent. Its values

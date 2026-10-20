@@ -87,7 +87,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 7f;
                     MaximumRollAngleDegrees = 7f;
                     Model = "buildings\\human\\AltarofKings\\AltarofKings";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Altar of Kings";
                     NormalSkin = "Abds";
                     OccluderHeight = 0f;
@@ -214,7 +214,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 7f;
                     MaximumRollAngleDegrees = 7f;
                     Model = "buildings\\human\\ArcaneSanctum\\ArcaneSanctum";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Arcane Sanctum";
                     NormalSkin = "Abds";
                     OccluderHeight = 0f;
@@ -356,7 +356,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
                     Model = "buildings\\human\\HumanTower\\HumanTower";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Arcane Tower";
                     NormalSkin = "Abds,Afbt,AHta,Adts";
                     OccluderHeight = 0f;
@@ -482,7 +482,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
                     Model = "buildings\\human\\ArcaneVault\\ArcaneVault";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Arcane Vault";
                     NormalSkin = "Abds,Aall,Apit";
                     OccluderHeight = 0f;
@@ -645,7 +645,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\human\\HeroArchMage\\HeroArchMage";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Movement = "HumanHeroArchMageMovement";
                     Name = "Archmage";
                     NormalSkin = "AInv";
@@ -788,7 +788,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
                     Model = "buildings\\human\\HumanBarracks\\HumanBarracks";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Barracks";
                     NormalSkin = "Abds";
                     OccluderHeight = 0f;
@@ -913,7 +913,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 7f;
                     MaximumRollAngleDegrees = 7f;
                     Model = "buildings\\human\\Blacksmith\\Blacksmith";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Blacksmith";
                     NormalSkin = "Abds";
                     OccluderHeight = 0f;
@@ -1075,7 +1075,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\human\\HeroBloodElf\\HeroBloodElf";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Blood Mage";
                     NormalSkin = "AInv,Asph";
                     OccluderHeight = 0f;
@@ -1247,7 +1247,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
                     Model = "buildings\\human\\HumanTower\\HumanTower";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Cannon Tower";
                     NormalSkin = "Abds,Adts,Afsh";
                     OccluderHeight = 0f;
@@ -1377,7 +1377,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
                     Model = "buildings\\human\\TownHall\\TownHall";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Castle";
                     NormalSkin = "Abdl,Amic,Argl";
                     OccluderHeight = 0f;
@@ -1531,7 +1531,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 180f;
                     MaximumRollAngleDegrees = 180f;
                     Model = "Units\\Other\\DiabloCar\\DiabloCar";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Movement = "HumanSteamTankMovement";
                     Name = "Diablo Cart";
                     NormalSkin = "A01X,A01V";
@@ -1677,7 +1677,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Dragonhawk Rider";
                     NormalSkin = "Aclf,Amls,Ahan";
                     OccluderHeight = 0f;
@@ -1833,7 +1833,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 180f;
                     MaximumRollAngleDegrees = 180f;
                     Model = "Units\\Other\\DwarfCar\\DwarfCar";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Movement = "HumanSteamTankMovement";
                     Name = "Dwarf Cart";
                     NormalSkin = "A01X,A01V";
@@ -1962,7 +1962,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 15f;
                     MaximumRollAngleDegrees = 15f;
                     Model = "buildings\\human\\Farm\\Farm";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Farm";
                     NormalSkin = "Abds";
                     OccluderHeight = 0f;
@@ -2113,7 +2113,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\human\\Gyrocopter\\Gyrocopter";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)6;
+                    ModelFileExtraVersions = global::Moonwell.Objects.VersionFlags.TheFrozenThrone | global::Moonwell.Objects.VersionFlags.Unlisted4;
                     Movement = "HumanGyrocopterMovement";
                     Name = "Flying Machine";
                     NormalSkin = "Agyb,Agyv,Aflk";
@@ -2256,7 +2256,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\human\\Footman\\Footman";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Footman";
                     NormalSkin = "Adef,Aihn";
                     OccluderHeight = 0f;
@@ -2386,7 +2386,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 7f;
                     MaximumRollAngleDegrees = 7f;
                     Model = "buildings\\human\\GryphonAviary\\GryphonAviary";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Gryphon Aviary";
                     NormalSkin = "Abds";
                     OccluderHeight = 0f;
@@ -2536,7 +2536,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\human\\GryphonRider\\GryphonRider";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Gryphon Rider";
                     NormalSkin = "Asth,Ahan";
                     OccluderHeight = 0f;
@@ -2684,7 +2684,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
                     Model = "buildings\\human\\HumanTower\\HumanTower";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Guard Tower";
                     NormalSkin = "Abds,Adts";
                     OccluderHeight = 0f;
@@ -2814,7 +2814,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
                     Model = "buildings\\human\\TownHall\\TownHall";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Keep";
                     NormalSkin = "Abdl,Amic,Argl";
                     OccluderHeight = 0f;
@@ -2978,7 +2978,7 @@ namespace Moonwell.Objects
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Movement = "HumanHeroArchMageMovement";
                     Name = "High Elf Archmage";
                     NormalSkin = "AInv";
@@ -3129,7 +3129,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\human\\Knight\\Knight";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Movement = "HumanKnightMovement";
                     Name = "Knight";
                     NormalSkin = "Aihn,Ahsb,Ahan";
@@ -3262,7 +3262,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 7f;
                     MaximumRollAngleDegrees = 7f;
                     Model = "buildings\\human\\HumanLumbermill\\HumanLumbermill";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Lumber Mill";
                     NormalSkin = "Abds,Arlm";
                     OccluderHeight = 0f;
@@ -3398,7 +3398,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\human\\Militia\\Militia";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Militia";
                     NormalSkin = "Ahar,Amil,Ahrp";
                     OccluderHeight = 0f;
@@ -3557,7 +3557,7 @@ namespace Moonwell.Objects
                     MaximumRollAngleDegrees = 10f;
                     MinimumAttackRange = 250;
                     Model = "units\\human\\MortarTeam\\MortarTeam";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Mortar Team";
                     NormalSkin = "Afla,Afsh";
                     OccluderHeight = 0f;
@@ -3723,7 +3723,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\human\\HeroMountainKing\\HeroMountainKing";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Mountain King";
                     NormalSkin = "AInv";
                     OccluderHeight = 0f;
@@ -3889,7 +3889,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 180f;
                     MaximumRollAngleDegrees = 180f;
                     Model = "Units\\Other\\Orccar\\Orccar";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Movement = "HumanSteamTankMovement";
                     Name = "Orc Cart";
                     NormalSkin = "A01X,A01V";
@@ -4052,7 +4052,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\human\\HeroPaladin\\HeroPaladin";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Paladin";
                     NormalSkin = "AInv";
                     OccluderHeight = 0f;
@@ -4218,7 +4218,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\human\\Peasant\\Peasant";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Peasant";
                     NormalSkin = "Ahar,Amil,Ahrp,Ahlh";
                     OccluderHeight = 0f;
@@ -4369,7 +4369,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\human\\phoenix\\phoenix";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Phoenix";
                     NormalSkin = "Aphx,ACmi,ACrk,Apxf,Ahpe";
                     OccluderHeight = 0f;
@@ -4491,7 +4491,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 25f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\human\\phoenix\\phoenix";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Phoenix Egg";
                     NormalSkin = "Aphx,ACrk,ACmi";
                     OccluderHeight = 0f;
@@ -4635,7 +4635,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\human\\Priest\\Priest";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)6;
+                    ModelFileExtraVersions = global::Moonwell.Objects.VersionFlags.TheFrozenThrone | global::Moonwell.Objects.VersionFlags.Unlisted4;
                     Name = "Priest";
                     NormalSkin = "Ahea,Ainf,Adis,Aihn";
                     OccluderHeight = 0f;
@@ -4779,7 +4779,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\human\\Rifleman\\Rifleman";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Rifleman";
                     NormalSkin = "Aihn,Ahri";
                     OccluderHeight = 0f;
@@ -4933,7 +4933,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Runner";
                     NameEditorSuffix = "High Elf";
                     NormalSkin = "Ahar,Amil,Ahrp,Ahlh";
@@ -5066,7 +5066,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
                     Model = "buildings\\human\\HumanTower\\HumanTower";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Scout Tower";
                     NormalSkin = "Abds,Adts";
                     OccluderHeight = 0f;
@@ -5216,7 +5216,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
                     Model = "units\\human\\WarWagon\\WarWagon";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)6;
+                    ModelFileExtraVersions = global::Moonwell.Objects.VersionFlags.TheFrozenThrone | global::Moonwell.Objects.VersionFlags.Unlisted4;
                     Movement = "HumanSteamTankMovement";
                     Name = "Siege Engine";
                     NormalSkin = "Srtt,Aroc";
@@ -5380,7 +5380,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
                     Model = "units\\human\\WarWagon\\WarWagon";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)6;
+                    ModelFileExtraVersions = global::Moonwell.Objects.VersionFlags.TheFrozenThrone | global::Moonwell.Objects.VersionFlags.Unlisted4;
                     Movement = "HumanSteamTankMovement";
                     Name = "Siege Engine";
                     NameEditorSuffix = "(Barrage)";
@@ -5536,7 +5536,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\human\\Sorceress\\Sorceress";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)6;
+                    ModelFileExtraVersions = global::Moonwell.Objects.VersionFlags.TheFrozenThrone | global::Moonwell.Objects.VersionFlags.Unlisted4;
                     Name = "Sorceress";
                     NormalSkin = "Aivs,Aply,Aslo,Aihn";
                     OccluderHeight = 0f;
@@ -5686,7 +5686,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\human\\BloodElfSpellThief\\BloodElfSpellThief";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Spellbreaker";
                     NormalSkin = "Asps,Acmg,Amim,Afbk,Aihn";
                     OccluderHeight = 0f;
@@ -5823,7 +5823,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
                     Model = "buildings\\human\\TownHall\\TownHall";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Town Hall";
                     NormalSkin = "Abdl,Amic,Argl";
                     OccluderHeight = 0f;
@@ -5976,7 +5976,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 180f;
                     MaximumRollAngleDegrees = 180f;
                     Model = "Units\\Other\\UndeadCar\\UndeadCar";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Movement = "HumanSteamTankMovement";
                     Name = "Undead Cart";
                     NormalSkin = "A01X,A01V";
@@ -6129,7 +6129,7 @@ namespace Moonwell.Objects
                     LumberCost = 60;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Movement = "HumanSteamTankMovement";
                     Name = "War Wagon";
                     NormalSkin = "Srtt,Aroc";
@@ -6275,7 +6275,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\human\\WaterElemental\\WaterElemental";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Water Elemental";
                     NameEditorSuffix = "(Level 1)";
                     OccluderHeight = 0f;
@@ -6416,7 +6416,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Water Elemental";
                     NameEditorSuffix = "(Level 2)";
                     OccluderHeight = 0f;
@@ -6554,7 +6554,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Water Elemental";
                     NameEditorSuffix = "(Level 3)";
                     OccluderHeight = 0f;
@@ -6681,7 +6681,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 7f;
                     MaximumRollAngleDegrees = 7f;
                     Model = "buildings\\human\\Workshop\\Workshop";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Workshop";
                     NormalSkin = "Abds";
                     OccluderHeight = 0f;

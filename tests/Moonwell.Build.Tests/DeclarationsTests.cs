@@ -538,7 +538,7 @@ namespace Moonwell.Build.Tests
         {
             AssertFails(
                 "BeyondLimitsNegative",
-                "Objects.cs:15: Hollow.HitPoints is -5; Hit Points Maximum (Base) (uhpm) allows 0 or more, even with [BeyondLimits]");
+                "Objects.cs:15: Hollow.CollisionSize is -5; Collision Size (ucol) allows 0 or more, even with [BeyondLimits]");
         }
 
         [Fact]

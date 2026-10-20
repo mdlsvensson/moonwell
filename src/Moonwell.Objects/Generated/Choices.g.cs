@@ -2,7 +2,7 @@
 
 namespace Moonwell.Objects
 {
-    /// <summary>Any of the values of the metadata type <c>abilityModifierStats</c>, as World Editor offers them; the object file holds a comma list of their texts.</summary>
+    /// <summary>Any of the values of the metadata type <c>abilityModifierStats</c>, as World Editor offers them; the object file holds a comma list of their texts, and 0 is none of them. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     [global::System.Flags]
     public enum AbilityModifierStats
@@ -76,7 +76,7 @@ namespace Moonwell.Objects
         MagicResistance = 65536,
     }
 
-    /// <summary>A value of the metadata type <c>aiBuffer</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>aiBuffer</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum AiBuffer
     {
@@ -101,7 +101,7 @@ namespace Moonwell.Objects
         Buffer = 4,
     }
 
-    /// <summary>A value of the metadata type <c>armorType</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>armorType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum ArmorType
     {
@@ -126,7 +126,7 @@ namespace Moonwell.Objects
         Stone = 4,
     }
 
-    /// <summary>A value of the metadata type <c>attackBits</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>attackBits</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum AttackBits
     {
@@ -147,7 +147,7 @@ namespace Moonwell.Objects
         Both = 3,
     }
 
-    /// <summary>A value of the metadata type <c>attackType</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>attackType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum AttackType
     {
@@ -184,7 +184,7 @@ namespace Moonwell.Objects
         Hero = 7,
     }
 
-    /// <summary>A value of the metadata type <c>attributeType</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>attributeType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum AttributeType
     {
@@ -201,7 +201,7 @@ namespace Moonwell.Objects
         STR = 2,
     }
 
-    /// <summary>Any of the values of the metadata type <c>channelFlags</c>, as World Editor offers them; the object file holds the number whose bits they are.</summary>
+    /// <summary>Any of the values of the metadata type <c>channelFlags</c>, as World Editor offers them; the object file holds the number whose bits they are, and 0 is none of them. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     [global::System.Flags]
     public enum ChannelFlags
@@ -227,7 +227,7 @@ namespace Moonwell.Objects
         UniqueCast = 16,
     }
 
-    /// <summary>A value of the metadata type <c>channelType</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>channelType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum ChannelType
     {
@@ -248,7 +248,7 @@ namespace Moonwell.Objects
         UnitOrPointTarget = 3,
     }
 
-    /// <summary>A value of the metadata type <c>combatSound</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>combatSound</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum CombatSound
     {
@@ -305,7 +305,7 @@ namespace Moonwell.Objects
         WoodMediumBash = 12,
     }
 
-    /// <summary>A value of the metadata type <c>damageType</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>damageType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum DamageType
     {
@@ -322,7 +322,7 @@ namespace Moonwell.Objects
         All = 2,
     }
 
-    /// <summary>A value of the metadata type <c>deathType</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>deathType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum DeathType
     {
@@ -343,7 +343,7 @@ namespace Moonwell.Objects
         CanRaiseDoesDecay = 3,
     }
 
-    /// <summary>A value of the metadata type <c>defenseType</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>defenseType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum DefenseType
     {
@@ -380,7 +380,7 @@ namespace Moonwell.Objects
         None = 7,
     }
 
-    /// <summary>A value of the metadata type <c>defenseTypeInt</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>defenseTypeInt</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum DefenseTypeInt
     {
@@ -417,7 +417,7 @@ namespace Moonwell.Objects
         Unarmored = 7,
     }
 
-    /// <summary>A value of the metadata type <c>detectionType</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>detectionType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum DetectionType
     {
@@ -438,7 +438,7 @@ namespace Moonwell.Objects
         Both = 3,
     }
 
-    /// <summary>A value of the metadata type <c>equipmentType</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>equipmentType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum EquipmentType
     {
@@ -479,7 +479,7 @@ namespace Moonwell.Objects
         Trinket = 8,
     }
 
-    /// <summary>A value of the metadata type <c>fullFlags</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>fullFlags</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum FullFlags
     {
@@ -500,7 +500,7 @@ namespace Moonwell.Objects
         Always = 3,
     }
 
-    /// <summary>Any of the values of the metadata type <c>interactionFlags</c>, as World Editor offers them; the object file holds the number whose bits they are.</summary>
+    /// <summary>Any of the values of the metadata type <c>interactionFlags</c>, as World Editor offers them; the object file holds the number whose bits they are, and 0 is none of them. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     [global::System.Flags]
     public enum InteractionFlags
@@ -516,9 +516,13 @@ namespace Moonwell.Objects
         /// <summary>Any.</summary>
         [global::Moonwell.Objects.GameValue("4")]
         Any = 4,
+
+        /// <summary>A bit World Editor does not list, which the game's standard data uses.</summary>
+        [global::Moonwell.Objects.GameValue("16")]
+        Unlisted16 = 16,
     }
 
-    /// <summary>A value of the metadata type <c>itemClass</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>itemClass</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum ItemClass
     {
@@ -555,7 +559,7 @@ namespace Moonwell.Objects
         Equipment = 7,
     }
 
-    /// <summary>A value of the metadata type <c>itemTag</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>itemTag</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum ItemTag
     {
@@ -592,7 +596,7 @@ namespace Moonwell.Objects
         Shop = 7,
     }
 
-    /// <summary>A value of the metadata type <c>lightningEffect</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>lightningEffect</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum LightningEffect
     {
@@ -657,7 +661,7 @@ namespace Moonwell.Objects
         POSS = 14,
     }
 
-    /// <summary>Any of the values of the metadata type <c>morphFlags</c>, as World Editor offers them; the object file holds the number whose bits they are.</summary>
+    /// <summary>Any of the values of the metadata type <c>morphFlags</c>, as World Editor offers them; the object file holds the number whose bits they are, and 0 is none of them. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     [global::System.Flags]
     public enum MorphFlags
@@ -683,7 +687,7 @@ namespace Moonwell.Objects
         RequiresPayment = 16,
     }
 
-    /// <summary>A value of the metadata type <c>moveType</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>moveType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum MoveType
     {
@@ -712,7 +716,7 @@ namespace Moonwell.Objects
         Amph = 5,
     }
 
-    /// <summary>A value of the metadata type <c>occlusionType</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>occlusionType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum OcclusionType
     {
@@ -733,7 +737,7 @@ namespace Moonwell.Objects
         NoOcclusion = 3,
     }
 
-    /// <summary>A value of the metadata type <c>occlusionType2</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>occlusionType2</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum OcclusionType2
     {
@@ -750,7 +754,7 @@ namespace Moonwell.Objects
         NoOcclusion = 2,
     }
 
-    /// <summary>Any of the values of the metadata type <c>pathingListPrevent</c>, as World Editor offers them; the object file holds a comma list of their texts.</summary>
+    /// <summary>Any of the values of the metadata type <c>pathingListPrevent</c>, as World Editor offers them; the object file holds a comma list of their texts, and 0 is none of them. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     [global::System.Flags]
     public enum PathingListPrevent
@@ -780,7 +784,7 @@ namespace Moonwell.Objects
         Unfloat = 32,
     }
 
-    /// <summary>Any of the values of the metadata type <c>pathingListRequire</c>, as World Editor offers them; the object file holds a comma list of their texts.</summary>
+    /// <summary>Any of the values of the metadata type <c>pathingListRequire</c>, as World Editor offers them; the object file holds a comma list of their texts, and 0 is none of them. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     [global::System.Flags]
     public enum PathingListRequire
@@ -810,7 +814,7 @@ namespace Moonwell.Objects
         Unfloat = 32,
     }
 
-    /// <summary>Any of the values of the metadata type <c>pickFlags</c>, as World Editor offers them; the object file holds the number whose bits they are.</summary>
+    /// <summary>Any of the values of the metadata type <c>pickFlags</c>, as World Editor offers them; the object file holds the number whose bits they are, and 0 is none of them. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     [global::System.Flags]
     public enum PickFlags
@@ -832,7 +836,7 @@ namespace Moonwell.Objects
         General = 8,
     }
 
-    /// <summary>A value of the metadata type <c>proctargetType</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>proctargetType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum ProctargetType
     {
@@ -845,7 +849,7 @@ namespace Moonwell.Objects
         Enemies = 1,
     }
 
-    /// <summary>A value of the metadata type <c>regenType</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>regenType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum RegenType
     {
@@ -870,7 +874,7 @@ namespace Moonwell.Objects
         Night = 4,
     }
 
-    /// <summary>A value of the metadata type <c>shadowImage</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>shadowImage</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum ShadowImage
     {
@@ -883,7 +887,7 @@ namespace Moonwell.Objects
         ShadowFlyer = 1,
     }
 
-    /// <summary>Any of the values of the metadata type <c>silenceFlags</c>, as World Editor offers them; the object file holds the number whose bits they are.</summary>
+    /// <summary>Any of the values of the metadata type <c>silenceFlags</c>, as World Editor offers them; the object file holds the number whose bits they are, and 0 is none of them. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     [global::System.Flags]
     public enum SilenceFlags
@@ -905,7 +909,7 @@ namespace Moonwell.Objects
         Spells = 8,
     }
 
-    /// <summary>A value of the metadata type <c>spellDetail</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>spellDetail</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum SpellDetail
     {
@@ -922,7 +926,7 @@ namespace Moonwell.Objects
         High = 2,
     }
 
-    /// <summary>Any of the values of the metadata type <c>stackFlags</c>, as World Editor offers them; the object file holds the number whose bits they are.</summary>
+    /// <summary>Any of the values of the metadata type <c>stackFlags</c>, as World Editor offers them; the object file holds the number whose bits they are, and 0 is none of them. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     [global::System.Flags]
     public enum StackFlags
@@ -944,7 +948,7 @@ namespace Moonwell.Objects
         KillUnit = 8,
     }
 
-    /// <summary>Any of the values of the metadata type <c>targetList</c>, as World Editor offers them; the object file holds a comma list of their texts.</summary>
+    /// <summary>Any of the values of the metadata type <c>targetList</c>, as World Editor offers them; the object file holds a comma list of their texts, and 0 is none of them. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     [global::System.Flags]
     public enum Targets
@@ -997,7 +1001,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.GameValue("neutral", "neut")]
         Neutral = 2048,
 
-        /// <summary>None.</summary>
+        /// <summary>None. World Editor's "none", a value of its own: no values at all is 0, not this.</summary>
         [global::Moonwell.Objects.GameValue("none")]
         None = 4096,
 
@@ -1074,7 +1078,7 @@ namespace Moonwell.Objects
         Decoration = 1073741824,
     }
 
-    /// <summary>A value of the metadata type <c>teamColor</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>teamColor</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum TeamColor
     {
@@ -1183,7 +1187,7 @@ namespace Moonwell.Objects
         NeutralHostile = 24,
     }
 
-    /// <summary>Any of the values of the metadata type <c>unitClass</c>, as World Editor offers them; the object file holds a comma list of their texts.</summary>
+    /// <summary>Any of the values of the metadata type <c>unitClass</c>, as World Editor offers them; the object file holds a comma list of their texts, and 0 is none of them. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     [global::System.Flags]
     public enum UnitClass
@@ -1241,7 +1245,7 @@ namespace Moonwell.Objects
         Tauren = 4096,
     }
 
-    /// <summary>A value of the metadata type <c>unitRace</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>unitRace</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum UnitRace
     {
@@ -1290,7 +1294,7 @@ namespace Moonwell.Objects
         Unknown = 10,
     }
 
-    /// <summary>A value of the metadata type <c>upgradeClass</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>upgradeClass</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum UpgradeClass
     {
@@ -1315,7 +1319,7 @@ namespace Moonwell.Objects
         Caster = 4,
     }
 
-    /// <summary>A value of the metadata type <c>upgradeEffect</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>upgradeEffect</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum UpgradeEffect
     {
@@ -1456,7 +1460,7 @@ namespace Moonwell.Objects
         Rspp = 33,
     }
 
-    /// <summary>Any of the values of the metadata type <c>versionFlags</c>, as World Editor offers them; the object file holds the number whose bits they are.</summary>
+    /// <summary>Any of the values of the metadata type <c>versionFlags</c>, as World Editor offers them; the object file holds the number whose bits they are, and 0 is none of them. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     [global::System.Flags]
     public enum VersionFlags
@@ -1468,9 +1472,13 @@ namespace Moonwell.Objects
         /// <summary>The Frozen Throne.</summary>
         [global::Moonwell.Objects.GameValue("2")]
         TheFrozenThrone = 2,
+
+        /// <summary>A bit World Editor does not list, which the game's standard data uses.</summary>
+        [global::Moonwell.Objects.GameValue("4")]
+        Unlisted4 = 4,
     }
 
-    /// <summary>A value of the metadata type <c>weaponType</c>, as World Editor offers it.</summary>
+    /// <summary>A value of the metadata type <c>weaponType</c>, as World Editor offers it. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     public enum WeaponType
     {

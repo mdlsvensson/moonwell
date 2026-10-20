@@ -30,17 +30,28 @@ public static class GeneratedObjects
         var fieldsOf = new Dictionary<Kind, IReadOnlyList<Field>>();
         var objectsOf = new Dictionary<Kind, IReadOnlyList<StandardObject>>();
         var everything = new List<StandardObject>();
-        var choices = Choices.All(tables, runtime?.Taken());
+        var listed = Choices.All(tables, runtime?.Taken());
+        foreach (var kind in Enum.GetValues<Kind>())
+        {
+            var fields = Fields.Of(tables, kind, runtime?.Of(kind), listed);
+            fieldsOf[kind] = fields;
+            objectsOf[kind] = StandardObjects.Of(tables, kind, fields);
+        }
+
+        // A bit the game's own data uses is a member of its enum, and a negative it holds is allowed past the range
+        // (ruling R14): a map may write any standard value.
+        var choices = Choices.WithStandardBits(listed, fieldsOf.Keys.Select(kind => (fieldsOf[kind], objectsOf[kind])).ToList());
 
         // The enums are not left out under MOONWELL_LUA: the build's stubs name them. CSharp.lua writes no Lua for them.
         files["Choices.g.cs"] = ObjectsWriter.Header(gameVersion) + "\n" + ObjectsWriter.Choices(choices.Values);
         foreach (var kind in Enum.GetValues<Kind>())
         {
-            var fields = Fields.Of(tables, kind, runtime?.Of(kind), choices);
-            var objects = StandardObjects.Of(tables, kind, fields);
+            var objects = objectsOf[kind];
+            var fields = Fields.WithStandardNegatives(fieldsOf[kind], objects)
+                .Select(field => field.Choice == null ? field : field with { Choice = choices[field.Choice.Type] })
+                .ToList();
             CheckSingleChoices(fields, objects);
             fieldsOf[kind] = fields;
-            objectsOf[kind] = objects;
             everything.AddRange(objects);
             files[ValuesFile(kind)] = ObjectsWriter.Values(objects, fields);
             files["Kinds/" + ObjectsWriter.KindBase(kind, false) + ".g.cs"] = header + "\n" + ObjectsWriter.Kind(kind, fields, false) + footer;

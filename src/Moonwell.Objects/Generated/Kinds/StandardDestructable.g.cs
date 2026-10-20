@@ -91,7 +91,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>bbut</c>.</summary>
         [global::Moonwell.Objects.Field("bbut", Label = "Build Time")]
         [global::Moonwell.Objects.Limits(1, 298)]
-        [global::Moonwell.Objects.NonNegative]
         public int BuildTime
         {
             get { return Fields.Get<int>(this, "bbut"); }
@@ -109,7 +108,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>bclh</c>.</summary>
         [global::Moonwell.Objects.Field("bclh", Label = "Cliff Height")]
         [global::Moonwell.Objects.Limits(0, 50)]
-        [global::Moonwell.Objects.NonNegative]
         public int CliffHeight
         {
             get { return Fields.Get<int>(this, "bclh"); }
@@ -151,7 +149,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>bflh</c>.</summary>
         [global::Moonwell.Objects.Field("bflh", Label = "Fly-Over Height")]
         [global::Moonwell.Objects.Limits(0, 99999)]
-        [global::Moonwell.Objects.NonNegative]
         public float FlyOverHeight
         {
             get { return Fields.Get<float>(this, "bflh"); }
@@ -280,7 +277,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>bmmb</c>.</summary>
         [global::Moonwell.Objects.Field("bmmb", Label = "Minimap Color 3 (Blue)")]
         [global::Moonwell.Objects.Limits(0, 255)]
-        [global::Moonwell.Objects.NonNegative]
         public int MinimapColor3Blue
         {
             get { return Fields.Get<int>(this, "bmmb"); }
@@ -290,7 +286,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>bmmg</c>.</summary>
         [global::Moonwell.Objects.Field("bmmg", Label = "Minimap Color 2 (Green)")]
         [global::Moonwell.Objects.Limits(0, 255)]
-        [global::Moonwell.Objects.NonNegative]
         public int MinimapColor2Green
         {
             get { return Fields.Get<int>(this, "bmmg"); }
@@ -300,7 +295,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>bmmr</c>.</summary>
         [global::Moonwell.Objects.Field("bmmr", Label = "Minimap Color 1 (Red)")]
         [global::Moonwell.Objects.Limits(0, 255)]
-        [global::Moonwell.Objects.NonNegative]
         public int MinimapColor1Red
         {
             get { return Fields.Get<int>(this, "bmmr"); }
@@ -327,7 +321,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>boch</c>.</summary>
         [global::Moonwell.Objects.Field("boch", Label = "Occlusion Height")]
         [global::Moonwell.Objects.Limits(0, 99999)]
-        [global::Moonwell.Objects.NonNegative]
         public float OcclusionHeight
         {
             get { return Fields.Get<float>(this, "boch"); }
@@ -387,7 +380,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>breg</c>.</summary>
         [global::Moonwell.Objects.Field("breg", Label = "Repair Gold Cost")]
         [global::Moonwell.Objects.Limits(0, 100000)]
-        [global::Moonwell.Objects.NonNegative]
         public int RepairGoldCost
         {
             get { return Fields.Get<int>(this, "breg"); }
@@ -397,7 +389,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>brel</c>.</summary>
         [global::Moonwell.Objects.Field("brel", Label = "Repair Lumber Cost")]
         [global::Moonwell.Objects.Limits(0, 100000)]
-        [global::Moonwell.Objects.NonNegative]
         public int RepairLumberCost
         {
             get { return Fields.Get<int>(this, "brel"); }
@@ -407,7 +398,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>bret</c>.</summary>
         [global::Moonwell.Objects.Field("bret", Label = "Repair Time")]
         [global::Moonwell.Objects.Limits(1, 10000)]
-        [global::Moonwell.Objects.NonNegative]
         public int RepairTime
         {
             get { return Fields.Get<int>(this, "bret"); }
@@ -508,7 +498,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>btxi</c>.</summary>
         [global::Moonwell.Objects.Field("btxi", Label = "Replaceable Texture ID")]
         [global::Moonwell.Objects.Limits(0, 1000)]
-        [global::Moonwell.Objects.NonNegative]
         public int ReplaceableTextureID
         {
             get { return Fields.Get<int>(this, "btxi"); }
@@ -542,7 +531,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>bvar</c>.</summary>
         [global::Moonwell.Objects.Field("bvar", Label = "Model File - Variations")]
         [global::Moonwell.Objects.Limits(1, 10)]
-        [global::Moonwell.Objects.NonNegative]
         public int ModelFileVariations
         {
             get { return Fields.Get<int>(this, "bvar"); }
@@ -552,7 +540,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>bvcb</c>.</summary>
         [global::Moonwell.Objects.Field("bvcb", Label = "Tinting Color 3 (Blue)")]
         [global::Moonwell.Objects.Limits(0, 255)]
-        [global::Moonwell.Objects.NonNegative]
         public int TintingColor3Blue
         {
             get { return Fields.Get<int>(this, "bvcb"); }
@@ -562,7 +549,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>bvcg</c>.</summary>
         [global::Moonwell.Objects.Field("bvcg", Label = "Tinting Color 2 (Green)")]
         [global::Moonwell.Objects.Limits(0, 255)]
-        [global::Moonwell.Objects.NonNegative]
         public int TintingColor2Green
         {
             get { return Fields.Get<int>(this, "bvcg"); }
@@ -572,7 +558,6 @@ namespace Moonwell.Objects
         /// <summary>The field <c>bvcr</c>.</summary>
         [global::Moonwell.Objects.Field("bvcr", Label = "Tinting Color 1 (Red)")]
         [global::Moonwell.Objects.Limits(0, 255)]
-        [global::Moonwell.Objects.NonNegative]
         public int TintingColor1Red
         {
             get { return Fields.Get<int>(this, "bvcr"); }

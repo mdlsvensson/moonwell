@@ -84,7 +84,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\critters\\Albatross\\Albatross";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Albatross";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -209,7 +209,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\critters\\EasterChicken\\EasterChicken";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Chicken";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -335,7 +335,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\critters\\SpiderCrab\\SpiderCrab";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Crab";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -457,7 +457,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\BrownWolf\\BrownWolf";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Dog";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -581,7 +581,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\critters\\DuneWorm\\DuneWorm";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Dune Worm";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -703,7 +703,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Felboar\\Felboar";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Fel Boar";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -822,7 +822,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\critters\\FlyingSheep\\FlyingSheep";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Flying Sheep";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -947,7 +947,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\critters\\Frog\\Frog";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Frog";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -1069,7 +1069,7 @@ namespace Moonwell.Objects
                     LumberCost = 0;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Guard Dog";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -1190,7 +1190,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\critters\\HermitCrab\\HermitCrab";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Hermit Crab";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -1312,7 +1312,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Penguin\\Penguin";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Penguin";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -1434,7 +1434,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Penguin\\Penguin";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Penguin";
                     NameEditorSuffix = "(Waterborne)";
                     NormalSkin = "Awan";
@@ -1558,7 +1558,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Pig\\Pig";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Pig";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -1684,7 +1684,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\critters\\EasterRabbit\\EasterRabbit";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Rabbit";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -1811,7 +1811,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\critters\\Raccoon\\Raccoon";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Raccoon";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -1936,7 +1936,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Rat\\Rat";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Rat";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -2058,7 +2058,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Seal\\Seal";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Seal";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -2180,7 +2180,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Sheep\\Sheep";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Sheep";
                     NameEditorSuffix = "(Amphibious)";
                     NormalSkin = "Awan";
@@ -2304,7 +2304,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Sheep\\Sheep";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Sheep";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -2427,7 +2427,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Sheep\\Sheep";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Sheep";
                     NameEditorSuffix = "(Waterborne)";
                     NormalSkin = "Awan";
@@ -2554,7 +2554,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\critters\\Skink\\Skink";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Skink";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -2678,7 +2678,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\critters\\SnowOwl\\SnowOwl";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Snowy Owl";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -2799,7 +2799,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\BlackStagMale\\BlackStagMale";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Stag";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
@@ -2919,7 +2919,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\critters\\Vulture\\Vulture";
-                    ModelFileExtraVersions = (global::Moonwell.Objects.VersionFlags)0;
+                    ModelFileExtraVersions = 0;
                     Name = "Vulture";
                     NormalSkin = "Awan";
                     OccluderHeight = 0f;
