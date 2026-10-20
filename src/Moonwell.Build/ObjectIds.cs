@@ -48,18 +48,20 @@ namespace Moonwell.Build
                     }
 
                     ids[declared.ClassName] = declared.StandardRoot;
-                    continue;
                 }
-
-                if (declared.PinnedId == null)
+                else if (declared.PinnedId == null)
                 {
                     missing.Add(declared);
                     continue;
                 }
+                else
+                {
+                    Check(declared.ClassName, declared.Kind, declared.PinnedId, standardIds);
+                    Claim(claims[SpaceOf(declared.Kind)], declared.PinnedId, declared.ClassName);
+                    ids[declared.ClassName] = declared.PinnedId;
+                }
 
-                Check(declared.ClassName, declared.Kind, declared.PinnedId, standardIds);
-                Claim(claims[SpaceOf(declared.Kind)], declared.PinnedId, declared.ClassName);
-                ids[declared.ClassName] = declared.PinnedId;
+                // A buff shows its icon through a carrier ability, a replaced standard buff too.
                 if (declared.Kind == "buff")
                 {
                     if (declared.CarrierId == null)
@@ -109,7 +111,9 @@ namespace Moonwell.Build
             foreach (var declared in missingCarrier)
             {
                 var carrier = Free('A', claims["ability"], standardIds, sourceMapIds, declared.ClassName + CarrierSuffix);
-                lines.Add($"{declared.ClassName} has no carrier id; add Carrier = \"{carrier}\" to its [ObjectId]");
+                lines.Add(declared.Replaces
+                    ? $"{declared.ClassName} has no carrier id; add [ObjectId(Carrier = \"{carrier}\")] to it"
+                    : $"{declared.ClassName} has no carrier id; add Carrier = \"{carrier}\" to its [ObjectId]");
             }
 
             return string.Join("\n", lines);

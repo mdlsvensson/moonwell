@@ -268,7 +268,7 @@ namespace Moonwell.Build
             {
                 if (data.AttributeType.FullName == attribute)
                 {
-                    return (string?)data.ConstructorArguments[0].Value;
+                    return data.ConstructorArguments.Count == 0 ? null : (string?)data.ConstructorArguments[0].Value;
                 }
             }
 

@@ -141,6 +141,23 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_replaced_buff_takes_its_carrier_from_the_attribute()
+        {
+            var ids = Assign(Obj("Objects.Slow", "buff", root: "Bslo", replaces: true, carrier: "A001"));
+
+            Assert.Equal("Bslo", ids["Objects.Slow"]);
+            Assert.Equal("A001", ids["Objects.Slow#carrier"]);
+        }
+
+        [Fact]
+        public void a_replaced_buff_without_a_carrier_fails_naming_a_free_ability_id()
+        {
+            var error = Assert.Throws<BuildException>(() => Assign(Obj("Objects.Slow", "buff", root: "Bslo", replaces: true)));
+
+            Assert.Equal("Objects.Slow has no carrier id; add [ObjectId(Carrier = \"A001\")] to it", error.Message);
+        }
+
+        [Fact]
         public void replaces_cannot_pin()
         {
             var error = Assert.Throws<BuildException>(
