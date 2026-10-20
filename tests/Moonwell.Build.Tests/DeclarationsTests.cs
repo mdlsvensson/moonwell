@@ -215,7 +215,7 @@ namespace Moonwell.Build.Tests
             Assert.Equal(
                 new[]
                 {
-                    "Objects.Arthas", "Objects.Burn", "Objects.Claws", "Objects.DarkArthas", "Objects.Duelist",
+                    "Objects.Arthas", "Objects.Burn", "Objects.Claws", "Objects.DarkArthas", "Objects.Drilled", "Objects.Duelist",
                     "Objects.Elemental", "Objects.Firebolt", "Objects.Forge", "Objects.Gate", "Objects.Portal",
                     "Objects.Rock", "Objects.StrongFootman", "Objects.Tuned",
                 },

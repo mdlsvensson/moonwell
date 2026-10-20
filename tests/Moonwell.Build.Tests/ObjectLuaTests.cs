@@ -69,6 +69,16 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void every_list_call_runs_in_lua()
+        {
+            using var lua = compiled.Start();
+
+            // Drilled's constructor calls Set with one to eight classes, Replace, Add and Remove; in the game they do nothing.
+            // The list the build wrote: Firebolt, Elemental, Defend.
+            Assert.Equal("3", Query(lua, "return tostring(Objects.Drilled():getAbilities():getCount())"));
+        }
+
+        [Fact]
         public void lists_and_references_read_in_lua()
         {
             using var lua = compiled.Start();

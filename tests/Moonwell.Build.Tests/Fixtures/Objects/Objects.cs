@@ -69,6 +69,26 @@ namespace Objects
         }
     }
 
+    [Moonwell.Objects.ObjectId("h002")]
+    public class Drilled : Moonwell.Objects.Human.Units.Footman
+    {
+        public Drilled()
+        {
+            // Every list call runs again in the game, where it does nothing.
+            Abilities.Set<Firebolt>();
+            Abilities.Set<Firebolt, Tuned>();
+            Abilities.Set<Firebolt, Tuned, Elemental>();
+            Abilities.Set<Firebolt, Tuned, Elemental, Portal>();
+            Abilities.Set<Firebolt, Tuned, Elemental, Portal, Firebolt>();
+            Abilities.Set<Firebolt, Tuned, Elemental, Portal, Firebolt, Tuned>();
+            Abilities.Set<Firebolt, Tuned, Elemental, Portal, Firebolt, Tuned, Elemental>();
+            Abilities.Set<Firebolt, Tuned, Elemental, Portal, Firebolt, Tuned, Elemental, Portal>();
+            Abilities.Replace<Portal, Moonwell.Objects.Human.Abilities.Defend>();
+            Abilities.Add<Firebolt>();
+            Abilities.Remove<Tuned>();
+        }
+    }
+
     [Moonwell.Objects.ObjectId("h001")]
     public class Duelist : Moonwell.Objects.Human.Units.Footman
     {

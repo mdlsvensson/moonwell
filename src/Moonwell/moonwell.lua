@@ -13,7 +13,7 @@ end
 -- MoonwellField(obj, id, kind): the value of an object field of obj's class, read from MoonwellObjectValues, which the
 -- build appends to the script with the fields the map's code reads of each class it uses. Its getters in the objects'
 -- library call it. kind is "value"; "levels", a table with get(level) and getCount(); "list", a table with getCount(),
--- Contains(T) and an Add and Remove that do nothing; or "ref", a table with Is(T) and a Set that does nothing. A class's
+-- Contains(T) and an Add, Remove, Replace and Set that do nothing; or "ref", a table with Is(T) and a Set that does nothing. A class's
 -- values are found by its full name, walking up its bases to the first class that has an entry; the build writes one
 -- for every class it uses, so that is the class itself. They are kept on the class table.
 local valuesKey = {}
@@ -40,6 +40,16 @@ local listTable = { __index = {
   end,
   Add = nothing,
   Remove = nothing,
+  Replace = nothing,
+  -- CSharp.lua names Set's overloads by their order in ObjectList: Set<T1> is Set, Set<T1, T2> Set1, up to Set7.
+  Set = nothing,
+  Set1 = nothing,
+  Set2 = nothing,
+  Set3 = nothing,
+  Set4 = nothing,
+  Set5 = nothing,
+  Set6 = nothing,
+  Set7 = nothing,
 } }
 
 local refTable = { __index = {
