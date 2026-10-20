@@ -186,7 +186,9 @@ game with it. Both make a development build: it checks the values Moonwell recei
 `--release` makes the release build. `moonwell run --game <exe>` names the game when it is not in its usual place.
 
 The build also rejects what CSharp.lua cannot compile: collection expressions, `[1, 2]` (write `new List<int> { 1, 2 }`),
-and `using static Moonwell.Natives` (write `Natives.X`).
+and `using static Moonwell.Natives` (write `Natives.X`). It does not catch a `Dictionary` keyed by a map's own class
+that has a static field with a value: the map can stop while it loads, with nothing on the screen. Key by the handle,
+or set the field on first use. Moonwell's classes, `Unit` and the rest, are safe keys.
 
 An error in a reaction shows on the screen with its C# file and line, and is written in full to
 `Documents\Warcraft III\CustomMapData\Moonwell\log.txt`. A release build leaves the message off the screen and keeps

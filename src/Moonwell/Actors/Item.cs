@@ -6,8 +6,22 @@ namespace Moonwell
     /// <summary>An item of the game: an object of its declared class, which holds the components the class starts with.</summary>
     public class Item : Widget
     {
+        /// <summary>The table behind ItemHooks, made on first use so that the class has no static initializer (see Unit.UnitHooks).</summary>
+        private static HookTable? itemHooks;
+
         /// <summary>The reactions of items; declared here, so that an override in a subclass is found.</summary>
-        internal static readonly HookTable ItemHooks = new HookTable(typeof(Item), new string[] { "OnPickedUp", "OnDropped" }, new int[] { Hook.OnPickedUp, Hook.OnDropped });
+        internal static HookTable ItemHooks
+        {
+            get
+            {
+                if (itemHooks == null)
+                {
+                    itemHooks = new HookTable(typeof(Item), new string[] { "OnPickedUp", "OnDropped" }, new int[] { Hook.OnPickedUp, Hook.OnDropped });
+                }
+
+                return itemHooks;
+            }
+        }
 
         /// <summary>The bit mask of the reactions this class overrides, worked out when the item is taken in.</summary>
         internal int Mask;

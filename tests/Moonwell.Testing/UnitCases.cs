@@ -128,6 +128,15 @@ namespace Moonwell.Testing
             Expect.Equal(1, unit.Player.Slot, "the owner's slot after the sweep");
         }
 
+        /// <summary>A static dictionary keyed by the unit object loads, and finds a unit by its object.</summary>
+        public static void DictionaryKey(FakeWorld world)
+        {
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            KeyedNames.Names[unit] = "footman";
+            Expect.Equal("footman", KeyedNames.Names[unit], "the unit's name");
+            KeyedNames.Names.Remove(unit);
+        }
+
         /// <summary>Remove ends the unit once, removes it from the game, and forgets it.</summary>
         public static void Remove(FakeWorld world)
         {

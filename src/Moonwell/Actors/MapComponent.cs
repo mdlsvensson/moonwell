@@ -3,8 +3,22 @@ namespace Moonwell
     /// <summary>A component that reacts to events of the map as a whole, such as the game's start.</summary>
     public abstract class MapComponent : Component
     {
+        /// <summary>The table behind MapHooks, made on first use so that the class has no static initializer (see Unit.UnitHooks).</summary>
+        private static HookTable? mapHooks;
+
         /// <summary>The reactions of map components; declared here, so that an override in a subclass is found.</summary>
-        internal static readonly HookTable MapHooks = new HookTable(typeof(MapComponent), new[] { "OnGameStart", "OnUnitEnter", "OnUnitDamaged", "OnUnitDied", "OnUnitCast", "OnLeave" }, new[] { Hook.OnGameStart, Hook.OnUnitEnter, Hook.OnUnitDamaged, Hook.OnUnitDied, Hook.OnUnitCast, Hook.OnLeave });
+        internal static HookTable MapHooks
+        {
+            get
+            {
+                if (mapHooks == null)
+                {
+                    mapHooks = new HookTable(typeof(MapComponent), new[] { "OnGameStart", "OnUnitEnter", "OnUnitDamaged", "OnUnitDied", "OnUnitCast", "OnLeave" }, new[] { Hook.OnGameStart, Hook.OnUnitEnter, Hook.OnUnitDamaged, Hook.OnUnitDied, Hook.OnUnitCast, Hook.OnLeave });
+                }
+
+                return mapHooks;
+            }
+        }
 
         /// <summary>Runs when the game starts.</summary>
         public virtual void OnGameStart()

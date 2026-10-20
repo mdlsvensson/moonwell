@@ -6,8 +6,22 @@ namespace Moonwell
     /// <summary>A destructable of the game: an object of its declared class, which holds the components the class starts with.</summary>
     public class Destructable : Widget
     {
+        /// <summary>The table behind DestructableHooks, made on first use so that the class has no static initializer (see Unit.UnitHooks).</summary>
+        private static HookTable? destructableHooks;
+
         /// <summary>The reactions of destructables; declared here, so that an override in a subclass is found.</summary>
-        internal static readonly HookTable DestructableHooks = new HookTable(typeof(Destructable), new string[] { "OnDeath" }, new int[] { Hook.OnDeath });
+        internal static HookTable DestructableHooks
+        {
+            get
+            {
+                if (destructableHooks == null)
+                {
+                    destructableHooks = new HookTable(typeof(Destructable), new string[] { "OnDeath" }, new int[] { Hook.OnDeath });
+                }
+
+                return destructableHooks;
+            }
+        }
 
         /// <summary>The bit mask of the reactions this class overrides, worked out when the destructable is taken in.</summary>
         internal int Mask;
