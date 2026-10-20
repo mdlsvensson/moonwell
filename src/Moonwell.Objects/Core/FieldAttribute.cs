@@ -10,6 +10,9 @@ namespace Moonwell.Objects
         /// <summary>The id of the field.</summary>
         public string Id { get; }
 
+        /// <summary>The field's World Editor label (<c>Hit Points Maximum (Base)</c>), which errors name; empty when it has none.</summary>
+        public string Label { get; set; } = string.Empty;
+
         /// <summary>Marks a property as the field with this id.</summary>
         public FieldAttribute(string id)
         {

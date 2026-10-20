@@ -6,11 +6,14 @@ namespace Moonwell.Objects
 {
     /// <summary>A list of declared classes a field holds, in order, each once; it starts as the standard object's list.</summary>
     /// @CSharpLua.Ignore
-    public sealed class ObjectList<T>
+    public sealed class ObjectList<T> : IObjectList
     {
         // Each entry is a Type, or the id text of a standard object that has no standard class.
         private readonly List<object> entries;
         private readonly object[] standard;
+
+        /// <summary>Called with the number of entries after the list grew, to check it against its field's rules; null for none.</summary>
+        internal Action<int>? Grew { get; set; }
 
         /// <summary>Makes an empty list.</summary>
         public ObjectList()
@@ -56,6 +59,7 @@ namespace Moonwell.Objects
             if (!entries.Contains(typeof(TObject)))
             {
                 entries.Add(typeof(TObject));
+                Grew?.Invoke(entries.Count);
             }
         }
 
@@ -180,6 +184,8 @@ namespace Moonwell.Objects
                     entries.Add(type);
                 }
             }
+
+            Grew?.Invoke(entries.Count);
         }
 
         /// <summary>Whether the list holds this class.</summary>
@@ -188,5 +194,13 @@ namespace Moonwell.Objects
         {
             return entries.Contains(typeof(TObject));
         }
+    }
+
+    /// <summary>An object list as the rule checks read it, whatever the type of its entries.</summary>
+    /// @CSharpLua.Ignore
+    internal interface IObjectList
+    {
+        /// <summary>The number of entries in the list.</summary>
+        int Count { get; }
     }
 }

@@ -10,6 +10,18 @@ namespace Moonwell.Objects
         private static readonly Lazy<Dictionary<string, Type>> StandardClasses = new Lazy<Dictionary<string, Type>>(FindStandardClasses);
 
         private readonly Dictionary<string, object?> values = new Dictionary<string, object?>();
+        private readonly object? owner;
+
+        /// <summary>Holds the values of an object whose puts are not checked.</summary>
+        public Declared()
+        {
+        }
+
+        /// <summary>Holds the values of <paramref name="owner"/>, checking each put against the rules of its field's property (see <see cref="FieldRuleException"/>).</summary>
+        public Declared(object owner)
+        {
+            this.owner = owner;
+        }
 
         /// <summary>The fields that were put (and the lists and references that were asked for), by field id.</summary>
         public IReadOnlyDictionary<string, object?> Values
@@ -28,10 +40,26 @@ namespace Moonwell.Objects
             return StandardValues.Parse<T>(ReadStandard(owner, field, 0));
         }
 
-        /// <summary>Puts a value on a field.</summary>
+        /// <summary>Puts a value on a field; a value its rules do not allow throws a <see cref="FieldRuleException"/>, and a formula of levels is checked when its levels are counted.</summary>
         public void Put<T>(string field, T value)
         {
+            if (owner != null)
+            {
+                RuleChecks.Put(owner, field, null, value);
+            }
+
             values[field] = value;
+        }
+
+        /// <summary>Puts the value of one level of a field, kept under <c>field:level</c>; a value its rules do not allow throws a <see cref="FieldRuleException"/> naming the level.</summary>
+        public void PutLevel(string field, int level, object value)
+        {
+            if (owner != null)
+            {
+                RuleChecks.Put(owner, field, level, value);
+            }
+
+            values[field + ":" + level.ToString(System.Globalization.CultureInfo.InvariantCulture)] = value;
         }
 
         /// <summary>Gives the per-level values put on a field, else the standard object's values, read level by level.</summary>
@@ -50,7 +78,14 @@ namespace Moonwell.Objects
         {
             if (!values.TryGetValue(field, out var list))
             {
-                list = new ObjectList<T>(StandardEntries(ReadStandard(owner, field, 0) ?? ReadStandard(owner, field, 1)));
+                var made = new ObjectList<T>(StandardEntries(ReadStandard(owner, field, 0) ?? ReadStandard(owner, field, 1)));
+                if (this.owner != null)
+                {
+                    var checkedOwner = this.owner;
+                    made.Grew = count => RuleChecks.Entries(checkedOwner, field, count);
+                }
+
+                list = made;
                 values[field] = list;
             }
 

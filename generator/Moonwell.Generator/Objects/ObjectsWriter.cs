@@ -78,7 +78,7 @@ public static class ObjectsWriter
         text.Append("            };\n\n");
         text.Append($"        private {Root}.Declared? declared;\n\n");
         text.Append("        /// <summary>The declared values of this object, created on first use.</summary>\n");
-        text.Append($"        protected {Root}.Declared Fields => declared ??= new {Root}.Declared();\n\n");
+        text.Append($"        protected {Root}.Declared Fields => declared ??= new {Root}.Declared(this);\n\n");
         text.Append("        /// <summary>The values put on this object so far, by field id; the build reads them.</summary>\n");
         text.Append("        internal global::System.Collections.Generic.IReadOnlyDictionary<string, object?> Declared => Fields.Values;\n");
         foreach (var field in common)
@@ -99,7 +99,7 @@ public static class ObjectsWriter
         text.Append($"            Fields.Put(field, {Root}.FieldChecks.Value({Literal(name)}, fieldTypes, this, field, value));\n        }}\n\n");
         text.Append("        /// <summary>Puts the value of one level of a field by its field id; a value of another type is an error naming the field.</summary>\n");
         text.Append("        protected void Set(string field, int level, object value)\n        {\n");
-        text.Append($"            Fields.Put(field + \":\" + level, {Root}.FieldChecks.LevelValue({Literal(name)}, fieldTypes, this, field, level, value));\n        }}\n");
+        text.Append($"            Fields.PutLevel(field, level, {Root}.FieldChecks.LevelValue({Literal(name)}, fieldTypes, this, field, level, value));\n        }}\n");
         text.Append("    }\n}\n");
         return text.ToString();
     }
@@ -329,7 +329,13 @@ public static class ObjectsWriter
         var id = Literal(field.Id);
         var element = ElementType(field);
         text.Append($"{indent}/// <summary>The field <c>{Xml(field.Id)}</c>.</summary>\n");
-        text.Append($"{indent}[{Root}.Field({id})]\n");
+        var label = field.Rules.Label == null ? "" : $", Label = {Literal(field.Rules.Label)}";
+        text.Append($"{indent}[{Root}.Field({id}{label})]\n");
+        foreach (var rule in RuleAttributes(field))
+        {
+            text.Append(indent).Append(rule).Append('\n');
+        }
+
         text.Append($"{indent}public {PropertyType(field)} {field.Name}\n{indent}{{\n");
         if (field.Type == FieldType.ObjectList)
         {
@@ -347,6 +353,54 @@ public static class ObjectsWriter
         }
 
         text.Append($"{indent}}}\n");
+    }
+
+    /// <summary>
+    /// The rule attributes of a field's property, in this order and only those the field has: <c>[Limits]</c> for a
+    /// number field (or a number list held as text) with a <c>minVal</c> or <c>maxVal</c>; <c>[NonNegative]</c> for one
+    /// that allows no negative (<see cref="FieldRules.NoNegative"/>); <c>[Required]</c>; <c>[MaxLength]</c>;
+    /// <c>[MaxEntries]</c>. A choice has none: its enum is its rule.
+    /// </summary>
+    private static List<string> RuleAttributes(Field field)
+    {
+        var rules = field.Rules;
+        var attributes = new List<string>();
+        var limited = rules.Min.HasValue || rules.Max.HasValue;
+        var number = field.Type == FieldType.Int || field.Type == FieldType.Float || (field.Type == FieldType.String && limited);
+        if (number && limited)
+        {
+            attributes.Add(LimitsAttribute(rules.Min, rules.Max));
+        }
+
+        if (number && rules.NoNegative)
+        {
+            attributes.Add($"[{Root}.NonNegative]");
+        }
+
+        if (rules.Required)
+        {
+            attributes.Add($"[{Root}.Required]");
+        }
+
+        if (rules.MaxLength.HasValue)
+        {
+            attributes.Add($"[{Root}.MaxLength({rules.MaxLength.Value.ToString(CultureInfo.InvariantCulture)})]");
+        }
+
+        if (rules.MaxEntries.HasValue)
+        {
+            attributes.Add($"[{Root}.MaxEntries({rules.MaxEntries.Value.ToString(CultureInfo.InvariantCulture)})]");
+        }
+
+        return attributes;
+    }
+
+    /// <summary>The <c>[Limits]</c> attribute of a range; a missing end is an infinity (<c>double.NegativeInfinity</c>).</summary>
+    public static string LimitsAttribute(double? min, double? max)
+    {
+        var low = min.HasValue ? min.Value.ToString("R", CultureInfo.InvariantCulture) : "double.NegativeInfinity";
+        var high = max.HasValue ? max.Value.ToString("R", CultureInfo.InvariantCulture) : "double.PositiveInfinity";
+        return $"[{Root}.Limits({low}, {high})]";
     }
 
     /// <summary>The type of a field's value: the object type for a list or a reference, the enum for a choice, else <c>int</c>, <c>float</c>, <c>bool</c> or <c>string</c>.</summary>

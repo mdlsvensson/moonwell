@@ -324,8 +324,55 @@ public class FieldsTests
         Assert.Null(Find(Fields.Of(tables, Kind.Unit), "utip").Rules.MaxLength);
         Assert.Null(Find(Fields.Of(tables, Kind.Unit), "unam").Rules.MaxLength);
         Assert.Null(Find(Fields.Of(tables, Kind.Unit), "unam").Rules.Max);
-        Assert.Equal(32, Find(Fields.Of(tables, Kind.Unit), "ucun").Rules.MaxLength);
-        Assert.Null(Find(Fields.Of(tables, Kind.Unit), "ucun").Rules.Max);
+        Assert.Equal(50, Find(Fields.Of(tables, Kind.Unit), "unsf").Rules.MaxLength);
+        Assert.Null(Find(Fields.Of(tables, Kind.Unit), "unsf").Rules.MaxEntries);
+    }
+
+    [Fact]
+    public void a_list_limit_is_a_number_of_entries()
+    {
+        var tables = MiniExport();
+
+        // A stringList's maxVal counts entries: the standard upro holds 279 characters in 18 names under a maxVal of 32.
+        var casterNames = Find(Fields.Of(tables, Kind.Unit), "ucun").Rules;
+        Assert.Equal(32, casterNames.MaxEntries);
+        Assert.Null(casterNames.MaxLength);
+        Assert.Null(casterNames.Max);
+        Assert.Equal(12, Find(Fields.Of(tables, Kind.Unit), "usei").Rules.MaxEntries);
+        Assert.Equal(5, Find(Fields.Of(tables, Kind.Unit), "uhab").Rules.MaxEntries);
+        Assert.Null(Find(Fields.Of(tables, Kind.Unit), "uabi").Rules.MaxEntries);
+        Assert.Null(Find(Fields.Of(tables, Kind.Unit), "usei").Rules.Max);
+    }
+
+    [Fact]
+    public void only_a_name_is_required()
+    {
+        var tables = MiniExport();
+
+        Assert.True(Find(Fields.Of(tables, Kind.Unit), "unam").Rules.Required);
+        Assert.True(Find(Fields.Of(tables, Kind.Ability), "anam").Rules.Required);
+        Assert.True(Find(Fields.Of(tables, Kind.Destructable), "bnam").Rules.Required);
+        Assert.True(Find(Fields.Of(tables, Kind.Upgrade), "gnam").Rules.Required);
+
+        // canBeEmpty is 0 on these too, yet standard objects leave them empty: 267 units have no abilities.
+        Assert.False(Find(Fields.Of(tables, Kind.Unit), "ucun").Rules.Required);
+        Assert.False(Find(Fields.Of(tables, Kind.Unit), "uabi").Rules.Required);
+        Assert.False(Find(Fields.Of(tables, Kind.Unit), "usei").Rules.Required);
+        Assert.False(Find(Fields.Of(tables, Kind.Unit), "utip").Rules.Required);
+        Assert.False(Find(Fields.Of(tables, Kind.Unit), "uhpm").Rules.Required);
+    }
+
+    [Theory]
+    [InlineData(1d, null, false, true)]
+    [InlineData(0d, 10d, false, true)]
+    [InlineData(-1000d, 1000d, true, false)]
+    [InlineData(null, 9d, false, false)]
+    [InlineData(null, null, true, true)]
+    public void no_negative_when_the_minimum_is_not_below_zero_or_none_is_given_and_the_field_says_so(double? min, double? max, bool nonNegative, bool expected)
+    {
+        var rules = new FieldRules(min, max, nonNegative, false, null, null);
+
+        Assert.Equal(expected, rules.NoNegative);
     }
 
     [Fact]

@@ -464,6 +464,56 @@ namespace Moonwell.Build.Tests
                 "Objects.cs:13: GameCall.Lucky calls the game while it is declared; game work starts from a reaction or the game's start");
         }
 
+        [Fact]
+        public void a_value_out_of_range_names_the_line_of_the_assignment()
+        {
+            AssertFails(
+                "OutOfRange",
+                "Objects.cs:13: Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it");
+        }
+
+        [Fact]
+        public void a_value_out_of_range_set_by_id_names_the_line_of_the_set()
+        {
+            AssertFails(
+                "OutOfRangeById",
+                "Objects.cs:13: Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it");
+        }
+
+        [Fact]
+        public void a_formula_out_of_range_at_a_level_names_the_level_and_the_line_it_was_put_on()
+        {
+            // Storm Bolt has 3 levels: 1300 and 2600 are allowed, 3900 is not. The formula is worked out after the constructor.
+            AssertFails(
+                "OutOfRangeLevel",
+                "Objects.cs:13: Bolt.Cooldown at level 3 is 3900; Cooldown (acdn) allows 0 to 3600; [BeyondLimits] goes past it");
+        }
+
+        [Fact]
+        public void an_empty_name_names_the_line()
+        {
+            AssertFails("EmptyRequired", "Objects.cs:13: Nobody.Name is \"\"; Name (unam) allows any text that is not empty");
+        }
+
+        [Fact]
+        public void beyond_limits_builds_a_value_past_the_range()
+        {
+            var project = MapProject.Find(Path.Combine(TestFolders.Fixture("ObjectErrors"), "BeyondLimits"));
+            var assembly = DotnetBuild.Run(project, false, TextWriter.Null);
+
+            var declared = Declarations.Read(assembly, project, built.Standard, null);
+
+            Assert.Equal(600000, Find(declared.Objects, "BeyondLimits.Giant").Changed["uhpm"]);
+        }
+
+        [Fact]
+        public void beyond_limits_never_lets_a_negative_through()
+        {
+            AssertFails(
+                "BeyondLimitsNegative",
+                "Objects.cs:15: Hollow.HitPoints is -5; Hit Points Maximum (Base) (uhpm) allows 0 or more, even with [BeyondLimits]");
+        }
+
         private static DeclaredObject Find(IReadOnlyList<DeclaredObject> declared, string className)
         {
             return Assert.Single(declared, one => one.ClassName == className);

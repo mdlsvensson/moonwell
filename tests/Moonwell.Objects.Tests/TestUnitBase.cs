@@ -6,7 +6,7 @@ namespace Moonwell.Objects.Tests
         private Declared? declared;
 
         /// <summary>The declared values of this object, created on first use.</summary>
-        protected Declared Fields => declared ??= new Declared();
+        protected Declared Fields => declared ??= new Declared(this);
 
         /// <summary>The hit points.</summary>
         [Field("uhpm")]
@@ -62,7 +62,7 @@ namespace Moonwell.Objects.Tests
         /// <summary>Puts the value of one level by its field id.</summary>
         protected void Set(string field, int level, object value)
         {
-            Fields.Put(field + ":" + level, value);
+            Fields.PutLevel(field, level, value);
         }
     }
 }

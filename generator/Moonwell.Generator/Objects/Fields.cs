@@ -19,23 +19,41 @@ public enum FieldType
 /// <summary>What World Editor allows a field to hold, from the metadata.</summary>
 /// <param name="Min">The lowest value allowed, from <c>minVal</c>; null for a field with no lower limit.</param>
 /// <param name="Max">The highest value allowed, from <c>maxVal</c>; null for a field with no upper limit.</param>
-/// <param name="NonNegative">True when the value may not be negative: <c>forceNonNeg</c>, or an <c>unreal</c> type.</param>
+/// <param name="NonNegative">True when the metadata says the value may not be negative: <c>forceNonNeg</c>, or an <c>unreal</c> type. See <see cref="NoNegative"/> for what is checked.</param>
 /// <param name="CanBeEmpty">True when the editor accepts an empty value (<c>canBeEmpty</c>).</param>
 /// <param name="MaxLength">
-/// For a text field, the most characters allowed, from a numeric <c>maxVal</c>; null when there is none or when the
-/// export names a text size (<c>TTName</c>, <c>TTDesc</c>, <c>TTUber</c>), which is not a number of characters.
+/// For a <c>string</c> field, the most characters allowed, from a numeric <c>maxVal</c>; null when there is none or
+/// when the export names a text size (<c>TTName</c>, <c>TTDesc</c>, <c>TTUber</c>), which is not a number of characters.
 /// </param>
 /// <param name="Label">The field's World Editor label, or null when the export has none.</param>
+/// <param name="MaxEntries">
+/// For a <c>stringList</c> or an object list, the most entries allowed, from a numeric <c>maxVal</c>; null when there
+/// is none. The standard data shows it counts entries: upro holds 279 characters in 18 names under a maxVal of 32.
+/// </param>
+/// <param name="Required">
+/// True for a name (a <c>string</c> with <c>canBeEmpty</c> 0 and <c>maxVal</c> <c>TTName</c>), which may not be
+/// empty. Other fields with <c>canBeEmpty</c> 0 are not: standard objects leave them empty (267 units have no
+/// abilities).
+/// </param>
 public sealed record FieldRules(
     double? Min,
     double? Max,
     bool NonNegative,
     bool CanBeEmpty,
     int? MaxLength,
-    string? Label)
+    string? Label,
+    int? MaxEntries = null,
+    bool Required = false)
 {
     /// <summary>The rules of a field with none.</summary>
     public static FieldRules None { get; } = new FieldRules(null, null, false, false, null, null);
+
+    /// <summary>
+    /// True when a number below 0 is never allowed, even past the limits: when <see cref="Min"/> is 0 or more, or when
+    /// there is no <see cref="Min"/> and <see cref="NonNegative"/> is set. An explicit negative <see cref="Min"/>
+    /// allows negatives down to it.
+    /// </summary>
+    public bool NoNegative => Min.HasValue ? Min.Value >= 0 : NonNegative;
 }
 
 /// <summary>One field of one kind of object.</summary>
@@ -330,21 +348,34 @@ public static class Fields
         double? min = null;
         double? max = null;
         int? maxLength = null;
+        int? maxEntries = null;
+        var canBeEmpty = Value(row, "canBeEmpty") == "1";
+        var required = false;
         if (NumberTypes.Contains(type))
         {
             min = Limit(row, "minVal");
             max = Limit(row, "maxVal");
         }
-        else if (type == "string" || type == "stringList")
+        else if (type == "string")
         {
             var length = Limit(row, "maxVal", textSize: true);
             if (length.HasValue)
             {
                 maxLength = (int)length.Value;
             }
+
+            required = !canBeEmpty && Value(row, "maxVal") == "TTName";
+        }
+        else if (type == "stringList" || TypeOf(type).Item1 == FieldType.ObjectList)
+        {
+            var entries = Limit(row, "maxVal", textSize: true);
+            if (entries.HasValue)
+            {
+                maxEntries = (int)entries.Value;
+            }
         }
 
-        return new FieldRules(min, max, nonNegative, Value(row, "canBeEmpty") == "1", maxLength, label.Length == 0 ? null : label);
+        return new FieldRules(min, max, nonNegative, canBeEmpty, maxLength, label.Length == 0 ? null : label, maxEntries, required);
     }
 
     // A limit cell as a number; null when the cell is empty, or (for a text field) names a text size such as TTDesc.
