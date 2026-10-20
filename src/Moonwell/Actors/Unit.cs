@@ -65,8 +65,11 @@ namespace Moonwell
             return Units.TakeIn(handle, null);
         }
 
-        /// <summary>Creates a unit of a type for a player at a place and facing; owner, when given, owns it.</summary>
-        public static Unit Create(int typeId, Player player, float x, float y, float facing, Owner? owner = null)
+        /// <summary>The facing of a unit made without one, in degrees: the game's bj_UNIT_FACING.</summary>
+        public const float DefaultFacing = 270f;
+
+        /// <summary>Creates a unit of a type for a player at a place and facing (270 degrees without one); owner, when given, owns it.</summary>
+        public static Unit Create(int typeId, Player player, float x, float y, float facing = DefaultFacing, Owner? owner = null)
         {
             var handle = Runtime.World.SpawnUnit(player.Handle, typeId, x, y, facing);
             var made = Units.TakeIn(handle, owner)!;
@@ -78,8 +81,8 @@ namespace Moonwell
             return made;
         }
 
-        /// <summary>Creates a unit of a registered class for a player at a place and facing; owner, when given, owns it.</summary>
-        public static T Create<T>(Player player, float x, float y, float facing, Owner? owner = null)
+        /// <summary>Creates a unit of a registered class for a player at a place and facing (270 degrees without one); owner, when given, owns it.</summary>
+        public static T Create<T>(Player player, float x, float y, float facing = DefaultFacing, Owner? owner = null)
             where T : Unit
         {
             return (T)Create(ObjectTypes.IdOf<T>(), player, x, y, facing, owner);

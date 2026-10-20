@@ -59,6 +59,18 @@ namespace Moonwell.Testing
             Expect.True(all[2] is StrikerComp, "StrikerComp third");
         }
 
+        /// <summary>Unit.Create without a facing faces the game's default, 270 degrees, with or without an owner.</summary>
+        public static void CreateDefaultFacing(FakeWorld world)
+        {
+            ObjectTypes.Id<Dummy>(ObjectTypes.FourCC("h0df"));
+            ObjectTypes.Unit(ObjectTypes.FourCC("h0df"), () => new Dummy());
+            Unit.Create<Dummy>(Player.One, 0f, 0f);
+            Expect.True(world.LastFacing == 270f, "the facing of Create<T>");
+            world.LastFacing = 0f;
+            Unit.Create(ObjectTypes.FourCC("h0df"), Player.One, 0f, 0f, owner: Game.Instance);
+            Expect.True(world.LastFacing == 270f, "the facing of Create with an owner");
+        }
+
         /// <summary>Right after a map is constructed, the game has no components and no component's OnAdded has run.</summary>
         public static void ComponentsNotAddedEarly(FakeWorld world)
         {

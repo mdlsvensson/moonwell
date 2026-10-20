@@ -24,6 +24,9 @@ namespace Moonwell.Testing
         /// <summary>The slot of each line printed to a player, -1 for a line printed to everyone.</summary>
         public List<int> PrintedSlots = new List<int>();
 
+        /// <summary>The facing the last unit made by SpawnUnit was given.</summary>
+        public float LastFacing;
+
         /// <summary>Each line printed to a player or to everyone.</summary>
         public List<string> PrintedTexts = new List<string>();
 
@@ -352,9 +355,10 @@ namespace Moonwell.Testing
             return new List<destructable>(PlacedDestructables);
         }
 
-        /// <summary>Makes a unit owned by the owner's slot; the place and facing are not kept.</summary>
+        /// <summary>Makes a unit owned by the owner's slot, and keeps the facing in LastFacing; the place is not kept.</summary>
         public unit SpawnUnit(player owner, int typeId, float x, float y, float facing)
         {
+            LastFacing = facing;
             return NewUnit(typeId, SlotOf(owner));
         }
 
