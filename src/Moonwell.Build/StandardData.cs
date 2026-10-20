@@ -34,12 +34,13 @@ namespace Moonwell.Build
 
         /// <summary>A field of an object kind, as the metadata describes it.</summary>
         /// <param name="Id">The field's four-character id.</param>
-        /// <param name="Type">The field's type: <c>int</c>, <c>float</c>, <c>bool</c>, <c>string</c>, <c>objectList</c> or <c>objectRef</c>.</param>
+        /// <param name="Type">The field's type: <c>int</c>, <c>float</c>, <c>bool</c>, <c>string</c>, <c>objectList</c>, <c>objectRef</c> or <c>choice</c>.</param>
         /// <param name="PerLevel">Whether the field has one value for each level.</param>
         /// <param name="Pointer">The data pointer of an ability field; 0 for the others.</param>
         /// <param name="Skin">Whether the field goes in the skin file.</param>
         /// <param name="Store">How the object file stores the value: <c>int</c>, <c>real</c>, <c>unreal</c> or <c>string</c>.</param>
-        public sealed record ObjectField(string Id, string Type, bool PerLevel, int Pointer, bool Skin, string Store);
+        /// <param name="Choice">For a field of type <c>choice</c>, the enum of <c>Moonwell.Objects</c> it holds; null for the others.</param>
+        public sealed record ObjectField(string Id, string Type, bool PerLevel, int Pointer, bool Skin, string Store, Choice? Choice = null);
 
         /// <summary>Reads the standard values embedded in the map's copy of <c>Moonwell.Objects.dll</c>.</summary>
         /// <param name="objectsDll">The path of <c>Moonwell.Objects.dll</c>, beside the map's assembly.</param>
@@ -132,13 +133,26 @@ namespace Moonwell.Build
             var fields = new Dictionary<string, IReadOnlyList<ObjectField>>(StringComparer.Ordinal);
             var ids = new Dictionary<string, IReadOnlySet<string>>(StringComparer.Ordinal);
             var objects = new Dictionary<string, StandardObject>(StringComparer.Ordinal);
+            var choices = new Dictionary<string, Choice>(StringComparer.Ordinal);
+            Choice ChoiceOf(string name)
+            {
+                if (!choices.TryGetValue(name, out var choice))
+                {
+                    var type = assembly.GetType("Moonwell.Objects." + name)
+                        ?? throw new BuildException($"{Path.GetFileName(objectsDll)} has no enum Moonwell.Objects.{name}, which its values name");
+                    choices[name] = choice = Choice.Read(type);
+                }
+
+                return choice;
+            }
+
             foreach (var kind in KindFiles)
             {
                 var resource = $"Moonwell.Objects.Values.{kind}.json";
                 using var stream = assembly.GetManifestResourceStream(resource)
                     ?? throw new BuildException($"{Path.GetFileName(objectsDll)} holds no {resource}");
                 using var document = JsonDocument.Parse(stream);
-                fields[kind] = ReadFields(document.RootElement.GetProperty("fields"));
+                fields[kind] = ReadFields(document.RootElement.GetProperty("fields"), ChoiceOf);
                 var kindIds = new HashSet<string>(StringComparer.Ordinal);
                 foreach (var entry in document.RootElement.GetProperty("objects").EnumerateObject())
                 {
@@ -157,18 +171,20 @@ namespace Moonwell.Build
             return new StandardData(fields, ids, objects);
         }
 
-        private static IReadOnlyList<ObjectField> ReadFields(JsonElement array)
+        private static IReadOnlyList<ObjectField> ReadFields(JsonElement array, Func<string, Choice> choiceOf)
         {
             var list = new List<ObjectField>();
             foreach (var field in array.EnumerateArray())
             {
+                var choice = field.TryGetProperty("choice", out var name) ? choiceOf(name.GetString()!) : null;
                 list.Add(new ObjectField(
                     field.GetProperty("id").GetString()!,
                     field.GetProperty("type").GetString()!,
                     field.GetProperty("perLevel").GetBoolean(),
                     field.GetProperty("pointer").GetInt32(),
                     field.GetProperty("skin").GetBoolean(),
-                    field.GetProperty("store").GetString()!));
+                    field.GetProperty("store").GetString()!,
+                    choice));
             }
 
             return list;

@@ -9,7 +9,10 @@ namespace Moonwell.Build
         /// <summary>The type and value to write for a field's declared value.</summary>
         /// <param name="owner">The declared class, for messages.</param>
         /// <param name="field">The field.</param>
-        /// <param name="value">The declared value: <c>int</c>, <c>float</c>, <c>bool</c> or <c>string</c>; for a list the class names (<c>IReadOnlyList&lt;string&gt;</c>), for a reference the class name.</param>
+        /// <param name="value">
+        /// The declared value: <c>int</c>, <c>float</c>, <c>bool</c> or <c>string</c>; for a list the class names (<c>IReadOnlyList&lt;string&gt;</c>), for a
+        /// reference the class name; for a choice its number, or the game's text of it.
+        /// </param>
         /// <param name="idOf">Gives the object id of a class name, or text that is an id; throws for a name that is none.</param>
         public static (ObjectDataType Type, object Value) Of(string owner, StandardData.ObjectField field, object value, Func<string, string> idOf)
         {
@@ -23,6 +26,12 @@ namespace Moonwell.Build
                 return (ObjectDataType.String, idOf(name));
             }
 
+            if (field.Choice != null)
+            {
+                var number = NumberOf(owner, field, field.Choice, value);
+                return field.Store == "int" ? (ObjectDataType.Int, number) : (ObjectDataType.String, field.Choice.Text(owner, field.Id, number));
+            }
+
             switch (field.Store)
             {
                 case "int":
@@ -34,6 +43,27 @@ namespace Moonwell.Build
                 default:
                     return (ObjectDataType.String, AsText(value));
             }
+        }
+
+        // A choice's number: the number kept for a declared enum value, or the game's text of members (a carrier's targets).
+        private static int NumberOf(string owner, StandardData.ObjectField field, Choice choice, object value)
+        {
+            switch (value)
+            {
+                case int number:
+                    return number;
+                case Enum member:
+                    return Convert.ToInt32(member, CultureInfo.InvariantCulture);
+                case string text when choice.ExactNumber(text) is int number:
+                    return number;
+                default:
+                    throw new BuildException($"{owner}: {field.Id} holds {Article(choice.Name)} {choice.Name}, and \"{value}\" is none of its values");
+            }
+        }
+
+        private static string Article(string name)
+        {
+            return "AEIOU".Contains(name[0]) ? "an" : "a";
         }
 
         private static int AsInt(string owner, StandardData.ObjectField field, object value)

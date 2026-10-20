@@ -11,6 +11,9 @@ public enum FieldType
     String,
     ObjectList,
     ObjectRef,
+
+    /// <summary>One of the values World Editor offers, or any of them for flags: an enum of <c>Moonwell.Objects</c> (<see cref="Field.Choice"/>).</summary>
+    Choice,
 }
 
 /// <summary>What World Editor allows a field to hold, from the metadata.</summary>
@@ -56,6 +59,7 @@ public sealed record FieldRules(
 /// </param>
 /// <param name="Store">How an object file stores the field's value: <c>int</c>, <c>real</c>, <c>unreal</c> or <c>string</c>.</param>
 /// <param name="Rules">What World Editor allows the field to hold; <see cref="FieldRules.None"/> when not given.</param>
+/// <param name="Choice">For a <see cref="FieldType.Choice"/> field, the enum it holds; null for any other type.</param>
 public sealed record Field(
     Kind Kind,
     string Id,
@@ -69,7 +73,8 @@ public sealed record Field(
     string Column,
     bool HeroOnly = false,
     string Store = "string",
-    FieldRules? Rules = null)
+    FieldRules? Rules = null,
+    ChoiceType? Choice = null)
 {
     /// <summary>What World Editor allows the field to hold; never null.</summary>
     public FieldRules Rules { get; init; } = Rules ?? FieldRules.None;
@@ -105,9 +110,17 @@ public static class Fields
     /// <summary>
     /// The fields of <paramref name="kind"/>, ordered by field id. A name in <paramref name="reserved"/> (the members
     /// of the runtime class the kind's objects inherit) is never given to a field: see <see cref="FieldNames.Assign"/>.
+    /// A field of a type in <paramref name="choices"/> holds its enum (<see cref="Choices.All"/> of the export when
+    /// null), and no property is named like an enum it does not hold: see <see cref="BesideEnums"/>.
     /// </summary>
-    public static IReadOnlyList<Field> Of(ExportTables tables, Kind kind, IReadOnlySet<string>? reserved = null)
+    public static IReadOnlyList<Field> Of(
+        ExportTables tables,
+        Kind kind,
+        IReadOnlySet<string>? reserved = null,
+        IReadOnlyDictionary<string, ChoiceType>? choices = null)
     {
+        choices ??= Choices.All(tables, null);
+        var enums = new HashSet<string>(choices.Values.Select(c => c.Name), StringComparer.Ordinal);
         var rows = new List<MetaRow>();
         foreach (var row in tables.Meta(kind))
         {
@@ -135,6 +148,12 @@ public static class Fields
             var pointer = Number(row, "data");
             var specific = Split(Value(row, "useSpecific"));
             var (fieldType, listOf) = TypeOf(Value(row, "type"));
+            var choice = choices.GetValueOrDefault(Value(row, "type"));
+            if (choice != null)
+            {
+                fieldType = FieldType.Choice;
+            }
+
             var listed = handPicked.TryGetValue(row.Id, out var name);
             if (!listed)
             {
@@ -150,6 +169,8 @@ public static class Fields
                 }
             }
 
+            name = BesideEnums(row.Id, name!, listed, choice, repeat > 0, enums);
+
             fields.Add(new Field(
                 kind,
                 row.Id,
@@ -163,7 +184,8 @@ public static class Fields
                 ColumnOf(row, repeat, pointer, perField),
                 kind == Kind.Unit && Value(row, "useHero") == "1" && Value(row, "useUnit") != "1" && Value(row, "useBuilding") != "1",
                 StoreOf(Value(row, "type")),
-                RulesOf(row, LabelOf(tables, row))));
+                RulesOf(row, LabelOf(tables, row)),
+                choice));
             candidates.Add(new NameCandidate(row.Id, name!, listed, GroupsOf(kind, row, specific, mentioned)));
         }
 
@@ -209,6 +231,33 @@ public static class Fields
         }
 
         return number;
+    }
+
+    /// <summary>
+    /// The name a field's property gets beside the enums: inside a class, a property named like an enum hides it
+    /// unless the property holds that enum itself (C# reads <c>AttackType.Magic</c> as the enum then), so a property
+    /// that holds another type (<c>Levels&lt;Targets&gt; Targets</c>) gets its id appended (<c>TargetsAtar</c>).
+    /// </summary>
+    /// <param name="id">The field id.</param>
+    /// <param name="name">The name the field asks for.</param>
+    /// <param name="listed">True when the name is hand-picked.</param>
+    /// <param name="holds">The enum the field holds; null for a field of another type.</param>
+    /// <param name="perLevel">True when the property holds a value for each level (<c>Levels&lt;T&gt;</c>).</param>
+    /// <param name="enums">The names of every enum of <c>Moonwell.Objects</c>.</param>
+    /// <exception cref="InvalidOperationException">A hand-picked name is an enum's that the property does not hold.</exception>
+    public static string BesideEnums(string id, string name, bool listed, ChoiceType? holds, bool perLevel, IReadOnlySet<string> enums)
+    {
+        if (!enums.Contains(name) || (holds != null && holds.Name == name && !perLevel))
+        {
+            return name;
+        }
+
+        if (listed)
+        {
+            throw new InvalidOperationException($"field {id} is hand-picked as {name}, the name of an enum its property does not hold");
+        }
+
+        return name + char.ToUpperInvariant(id[0]) + id.Substring(1);
     }
 
     private static (FieldType, string?) TypeOf(string type)
@@ -257,7 +306,8 @@ public static class Fields
         "teamColor", "techAvail",
     };
 
-    private static string StoreOf(string type)
+    /// <summary>How an object file stores a value of the metadata type: <c>int</c>, <c>real</c>, <c>unreal</c> or <c>string</c>.</summary>
+    internal static string StoreOf(string type)
     {
         if (IntTypes.Contains(type) || type.EndsWith("Flags", StringComparison.Ordinal))
         {

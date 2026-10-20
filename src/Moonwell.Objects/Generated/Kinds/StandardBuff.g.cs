@@ -19,16 +19,16 @@ namespace Moonwell.Objects
                 ["fefl"] = typeof(string),
                 ["fefs"] = typeof(string),
                 ["feft"] = typeof(string),
-                ["flig"] = typeof(string),
+                ["flig"] = typeof(global::Moonwell.Objects.LightningEffect),
                 ["fmac"] = typeof(float),
                 ["fmat"] = typeof(string),
                 ["fmho"] = typeof(bool),
                 ["fmsp"] = typeof(int),
                 ["fnam"] = typeof(string),
                 ["fnsf"] = typeof(string),
-                ["frac"] = typeof(string),
+                ["frac"] = typeof(global::Moonwell.Objects.UnitRace),
                 ["fsat"] = typeof(string),
-                ["fspd"] = typeof(string),
+                ["fspd"] = typeof(global::Moonwell.Objects.SpellDetail),
                 ["fspt"] = typeof(string),
                 ["fta0"] = typeof(string),
                 ["fta1"] = typeof(string),
@@ -100,9 +100,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>flig</c>.</summary>
         [global::Moonwell.Objects.Field("flig")]
-        public string Lightning
+        public global::Moonwell.Objects.LightningEffect Lightning
         {
-            get { return Fields.Get<string>(this, "flig"); }
+            get { return Fields.Get<global::Moonwell.Objects.LightningEffect>(this, "flig"); }
             protected set { Fields.Put("flig", value); }
         }
 
@@ -156,9 +156,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>frac</c>.</summary>
         [global::Moonwell.Objects.Field("frac")]
-        public string Race
+        public global::Moonwell.Objects.UnitRace Race
         {
-            get { return Fields.Get<string>(this, "frac"); }
+            get { return Fields.Get<global::Moonwell.Objects.UnitRace>(this, "frac"); }
             protected set { Fields.Put("frac", value); }
         }
 
@@ -172,9 +172,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>fspd</c>.</summary>
         [global::Moonwell.Objects.Field("fspd")]
-        public string RequiredSpellDetail
+        public global::Moonwell.Objects.SpellDetail RequiredSpellDetail
         {
-            get { return Fields.Get<string>(this, "fspd"); }
+            get { return Fields.Get<global::Moonwell.Objects.SpellDetail>(this, "fspd"); }
             protected set { Fields.Put("fspd", value); }
         }
 

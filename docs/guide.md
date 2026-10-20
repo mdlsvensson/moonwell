@@ -73,6 +73,9 @@ public sealed class Champion : Human.Units.Paladin
 ```
 
 - A field with levels takes `Levels(75f, 150f, 225f)`, or `PerLevel(level => ...)` to compute each level.
+- A field World Editor offers a list of values for holds an enum of them, named as the game's data spells them:
+  `AttackType = AttackType.Magic`. One that takes several, such as the targets, holds flags:
+  `Attack1TargetsAllowed = Targets.Air | Targets.Ground`.
 - A list takes `Set<A, B, C>()` (the whole list, in order), `Replace<Old, New>()` (in the old one's place), `Add<T>()`
   and `Remove<T>()`.
 - The tooltips are World Editor's four: `Tooltip` (Tooltip - Normal), `TooltipExtended` (Tooltip - Normal - Extended),

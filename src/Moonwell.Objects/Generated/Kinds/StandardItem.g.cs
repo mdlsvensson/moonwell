@@ -14,16 +14,16 @@ namespace Moonwell.Objects
             new global::System.Collections.Generic.Dictionary<string, global::System.Type>
             {
                 ["iabi"] = typeof(global::Moonwell.Objects.ObjectList<global::Moonwell.Ability>),
-                ["iarm"] = typeof(string),
+                ["iarm"] = typeof(global::Moonwell.Objects.ArmorType),
                 ["icid"] = typeof(global::Moonwell.Objects.ObjectRef<global::Moonwell.Ability>),
-                ["icla"] = typeof(string),
+                ["icla"] = typeof(global::Moonwell.Objects.ItemClass),
                 ["iclb"] = typeof(int),
                 ["iclg"] = typeof(int),
                 ["iclr"] = typeof(int),
                 ["ides"] = typeof(string),
                 ["idro"] = typeof(bool),
                 ["idrp"] = typeof(bool),
-                ["iequ"] = typeof(string),
+                ["iequ"] = typeof(global::Moonwell.Objects.EquipmentType),
                 ["ifil"] = typeof(string),
                 ["igol"] = typeof(int),
                 ["ihtp"] = typeof(int),
@@ -47,9 +47,9 @@ namespace Moonwell.Objects
                 ["ista"] = typeof(int),
                 ["isto"] = typeof(int),
                 ["istr"] = typeof(int),
-                ["itag"] = typeof(string),
+                ["itag"] = typeof(global::Moonwell.Objects.ItemTag),
                 ["itcc"] = typeof(bool),
-                ["itco"] = typeof(string),
+                ["itco"] = typeof(global::Moonwell.Objects.TeamColor),
                 ["iusa"] = typeof(bool),
                 ["iuse"] = typeof(int),
                 ["ubpx"] = typeof(int),
@@ -80,9 +80,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>iarm</c>.</summary>
         [global::Moonwell.Objects.Field("iarm")]
-        public string ArmorType
+        public global::Moonwell.Objects.ArmorType ArmorType
         {
-            get { return Fields.Get<string>(this, "iarm"); }
+            get { return Fields.Get<global::Moonwell.Objects.ArmorType>(this, "iarm"); }
             protected set { Fields.Put("iarm", value); }
         }
 
@@ -95,9 +95,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>icla</c>.</summary>
         [global::Moonwell.Objects.Field("icla")]
-        public string Classification
+        public global::Moonwell.Objects.ItemClass Classification
         {
-            get { return Fields.Get<string>(this, "icla"); }
+            get { return Fields.Get<global::Moonwell.Objects.ItemClass>(this, "icla"); }
             protected set { Fields.Put("icla", value); }
         }
 
@@ -151,9 +151,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>iequ</c>.</summary>
         [global::Moonwell.Objects.Field("iequ")]
-        public string EquipmentType
+        public global::Moonwell.Objects.EquipmentType EquipmentType
         {
-            get { return Fields.Get<string>(this, "iequ"); }
+            get { return Fields.Get<global::Moonwell.Objects.EquipmentType>(this, "iequ"); }
             protected set { Fields.Put("iequ", value); }
         }
 
@@ -343,9 +343,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>itag</c>.</summary>
         [global::Moonwell.Objects.Field("itag")]
-        public string Tag
+        public global::Moonwell.Objects.ItemTag Tag
         {
-            get { return Fields.Get<string>(this, "itag"); }
+            get { return Fields.Get<global::Moonwell.Objects.ItemTag>(this, "itag"); }
             protected set { Fields.Put("itag", value); }
         }
 
@@ -359,9 +359,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>itco</c>.</summary>
         [global::Moonwell.Objects.Field("itco")]
-        public string TeamColor
+        public global::Moonwell.Objects.TeamColor TeamColor
         {
-            get { return Fields.Get<string>(this, "itco"); }
+            get { return Fields.Get<global::Moonwell.Objects.TeamColor>(this, "itco"); }
             protected set { Fields.Put("itco", value); }
         }
 

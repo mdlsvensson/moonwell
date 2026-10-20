@@ -435,7 +435,7 @@ namespace Moonwell.Build.Tests
                 false,
                 null,
                 null,
-                new SortedDictionary<string, object?> { ["udea"] = "2" },
+                new SortedDictionary<string, object?> { ["ugol"] = "2" },
                 Array.Empty<string>());
 
             var staged = WriteObjects(new[] { unit }, new Dictionary<string, string> { ["Objects.Odd"] = "h001" }, new Dictionary<string, string>(), built.Standard);
@@ -455,13 +455,63 @@ namespace Moonwell.Build.Tests
                 false,
                 null,
                 null,
-                new SortedDictionary<string, object?> { ["udea"] = "some" },
+                new SortedDictionary<string, object?> { ["ugol"] = "some" },
                 Array.Empty<string>());
 
             var error = Assert.Throws<BuildException>(
                 () => WriteObjects(new[] { unit }, new Dictionary<string, string> { ["Objects.Odd"] = "h001" }, new Dictionary<string, string>(), built.Standard));
 
-            Assert.Equal("Objects.Odd: udea is a whole number in the object file, and \"some\" is not one", error.Message);
+            Assert.Equal("Objects.Odd: ugol is a whole number in the object file, and \"some\" is not one", error.Message);
+        }
+
+        [Fact]
+        public void choices_are_written_as_the_game_spells_them()
+        {
+            var staged = StageFixtureObjects(out var ids, out _);
+
+            var mage = Assert.Single(ReadUnits(staged, "war3map.w3u").NewUnits, one => one.NewId == IdOf(ids["Objects.Mage"]));
+            var attack = Assert.Single(mage.Modifications, one => one.Id == IdOf("ua1t"));
+            Assert.Equal(ObjectDataType.String, attack.Type);
+            Assert.Equal("magic", attack.Value);
+            var targets = Assert.Single(mage.Modifications, one => one.Id == IdOf("ua1g"));
+            Assert.Equal(ObjectDataType.String, targets.Type);
+            Assert.Equal("air,enemies", targets.Value);
+            var death = Assert.Single(mage.Modifications, one => one.Id == IdOf("udea"));
+            Assert.Equal(ObjectDataType.Int, death.Type);
+            Assert.Equal(1, death.Value);
+            Assert.DoesNotContain(mage.Modifications, one => one.Id == IdOf("umvt") || one.Id == IdOf("utar"));
+
+            var zap = Assert.Single(ReadAbilities(staged, "war3map.w3a").NewAbilities, one => one.NewId == IdOf(ids["Objects.Zap"]));
+            Assert.Equal(
+                new[] { (1, "air,enemies"), (2, "ground"), (3, "ground,structure") },
+                zap.Modifications.Where(one => one.Id == IdOf("atar")).Select(one => (one.Level, (string)one.Value)).ToArray());
+        }
+
+        [Fact]
+        public void a_choice_given_as_the_games_text_is_written_as_world_editor_spells_it()
+        {
+            var unit = Odd(new SortedDictionary<string, object?> { ["ua1t"] = "MAGIC", ["ua1g"] = "enemy,aliv", ["udea"] = "2" });
+
+            var staged = WriteObjects(new[] { unit }, new Dictionary<string, string> { ["Objects.Odd"] = "h001" }, new Dictionary<string, string>(), built.Standard);
+
+            var mods = Assert.Single(ReadUnits(staged, "war3map.w3u").NewUnits).Modifications;
+            Assert.Equal("magic", Assert.Single(mods, one => one.Id == IdOf("ua1t")).Value);
+            Assert.Equal("alive,enemies", Assert.Single(mods, one => one.Id == IdOf("ua1g")).Value);
+            Assert.Equal(2, Assert.Single(mods, one => one.Id == IdOf("udea")).Value);
+        }
+
+        [Theory]
+        [InlineData("ua1t", 42, "Objects.Odd: ua1t is 42, which is no value of AttackType")]
+        [InlineData("upap", 64, "Objects.Odd: upap is 64, whose bit 64 is no value of PathingListPrevent")]
+        [InlineData("ua1t", "sharp", "Objects.Odd: ua1t holds an AttackType, and \"sharp\" is none of its values")]
+        public void a_choice_that_is_no_value_fails(string field, object value, string message)
+        {
+            var unit = Odd(new SortedDictionary<string, object?> { [field] = value });
+
+            var error = Assert.Throws<BuildException>(
+                () => WriteObjects(new[] { unit }, new Dictionary<string, string> { ["Objects.Odd"] = "h001" }, new Dictionary<string, string>(), built.Standard));
+
+            Assert.Equal(message, error.Message);
         }
 
         [Fact]
@@ -482,6 +532,11 @@ namespace Moonwell.Build.Tests
             var mod = Assert.Single(Assert.Single(ReadItems(staged, "war3mapSkin.w3t").NewItems).Modifications);
             Assert.Equal(ObjectDataType.Real, mod.Type);
             Assert.Equal(2f, mod.Value);
+        }
+
+        private static DeclaredObject Odd(SortedDictionary<string, object?> changed)
+        {
+            return new DeclaredObject("Objects.Odd", "unit", "hfoo", false, null, null, changed, Array.Empty<string>());
         }
 
         private string StageFixtureObjects(out IReadOnlyDictionary<string, string> ids, out DeclarationSet set)

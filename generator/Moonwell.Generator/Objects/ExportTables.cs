@@ -17,6 +17,13 @@ public enum Kind
 /// <summary>A row of a metadata table by its column names; a column the row leaves empty is absent.</summary>
 public sealed record MetaRow(string Id, IReadOnlyDictionary<string, string> Columns);
 
+/// <summary>One of the values World Editor offers for a metadata type, from a section of <c>ui/uniteditordata.txt</c>.</summary>
+/// <param name="Index">The entry's number in its section: <c>00</c> is 0.</param>
+/// <param name="Text">The value as the game's data spells it (<c>air</c>, <c>3</c>).</param>
+/// <param name="Label">The editor's label key for the value (<c>WESTRING_UE_TARGETTYPE_AIR</c>), or empty when the entry has none.</param>
+/// <param name="Alternates">The other spellings the game's data uses for the value (<c>NN_Alt</c>: <c>aliv</c> for <c>alive</c>); empty when none.</param>
+public sealed record ChoiceEntry(int Index, string Text, string Label, IReadOnlyList<string> Alternates);
+
 /// <summary>Every column and every key=value of one object, keys as the tables spell them.</summary>
 /// <param name="Id">The object id.</param>
 /// <param name="Values">The values by key.</param>
@@ -95,11 +102,13 @@ public sealed class ExportTables
     private const string LabelsFile = LocaleFolder + "/ui/worldeditstrings.txt";
     private const string GameLabelsFile = LocaleFolder + "/ui/worldeditgamestrings.txt";
     private const string LabelsSection = "WorldEditStrings";
+    private const string ChoicesFile = "ui/uniteditordata.txt";
 
     private readonly string _folder;
     private readonly Dictionary<string, string> _labels;
     private readonly Dictionary<Kind, IReadOnlyList<MetaRow>> _meta = new();
     private readonly Dictionary<(Kind, string?), IReadOnlyList<ObjectRows>> _objects = new();
+    private Dictionary<string, IReadOnlyList<ChoiceEntry>>? _choices;
 
     private ExportTables(string folder, Dictionary<string, string> labels)
     {
@@ -234,6 +243,63 @@ public sealed class ExportTables
     public string Label(string key)
     {
         return _labels.TryGetValue(key, out var label) ? label : key;
+    }
+
+    /// <summary>
+    /// The values World Editor offers for a metadata type (<c>attackType</c>, <c>targetList</c>), in the order of their
+    /// numbers, from the section of <c>ui/uniteditordata.txt</c> the type names; null when the file has no section for
+    /// it. An entry is <c>NN=text,label[,version]</c>, and <c>NN_Alt=one,two</c> gives the other spellings of entry
+    /// <c>NN</c>; the section's other keys (<c>Sort</c>, <c>NumValues</c>) are not values.
+    /// </summary>
+    public IReadOnlyList<ChoiceEntry>? Choices(string type)
+    {
+        _choices ??= ReadChoices(Require(ChoicesFile, null));
+        return _choices.TryGetValue(type, out var entries) ? entries : null;
+    }
+
+    private static Dictionary<string, IReadOnlyList<ChoiceEntry>> ReadChoices(string path)
+    {
+        var choices = new Dictionary<string, IReadOnlyList<ChoiceEntry>>(StringComparer.Ordinal);
+        foreach (var section in ReadSections(path, out _))
+        {
+            var entries = new SortedDictionary<int, (string Text, string Label)>();
+            var alternates = new Dictionary<int, List<string>>();
+            foreach (var (key, value) in section.Value)
+            {
+                var alternate = key.EndsWith("_Alt", StringComparison.Ordinal);
+                var digits = alternate ? key.Substring(0, key.Length - 4) : key;
+                if (digits.Length == 0 || !digits.All(char.IsAsciiDigit))
+                {
+                    continue;
+                }
+
+                var index = int.Parse(digits, System.Globalization.CultureInfo.InvariantCulture);
+                var parts = value.Split(',');
+                if (alternate)
+                {
+                    alternates[index] = parts.Select(p => p.Trim()).Where(p => p.Length > 0).ToList();
+                }
+                else
+                {
+                    entries[index] = (parts[0].Trim(), parts.Length > 1 ? parts[1].Trim() : "");
+                }
+            }
+
+            if (entries.Count == 0)
+            {
+                continue;
+            }
+
+            var list = new List<ChoiceEntry>(entries.Count);
+            foreach (var (index, entry) in entries)
+            {
+                list.Add(new ChoiceEntry(index, entry.Text, entry.Label, alternates.TryGetValue(index, out var other) ? other : new List<string>()));
+            }
+
+            choices[section.Key] = list;
+        }
+
+        return choices;
     }
 
     private IReadOnlyList<ObjectRows> ReadObjects(Source source, string? set)

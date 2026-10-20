@@ -2328,9 +2328,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>Det1</c>.</summary>
                 [global::Moonwell.Objects.Field("Det1")]
-                public global::Moonwell.Objects.Levels<string> DetectionType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DetectionType> DetectionTypeDet1
                 {
-                    get { return Fields.GetLevels<string>(this, "Det1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DetectionType>(this, "Det1"); }
                     protected set { Fields.Put("Det1", value); }
                 }
             }
@@ -2577,9 +2577,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>Nsi1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nsi1")]
-                public global::Moonwell.Objects.Levels<string> AttacksPrevented
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.SilenceFlags> AttacksPrevented
                 {
-                    get { return Fields.GetLevels<string>(this, "Nsi1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.SilenceFlags>(this, "Nsi1"); }
                     protected set { Fields.Put("Nsi1", value); }
                 }
 
@@ -3554,9 +3554,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>Det1</c>.</summary>
                 [global::Moonwell.Objects.Field("Det1")]
-                public global::Moonwell.Objects.Levels<string> DetectionType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DetectionType> DetectionTypeDet1
                 {
-                    get { return Fields.GetLevels<string>(this, "Det1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DetectionType>(this, "Det1"); }
                     protected set { Fields.Put("Det1", value); }
                 }
             }
@@ -3902,9 +3902,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Ifa1</c>.</summary>
                 [global::Moonwell.Objects.Field("Ifa1")]
-                public global::Moonwell.Objects.Levels<string> DetectionType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DetectionType> DetectionTypeIfa1
                 {
-                    get { return Fields.GetLevels<string>(this, "Ifa1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DetectionType>(this, "Ifa1"); }
                     protected set { Fields.Put("Ifa1", value); }
                 }
             }
@@ -6684,9 +6684,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>Idet</c>.</summary>
                 [global::Moonwell.Objects.Field("Idet")]
-                public global::Moonwell.Objects.Levels<string> DetectionRadius
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DetectionType> DetectionRadius
                 {
-                    get { return Fields.GetLevels<string>(this, "Idet"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DetectionType>(this, "Idet"); }
                     protected set { Fields.Put("Idet", value); }
                 }
             }
@@ -7060,9 +7060,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -7121,9 +7121,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -7182,9 +7182,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -7358,9 +7358,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>ohp1</c>.</summary>
                 [global::Moonwell.Objects.Field("ohp1")]
-                public global::Moonwell.Objects.Levels<string> AllowedDamageType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DamageType> AllowedDamageType
                 {
-                    get { return Fields.GetLevels<string>(this, "ohp1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DamageType>(this, "ohp1"); }
                     protected set { Fields.Put("ohp1", value); }
                 }
 
@@ -7381,9 +7381,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -7416,9 +7416,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>ohp1</c>.</summary>
                 [global::Moonwell.Objects.Field("ohp1")]
-                public global::Moonwell.Objects.Levels<string> AllowedDamageType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DamageType> AllowedDamageType
                 {
-                    get { return Fields.GetLevels<string>(this, "ohp1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DamageType>(this, "ohp1"); }
                     protected set { Fields.Put("ohp1", value); }
                 }
 
@@ -7439,9 +7439,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -8124,9 +8124,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -8185,9 +8185,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -8283,9 +8283,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -8436,9 +8436,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -8572,9 +8572,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -8633,9 +8633,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -8738,9 +8738,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -8813,9 +8813,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -8928,9 +8928,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -9137,9 +9137,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -9244,9 +9244,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -9335,9 +9335,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -9426,9 +9426,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -9487,9 +9487,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -9608,9 +9608,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -9669,9 +9669,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -9931,9 +9931,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -9992,9 +9992,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -10185,9 +10185,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -11700,9 +11700,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -11729,9 +11729,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -11790,9 +11790,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -11901,9 +11901,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>ohp1</c>.</summary>
                 [global::Moonwell.Objects.Field("ohp1")]
-                public global::Moonwell.Objects.Levels<string> AllowedDamageType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DamageType> AllowedDamageType
                 {
-                    get { return Fields.GetLevels<string>(this, "ohp1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DamageType>(this, "ohp1"); }
                     protected set { Fields.Put("ohp1", value); }
                 }
 
@@ -11924,9 +11924,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -11978,9 +11978,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Poi4</c>.</summary>
                 [global::Moonwell.Objects.Field("Poi4")]
-                public global::Moonwell.Objects.Levels<string> StackingType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.StackFlags> StackingType
                 {
-                    get { return Fields.GetLevels<string>(this, "Poi4"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.StackFlags>(this, "Poi4"); }
                     protected set { Fields.Put("Poi4", value); }
                 }
 
@@ -12190,9 +12190,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>Nsi1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nsi1")]
-                public global::Moonwell.Objects.Levels<string> AttacksPrevented
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.SilenceFlags> AttacksPrevented
                 {
-                    get { return Fields.GetLevels<string>(this, "Nsi1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.SilenceFlags>(this, "Nsi1"); }
                     protected set { Fields.Put("Nsi1", value); }
                 }
 
@@ -12228,9 +12228,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>ohp1</c>.</summary>
                 [global::Moonwell.Objects.Field("ohp1")]
-                public global::Moonwell.Objects.Levels<string> AllowedDamageType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DamageType> AllowedDamageType
                 {
-                    get { return Fields.GetLevels<string>(this, "ohp1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DamageType>(this, "ohp1"); }
                     protected set { Fields.Put("ohp1", value); }
                 }
 
@@ -12251,9 +12251,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -12469,9 +12469,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Rej3</c>.</summary>
                 [global::Moonwell.Objects.Field("Rej3")]
-                public global::Moonwell.Objects.Levels<string> AllowWhenFull
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.FullFlags> AllowWhenFull
                 {
-                    get { return Fields.GetLevels<string>(this, "Rej3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.FullFlags>(this, "Rej3"); }
                     protected set { Fields.Put("Rej3", value); }
                 }
 
@@ -12568,9 +12568,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -12629,9 +12629,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -12690,9 +12690,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -12751,9 +12751,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -13506,9 +13506,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>ohp1</c>.</summary>
                 [global::Moonwell.Objects.Field("ohp1")]
-                public global::Moonwell.Objects.Levels<string> AllowedDamageType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DamageType> AllowedDamageType
                 {
-                    get { return Fields.GetLevels<string>(this, "ohp1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DamageType>(this, "ohp1"); }
                     protected set { Fields.Put("ohp1", value); }
                 }
 
@@ -13529,9 +13529,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -13728,9 +13728,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -13810,9 +13810,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -13922,9 +13922,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -13983,9 +13983,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -14026,9 +14026,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -14087,9 +14087,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -14148,9 +14148,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -14186,9 +14186,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Poi4</c>.</summary>
                 [global::Moonwell.Objects.Field("Poi4")]
-                public global::Moonwell.Objects.Levels<string> StackingType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.StackFlags> StackingType
                 {
-                    get { return Fields.GetLevels<string>(this, "Poi4"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.StackFlags>(this, "Poi4"); }
                     protected set { Fields.Put("Poi4", value); }
                 }
             }
@@ -14353,9 +14353,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -14992,9 +14992,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -15053,9 +15053,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -15112,9 +15112,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -15141,9 +15141,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -16722,9 +16722,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -16851,9 +16851,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -16950,9 +16950,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -17049,9 +17049,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -17145,9 +17145,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>ohp1</c>.</summary>
                 [global::Moonwell.Objects.Field("ohp1")]
-                public global::Moonwell.Objects.Levels<string> AllowedDamageType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DamageType> AllowedDamageType
                 {
-                    get { return Fields.GetLevels<string>(this, "ohp1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DamageType>(this, "ohp1"); }
                     protected set { Fields.Put("ohp1", value); }
                 }
 
@@ -17168,9 +17168,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -17462,9 +17462,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -17612,9 +17612,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -18111,9 +18111,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -18186,9 +18186,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -18830,9 +18830,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -19065,9 +19065,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Hca4</c>.</summary>
                 [global::Moonwell.Objects.Field("Hca4")]
-                public global::Moonwell.Objects.Levels<string> StackFlags
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.StackFlags> StackFlagsHca4
                 {
-                    get { return Fields.GetLevels<string>(this, "Hca4"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.StackFlags>(this, "Hca4"); }
                     protected set { Fields.Put("Hca4", value); }
                 }
             }
@@ -19247,9 +19247,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Spo4</c>.</summary>
                 [global::Moonwell.Objects.Field("Spo4")]
-                public global::Moonwell.Objects.Levels<string> StackingType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.StackFlags> StackingType
                 {
-                    get { return Fields.GetLevels<string>(this, "Spo4"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.StackFlags>(this, "Spo4"); }
                     protected set { Fields.Put("Spo4", value); }
                 }
             }
@@ -19261,9 +19261,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>ohp1</c>.</summary>
                 [global::Moonwell.Objects.Field("ohp1")]
-                public global::Moonwell.Objects.Levels<string> AllowedDamageType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DamageType> AllowedDamageType
                 {
-                    get { return Fields.GetLevels<string>(this, "ohp1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DamageType>(this, "ohp1"); }
                     protected set { Fields.Put("ohp1", value); }
                 }
 
@@ -19284,9 +19284,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -19399,9 +19399,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -19475,9 +19475,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Spo4</c>.</summary>
                 [global::Moonwell.Objects.Field("Spo4")]
-                public global::Moonwell.Objects.Levels<string> StackingType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.StackFlags> StackingType
                 {
-                    get { return Fields.GetLevels<string>(this, "Spo4"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.StackFlags>(this, "Spo4"); }
                     protected set { Fields.Put("Spo4", value); }
                 }
             }
@@ -19536,9 +19536,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -19564,9 +19564,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>ohp1</c>.</summary>
                 [global::Moonwell.Objects.Field("ohp1")]
-                public global::Moonwell.Objects.Levels<string> AllowedDamageType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DamageType> AllowedDamageType
                 {
-                    get { return Fields.GetLevels<string>(this, "ohp1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DamageType>(this, "ohp1"); }
                     protected set { Fields.Put("ohp1", value); }
                 }
 
@@ -19587,9 +19587,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -19631,9 +19631,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>ohp1</c>.</summary>
                 [global::Moonwell.Objects.Field("ohp1")]
-                public global::Moonwell.Objects.Levels<string> AllowedDamageType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DamageType> AllowedDamageType
                 {
-                    get { return Fields.GetLevels<string>(this, "ohp1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DamageType>(this, "ohp1"); }
                     protected set { Fields.Put("ohp1", value); }
                 }
 
@@ -19654,9 +19654,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -19945,9 +19945,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -20028,9 +20028,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -20390,9 +20390,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>Det1</c>.</summary>
                 [global::Moonwell.Objects.Field("Det1")]
-                public global::Moonwell.Objects.Levels<string> DetectionType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DetectionType> DetectionTypeDet1
                 {
-                    get { return Fields.GetLevels<string>(this, "Det1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DetectionType>(this, "Det1"); }
                     protected set { Fields.Put("Det1", value); }
                 }
             }
@@ -20451,9 +20451,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -20580,9 +20580,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -20648,9 +20648,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>ohp1</c>.</summary>
                 [global::Moonwell.Objects.Field("ohp1")]
-                public global::Moonwell.Objects.Levels<string> AllowedDamageType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DamageType> AllowedDamageType
                 {
-                    get { return Fields.GetLevels<string>(this, "ohp1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DamageType>(this, "ohp1"); }
                     protected set { Fields.Put("ohp1", value); }
                 }
 
@@ -20671,9 +20671,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -20794,9 +20794,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -20855,9 +20855,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -20938,9 +20938,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -21010,9 +21010,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -21096,9 +21096,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>ohp1</c>.</summary>
                 [global::Moonwell.Objects.Field("ohp1")]
-                public global::Moonwell.Objects.Levels<string> AllowedDamageType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DamageType> AllowedDamageType
                 {
-                    get { return Fields.GetLevels<string>(this, "ohp1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DamageType>(this, "ohp1"); }
                     protected set { Fields.Put("ohp1", value); }
                 }
 
@@ -21119,9 +21119,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -21253,9 +21253,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>Nsi1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nsi1")]
-                public global::Moonwell.Objects.Levels<string> AttacksPrevented
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.SilenceFlags> AttacksPrevented
                 {
-                    get { return Fields.GetLevels<string>(this, "Nsi1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.SilenceFlags>(this, "Nsi1"); }
                     protected set { Fields.Put("Nsi1", value); }
                 }
 
@@ -21418,9 +21418,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -22840,9 +22840,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -22907,9 +22907,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -23174,9 +23174,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -23494,9 +23494,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -23617,9 +23617,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -23647,9 +23647,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Rej3</c>.</summary>
                 [global::Moonwell.Objects.Field("Rej3")]
-                public global::Moonwell.Objects.Levels<string> AllowWhenFull
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.FullFlags> AllowWhenFull
                 {
-                    get { return Fields.GetLevels<string>(this, "Rej3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.FullFlags>(this, "Rej3"); }
                     protected set { Fields.Put("Rej3", value); }
                 }
 
@@ -23738,9 +23738,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -23820,9 +23820,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -24086,9 +24086,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -24145,9 +24145,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -24298,9 +24298,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -25505,9 +25505,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -25526,9 +25526,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>ohp1</c>.</summary>
                 [global::Moonwell.Objects.Field("ohp1")]
-                public global::Moonwell.Objects.Levels<string> AllowedDamageType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DamageType> AllowedDamageType
                 {
-                    get { return Fields.GetLevels<string>(this, "ohp1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DamageType>(this, "ohp1"); }
                     protected set { Fields.Put("ohp1", value); }
                 }
 
@@ -25549,9 +25549,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -25578,9 +25578,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>opp3</c>.</summary>
                 [global::Moonwell.Objects.Field("opp3")]
-                public global::Moonwell.Objects.Levels<string> TargetType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.ProctargetType> TargetType
                 {
-                    get { return Fields.GetLevels<string>(this, "opp3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.ProctargetType>(this, "opp3"); }
                     protected set { Fields.Put("opp3", value); }
                 }
             }
@@ -25834,9 +25834,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Poi4</c>.</summary>
                 [global::Moonwell.Objects.Field("Poi4")]
-                public global::Moonwell.Objects.Levels<string> StackingType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.StackFlags> StackingType
                 {
-                    get { return Fields.GetLevels<string>(this, "Poi4"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.StackFlags>(this, "Poi4"); }
                     protected set { Fields.Put("Poi4", value); }
                 }
             }
@@ -25872,9 +25872,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Poi4</c>.</summary>
                 [global::Moonwell.Objects.Field("Poi4")]
-                public global::Moonwell.Objects.Levels<string> StackingType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.StackFlags> StackingType
                 {
-                    get { return Fields.GetLevels<string>(this, "Poi4"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.StackFlags>(this, "Poi4"); }
                     protected set { Fields.Put("Poi4", value); }
                 }
             }
@@ -25910,9 +25910,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Poi4</c>.</summary>
                 [global::Moonwell.Objects.Field("Poi4")]
-                public global::Moonwell.Objects.Levels<string> StackingType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.StackFlags> StackingType
                 {
-                    get { return Fields.GetLevels<string>(this, "Poi4"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.StackFlags>(this, "Poi4"); }
                     protected set { Fields.Put("Poi4", value); }
                 }
             }
@@ -27692,9 +27692,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Idg3</c>.</summary>
                 [global::Moonwell.Objects.Field("Idg3")]
-                public global::Moonwell.Objects.Levels<string> TargetsAllowedForHeal
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.Targets> TargetsAllowedForHeal
                 {
-                    get { return Fields.GetLevels<string>(this, "Idg3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.Targets>(this, "Idg3"); }
                     protected set { Fields.Put("Idg3", value); }
                 }
 
@@ -27738,9 +27738,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Idg3</c>.</summary>
                 [global::Moonwell.Objects.Field("Idg3")]
-                public global::Moonwell.Objects.Levels<string> TargetsAllowedForHeal
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.Targets> TargetsAllowedForHeal
                 {
-                    get { return Fields.GetLevels<string>(this, "Idg3"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.Targets>(this, "Idg3"); }
                     protected set { Fields.Put("Idg3", value); }
                 }
 
@@ -28284,9 +28284,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Neu2</c>.</summary>
                 [global::Moonwell.Objects.Field("Neu2")]
-                public global::Moonwell.Objects.Levels<string> InteractionType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.InteractionFlags> InteractionType
                 {
-                    get { return Fields.GetLevels<string>(this, "Neu2"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.InteractionFlags>(this, "Neu2"); }
                     protected set { Fields.Put("Neu2", value); }
                 }
 
@@ -28322,9 +28322,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Neu2</c>.</summary>
                 [global::Moonwell.Objects.Field("Neu2")]
-                public global::Moonwell.Objects.Levels<string> InteractionType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.InteractionFlags> InteractionType
                 {
-                    get { return Fields.GetLevels<string>(this, "Neu2"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.InteractionFlags>(this, "Neu2"); }
                     protected set { Fields.Put("Neu2", value); }
                 }
 
@@ -28506,9 +28506,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Neu2</c>.</summary>
                 [global::Moonwell.Objects.Field("Neu2")]
-                public global::Moonwell.Objects.Levels<string> InteractionType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.InteractionFlags> InteractionType
                 {
-                    get { return Fields.GetLevels<string>(this, "Neu2"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.InteractionFlags>(this, "Neu2"); }
                     protected set { Fields.Put("Neu2", value); }
                 }
 
@@ -28647,9 +28647,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Spo4</c>.</summary>
                 [global::Moonwell.Objects.Field("Spo4")]
-                public global::Moonwell.Objects.Levels<string> StackingType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.StackFlags> StackingType
                 {
-                    get { return Fields.GetLevels<string>(this, "Spo4"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.StackFlags>(this, "Spo4"); }
                     protected set { Fields.Put("Spo4", value); }
                 }
             }
@@ -29333,9 +29333,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>Npr1</c>.</summary>
                 [global::Moonwell.Objects.Field("Npr1")]
-                public global::Moonwell.Objects.Levels<string> BuildingTypesAllowed
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.PickFlags> BuildingTypesAllowed
                 {
-                    get { return Fields.GetLevels<string>(this, "Npr1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.PickFlags>(this, "Npr1"); }
                     protected set { Fields.Put("Npr1", value); }
                 }
             }
@@ -29347,9 +29347,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>Nsa1</c>.</summary>
                 [global::Moonwell.Objects.Field("Nsa1")]
-                public global::Moonwell.Objects.Levels<string> BuildingTypesAllowed
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.PickFlags> BuildingTypesAllowed
                 {
-                    get { return Fields.GetLevels<string>(this, "Nsa1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.PickFlags>(this, "Nsa1"); }
                     protected set { Fields.Put("Nsa1", value); }
                 }
 
@@ -29545,9 +29545,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>Asdf</c>.</summary>
                 [global::Moonwell.Objects.Field("Asdf")]
-                public global::Moonwell.Objects.Levels<string> SupportedStatModifiers
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.AbilityModifierStats> SupportedStatModifiers
                 {
-                    get { return Fields.GetLevels<string>(this, "Asdf"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.AbilityModifierStats>(this, "Asdf"); }
                     protected set { Fields.Put("Asdf", value); }
                 }
             }
@@ -30949,9 +30949,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>Det1</c>.</summary>
                 [global::Moonwell.Objects.Field("Det1")]
-                public global::Moonwell.Objects.Levels<string> DetectionType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DetectionType> DetectionTypeDet1
                 {
-                    get { return Fields.GetLevels<string>(this, "Det1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DetectionType>(this, "Det1"); }
                     protected set { Fields.Put("Det1", value); }
                 }
             }
@@ -30963,9 +30963,9 @@ namespace Moonwell.Objects
             {
                 /// <summary>The field <c>Det1</c>.</summary>
                 [global::Moonwell.Objects.Field("Det1")]
-                public global::Moonwell.Objects.Levels<string> DetectionType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DetectionType> DetectionTypeDet1
                 {
-                    get { return Fields.GetLevels<string>(this, "Det1"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DetectionType>(this, "Det1"); }
                     protected set { Fields.Put("Det1", value); }
                 }
             }

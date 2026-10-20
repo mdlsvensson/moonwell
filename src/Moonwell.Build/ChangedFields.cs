@@ -59,13 +59,13 @@ namespace Moonwell.Build
                 {
                     var field = fields[entry.Key.Substring(0, colon)];
                     var level = int.Parse(entry.Key.Substring(colon + 1), CultureInfo.InvariantCulture);
-                    if (Same(field.Type, entry.Value, standard.Value(root, field.Id, level, set)))
+                    if (Same(field, entry.Value, standard.Value(root, field.Id, level, set)))
                     {
                         changed.Remove(entry.Key);
                     }
                     else
                     {
-                        changed[entry.Key] = entry.Value;
+                        changed[entry.Key] = Plain(entry.Value);
                     }
                 }
             }
@@ -129,9 +129,9 @@ namespace Moonwell.Build
                     WholeReference(field, (Type?)type.GetProperty("Type", Internal)!.GetValue(value), root, levels, changed, references);
                     break;
                 default:
-                    if (!Same(field.Type, value, standard.Value(root, field.Id, 0, set)))
+                    if (!Same(field, value, standard.Value(root, field.Id, 0, set)))
                     {
-                        changed[field.Id] = value;
+                        changed[field.Id] = Plain(value);
                     }
 
                     break;
@@ -155,14 +155,14 @@ namespace Moonwell.Build
             var differs = false;
             for (var i = 0; i < values.Length; i++)
             {
-                differs |= !Same(field.Type, values.GetValue(i), standard.Value(root, field.Id, i + 1, set));
+                differs |= !Same(field, values.GetValue(i), standard.Value(root, field.Id, i + 1, set));
             }
 
             if (differs)
             {
                 for (var i = 0; i < values.Length; i++)
                 {
-                    changed[Key(field.Id, i + 1)] = values.GetValue(i);
+                    changed[Key(field.Id, i + 1)] = Plain(values.GetValue(i));
                 }
             }
         }
@@ -259,10 +259,21 @@ namespace Moonwell.Build
             return field + ":" + level.ToString(CultureInfo.InvariantCulture);
         }
 
-        // Whether a value is the one the standard text says; a standard object with no value reads as the type's default.
-        private static bool Same(string type, object? value, string? text)
+        // A declared value as the build keeps it: a choice's enum value as its number, the enum's type being the map's.
+        private static object? Plain(object? value)
         {
-            switch (type)
+            return value is Enum choice ? Convert.ToInt32(choice, CultureInfo.InvariantCulture) : value;
+        }
+
+        // Whether a value is the one the standard text says; a standard object with no value reads as the type's default.
+        private static bool Same(StandardData.ObjectField field, object? value, string? text)
+        {
+            if (field.Choice != null)
+            {
+                return Convert.ToInt32(value, CultureInfo.InvariantCulture) == field.Choice.Number(text);
+            }
+
+            switch (field.Type)
             {
                 case "int":
                     var number = (int)value!;

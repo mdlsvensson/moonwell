@@ -18,6 +18,16 @@ namespace Objects
             return arthas.Description + "!";
         }
 
+        // Choices read in the game as their enums' numbers: the mage's declared ones, the footman's standard ones, the zap's levels.
+        public static string Chosen(Mage mage, Zap zap)
+        {
+            var declared = mage.AttackType == Moonwell.Objects.AttackType.Magic
+                && (mage.Attack1TargetsAllowed & Moonwell.Objects.Targets.Enemies) != 0
+                && mage.DeathType == Moonwell.Objects.DeathType.CanRaiseDoesNotDecay;
+            var standard = mage.ArmorType == Moonwell.Objects.ArmorType.Metal && mage.TargetedAs == Moonwell.Objects.Targets.Ground;
+            return (declared ? "yes" : "no") + " " + (standard ? "yes" : "no") + " " + (int)zap.TargetsAllowed[3];
+        }
+
         public override void OnUnitDied(Unit dying, Unit? killer)
         {
             // Standard classes used only inside a reaction.

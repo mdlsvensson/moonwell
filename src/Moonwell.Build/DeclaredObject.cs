@@ -9,8 +9,9 @@ namespace Moonwell.Build
     /// <param name="CarrierId">The carrier ability's id the class's <c>[ObjectId]</c> gives (<c>Carrier</c>); null when none.</param>
     /// <param name="Changed">
     /// The changed values by field id, or <c>&lt;field id&gt;:&lt;level&gt;</c> for a per-level field: an <c>int</c>,
-    /// <c>float</c>, <c>bool</c> or <c>string</c>; for a list the full class names in order (<c>IReadOnlyList&lt;string&gt;</c>),
-    /// for a reference the full class name. An id the standard data holds that no standard class has stays as its id text.
+    /// <c>float</c>, <c>bool</c> or <c>string</c>; for a choice its enum's number (an <c>int</c>); for a list the full class names
+    /// in order (<c>IReadOnlyList&lt;string&gt;</c>), for a reference the full class name. An id the standard data holds that no
+    /// standard class has stays as its id text.
     /// Only values that differ from the standard root's are there; a per-level field the class changed has every level.
     /// </param>
     /// <param name="References">The full names of the classes the changed lists and references hold, each once, in ordinal order.</param>

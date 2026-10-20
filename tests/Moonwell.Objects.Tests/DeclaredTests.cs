@@ -140,6 +140,20 @@ namespace Moonwell.Objects.Tests
         }
 
         [Fact]
+        public void a_standard_choice_reads_as_its_enum_from_the_datas_spellings()
+        {
+            // The standard data spells some targets the short way: aliv for alive, enem for enemies.
+            StandardValues.Read = (id, field, level) =>
+                id == "AHtb" && field == "atar" && level == 1 ? "aliv,enem"
+                : id == "hfoo" && field == "ua1t" ? "normal"
+                : null;
+
+            Assert.Equal(Targets.Alive | Targets.Enemies, new OpenStormBolt().TargetsAllowed[1]);
+            Assert.Equal(AttackType.Normal, new Moonwell.Objects.Human.Units.Footman().AttackType);
+            Assert.Equal(AttackType.Unknown, new Moonwell.Objects.Human.Units.Rifleman().AttackType);
+        }
+
+        [Fact]
         public void no_standard_in_chain_reads_default()
         {
             Assert.Equal(0, new Footman().HitPoints);

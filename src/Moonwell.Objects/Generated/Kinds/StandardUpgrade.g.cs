@@ -20,15 +20,15 @@ namespace Moonwell.Objects
                 ["gba4"] = typeof(float),
                 ["gbpx"] = typeof(int),
                 ["gbpy"] = typeof(int),
-                ["gcls"] = typeof(string),
+                ["gcls"] = typeof(global::Moonwell.Objects.UpgradeClass),
                 ["gco1"] = typeof(string),
                 ["gco2"] = typeof(string),
                 ["gco3"] = typeof(string),
                 ["gco4"] = typeof(string),
-                ["gef1"] = typeof(string),
-                ["gef2"] = typeof(string),
-                ["gef3"] = typeof(string),
-                ["gef4"] = typeof(string),
+                ["gef1"] = typeof(global::Moonwell.Objects.UpgradeEffect),
+                ["gef2"] = typeof(global::Moonwell.Objects.UpgradeEffect),
+                ["gef3"] = typeof(global::Moonwell.Objects.UpgradeEffect),
+                ["gef4"] = typeof(global::Moonwell.Objects.UpgradeEffect),
                 ["gglb"] = typeof(int),
                 ["gglm"] = typeof(int),
                 ["ghk1"] = typeof(global::Moonwell.Objects.Levels<string>),
@@ -43,7 +43,7 @@ namespace Moonwell.Objects
                 ["gmo4"] = typeof(float),
                 ["gnam"] = typeof(global::Moonwell.Objects.Levels<string>),
                 ["gnsf"] = typeof(global::Moonwell.Objects.Levels<string>),
-                ["grac"] = typeof(string),
+                ["grac"] = typeof(global::Moonwell.Objects.UnitRace),
                 ["greq"] = typeof(global::Moonwell.Objects.ObjectList<object>),
                 ["grqc"] = typeof(global::Moonwell.Objects.Levels<string>),
                 ["gtib"] = typeof(int),
@@ -118,9 +118,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>gcls</c>.</summary>
         [global::Moonwell.Objects.Field("gcls")]
-        public string Class
+        public global::Moonwell.Objects.UpgradeClass Class
         {
-            get { return Fields.Get<string>(this, "gcls"); }
+            get { return Fields.Get<global::Moonwell.Objects.UpgradeClass>(this, "gcls"); }
             protected set { Fields.Put("gcls", value); }
         }
 
@@ -158,33 +158,33 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>gef1</c>.</summary>
         [global::Moonwell.Objects.Field("gef1")]
-        public string Effect1
+        public global::Moonwell.Objects.UpgradeEffect Effect1
         {
-            get { return Fields.Get<string>(this, "gef1"); }
+            get { return Fields.Get<global::Moonwell.Objects.UpgradeEffect>(this, "gef1"); }
             protected set { Fields.Put("gef1", value); }
         }
 
         /// <summary>The field <c>gef2</c>.</summary>
         [global::Moonwell.Objects.Field("gef2")]
-        public string Effect2
+        public global::Moonwell.Objects.UpgradeEffect Effect2
         {
-            get { return Fields.Get<string>(this, "gef2"); }
+            get { return Fields.Get<global::Moonwell.Objects.UpgradeEffect>(this, "gef2"); }
             protected set { Fields.Put("gef2", value); }
         }
 
         /// <summary>The field <c>gef3</c>.</summary>
         [global::Moonwell.Objects.Field("gef3")]
-        public string Effect3
+        public global::Moonwell.Objects.UpgradeEffect Effect3
         {
-            get { return Fields.Get<string>(this, "gef3"); }
+            get { return Fields.Get<global::Moonwell.Objects.UpgradeEffect>(this, "gef3"); }
             protected set { Fields.Put("gef3", value); }
         }
 
         /// <summary>The field <c>gef4</c>.</summary>
         [global::Moonwell.Objects.Field("gef4")]
-        public string Effect4
+        public global::Moonwell.Objects.UpgradeEffect Effect4
         {
-            get { return Fields.Get<string>(this, "gef4"); }
+            get { return Fields.Get<global::Moonwell.Objects.UpgradeEffect>(this, "gef4"); }
             protected set { Fields.Put("gef4", value); }
         }
 
@@ -302,9 +302,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>grac</c>.</summary>
         [global::Moonwell.Objects.Field("grac")]
-        public string Race
+        public global::Moonwell.Objects.UnitRace Race
         {
-            get { return Fields.Get<string>(this, "grac"); }
+            get { return Fields.Get<global::Moonwell.Objects.UnitRace>(this, "grac"); }
             protected set { Fields.Put("grac", value); }
         }
 

@@ -56,6 +56,43 @@ public sealed class RuntimeMembers
         return names;
     }
 
+    /// <summary>
+    /// The names an enum of <c>Moonwell.Objects</c> may not have: the public types of namespace <c>Moonwell</c> in
+    /// <c>Moonwell.dll</c> and the Moonwell libraries it references (a map that imports both namespaces could not name
+    /// the enum), and the members the objects of every kind inherit (inside a standard class, one would hide the enum).
+    /// </summary>
+    public IReadOnlySet<string> Taken()
+    {
+        var names = new HashSet<string>(StringComparer.Ordinal);
+        var assemblies = new List<Assembly> { _runtime };
+        foreach (var reference in _runtime.GetReferencedAssemblies())
+        {
+            var beside = Path.Combine(Path.GetDirectoryName(_runtime.Location)!, reference.Name + ".dll");
+            if (reference.Name != null && reference.Name.StartsWith("Moonwell", StringComparison.Ordinal) && File.Exists(beside))
+            {
+                assemblies.Add(Assembly.LoadFrom(beside));
+            }
+        }
+
+        foreach (var assembly in assemblies)
+        {
+            foreach (var type in assembly.GetExportedTypes())
+            {
+                if (type.Namespace == "Moonwell" && !type.IsNested)
+                {
+                    names.Add(type.Name.Split('`')[0]);
+                }
+            }
+        }
+
+        foreach (var kind in Enum.GetValues<Kind>())
+        {
+            names.UnionWith(Of(kind));
+        }
+
+        return names;
+    }
+
     private static string[] TypesOf(Kind kind)
     {
         return kind == Kind.Unit ? new[] { "Unit", "Hero" } : new[] { kind.ToString() };

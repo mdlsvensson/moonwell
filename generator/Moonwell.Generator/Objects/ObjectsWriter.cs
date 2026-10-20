@@ -207,7 +207,60 @@ public static class ObjectsWriter
     }
 
     /// <summary>
-    /// The JSON of a kind's standard values: <c>fields</c> (id, type, perLevel, pointer, skin, store), one per line, then
+    /// The source of the enums of the choice types, ordered by name, in namespace <c>Moonwell.Objects</c>. Each member
+    /// has the game's text in <c>[GameValue]</c>, then the other spellings the game's data uses; a flags type is a
+    /// <c>[Flags]</c> enum. Each enum is <c>@CSharpLua.Ignore</c>: the map's Lua has the members' numbers, not the enum.
+    /// </summary>
+    public static string Choices(IEnumerable<ChoiceType> choices)
+    {
+        var text = new StringBuilder();
+        text.Append("namespace Moonwell.Objects\n{\n");
+        var first = true;
+        foreach (var choice in choices.OrderBy(c => c.Name, StringComparer.Ordinal))
+        {
+            text.Append(first ? "" : "\n");
+            first = false;
+            text.Append($"    /// <summary>{ChoiceSummary(choice)}</summary>\n");
+            text.Append($"    {Ignore}\n");
+            if (choice.Flags)
+            {
+                text.Append("    [global::System.Flags]\n");
+            }
+
+            text.Append($"    public enum {choice.Name}\n    {{\n");
+            for (var m = 0; m < choice.Members.Count; m++)
+            {
+                var member = choice.Members[m];
+                var texts = string.Join(", ", new[] { member.Text }.Concat(member.Alternates).Select(Literal));
+                text.Append(m > 0 ? "\n" : "");
+                text.Append($"        /// <summary>{Xml(member.Label.Length > 0 ? member.Label : member.Text)}.</summary>\n");
+                text.Append($"        [{Root}.GameValue({texts})]\n");
+                text.Append($"        {member.Name} = {member.Value.ToString(CultureInfo.InvariantCulture)},\n");
+            }
+
+            text.Append("    }\n");
+        }
+
+        text.Append("}\n");
+        return text.ToString();
+    }
+
+    private static string ChoiceSummary(ChoiceType choice)
+    {
+        switch (choice.Form)
+        {
+            case ChoiceForm.List:
+                return $"Any of the values of the metadata type <c>{Xml(choice.Type)}</c>, as World Editor offers them; the object file holds a comma list of their texts.";
+            case ChoiceForm.Bits:
+                return $"Any of the values of the metadata type <c>{Xml(choice.Type)}</c>, as World Editor offers them; the object file holds the number whose bits they are.";
+            default:
+                return $"A value of the metadata type <c>{Xml(choice.Type)}</c>, as World Editor offers it.";
+        }
+    }
+
+    /// <summary>
+    /// The JSON of a kind's standard values: <c>fields</c> (id, type, perLevel, pointer, skin, store, and for a choice
+    /// the enum's name in <c>choice</c>), one per line, then
     /// <c>objects</c> by id, one per line, each with its <c>values</c>, the <c>sets</c> that differ and, only when
     /// there are any, the <c>missingFrom</c> sets. Keys are in ordinal order. A key whose value is the empty string in
     /// a set is a key the set has no value for.
@@ -225,6 +278,11 @@ public static class ObjectsWriter
             text.Append(",\"pointer\":").Append(field.DataPointer.ToString(CultureInfo.InvariantCulture));
             text.Append(",\"skin\":").Append(field.Skin ? "true" : "false");
             text.Append(",\"store\":").Append(Json(field.Store));
+            if (field.Choice != null)
+            {
+                text.Append(",\"choice\":").Append(Json(field.Choice.Name));
+            }
+
             text.Append(i + 1 < fields.Count ? "},\n" : "}\n");
         }
 
@@ -291,7 +349,7 @@ public static class ObjectsWriter
         text.Append($"{indent}}}\n");
     }
 
-    /// <summary>The type of a field's value: the object type for a list or a reference, else <c>int</c>, <c>float</c>, <c>bool</c> or <c>string</c>.</summary>
+    /// <summary>The type of a field's value: the object type for a list or a reference, the enum for a choice, else <c>int</c>, <c>float</c>, <c>bool</c> or <c>string</c>.</summary>
     private static string ElementType(Field field)
     {
         switch (field.Type)
@@ -304,6 +362,8 @@ public static class ObjectsWriter
                 return "bool";
             case FieldType.String:
                 return "string";
+            case FieldType.Choice:
+                return $"{Root}.{field.Choice!.Name}";
             default:
                 return field.ListOf == null || field.ListOf == "object" ? "object" : $"{Runtime}.{field.ListOf}";
         }

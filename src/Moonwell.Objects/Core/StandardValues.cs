@@ -12,7 +12,8 @@ namespace Moonwell.Objects
 
         /// <summary>
         /// Turns the text of a value into its type; null gives the default of the type. A text that is not a number of its type
-        /// reads as the build's Lua side reads it: a decimal truncated for an <c>int</c>, else 0.
+        /// reads as the build's Lua side reads it: a decimal truncated for an <c>int</c>, else 0. A choice's text gives its enum's
+        /// member, the other spellings of the game's data too (<c>aliv</c> is <see cref="Targets.Alive"/>).
         /// </summary>
         internal static T Parse<T>(string? text)
         {
@@ -24,6 +25,11 @@ namespace Moonwell.Objects
             if (text == null)
             {
                 return default!;
+            }
+
+            if (typeof(T).IsEnum)
+            {
+                return (T)Enum.ToObject(typeof(T), ChoiceTexts.Number(typeof(T), text));
             }
 
             if (typeof(T) == typeof(int))

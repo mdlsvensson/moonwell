@@ -13,7 +13,7 @@ namespace Moonwell.Objects
         private static readonly global::System.Collections.Generic.Dictionary<string, global::System.Type> fieldTypes =
             new global::System.Collections.Generic.Dictionary<string, global::System.Type>
             {
-                ["barm"] = typeof(string),
+                ["barm"] = typeof(global::Moonwell.Objects.ArmorType),
                 ["bbut"] = typeof(int),
                 ["bcat"] = typeof(string),
                 ["bclh"] = typeof(int),
@@ -41,7 +41,7 @@ namespace Moonwell.Objects
                 ["bnam"] = typeof(string),
                 ["bnrn"] = typeof(bool),
                 ["boch"] = typeof(float),
-                ["boct"] = typeof(string),
+                ["boct"] = typeof(global::Moonwell.Objects.OcclusionType),
                 ["bonc"] = typeof(bool),
                 ["bonw"] = typeof(bool),
                 ["bptd"] = typeof(string),
@@ -55,9 +55,9 @@ namespace Moonwell.Objects
                 ["bsmm"] = typeof(bool),
                 ["bsnd"] = typeof(string),
                 ["bsuf"] = typeof(string),
-                ["btar"] = typeof(string),
+                ["btar"] = typeof(global::Moonwell.Objects.Targets),
                 ["btcc"] = typeof(bool),
-                ["btco"] = typeof(string),
+                ["btco"] = typeof(global::Moonwell.Objects.TeamColor),
                 ["btil"] = typeof(string),
                 ["btsp"] = typeof(bool),
                 ["btxf"] = typeof(string),
@@ -82,9 +82,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>barm</c>.</summary>
         [global::Moonwell.Objects.Field("barm")]
-        public string ArmorType
+        public global::Moonwell.Objects.ArmorType ArmorType
         {
-            get { return Fields.Get<string>(this, "barm"); }
+            get { return Fields.Get<global::Moonwell.Objects.ArmorType>(this, "barm"); }
             protected set { Fields.Put("barm", value); }
         }
 
@@ -306,9 +306,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>boct</c>.</summary>
         [global::Moonwell.Objects.Field("boct")]
-        public string OcclusionTypeHD
+        public global::Moonwell.Objects.OcclusionType OcclusionTypeHD
         {
-            get { return Fields.Get<string>(this, "boct"); }
+            get { return Fields.Get<global::Moonwell.Objects.OcclusionType>(this, "boct"); }
             protected set { Fields.Put("boct", value); }
         }
 
@@ -418,9 +418,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>btar</c>.</summary>
         [global::Moonwell.Objects.Field("btar")]
-        public string TargetedAs
+        public global::Moonwell.Objects.Targets TargetedAs
         {
-            get { return Fields.Get<string>(this, "btar"); }
+            get { return Fields.Get<global::Moonwell.Objects.Targets>(this, "btar"); }
             protected set { Fields.Put("btar", value); }
         }
 
@@ -434,9 +434,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>btco</c>.</summary>
         [global::Moonwell.Objects.Field("btco")]
-        public string TeamColor
+        public global::Moonwell.Objects.TeamColor TeamColor
         {
-            get { return Fields.Get<string>(this, "btco"); }
+            get { return Fields.Get<global::Moonwell.Objects.TeamColor>(this, "btco"); }
             protected set { Fields.Put("btco", value); }
         }
 

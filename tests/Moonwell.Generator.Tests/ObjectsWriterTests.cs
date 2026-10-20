@@ -111,9 +111,9 @@ public class ObjectsWriterTests
     [Fact]
     public void every_source_is_left_out_when_moonwell_lua_is_defined()
     {
-        // CSharp.lua compiles with MOONWELL_LUA and reads the build's stubs of the used classes instead.
+        // CSharp.lua compiles with MOONWELL_LUA and reads the build's stubs of the used classes instead; the stubs name the enums.
         var lua = new CSharpParseOptions(LanguageVersion.CSharp13, preprocessorSymbols: new[] { "MOONWELL_LUA" });
-        foreach (var (path, text) in MiniFiles.Value.Where(f => f.Key.EndsWith(".cs", StringComparison.Ordinal)))
+        foreach (var (path, text) in MiniFiles.Value.Where(f => f.Key.EndsWith(".cs", StringComparison.Ordinal) && f.Key != "Choices.g.cs"))
         {
             var root = CSharpSyntaxTree.ParseText(text, lua, path).GetCompilationUnitRoot();
             Assert.Empty(root.Members);
@@ -127,6 +127,7 @@ public class ObjectsWriterTests
         Assert.Equal(
             new[]
             {
+                "Choices.g.cs",
                 "Destructables.g.cs",
                 "Doodads.g.cs",
                 "Human/Abilities.g.cs",
@@ -210,7 +211,8 @@ public class ObjectsWriterTests
             for (var i = 0; i < lines.Length; i++)
             {
                 if (lines[i].TrimStart().StartsWith("public class ", StringComparison.Ordinal)
-                    || lines[i].TrimStart().StartsWith("public abstract class ", StringComparison.Ordinal))
+                    || lines[i].TrimStart().StartsWith("public abstract class ", StringComparison.Ordinal)
+                    || lines[i].TrimStart().StartsWith("public enum ", StringComparison.Ordinal))
                 {
                     var above = i - 1;
                     while (lines[above].TrimStart().StartsWith("[", StringComparison.Ordinal))
@@ -373,7 +375,7 @@ public class ObjectsWriterTests
             "Moonwell.Objects.Human.Abilities", new[] { (storm, new ClassName("Moonwell.Objects.Human.Abilities", "Damage")) }, fields);
 
         Assert.Contains("public global::Moonwell.Objects.Levels<float> DamageHtb1\n", text);
-        Assert.Empty(Compile(new[] { MiniFiles.Value["Kinds/StandardAbility.g.cs"], text }));
+        Assert.Empty(Compile(new[] { MiniFiles.Value["Choices.g.cs"], MiniFiles.Value["Kinds/StandardAbility.g.cs"], text }));
     }
 
     [Fact]

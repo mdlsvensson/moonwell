@@ -32,7 +32,7 @@ namespace Moonwell.Objects
                 ["dmmg"] = typeof(int),
                 ["dmmr"] = typeof(int),
                 ["dnam"] = typeof(string),
-                ["doct"] = typeof(string),
+                ["doct"] = typeof(global::Moonwell.Objects.OcclusionType2),
                 ["donc"] = typeof(bool),
                 ["donw"] = typeof(bool),
                 ["dptx"] = typeof(string),
@@ -43,7 +43,7 @@ namespace Moonwell.Objects
                 ["dsmm"] = typeof(bool),
                 ["dsnd"] = typeof(string),
                 ["dtcc"] = typeof(bool),
-                ["dtco"] = typeof(string),
+                ["dtco"] = typeof(global::Moonwell.Objects.TeamColor),
                 ["dtil"] = typeof(string),
                 ["dtsp"] = typeof(bool),
                 ["duch"] = typeof(bool),
@@ -220,9 +220,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>doct</c>.</summary>
         [global::Moonwell.Objects.Field("doct")]
-        public string OcclusionTypeHD
+        public global::Moonwell.Objects.OcclusionType2 OcclusionTypeHD
         {
-            get { return Fields.Get<string>(this, "doct"); }
+            get { return Fields.Get<global::Moonwell.Objects.OcclusionType2>(this, "doct"); }
             protected set { Fields.Put("doct", value); }
         }
 
@@ -308,9 +308,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>dtco</c>.</summary>
         [global::Moonwell.Objects.Field("dtco")]
-        public string TeamColor
+        public global::Moonwell.Objects.TeamColor TeamColor
         {
-            get { return Fields.Get<string>(this, "dtco"); }
+            get { return Fields.Get<global::Moonwell.Objects.TeamColor>(this, "dtco"); }
             protected set { Fields.Put("dtco", value); }
         }
 

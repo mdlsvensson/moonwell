@@ -208,6 +208,23 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_choice_is_kept_as_its_number_and_one_the_same_as_the_standard_is_not()
+        {
+            var objects = built.Read(null).Objects;
+
+            var mage = Find(objects, "Objects.Mage");
+            Assert.Equal(6, mage.Changed["ua1t"]);
+            Assert.Equal(1 | 32, mage.Changed["ua1g"]);
+            Assert.Equal(1, mage.Changed["udea"]);
+            // The footman moves on foot and is targeted as ground: the mage's same choices are not changes.
+            Assert.False(mage.Changed.ContainsKey("umvt"));
+            Assert.False(mage.Changed.ContainsKey("utar"));
+
+            var zap = Find(objects, "Objects.Zap");
+            Assert.Equal(new object?[] { 1 | 32, 64, 64 | 1048576 }, new[] { zap.Changed["atar:1"], zap.Changed["atar:2"], zap.Changed["atar:3"] });
+        }
+
+        [Fact]
         public void ordered_by_class_name()
         {
             var names = built.Read(null).Objects.Select(one => one.ClassName).ToList();
@@ -216,8 +233,8 @@ namespace Moonwell.Build.Tests
                 new[]
                 {
                     "Objects.Arthas", "Objects.Burn", "Objects.Claws", "Objects.DarkArthas", "Objects.Drilled", "Objects.Duelist",
-                    "Objects.Elemental", "Objects.Firebolt", "Objects.Forge", "Objects.Gate", "Objects.Portal",
-                    "Objects.Rock", "Objects.StrongFootman", "Objects.Tuned",
+                    "Objects.Elemental", "Objects.Firebolt", "Objects.Forge", "Objects.Gate", "Objects.Mage", "Objects.Portal",
+                    "Objects.Rock", "Objects.StrongFootman", "Objects.Tuned", "Objects.Zap",
                 },
                 names);
         }
@@ -299,9 +316,41 @@ namespace Moonwell.Build.Tests
 
             Assert.Equal(standard.Fields("unit"), standard.Fields("hero"));
             Assert.Contains(new StandardData.ObjectField("Htb1", "float", true, 1, false, "unreal"), standard.Fields("ability"));
+            var attack = standard.Fields("unit").Single(field => field.Id == "ua1t");
+            Assert.Equal("choice", attack.Type);
+            Assert.Equal("AttackType", attack.Choice!.Name);
+            Assert.False(attack.Choice.Flags);
+            Assert.Equal(new[] { "unknown", "normal", "pierce", "siege", "spells", "chaos", "magic", "hero" }, attack.Choice.Members.Select(member => member.Text));
+            var targets = standard.Fields("ability").Single(field => field.Id == "atar").Choice!;
+            Assert.True(targets.Flags);
+            Assert.Equal(new[] { "alive", "aliv" }, targets.Members.Where(member => member.Number == 2).Select(member => new[] { member.Text }.Concat(member.Alternates)).Single());
             Assert.Contains("Hpal", standard.Ids("hero"));
             Assert.Contains("AHtb", standard.Ids("ability"));
             Assert.DoesNotContain("AHtb", standard.Ids("unit"));
+        }
+
+        [Theory]
+        [InlineData("unit", "ua1t", "magic", 6)]
+        [InlineData("unit", "ua1t", "MAGIC", 6)]
+        [InlineData("unit", "ua1t", " hero ", 7)]
+        [InlineData("unit", "ua1t", "3", 3)]
+        [InlineData("unit", "ua1t", "nonsense", 0)]
+        [InlineData("unit", "ua1t", null, 0)]
+        [InlineData("unit", "ua1g", "air,enemies", 1 | 32)]
+        [InlineData("unit", "ua1g", "aliv", 2)]
+        [InlineData("unit", "ua1g", "air, alli ,ally", 1 | 4)]
+        [InlineData("unit", "ua1g", "0", 0)]
+        [InlineData("unit", "ua1g", "", 0)]
+        [InlineData("unit", "ua1g", "air,nothing", 1)]
+        [InlineData("unit", "utyp", "undead,Mechanical", 2 | 8)]
+        [InlineData("unit", "udea", "3", 3)]
+        [InlineData("ability", "Eme2", "5", 5)]
+        public void a_standard_choice_reads_as_the_net_side_reads_it(string kind, string field, string? text, int expected)
+        {
+            // The same texts as ChoicesTests in Moonwell.Objects.Tests: the Lua's numbers are the ones .NET reads.
+            var choice = built.Standard.Fields(kind).Single(one => one.Id == field).Choice!;
+
+            Assert.Equal(expected, choice.Number(text));
         }
 
         [Fact]

@@ -37,22 +37,34 @@ namespace Moonwell.Build
         /// <summary>The field's value as a Lua literal: a value, a table of the levels' values, a table of ids, or an id (0 for none).</summary>
         public string Literal(UsedField field)
         {
-            var type = fields.TryGetValue(field.FieldId, out var known) ? known.Type : "string";
+            var known = fields.TryGetValue(field.FieldId, out var found) ? found : null;
+            var type = known?.Type ?? "string";
             switch (field.Access)
             {
                 case "levels":
-                    return Levels(field.FieldId, type);
+                    return Levels(field.FieldId, type, known?.Choice);
                 case "list":
                     return "{" + string.Join(", ", Entries(field.FieldId)) + "}";
                 case "ref":
                     var entries = Entries(field.FieldId);
                     return entries.Count > 0 ? entries[0] : "0";
                 default:
-                    return Scalar(type, Raw(field.FieldId, 0));
+                    return Value(type, known?.Choice, Raw(field.FieldId, 0));
             }
         }
 
-        private string Levels(string field, string type)
+        // A value of the field; a choice is its enum's number, as CSharp.lua compiles the enum.
+        private static string Value(string type, Choice? choice, object? raw)
+        {
+            if (choice == null)
+            {
+                return Scalar(type, raw);
+            }
+
+            return (raw is int number ? number : choice.Number((string?)raw)).ToString(CultureInfo.InvariantCulture);
+        }
+
+        private string Levels(string field, string type, Choice? choice)
         {
             var count = LevelCount();
             var prefix = field + ":";
@@ -67,7 +79,7 @@ namespace Moonwell.Build
             var values = new List<string>();
             for (var level = 1; level <= count; level++)
             {
-                values.Add(Scalar(type, Raw(field, level)));
+                values.Add(Value(type, choice, Raw(field, level)));
             }
 
             return "{" + string.Join(", ", values) + "}";

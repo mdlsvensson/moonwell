@@ -158,6 +158,33 @@ namespace Objects
         }
     }
 
+    // Choices: a text, a list and a number in the object file; a choice the same as the footman's is not written.
+    [Moonwell.Objects.ObjectId("h003")]
+    public class Mage : Moonwell.Objects.Human.Units.Footman
+    {
+        public Mage()
+        {
+            AttackType = Moonwell.Objects.AttackType.Magic;
+            Attack1TargetsAllowed = Moonwell.Objects.Targets.Air | Moonwell.Objects.Targets.Enemies;
+            DeathType = Moonwell.Objects.DeathType.CanRaiseDoesNotDecay;
+            Type = Moonwell.Objects.MoveType.Foot;
+            TargetedAs = Moonwell.Objects.Targets.Ground;
+        }
+    }
+
+    // A choice for each level.
+    [Moonwell.Objects.ObjectId("A006")]
+    public class Zap : Moonwell.Objects.Human.Abilities.StormBolt
+    {
+        public Zap()
+        {
+            TargetsAllowed = Levels(
+                Moonwell.Objects.Targets.Air | Moonwell.Objects.Targets.Enemies,
+                Moonwell.Objects.Targets.Ground,
+                Moonwell.Objects.Targets.Ground | Moonwell.Objects.Targets.Structure);
+        }
+    }
+
     [Moonwell.Objects.Replaces]
     public class StrongFootman : Moonwell.Objects.Human.Units.Footman
     {

@@ -18,43 +18,43 @@ namespace Moonwell.Objects
                 ["ua1c"] = typeof(float),
                 ["ua1d"] = typeof(int),
                 ["ua1f"] = typeof(int),
-                ["ua1g"] = typeof(string),
+                ["ua1g"] = typeof(global::Moonwell.Objects.Targets),
                 ["ua1h"] = typeof(int),
                 ["ua1m"] = typeof(string),
-                ["ua1p"] = typeof(string),
+                ["ua1p"] = typeof(global::Moonwell.Objects.Targets),
                 ["ua1q"] = typeof(int),
                 ["ua1r"] = typeof(int),
                 ["ua1s"] = typeof(int),
-                ["ua1t"] = typeof(string),
-                ["ua1w"] = typeof(string),
+                ["ua1t"] = typeof(global::Moonwell.Objects.AttackType),
+                ["ua1w"] = typeof(global::Moonwell.Objects.WeaponType),
                 ["ua1z"] = typeof(int),
                 ["ua2b"] = typeof(int),
                 ["ua2c"] = typeof(float),
                 ["ua2d"] = typeof(int),
                 ["ua2f"] = typeof(int),
-                ["ua2g"] = typeof(string),
+                ["ua2g"] = typeof(global::Moonwell.Objects.Targets),
                 ["ua2h"] = typeof(int),
                 ["ua2m"] = typeof(string),
-                ["ua2p"] = typeof(string),
+                ["ua2p"] = typeof(global::Moonwell.Objects.Targets),
                 ["ua2q"] = typeof(int),
                 ["ua2r"] = typeof(int),
                 ["ua2s"] = typeof(int),
-                ["ua2t"] = typeof(string),
-                ["ua2w"] = typeof(string),
+                ["ua2t"] = typeof(global::Moonwell.Objects.AttackType),
+                ["ua2w"] = typeof(global::Moonwell.Objects.WeaponType),
                 ["ua2z"] = typeof(int),
                 ["uaap"] = typeof(string),
                 ["uabi"] = typeof(global::Moonwell.Objects.ObjectList<global::Moonwell.Ability>),
                 ["uabr"] = typeof(float),
                 ["uabs"] = typeof(string),
-                ["uabt"] = typeof(string),
+                ["uabt"] = typeof(global::Moonwell.Objects.AiBuffer),
                 ["uacq"] = typeof(float),
-                ["uaen"] = typeof(string),
+                ["uaen"] = typeof(global::Moonwell.Objects.AttackBits),
                 ["uagi"] = typeof(int),
                 ["uagp"] = typeof(float),
                 ["ualp"] = typeof(string),
                 ["uamn"] = typeof(int),
                 ["uani"] = typeof(string),
-                ["uarm"] = typeof(string),
+                ["uarm"] = typeof(global::Moonwell.Objects.ArmorType),
                 ["uatg"] = typeof(bool),
                 ["uawt"] = typeof(string),
                 ["ubba"] = typeof(int),
@@ -79,13 +79,13 @@ namespace Moonwell.Objects
                 ["uclr"] = typeof(int),
                 ["ucol"] = typeof(float),
                 ["ucpt"] = typeof(float),
-                ["ucs1"] = typeof(string),
-                ["ucs2"] = typeof(string),
+                ["ucs1"] = typeof(global::Moonwell.Objects.CombatSound),
+                ["ucs2"] = typeof(global::Moonwell.Objects.CombatSound),
                 ["ucua"] = typeof(string),
                 ["ucun"] = typeof(string),
                 ["ucut"] = typeof(string),
                 ["udaa"] = typeof(global::Moonwell.Objects.ObjectRef<global::Moonwell.Ability>),
-                ["udea"] = typeof(string),
+                ["udea"] = typeof(global::Moonwell.Objects.DeathType),
                 ["udef"] = typeof(int),
                 ["udep"] = typeof(global::Moonwell.Objects.ObjectList<global::Moonwell.Unit>),
                 ["udl1"] = typeof(float),
@@ -94,7 +94,7 @@ namespace Moonwell.Objects
                 ["udp2"] = typeof(float),
                 ["udro"] = typeof(bool),
                 ["udtm"] = typeof(float),
-                ["udty"] = typeof(string),
+                ["udty"] = typeof(global::Moonwell.Objects.DefenseType),
                 ["udu1"] = typeof(int),
                 ["udu2"] = typeof(int),
                 ["udup"] = typeof(int),
@@ -122,7 +122,7 @@ namespace Moonwell.Objects
                 ["uhot"] = typeof(string),
                 ["uhpm"] = typeof(int),
                 ["uhpr"] = typeof(float),
-                ["uhrt"] = typeof(string),
+                ["uhrt"] = typeof(global::Moonwell.Objects.RegenType),
                 ["uibo"] = typeof(bool),
                 ["uico"] = typeof(string),
                 ["uimz"] = typeof(float),
@@ -161,7 +161,7 @@ namespace Moonwell.Objects
                 ["umvh"] = typeof(float),
                 ["umvr"] = typeof(float),
                 ["umvs"] = typeof(int),
-                ["umvt"] = typeof(string),
+                ["umvt"] = typeof(global::Moonwell.Objects.MoveType),
                 ["umxp"] = typeof(float),
                 ["umxr"] = typeof(float),
                 ["unam"] = typeof(string),
@@ -169,23 +169,23 @@ namespace Moonwell.Objects
                 ["unbr"] = typeof(bool),
                 ["unsf"] = typeof(string),
                 ["uocc"] = typeof(float),
-                ["uoct"] = typeof(string),
+                ["uoct"] = typeof(global::Moonwell.Objects.OcclusionType),
                 ["uori"] = typeof(int),
-                ["upap"] = typeof(string),
-                ["upar"] = typeof(string),
+                ["upap"] = typeof(global::Moonwell.Objects.PathingListPrevent),
+                ["upar"] = typeof(global::Moonwell.Objects.PathingListRequire),
                 ["upat"] = typeof(string),
                 ["upaw"] = typeof(float),
                 ["upgr"] = typeof(global::Moonwell.Objects.ObjectList<global::Moonwell.Upgrade>),
                 ["upoi"] = typeof(int),
                 ["upor"] = typeof(string),
-                ["upra"] = typeof(string),
+                ["upra"] = typeof(global::Moonwell.Objects.AttributeType),
                 ["upri"] = typeof(int),
                 ["upro"] = typeof(string),
                 ["upru"] = typeof(int),
                 ["uprw"] = typeof(float),
                 ["uqd1"] = typeof(float),
                 ["uqd2"] = typeof(float),
-                ["urac"] = typeof(string),
+                ["urac"] = typeof(global::Moonwell.Objects.UnitRace),
                 ["urb1"] = typeof(float),
                 ["urb2"] = typeof(float),
                 ["ureq"] = typeof(global::Moonwell.Objects.ObjectList<object>),
@@ -219,7 +219,7 @@ namespace Moonwell.Objects
                 ["ushb"] = typeof(string),
                 ["ushh"] = typeof(float),
                 ["ushr"] = typeof(bool),
-                ["ushu"] = typeof(string),
+                ["ushu"] = typeof(global::Moonwell.Objects.ShadowImage),
                 ["ushw"] = typeof(float),
                 ["ushx"] = typeof(float),
                 ["ushy"] = typeof(float),
@@ -241,22 +241,22 @@ namespace Moonwell.Objects
                 ["ustp"] = typeof(float),
                 ["ustr"] = typeof(int),
                 ["utaa"] = typeof(string),
-                ["utar"] = typeof(string),
+                ["utar"] = typeof(global::Moonwell.Objects.Targets),
                 ["utc1"] = typeof(int),
                 ["utc2"] = typeof(int),
                 ["utcc"] = typeof(bool),
-                ["utco"] = typeof(string),
+                ["utco"] = typeof(global::Moonwell.Objects.TeamColor),
                 ["util"] = typeof(string),
                 ["utip"] = typeof(string),
                 ["utpr"] = typeof(string),
                 ["utra"] = typeof(global::Moonwell.Objects.ObjectList<global::Moonwell.Unit>),
                 ["utss"] = typeof(bool),
                 ["utub"] = typeof(string),
-                ["utyp"] = typeof(string),
+                ["utyp"] = typeof(global::Moonwell.Objects.UnitClass),
                 ["uubs"] = typeof(string),
                 ["uuch"] = typeof(bool),
                 ["uupt"] = typeof(global::Moonwell.Objects.ObjectList<global::Moonwell.Unit>),
-                ["uver"] = typeof(string),
+                ["uver"] = typeof(global::Moonwell.Objects.VersionFlags),
                 ["uwal"] = typeof(float),
                 ["uwu1"] = typeof(bool),
                 ["uwu2"] = typeof(bool),
@@ -312,9 +312,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>ua1g</c>.</summary>
         [global::Moonwell.Objects.Field("ua1g")]
-        public string Attack1TargetsAllowed
+        public global::Moonwell.Objects.Targets Attack1TargetsAllowed
         {
-            get { return Fields.Get<string>(this, "ua1g"); }
+            get { return Fields.Get<global::Moonwell.Objects.Targets>(this, "ua1g"); }
             protected set { Fields.Put("ua1g", value); }
         }
 
@@ -336,9 +336,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>ua1p</c>.</summary>
         [global::Moonwell.Objects.Field("ua1p")]
-        public string Attack1AreaOfEffectTargets
+        public global::Moonwell.Objects.Targets Attack1AreaOfEffectTargets
         {
-            get { return Fields.Get<string>(this, "ua1p"); }
+            get { return Fields.Get<global::Moonwell.Objects.Targets>(this, "ua1p"); }
             protected set { Fields.Put("ua1p", value); }
         }
 
@@ -368,17 +368,17 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>ua1t</c>.</summary>
         [global::Moonwell.Objects.Field("ua1t")]
-        public string AttackType
+        public global::Moonwell.Objects.AttackType AttackType
         {
-            get { return Fields.Get<string>(this, "ua1t"); }
+            get { return Fields.Get<global::Moonwell.Objects.AttackType>(this, "ua1t"); }
             protected set { Fields.Put("ua1t", value); }
         }
 
         /// <summary>The field <c>ua1w</c>.</summary>
         [global::Moonwell.Objects.Field("ua1w")]
-        public string Attack1WeaponType
+        public global::Moonwell.Objects.WeaponType Attack1WeaponType
         {
-            get { return Fields.Get<string>(this, "ua1w"); }
+            get { return Fields.Get<global::Moonwell.Objects.WeaponType>(this, "ua1w"); }
             protected set { Fields.Put("ua1w", value); }
         }
 
@@ -424,9 +424,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>ua2g</c>.</summary>
         [global::Moonwell.Objects.Field("ua2g")]
-        public string Attack2TargetsAllowed
+        public global::Moonwell.Objects.Targets Attack2TargetsAllowed
         {
-            get { return Fields.Get<string>(this, "ua2g"); }
+            get { return Fields.Get<global::Moonwell.Objects.Targets>(this, "ua2g"); }
             protected set { Fields.Put("ua2g", value); }
         }
 
@@ -448,9 +448,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>ua2p</c>.</summary>
         [global::Moonwell.Objects.Field("ua2p")]
-        public string Attack2AreaOfEffectTargets
+        public global::Moonwell.Objects.Targets Attack2AreaOfEffectTargets
         {
-            get { return Fields.Get<string>(this, "ua2p"); }
+            get { return Fields.Get<global::Moonwell.Objects.Targets>(this, "ua2p"); }
             protected set { Fields.Put("ua2p", value); }
         }
 
@@ -480,17 +480,17 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>ua2t</c>.</summary>
         [global::Moonwell.Objects.Field("ua2t")]
-        public string Attack2AttackType
+        public global::Moonwell.Objects.AttackType Attack2AttackType
         {
-            get { return Fields.Get<string>(this, "ua2t"); }
+            get { return Fields.Get<global::Moonwell.Objects.AttackType>(this, "ua2t"); }
             protected set { Fields.Put("ua2t", value); }
         }
 
         /// <summary>The field <c>ua2w</c>.</summary>
         [global::Moonwell.Objects.Field("ua2w")]
-        public string Attack2WeaponType
+        public global::Moonwell.Objects.WeaponType Attack2WeaponType
         {
-            get { return Fields.Get<string>(this, "ua2w"); }
+            get { return Fields.Get<global::Moonwell.Objects.WeaponType>(this, "ua2w"); }
             protected set { Fields.Put("ua2w", value); }
         }
 
@@ -535,9 +535,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>uabt</c>.</summary>
         [global::Moonwell.Objects.Field("uabt")]
-        public string AIPlacementType
+        public global::Moonwell.Objects.AiBuffer AIPlacementType
         {
-            get { return Fields.Get<string>(this, "uabt"); }
+            get { return Fields.Get<global::Moonwell.Objects.AiBuffer>(this, "uabt"); }
             protected set { Fields.Put("uabt", value); }
         }
 
@@ -551,9 +551,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>uaen</c>.</summary>
         [global::Moonwell.Objects.Field("uaen")]
-        public string AttacksEnabled
+        public global::Moonwell.Objects.AttackBits AttacksEnabled
         {
-            get { return Fields.Get<string>(this, "uaen"); }
+            get { return Fields.Get<global::Moonwell.Objects.AttackBits>(this, "uaen"); }
             protected set { Fields.Put("uaen", value); }
         }
 
@@ -599,9 +599,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>uarm</c>.</summary>
         [global::Moonwell.Objects.Field("uarm")]
-        public string ArmorType
+        public global::Moonwell.Objects.ArmorType ArmorType
         {
-            get { return Fields.Get<string>(this, "uarm"); }
+            get { return Fields.Get<global::Moonwell.Objects.ArmorType>(this, "uarm"); }
             protected set { Fields.Put("uarm", value); }
         }
 
@@ -798,17 +798,17 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>ucs1</c>.</summary>
         [global::Moonwell.Objects.Field("ucs1")]
-        public string Attack1WeaponSound
+        public global::Moonwell.Objects.CombatSound Attack1WeaponSound
         {
-            get { return Fields.Get<string>(this, "ucs1"); }
+            get { return Fields.Get<global::Moonwell.Objects.CombatSound>(this, "ucs1"); }
             protected set { Fields.Put("ucs1", value); }
         }
 
         /// <summary>The field <c>ucs2</c>.</summary>
         [global::Moonwell.Objects.Field("ucs2")]
-        public string Attack2WeaponSound
+        public global::Moonwell.Objects.CombatSound Attack2WeaponSound
         {
-            get { return Fields.Get<string>(this, "ucs2"); }
+            get { return Fields.Get<global::Moonwell.Objects.CombatSound>(this, "ucs2"); }
             protected set { Fields.Put("ucs2", value); }
         }
 
@@ -845,9 +845,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>udea</c>.</summary>
         [global::Moonwell.Objects.Field("udea")]
-        public string DeathType
+        public global::Moonwell.Objects.DeathType DeathType
         {
-            get { return Fields.Get<string>(this, "udea"); }
+            get { return Fields.Get<global::Moonwell.Objects.DeathType>(this, "udea"); }
             protected set { Fields.Put("udea", value); }
         }
 
@@ -916,9 +916,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>udty</c>.</summary>
         [global::Moonwell.Objects.Field("udty")]
-        public string DefenseType
+        public global::Moonwell.Objects.DefenseType DefenseType
         {
-            get { return Fields.Get<string>(this, "udty"); }
+            get { return Fields.Get<global::Moonwell.Objects.DefenseType>(this, "udty"); }
             protected set { Fields.Put("udty", value); }
         }
 
@@ -1139,9 +1139,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>uhrt</c>.</summary>
         [global::Moonwell.Objects.Field("uhrt")]
-        public string HitPointsRegenerationType
+        public global::Moonwell.Objects.RegenType HitPointsRegenerationType
         {
-            get { return Fields.Get<string>(this, "uhrt"); }
+            get { return Fields.Get<global::Moonwell.Objects.RegenType>(this, "uhrt"); }
             protected set { Fields.Put("uhrt", value); }
         }
 
@@ -1450,9 +1450,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>umvt</c>.</summary>
         [global::Moonwell.Objects.Field("umvt")]
-        public string Type
+        public global::Moonwell.Objects.MoveType Type
         {
-            get { return Fields.Get<string>(this, "umvt"); }
+            get { return Fields.Get<global::Moonwell.Objects.MoveType>(this, "umvt"); }
             protected set { Fields.Put("umvt", value); }
         }
 
@@ -1514,9 +1514,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>uoct</c>.</summary>
         [global::Moonwell.Objects.Field("uoct")]
-        public string OcclusionTypeHD
+        public global::Moonwell.Objects.OcclusionType OcclusionTypeHD
         {
-            get { return Fields.Get<string>(this, "uoct"); }
+            get { return Fields.Get<global::Moonwell.Objects.OcclusionType>(this, "uoct"); }
             protected set { Fields.Put("uoct", value); }
         }
 
@@ -1530,17 +1530,17 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>upap</c>.</summary>
         [global::Moonwell.Objects.Field("upap")]
-        public string PlacementRequires
+        public global::Moonwell.Objects.PathingListPrevent PlacementRequires
         {
-            get { return Fields.Get<string>(this, "upap"); }
+            get { return Fields.Get<global::Moonwell.Objects.PathingListPrevent>(this, "upap"); }
             protected set { Fields.Put("upap", value); }
         }
 
         /// <summary>The field <c>upar</c>.</summary>
         [global::Moonwell.Objects.Field("upar")]
-        public string PlacementPreventedBy
+        public global::Moonwell.Objects.PathingListRequire PlacementPreventedBy
         {
-            get { return Fields.Get<string>(this, "upar"); }
+            get { return Fields.Get<global::Moonwell.Objects.PathingListRequire>(this, "upar"); }
             protected set { Fields.Put("upar", value); }
         }
 
@@ -1585,9 +1585,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>upra</c>.</summary>
         [global::Moonwell.Objects.Field("upra")]
-        public string PrimaryAttribute
+        public global::Moonwell.Objects.AttributeType PrimaryAttribute
         {
-            get { return Fields.Get<string>(this, "upra"); }
+            get { return Fields.Get<global::Moonwell.Objects.AttributeType>(this, "upra"); }
             protected set { Fields.Put("upra", value); }
         }
 
@@ -1641,9 +1641,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>urac</c>.</summary>
         [global::Moonwell.Objects.Field("urac")]
-        public string Race
+        public global::Moonwell.Objects.UnitRace Race
         {
-            get { return Fields.Get<string>(this, "urac"); }
+            get { return Fields.Get<global::Moonwell.Objects.UnitRace>(this, "urac"); }
             protected set { Fields.Put("urac", value); }
         }
 
@@ -1900,9 +1900,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>ushu</c>.</summary>
         [global::Moonwell.Objects.Field("ushu")]
-        public string ShadowImageUnit
+        public global::Moonwell.Objects.ShadowImage ShadowImageUnit
         {
-            get { return Fields.Get<string>(this, "ushu"); }
+            get { return Fields.Get<global::Moonwell.Objects.ShadowImage>(this, "ushu"); }
             protected set { Fields.Put("ushu", value); }
         }
 
@@ -2076,9 +2076,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>utar</c>.</summary>
         [global::Moonwell.Objects.Field("utar")]
-        public string TargetedAs
+        public global::Moonwell.Objects.Targets TargetedAs
         {
-            get { return Fields.Get<string>(this, "utar"); }
+            get { return Fields.Get<global::Moonwell.Objects.Targets>(this, "utar"); }
             protected set { Fields.Put("utar", value); }
         }
 
@@ -2108,9 +2108,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>utco</c>.</summary>
         [global::Moonwell.Objects.Field("utco")]
-        public string TeamColor
+        public global::Moonwell.Objects.TeamColor TeamColor
         {
-            get { return Fields.Get<string>(this, "utco"); }
+            get { return Fields.Get<global::Moonwell.Objects.TeamColor>(this, "utco"); }
             protected set { Fields.Put("utco", value); }
         }
 
@@ -2163,9 +2163,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>utyp</c>.</summary>
         [global::Moonwell.Objects.Field("utyp")]
-        public string UnitClassification
+        public global::Moonwell.Objects.UnitClass UnitClassification
         {
-            get { return Fields.Get<string>(this, "utyp"); }
+            get { return Fields.Get<global::Moonwell.Objects.UnitClass>(this, "utyp"); }
             protected set { Fields.Put("utyp", value); }
         }
 
@@ -2194,9 +2194,9 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>uver</c>.</summary>
         [global::Moonwell.Objects.Field("uver")]
-        public string ModelFileExtraVersions
+        public global::Moonwell.Objects.VersionFlags ModelFileExtraVersions
         {
-            get { return Fields.Get<string>(this, "uver"); }
+            get { return Fields.Get<global::Moonwell.Objects.VersionFlags>(this, "uver"); }
             protected set { Fields.Put("uver", value); }
         }
 

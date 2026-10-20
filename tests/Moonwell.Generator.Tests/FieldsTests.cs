@@ -27,7 +27,7 @@ public class FieldsTests
     [InlineData(Kind.Upgrade, "glvl", "LevelCount")]
     [InlineData(Kind.Ability, "anam", "Name")]
     [InlineData(Kind.Ability, "abuf", "Buffs")]
-    [InlineData(Kind.Ability, "atar", "Targets")]
+    [InlineData(Kind.Ability, "atar", "TargetsAllowed")]
     [InlineData(Kind.Item, "iabi", "Abilities")]
     public void hand_picked_names(Kind kind, string id, string name)
     {

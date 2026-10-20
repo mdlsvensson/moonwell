@@ -14,9 +14,9 @@ public static class GeneratedObjects
     }
 
     /// <summary>
-    /// The files, by path under <c>Generated/</c> with <c>/</c> separators: the eight kind bases (<c>Kinds/</c>), one
-    /// file for each namespace (<c>Units/Human.g.cs</c>, <c>Items.g.cs</c>) and a values file for each kind
-    /// (<c>Values/unit.json</c>, heroes included).
+    /// The files, by path under <c>Generated/</c> with <c>/</c> separators: the enums of the choice types
+    /// (<c>Choices.g.cs</c>), the eight kind bases (<c>Kinds/</c>), one file for each namespace (<c>Units/Human.g.cs</c>,
+    /// <c>Items.g.cs</c>) and a values file for each kind (<c>Values/unit.json</c>, heroes included).
     /// </summary>
     /// <param name="tables">The export.</param>
     /// <param name="runtime">The runtime classes' members, whose names no field takes; null for none.</param>
@@ -30,10 +30,15 @@ public static class GeneratedObjects
         var fieldsOf = new Dictionary<Kind, IReadOnlyList<Field>>();
         var objectsOf = new Dictionary<Kind, IReadOnlyList<StandardObject>>();
         var everything = new List<StandardObject>();
+        var choices = Choices.All(tables, runtime?.Taken());
+
+        // The enums are not left out under MOONWELL_LUA: the build's stubs name them. CSharp.lua writes no Lua for them.
+        files["Choices.g.cs"] = ObjectsWriter.Header(gameVersion) + "\n" + ObjectsWriter.Choices(choices.Values);
         foreach (var kind in Enum.GetValues<Kind>())
         {
-            var fields = Fields.Of(tables, kind, runtime?.Of(kind));
+            var fields = Fields.Of(tables, kind, runtime?.Of(kind), choices);
             var objects = StandardObjects.Of(tables, kind, fields);
+            CheckSingleChoices(fields, objects);
             fieldsOf[kind] = fields;
             objectsOf[kind] = objects;
             everything.AddRange(objects);
@@ -64,6 +69,38 @@ public static class GeneratedObjects
         }
 
         return files;
+    }
+
+    /// <summary>
+    /// Fails when a standard value of a field of a single choice is a comma list: its type holds any of its values, and
+    /// belongs with the list types of <see cref="Choices"/>.
+    /// </summary>
+    private static void CheckSingleChoices(IReadOnlyList<Field> fields, IReadOnlyList<StandardObject> objects)
+    {
+        var single = new Dictionary<string, Field>(StringComparer.Ordinal);
+        foreach (var field in fields)
+        {
+            if (field.Choice is { Form: ChoiceForm.One })
+            {
+                single[field.Id] = field;
+            }
+        }
+
+        foreach (var obj in objects)
+        {
+            foreach (var values in new[] { obj.Values }.Concat(obj.Sets.Values))
+            {
+                foreach (var (key, value) in values)
+                {
+                    var colon = key.IndexOf(':');
+                    if (value.Contains(',') && single.TryGetValue(colon < 0 ? key : key.Substring(0, colon), out var field))
+                    {
+                        throw new InvalidOperationException(
+                            $"{obj.Id} {key} is '{value}', a list, and {field.Choice!.Type} is a single choice; list the type in Choices");
+                    }
+                }
+            }
+        }
     }
 
     /// <summary>The file of a group and kind: <c>Moonwell.Objects.Human.Units</c> is <c>Human/Units.g.cs</c>.</summary>

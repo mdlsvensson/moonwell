@@ -224,6 +224,24 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void choices_read_in_lua_as_their_numbers()
+        {
+            using var lua = compiled.Start();
+
+            // The mage's declared choices, the footman's standard ones (Metal armor, targeted as ground) and the zap's levels.
+            Assert.Equal("6", Query(lua, "return tostring(Objects.Mage():getAttackType())"));
+            Assert.Equal("33", Query(lua, "return tostring(Objects.Mage():getAttack1TargetsAllowed())"));
+            Assert.Equal("1", Query(lua, "return tostring(Objects.Mage():getArmorType())"));
+            Assert.Equal("64", Query(lua, "return tostring(Objects.Mage():getTargetedAs())"));
+            Assert.Equal("yes yes 1048640", Query(lua, "return Objects.Report.Chosen(Objects.Mage(), Objects.Zap())"));
+
+            // The enums are ignored: CSharp.lua writes their members as numbers (a debug build names them in a comment) and no Lua of their own.
+            Assert.Contains("33 --[[Moonwell.Objects.Targets.Air | Moonwell.Objects.Targets.Enemies]]", compiled.Script);
+            Assert.DoesNotMatch("(?<![gs]et)AttackType", compiled.ReleaseScript);
+            Assert.DoesNotContain("Moonwell.Objects.Targets", compiled.ReleaseScript);
+        }
+
+        [Fact]
         public void ctor_runs_runtime_base()
         {
             using var lua = compiled.Start();

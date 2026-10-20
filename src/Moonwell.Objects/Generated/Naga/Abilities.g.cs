@@ -273,9 +273,9 @@ namespace Moonwell.Objects
 
                 /// <summary>The field <c>Poi4</c>.</summary>
                 [global::Moonwell.Objects.Field("Poi4")]
-                public global::Moonwell.Objects.Levels<string> StackingType
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.StackFlags> StackingType
                 {
-                    get { return Fields.GetLevels<string>(this, "Poi4"); }
+                    get { return Fields.GetLevels<global::Moonwell.Objects.StackFlags>(this, "Poi4"); }
                     protected set { Fields.Put("Poi4", value); }
                 }
 
