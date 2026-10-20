@@ -4,7 +4,7 @@ namespace Moonwell
     public abstract class MapComponent : Component
     {
         /// <summary>The reactions of map components; declared here, so that an override in a subclass is found.</summary>
-        internal static readonly HookTable MapHooks = new HookTable(typeof(MapComponent), new[] { "OnGameStart", "OnUnitEnter", "OnUnitDamaged", "OnUnitDied", "OnUnitCast" }, new[] { Hook.OnGameStart, Hook.OnUnitEnter, Hook.OnUnitDamaged, Hook.OnUnitDied, Hook.OnUnitCast });
+        internal static readonly HookTable MapHooks = new HookTable(typeof(MapComponent), new[] { "OnGameStart", "OnUnitEnter", "OnUnitDamaged", "OnUnitDied", "OnUnitCast", "OnLeave" }, new[] { Hook.OnGameStart, Hook.OnUnitEnter, Hook.OnUnitDamaged, Hook.OnUnitDied, Hook.OnUnitCast, Hook.OnLeave });
 
         /// <summary>Runs when the game starts.</summary>
         public virtual void OnGameStart()
@@ -28,6 +28,11 @@ namespace Moonwell
 
         /// <summary>Runs when a unit in the map begins a cast, for the game's components, then the components of the caster's player.</summary>
         public virtual void OnUnitCast(Cast cast)
+        {
+        }
+
+        /// <summary>Runs when a player leaves the game, for the game's components, then the leaving player's.</summary>
+        public virtual void OnLeave(Player player)
         {
         }
 

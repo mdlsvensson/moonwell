@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Moonwell.Hosting;
 
 namespace Moonwell
@@ -7,6 +8,9 @@ namespace Moonwell
     {
         /// <summary>The number of player slots, the game's bj_MAX_PLAYER_SLOTS.</summary>
         public const int MaxSlots = 28;
+
+        /// <summary>The number of slots a person or a computer can play in, the game's bj_MAX_PLAYERS.</summary>
+        public const int PlayableSlots = 24;
 
         /// <summary>The player object of each slot, made when the slot is first asked for; null until then.</summary>
         private static readonly Player?[] bySlot = new Player?[MaxSlots];
@@ -263,6 +267,22 @@ namespace Moonwell
             Runtime.World.PrintTo(Handle, text, seconds);
         }
 
+        /// <summary>Whether the slot is in the game: empty, playing, or left.</summary>
+        [LocalSafe]
+        public SlotState SlotState => (SlotState)Runtime.World.SlotStateOf(Handle);
+
+        /// <summary>Who controls the slot: a person, a computer, or another kind.</summary>
+        [LocalSafe]
+        public Controller Controller => (Controller)Runtime.World.ControllerOf(Handle);
+
+        /// <summary>The players in the game, people and computers, in slot order: a new list each time it is read.</summary>
+        [LocalSafe]
+        public static List<Player> Playing => InGame(false);
+
+        /// <summary>The players in the game that a person controls, in slot order: a new list each time it is read.</summary>
+        [LocalSafe]
+        public static List<Player> Users => InGame(true);
+
         /// <summary>The level the player has of an upgrade class.</summary>
         [LocalSafe]
         public int LevelOf<T>() where T : Upgrade
@@ -272,6 +292,22 @@ namespace Moonwell
 
         /// <summary>Adds a component to the player, and returns it.</summary>
         public T Add<T>(T component) where T : PlayerComponent => AddComponent(component);
+
+        // The playing players of the slots a person or computer can have, people only when asked.
+        private static List<Player> InGame(bool usersOnly)
+        {
+            var found = new List<Player>();
+            for (var slot = 0; slot < PlayableSlots; slot++)
+            {
+                var player = Get(slot);
+                if (player.SlotState == SlotState.Playing && (!usersOnly || player.Controller == Controller.User))
+                {
+                    found.Add(player);
+                }
+            }
+
+            return found;
+        }
 
         /// <summary>Forgets every player object; Runtime.Reset calls it.</summary>
         internal static void Reset()

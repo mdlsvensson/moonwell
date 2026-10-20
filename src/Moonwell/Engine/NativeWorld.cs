@@ -88,6 +88,15 @@ namespace Moonwell.Engine
                 case GameEvent.Drop:
                     Register(Natives.EVENT_PLAYER_UNIT_DROP_ITEM, DropAction);
                     break;
+                case GameEvent.Leave:
+                    var trigger = Natives.CreateTrigger();
+                    for (var slot = 0; slot < Natives.bj_MAX_PLAYERS; slot++)
+                    {
+                        Natives.TriggerRegisterPlayerEvent(trigger, Natives.Player(slot), Natives.EVENT_PLAYER_LEAVE);
+                    }
+
+                    Natives.TriggerAddAction(trigger, LeaveAction);
+                    break;
             }
         }
 
@@ -101,6 +110,45 @@ namespace Moonwell.Engine
         public void Print(string text)
         {
             Natives.DisplayTimedTextToPlayer(Natives.GetLocalPlayer(), 0f, 0f, 30f, text);
+        }
+
+        /// <summary>The slot state of a player, from the game.</summary>
+        public int SlotStateOf(player player)
+        {
+            var state = Natives.GetPlayerSlotState(player);
+            if (state == Natives.PLAYER_SLOT_STATE_PLAYING)
+            {
+                return 1;
+            }
+
+            return state == Natives.PLAYER_SLOT_STATE_LEFT ? 2 : 0;
+        }
+
+        /// <summary>Who controls a player, from the game.</summary>
+        public int ControllerOf(player player)
+        {
+            var control = Natives.GetPlayerController(player);
+            if (control == Natives.MAP_CONTROL_USER)
+            {
+                return 0;
+            }
+
+            if (control == Natives.MAP_CONTROL_COMPUTER)
+            {
+                return 1;
+            }
+
+            if (control == Natives.MAP_CONTROL_RESCUABLE)
+            {
+                return 2;
+            }
+
+            if (control == Natives.MAP_CONTROL_NEUTRAL)
+            {
+                return 3;
+            }
+
+            return control == Natives.MAP_CONTROL_CREEP ? 4 : 5;
         }
 
         /// <summary>A state of a player, from the game.</summary>
@@ -491,6 +539,18 @@ namespace Moonwell.Engine
         }
 
         /// <summary>Hands a drop to Inbound.</summary>
+        private static void LeaveAction()
+        {
+            try
+            {
+                Inbound.Left(Natives.GetTriggerPlayer());
+            }
+            catch (Exception error)
+            {
+                Errors.Report("Moonwell.Leave", error);
+            }
+        }
+
         private static void DropAction()
         {
             try

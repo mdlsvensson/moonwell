@@ -44,5 +44,8 @@ namespace Moonwell
 
         /// <summary>The game starts.</summary>
         internal const int OnGameStart = 8192;
+
+        /// <summary>A player leaves the game.</summary>
+        internal const int OnLeave = 16384;
     }
 }

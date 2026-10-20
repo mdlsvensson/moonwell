@@ -742,6 +742,48 @@ namespace Moonwell
             caster.EndDispatch();
         }
 
+        /// <summary>A player leaves the game: the game's components react, then the leaving player's.</summary>
+        internal static void Left(player p)
+        {
+            var leaving = Player.Of(p);
+            if (leaving == null)
+            {
+                return;
+            }
+
+            MapLeft(Game.Instance, leaving);
+            MapLeft(leaving, leaving);
+        }
+
+        /// <summary>Runs OnLeave on the map components of an actor, in add order.</summary>
+        private static void MapLeft(Actor actor, Player leaving)
+        {
+            var count = actor.BeginDispatch();
+            for (var i = 0; i < count; i++)
+            {
+                var component = actor.ComponentAt(i) as MapComponent;
+                if (component == null || component.HasEnded || (component.Mask & Hook.OnLeave) == 0)
+                {
+                    continue;
+                }
+
+                var previous = Owner.current;
+                Owner.current = component;
+                try
+                {
+                    component.OnLeave(leaving);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(component) + ".OnLeave", error);
+                }
+
+                Owner.current = previous;
+            }
+
+            actor.EndDispatch();
+        }
+
         /// <summary>Runs OnUnitCast on the map components of an actor, in add order.</summary>
         private static void MapCast(Actor actor, Cast cast)
         {

@@ -100,6 +100,18 @@ public class LocalTests
     }
 
     [Fact]
+    public void who_is_playing_reads_inside()
+    {
+        Assert.Empty(MapCode.Check("""
+            Local.For(p, () =>
+            {
+                var playing = Player.Playing.Count + Player.Users.Count;
+                var left = p.SlotState == SlotState.Left || p.Controller == Controller.Computer;
+            });
+            """));
+    }
+
+    [Fact]
     public void printing_is_allowed_inside()
     {
         Assert.Empty(MapCode.Check("""

@@ -95,6 +95,12 @@ namespace Moonwell.Hosting
         /// <summary>The player that owns a unit; null a while after the game has removed it.</summary>
         player OwnerOf(unit unit);
 
+        /// <summary>The slot state of a player, as SlotState counts it (0 empty, 1 playing, 2 left).</summary>
+        int SlotStateOf(player player);
+
+        /// <summary>Who controls a player, as Controller counts it (0 user, 1 computer, 2 rescuable, 3 neutral, 4 creep, 5 none).</summary>
+        int ControllerOf(player player);
+
         /// <summary>A state of a player: its gold, lumber, food or upkeep.</summary>
         int StateOf(player player, PlayerState state);
 

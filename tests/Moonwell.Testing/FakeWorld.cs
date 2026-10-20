@@ -99,6 +99,12 @@ namespace Moonwell.Testing
         /// <summary>The states set on players, by slot times 16 plus the state.</summary>
         private readonly Dictionary<int, int> states = new Dictionary<int, int>();
 
+        /// <summary>The slot state of each slot SetSlot set.</summary>
+        private readonly Dictionary<int, int> slotStates = new Dictionary<int, int>();
+
+        /// <summary>Who controls each slot SetSlot set.</summary>
+        private readonly Dictionary<int, int> controllers = new Dictionary<int, int>();
+
         /// <summary>The slot of each player made.</summary>
         private readonly Dictionary<player, int> slots = new Dictionary<player, int>();
 
@@ -234,6 +240,26 @@ namespace Moonwell.Testing
         public void Print(string text)
         {
             Printed.Add(text);
+        }
+
+        /// <summary>The slot state of a player; Empty until SetSlot sets it.</summary>
+        public int SlotStateOf(player player)
+        {
+            return slotStates.TryGetValue(SlotOf(player), out var state) ? state : 0;
+        }
+
+        /// <summary>Who controls a player; User until SetSlot sets it.</summary>
+        public int ControllerOf(player player)
+        {
+            return controllers.TryGetValue(SlotOf(player), out var control) ? control : 0;
+        }
+
+        /// <summary>Sets a slot's state and who controls it.</summary>
+        public void SetSlot(int slot, SlotState state, Controller controller)
+        {
+            PlayerAt(slot);
+            slotStates[slot] = (int)state;
+            controllers[slot] = (int)controller;
         }
 
         /// <summary>A state of a player; 0 until it is set.</summary>
