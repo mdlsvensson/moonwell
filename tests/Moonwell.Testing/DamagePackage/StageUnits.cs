@@ -15,6 +15,18 @@ namespace Moonwell.Testing
         /// <summary>Logs the stage.</summary>
         public void OnDealt(Hit hit) => TestLog.Lines.Add("source dealt");
 
+        /// <summary>Run in OnBurst; null for nothing.</summary>
+        public System.Action<Burst>? Bursted;
+
+        /// <summary>Runs Bursted.</summary>
+        public void OnBurst(Burst burst)
+        {
+            if (Bursted != null)
+            {
+                Bursted(burst);
+            }
+        }
+
         /// <summary>Logs core's reaction.</summary>
         public override void OnDealtDamage(Damage damage) => TestLog.Lines.Add("source core dealt");
     }
@@ -61,6 +73,30 @@ namespace Moonwell.Testing
             if (Taken != null)
             {
                 Taken(hit);
+            }
+        }
+
+        /// <summary>Run in OnLethal; null for nothing.</summary>
+        public System.Action<Hit>? Lethal;
+
+        /// <summary>Run in OnHurt; null for nothing.</summary>
+        public System.Action<Hit>? Hurt;
+
+        /// <summary>Runs Lethal.</summary>
+        public void OnLethal(Hit hit)
+        {
+            if (Lethal != null)
+            {
+                Lethal(hit);
+            }
+        }
+
+        /// <summary>Runs Hurt.</summary>
+        public void OnHurt(Hit hit)
+        {
+            if (Hurt != null)
+            {
+                Hurt(hit);
             }
         }
 

@@ -6,6 +6,9 @@ namespace Moonwell.Testing
         /// <summary>The fake damage world of the current case.</summary>
         private static FakeDamageWorld fake = null!;
 
+        /// <summary>The fake damage world of the current case, for the other damage package cases.</summary>
+        internal static FakeDamageWorld Fake => fake;
+
         /// <summary>Checks that the log is exactly the expected lines, in order.</summary>
         internal static void ExpectLog(string[] expected, string what)
         {
@@ -17,7 +20,7 @@ namespace Moonwell.Testing
         }
 
         /// <summary>Installs the package on a fake, registers SourceUnit (H001) and TargetUnit (h001), and makes one of each: the source for player 0, the target for player 1.</summary>
-        private static void Arena(FakeWorld world, out SourceUnit source, out TargetUnit target)
+        internal static void Arena(FakeWorld world, out SourceUnit source, out TargetUnit target)
         {
             fake = new FakeDamageWorld();
             DamageSystem.Install(fake);

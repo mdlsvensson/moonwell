@@ -21,6 +21,9 @@ namespace Moonwell
         /// <summary>The hits between their before-armor and after-armor events, innermost last.</summary>
         private static readonly List<Hit> open = new List<Hit>();
 
+        /// <summary>The hits that finished their after-armor stage since the 0 s timer last ran, in order: they land when it runs.</summary>
+        private static List<Hit> moment = new List<Hit>();
+
         /// <summary>Makes a world the package's world, clears its state and plugs it into the runtime.</summary>
         internal static void Install(IDamageWorld world)
         {
@@ -28,6 +31,7 @@ namespace Moonwell
             listening = false;
             Watched = false;
             open.Clear();
+            moment = new List<Hit>();
             Reactions.Reset();
             Events.DamageListener = Listen;
             Hooks.Seen = Saw;
@@ -155,7 +159,15 @@ namespace Moonwell
                 World.SetDefenseType(target, hit.DefenseTypeCode);
             }
 
+            // Spell immunity: the game will not send this hit's after-armor event, so it ends here.
+            if (Immunity.Stops(World.IsMagicImmune(target), hit.AttackTypeCode, (int)hit.DamageType))
+            {
+                PutBack(hit);
+                return;
+            }
+
             open.Add(hit);
+            World.AfterZero(Settle);
         }
 
         /// <summary>The game's damaged event: the target's own armor back, core's reactions, then the after-armor stage.</summary>
@@ -185,10 +197,81 @@ namespace Moonwell
             hit.LifeBefore = World.Life(targetHandle);
             Inbound.Dispatch(hit);
             Reactions.Run(hit, Stage.AfterArmor);
+            if (hit.LifeBefore - hit.Amount <= 0.405f)
+            {
+                hit.Stage = Stage.Lethal;
+                Reactions.Run(hit, Stage.Lethal);
+            }
+
             if (hit.Amount != amount)
             {
                 World.SetEventAmount(hit.Amount);
             }
+
+            moment.Add(hit);
+            World.AfterZero(Settle);
+        }
+
+        /// <summary>The 0 s timer: hits still waiting for their after-armor event end without it; the moment's hits land, in order; then each source's burst.</summary>
+        private static void Settle()
+        {
+            while (open.Count > 0)
+            {
+                PutBack(open[open.Count - 1]);
+                open.RemoveAt(open.Count - 1);
+            }
+
+            var landed = moment;
+            moment = new List<Hit>();
+            var bursts = new List<Burst>();
+            for (var i = 0; i < landed.Count; i++)
+            {
+                var hit = landed[i];
+                hit.Stage = Stage.Landed;
+                hit.Killed = World.IsDead(hit.Target.Handle);
+                Reactions.Run(hit, Stage.Landed);
+                if (hit.Source != null)
+                {
+                    AddToBurst(bursts, hit);
+                }
+            }
+
+            for (var i = 0; i < bursts.Count; i++)
+            {
+                Reactions.RunBurst(bursts[i]);
+            }
+        }
+
+        /// <summary>Adds a hit to its source's burst, made when it is the source's first; counts a target the burst has not hit yet.</summary>
+        private static void AddToBurst(List<Burst> bursts, Hit hit)
+        {
+            Burst? burst = null;
+            for (var i = 0; i < bursts.Count; i++)
+            {
+                if (bursts[i].Source == hit.Source)
+                {
+                    burst = bursts[i];
+                }
+            }
+
+            if (burst == null)
+            {
+                burst = new Burst(hit.Source!);
+                bursts.Add(burst);
+            }
+
+            var known = false;
+            for (var i = 0; i < burst.Hits.Count; i++)
+            {
+                known = known || burst.Hits[i].Target == hit.Target;
+            }
+
+            if (!known)
+            {
+                burst.Targets++;
+            }
+
+            burst.Hits.Add(hit);
         }
 
         /// <summary>Puts the hit's armor on the target, whether the game's armor setter sets the armor with its bonuses or without them, and remembers what puts the target's own back.</summary>

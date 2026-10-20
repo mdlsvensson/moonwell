@@ -130,6 +130,15 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "damage-package.type-set-after-armor-reported", Run = StageCases.TypeSetAfterArmorReported });
             list.Add(new Case { Name = "damage-package.removed-mid-stage", Run = StageCases.RemovedMidStage });
             list.Add(new Case { Name = "damage-package.melee-or-ranged", Run = StageCases.MeleeOrRanged });
+            list.Add(new Case { Name = "damage-package.lethal-spare", Run = LandingCases.LethalSpare });
+            list.Add(new Case { Name = "damage-package.lethal-only-when-lethal", Run = LandingCases.LethalOnlyWhenLethal });
+            list.Add(new Case { Name = "damage-package.landed-after-zero", Run = LandingCases.LandedAfterZero });
+            list.Add(new Case { Name = "damage-package.burst-counts", Run = LandingCases.BurstCounts });
+            list.Add(new Case { Name = "damage-package.immunity-stops", Run = LandingCases.ImmunityStops });
+            list.Add(new Case { Name = "damage-package.immunity-after-type-change", Run = LandingCases.ImmunityAfterTypeChange });
+            list.Add(new Case { Name = "damage-package.immunity-inside-hit", Run = LandingCases.ImmunityInsideHit });
+            list.Add(new Case { Name = "damage-package.nested-keeps-outer", Run = LandingCases.NestedKeepsOuter });
+            list.Add(new Case { Name = "damage-package.stray-open-ended", Run = LandingCases.StrayOpenEnded });
             list.Add(new Case { Name = "death.order", Run = DeathCases.Order });
             list.Add(new Case { Name = "death.self", Run = DeathCases.Self });
             list.Add(new Case { Name = "death.not-an-end", Run = DeathCases.NotAnEnd });
