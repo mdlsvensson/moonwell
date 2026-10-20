@@ -88,6 +88,20 @@ public sealed class Champion : Human.Units.Paladin
 - `[Replaces]` makes the class the game's object itself: every unit of that type is made as the class.
 - `Unit.Create<Champion>(player, x, y)` makes one in the game, facing 270 degrees unless a facing follows.
 
+Each value a class sets is checked against World Editor's limits. One outside them fails the build with its line, and
+a constant is marked in the editor as error MW0009:
+
+```
+Heroes/Giant.cs:12: Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it
+```
+
+`[BeyondLimits(nameof(HitPoints))]` on the class goes past a range on purpose. It lifts ranges, lengths and counts
+only: an empty name, a negative where none is allowed and a number that is no value of the enum still fail. The values
+a standard class has are the game's, and are never checked.
+
+To see a standard object's values, go to its class (Go to Definition on `Paladin`): its constructor sets each value
+World Editor shows for it.
+
 ## Components and reactions
 
 A reaction is a method on the thing involved: `OnDamaged`, `OnDeath` and `OnKill` on a unit, `OnCast` on an ability,
