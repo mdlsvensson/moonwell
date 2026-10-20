@@ -12,8 +12,8 @@ namespace Moonwell
         /// <summary>The bit mask of the reactions this class overrides, worked out when the item is taken in.</summary>
         internal int Mask;
 
-        /// <summary>The components the class starts with, added in order when the item is taken in.</summary>
-        protected List<ItemComponent> Components { get; } = new List<ItemComponent>();
+        /// <summary>The components the class starts with, added in order when the item is taken in. Assigning a new list drops what a parent class listed.</summary>
+        protected List<ItemComponent> Components { get; set; } = new List<ItemComponent>();
 
         /// <summary>The game's handle of the item.</summary>
         [LocalSafe]

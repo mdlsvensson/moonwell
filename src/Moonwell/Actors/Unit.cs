@@ -15,8 +15,8 @@ namespace Moonwell
         /// <summary>The cast the unit is making now, which ends when its spell ends or its next cast begins; null when none.</summary>
         internal Cast? ActiveCast;
 
-        /// <summary>The components the class starts with, added in order when the unit enters.</summary>
-        protected List<UnitComponent> Components { get; } = new List<UnitComponent>();
+        /// <summary>The components the class starts with, added in order when the unit enters. Assigning a new list drops what a parent class listed.</summary>
+        protected List<UnitComponent> Components { get; set; } = new List<UnitComponent>();
 
         /// <summary>The ability objects of the unit, one per ability id, in the order they were first asked for.</summary>
         private readonly OrderedMap<int, Ability> abilities = new OrderedMap<int, Ability>();

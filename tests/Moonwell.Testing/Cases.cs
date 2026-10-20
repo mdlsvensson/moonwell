@@ -72,6 +72,10 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "local.skips-other-players", Run = LocalCases.SkipsOtherPlayers });
             list.Add(new Case { Name = "map.components-in-order", Run = MapCases.ComponentsInOrder });
             list.Add(new Case { Name = "map.components-not-added-early", Run = MapCases.ComponentsNotAddedEarly });
+            list.Add(new Case { Name = "map.components-assigned", Run = MapCases.ComponentsAssigned });
+            list.Add(new Case { Name = "map.components-add-many", Run = MapCases.ComponentsAddMany });
+            list.Add(new Case { Name = "units.subclass-assigning-drops-parent", Run = MapCases.SubclassAssigningDropsParent });
+            list.Add(new Case { Name = "units.subclass-add-many-keeps-parent", Run = MapCases.SubclassAddManyKeepsParent });
             list.Add(new Case { Name = "map.settings-default-empty", Run = MapCases.SettingsDefaultEmpty });
             list.Add(new Case { Name = "map.balance-default", Run = MapCases.BalanceDefault });
             list.Add(new Case { Name = "types.fourcc", Run = UnitCases.FourCC });

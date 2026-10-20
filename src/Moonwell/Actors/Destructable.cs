@@ -15,8 +15,8 @@ namespace Moonwell
         /// <summary>Whether the world has been asked to deliver this destructable's death, once.</summary>
         internal bool watched;
 
-        /// <summary>The components the class starts with, added in order when the destructable is taken in.</summary>
-        protected List<DestructableComponent> Components { get; } = new List<DestructableComponent>();
+        /// <summary>The components the class starts with, added in order when the destructable is taken in. Assigning a new list drops what a parent class listed.</summary>
+        protected List<DestructableComponent> Components { get; set; } = new List<DestructableComponent>();
 
         /// <summary>The game's handle of the destructable.</summary>
         [LocalSafe]

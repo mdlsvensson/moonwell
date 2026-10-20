@@ -23,8 +23,8 @@ namespace Moonwell
         /// <summary>The game data version the map plays with; ForsakenKingdom, World Editor's default, when the map sets none.</summary>
         public DataVersion DataVersion { get; protected set; } = DataVersion.ForsakenKingdom;
 
-        /// <summary>The components the game starts with, added in list order when the game starts; the constructor lists them.</summary>
-        protected List<GameComponent> Components { get; } = new List<GameComponent>();
+        /// <summary>The components the game starts with, added in list order when the game starts; the constructor lists them, or assigns a new list.</summary>
+        protected List<GameComponent> Components { get; set; } = new List<GameComponent>();
 
         /// <summary>The starting components, in the order they were listed.</summary>
         internal List<GameComponent> StartComponents => Components;
