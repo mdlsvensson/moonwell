@@ -56,6 +56,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
         private readonly INamedTypeSymbol? natives;
         private readonly IMethodSymbol? localFor;
         private readonly IAssemblySymbol? runtime;
+        private readonly IAssemblySymbol? damage;
         private readonly INamedTypeSymbol? createsHandle;
         private readonly INamedTypeSymbol? changesState;
         private readonly INamedTypeSymbol? machineLocal;
@@ -76,6 +77,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             var local = compilation.GetTypeByMetadataName("Moonwell.Local");
             localFor = local?.GetMembers("For").OfType<IMethodSymbol>().FirstOrDefault();
             runtime = local?.ContainingAssembly;
+            damage = compilation.GetTypeByMetadataName("Moonwell.DamageSystem")?.ContainingAssembly;
             createsHandle = compilation.GetTypeByMetadataName("Moonwell.CreatesHandleAttribute");
             changesState = compilation.GetTypeByMetadataName("Moonwell.ChangesStateAttribute");
             machineLocal = compilation.GetTypeByMetadataName("Moonwell.MachineLocalAttribute");
@@ -249,7 +251,8 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
                 return Has(member, changesState) ? new Finding(name, "changes game state") : null;
             }
 
-            if (runtime != null && SymbolEqualityComparer.Default.Equals(member.ContainingAssembly, runtime))
+            if ((runtime != null && SymbolEqualityComparer.Default.Equals(member.ContainingAssembly, runtime))
+                || (damage != null && SymbolEqualityComparer.Default.Equals(member.ContainingAssembly, damage)))
             {
                 // Making a Moonwell object changes nothing in the game until it is added or started.
                 if (member is IMethodSymbol { MethodKind: MethodKind.Constructor } || IsLocalSafe(member, write) || Has(member, machineLocal))

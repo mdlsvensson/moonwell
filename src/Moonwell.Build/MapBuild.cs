@@ -3,6 +3,9 @@ namespace Moonwell.Build
     /// <summary>Builds a map project into a map archive.</summary>
     public static class MapBuild
     {
+        /// <summary>The damage package's assembly: a map that references it gets it installed by its Main.</summary>
+        private const string DamageAssemblyName = "Moonwell.Damage";
+
         /// <summary>Runs every step of the build, in order.</summary>
         /// <param name="path">A project folder, or the path of its <c>.csproj</c> file.</param>
         /// <param name="options">What kind of build to make.</param>
@@ -59,7 +62,7 @@ namespace Moonwell.Build
             BalanceCheck.Run(declarations, standard, data);
 
             var ids = ObjectIds.Assign(declarations.Objects, standard.AllIds(), MapObjectIds.Defined(project));
-            EntryWriter.Write(project, settings, true);
+            EntryWriter.Write(project, settings, true, Declarations.References(targetPath, DamageAssemblyName));
             RegistryWriter.Write(project, declarations.Used, declarations.Objects, ids);
             LuaCompiler.Compile(project, map, targetPath, options.Release, declarations, ids, standard, data.ValueSet);
             StageWith(project, () => Stage.Write(project, map, declarations.Objects, ids, declarations.StandardClassIds, standard, log));
@@ -77,7 +80,7 @@ namespace Moonwell.Build
 
             ObjectStubs.Delete(project);
 
-            EntryWriter.Write(project, settings);
+            EntryWriter.Write(project, settings, false, Declarations.References(targetPath, DamageAssemblyName));
             LuaCompiler.Compile(project, map, targetPath, options.Release);
             StageWith(project, () => Stage.WriteWithoutObjects(project, map, log));
         }

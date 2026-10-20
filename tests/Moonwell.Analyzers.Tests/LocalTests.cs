@@ -87,6 +87,23 @@ public class LocalTests
     }
 
     [Fact]
+    public void damage_package_members_need_local_safe()
+    {
+        var found = MapCode.Check("""
+            var unit = Unit.Of(u)!;
+            Local.For(p, () =>
+            {
+                var amount = Hit!.Amount + Hit.Original;
+                var tag = Hit.Tag;
+                var spell = Hit.IsSpell;
+                unit.Damage(unit, 1f);
+            });
+            """, "public static Hit? Hit;");
+
+        Assert.Equal(new[] { "MW0001: unit.Damage(unit, 1f)" }, found);
+    }
+
+    [Fact]
     public void player_reads_are_local_safe()
     {
         Assert.Empty(MapCode.Check("""
