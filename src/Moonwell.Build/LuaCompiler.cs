@@ -133,7 +133,7 @@ namespace Moonwell.Build
                 throw new BuildException(string.Join(Environment.NewLine, lines));
             }
 
-            var script = map.Script ?? throw new BuildException("CSharp.lua wrote no script");
+            var script = ScriptLibraries.Trim(map.Script ?? throw new BuildException("CSharp.lua wrote no script"));
 
             // Without war3map.w3e War3Net writes config but no main, and the game crashes to desktop.
             if (!script.Contains("function main(", StringComparison.Ordinal))
