@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using CSharpLua;
 using Microsoft.CodeAnalysis;
+using Moonwell.Build;
 using War3Net.Build;
 using War3Net.Build.Extensions;
 
@@ -20,7 +22,8 @@ internal static class LuaScript
         var map = War3Net.Build.Map.Open(Path.Combine(RepoRoot, "tests", "Moonwell.Lua.Tests", "map"), MapFiles.All & ~MapFiles.Triggers & ~MapFiles.CustomTextTriggers);
         var outputFolder = Path.Combine(Path.GetTempPath(), "moonwell-lua", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(outputFolder);
-        var compiler = new Compiler(csproj, outputFolder, string.Empty, null, null, string.Empty, string.Empty, false, null, string.Empty)
+        var copy = Rewritten(csproj, Path.Combine(outputFolder, "project"));
+        var compiler = new Compiler(copy, outputFolder, string.Empty, null, null, string.Empty, string.Empty, false, null, string.Empty)
         {
             IsExportMetadata = false,
             IsModule = false,
@@ -51,6 +54,41 @@ internal static class LuaScript
         }
 
         return map.Script;
+    }
+
+    // A copy of the project whose whole-number floats are written as the map build writes a map's (FloatLiterals), with its
+    // project references made absolute; the projects it references are compiled as they are, as a map's packages are.
+    private static string Rewritten(string csproj, string folder)
+    {
+        var source = Path.GetDirectoryName(Path.GetFullPath(csproj));
+        var files = new List<string>();
+        foreach (var file in Directory.EnumerateFiles(source, "*.cs", SearchOption.AllDirectories))
+        {
+            var relative = Path.GetRelativePath(source, file);
+            var top = relative.Split(Path.DirectorySeparatorChar)[0];
+            if (top.Equals("bin", StringComparison.OrdinalIgnoreCase) || top.Equals("obj", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            var target = Path.Combine(folder, relative);
+            Directory.CreateDirectory(Path.GetDirectoryName(target));
+            File.Copy(file, target);
+            files.Add(relative);
+        }
+
+        var project = Path.Combine(folder, Path.GetFileName(csproj));
+        var text = Regex.Replace(
+            File.ReadAllText(csproj),
+            "(<ProjectReference Include=\")([^\"]+)\"",
+            match => match.Groups[1].Value + Path.GetFullPath(Path.Combine(source, match.Groups[2].Value)) + "\"");
+        File.WriteAllText(project, text);
+
+        var tested = Path.GetFileNameWithoutExtension(csproj);
+        var references = Directory.EnumerateFiles(AppContext.BaseDirectory, "Moonwell*.dll")
+            .Where(path => Path.GetFileNameWithoutExtension(path) is var name && name != tested && name != "Moonwell.Lua.Tests" && name != "Moonwell.Build");
+        FloatLiterals.Rewrite(folder, files, references, Array.Empty<string>());
+        return project;
     }
 
     public static List<string> Run(string script)

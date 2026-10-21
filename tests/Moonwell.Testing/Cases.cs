@@ -179,6 +179,11 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "buff.ends-on-death", Run = BuffCases.EndsOnDeath });
             list.Add(new Case { Name = "buff.kept-through-death", Run = BuffCases.KeptThroughDeath });
             list.Add(new Case { Name = "buff.listens-for-death", Run = BuffCases.ListensForDeath });
+            list.Add(new Case { Name = "floats.whole-literal", Run = FloatCases.WholeLiteral });
+            list.Add(new Case { Name = "floats.no-wrap", Run = FloatCases.NoWrap });
+            list.Add(new Case { Name = "floats.folded", Run = FloatCases.Folded });
+            list.Add(new Case { Name = "floats.stored", Run = FloatCases.Stored });
+            list.Add(new Case { Name = "floats.ints-stay", Run = FloatCases.IntsStay });
             return list;
         }
 

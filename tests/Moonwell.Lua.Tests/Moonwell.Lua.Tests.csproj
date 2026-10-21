@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Moonwell.Build\Moonwell.Build.csproj" />
     <ProjectReference Include="..\Moonwell.Testing\Moonwell.Testing.csproj" />
   </ItemGroup>
 
