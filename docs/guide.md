@@ -91,7 +91,8 @@ public sealed class Champion : Human.Units.Paladin
   names are `MaxLife`, `MaxMana`, `Mana` (what it starts with), `Scale`, `FlyHeight` and `Name` on a unit and hero,
   `Level` on a unit that is not a hero, `Strength`, `Agility` and `Intelligence` on a hero, and `Charges` on an item.
   They were `HitPoints`, `ManaPoints`, `ManaInitialAmount`, `ScalingValue`, `Height`, `UnitLevel`,
-  `StartingStrength`, `StartingAgility`, `StartingIntelligence` and `NumberOfCharges`, which are gone. An item's `Level`,
+  `StartingStrength`, `StartingAgility`, `StartingIntelligence` and `NumberOfCharges`, which are gone. Outside the
+  constructor the old names read the declared value; write `Default.MaxLife` (`Default.Name`) for that. An item's `Level`,
   `Scale` and `HitPoints`, a doodad's `Scale` and a destructable's `HitPoints` keep their names, and six ability fields are
   named apart: `Inferno.InfernalDuration`, `Taunt.PreferHostiles` and `PreferFriendlies`, `WindWalk.BackstabDamage` and
   `Backstab`, `HealingModifier.HealingPercent`.
@@ -103,8 +104,8 @@ public sealed class Champion : Human.Units.Paladin
   attributes alone pass fails the build with its line: `Champion.MaxLife is 400; its 30 strength already give 750
   (751 at least)`. A hero class that sets `Strength` but not `MaxLife` keeps its base, so its life follows the strength.
   A hero starts at level 1: `Level = ...` or `Set("ulev", ...)` in a hero's constructor is error MW0012; use `SetLevel`
-  in the game. A unit's `Level` is set only in its class's constructor, since the game has no setter: anywhere else it is
-  error MW0015, and a build error too.
+  in the game. A unit's `Level` is set only in its declared class's constructor, since the game has no setter: anywhere
+  else it is error MW0015, and a build error too.
 - A list takes `Set<A, B, C>()` (the whole list, in order), `Replace<Old, New>()` (in the old one's place), `Add<T>()`
   and `Remove<T>()`.
 - The tooltips are World Editor's four: `Tooltip` (Tooltip - Normal), `TooltipExtended` (Tooltip - Normal - Extended),
@@ -143,7 +144,12 @@ item has it, a plain standard unit too: `unit.Default.MaxMana` is 300 whatever t
 alone it is `Unit.Default<Champion>().MaxMana`: `Unit.Default<T>()` takes a unit class (`Hero.Default<T>()` works too),
 `Item.Default<T>()` an item class. On a declared class `Default` is typed as its kind base (`StandardUnit`,
 `StandardHero` or `StandardItem`), so it holds every field of it (`Default.Model`, `Default.GoldCost`); the class's own
-members come through `Unit.Default<T>()`. Its live actions do nothing.
+members come through `Unit.Default<T>()`. Its live actions do nothing. In the class's own constructor the default
+object is what the constructor is making, so `Default` and `Unit.Default<T>()` of the class there are error MW0012:
+read the field itself (`MaxLife`, not `Default.MaxLife`).
+
+`Default` of a type made or changed in World Editor, not in code, reads the game's standard values (0 for a type that
+isn't one, and an empty name).
 
 `unit.Name` reads the game's name, which is in each player's language, so reading it is error MW0002 outside
 `Local.For`; setting it is fine anywhere outside `Local.For`. Reading `Name` in a declared class's constructor, and on
@@ -199,7 +205,7 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 | `Life`, `MaxLife`, `Mana`, `MaxMana` | read and set; a `Life` under 0.405 kills, above the most it clamps; the most are whole numbers |
 | `X`, `Y` | read; `MoveTo(x, y)` through the game's pathing, `PlaceAt(x, y)` with none, not even the map's edge |
 | `Facing` | read and set (the unit turns, so a read at once gives the old one); `FaceNow(degrees)` turns at once, a walking unit turns back |
-| `Level` | read; a hero's hero level; a unit's level is set only in its class's constructor |
+| `Level` | read; a hero's hero level; a unit's level is set only in its declared class's constructor |
 | `IsAlive`, `Kill()` | whether it lives; kills it, with `OnDeath` run |
 | `IsPaused`, `Scale`, `FlyHeight` | read and set; a paused unit takes no orders but still animates; `Scale` reads its type's scale until set; `FlyHeight` also lifts a ground unit |
 | `Name` | read inside `Local.For` only (each player's language), set anywhere outside it |
