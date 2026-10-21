@@ -91,6 +91,20 @@ namespace Moonwell.Objects.Tests
         }
     }
 
+    public class Even : Paladin
+    {
+        public Even()
+        {
+            Damage = 25f;
+        }
+
+        public Levels<float> Resolved(int count)
+        {
+            Damage.Resolve(count);
+            return Damage;
+        }
+    }
+
     public class Giant : Moonwell.Objects.Human.Units.Footman
     {
         public Giant()
@@ -473,6 +487,14 @@ namespace Moonwell.Objects.Tests
             Assert.Equal(30f, levels[3]);
             Assert.Equal(new[] { 10f, 20f, 30f }, levels.Values);
             Assert.Throws<ArgumentOutOfRangeException>(() => levels[4]);
+        }
+
+        [Fact]
+        public void a_plain_value_is_the_value_of_every_level()
+        {
+            var levels = new Even().Resolved(3);
+
+            Assert.Equal(new[] { 25f, 25f, 25f }, levels.Values);
         }
 
         [Fact]

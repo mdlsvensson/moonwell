@@ -7,7 +7,7 @@ namespace MoonwellMap.Heroes
     {
         private int kills;
 
-        public override void OnKill(Unit victim)
+        public override void OnKill(Unit killedUnit)
         {
             kills++;
             Unit.Player.Print("Kills: " + kills);

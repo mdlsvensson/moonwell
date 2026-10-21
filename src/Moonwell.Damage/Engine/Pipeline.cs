@@ -38,6 +38,8 @@ namespace Moonwell
             pending = null;
             Reactions.Reset();
             Events.DamageListener = Listen;
+            Events.DamageDealer = (source, target, amount, kind, attackType, isAttack, ranged, sound, tag) =>
+                Deal(source, target, amount, TypeCodes.AttackCode(attackType), kind, isAttack, ranged, sound, tag);
             Hooks.Seen = Saw;
         }
 
@@ -70,7 +72,7 @@ namespace Moonwell
         /// <summary>Whether anything can react to a hit between two units: a unit the runtime holds, or a map-wide reaction.</summary>
         private static bool Wanted(unit target, unit? source)
         {
-            return Units.Find(target) != null || (source != null && Units.Find(source) != null) || Watched || Events.Wants(Hook.OnUnitDamaged);
+            return KnownUnits.Find(target) != null || (source != null && KnownUnits.Find(source) != null) || Watched || Events.Wants(Hook.OnUnitDamaged);
         }
 
         /// <summary>Deals damage from code: the hit its before-armor event makes is marked as code's and returned. A deal from a reaction continues the reacting hit's chain; one that would make the chain longer than MaxChain throws, which the reaction reports.</summary>

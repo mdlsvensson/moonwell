@@ -30,6 +30,18 @@ internal static class MapCode
         return Found(Analyze(source));
     }
 
+    /// <summary>The id analyzer's diagnostics for a whole file, in source order, each as "id: the code it points at".</summary>
+    public static List<string> CheckIds(string source)
+    {
+        return Found(Analyze(source, analyzers: ImmutableArray.Create<DiagnosticAnalyzer>(new IdAnalyzer())));
+    }
+
+    /// <summary>The messages of the id analyzer's diagnostics for a whole file, in source order.</summary>
+    public static List<string> MessagesOfIds(string source)
+    {
+        return Analyze(source, analyzers: ImmutableArray.Create<DiagnosticAnalyzer>(new IdAnalyzer())).Diagnostics.OrderBy(d => d.Location.SourceSpan.Start).Select(d => d.GetMessage()).ToList();
+    }
+
     /// <summary>The messages of the analyzer's diagnostics for a whole file, in source order.</summary>
     public static List<string> MessagesOfFile(string source)
     {
@@ -109,10 +121,11 @@ internal static class MapCode
         return (tree, compilation);
     }
 
-    private static (SyntaxTree Tree, ImmutableArray<Diagnostic> Diagnostics) Analyze(string source, bool broken = false)
+    // Every analyzer but the id analyzer, unless the caller names them: the other tests' classes have no ids.
+    private static (SyntaxTree Tree, ImmutableArray<Diagnostic> Diagnostics) Analyze(string source, bool broken = false, ImmutableArray<DiagnosticAnalyzer>? analyzers = null)
     {
         var (tree, compilation) = Compile(source, broken);
-        var analyzers = ImmutableArray.Create<DiagnosticAnalyzer>(new SyncAnalyzer(), new LuaAnalyzer(), new FieldRulesAnalyzer(), new MovedAnalyzer(), new DeclaredAnalyzer());
-        return (tree, compilation.WithAnalyzers(analyzers).GetAnalyzerDiagnosticsAsync().Result);
+        analyzers ??= ImmutableArray.Create<DiagnosticAnalyzer>(new SyncAnalyzer(), new LuaAnalyzer(), new FieldRulesAnalyzer(), new MovedAnalyzer(), new DeclaredAnalyzer());
+        return (tree, compilation.WithAnalyzers(analyzers.Value).GetAnalyzerDiagnosticsAsync().Result);
     }
 }

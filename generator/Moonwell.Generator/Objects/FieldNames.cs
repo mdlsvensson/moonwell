@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Moonwell.Generator.Objects;
 
@@ -24,11 +25,14 @@ public static class FieldNames
 
     /// <summary>
     /// The PascalCase of the label's words: letters and digits only, apostrophes dropped, a leading digit prefixed
-    /// with <c>_</c> (<c>Hit Points Maximum (Base)</c> is <c>HitPointsMaximumBase</c>). A label with no letter or
-    /// digit gives an empty string.
+    /// with <c>_</c> (<c>Hit Points Maximum (Base)</c> is <c>HitPointsMaximumBase</c>). The game's colour codes and line
+    /// breaks (<c>|cff6295E3</c>, <c>|r</c>, <c>|n</c>) are dropped first, a line break between words. A label with no
+    /// letter or digit gives an empty string.
     /// </summary>
     public static string FromLabel(string label)
     {
+        label = Regex.Replace(label, @"\|[cC][0-9A-Fa-f]{8}|\|[rR]", string.Empty);
+        label = Regex.Replace(label, @"\|[nN]", " ");
         var name = new StringBuilder();
         var startOfWord = true;
         foreach (var c in label)

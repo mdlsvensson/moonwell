@@ -28,6 +28,15 @@
     <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
 
+  <!--
+    The libraries a map references ship their XML docs beside them, so an editor shows each member's summary on hover.
+    A member without one is not an error: the generated natives and objects do not all have one.
+  -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Moonwell' Or '$(MSBuildProjectName)' == 'Moonwell.Natives' Or '$(MSBuildProjectName)' == 'Moonwell.Objects' Or '$(MSBuildProjectName)' == 'Moonwell.Damage'">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(MSBuildProjectName)' != 'Moonwell' And '$(MSBuildProjectName)' != 'Moonwell.Natives' And '$(MSBuildProjectName)' != 'Moonwell.Objects' And '$(MSBuildProjectName)' != 'Moonwell.Damage' And '$(MSBuildProjectName)' != 'Moonwell.Testing'">
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>

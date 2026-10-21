@@ -228,20 +228,27 @@ namespace Moonwell
                 return null;
             }
 
-            return Items.TakeIn(handle, null);
+            return KnownItems.TakeIn(handle, null);
         }
 
         /// <summary>Creates an item of a type at a place; owner, when given, owns it.</summary>
         public static Item Create(int typeId, float x, float y, Owner? owner = null)
         {
             var handle = Runtime.World.SpawnItem(typeId, x, y);
-            var made = Items.TakeIn(handle, owner)!;
+            var made = KnownItems.TakeIn(handle, owner)!;
             if (owner != null && made.Owner == null)
             {
                 owner.Adopt(made);
             }
 
             return made;
+        }
+
+        /// <summary>Creates an item of a registered class at a place; owner, when given, owns it.</summary>
+        public static T Create<T>(float x, float y, Owner? owner = null)
+            where T : Item
+        {
+            return (T)Create(ObjectTypes.IdOf<T>(), x, y, owner);
         }
 
         /// <summary>Adds a component to the item, and returns it.</summary>
@@ -251,8 +258,8 @@ namespace Moonwell
         /// <summary>Removes the item from the game: it ends, which runs its OnLeave.</summary>
         public void Remove() => End();
 
-        /// <summary>Runs when the item enters the game, after its starting components are added.</summary>
-        protected virtual void OnEnter()
+        /// <summary>Runs once, when the item comes into the game, after its starting components are added.</summary>
+        protected virtual void OnCreated()
         {
         }
 
@@ -261,19 +268,21 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs OnEnter; Items calls it, since a map overrides the hook as protected.</summary>
+        /// <summary>Runs OnCreated; Items calls it, since a map overrides the hook as protected.</summary>
         internal void CallEnter()
         {
-            OnEnter();
+            OnCreated();
         }
 
         /// <summary>Runs when the item is picked up by a unit, before the components see it.</summary>
-        public virtual void OnPickedUp(Unit by)
+        /// <param name="carrierUnit">The unit that picked the item up.</param>
+        public virtual void OnPickedUp(Unit carrierUnit)
         {
         }
 
         /// <summary>Runs when the item is dropped by a unit, before the components see it. Inside the call that drops it (Drop, UnitRemoveItem) Carrier is still the unit; for the drops the game fires after RemoveUnit it is already null (see Unit.Drop). Not run when a unit that is not a hero dies and drops its items.</summary>
-        public virtual void OnDropped(Unit by)
+        /// <param name="carrierUnit">The unit that dropped the item.</param>
+        public virtual void OnDropped(Unit carrierUnit)
         {
         }
 
@@ -303,7 +312,7 @@ namespace Moonwell
                 IsGone = true;
             }
 
-            Items.Forget(this);
+            KnownItems.Forget(this);
         }
     }
 }

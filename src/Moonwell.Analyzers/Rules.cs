@@ -139,4 +139,25 @@ public static class Rules
 
     /// <summary>The rules for the constructor of a declared object class.</summary>
     public static ImmutableArray<DiagnosticDescriptor> Declared { get; } = ImmutableArray.Create(LiveInDeclaration);
+
+    public static readonly DiagnosticDescriptor NoId = new(
+        "MW0013",
+        "A declared object without its id",
+        "{0} has {1}; moonwell build names a free one",
+        ObjectsCategory,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Every class that declares an object of the map's own needs its id, as World Editor shows it, in [ObjectId(\"h001\")]; a [Replaces] class has its standard object's. A buff also names its carrier, the hidden ability that shows its icon: [ObjectId(\"B001\", Carrier = \"A001\")]. The build fails without them and names a free id to use.");
+
+    public static readonly DiagnosticDescriptor BadId = new(
+        "MW0014",
+        "An object id the game cannot take",
+        "{0} {1}",
+        ObjectsCategory,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "An object id is four characters. The game makes a unit whose id starts with an upper-case letter a hero, and only such a unit: a hero's id starts with one, another unit's does not.");
+
+    /// <summary>The rules for a declared object's id.</summary>
+    public static ImmutableArray<DiagnosticDescriptor> Ids { get; } = ImmutableArray.Create(NoId, BadId);
 }

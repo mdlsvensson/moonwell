@@ -44,6 +44,32 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void package_source_has_its_own_version()
+        {
+            using var archive = ZipFile.OpenRead(packed.MoonwellPackage);
+            var entry = archive.Entries.SingleOrDefault(candidate => candidate.FullName == "contentFiles/cs/net10.0/Moonwell/Core/Package.g.cs");
+            Assert.NotNull(entry);
+            using var reader = new StreamReader(entry!.Open());
+            Assert.Contains("public const string Version = \"" + packed.Version + "\";", reader.ReadToEnd());
+        }
+
+        [Theory]
+        [InlineData("Moonwell")]
+        [InlineData("Moonwell.Natives")]
+        [InlineData("Moonwell.Objects")]
+        [InlineData("Moonwell.Damage")]
+        public void package_ships_xml_docs_beside_its_library(string id)
+        {
+            using var archive = ZipFile.OpenRead(Path.Combine(packed.Feed, id + "." + packed.Version + ".nupkg"));
+            var docs = archive.Entries.SingleOrDefault(entry => entry.FullName == "lib/net10.0/" + id + ".xml");
+            Assert.NotNull(docs);
+            using var reader = new StreamReader(docs!.Open());
+            var members = XDocument.Parse(reader.ReadToEnd()).Descendants("member").ToList();
+            Assert.NotEmpty(members);
+            Assert.DoesNotContain(members.Descendants("summary"), summary => summary.Value.Contains("@CSharpLua", StringComparison.Ordinal));
+        }
+
+        [Fact]
         public void natives_package_has_source()
         {
             var natives = Path.Combine(packed.Feed, "Moonwell.Natives." + packed.Version + ".nupkg");

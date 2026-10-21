@@ -5,6 +5,8 @@ namespace Moonwell
     /// <summary>The events the world delivers to the runtime, and what the runtime does with each.</summary>
     internal static class Inbound
     {
+        /// <summary>The damage Unit.Damage is dealing, whose event keeps the damage it makes; null outside the call.</summary>
+        private static Dealing? dealing;
         /// <summary>Runs OnGameStart on the game's components, then on each existing player's, in slot order.</summary>
         internal static void GameStarted()
         {
@@ -22,21 +24,21 @@ namespace Moonwell
         /// <summary>A unit enters the map: it is taken in when its type is registered, or when a component wants to hear of entries.</summary>
         internal static void Entered(unit handle)
         {
-            if (Units.Find(handle) != null)
+            if (KnownUnits.Find(handle) != null)
             {
                 return;
             }
 
-            if (ObjectTypes.UnitMaker(Runtime.World.UnitTypeId(handle)) != null || Events.Wants(Hook.OnUnitEnter))
+            if (ObjectTypes.UnitMaker(Runtime.World.UnitTypeId(handle)) != null || Events.Wants(Hook.OnUnitCreated))
             {
-                Units.TakeIn(handle, null);
+                KnownUnits.TakeIn(handle, null);
             }
         }
 
         /// <summary>A unit picks up an item: the item's OnPickedUp and components, then the unit's OnItemPickedUp and components.</summary>
         internal static void PickedUp(unit u, item i)
         {
-            if (Units.Find(u) == null && Items.Find(i) == null && ObjectTypes.ItemMaker(Runtime.World.ItemTypeId(i)) == null)
+            if (KnownUnits.Find(u) == null && KnownItems.Find(i) == null && ObjectTypes.ItemMaker(Runtime.World.ItemTypeId(i)) == null)
             {
                 return;
             }
@@ -56,7 +58,7 @@ namespace Moonwell
         /// <summary>A unit drops an item: the item's OnDropped and components, then the unit's OnItemDropped and components.</summary>
         internal static void Dropped(unit u, item i)
         {
-            if (Units.Find(u) == null && Items.Find(i) == null && ObjectTypes.ItemMaker(Runtime.World.ItemTypeId(i)) == null)
+            if (KnownUnits.Find(u) == null && KnownItems.Find(i) == null && ObjectTypes.ItemMaker(Runtime.World.ItemTypeId(i)) == null)
             {
                 return;
             }
@@ -126,7 +128,7 @@ namespace Moonwell
         /// <summary>A unit takes damage: the source's type and components deal it, the target's take it, then the map's and the players' reactions; returns the amount after them.</summary>
         internal static float Damaged(unit target, unit? source, float amount, bool isAttack)
         {
-            if (Units.Find(target) == null && (source == null || Units.Find(source) == null) && !Events.Wants(Hook.OnUnitDamaged))
+            if (KnownUnits.Find(target) == null && (source == null || KnownUnits.Find(source) == null) && !Events.Wants(Hook.OnUnitDamaged))
             {
                 return amount;
             }
@@ -139,8 +141,59 @@ namespace Moonwell
 
             Unit? from = source == null ? null : Unit.Of(source);
             var damage = new Damage(hit, from, amount, isAttack);
+            if (dealing != null && dealing.Damage == null && dealing.Target == target && dealing.Source == source)
+            {
+                dealing.Damage = damage;
+                damage.Tag = dealing.Tag;
+            }
+
             Dispatch(damage);
             return damage.Amount;
+        }
+
+        /// <summary>Deals damage from code through the world, and returns the damage the reactions saw; one made here when none ran, null when the game dealt nothing.</summary>
+        internal static Damage? Deal(Unit source, Unit target, float amount, DamageKind kind, AttackType attackType, bool isAttack, bool ranged, WeaponSound sound, object? tag)
+        {
+            var previous = dealing;
+            var deal = new Dealing(source.Handle, target.Handle, tag);
+            dealing = deal;
+            bool dealt;
+            try
+            {
+                dealt = Runtime.World.DealDamage(source.Handle, target.Handle, amount, isAttack, ranged, TypeCodes.AttackCode(attackType), (int)kind, (int)sound);
+            }
+            finally
+            {
+                dealing = previous;
+            }
+
+            if (!dealt)
+            {
+                return null;
+            }
+
+            var damage = deal.Damage ?? new Damage(target, source, amount, isAttack);
+            damage.Tag = tag;
+            return damage;
+        }
+
+        /// <summary>A damage Unit.Damage deals: its handles, and the damage its event made.</summary>
+        private sealed class Dealing
+        {
+            internal Dealing(unit source, unit target, object? tag)
+            {
+                Source = source;
+                Target = target;
+                Tag = tag;
+            }
+
+            internal object? Tag { get; }
+
+            internal unit Source { get; }
+
+            internal unit Target { get; }
+
+            internal Damage? Damage { get; set; }
         }
 
         /// <summary>Runs a damage's reactions: the source's type and components deal it, the target's take it, then the map's and the players' reactions; a damage package calls it with its own kind of damage.</summary>
@@ -177,7 +230,7 @@ namespace Moonwell
         internal static void Died(unit dying, unit? killer)
         {
             unit? slain = killer == dying ? null : killer;
-            if (Units.Find(dying) == null && (slain == null || Units.Find(slain) == null) && !Events.Wants(Hook.OnUnitDied))
+            if (KnownUnits.Find(dying) == null && (slain == null || KnownUnits.Find(slain) == null) && !Events.Wants(Hook.OnUnitDied))
             {
                 return;
             }
@@ -219,7 +272,7 @@ namespace Moonwell
         /// <summary>A unit's spell takes effect: its previous cast ends, the ability and the caster see the new cast, then the map's and the caster's player's reactions run.</summary>
         internal static void SpellEffect(unit caster, int abilityId, unit? target, float x, float y)
         {
-            if (Units.Find(caster) == null && ObjectTypes.AbilityMaker(abilityId) == null && !Events.Wants(Hook.OnUnitCast))
+            if (KnownUnits.Find(caster) == null && ObjectTypes.AbilityMaker(abilityId) == null && !Events.Wants(Hook.OnUnitCast))
             {
                 return;
             }
@@ -254,7 +307,7 @@ namespace Moonwell
         /// <summary>A unit's spell ends: the cast it is making ends, when that cast is live and is for this ability.</summary>
         internal static void SpellEnded(unit caster, int abilityId)
         {
-            var ended = Units.Find(caster);
+            var ended = KnownUnits.Find(caster);
             if (ended == null)
             {
                 return;

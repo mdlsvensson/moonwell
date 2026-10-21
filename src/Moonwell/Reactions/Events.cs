@@ -15,6 +15,9 @@ namespace Moonwell
         /// <summary>Set by a damage package: called in place of listening for the game's damage event; null without one.</summary>
         internal static Action? DamageListener;
 
+        /// <summary>A damage package's own Unit.Damage, which deals through its stages and returns its hit; null without one.</summary>
+        internal static Func<Unit, Unit, float, DamageKind, AttackType, bool, bool, WeaponSound, object?, Damage?>? DamageDealer;
+
         /// <summary>Adds the reaction bits to the wanted ones, and listens for the event each bit needs.</summary>
         internal static void Need(int mask)
         {
@@ -69,6 +72,7 @@ namespace Moonwell
             listening = new bool[6];
             wanted = 0;
             DamageListener = null;
+            DamageDealer = null;
         }
 
         /// <summary>Asks the world to deliver an event, once.</summary>

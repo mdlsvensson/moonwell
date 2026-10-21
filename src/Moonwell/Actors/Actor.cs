@@ -79,6 +79,19 @@ namespace Moonwell
             component.End();
         }
 
+        /// <summary>Removes the first component of a class, in add order: it ends, which runs its OnRemoved. Returns whether there was one.</summary>
+        public bool Remove<T>() where T : Component
+        {
+            var found = Get<T>();
+            if (found == null)
+            {
+                return false;
+            }
+
+            Remove(found);
+            return true;
+        }
+
         /// <summary>Removes every component of a class and returns how many there were.</summary>
         public int RemoveAll<T>() where T : Component
         {

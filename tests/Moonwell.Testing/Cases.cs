@@ -63,6 +63,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "actors.add-and-get", Run = ActorCases.AddAndGet });
             list.Add(new Case { Name = "actors.remove", Run = ActorCases.RemoveOne });
             list.Add(new Case { Name = "actors.remove-all", Run = ActorCases.RemoveAllOf });
+            list.Add(new Case { Name = "actors.remove-of-class", Run = ActorCases.RemoveOf });
             list.Add(new Case { Name = "actors.current-in-onadded", Run = ActorCases.CurrentInOnAdded });
             list.Add(new Case { Name = "actors.end-removes-last-first", Run = ActorCases.EndRemovesLastFirst });
             list.Add(new Case { Name = "actors.add-to-ended", Run = ActorCases.AddToEnded });
@@ -178,6 +179,10 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "items.listen", Run = ItemCases.Listens });
             list.Add(new Case { Name = "items.sweep", Run = ItemCases.SweepDetectsRemoval });
             list.Add(new Case { Name = "items.owned-create", Run = ItemCases.OwnedByOwner });
+            list.Add(new Case { Name = "items.create-of-class", Run = ItemCases.CreateOfClass });
+            list.Add(new Case { Name = "damage.deal-from-code", Run = DamageCases.DealFromCode });
+            list.Add(new Case { Name = "damage.deal-runs-reactions", Run = DamageCases.DealRunsReactions });
+            list.Add(new Case { Name = "damage.deal-refused", Run = DamageCases.DealRefused });
             list.Add(new Case { Name = "items.charges", Run = ItemCases.Charges });
             list.Add(new Case { Name = "items.player", Run = ItemCases.PlayerOf });
             list.Add(new Case { Name = "items.position", Run = ItemCases.Position });

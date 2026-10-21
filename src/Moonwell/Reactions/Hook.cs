@@ -31,7 +31,7 @@ namespace Moonwell
         internal const int OnDropped = 256;
 
         /// <summary>A unit enters the map.</summary>
-        internal const int OnUnitEnter = 512;
+        internal const int OnUnitCreated = 512;
 
         /// <summary>A unit in the map takes damage.</summary>
         internal const int OnUnitDamaged = 1024;

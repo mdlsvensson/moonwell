@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Moonwell
 {
     /// <summary>The destructables the runtime holds: the object of each game destructable, found by its handle, and the live ones in order.</summary>
-    internal static class Destructables
+    internal static class KnownDestructables
     {
         /// <summary>The object of each destructable the runtime holds, keyed by the game's handle; a lookup only.</summary>
         private static Dictionary<destructable, Destructable> known = new Dictionary<destructable, Destructable>();
@@ -23,7 +23,7 @@ namespace Moonwell
             return null;
         }
 
-        /// <summary>Takes a game destructable in: makes its object, adds its starting components, and runs OnEnter.</summary>
+        /// <summary>Takes a game destructable in: makes its object, adds its starting components, and runs OnCreated.</summary>
         internal static Destructable? TakeIn(destructable handle, Owner? owner)
         {
             var existing = Find(handle);
@@ -72,7 +72,7 @@ namespace Moonwell
                 }
                 catch (Exception error)
                 {
-                    Errors.Report(Names.NameOf(made) + ".OnEnter", error);
+                    Errors.Report(Names.NameOf(made) + ".OnCreated", error);
                 }
 
                 Owner.current = previous;

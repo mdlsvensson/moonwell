@@ -28,12 +28,14 @@ namespace Moonwell
         internal override HookTable Table => ComponentHooks;
 
         /// <summary>Runs when the item is picked up by a unit.</summary>
-        public virtual void OnPickedUp(Unit by)
+        /// <param name="carrierUnit">The unit that picked the item up.</param>
+        public virtual void OnPickedUp(Unit carrierUnit)
         {
         }
 
         /// <summary>Runs when the item is dropped by a unit.</summary>
-        public virtual void OnDropped(Unit by)
+        /// <param name="carrierUnit">The unit that dropped the item.</param>
+        public virtual void OnDropped(Unit carrierUnit)
         {
         }
     }

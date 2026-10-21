@@ -27,10 +27,6 @@ namespace Moonwell
         [LocalSafe]
         public bool IsCode { get; internal set; }
 
-        /// <summary>The tag the code that dealt the hit gave it; null otherwise.</summary>
-        [LocalSafe]
-        public object? Tag { get; internal set; }
-
         /// <summary>Whether the hit is a spell's: not an attack, with the attack type the game gives spells.</summary>
         [LocalSafe]
         public bool IsSpell => !IsAttack && AttackTypeCode == 0;

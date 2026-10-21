@@ -1,0 +1,185 @@
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+
+namespace Moonwell.Analyzers;
+
+/// <summary>
+/// The build's id checks in the editor: a declared object class with no <c>[ObjectId]</c>, a buff with no carrier id
+/// (MW0013), and an id that is not four characters or whose first letter's case is wrong for a unit or a hero (MW0014).
+/// A declared class is one the build makes an object of: not abstract or generic, and inheriting a standard object's
+/// kind base (<c>StandardUnit</c> and the rest). Which ids are free, and which a standard object has, only the build
+/// knows, so it still names a free one.
+/// </summary>
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public sealed class IdAnalyzer : DiagnosticAnalyzer
+{
+    private const string ObjectsNamespace = "Moonwell.Objects";
+
+    private static readonly Dictionary<string, string> KindOfBase = new()
+    {
+        ["StandardUnit"] = "unit",
+        ["StandardHero"] = "hero",
+        ["StandardItem"] = "item",
+        ["StandardDestructable"] = "destructable",
+        ["StandardDoodad"] = "doodad",
+        ["StandardAbility"] = "ability",
+        ["StandardBuff"] = "buff",
+        ["StandardUpgrade"] = "upgrade",
+    };
+
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules.Ids;
+
+    public override void Initialize(AnalysisContext context)
+    {
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+        context.EnableConcurrentExecution();
+        context.RegisterSyntaxNodeAction(Class, SyntaxKind.ClassDeclaration);
+    }
+
+    private static void Class(SyntaxNodeAnalysisContext context)
+    {
+        var declaration = (ClassDeclarationSyntax)context.Node;
+        var type = context.SemanticModel.GetDeclaredSymbol(declaration, context.CancellationToken);
+        if (type == null || type.IsAbstract || type.IsGenericType || HasAttribute(type, "StandardAttribute"))
+        {
+            return;
+        }
+
+        var kind = KindOf(type);
+        if (kind == null)
+        {
+            return;
+        }
+
+        var objectId = Attribute(declaration, context, "ObjectIdAttribute");
+        var replaces = Attribute(declaration, context, "ReplacesAttribute");
+        var id = objectId == null ? null : IdOf(objectId);
+        var carrier = objectId == null ? null : CarrierOf(objectId);
+
+        if (id == null && replaces == null)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(Rules.NoId, declaration.Identifier.GetLocation(), type.Name, MissingId(kind)));
+        }
+        else if (kind == "buff" && carrier == null)
+        {
+            var at = objectId ?? replaces!;
+            var what = objectId != null && id != null
+                ? "add Carrier = \"...\" to its [ObjectId]"
+                : "add [ObjectId(Carrier = \"...\")] to it";
+            context.ReportDiagnostic(Diagnostic.Create(Rules.NoId, at.GetLocation(), type.Name,
+                $"no carrier id; {what}, the id of the hidden ability that shows the buff's icon"));
+        }
+
+        if (id != null)
+        {
+            CheckShape(context, type.Name, kind, id.Value);
+        }
+
+        if (carrier != null)
+        {
+            CheckShape(context, type.Name, "ability", carrier.Value);
+        }
+    }
+
+    private static string MissingId(string kind)
+    {
+        switch (kind)
+        {
+            case "unit":
+                return "no object id; add [ObjectId(\"...\")] with a unit's id, which starts with a lower-case letter";
+            case "hero":
+                return "no object id; add [ObjectId(\"...\")] with a hero's id, which starts with an upper-case letter";
+            default:
+                return "no object id; add [ObjectId(\"...\")] to it";
+        }
+    }
+
+    private static void CheckShape(SyntaxNodeAnalysisContext context, string owner, string kind, (string Text, Location Location) id)
+    {
+        string? why = null;
+        if (id.Text.Length != 4)
+        {
+            why = $"has the id \"{id.Text}\", which is not four characters";
+        }
+        else if (kind == "hero" && !IsUpper(id.Text[0]))
+        {
+            why = $"is a hero, so its id {id.Text} must start with an upper-case letter";
+        }
+        else if (kind == "unit" && IsUpper(id.Text[0]))
+        {
+            why = $"is a unit, so its id {id.Text} must not start with an upper-case letter: the game makes such a unit a hero";
+        }
+
+        if (why != null)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(Rules.BadId, id.Location, owner, why));
+        }
+    }
+
+    private static bool IsUpper(char letter) => letter >= 'A' && letter <= 'Z';
+
+    // The kind of the nearest kind base in the class's base chain: hero before unit, as StandardHero inherits StandardUnit.
+    private static string? KindOf(INamedTypeSymbol type)
+    {
+        for (var at = type.BaseType; at != null; at = at.BaseType)
+        {
+            if (at.ContainingNamespace?.ToDisplayString() == ObjectsNamespace && KindOfBase.TryGetValue(at.Name, out var kind))
+            {
+                return kind;
+            }
+        }
+
+        return null;
+    }
+
+    private static bool HasAttribute(INamedTypeSymbol type, string name)
+    {
+        return type.GetAttributes().Any(attribute => attribute.AttributeClass?.Name == name
+            && attribute.AttributeClass.ContainingNamespace?.ToDisplayString() == ObjectsNamespace);
+    }
+
+    private static AttributeSyntax? Attribute(ClassDeclarationSyntax declaration, SyntaxNodeAnalysisContext context, string name)
+    {
+        foreach (var list in declaration.AttributeLists)
+        {
+            foreach (var attribute in list.Attributes)
+            {
+                var symbol = context.SemanticModel.GetSymbolInfo(attribute, context.CancellationToken).Symbol?.ContainingType;
+                if (symbol?.Name == name && symbol.ContainingNamespace?.ToDisplayString() == ObjectsNamespace)
+                {
+                    return attribute;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // The id given as the attribute's first argument, a string literal; another expression is left to the build.
+    private static (string Text, Location Location)? IdOf(AttributeSyntax attribute)
+    {
+        var first = attribute.ArgumentList?.Arguments.FirstOrDefault(argument => argument.NameEquals == null && argument.NameColon == null);
+        return Literal(first);
+    }
+
+    private static (string Text, Location Location)? CarrierOf(AttributeSyntax attribute)
+    {
+        var carrier = attribute.ArgumentList?.Arguments.FirstOrDefault(argument => argument.NameEquals?.Name.Identifier.ValueText == "Carrier");
+        return Literal(carrier);
+    }
+
+    private static (string Text, Location Location)? Literal(AttributeArgumentSyntax? argument)
+    {
+        if (argument?.Expression is LiteralExpressionSyntax literal && literal.IsKind(SyntaxKind.StringLiteralExpression))
+        {
+            return (literal.Token.ValueText, literal.GetLocation());
+        }
+
+        return null;
+    }
+}

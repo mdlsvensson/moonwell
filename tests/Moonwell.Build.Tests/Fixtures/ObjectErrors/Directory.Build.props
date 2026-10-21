@@ -1,0 +1,10 @@
+<Project>
+
+  <Import Project="$([MSBuild]::GetPathOfFileAbove(Directory.Build.props, $(MSBuildThisFileDirectory)..))" />
+
+  <!-- These fixtures test the build's own reports of a declared class, which have no ids; the id rules would stop dotnet build first. -->
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);MW0013;MW0014</NoWarn>
+  </PropertyGroup>
+
+</Project>

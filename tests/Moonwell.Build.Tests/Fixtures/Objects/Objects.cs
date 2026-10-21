@@ -1,4 +1,6 @@
 using Moonwell;
+// Both usings, as a map writes them: Items and Destructables are Moonwell.Objects' groups, which nothing in Moonwell may clash with.
+using Moonwell.Objects;
 
 namespace Objects
 {
@@ -123,7 +125,7 @@ namespace Objects
     }
 
     [Moonwell.Objects.ObjectId("I001")]
-    public class Claws : Moonwell.Objects.Items.ClawsOfAttack15
+    public class Claws : Items.ClawsOfAttack15
     {
         public Claws()
         {
@@ -132,7 +134,7 @@ namespace Objects
     }
 
     [Moonwell.Objects.ObjectId("B001")]
-    public class Gate : Moonwell.Objects.Destructables.DemonicGate
+    public class Gate : Destructables.DemonicGate
     {
         public Gate()
         {

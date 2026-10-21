@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Moonwell
 {
     /// <summary>The units the runtime holds: the object of each game unit, found by its handle, and the live ones in order.</summary>
-    internal static class Units
+    internal static class KnownUnits
     {
         /// <summary>The object of each unit the runtime holds, keyed by the game's handle; a lookup only.</summary>
         private static Dictionary<unit, Unit> known = new Dictionary<unit, Unit>();
@@ -23,7 +23,7 @@ namespace Moonwell
             return null;
         }
 
-        /// <summary>Takes a game unit in: makes its object, adds its starting components, and runs OnEnter and the map's OnUnitEnter.</summary>
+        /// <summary>Takes a game unit in: makes its object, adds its starting components, and runs OnCreated and the map's OnUnitCreated.</summary>
         internal static Unit? TakeIn(unit handle, Owner? owner)
         {
             var existing = Find(handle);
@@ -76,13 +76,13 @@ namespace Moonwell
                 }
                 catch (Exception error)
                 {
-                    Errors.Report(Names.NameOf(made) + ".OnEnter", error);
+                    Errors.Report(Names.NameOf(made) + ".OnCreated", error);
                 }
 
                 Owner.current = previous;
             }
 
-            if (Events.Wants(Hook.OnUnitEnter) && !made.HasEnded)
+            if (Events.Wants(Hook.OnUnitCreated) && !made.HasEnded)
             {
                 EnterComponents(Game.Instance, made);
                 var player = Player.Existing(made.Player.Slot);
@@ -109,14 +109,14 @@ namespace Moonwell
             Live.Clear();
         }
 
-        /// <summary>Runs OnUnitEnter on the map components of an actor, in add order.</summary>
+        /// <summary>Runs OnUnitCreated on the map components of an actor, in add order.</summary>
         private static void EnterComponents(Actor actor, Unit unit)
         {
             var count = actor.BeginDispatch();
             for (var i = 0; i < count; i++)
             {
                 var component = actor.ComponentAt(i) as MapComponent;
-                if (component == null || component.HasEnded || (component.Mask & Hook.OnUnitEnter) == 0)
+                if (component == null || component.HasEnded || (component.Mask & Hook.OnUnitCreated) == 0)
                 {
                     continue;
                 }
@@ -125,11 +125,11 @@ namespace Moonwell
                 Owner.current = component;
                 try
                 {
-                    component.OnUnitEnter(unit);
+                    component.OnUnitCreated(unit);
                 }
                 catch (Exception error)
                 {
-                    Errors.Report(Names.NameOf(component) + ".OnUnitEnter", error);
+                    Errors.Report(Names.NameOf(component) + ".OnUnitCreated", error);
                 }
 
                 Owner.current = previous;
