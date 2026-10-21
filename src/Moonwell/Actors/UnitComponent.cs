@@ -50,7 +50,7 @@ namespace Moonwell
         }
 
         /// <summary>Runs when the unit dies; the killer is null when no unit killed it.</summary>
-        /// <param name="killerUnit">The unit that killed it; null when no unit did, as for Kill() from code.</param>
+        /// <param name="killerUnit">The unit whose damage killed it; null when no unit did: Kill() or Life set to 0 from code, timed life running out, or its own damage (seen 10-21).</param>
         public virtual void OnDeath(Unit? killerUnit)
         {
         }

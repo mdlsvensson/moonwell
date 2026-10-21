@@ -146,7 +146,8 @@ public sealed class KillCounter : UnitComponent
 - Reactions to the whole map (`OnGameStart`, `OnUnitCreated`, `OnUnitDied`, `OnUnitCast`, `OnLeave`) go on a game or
   player component. `OnUnitCreated` runs once for each unit, when it comes into the game; a unit's own is `OnCreated`.
 - A reaction's parameters say the role: `OnPickedUp(Unit carrierUnit)`, `OnUnitDied(Unit dyingUnit, Unit? killerUnit)`,
-  `OnKill(Unit killedUnit)`. The killer is null when no unit killed, as for `Kill()` from code.
+  `OnKill(Unit killedUnit)`. The killer is null when no unit's damage killed: `Kill()` or `Life = 0` from code, timed
+  life running out, or a unit's own damage.
 - An event runs the type's reaction first, then its components' in the order added, then the game's and the
   players'. A reaction that fails is reported, and the others still run.
 - A buff is a class that inherits `Buff`, or a standard buff to show its icon. `Duration` and `Tick` set its time,

@@ -38,7 +38,7 @@ namespace Moonwell
 
         /// <summary>Runs when a unit in the map dies, for the game's components, then the components of the players involved.</summary>
         /// <param name="dyingUnit">The unit that died.</param>
-        /// <param name="killerUnit">The unit that killed it; null when no unit did, as for Kill() from code.</param>
+        /// <param name="killerUnit">The unit whose damage killed it; null when no unit did: Kill() or Life set to 0 from code, timed life running out, or its own damage (seen 10-21).</param>
         public virtual void OnUnitDied(Unit dyingUnit, Unit? killerUnit)
         {
         }
