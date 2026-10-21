@@ -36,7 +36,7 @@ namespace Moonwell.Testing
         /// <summary>The lines appended to the log.</summary>
         public List<string> Logged = new List<string>();
 
-        /// <summary>The damage the runtime asked the game to deal: the amount, attack, ranged, and the game's attack, damage and weapon numbers.</summary>
+        /// <summary>The damage the runtime asked the game to deal: the amount (whole), attack, ranged, and the game's attack, damage and weapon numbers.</summary>
         public List<string> Dealt = new List<string>();
 
         /// <summary>Whether the game deals no damage the runtime asks for, as for a target that cannot take it.</summary>
@@ -407,7 +407,7 @@ namespace Moonwell.Testing
         /// <summary>Records the damage; unless refused, delivers it to Inbound as the game does, inside the call, when the runtime listens for damage.</summary>
         public bool DealDamage(unit source, unit target, float amount, bool attack, bool ranged, int attackType, int damageType, int weaponType)
         {
-            Dealt.Add(amount + " attack:" + attack + " ranged:" + ranged + " " + attackType + " " + damageType + " " + weaponType);
+            Dealt.Add((int)amount + " attack:" + attack + " ranged:" + ranged + " " + attackType + " " + damageType + " " + weaponType);
             if (RefuseDamage)
             {
                 return false;
