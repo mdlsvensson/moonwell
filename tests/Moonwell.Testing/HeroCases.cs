@@ -222,7 +222,7 @@ namespace Moonwell.Testing
             Expect.Equal(700, hero.Experience, "experience after the sweep");
         }
 
-        /// <summary>A hero's proper name is the game's: read inside Local.For, set for every machine; once the hero is gone, the last name read or set, and a set calls nothing.</summary>
+        /// <summary>A hero's proper name is the game's: read inside Local.For, set for every machine; once the hero is gone, the last value set (a read keeps nothing), and a set calls nothing.</summary>
         public static void ProperName(FakeWorld world)
         {
             var hero = NewHero(world, out var handle);
@@ -246,6 +246,13 @@ namespace Moonwell.Testing
             Local.For(Player.Get(0), () => seen = hero.ProperName);
             Expect.Equal("Arthas", seen, "the gone hero's last proper name");
             Expect.Equal(1, world.HeroCalls.Count, "no call for the gone hero");
+
+            var unset = (Hero)Unit.Of(world.NewUnit(ObjectTypes.FourCC("Hpal"), hero: true))!;
+            world.SetProperName(unset.Handle, "Read only");
+            Local.For(Player.Get(0), () => seen = unset.ProperName);
+            unset.Remove();
+            Local.For(Player.Get(0), () => seen = unset.ProperName);
+            Expect.Equal("", seen, "a gone hero whose proper name was only read");
         }
 
         /// <summary>A hero that records what its shared members ask of the hooks, and reads each declared value as Unit does.</summary>
