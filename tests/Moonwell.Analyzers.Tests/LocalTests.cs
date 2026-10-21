@@ -293,4 +293,110 @@ public class LocalTests
 
         Assert.Empty(found);
     }
+
+    [Fact]
+    public void name_read_outside_local_for_is_mw0002()
+    {
+        var found = MapCode.Check("""
+            var unit = Unit.Of(u)!;
+            var hero = (Hero)Unit.Of(u)!;
+            var outside = unit.Name;
+            var proper = hero.ProperName;
+            Local.For(p, () => { var inside = unit.Name + hero.ProperName; });
+            """);
+
+        Assert.Equal(new[] { "MW0002: unit.Name", "MW0002: hero.ProperName" }, found);
+    }
+
+    [Fact]
+    public void name_set_outside_local_for_is_accepted()
+    {
+        Assert.Empty(MapCode.Check("""
+            var unit = Unit.Of(u)!;
+            var hero = (Hero)Unit.Of(u)!;
+            unit.Name = "Guard";
+            hero.ProperName = "Arthas";
+            """));
+    }
+
+    [Fact]
+    public void name_set_inside_local_for_is_mw0001()
+    {
+        Assert.Equal(new[] { "MW0001: unit.Name" }, MapCode.Check("""
+            var unit = Unit.Of(u)!;
+            Local.For(p, () => { unit.Name = "Guard"; });
+            """));
+    }
+
+    [Fact]
+    public void name_read_in_a_constructor_and_on_default_is_accepted()
+    {
+        Assert.Empty(MapCode.CheckFile("""
+            using System;
+            using Moonwell;
+            using Moonwell.Objects;
+
+            namespace Map
+            {
+                public class Mage : Human.Units.Footman
+                {
+                    public Mage()
+                    {
+                        Name = "Mage";
+                        Tooltip = Name + " " + this.Name + " " + base.Name;
+                    }
+                }
+
+                public class Champion : Human.Units.Paladin
+                {
+                    public Champion()
+                    {
+                        Tooltip = Name;
+                    }
+                }
+
+                public static class Use
+                {
+                    public static string Run(Unit unit, Hero hero)
+                    {
+                        return unit.Default.Name + hero.Default.Name + hero.Default.ProperName + Unit.Default<Mage>().Name
+                            + Hero.Default<Champion>().Name + Unit.Default<Mage>().Default.Name;
+                    }
+                }
+            }
+            """));
+    }
+
+    [Fact]
+    public void name_read_in_a_lambda_in_a_constructor_or_on_another_unit_is_mw0002()
+    {
+        Assert.Equal(new[] { "MW0002: Name", "MW0002: other.Name" }, MapCode.CheckFile("""
+            using System;
+            using Moonwell;
+            using Moonwell.Objects;
+
+            namespace Map
+            {
+                public class Mage : Human.Units.Footman
+                {
+                    public Mage(Unit other)
+                    {
+                        Action later = () => Console.WriteLine(Name);
+                        Tooltip = other.Name;
+                    }
+                }
+            }
+            """));
+    }
+
+    [Fact]
+    public void name_on_a_local_copy_of_default_is_mw0002()
+    {
+        // The plan accepts this false alarm: only a read straight on Default is known to be declared.
+        Assert.Equal(new[] { "MW0002: copy.Name" }, MapCode.Check("""
+            var unit = Unit.Of(u)!;
+            var copy = unit.Default;
+            var name = copy.Name;
+            """));
+    }
 }

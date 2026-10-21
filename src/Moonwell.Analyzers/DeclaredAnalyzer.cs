@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace Moonwell.Analyzers;
 
@@ -12,8 +13,9 @@ namespace Moonwell.Analyzers;
 /// inherits <c>StandardUnit</c>, <c>StandardHero</c> or <c>StandardItem</c>, whose constructor the build runs with no game.
 /// A member of <c>Unit</c>, <c>Hero</c> or <c>Item</c> on the object itself is reported, except <c>Components</c> and the
 /// live members a declared field shares (<c>MaxMana</c>, <c>Name</c>, <c>Strength</c>, <c>Charges</c>), which there are the
-/// class's declared values; a hero's <c>Level</c> is not one, since a hero starts at level 1. Code in a lambda or a local
-/// function may run later in the game, and is left alone.
+/// class's declared values; a hero's <c>Level</c> (and <c>Set("ulev", ...)</c>) is not one, since a hero starts at level 1.
+/// Code in a lambda or a local function may run later in the game, and is left alone. Also MW0015: a unit's <c>Level</c>,
+/// which has no setter in the game, is set only in the constructor of its declared class.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
@@ -34,6 +36,7 @@ public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
         context.RegisterSyntaxNodeAction(Constructor, SyntaxKind.ConstructorDeclaration);
+        context.RegisterOperationAction(LevelSet, OperationKind.PropertyReference);
     }
 
     private static void Constructor(SyntaxNodeAnalysisContext context)
@@ -62,8 +65,70 @@ public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
             {
                 Check(context, name);
             }
+            else if (node is InvocationExpressionSyntax invocation && IsHero(type))
+            {
+                CheckSetLevel(context, invocation);
+            }
         }
     }
+
+    // Set("ulev", ...) on the object itself in a hero class: the same declared level a hero does not have.
+    private static void CheckSetLevel(SyntaxNodeAnalysisContext context, InvocationExpressionSyntax invocation)
+    {
+        if (invocation.Expression is not (IdentifierNameSyntax or MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax or BaseExpressionSyntax })
+            || invocation.ArgumentList.Arguments.Count != 2
+            || context.SemanticModel.GetConstantValue(invocation.ArgumentList.Arguments[0].Expression, context.CancellationToken).Value as string != "ulev"
+            || context.SemanticModel.GetSymbolInfo(invocation, context.CancellationToken).Symbol is not IMethodSymbol { Name: "Set" } method
+            || method.ContainingType is not { Name: "StandardHero" } kind || !IsObjects(kind))
+        {
+            return;
+        }
+
+        context.ReportDiagnostic(Diagnostic.Create(Rules.LiveInDeclaration, invocation.GetLocation(), "Set(\"ulev\")", HeroLevelWhy));
+    }
+
+    // MW0015: a unit's Level set anywhere but the constructor of its declared class (or a lambda or local function in it).
+    private static void LevelSet(OperationAnalysisContext context)
+    {
+        var reference = (IPropertyReferenceOperation)context.Operation;
+        if (reference.Property is not { Name: "Level" } property || !IsNamed(property.ContainingType, "Unit") || !IsWritten(reference))
+        {
+            return;
+        }
+
+        for (var node = reference.Syntax; node != null; node = node.Parent)
+        {
+            if (node is ConstructorDeclarationSyntax constructor)
+            {
+                if (!constructor.Modifiers.Any(SyntaxKind.StaticKeyword)
+                    && context.ContainingSymbol is IMethodSymbol { MethodKind: MethodKind.Constructor } symbol && IsDeclared(symbol.ContainingType))
+                {
+                    return;
+                }
+
+                break;
+            }
+
+            if (node is MemberDeclarationSyntax)
+            {
+                break;
+            }
+        }
+
+        context.ReportDiagnostic(Diagnostic.Create(Rules.LevelOutsideConstructor, reference.Syntax.GetLocation()));
+    }
+
+    private static bool IsWritten(IOperation operation) => operation.Parent switch
+    {
+        IAssignmentOperation assignment => assignment.Target == operation,
+        IIncrementOrDecrementOperation => true,
+        _ => false,
+    };
+
+    private static bool IsObjects(INamedTypeSymbol type) =>
+        type.ContainingNamespace is { Name: "Objects", ContainingNamespace: { Name: "Moonwell", ContainingNamespace.IsGlobalNamespace: true } };
+
+    private const string HeroLevelWhy = "is the hero's level in the game: a hero starts at level 1; its level is not declared";
 
     private static void Check(SyntaxNodeAnalysisContext context, SimpleNameSyntax name)
     {
@@ -98,7 +163,7 @@ public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
         string why;
         if (text == "Level")
         {
-            why = "is the hero's level in the game: a hero starts at level 1; its level is not declared";
+            why = HeroLevelWhy;
         }
         else if (text == "Life")
         {
@@ -117,7 +182,7 @@ public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
     }
 
     // A class that inherits a standard unit, hero or item of Moonwell.Objects: the build runs its constructor to read its fields.
-    private static bool IsDeclared(INamedTypeSymbol type)
+    internal static bool IsDeclared(INamedTypeSymbol type)
     {
         for (var at = type.BaseType; at != null; at = at.BaseType)
         {

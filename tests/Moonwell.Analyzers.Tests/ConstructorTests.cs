@@ -185,4 +185,115 @@ public class ConstructorTests
             }
             """));
     }
+
+    [Fact]
+    public void a_heros_level_set_by_its_field_is_the_same_error()
+    {
+        Assert.Equal(
+            new[]
+            {
+                "'Set(\"ulev\")' is the hero's level in the game: a hero starts at level 1; its level is not declared",
+            },
+            MapCode.MessagesOfFile("""
+                using Moonwell;
+                using Moonwell.Objects;
+
+                namespace Map
+                {
+                    public class Champion : Human.Units.Paladin
+                    {
+                        public Champion()
+                        {
+                            Set("ulev", 5);
+                            Set("uhpm", 900);
+                        }
+                    }
+
+                    public class Mage : Human.Units.Footman
+                    {
+                        public Mage()
+                        {
+                            Set("ulev", 5);
+                        }
+                    }
+                }
+                """));
+    }
+
+    [Fact]
+    public void a_units_level_set_in_a_component_is_mw0015()
+    {
+        var source = """
+            using Moonwell;
+            using Moonwell.Objects;
+
+            namespace Map
+            {
+                public sealed class Promote : UnitComponent
+                {
+                    protected override void OnAdded()
+                    {
+                        Unit.Level = 3;
+                        Unit.Level++;
+                        var read = Unit.Level;
+                    }
+                }
+
+                public class Walker : Unit
+                {
+                    public Walker()
+                    {
+                        Level = 2;
+                    }
+                }
+            }
+            """;
+
+        Assert.Equal(new[] { "MW0015: Unit.Level", "MW0015: Unit.Level", "MW0015: Level" }, MapCode.CheckFile(source));
+        Assert.Equal("a unit's level is set only in its class's constructor", MapCode.MessagesOfFile(source)[0]);
+    }
+
+    [Fact]
+    public void a_units_level_set_in_a_declared_class_constructor_and_its_lambdas_is_accepted()
+    {
+        Assert.Empty(MapCode.CheckFile("""
+            using System;
+            using Moonwell;
+            using Moonwell.Objects;
+
+            namespace Map
+            {
+                public abstract class Veteran : Human.Units.Footman
+                {
+                    protected Veteran()
+                    {
+                        Level = 3;
+                    }
+                }
+
+                public class Elite<T> : Human.Units.Footman
+                {
+                    public Elite()
+                    {
+                        this.Level = 4;
+                    }
+                }
+
+                public class Captain : Veteran
+                {
+                    public Captain()
+                    {
+                        base.Level = 5;
+                        Action later = () => Level = 6;
+                        Wrap();
+
+                        void Wrap()
+                        {
+                            Level = 7;
+                        }
+                    }
+                }
+            }
+            """));
+    }
 }

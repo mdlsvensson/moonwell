@@ -351,7 +351,9 @@ namespace Moonwell.Build.Tests
             File.Delete(Path.Combine(copy, "ids.json"));
             var project = Path.Combine(copy, "Sample.csproj");
             File.WriteAllText(project, Regex.Replace(File.ReadAllText(project), @"[ \t]*<ProjectReference [^>]*Moonwell\.Objects\.csproj"" />\r?\n", string.Empty));
+            // MW0015 reports the same set while compiling; the pragma leaves it to the build's own check.
             File.WriteAllText(Path.Combine(copy, "Drill.cs"), """
+                #pragma warning disable MW0015
                 using Moonwell;
 
                 namespace Sample

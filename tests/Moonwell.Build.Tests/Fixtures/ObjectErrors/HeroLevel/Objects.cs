@@ -1,3 +1,4 @@
+#pragma warning disable MW0012 // the analyzer reports this too; the fixture is for the build's own check
 using Moonwell;
 
 namespace HeroLevel
