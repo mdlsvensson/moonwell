@@ -84,6 +84,36 @@ namespace Moonwell.Testing
         /// <summary>The type id of each destructable the world made.</summary>
         private readonly Dictionary<destructable, int> destructableTypes = new Dictionary<destructable, int>();
 
+        /// <summary>The calls that changed a unit's place or facing, as "move", "place", "turn" or "face-now".</summary>
+        public List<string> UnitCalls = new List<string>();
+
+        /// <summary>How many times a unit's life, mana, place or facing was read or set after the game had removed it, which the runtime must never do.</summary>
+        public int GoneCalls;
+
+        /// <summary>The facing each unit was last ordered to turn to; its own facing does not change by it, since turning takes time.</summary>
+        public Dictionary<unit, float> TurnTargets = new Dictionary<unit, float>();
+
+        /// <summary>The life of each unit, 0 until set.</summary>
+        private readonly Dictionary<unit, float> lives = new Dictionary<unit, float>();
+
+        /// <summary>The most life of each unit, 0 until set.</summary>
+        private readonly Dictionary<unit, float> maxLives = new Dictionary<unit, float>();
+
+        /// <summary>The mana of each unit, 0 until set.</summary>
+        private readonly Dictionary<unit, float> manas = new Dictionary<unit, float>();
+
+        /// <summary>The most mana of each unit, 0 until set.</summary>
+        private readonly Dictionary<unit, float> maxManas = new Dictionary<unit, float>();
+
+        /// <summary>The x of each unit, 0 until set.</summary>
+        private readonly Dictionary<unit, float> unitXs = new Dictionary<unit, float>();
+
+        /// <summary>The y of each unit, 0 until set.</summary>
+        private readonly Dictionary<unit, float> unitYs = new Dictionary<unit, float>();
+
+        /// <summary>The facing of each unit, 0 until set.</summary>
+        private readonly Dictionary<unit, float> facings = new Dictionary<unit, float>();
+
         /// <summary>The player made for each slot, once it is asked for.</summary>
         private readonly Dictionary<int, player> players = new Dictionary<int, player>();
 
@@ -637,6 +667,126 @@ namespace Moonwell.Testing
         public void RemoveAbility(unit unit, int abilityId)
         {
             AbilityCalls.Add("remove " + abilityId);
+        }
+
+        /// <summary>Counts a call on a unit the world has removed.</summary>
+        private void NoteGone(unit unit)
+        {
+            if (UnitTypeId(unit) == 0)
+            {
+                GoneCalls++;
+            }
+        }
+
+        /// <summary>A value kept for a unit; 0 when none was set.</summary>
+        private float Kept(Dictionary<unit, float> values, unit unit)
+        {
+            NoteGone(unit);
+            return values.TryGetValue(unit, out var value) ? value : 0.0f;
+        }
+
+        /// <summary>The life of a unit; 0 until set.</summary>
+        public float LifeOf(unit unit)
+        {
+            return Kept(lives, unit);
+        }
+
+        /// <summary>Sets the life of a unit, as given.</summary>
+        public void SetLife(unit unit, float life)
+        {
+            NoteGone(unit);
+            lives[unit] = life;
+        }
+
+        /// <summary>The most life of a unit; 0 until set.</summary>
+        public float MaxLifeOf(unit unit)
+        {
+            return Kept(maxLives, unit);
+        }
+
+        /// <summary>Sets the most life of a unit, as given.</summary>
+        public void SetMaxLife(unit unit, float life)
+        {
+            NoteGone(unit);
+            maxLives[unit] = life;
+        }
+
+        /// <summary>The mana of a unit; 0 until set.</summary>
+        public float ManaOf(unit unit)
+        {
+            return Kept(manas, unit);
+        }
+
+        /// <summary>Sets the mana of a unit, as given.</summary>
+        public void SetMana(unit unit, float mana)
+        {
+            NoteGone(unit);
+            manas[unit] = mana;
+        }
+
+        /// <summary>The most mana of a unit; 0 until set.</summary>
+        public float MaxManaOf(unit unit)
+        {
+            return Kept(maxManas, unit);
+        }
+
+        /// <summary>Sets the most mana of a unit, as given.</summary>
+        public void SetMaxMana(unit unit, float mana)
+        {
+            NoteGone(unit);
+            maxManas[unit] = mana;
+        }
+
+        /// <summary>The x of a unit; 0 until set.</summary>
+        public float UnitX(unit unit)
+        {
+            return Kept(unitXs, unit);
+        }
+
+        /// <summary>The y of a unit; 0 until set.</summary>
+        public float UnitY(unit unit)
+        {
+            return Kept(unitYs, unit);
+        }
+
+        /// <summary>Puts a unit at the place, and records a "move".</summary>
+        public void MoveUnit(unit unit, float x, float y)
+        {
+            NoteGone(unit);
+            UnitCalls.Add("move");
+            unitXs[unit] = x;
+            unitYs[unit] = y;
+        }
+
+        /// <summary>Puts a unit at the place, and records a "place".</summary>
+        public void PlaceUnit(unit unit, float x, float y)
+        {
+            NoteGone(unit);
+            UnitCalls.Add("place");
+            unitXs[unit] = x;
+            unitYs[unit] = y;
+        }
+
+        /// <summary>The facing of a unit; 0 until set.</summary>
+        public float FacingOf(unit unit)
+        {
+            return Kept(facings, unit);
+        }
+
+        /// <summary>Records a "turn" and the facing asked for in TurnTargets; the unit's facing stays, since a turn takes time.</summary>
+        public void TurnUnit(unit unit, float degrees)
+        {
+            NoteGone(unit);
+            UnitCalls.Add("turn");
+            TurnTargets[unit] = degrees;
+        }
+
+        /// <summary>Sets the facing of a unit, and records a "face-now".</summary>
+        public void FaceUnitNow(unit unit, float degrees)
+        {
+            NoteGone(unit);
+            UnitCalls.Add("face-now");
+            facings[unit] = degrees;
         }
     }
 }

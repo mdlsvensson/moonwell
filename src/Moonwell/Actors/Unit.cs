@@ -65,6 +65,199 @@ namespace Moonwell
             }
         }
 
+        /// <summary>The life last read, kept for when the game no longer gives it.</summary>
+        private float lastLife;
+
+        /// <summary>The most life last read.</summary>
+        private float lastMaxLife;
+
+        /// <summary>The mana last read.</summary>
+        private float lastMana;
+
+        /// <summary>The most mana last read.</summary>
+        private float lastMaxMana;
+
+        /// <summary>The x last read.</summary>
+        private float lastX;
+
+        /// <summary>The y last read.</summary>
+        private float lastY;
+
+        /// <summary>The facing last read.</summary>
+        private float lastFacing;
+
+        /// <summary>The unit's life; setting it to less than 0.405 kills the unit. Once the game has removed the unit, the last life read, and setting does nothing.</summary>
+        [LocalSafe]
+        public float Life
+        {
+            get
+            {
+                if (!IsGone)
+                {
+                    lastLife = Runtime.World.LifeOf(Handle);
+                }
+
+                return lastLife;
+            }
+
+            set
+            {
+                if (!IsGone)
+                {
+                    Runtime.World.SetLife(Handle, value);
+                }
+            }
+        }
+
+        /// <summary>The most life the unit can have. Once the game has removed the unit, the last value read, and setting does nothing.</summary>
+        [LocalSafe]
+        public float MaxLife
+        {
+            get
+            {
+                if (!IsGone)
+                {
+                    lastMaxLife = Runtime.World.MaxLifeOf(Handle);
+                }
+
+                return lastMaxLife;
+            }
+
+            set
+            {
+                if (!IsGone)
+                {
+                    Runtime.World.SetMaxLife(Handle, value);
+                }
+            }
+        }
+
+        /// <summary>The unit's mana. Once the game has removed the unit, the last mana read, and setting does nothing.</summary>
+        [LocalSafe]
+        public float Mana
+        {
+            get
+            {
+                if (!IsGone)
+                {
+                    lastMana = Runtime.World.ManaOf(Handle);
+                }
+
+                return lastMana;
+            }
+
+            set
+            {
+                if (!IsGone)
+                {
+                    Runtime.World.SetMana(Handle, value);
+                }
+            }
+        }
+
+        /// <summary>The most mana the unit can have. Once the game has removed the unit, the last value read, and setting does nothing.</summary>
+        [LocalSafe]
+        public float MaxMana
+        {
+            get
+            {
+                if (!IsGone)
+                {
+                    lastMaxMana = Runtime.World.MaxManaOf(Handle);
+                }
+
+                return lastMaxMana;
+            }
+
+            set
+            {
+                if (!IsGone)
+                {
+                    Runtime.World.SetMaxMana(Handle, value);
+                }
+            }
+        }
+
+        /// <summary>The x of the unit; once the game has removed it, the last x read.</summary>
+        [LocalSafe]
+        public float X
+        {
+            get
+            {
+                if (!IsGone)
+                {
+                    lastX = Runtime.World.UnitX(Handle);
+                }
+
+                return lastX;
+            }
+        }
+
+        /// <summary>The y of the unit; once the game has removed it, the last y read.</summary>
+        [LocalSafe]
+        public float Y
+        {
+            get
+            {
+                if (!IsGone)
+                {
+                    lastY = Runtime.World.UnitY(Handle);
+                }
+
+                return lastY;
+            }
+        }
+
+        /// <summary>Moves the unit to a place through the game's pathing (SetUnitPosition): the game finds a free spot, and the unit's order ends. Does nothing once the unit is gone.</summary>
+        public void MoveTo(float x, float y)
+        {
+            if (!IsGone)
+            {
+                Runtime.World.MoveUnit(Handle, x, y);
+            }
+        }
+
+        /// <summary>Puts the unit at a place with no pathing (SetUnitX and SetUnitY): it may stand where it could not walk, and its order goes on. Does nothing once the unit is gone.</summary>
+        public void PlaceAt(float x, float y)
+        {
+            if (!IsGone)
+            {
+                Runtime.World.PlaceUnit(Handle, x, y);
+            }
+        }
+
+        /// <summary>The unit's facing in degrees. Setting it makes the unit turn at its turn rate (SetUnitFacing), so a read just after still gives the old facing; FaceNow turns at once. Once the game has removed the unit, the last facing read, and setting does nothing.</summary>
+        [LocalSafe]
+        public float Facing
+        {
+            get
+            {
+                if (!IsGone)
+                {
+                    lastFacing = Runtime.World.FacingOf(Handle);
+                }
+
+                return lastFacing;
+            }
+
+            set
+            {
+                if (!IsGone)
+                {
+                    Runtime.World.TurnUnit(Handle, value);
+                }
+            }
+        }
+
+        /// <summary>Turns the unit to a facing in degrees at once (BlzSetUnitFacingEx). Does nothing once the unit is gone.</summary>
+        public void FaceNow(float degrees)
+        {
+            if (!IsGone)
+            {
+                Runtime.World.FaceUnitNow(Handle, degrees);
+            }
+        }
+
         /// <summary>The starting components, which the runtime adds in order when the unit enters.</summary>
         internal List<UnitComponent> StartComponents => Components;
 

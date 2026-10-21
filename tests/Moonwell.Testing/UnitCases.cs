@@ -128,6 +128,151 @@ namespace Moonwell.Testing
             Expect.Equal(1, unit.Player.Slot, "the owner's slot after the sweep");
         }
 
+        /// <summary>A unit's life, most life, mana and most mana are the game's: read and set, each apart.</summary>
+        public static void LifeAndMana(FakeWorld world)
+        {
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var unit = Unit.Of(handle)!;
+            Expect.Near(0.0f, unit.Life, "the game's life before");
+
+            unit.MaxLife = 420.0f;
+            unit.Life = 300.5f;
+            unit.MaxMana = 100.0f;
+            unit.Mana = 40.0f;
+
+            Expect.Near(300.5f, unit.Life, "the new life");
+            Expect.Near(420.0f, unit.MaxLife, "the new most life");
+            Expect.Near(40.0f, unit.Mana, "the new mana");
+            Expect.Near(100.0f, unit.MaxMana, "the new most mana");
+            Expect.Near(300.5f, world.LifeOf(handle), "the game's life");
+            Expect.Near(420.0f, world.MaxLifeOf(handle), "the game's most life");
+            Expect.Near(40.0f, world.ManaOf(handle), "the game's mana");
+            Expect.Near(100.0f, world.MaxManaOf(handle), "the game's most mana");
+
+            var other = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            Expect.Near(0.0f, other.Life, "another unit's life");
+            Expect.Near(0.0f, other.Mana, "another unit's mana");
+        }
+
+        /// <summary>PlaceAt puts the unit at a place without the game's pathing, and X and Y read it.</summary>
+        public static void Position(FakeWorld world)
+        {
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var unit = Unit.Of(handle)!;
+            Expect.Near(0.0f, unit.X, "x before");
+            Expect.Near(0.0f, unit.Y, "y before");
+
+            unit.PlaceAt(128.5f, -64.0f);
+
+            Expect.Near(128.5f, unit.X, "the new x");
+            Expect.Near(-64.0f, unit.Y, "the new y");
+            Expect.Equal(1, world.UnitCalls.Count, "calls to the game");
+            Expect.Equal("place", world.UnitCalls[0], "the call was a place");
+            Expect.Near(128.5f, world.UnitX(handle), "the game's x");
+            Expect.Near(-64.0f, world.UnitY(handle), "the game's y");
+        }
+
+        /// <summary>MoveTo moves the unit through the game's pathing, which is another call than PlaceAt.</summary>
+        public static void MoveTo(FakeWorld world)
+        {
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+
+            unit.MoveTo(512.0f, 256.0f);
+
+            Expect.Equal(1, world.UnitCalls.Count, "calls to the game");
+            Expect.Equal("move", world.UnitCalls[0], "the call was a move");
+            Expect.Near(512.0f, unit.X, "the new x");
+            Expect.Near(256.0f, unit.Y, "the new y");
+        }
+
+        /// <summary>Setting Facing orders a turn at the turn rate, which does not change the facing at once; FaceNow does.</summary>
+        public static void Facing(FakeWorld world)
+        {
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var unit = Unit.Of(handle)!;
+            unit.FaceNow(90.0f);
+            Expect.Near(90.0f, unit.Facing, "the facing after FaceNow");
+
+            unit.Facing = 180.0f;
+
+            Expect.Near(90.0f, unit.Facing, "the facing is not turned at once");
+            Expect.Near(180.0f, world.TurnTargets[handle], "the facing the unit was ordered to");
+            Expect.Equal(2, world.UnitCalls.Count, "calls to the game");
+            Expect.Equal("face-now", world.UnitCalls[0], "the first call");
+            Expect.Equal("turn", world.UnitCalls[1], "the second call");
+
+            unit.FaceNow(270.0f);
+
+            Expect.Near(270.0f, unit.Facing, "the facing after the second FaceNow");
+        }
+
+        /// <summary>A unit the game has removed, found by the sweep or removed by Remove, gives the values it last read, ignores setters and actions, and the game is not asked.</summary>
+        public static void GoneReadsLast(FakeWorld world)
+        {
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var swept = Unit.Of(handle)!;
+            SetAndRead(swept);
+            var calls = world.UnitCalls.Count;
+
+            world.VanishUnit(handle);
+            world.Advance(0.3f);
+            Expect.True(swept.IsGone, "the sweep found the unit gone");
+            world.GoneCalls = 0;
+            ExpectGoneIsQuiet(world, swept, calls, "swept");
+
+            var removed = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            SetAndRead(removed);
+            calls = world.UnitCalls.Count;
+            removed.Remove();
+            world.GoneCalls = 0;
+            ExpectGoneIsQuiet(world, removed, calls, "removed");
+        }
+
+        /// <summary>Sets a unit's life, mana, place and facing and reads each back, so the unit has seen them.</summary>
+        private static void SetAndRead(Unit unit)
+        {
+            unit.MaxLife = 500.0f;
+            unit.Life = 450.0f;
+            unit.MaxMana = 200.0f;
+            unit.Mana = 150.0f;
+            unit.PlaceAt(10.0f, 20.0f);
+            unit.FaceNow(45.0f);
+            Expect.Near(450.0f, unit.Life, "life read");
+            Expect.Near(500.0f, unit.MaxLife, "most life read");
+            Expect.Near(150.0f, unit.Mana, "mana read");
+            Expect.Near(200.0f, unit.MaxMana, "most mana read");
+            Expect.Near(10.0f, unit.X, "x read");
+            Expect.Near(20.0f, unit.Y, "y read");
+            Expect.Near(45.0f, unit.Facing, "facing read");
+        }
+
+        /// <summary>Checks that a gone unit gives the values SetAndRead left and that its setters and actions do not reach the game.</summary>
+        private static void ExpectGoneIsQuiet(FakeWorld world, Unit unit, int calls, string what)
+        {
+            Expect.Near(450.0f, unit.Life, what + ": life");
+            Expect.Near(500.0f, unit.MaxLife, what + ": most life");
+            Expect.Near(150.0f, unit.Mana, what + ": mana");
+            Expect.Near(200.0f, unit.MaxMana, what + ": most mana");
+            Expect.Near(10.0f, unit.X, what + ": x");
+            Expect.Near(20.0f, unit.Y, what + ": y");
+            Expect.Near(45.0f, unit.Facing, what + ": facing");
+
+            unit.Life = 1.0f;
+            unit.MaxLife = 1.0f;
+            unit.Mana = 1.0f;
+            unit.MaxMana = 1.0f;
+            unit.PlaceAt(99.0f, 99.0f);
+            unit.MoveTo(99.0f, 99.0f);
+            unit.Facing = 99.0f;
+            unit.FaceNow(99.0f);
+
+            Expect.Near(450.0f, unit.Life, what + ": life after a set");
+            Expect.Near(10.0f, unit.X, what + ": x after PlaceAt");
+            Expect.Near(45.0f, unit.Facing, what + ": facing after a set");
+            Expect.Equal(0, world.GoneCalls, what + ": no call to the game for the gone unit");
+            Expect.Equal(calls, world.UnitCalls.Count, what + ": no action reached the game");
+        }
+
         /// <summary>A static dictionary keyed by the unit object loads, and finds a unit by its object.</summary>
         public static void DictionaryKey(FakeWorld world)
         {

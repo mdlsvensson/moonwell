@@ -552,6 +552,97 @@ namespace Moonwell.Engine
             Natives.UnitRemoveAbility(unit, abilityId);
         }
 
+        /// <summary>The life of a unit, from the game.</summary>
+        public float LifeOf(unit unit)
+        {
+            return Natives.GetWidgetLife(unit);
+        }
+
+        /// <summary>Sets the life of a unit in the game.</summary>
+        public void SetLife(unit unit, float life)
+        {
+            Natives.SetWidgetLife(unit, life);
+        }
+
+        /// <summary>The most life a unit can have, from the game.</summary>
+        public float MaxLifeOf(unit unit)
+        {
+            return Natives.GetUnitState(unit, Natives.UNIT_STATE_MAX_LIFE);
+        }
+
+        /// <summary>Sets the most life a unit can have in the game.</summary>
+        public void SetMaxLife(unit unit, float life)
+        {
+            Natives.SetUnitState(unit, Natives.UNIT_STATE_MAX_LIFE, life);
+        }
+
+        /// <summary>The mana of a unit, from the game.</summary>
+        public float ManaOf(unit unit)
+        {
+            return Natives.GetUnitState(unit, Natives.UNIT_STATE_MANA);
+        }
+
+        /// <summary>Sets the mana of a unit in the game.</summary>
+        public void SetMana(unit unit, float mana)
+        {
+            Natives.SetUnitState(unit, Natives.UNIT_STATE_MANA, mana);
+        }
+
+        /// <summary>The most mana a unit can have, from the game.</summary>
+        public float MaxManaOf(unit unit)
+        {
+            return Natives.GetUnitState(unit, Natives.UNIT_STATE_MAX_MANA);
+        }
+
+        /// <summary>Sets the most mana a unit can have in the game.</summary>
+        public void SetMaxMana(unit unit, float mana)
+        {
+            Natives.SetUnitState(unit, Natives.UNIT_STATE_MAX_MANA, mana);
+        }
+
+        /// <summary>The x of a unit, from the game.</summary>
+        public float UnitX(unit unit)
+        {
+            return Natives.GetUnitX(unit);
+        }
+
+        /// <summary>The y of a unit, from the game.</summary>
+        public float UnitY(unit unit)
+        {
+            return Natives.GetUnitY(unit);
+        }
+
+        /// <summary>Moves a unit through the game's pathing: SetUnitPosition.</summary>
+        public void MoveUnit(unit unit, float x, float y)
+        {
+            Natives.SetUnitPosition(unit, x, y);
+        }
+
+        /// <summary>Puts a unit at a place with no pathing: SetUnitX and SetUnitY.</summary>
+        public void PlaceUnit(unit unit, float x, float y)
+        {
+            Natives.SetUnitX(unit, x);
+            Natives.SetUnitY(unit, y);
+        }
+
+        /// <summary>The facing of a unit, from the game.</summary>
+        public float FacingOf(unit unit)
+        {
+            return Natives.GetUnitFacing(unit);
+        }
+
+        /// <summary>Orders a unit to turn at its turn rate: SetUnitFacing.</summary>
+        public void TurnUnit(unit unit, float degrees)
+        {
+            Natives.SetUnitFacing(unit, degrees);
+        }
+
+        /// <summary>Sets the facing of a unit at once: BlzSetUnitFacingEx.</summary>
+        public void FaceUnitNow(unit unit, float degrees)
+        {
+            Natives.BlzSetUnitFacingEx(unit, degrees);
+        }
+
         /// <summary>Runs a callback once, after the map's main function has returned.</summary>
         internal static void Later(Action callback)
         {

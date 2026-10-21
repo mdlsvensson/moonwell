@@ -166,5 +166,50 @@ namespace Moonwell.Hosting
 
         /// <summary>Takes an ability from a unit.</summary>
         void RemoveAbility(unit unit, int abilityId);
+
+        /// <summary>The life of a unit.</summary>
+        float LifeOf(unit unit);
+
+        /// <summary>Sets the life of a unit; a unit left below 0.405 life dies.</summary>
+        void SetLife(unit unit, float life);
+
+        /// <summary>The most life a unit can have.</summary>
+        float MaxLifeOf(unit unit);
+
+        /// <summary>Sets the most life a unit can have.</summary>
+        void SetMaxLife(unit unit, float life);
+
+        /// <summary>The mana of a unit.</summary>
+        float ManaOf(unit unit);
+
+        /// <summary>Sets the mana of a unit.</summary>
+        void SetMana(unit unit, float mana);
+
+        /// <summary>The most mana a unit can have.</summary>
+        float MaxManaOf(unit unit);
+
+        /// <summary>Sets the most mana a unit can have.</summary>
+        void SetMaxMana(unit unit, float mana);
+
+        /// <summary>The x of a unit.</summary>
+        float UnitX(unit unit);
+
+        /// <summary>The y of a unit.</summary>
+        float UnitY(unit unit);
+
+        /// <summary>Moves a unit to a place the way the game does for a unit that is told to stand there: it finds a free spot and the unit's order ends.</summary>
+        void MoveUnit(unit unit, float x, float y);
+
+        /// <summary>Puts a unit at a place with no pathing check; the unit's order goes on.</summary>
+        void PlaceUnit(unit unit, float x, float y);
+
+        /// <summary>The facing of a unit, in degrees.</summary>
+        float FacingOf(unit unit);
+
+        /// <summary>Orders a unit to turn to a facing, in degrees, at its turn rate.</summary>
+        void TurnUnit(unit unit, float degrees);
+
+        /// <summary>Sets the facing of a unit, in degrees, at once.</summary>
+        void FaceUnitNow(unit unit, float degrees);
     }
 }

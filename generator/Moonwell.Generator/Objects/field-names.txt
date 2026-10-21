@@ -1,7 +1,7 @@
 unit unam Name
 unit uhpm HitPoints
 unit uhpr HitPointRegen
-unit umpm Mana
+unit umpm ManaPoints
 unit umpr ManaRegen
 unit udef Armor
 unit umvs Speed

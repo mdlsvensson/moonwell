@@ -253,8 +253,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -1102,8 +1102,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -1396,8 +1396,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -1568,8 +1568,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -1744,8 +1744,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -1907,8 +1907,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 30f;
                     MaximumRollAngleDegrees = 30f;
@@ -2082,8 +2082,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -2245,8 +2245,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 20;
-                    Mana = 350;
                     ManaInitialAmount = 350;
+                    ManaPoints = 350;
                     ManaRegen = 0.6666667f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -2680,8 +2680,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 2f;
                     MaximumPitchAngleDegrees = 5f;
                     MaximumRollAngleDegrees = 5f;
@@ -2843,8 +2843,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -3011,8 +3011,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -3177,8 +3177,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -3345,8 +3345,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -3647,8 +3647,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -4088,8 +4088,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -4251,8 +4251,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -4652,8 +4652,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -4811,8 +4811,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 20;
-                    Mana = 0;
                     ManaInitialAmount = 0;
+                    ManaPoints = 0;
                     ManaRegen = 0f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -5111,8 +5111,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 20;
-                    Mana = 250;
                     ManaInitialAmount = 100;
+                    ManaPoints = 250;
                     ManaRegen = 0.625f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -5665,8 +5665,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -5833,8 +5833,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -6000,8 +6000,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -6306,8 +6306,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 55;
                     ManaInitialAmount = 200;
+                    ManaPoints = 55;
                     ManaRegen = 2f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -6456,8 +6456,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 10;
-                    Mana = 400;
                     ManaInitialAmount = 200;
+                    ManaPoints = 400;
                     ManaRegen = 1.3333334f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -6620,8 +6620,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -9345,8 +9345,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 10;
-                    Mana = 200;
                     ManaInitialAmount = 75;
+                    ManaPoints = 200;
                     ManaRegen = 0.72f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -10063,8 +10063,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 40;
-                    Mana = 300;
                     ManaInitialAmount = 300;
+                    ManaPoints = 300;
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
@@ -10679,8 +10679,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 30;
-                    Mana = 200;
                     ManaInitialAmount = 50;
+                    ManaPoints = 200;
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
@@ -10982,8 +10982,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -11274,8 +11274,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -12082,8 +12082,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -13707,8 +13707,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 20;
-                    Mana = 350;
                     ManaInitialAmount = 350;
+                    ManaPoints = 350;
                     ManaRegen = 0.875f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -13867,8 +13867,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -14150,8 +14150,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
-                    Mana = 200;
                     ManaInitialAmount = 75;
+                    ManaPoints = 200;
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -15224,8 +15224,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
-                    Mana = 400;
                     ManaInitialAmount = 75;
+                    ManaPoints = 400;
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -15658,8 +15658,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 150;
-                    Mana = 600;
                     ManaInitialAmount = 600;
+                    ManaPoints = 600;
                     ManaRegen = 1.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -17103,8 +17103,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -17272,8 +17272,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -17440,8 +17440,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -17611,8 +17611,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -17782,8 +17782,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -18231,8 +18231,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -18873,8 +18873,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
-                    Mana = 150;
                     ManaInitialAmount = 150;
+                    ManaPoints = 150;
                     ManaRegen = 0.375f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -19029,8 +19029,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -19196,8 +19196,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -19366,8 +19366,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -19533,8 +19533,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -21989,8 +21989,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 20;
-                    Mana = 400;
                     ManaInitialAmount = 200;
+                    ManaPoints = 400;
                     ManaRegen = 1.3333334f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -22378,8 +22378,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -22549,8 +22549,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -22722,8 +22722,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -22899,8 +22899,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -23078,8 +23078,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -23248,8 +23248,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -23422,8 +23422,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -23844,8 +23844,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 20;
-                    Mana = 200;
                     ManaInitialAmount = 75;
+                    ManaPoints = 200;
                     ManaRegen = 0.6666667f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -24142,8 +24142,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 5f;
                     MaximumRollAngleDegrees = 5f;
@@ -24312,8 +24312,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -24480,8 +24480,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -24649,8 +24649,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -24785,8 +24785,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
-                    Mana = 200;
                     ManaInitialAmount = 75;
+                    ManaPoints = 200;
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -24940,8 +24940,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -25090,8 +25090,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
-                    Mana = 200;
                     ManaInitialAmount = 75;
+                    ManaPoints = 200;
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -25245,8 +25245,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -25407,8 +25407,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -25853,8 +25853,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -26020,8 +26020,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -26185,8 +26185,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -26347,8 +26347,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     ModelFileExtraVersions = 0;
                     Name = "Warrior";
@@ -26738,8 +26738,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -26903,8 +26903,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -27070,8 +27070,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -27466,8 +27466,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -27633,8 +27633,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -27803,8 +27803,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -27970,8 +27970,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -28141,8 +28141,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -28310,8 +28310,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -28482,8 +28482,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -28648,8 +28648,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -29216,8 +29216,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
-                    Mana = 200;
                     ManaInitialAmount = 75;
+                    ManaPoints = 200;
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
@@ -29362,8 +29362,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
-                    Mana = 200;
                     ManaInitialAmount = 75;
+                    ManaPoints = 200;
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -29652,8 +29652,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -30237,8 +30237,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 500;
                     ManaInitialAmount = 500;
+                    ManaPoints = 500;
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -30390,8 +30390,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 20;
-                    Mana = 200;
                     ManaInitialAmount = 200;
+                    ManaPoints = 200;
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -33186,8 +33186,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
-                    Mana = 300;
                     ManaInitialAmount = 75;
+                    ManaPoints = 300;
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -33589,8 +33589,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -34097,8 +34097,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -34268,8 +34268,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -34443,8 +34443,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -34620,8 +34620,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -34788,8 +34788,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -34955,8 +34955,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -35357,8 +35357,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -35653,8 +35653,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -35965,8 +35965,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 5f;
                     MaximumRollAngleDegrees = 5f;
@@ -36132,8 +36132,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -36830,8 +36830,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
-                    Mana = 300;
                     ManaInitialAmount = 75;
+                    ManaPoints = 300;
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -37486,8 +37486,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -37651,8 +37651,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -37819,8 +37819,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -37968,8 +37968,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
-                    Mana = 300;
                     ManaInitialAmount = 300;
+                    ManaPoints = 300;
                     ManaRegen = 0.75f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -39158,8 +39158,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 40;
-                    Mana = 400;
                     ManaInitialAmount = 400;
+                    ManaPoints = 400;
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -39694,8 +39694,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 500;
                     ManaInitialAmount = 500;
+                    ManaPoints = 500;
                     ManaRegen = 1.25f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -39976,8 +39976,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 20;
-                    Mana = 200;
                     ManaInitialAmount = 200;
+                    ManaPoints = 200;
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -40390,8 +40390,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -40562,8 +40562,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -40713,8 +40713,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
-                    Mana = 300;
                     ManaInitialAmount = 75;
+                    ManaPoints = 300;
                     ManaRegen = 0.8f;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
@@ -41139,8 +41139,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -41442,8 +41442,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -41613,8 +41613,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -41782,8 +41782,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -42073,8 +42073,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     ModelFileExtraVersions = 0;
                     Name = "Scarlet Captain";
@@ -42349,8 +42349,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -43052,8 +43052,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -43218,8 +43218,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 200;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -43736,8 +43736,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 25;
-                    Mana = 200;
                     ManaInitialAmount = 75;
+                    ManaPoints = 200;
                     ManaRegen = 0.5f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;

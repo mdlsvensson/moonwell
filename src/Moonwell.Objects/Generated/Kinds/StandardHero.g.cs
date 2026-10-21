@@ -1497,7 +1497,7 @@ namespace Moonwell.Objects
         /// <summary>The field <c>umpm</c>.</summary>
         [global::Moonwell.Objects.Field("umpm", Label = "Mana Maximum")]
         [global::Moonwell.Objects.Limits(0, 100000)]
-        public int Mana
+        public int ManaPoints
         {
             get { return Fields.Get<int>(this, "umpm"); }
             protected set { Fields.Put("umpm", value); }

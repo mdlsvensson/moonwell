@@ -223,8 +223,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 35;
-                    Mana = 300;
                     ManaInitialAmount = 100;
+                    ManaPoints = 300;
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -932,8 +932,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -1539,8 +1539,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -3490,8 +3490,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
@@ -3782,8 +3782,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 20;
-                    Mana = 200;
                     ManaInitialAmount = 75;
+                    ManaPoints = 200;
                     ManaRegen = 0.72f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -4187,8 +4187,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 35;
-                    Mana = 300;
                     ManaInitialAmount = 100;
+                    ManaPoints = 300;
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -4342,8 +4342,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 35;
-                    Mana = 300;
                     ManaInitialAmount = 100;
+                    ManaPoints = 300;
                     ManaRegen = 1f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -5035,8 +5035,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 100;
-                    Mana = 0;
                     ManaInitialAmount = 100;
+                    ManaPoints = 0;
                     ManaRegen = 0.01f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
@@ -5976,8 +5976,8 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 25;
-                    Mana = 200;
                     ManaInitialAmount = 75;
+                    ManaPoints = 200;
                     ManaRegen = 0.72f;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
