@@ -31,6 +31,13 @@ public class ClassNamesTests
     }
 
     [Fact]
+    public void colour_codes_and_line_breaks_are_not_part_of_the_name()
+    {
+        Assert.Equal("Moonwell.Objects.Items.SharpenedCleaver", FullName(Object(Kind.Item, "epsc", "|cff6295E3Sharpened Cleaver|r")));
+        Assert.Equal("Moonwell.Objects.Items.ThePrizeOfTheGods", FullName(Object(Kind.Item, "epri", "The |CFFFFCC00Prize|R|nof the Gods")));
+    }
+
+    [Fact]
     public void paladin_is_human()
     {
         var paladin = Object(Kind.Unit, "Hpal", "Paladin", "human");
