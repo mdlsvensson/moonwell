@@ -454,8 +454,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The item in a slot of the unit's inventory, counting from 0; null when the slot is empty, when there is no such slot, and once the unit is gone.</summary>
-        [LocalSafe]
+        /// <summary>The item in a slot of the unit's inventory, counting from 0; null when the slot is empty, when there is no such slot, and once the unit is gone. Not for Local.For code: an item Moonwell has not seen is taken in (its components and OnEnter run), which must happen on every machine.</summary>
         public Item? ItemIn(int slot)
         {
             if (IsGone || slot < 0 || slot >= InventorySize)
@@ -463,13 +462,7 @@ namespace Moonwell
                 return null;
             }
 
-            var found = Item.Of(Runtime.World.ItemInSlot(Handle, slot));
-            if (found != null)
-            {
-                found.CarrierUnit = this;
-            }
-
-            return found;
+            return Item.Of(Runtime.World.ItemInSlot(Handle, slot));
         }
 
         /// <summary>Gives the unit an item to pick up into its first free slot, and returns the game's answer (false when the inventory is full). The game counts it as a pick-up, so OnPickedUp and OnItemPickedUp run, inside this call. False, and no call to the game, once the unit or the item is gone.</summary>

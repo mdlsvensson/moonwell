@@ -57,14 +57,11 @@ namespace Moonwell.Testing
             ExpectLog(new string[] { "glow dropped", "hero dropped orb", "tally dropped orb" }, "the log");
         }
 
-        /// <summary>An item taken in makes the runtime listen for pick-ups and drops, which is how it keeps the item's carrier, even when its class overrides neither hook.</summary>
+        /// <summary>The runtime listens for pick-ups and drops from its start, before any item is taken in, since keeping an item's carrier needs them and listening must not begin in code that only one machine runs.</summary>
         public static void Listens(FakeWorld world)
         {
-            Expect.True(!world.Listening.Contains(GameEvent.PickUp), "PickUp is not listened for before an item is taken in");
-            Expect.True(!world.Listening.Contains(GameEvent.Drop), "Drop is not listened for before an item is taken in");
-            Item.Of(world.NewItem(ObjectTypes.FourCC("ofoo")));
-            Expect.True(world.Listening.Contains(GameEvent.PickUp), "PickUp is listened for");
-            Expect.True(world.Listening.Contains(GameEvent.Drop), "Drop is listened for");
+            Expect.True(world.Listening.Contains(GameEvent.PickUp), "PickUp is listened for from the start");
+            Expect.True(world.Listening.Contains(GameEvent.Drop), "Drop is listened for from the start");
         }
 
         /// <summary>An item that vanishes is ended by the sweep, and the game is not asked to remove it.</summary>
@@ -237,7 +234,7 @@ namespace Moonwell.Testing
             Expect.True(orb.Carrier == null, "no carrier after Drop");
         }
 
-        /// <summary>The carrier is already set when the item's own OnPickedUp runs, and already null when its OnDropped runs.</summary>
+        /// <summary>The carrier is already set when the item's own OnPickedUp runs; inside OnDropped it is what the game says then, and the item is already out of the inventory, so null.</summary>
         public static void CarrierInHooks(FakeWorld world)
         {
             ObjectTypes.Item(ObjectTypes.FourCC("I001"), () => new CarrierWatch());
@@ -266,8 +263,8 @@ namespace Moonwell.Testing
             Expect.True(!orb.IsCarried, "not carried after the carrier died");
         }
 
-        /// <summary>An item found in a slot (ItemIn) is carried by that unit, even though Moonwell never saw it picked up; a carrier the game has removed carries nothing.</summary>
-        public static void CarrierFound(FakeWorld world)
+        /// <summary>An item Moonwell never saw picked up has no carrier, even when ItemIn finds it in a slot; a carrier the game has removed carries nothing.</summary>
+        public static void CarrierUnseen(FakeWorld world)
         {
             var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
             var unit = Unit.Of(handle)!;
@@ -276,13 +273,67 @@ namespace Moonwell.Testing
 
             var found = unit.ItemIn(0)!;
 
-            Expect.Same(unit, found.Carrier, "the carrier of an item found in a slot");
-            Expect.True(found.IsCarried, "carried");
+            Expect.True(found.Carrier == null, "no carrier for an item never seen picked up");
+
+            var given = Item.Of(world.NewItem(ObjectTypes.FourCC("ofoo")))!;
+            unit.Give(given);
+            Expect.Same(unit, given.Carrier, "the carrier after Give");
 
             unit.Remove();
 
-            Expect.True(found.Carrier == null, "no carrier once the carrier is gone");
-            Expect.True(!found.IsCarried, "not carried once the carrier is gone");
+            Expect.True(given.Carrier == null, "no carrier once the carrier is gone");
+            Expect.True(!given.IsCarried, "not carried once the carrier is gone");
+        }
+
+        /// <summary>The drop the game fires when an item only moves between slots does not make the item uncarried: Carrier asks the game whether the unit still has it.</summary>
+        public static void CarrierSlotMove(FakeWorld world)
+        {
+            ObjectTypes.Item(ObjectTypes.FourCC("I001"), () => new CarrierWatch());
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var unit = Unit.Of(handle)!;
+            var watch = (CarrierWatch)Item.Of(world.NewItem(ObjectTypes.FourCC("I001")))!;
+            unit.Give(watch);
+            watch.DropSeen = false;
+
+            world.MoveItemSlot(handle, watch.Handle, 3);
+
+            Expect.True(watch.DropSeen, "the game fired a drop for the move");
+            Expect.Same(unit, watch.CarrierAtDrop, "the carrier seen in OnDropped for a move");
+            Expect.Same(unit, watch.Carrier, "the carrier after the move");
+            Expect.True(watch.IsCarried, "carried after the move");
+
+            unit.Drop(watch);
+
+            Expect.True(watch.Carrier == null, "no carrier after a real drop");
+        }
+
+        /// <summary>A hero that dies keeps its items (assumed, see unseen.md), so they stay carried; a unit that is not a hero drops them.</summary>
+        public static void CarrierHeroDies(FakeWorld world)
+        {
+            var hero = Unit.Of(world.NewUnit(ObjectTypes.FourCC("H001"), hero: true))!;
+            var orb = Item.Of(world.NewItem(ObjectTypes.FourCC("ofoo")))!;
+            hero.Give(orb);
+
+            hero.Kill();
+
+            Expect.Same(hero, orb.Carrier, "the hero still carries the item");
+        }
+
+        /// <summary>The player an item had when Moonwell took it in is what it gives if the game removes it before anyone reads it; an item the game gives no owner for belongs to the neutral passive player.</summary>
+        public static void PlayerGoneBeforeRead(FakeWorld world)
+        {
+            var handle = world.NewItem(ObjectTypes.FourCC("ofoo"));
+            world.SetItemOwner(handle, world.PlayerAt(3));
+            var swept = Item.Of(handle)!;
+            world.VanishItem(handle);
+            world.Advance(0.3f);
+            Expect.True(swept.IsGone, "the sweep found the item gone");
+            Expect.Equal(3, swept.Player.Slot, "the player it had when taken in");
+
+            var ownerless = world.NewItem(ObjectTypes.FourCC("ofoo"));
+            world.LoseItemOwner(ownerless);
+            var neutral = Item.Of(ownerless)!;
+            Expect.Equal(world.NeutralPassiveSlot(), neutral.Player.Slot, "no owner given: the neutral passive player");
         }
 
         /// <summary>A removed item gives the last charges, player and place read or set, has no carrier, changes nothing and asks the game nothing.</summary>

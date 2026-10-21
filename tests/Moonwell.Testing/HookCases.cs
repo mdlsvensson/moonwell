@@ -29,6 +29,9 @@ namespace Moonwell.Testing
         /// <summary>Each game event is listened for once, however many bits ask for it, and only when a bit needs it.</summary>
         public static void NeedListensOnce(FakeWorld world)
         {
+            // The runtime already listens for pick-ups and drops from its start; this case counts what Need adds.
+            Events.Reset();
+            world.Listening.Clear();
             Events.Need(Hook.OnDamaged | Hook.OnUnitDamaged);
             Events.Need(Hook.OnDamaged);
             Expect.Equal(1, world.Listening.Count, "one event is listened for");

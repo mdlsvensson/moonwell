@@ -68,7 +68,6 @@ namespace Moonwell
                 return;
             }
 
-            dropped.CarrierUnit = null;
             ItemDropped(dropped, by);
             UnitItemDropped(by, dropped);
         }

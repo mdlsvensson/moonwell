@@ -71,9 +71,16 @@ namespace Moonwell
             }
         }
 
+        /// <summary>Listens for pick-ups and drops, which is how an item's carrier is kept (Item.Carrier). Begin does it before the setup, where every machine runs the same code, and not when the first item is taken in, which Local.For code may do. Tests that make a world without Begin call it themselves.</summary>
+        internal static void ListenForCarriers()
+        {
+            Events.Need(Hook.OnPickedUp | Hook.OnDropped);
+        }
+
         /// <summary>Runs the setup, then takes in what is already in the world and starts the game's components.</summary>
         private static void Begin(Action setup)
         {
+            ListenForCarriers();
             var previous = Owner.current;
             Owner.current = Game.Instance;
             try

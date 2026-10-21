@@ -216,11 +216,12 @@ namespace Moonwell.Testing
         /// <summary>The tech limits set, keyed by slot, then by type id.</summary>
         private readonly Dictionary<int, Dictionary<int, int>> techMaxes = new Dictionary<int, Dictionary<int, int>>();
 
-        /// <summary>Makes a fresh world for one case and makes it the runtime's world.</summary>
+        /// <summary>Makes a fresh world for one case and makes it the runtime's world; as the runtime does at its start, it listens for pick-ups and drops.</summary>
         public static FakeWorld Install()
         {
             var world = new FakeWorld();
             Runtime.Reset(world);
+            Runtime.ListenForCarriers();
             return world;
         }
 
@@ -755,11 +756,59 @@ namespace Moonwell.Testing
             ItemCalls.Add("charges " + charges);
         }
 
-        /// <summary>The player that owns an item; slot 0 until set.</summary>
+        /// <summary>The player that owns an item; slot 0 until set, null once LoseItemOwner has been called for it.</summary>
         public player ItemOwnerOf(item item)
         {
             NoteGoneItem(item);
-            return PlayerAt(itemSlots.TryGetValue(item, out var slot) ? slot : 0);
+            var slot = itemSlots.TryGetValue(item, out var kept) ? kept : 0;
+            if (slot < 0)
+            {
+                return null!;
+            }
+
+            return PlayerAt(slot);
+        }
+
+        /// <summary>Makes the game give no owner for an item, as it may for an item nobody owns.</summary>
+        public void LoseItemOwner(item item)
+        {
+            itemSlots[item] = -1;
+        }
+
+        /// <summary>Whether a unit has an item in a slot.</summary>
+        public bool CarriesItem(unit unit, item item)
+        {
+            NoteGone(unit);
+            var slots = SlotsOf(unit);
+            for (var i = 0; i < slots.Length; i++)
+            {
+                if (slots[i] == item)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>Moves an item to another, empty slot of the unit, as the game does when the player drags it; the game fires a drop for it (seen 10-15) while the unit still has the item.</summary>
+        public void MoveItemSlot(unit unit, item item, int toSlot)
+        {
+            var slots = SlotsOf(unit);
+            for (var i = 0; i < slots.Length; i++)
+            {
+                if (slots[i] == item)
+                {
+                    slots[i] = null!;
+                    slots[toSlot] = item;
+                    if (Listening.Contains(GameEvent.Drop))
+                    {
+                        Inbound.Dropped(unit, item);
+                    }
+
+                    return;
+                }
+            }
         }
 
         /// <summary>Sets the player of an item and records "owner" with the slot and False, since the item's colour is left alone.</summary>
@@ -952,9 +1001,14 @@ namespace Moonwell.Testing
             DropAll(unit);
         }
 
-        /// <summary>Empties a dead unit's slots as the game drops a dead unit's items, delivering each drop when it is listened for (assumed, not seen: see unseen.md).</summary>
+        /// <summary>Empties a dead unit's slots as the game drops the items of a unit that is not a hero, delivering each drop when it is listened for. Assumed, not seen: whether heroes keep their items, and whether the drops are fired (see unseen.md).</summary>
         private void DropAll(unit unit)
         {
+            if (heroes.TryGetValue(unit, out var isHero) && isHero)
+            {
+                return;
+            }
+
             var slots = SlotsOf(unit);
             for (var i = 0; i < slots.Length; i++)
             {

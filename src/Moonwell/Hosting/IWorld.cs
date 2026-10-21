@@ -299,6 +299,9 @@ namespace Moonwell.Hosting
         /// <summary>Makes a unit drop an item from its inventory, which the game counts as a drop.</summary>
         void DropItem(unit unit, item item);
 
+        /// <summary>Whether a unit has an item in its inventory.</summary>
+        bool CarriesItem(unit unit, item item);
+
         /// <summary>The number of charges of an item.</summary>
         int ChargesOf(item item);
 

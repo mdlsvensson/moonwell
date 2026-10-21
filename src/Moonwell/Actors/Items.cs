@@ -51,12 +51,12 @@ namespace Moonwell
 
             made.Handle = handle;
             made.TypeId = typeId;
+            made.OwningPlayer = Runtime.World.ItemOwnerOf(handle);
             known[handle] = made;
             Live.Add(made);
             owner?.Adopt(made);
             made.Mask = Hooks.MaskOf(made, Item.ItemHooks);
-            // Every item listens for pick-ups and drops: they are how the item's carrier is kept (Item.Carrier).
-            Events.Need(made.Mask | Hook.OnPickedUp | Hook.OnDropped);
+            Events.Need(made.Mask);
             for (var i = 0; i < made.StartComponents.Count; i++)
             {
                 made.Add(made.StartComponents[i]);

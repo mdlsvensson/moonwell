@@ -817,6 +817,12 @@ namespace Moonwell.Engine
             Natives.UnitRemoveItem(unit, item);
         }
 
+        /// <summary>Whether a unit has an item in its inventory: UnitHasItem.</summary>
+        public bool CarriesItem(unit unit, item item)
+        {
+            return Natives.UnitHasItem(unit, item);
+        }
+
         /// <summary>The charges of an item, from the game.</summary>
         public int ChargesOf(item item)
         {
