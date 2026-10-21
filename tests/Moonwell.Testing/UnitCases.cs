@@ -680,6 +680,76 @@ namespace Moonwell.Testing
             Expect.Near(400.0f, unit.Life, "life clamped down to the new most");
             Expect.Near(300.0f, unit.MaxMana, "most mana");
             Expect.Near(150.0f, unit.Mana, "mana kept when the most rises");
+
+            unit.MaxLife = 400.7f;
+            unit.MaxMana = 300.9f;
+
+            Expect.Near(400.0f, unit.MaxLife, "most life truncated to a whole number");
+            Expect.Near(300.0f, unit.MaxMana, "most mana truncated to a whole number");
+        }
+
+        /// <summary>What a setter stored is what a unit gives after the game removed it, unread: the whole number the game keeps for the most, and a life or mana clamped to it.</summary>
+        public static void MaxLastValues(FakeWorld world)
+        {
+            var first = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var unit = Unit.Of(first)!;
+            unit.MaxLife = 400.7f;
+            unit.MaxMana = 90.9f;
+            unit.Life = 450.0f;
+            unit.Mana = 100.0f;
+            world.VanishUnit(first);
+            Expect.Near(400.0f, unit.MaxLife, "most life: the whole number");
+            Expect.Near(90.0f, unit.MaxMana, "most mana: the whole number");
+            Expect.Near(400.0f, unit.Life, "life: clamped to the most");
+            Expect.Near(90.0f, unit.Mana, "mana: clamped to the most");
+
+            var second = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var lowered = Unit.Of(second)!;
+            lowered.MaxLife = 500.0f;
+            lowered.Life = 450.0f;
+            lowered.MaxMana = 200.0f;
+            lowered.Mana = 150.0f;
+            lowered.MaxLife = 300.5f;
+            lowered.MaxMana = 100.0f;
+            world.VanishUnit(second);
+            Expect.Near(300.0f, lowered.Life, "life: falls to the lowered most");
+            Expect.Near(100.0f, lowered.Mana, "mana: falls to the lowered most");
+        }
+
+        /// <summary>A unit that already has Amrf gets no add and remove (the remove would take its own ability away), and floats at once.</summary>
+        public static void FlyHeightWithAmrf(FakeWorld world)
+        {
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            world.SetAbilityLevel(handle, FakeWorld.CrowForm, 1);
+            var unit = Unit.Of(handle)!;
+
+            unit.FlyHeight = 150.0f;
+
+            Expect.Equal(0, world.AbilityCalls.Count, "no ability call");
+            Expect.True(world.Floats(handle), "the unit floats");
+            Expect.Near(150.0f, unit.FlyHeight, "the height");
+        }
+
+        /// <summary>A removed unit reads false for IsPaused before the sweep (every getter gives 0, seen 10-21): the last value stays.</summary>
+        public static void PausedGoneBeforeSweep(FakeWorld world)
+        {
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var unit = Unit.Of(handle)!;
+            unit.IsPaused = true;
+            Expect.True(unit.IsPaused, "paused read");
+
+            world.VanishUnit(handle);
+
+            Expect.True(unit.IsPaused, "paused before the sweep");
+            world.Advance(0.3f);
+            Expect.True(unit.IsGone, "the sweep found the unit gone");
+            Expect.True(unit.IsPaused, "paused after the sweep");
+
+            var live = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            live.IsPaused = true;
+            Expect.True(live.IsPaused, "a live unit reads true");
+            live.IsPaused = false;
+            Expect.True(!live.IsPaused, "a live unit reads false");
         }
 
         /// <summary>The game removes a unit and every getter reads 0 before the sweep finds it (seen 10-21): the last values stay, and a real 0 of a live unit is still read.</summary>
@@ -732,6 +802,31 @@ namespace Moonwell.Testing
 
             Expect.Near(10.0f, inside, "inside Local.For");
             Expect.Near(10.0f, unit.X, "outside");
+
+            var other = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var lively = Unit.Of(other)!;
+            lively.Life = 50.0f;
+            lively.Scale = 2.5f;
+            Expect.Near(50.0f, lively.Life, "life read");
+            var untouched = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            world.VanishUnit(other);
+            world.VanishUnit(untouched.Handle);
+
+            var life = 0.0f;
+            var scale = 0.0f;
+            var plain = 0.0f;
+            Local.For(Player.Get(0), () =>
+            {
+                life = lively.Life;
+                scale = lively.Scale;
+                plain = untouched.Scale;
+            });
+
+            Expect.Near(50.0f, life, "life inside Local.For");
+            Expect.Near(2.5f, scale, "scale inside Local.For");
+            Expect.Near(1.0f, plain, "an unset scale inside Local.For is the default, not 0");
+            Expect.Near(50.0f, lively.Life, "life outside");
+            Expect.Near(1.0f, untouched.Scale, "an unset scale outside");
         }
 
         /// <summary>The values SetAndRead left, as a unit the game removed gives them.</summary>

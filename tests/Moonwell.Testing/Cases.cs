@@ -143,6 +143,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "units.gone-reads-last", Run = UnitCases.GoneReadsLast });
             list.Add(new Case { Name = "units.fly-height-ground", Run = UnitCases.FlyHeightGroundUnit });
             list.Add(new Case { Name = "units.max-clamps", Run = UnitCases.MaxClampsLifeAndMana });
+            list.Add(new Case { Name = "units.max-last-values", Run = UnitCases.MaxLastValues });
+            list.Add(new Case { Name = "units.fly-height-has-amrf", Run = UnitCases.FlyHeightWithAmrf });
+            list.Add(new Case { Name = "units.paused-gone-before-sweep", Run = UnitCases.PausedGoneBeforeSweep });
             list.Add(new Case { Name = "units.gone-before-sweep", Run = UnitCases.GoneBeforeSweep });
             list.Add(new Case { Name = "units.gone-before-sweep-local", Run = UnitCases.GoneBeforeSweepInLocal });
             list.Add(new Case { Name = "units.order-immediate", Run = UnitCases.OrderImmediate });
@@ -181,6 +184,12 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "items.carrier-unseen", Run = ItemCases.CarrierUnseen });
             list.Add(new Case { Name = "items.carrier-slot-move", Run = ItemCases.CarrierSlotMove });
             list.Add(new Case { Name = "items.carrier-hero-dies", Run = ItemCases.CarrierHeroDies });
+            list.Add(new Case { Name = "items.carrier-nonhero-dies", Run = ItemCases.CarrierNonHeroDiesSilently });
+            list.Add(new Case { Name = "items.place-while-carried", Run = ItemCases.PlaceWhileCarried });
+            list.Add(new Case { Name = "items.removed-unit-drops-after", Run = ItemCases.RemovedUnitDropsAfterTheCall });
+            list.Add(new Case { Name = "items.give-full-inventory", Run = ItemCases.GiveFullInventory });
+            list.Add(new Case { Name = "items.give-held-again", Run = ItemCases.GiveHeldItemAgain });
+            list.Add(new Case { Name = "items.freed-slot-first", Run = ItemCases.FreedSlotFirst });
             list.Add(new Case { Name = "items.player-gone-before-read", Run = ItemCases.PlayerGoneBeforeRead });
             list.Add(new Case { Name = "items.gone-reads-last", Run = ItemCases.ItemGoneReadsLast });
             list.Add(new Case { Name = "items.gone-before-sweep", Run = ItemCases.GoneBeforeSweep });

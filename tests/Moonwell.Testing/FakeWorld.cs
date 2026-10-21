@@ -105,6 +105,9 @@ namespace Moonwell.Testing
         /// <summary>The red, green, blue and alpha each unit was last tinted with.</summary>
         public Dictionary<unit, int[]> Tints = new Dictionary<unit, int[]>();
 
+        /// <summary>The drops of units the runtime removed (RemoveUnit): the game fires them after the call (seen 10-21), so they wait for the next Advance. The items are removed with the unit.</summary>
+        private readonly List<KeyValuePair<unit, item>> pendingDrops = new List<KeyValuePair<unit, item>>();
+
         /// <summary>The units the game has removed but whose handles still answer: every number reads 0, as the game gives in the quarter second before the sweep.</summary>
         private readonly HashSet<unit> vanishedUnits = new HashSet<unit>();
 
@@ -297,7 +300,7 @@ namespace Moonwell.Testing
         /// <summary>Whether the unit would be seen above the ground: its type flies, or Amrf was added and removed (seen 10-21: a ground unit's fly height reads back but shows only then), and a height is set.</summary>
         public bool Floats(unit u)
         {
-            return floaters.Contains(u) && flyHeights.TryGetValue(u, out var height) && height != 0.0f;
+            return (floaters.Contains(u) || AbilityLevel(u, CrowForm) > 0) && flyHeights.TryGetValue(u, out var height) && height != 0.0f;
         }
 
         /// <summary>Sets the level an ability has on a unit.</summary>
@@ -342,6 +345,7 @@ namespace Moonwell.Testing
         public void Advance(float seconds)
         {
             var target = Time + seconds;
+            DeliverPendingDrops();
             while (WakeAt.HasValue && WakeAt.Value <= target + 0.001f)
             {
                 Time = WakeAt.Value;
@@ -350,6 +354,27 @@ namespace Moonwell.Testing
             }
 
             Time = target;
+        }
+
+        /// <summary>Fires the drop events that waited for the end of the call that removed their unit, when they are listened for, and then removes the items with the unit.</summary>
+        private void DeliverPendingDrops()
+        {
+            if (pendingDrops.Count == 0)
+            {
+                return;
+            }
+
+            var waiting = new List<KeyValuePair<unit, item>>(pendingDrops);
+            pendingDrops.Clear();
+            foreach (var drop in waiting)
+            {
+                if (Listening.Contains(GameEvent.Drop))
+                {
+                    Inbound.Dropped(drop.Key, drop.Value);
+                }
+
+                VanishItem(drop.Value);
+            }
         }
 
         /// <summary>The game seconds since the world was made.</summary>
@@ -575,11 +600,33 @@ namespace Moonwell.Testing
             return 0;
         }
 
-        /// <summary>Records a unit removed by the runtime, and reads its type id as 0.</summary>
+        /// <summary>Records a unit removed by the runtime, and reads its type id as 0. The unit's items leave its slots inside the call, at its place; their drop events come after the call, at the next Advance, and the items are removed with the unit (seen 10-21 for a hero).</summary>
         public void DeleteUnit(unit unit)
         {
             RemovedUnits.Add(unit);
+            if (inventories.TryGetValue(unit, out var slots))
+            {
+                for (var i = 0; i < slots.Length; i++)
+                {
+                    var carried = slots[i];
+                    if (carried != null)
+                    {
+                        slots[i] = null!;
+                        LandAt(unit, carried);
+                        pendingDrops.Add(new KeyValuePair<unit, item>(unit, carried));
+                    }
+                }
+            }
+
             unitTypes[unit] = 0;
+        }
+
+        /// <summary>Puts an item that leaves a unit's slots on the ground at the unit's place.</summary>
+        private void LandAt(unit unit, item item)
+        {
+            unitXs.TryGetValue(unit, out var x);
+            unitYs.TryGetValue(unit, out var y);
+            itemPlaces[item] = new float[] { x, y };
         }
 
         /// <summary>Records an item removed by the runtime, and reads its type id as 0.</summary>
@@ -920,11 +967,11 @@ namespace Moonwell.Testing
             return Kept(lives, unit);
         }
 
-        /// <summary>Sets the life of a unit, as given.</summary>
+        /// <summary>Sets the life of a unit; above the most life, once one is set, it is clamped to it (seen 10-21).</summary>
         public void SetLife(unit unit, float life)
         {
             NoteGone(unit);
-            lives[unit] = life;
+            lives[unit] = maxLives.TryGetValue(unit, out var most) && life > most ? most : life;
         }
 
         /// <summary>The most life of a unit; 0 until set.</summary>
@@ -950,11 +997,11 @@ namespace Moonwell.Testing
             return Kept(manas, unit);
         }
 
-        /// <summary>Sets the mana of a unit, as given.</summary>
+        /// <summary>Sets the mana of a unit; above the most mana, once one is set, it is clamped to it (seen 10-21).</summary>
         public void SetMana(unit unit, float mana)
         {
             NoteGone(unit);
-            manas[unit] = mana;
+            manas[unit] = maxManas.TryGetValue(unit, out var most) && mana > most ? most : mana;
         }
 
         /// <summary>The most mana of a unit; 0 until set.</summary>
@@ -1065,7 +1112,7 @@ namespace Moonwell.Testing
             DropAll(unit);
         }
 
-        /// <summary>Empties a dead unit's slots as the game drops the items of a unit that is not a hero, delivering each drop when it is listened for. Assumed, not seen: whether heroes keep their items, and whether the drops are fired (see unseen.md).</summary>
+        /// <summary>Empties a dead unit's slots as the game drops the items of a unit that is not a hero, at its place, with no drop event (seen 10-21); a hero keeps its items.</summary>
         private void DropAll(unit unit)
         {
             if (heroes.TryGetValue(unit, out var isHero) && isHero)
@@ -1080,10 +1127,7 @@ namespace Moonwell.Testing
                 if (carried != null)
                 {
                     slots[i] = null!;
-                    if (Listening.Contains(GameEvent.Drop))
-                    {
-                        Inbound.Dropped(unit, carried);
-                    }
+                    LandAt(unit, carried);
                 }
             }
         }
@@ -1259,7 +1303,7 @@ namespace Moonwell.Testing
         public bool IsPausedUnit(unit unit)
         {
             NoteGone(unit);
-            return PausedUnits.Contains(unit);
+            return !vanishedUnits.Contains(unit) && PausedUnits.Contains(unit);
         }
 
         /// <summary>Pauses or unpauses a unit.</summary>
@@ -1386,11 +1430,30 @@ namespace Moonwell.Testing
             return slot >= 0 && slot < slots.Length ? slots[slot] : null!;
         }
 
-        /// <summary>Puts an item in the first free slot, and as the game does, delivers the pick-up when it is listened for; false when no slot is free.</summary>
+        /// <summary>Puts an item in the first free slot, and as the game does, delivers the pick-up when it is listened for; false, with no event, when no slot is free. An item the unit already holds keeps its slot and fires a drop and then a pick-up (seen 10-21).</summary>
         public bool GiveItem(unit unit, item item)
         {
             NoteGone(unit);
             var slots = SlotsOf(unit);
+            for (var i = 0; i < slots.Length; i++)
+            {
+                if (slots[i] == item)
+                {
+                    InventoryCalls.Add("give");
+                    if (Listening.Contains(GameEvent.Drop))
+                    {
+                        Inbound.Dropped(unit, item);
+                    }
+
+                    if (Listening.Contains(GameEvent.PickUp))
+                    {
+                        Inbound.PickedUp(unit, item);
+                    }
+
+                    return true;
+                }
+            }
+
             for (var i = 0; i < slots.Length; i++)
             {
                 if (slots[i] == null)
@@ -1409,7 +1472,7 @@ namespace Moonwell.Testing
             return false;
         }
 
-        /// <summary>Takes an item out of its slot, and as the game does, delivers the drop when it is listened for.</summary>
+        /// <summary>Takes an item out of its slot and puts it at the unit's place; the game's drop event, when it is listened for, comes while the unit still has the item in the slot (seen 10-21).</summary>
         public void DropItem(unit unit, item item)
         {
             NoteGone(unit);
@@ -1419,12 +1482,17 @@ namespace Moonwell.Testing
                 if (slots[i] == item)
                 {
                     InventoryCalls.Add("drop");
-                    slots[i] = null!;
                     if (Listening.Contains(GameEvent.Drop))
                     {
                         Inbound.Dropped(unit, item);
                     }
 
+                    if (slots[i] == item)
+                    {
+                        slots[i] = null!;
+                    }
+
+                    LandAt(unit, item);
                     return;
                 }
             }

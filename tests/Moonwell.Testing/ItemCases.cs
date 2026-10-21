@@ -234,7 +234,7 @@ namespace Moonwell.Testing
             Expect.True(orb.Carrier == null, "no carrier after Drop");
         }
 
-        /// <summary>The carrier is already set when the item's own OnPickedUp runs; inside OnDropped it is what the game says then, and the item is already out of the inventory, so null.</summary>
+        /// <summary>The carrier is already set when the item's own OnPickedUp runs, and inside OnDropped it is still the unit: the game takes the item out of the slot after the drop event (seen 10-21), and after it the item has no carrier.</summary>
         public static void CarrierInHooks(FakeWorld world)
         {
             ObjectTypes.Item(ObjectTypes.FourCC("I001"), () => new CarrierWatch());
@@ -246,7 +246,8 @@ namespace Moonwell.Testing
 
             hero.Drop(watch);
             Expect.True(watch.DropSeen, "OnDropped ran");
-            Expect.True(watch.CarrierAtDrop == null, "the carrier seen in OnDropped");
+            Expect.Same(hero, watch.CarrierAtDrop, "the carrier seen in OnDropped");
+            Expect.True(watch.Carrier == null, "no carrier after the drop");
         }
 
         /// <summary>A carrier that dies drops the item (the game tells Moonwell as for any drop), so the item has no carrier then.</summary>
@@ -307,16 +308,139 @@ namespace Moonwell.Testing
             Expect.True(watch.Carrier == null, "no carrier after a real drop");
         }
 
-        /// <summary>A hero that dies keeps its items (assumed, see unseen.md), so they stay carried; a unit that is not a hero drops them.</summary>
+        /// <summary>A hero that dies keeps its items (seen 10-21), so they stay carried and no drop event runs.</summary>
         public static void CarrierHeroDies(FakeWorld world)
         {
+            ObjectTypes.Item(ObjectTypes.FourCC("I001"), () => new CarrierWatch());
             var hero = Unit.Of(world.NewUnit(ObjectTypes.FourCC("H001"), hero: true))!;
-            var orb = Item.Of(world.NewItem(ObjectTypes.FourCC("ofoo")))!;
+            var orb = (CarrierWatch)Item.Of(world.NewItem(ObjectTypes.FourCC("I001")))!;
             hero.Give(orb);
 
             hero.Kill();
 
             Expect.Same(hero, orb.Carrier, "the hero still carries the item");
+            Expect.Same(orb, hero.ItemIn(0), "the item is still in the slot");
+            Expect.True(!orb.DropSeen, "no drop event");
+        }
+
+        /// <summary>A unit that is not a hero drops its items when it dies, at its place, and the game fires no drop event for them (seen 10-21).</summary>
+        public static void CarrierNonHeroDiesSilently(FakeWorld world)
+        {
+            ObjectTypes.Item(ObjectTypes.FourCC("I001"), () => new CarrierWatch());
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            unit.PlaceAt(70.0f, 80.0f);
+            var watch = (CarrierWatch)Item.Create(ObjectTypes.FourCC("I001"), 5.0f, 6.0f);
+            unit.Give(watch);
+
+            unit.Kill();
+
+            Expect.True(!watch.DropSeen, "no drop event for the death");
+            Expect.True(watch.Carrier == null, "no carrier after the death");
+            Expect.True(unit.ItemIn(0) == null, "the slot is empty");
+            Expect.Near(70.0f, watch.X, "the item lies at the unit's x");
+            Expect.Near(80.0f, watch.Y, "the item lies at the unit's y");
+        }
+
+        /// <summary>An item picked up keeps the place it had (seen 10-21: GetItemX of a carried item is where it was picked up); a drop puts it at the unit's place.</summary>
+        public static void PlaceWhileCarried(FakeWorld world)
+        {
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            unit.PlaceAt(100.0f, 200.0f);
+            var item = Item.Create(ObjectTypes.FourCC("ofoo"), 5.0f, 6.0f);
+
+            unit.Give(item);
+            unit.PlaceAt(300.0f, 400.0f);
+
+            Expect.Near(5.0f, item.X, "x while carried");
+            Expect.Near(6.0f, item.Y, "y while carried");
+
+            unit.Drop(item);
+
+            Expect.Near(300.0f, item.X, "x after the drop");
+            Expect.Near(400.0f, item.Y, "y after the drop");
+        }
+
+        /// <summary>RemoveUnit takes the items out of the unit at once, but the drop events come after the call (seen 10-21), when the unit no longer has the item; the items are removed with the unit.</summary>
+        public static void RemovedUnitDropsAfterTheCall(FakeWorld world)
+        {
+            ObjectTypes.Item(ObjectTypes.FourCC("I001"), () => new CarrierWatch());
+            var handle = world.NewUnit(ObjectTypes.FourCC("H001"), hero: true);
+            var hero = Unit.Of(handle)!;
+            var watch = (CarrierWatch)Item.Of(world.NewItem(ObjectTypes.FourCC("I001")))!;
+            hero.Give(watch);
+            Expect.Same(hero, watch.Carrier, "carried before");
+
+            world.DeleteUnit(handle);
+
+            Expect.True(!watch.DropSeen, "no drop event inside the call");
+            Expect.True(watch.Carrier == null, "the unit no longer has the item");
+
+            world.Advance(0.1f);
+
+            Expect.True(watch.DropSeen, "the drop event came after the call");
+            Expect.True(watch.CarrierAtDrop == null, "the unit has no item at the event");
+            Expect.Equal(0, world.ItemTypeId(watch.Handle), "the item is removed with the unit");
+            world.Advance(0.3f);
+            Expect.True(watch.IsGone, "the sweep finds the item gone");
+        }
+
+        /// <summary>Giving an item to a full inventory, or to a unit without one, answers false and fires no event; the item stays where it is (seen 10-21).</summary>
+        public static void GiveFullInventory(FakeWorld world)
+        {
+            ObjectTypes.Item(ObjectTypes.FourCC("I001"), () => new CarrierWatch());
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            world.SetInventorySize(handle, 1);
+            var unit = Unit.Of(handle)!;
+            Expect.True(unit.Give(Item.Of(world.NewItem(ObjectTypes.FourCC("ofoo")))!), "the first item fits");
+            var watch = (CarrierWatch)Item.Create(ObjectTypes.FourCC("I001"), 9.0f, 8.0f);
+            world.InventoryCalls.Clear();
+
+            Expect.True(!unit.Give(watch), "the full inventory answers false");
+
+            Expect.True(watch.CarrierAtPickup == null && watch.Carrier == null, "no pick-up event");
+            Expect.True(!watch.DropSeen, "no drop event");
+            Expect.Equal(0, world.InventoryCalls.Count, "nothing changed");
+            Expect.Near(9.0f, watch.X, "the item stays on the ground");
+
+            var bare = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            world.SetInventorySize(bare, 0);
+            Expect.True(!Unit.Of(bare)!.Give(watch), "a unit without an inventory answers false");
+            Expect.True(watch.Carrier == null, "no carrier");
+        }
+
+        /// <summary>Giving an item the unit already holds fires a drop and then a pick-up, and the item keeps its slot (seen 10-21).</summary>
+        public static void GiveHeldItemAgain(FakeWorld world)
+        {
+            ObjectTypes.Unit(ObjectTypes.FourCC("H001"), () => new TestHero());
+            ObjectTypes.Item(ObjectTypes.FourCC("I001"), () => new TestOrb());
+            var hero = Unit.Of(world.NewUnit(ObjectTypes.FourCC("H001"), hero: true))!;
+            var orb = Item.Of(world.NewItem(ObjectTypes.FourCC("I001")))!;
+            hero.Give(orb);
+            TestLog.Lines.Clear();
+
+            Expect.True(hero.Give(orb), "the game accepts the item again");
+
+            ExpectLog(new string[] { "glow dropped", "hero dropped orb", "tally dropped orb", "orb picked", "glow picked", "hero got orb", "tally got orb" }, "the log");
+            Expect.Same(orb, hero.ItemIn(0), "the item keeps slot 0");
+            Expect.True(hero.ItemIn(1) == null, "no second slot used");
+            Expect.Same(hero, orb.Carrier, "still carried");
+        }
+
+        /// <summary>A freed slot is filled first (seen 10-21).</summary>
+        public static void FreedSlotFirst(FakeWorld world)
+        {
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var a = Item.Of(world.NewItem(ObjectTypes.FourCC("ofoo")))!;
+            var b = Item.Of(world.NewItem(ObjectTypes.FourCC("ofoo")))!;
+            var c = Item.Of(world.NewItem(ObjectTypes.FourCC("ofoo")))!;
+            unit.Give(a);
+            unit.Give(b);
+
+            unit.Drop(a);
+            unit.Give(c);
+
+            Expect.Same(c, unit.ItemIn(0), "slot 0 is filled again");
+            Expect.Same(b, unit.ItemIn(1), "slot 1");
         }
 
         /// <summary>The player an item had when Moonwell took it in is what it gives if the game removes it before anyone reads it; an item the game gives no owner for belongs to the neutral passive player.</summary>

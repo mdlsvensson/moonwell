@@ -147,7 +147,9 @@ namespace Moonwell
             {
                 if (!IsGone)
                 {
-                    lastLife = value;
+                    // The game clamps to the most life, so that is what a removed unit gives back.
+                    var most = MaxLife;
+                    lastLife = value < most ? value : most;
                     Runtime.World.SetLife(Handle, value);
                 }
             }
@@ -182,7 +184,13 @@ namespace Moonwell
             {
                 if (!IsGone)
                 {
-                    lastMaxLife = value;
+                    // The game keeps the whole number, and lowers the life to it.
+                    lastMaxLife = (int)value;
+                    if (lastLife > lastMaxLife)
+                    {
+                        lastLife = lastMaxLife;
+                    }
+
                     Runtime.World.SetMaxLife(Handle, value);
                 }
             }
@@ -217,7 +225,9 @@ namespace Moonwell
             {
                 if (!IsGone)
                 {
-                    lastMana = value;
+                    // The game clamps to the most mana (0 for a unit without mana), so that is what a removed unit gives back.
+                    var most = MaxMana;
+                    lastMana = value < most ? value : most;
                     Runtime.World.SetMana(Handle, value);
                 }
             }
@@ -252,7 +262,13 @@ namespace Moonwell
             {
                 if (!IsGone)
                 {
-                    lastMaxMana = value;
+                    // The game keeps the whole number, and lowers the mana to it.
+                    lastMaxMana = (int)value;
+                    if (lastMana > lastMaxMana)
+                    {
+                        lastMana = lastMaxMana;
+                    }
+
                     Runtime.World.SetMaxMana(Handle, value);
                 }
             }
@@ -423,6 +439,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.IsPausedUnit(Handle);
+                if (!now && RemovedByGame())
+                {
+                    return lastPaused;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastPaused = now;
@@ -520,9 +541,11 @@ namespace Moonwell
                     if (!flyReady)
                     {
                         flyReady = true;
-                        if (!Runtime.World.CanFly(Handle))
+                        var crowForm = ObjectTypes.FourCC("Amrf");
+
+                        // A unit that flies shows the height as it is; one that has Amrf must not lose it to the remove.
+                        if (!Runtime.World.CanFly(Handle) && Runtime.World.AbilityLevel(Handle, crowForm) <= 0)
                         {
-                            var crowForm = ObjectTypes.FourCC("Amrf");
                             Runtime.World.AddAbility(Handle, crowForm);
                             Runtime.World.RemoveAbility(Handle, crowForm);
                         }
@@ -617,13 +640,13 @@ namespace Moonwell
             return Item.Of(Runtime.World.ItemInSlot(Handle, slot));
         }
 
-        /// <summary>Gives the unit an item to pick up into its first free slot, and returns the game's answer (false when the inventory is full). The game counts it as a pick-up, so OnPickedUp and OnItemPickedUp run, inside this call. False, and no call to the game, once the unit or the item is gone.</summary>
+        /// <summary>Gives the unit an item to pick up into its first free slot (a slot a drop freed is filled first), and returns the game's answer. The game counts it as a pick-up, so OnPickedUp and OnItemPickedUp run, inside this call. The answer is false, with no event and the item left where it is, when the inventory is full or the unit has none. Giving an item the unit already holds answers true, keeps its slot and runs the drop reactions and then the pick-up reactions. An item that goes to a bag or is equipped (the 3.0 extended inventory) runs the same reactions, but the unit does not count it as held, so its Carrier is null. False, and no call to the game, once the unit or the item is gone.</summary>
         public bool Give(Item item)
         {
             return !IsGone && !item.IsGone && Runtime.World.GiveItem(Handle, item.Handle);
         }
 
-        /// <summary>Makes the unit drop an item from its inventory where it stands. The game counts it as a drop, so OnDropped and OnItemDropped run, inside this call. Does nothing once the unit or the item is gone.</summary>
+        /// <summary>Makes the unit drop an item from its inventory where it stands (UnitRemoveItem). The game counts it as a drop, so OnDropped and OnItemDropped run, inside this call and while the unit still has the item: the item's Carrier is the unit there, and null after the call. Does nothing for an item that lies on the ground, and once the unit or the item is gone. A unit that dies drops its items (a hero keeps them) with no drop reactions, and the items of a unit removed from the game leave it with their drop events after the call, when the unit has ended: Moonwell runs no reactions for those.</summary>
         public void Drop(Item item)
         {
             if (!IsGone && !item.IsGone)
@@ -770,7 +793,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the unit drops an item, before the unit's components see it.</summary>
+        /// <summary>Runs when the unit drops an item, before the unit's components see it. Not run for the items a dying unit drops; see Drop.</summary>
         public virtual void OnItemDropped(Item item)
         {
         }

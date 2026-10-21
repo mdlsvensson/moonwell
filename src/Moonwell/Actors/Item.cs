@@ -58,7 +58,7 @@ namespace Moonwell
             return Runtime.World.ItemTypeId(Handle) == 0;
         }
 
-        /// <summary>The item's charges. Once the game has removed the item, the last value read or set, and setting does nothing.</summary>
+        /// <summary>The item's charges (what the type gives: a healing potion 1, a ring 0). Any value is taken at once; 0 does not remove the item, it stays where it is, on the ground or in an inventory, and a carried potion of 0 charges can still be used. Once the game has removed the item, the last value read or set, and setting does nothing.</summary>
         [LocalSafe]
         public int Charges
         {
@@ -93,7 +93,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The player that owns the item; setting it leaves the item's colour as it is. Once the game has removed the item, the last player read or set (the one it had when Moonwell took it in, if none); the neutral passive player when the game gives none. Setting does nothing then.</summary>
+        /// <summary>The player that owns the item; a new item belongs to the neutral passive player. Picking the item up or dropping it does not change the owner, so this is not the carrier's player. Setting it takes effect at once and leaves the item's colour as it is. Once the game has removed the item, the last player read or set (the one it had when Moonwell took it in, if none); the neutral passive player when the game gives none. Setting does nothing then.</summary>
         [LocalSafe]
         public Player Player
         {
@@ -126,7 +126,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The x of the item. Once the game has removed it, the last x read or set.</summary>
+        /// <summary>The x of the item. While a unit carries it, this is the x where it was picked up, not the carrier's: read Carrier's X for that; a drop puts the item at the unit's place. Once the game has removed it, the last x read or set.</summary>
         [LocalSafe]
         public float X
         {
@@ -152,7 +152,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The y of the item. Once the game has removed it, the last y read or set.</summary>
+        /// <summary>The y of the item. While a unit carries it, this is the y where it was picked up, not the carrier's: read Carrier's Y for that; a drop puts the item at the unit's place. Once the game has removed it, the last y read or set.</summary>
         [LocalSafe]
         public float Y
         {
@@ -178,7 +178,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Moves the item to a place (SetItemPosition). Does nothing once the item is gone.</summary>
+        /// <summary>Moves the item to a place (SetItemPosition), through the game's pathing: a place on a tree, a building or unwalkable ground becomes a pathable spot nearby, and past the edge it stops inside the playable area, so X and Y may read other than what was given. Does nothing once the item is gone.</summary>
         public void MoveTo(float x, float y)
         {
             if (!IsGone)
@@ -189,7 +189,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The unit that carries the item: the last unit seen picking it up, as long as the game says it still has the item (UnitHasItem), so a drop the game fires when an item only moves between slots does not make it uncarried. Null for an item picked up before Moonwell saw it (Moonwell does not look through inventories), and once the item or the carrier is gone. Inside OnDropped it is what the game answers at that moment: null when the item is already out of the inventory.</summary>
+        /// <summary>The unit that carries the item: the last unit seen picking it up, as long as the game says it still has the item (UnitHasItem), so a drop the game fires when an item only moves between slots does not make it uncarried. Null for an item picked up before Moonwell saw it (Moonwell does not look through inventories), for an item in a bag or equipped (the 3.0 extended inventory: the unit does not count it as held), and once the item or the carrier is gone. Inside OnDropped it is still the unit, since the game takes the item out of the slot after the drop event, and it is null after the call; after a hero dies it stays the hero, which keeps its items, but a unit that dies or is removed from the game no longer has them.</summary>
         [LocalSafe]
         public Unit? Carrier
         {
@@ -264,7 +264,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the item is dropped by a unit, before the components see it.</summary>
+        /// <summary>Runs when the item is dropped by a unit, before the components see it, while the unit still has it (Carrier is the unit). Not run when a unit that is not a hero dies and drops its items; see Unit.Drop.</summary>
         public virtual void OnDropped(Unit by)
         {
         }
