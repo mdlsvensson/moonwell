@@ -89,6 +89,17 @@ namespace Moonwell.Testing
             Expect.Same(made.Handle, world.RemovedItems[0], "the handle removed");
         }
 
+        /// <summary>An item of a registered class is created by its class, as a unit is.</summary>
+        public static void CreateOfClass(FakeWorld world)
+        {
+            ObjectTypes.Item(ObjectTypes.FourCC("I002"), () => new TestOrb());
+            var orb = Item.Create<TestOrb>(5.0f, 6.0f);
+            Expect.True(orb.Has<OrbGlow>(), "the orb has its starting component");
+            Expect.Near(5.0f, orb.X, "the orb's x");
+            Expect.Near(6.0f, orb.Y, "the orb's y");
+            Expect.Equal(ObjectTypes.FourCC("I002"), world.ItemTypeId(orb.Handle), "the orb's type in the game");
+        }
+
         /// <summary>A hero's inventory: Give puts an item in the first free slot, ItemIn reads a slot (0-based), Drop takes the item out, and the pick-up and the drop come back through the game's events, once each.</summary>
         public static void Inventory(FakeWorld world)
         {

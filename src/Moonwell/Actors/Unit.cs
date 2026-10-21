@@ -640,7 +640,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The item in a slot of the unit's inventory, counting from 0; null when the slot is empty, when there is no such slot, and once the unit is gone. Not for Local.For code: an item Moonwell has not seen is taken in (its components and OnEnter run), which must happen on every machine.</summary>
+        /// <summary>The item in a slot of the unit's inventory, counting from 0; null when the slot is empty, when there is no such slot, and once the unit is gone. Not for Local.For code: an item Moonwell has not seen is taken in (its components and OnCreated run), which must happen on every machine.</summary>
         public Item? ItemIn(int slot)
         {
             if (IsGone || slot < 0 || slot >= InventorySize)
@@ -677,7 +677,7 @@ namespace Moonwell
                 return null;
             }
 
-            return Units.TakeIn(handle, null);
+            return KnownUnits.TakeIn(handle, null);
         }
 
         /// <summary>The facing of a unit made without one, in degrees: the game's bj_UNIT_FACING.</summary>
@@ -687,7 +687,7 @@ namespace Moonwell
         public static Unit Create(int typeId, Player player, float x, float y, float facing = DefaultFacing, Owner? owner = null)
         {
             var handle = Runtime.World.SpawnUnit(player.Handle, typeId, x, y, facing);
-            var made = Units.TakeIn(handle, owner)!;
+            var made = KnownUnits.TakeIn(handle, owner)!;
             if (owner != null && made.Owner == null)
             {
                 owner.Adopt(made);
@@ -783,8 +783,8 @@ namespace Moonwell
         /// <summary>Removes the unit from the game: it ends, which runs its OnLeave.</summary>
         public void Remove() => End();
 
-        /// <summary>Runs when the unit enters the game, after its starting components are added.</summary>
-        protected virtual void OnEnter()
+        /// <summary>Runs once, when the unit comes into the game, after its starting components are added.</summary>
+        protected virtual void OnCreated()
         {
         }
 
@@ -793,19 +793,21 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs OnEnter; Units calls it, since a map overrides the hook as protected.</summary>
+        /// <summary>Runs OnCreated; Units calls it, since a map overrides the hook as protected.</summary>
         internal void CallEnter()
         {
-            OnEnter();
+            OnCreated();
         }
 
         /// <summary>Runs when the unit picks up an item, before the unit's components see it.</summary>
-        public virtual void OnItemPickedUp(Item item)
+        /// <param name="pickedItem">The item the unit picked up.</param>
+        public virtual void OnItemPickedUp(Item pickedItem)
         {
         }
 
         /// <summary>Runs when the unit drops an item, before the unit's components see it. Not run for the items a dying unit drops; see Drop.</summary>
-        public virtual void OnItemDropped(Item item)
+        /// <param name="droppedItem">The item the unit dropped.</param>
+        public virtual void OnItemDropped(Item droppedItem)
         {
         }
 
@@ -819,13 +821,15 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the unit dies, before the unit's components see it; the killer is null when none is known.</summary>
-        public virtual void OnDeath(Unit? killer)
+        /// <summary>Runs when the unit dies, before the unit's components see it; the killer is null when no unit killed it.</summary>
+        /// <param name="killerUnit">The unit that killed it; null when no unit did, as for Kill() from code.</param>
+        public virtual void OnDeath(Unit? killerUnit)
         {
         }
 
         /// <summary>Runs when the unit kills another, before the unit's components see it.</summary>
-        public virtual void OnKill(Unit victim)
+        /// <param name="killedUnit">The unit it killed.</param>
+        public virtual void OnKill(Unit killedUnit)
         {
         }
 
@@ -860,7 +864,7 @@ namespace Moonwell
                 IsGone = true;
             }
 
-            Units.Forget(this);
+            KnownUnits.Forget(this);
         }
     }
 }

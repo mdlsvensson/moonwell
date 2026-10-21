@@ -6,7 +6,7 @@ namespace Moonwell
         /// <summary>Ends each live unit, item and destructable whose type id reads 0, which means the game has removed it.</summary>
         internal static void Run()
         {
-            var units = Units.Live.Snapshot();
+            var units = KnownUnits.Live.Snapshot();
             for (var i = 0; i < units.Count; i++)
             {
                 var unit = units[i];
@@ -17,7 +17,7 @@ namespace Moonwell
                 }
             }
 
-            var items = Items.Live.Snapshot();
+            var items = KnownItems.Live.Snapshot();
             for (var i = 0; i < items.Count; i++)
             {
                 var item = items[i];
@@ -28,7 +28,7 @@ namespace Moonwell
                 }
             }
 
-            var destructables = Destructables.Live.Snapshot();
+            var destructables = KnownDestructables.Live.Snapshot();
             for (var i = 0; i < destructables.Count; i++)
             {
                 var destructable = destructables[i];

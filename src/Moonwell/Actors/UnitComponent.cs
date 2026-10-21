@@ -28,12 +28,14 @@ namespace Moonwell
         internal override HookTable Table => ComponentHooks;
 
         /// <summary>Runs when the unit picks up an item.</summary>
-        public virtual void OnItemPickedUp(Item item)
+        /// <param name="pickedItem">The item the unit picked up.</param>
+        public virtual void OnItemPickedUp(Item pickedItem)
         {
         }
 
         /// <summary>Runs when the unit drops an item.</summary>
-        public virtual void OnItemDropped(Item item)
+        /// <param name="droppedItem">The item the unit dropped.</param>
+        public virtual void OnItemDropped(Item droppedItem)
         {
         }
 
@@ -47,13 +49,15 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the unit dies; the killer is null when none is known.</summary>
-        public virtual void OnDeath(Unit? killer)
+        /// <summary>Runs when the unit dies; the killer is null when no unit killed it.</summary>
+        /// <param name="killerUnit">The unit that killed it; null when no unit did, as for Kill() from code.</param>
+        public virtual void OnDeath(Unit? killerUnit)
         {
         }
 
         /// <summary>Runs when the unit kills another.</summary>
-        public virtual void OnKill(Unit victim)
+        /// <param name="killedUnit">The unit it killed.</param>
+        public virtual void OnKill(Unit killedUnit)
         {
         }
 

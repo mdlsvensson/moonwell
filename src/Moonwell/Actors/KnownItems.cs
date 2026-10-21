@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Moonwell
 {
     /// <summary>The items the runtime holds: the object of each game item, found by its handle, and the live ones in order.</summary>
-    internal static class Items
+    internal static class KnownItems
     {
         /// <summary>The object of each item the runtime holds, keyed by the game's handle; a lookup only.</summary>
         private static Dictionary<item, Item> known = new Dictionary<item, Item>();
@@ -23,7 +23,7 @@ namespace Moonwell
             return null;
         }
 
-        /// <summary>Takes a game item in: makes its object, adds its starting components, and runs OnEnter.</summary>
+        /// <summary>Takes a game item in: makes its object, adds its starting components, and runs OnCreated.</summary>
         internal static Item? TakeIn(item handle, Owner? owner)
         {
             var existing = Find(handle);
@@ -72,7 +72,7 @@ namespace Moonwell
                 }
                 catch (Exception error)
                 {
-                    Errors.Report(Names.NameOf(made) + ".OnEnter", error);
+                    Errors.Report(Names.NameOf(made) + ".OnCreated", error);
                 }
 
                 Owner.current = previous;

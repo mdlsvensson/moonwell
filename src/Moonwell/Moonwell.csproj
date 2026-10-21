@@ -21,6 +21,37 @@
     <MSBuild Projects="..\Moonwell.Analyzers\Moonwell.Analyzers.csproj" Targets="Restore;Build" Properties="Configuration=$(Configuration)" />
   </Target>
 
+  <!--
+    Moonwell.Package.Version is the package's version, which a map can print. Each build writes it to obj/ from $(Version),
+    compiles it, and packs it beside the other sources, so the map's Lua carries the version of the package it uses.
+    The class is not named Version, which a map with using System would find twice.
+  -->
+  <PropertyGroup>
+    <PackageSourceText>
+namespace Moonwell
+{
+    /// &lt;summary&gt;The Moonwell package the map is built with.&lt;/summary&gt;
+    public static class Package
+    {
+        /// &lt;summary&gt;Moonwell's version, as the package gives it, such as "0.2.2".&lt;/summary&gt;
+        public const string Version = "$(Version)"%3B
+    }
+}
+</PackageSourceText>
+  </PropertyGroup>
+
+  <Target Name="WritePackageSource" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <PackageSource>$(IntermediateOutputPath)Package.g.cs</PackageSource>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(PackageSource)" Overwrite="true" WriteOnlyWhenDifferent="true" Lines="$(PackageSourceText.Trim())" />
+    <ItemGroup>
+      <Compile Include="$(PackageSource)" />
+      <Content Include="$(PackageSource)" Pack="true" PackagePath="contentFiles/cs/net10.0/Moonwell/Core/Package.g.cs" BuildAction="None" />
+      <FileWrites Include="$(PackageSource)" />
+    </ItemGroup>
+  </Target>
+
   <ItemGroup>
     <EmbeddedResource Include="moonwell.lua" LogicalName="Moonwell.moonwell.lua" />
   </ItemGroup>

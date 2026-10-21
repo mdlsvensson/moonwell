@@ -173,7 +173,7 @@ public class ConstructorTests
                         ManaPoints = (int)other.Mana;
                     }
 
-                    protected override void OnEnter()
+                    protected override void OnCreated()
                     {
                         Mana = 300;
                         Scale = 1.2f;

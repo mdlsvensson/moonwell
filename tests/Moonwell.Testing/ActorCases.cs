@@ -193,6 +193,22 @@ namespace Moonwell.Testing
             Expect.Equal(1, actor.ComponentCount, "the components left");
         }
 
+        /// <summary>Remove of a class removes the first component of that class, and says whether there was one.</summary>
+        public static void RemoveOf(FakeWorld world)
+        {
+            var log = new List<string>();
+            var actor = new TestActor();
+            var first = actor.Add(new A(log));
+            actor.Add(new B(log));
+            var second = actor.Add(new A(log));
+            Expect.True(actor.Remove<A>(), "an A was removed");
+            Expect.True(first.HasEnded, "the first A has ended");
+            Expect.Same(second, actor.Get<A>(), "the second A is left");
+            Expect.Equal(2, actor.ComponentCount, "the components left");
+            actor.Remove<A>();
+            Expect.True(!actor.Remove<A>(), "no A is left to remove");
+        }
+
         /// <summary>Inside OnAdded, Owner.Current is the component.</summary>
         public static void CurrentInOnAdded(FakeWorld world)
         {

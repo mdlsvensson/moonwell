@@ -51,7 +51,7 @@ namespace Moonwell
                 return null;
             }
 
-            return Destructables.TakeIn(handle, null);
+            return KnownDestructables.TakeIn(handle, null);
         }
 
         /// <summary>Adds a component to the destructable, and returns it.</summary>
@@ -66,8 +66,8 @@ namespace Moonwell
         /// <summary>Removes the destructable from the game: it ends, which runs its OnLeave.</summary>
         public void Remove() => End();
 
-        /// <summary>Runs when the destructable enters the game, after its starting components are added.</summary>
-        protected virtual void OnEnter()
+        /// <summary>Runs once, when the destructable comes into the game, after its starting components are added.</summary>
+        protected virtual void OnCreated()
         {
         }
 
@@ -76,10 +76,10 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs OnEnter; Destructables calls it, since a map overrides the hook as protected.</summary>
+        /// <summary>Runs OnCreated; Destructables calls it, since a map overrides the hook as protected.</summary>
         internal void CallEnter()
         {
-            OnEnter();
+            OnCreated();
         }
 
         /// <summary>Runs when the destructable dies, before the components see it.</summary>
@@ -123,7 +123,7 @@ namespace Moonwell
                 IsGone = true;
             }
 
-            Destructables.Forget(this);
+            KnownDestructables.Forget(this);
         }
     }
 }

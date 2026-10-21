@@ -52,8 +52,8 @@ namespace Moonwell.Testing
             var target = world.NewUnit(ObjectTypes.FourCC("ofoo"));
             var source = world.NewUnit(ObjectTypes.FourCC("ofoo"));
             Expect.Near(100f, Inbound.Damaged(target, source, 100f, true), "the amount");
-            Expect.True(Units.Find(target) == null, "the target is not made");
-            Expect.True(Units.Find(source) == null, "the source is not made");
+            Expect.True(KnownUnits.Find(target) == null, "the target is not made");
+            Expect.True(KnownUnits.Find(source) == null, "the source is not made");
         }
 
         /// <summary>The world is asked to deliver damage only once a class overrides OnDamaged.</summary>

@@ -22,21 +22,21 @@ namespace Moonwell
         /// <summary>A unit enters the map: it is taken in when its type is registered, or when a component wants to hear of entries.</summary>
         internal static void Entered(unit handle)
         {
-            if (Units.Find(handle) != null)
+            if (KnownUnits.Find(handle) != null)
             {
                 return;
             }
 
-            if (ObjectTypes.UnitMaker(Runtime.World.UnitTypeId(handle)) != null || Events.Wants(Hook.OnUnitEnter))
+            if (ObjectTypes.UnitMaker(Runtime.World.UnitTypeId(handle)) != null || Events.Wants(Hook.OnUnitCreated))
             {
-                Units.TakeIn(handle, null);
+                KnownUnits.TakeIn(handle, null);
             }
         }
 
         /// <summary>A unit picks up an item: the item's OnPickedUp and components, then the unit's OnItemPickedUp and components.</summary>
         internal static void PickedUp(unit u, item i)
         {
-            if (Units.Find(u) == null && Items.Find(i) == null && ObjectTypes.ItemMaker(Runtime.World.ItemTypeId(i)) == null)
+            if (KnownUnits.Find(u) == null && KnownItems.Find(i) == null && ObjectTypes.ItemMaker(Runtime.World.ItemTypeId(i)) == null)
             {
                 return;
             }
@@ -56,7 +56,7 @@ namespace Moonwell
         /// <summary>A unit drops an item: the item's OnDropped and components, then the unit's OnItemDropped and components.</summary>
         internal static void Dropped(unit u, item i)
         {
-            if (Units.Find(u) == null && Items.Find(i) == null && ObjectTypes.ItemMaker(Runtime.World.ItemTypeId(i)) == null)
+            if (KnownUnits.Find(u) == null && KnownItems.Find(i) == null && ObjectTypes.ItemMaker(Runtime.World.ItemTypeId(i)) == null)
             {
                 return;
             }
@@ -126,7 +126,7 @@ namespace Moonwell
         /// <summary>A unit takes damage: the source's type and components deal it, the target's take it, then the map's and the players' reactions; returns the amount after them.</summary>
         internal static float Damaged(unit target, unit? source, float amount, bool isAttack)
         {
-            if (Units.Find(target) == null && (source == null || Units.Find(source) == null) && !Events.Wants(Hook.OnUnitDamaged))
+            if (KnownUnits.Find(target) == null && (source == null || KnownUnits.Find(source) == null) && !Events.Wants(Hook.OnUnitDamaged))
             {
                 return amount;
             }
@@ -177,7 +177,7 @@ namespace Moonwell
         internal static void Died(unit dying, unit? killer)
         {
             unit? slain = killer == dying ? null : killer;
-            if (Units.Find(dying) == null && (slain == null || Units.Find(slain) == null) && !Events.Wants(Hook.OnUnitDied))
+            if (KnownUnits.Find(dying) == null && (slain == null || KnownUnits.Find(slain) == null) && !Events.Wants(Hook.OnUnitDied))
             {
                 return;
             }
@@ -219,7 +219,7 @@ namespace Moonwell
         /// <summary>A unit's spell takes effect: its previous cast ends, the ability and the caster see the new cast, then the map's and the caster's player's reactions run.</summary>
         internal static void SpellEffect(unit caster, int abilityId, unit? target, float x, float y)
         {
-            if (Units.Find(caster) == null && ObjectTypes.AbilityMaker(abilityId) == null && !Events.Wants(Hook.OnUnitCast))
+            if (KnownUnits.Find(caster) == null && ObjectTypes.AbilityMaker(abilityId) == null && !Events.Wants(Hook.OnUnitCast))
             {
                 return;
             }
@@ -254,7 +254,7 @@ namespace Moonwell
         /// <summary>A unit's spell ends: the cast it is making ends, when that cast is live and is for this ability.</summary>
         internal static void SpellEnded(unit caster, int abilityId)
         {
-            var ended = Units.Find(caster);
+            var ended = KnownUnits.Find(caster);
             if (ended == null)
             {
                 return;

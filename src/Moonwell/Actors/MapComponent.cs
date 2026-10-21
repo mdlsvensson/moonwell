@@ -13,7 +13,7 @@ namespace Moonwell
             {
                 if (mapHooks == null)
                 {
-                    mapHooks = new HookTable(typeof(MapComponent), new[] { "OnGameStart", "OnUnitEnter", "OnUnitDamaged", "OnUnitDied", "OnUnitCast", "OnLeave" }, new[] { Hook.OnGameStart, Hook.OnUnitEnter, Hook.OnUnitDamaged, Hook.OnUnitDied, Hook.OnUnitCast, Hook.OnLeave });
+                    mapHooks = new HookTable(typeof(MapComponent), new[] { "OnGameStart", "OnUnitCreated", "OnUnitDamaged", "OnUnitDied", "OnUnitCast", "OnLeave" }, new[] { Hook.OnGameStart, Hook.OnUnitCreated, Hook.OnUnitDamaged, Hook.OnUnitDied, Hook.OnUnitCast, Hook.OnLeave });
                 }
 
                 return mapHooks;
@@ -25,8 +25,9 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when a unit enters the game, for the game's components and then the owner's player components.</summary>
-        public virtual void OnUnitEnter(Unit unit)
+        /// <summary>Runs once for each unit Moonwell takes in, when it comes into the game: made by code, trained, summoned, or placed in World Editor. For the game's components, then the owner's player components.</summary>
+        /// <param name="createdUnit">The unit that came into the game.</param>
+        public virtual void OnUnitCreated(Unit createdUnit)
         {
         }
 
@@ -36,7 +37,9 @@ namespace Moonwell
         }
 
         /// <summary>Runs when a unit in the map dies, for the game's components, then the components of the players involved.</summary>
-        public virtual void OnUnitDied(Unit dying, Unit? killer)
+        /// <param name="dyingUnit">The unit that died.</param>
+        /// <param name="killerUnit">The unit that killed it; null when no unit did, as for Kill() from code.</param>
+        public virtual void OnUnitDied(Unit dyingUnit, Unit? killerUnit)
         {
         }
 
@@ -46,7 +49,8 @@ namespace Moonwell
         }
 
         /// <summary>Runs when a player leaves the game, for the game's components, then the leaving player's.</summary>
-        public virtual void OnLeave(Player player)
+        /// <param name="leavingPlayer">The player who left.</param>
+        public virtual void OnLeave(Player leavingPlayer)
         {
         }
 

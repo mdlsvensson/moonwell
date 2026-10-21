@@ -27,9 +27,9 @@ namespace Moonwell
             Game.Instance = new Game();
             Root = Game.Instance;
             Player.Reset();
-            Units.Reset();
-            Items.Reset();
-            Destructables.Reset();
+            KnownUnits.Reset();
+            KnownItems.Reset();
+            KnownDestructables.Reset();
             ObjectTypes.Reset();
             Owner.current = null;
             Timer.Every(0.25f, Sweep.Run, Game.Instance);
@@ -98,7 +98,7 @@ namespace Moonwell
             {
                 try
                 {
-                    Units.TakeIn(handle, null);
+                    KnownUnits.TakeIn(handle, null);
                 }
                 catch (Exception error)
                 {
@@ -112,7 +112,7 @@ namespace Moonwell
                 {
                     try
                     {
-                        Items.TakeIn(handle, null);
+                        KnownItems.TakeIn(handle, null);
                     }
                     catch (Exception error)
                     {
@@ -127,7 +127,7 @@ namespace Moonwell
                 {
                     try
                     {
-                        Destructables.TakeIn(handle, null);
+                        KnownDestructables.TakeIn(handle, null);
                     }
                     catch (Exception error)
                     {

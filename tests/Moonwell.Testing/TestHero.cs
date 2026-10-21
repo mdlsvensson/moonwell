@@ -10,7 +10,7 @@ namespace Moonwell.Testing
         }
 
         /// <summary>Logs enter.</summary>
-        protected override void OnEnter()
+        protected override void OnCreated()
         {
             TestLog.Lines.Add("enter");
         }

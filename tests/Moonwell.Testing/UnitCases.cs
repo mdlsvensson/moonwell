@@ -22,11 +22,11 @@ namespace Moonwell.Testing
         /// <summary>A game component that keeps the last unit it was told entered.</summary>
         private sealed class EnterWatcher : GameComponent
         {
-            /// <summary>The unit the last OnUnitEnter was given.</summary>
+            /// <summary>The unit the last OnUnitCreated was given.</summary>
             public Unit? Seen;
 
             /// <summary>Keeps the unit.</summary>
-            public override void OnUnitEnter(Unit unit)
+            public override void OnUnitCreated(Unit unit)
             {
                 Seen = unit;
             }
@@ -93,7 +93,7 @@ namespace Moonwell.Testing
             Expect.Equal("Hero", Names.NameOf(Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo"), hero: true))!), "an unregistered hero");
         }
 
-        /// <summary>Taking in a unit adds its starting components before OnEnter runs.</summary>
+        /// <summary>Taking in a unit adds its starting components before OnCreated runs.</summary>
         public static void ComponentsBeforeEnter(FakeWorld world)
         {
             ObjectTypes.Unit(ObjectTypes.FourCC("H001"), () => new TestHero());
@@ -675,24 +675,24 @@ namespace Moonwell.Testing
             ExpectLog(new string[] { "tally added", "tally removed" }, "the log");
         }
 
-        /// <summary>A unit entering is taken in when its type is registered, or once a game component wants OnUnitEnter.</summary>
+        /// <summary>A unit entering is taken in when its type is registered, or once a game component wants OnUnitCreated.</summary>
         public static void Enter(FakeWorld world)
         {
             ObjectTypes.Unit(ObjectTypes.FourCC("H001"), () => new TestHero());
 
             var registered = world.NewUnit(ObjectTypes.FourCC("H001"), hero: true);
             Inbound.Entered(registered);
-            Expect.True(Units.Find(registered) != null, "a registered unit is taken in");
+            Expect.True(KnownUnits.Find(registered) != null, "a registered unit is taken in");
 
             var plain = world.NewUnit(ObjectTypes.FourCC("hfoo"));
             Inbound.Entered(plain);
-            Expect.True(Units.Find(plain) == null, "an unregistered unit is not taken in");
+            Expect.True(KnownUnits.Find(plain) == null, "an unregistered unit is not taken in");
 
             var watcher = Game.Instance.Add(new EnterWatcher());
             var later = world.NewUnit(ObjectTypes.FourCC("hfoo"));
             Inbound.Entered(later);
-            Expect.True(Units.Find(later) != null, "the unit is taken in once a component wants it");
-            Expect.Same(Units.Find(later), watcher.Seen, "the unit given to OnUnitEnter");
+            Expect.True(KnownUnits.Find(later) != null, "the unit is taken in once a component wants it");
+            Expect.Same(KnownUnits.Find(later), watcher.Seen, "the unit given to OnUnitCreated");
         }
 
         /// <summary>A ground unit's fly height shows only after Amrf is added and removed (seen 10-21): FlyHeight does that once per unit, the first time it sets, and one native call per set after; a unit that flies gets no trick.</summary>
