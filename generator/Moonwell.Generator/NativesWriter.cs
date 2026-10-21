@@ -214,14 +214,16 @@ public static class NativesWriter
         return unchecked((int)(negative ? -result.Value : result.Value));
     }
 
+    // A whole number keeps a point (270.0f): CSharp.lua writes a const by its value, and without one Lua reads an integer (C18).
     private static string? RealLiteral(string value)
     {
         if (!double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed))
         {
-            return IntegerLiteral(value) is { } whole ? $"{whole}f" : null;
+            return IntegerLiteral(value) is { } whole ? $"{whole}.0f" : null;
         }
 
-        return parsed.ToString("R", CultureInfo.InvariantCulture) + "f";
+        var text = parsed.ToString("R", CultureInfo.InvariantCulture);
+        return text.IndexOfAny(new[] { '.', 'E' }) < 0 ? text + ".0f" : text + "f";
     }
 
     public static string CsType(string jassType, string owner) => jassType switch

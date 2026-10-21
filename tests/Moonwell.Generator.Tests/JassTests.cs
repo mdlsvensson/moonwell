@@ -13,6 +13,7 @@ public class JassTests
         globals
             constant integer    JASS_MAX_ARRAY_SIZE = 32768
             constant real       bj_PI = 3.14159
+            constant real       bj_UNIT_FACING = 270.0
             constant string     NAME = "a // b"
             constant playerunitevent EVENT_PLAYER_UNIT_DEATH = ConvertPlayerUnitEvent(20)
             integer             counter = 0
@@ -47,7 +48,7 @@ public class JassTests
         Assert.Equal(new[] { "TimerStart", "GetTriggerUnit", "Condition", "TriggerRegisterTimerEvent", "RMinBJ" },
             scripts.Functions.Select(f => f.Name));
         Assert.Equal("blizzard.j", scripts.Functions.Last().Source);
-        Assert.Equal(7, scripts.Globals.Count);
+        Assert.Equal(8, scripts.Globals.Count);
         Assert.Equal("\"a // b\"", scripts.Globals.Single(g => g.Name == "NAME").Value);
         Assert.True(scripts.Globals.Single(g => g.Name == "units").IsArray);
         Assert.False(scripts.Globals.Single(g => g.Name == "counter").IsConstant);
@@ -90,6 +91,7 @@ public class JassTests
 
         Assert.Contains("public const int JASS_MAX_ARRAY_SIZE = 32768;", natives);
         Assert.Contains("public const float bj_PI = 3.14159f;", natives);
+        Assert.Contains("public const float bj_UNIT_FACING = 270.0f;", natives);
         Assert.Contains("public static extern playerunitevent EVENT_PLAYER_UNIT_DEATH { get; }", natives);
         Assert.Contains("/// @CSharpLua.Set = \"counter = {0}\"", natives);
         Assert.Contains("public static extern int counter { get; set; }", natives);

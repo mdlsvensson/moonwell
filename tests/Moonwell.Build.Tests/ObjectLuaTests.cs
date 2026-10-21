@@ -22,7 +22,8 @@ namespace Moonwell.Build.Tests
             var run = compiled.Run();
 
             Assert.Empty(run.Errors);
-            Assert.Contains($"objects: {2 * paladin} 200", run.Lines);
+            // Damage is a float, so Lua prints it with its point (C18).
+            Assert.Contains($"objects: {2 * paladin} 200.0", run.Lines);
         }
 
         [Fact]
@@ -65,7 +66,8 @@ namespace Moonwell.Build.Tests
             using var lua = compiled.Start();
 
             // Tuned's constructor runs Firebolt's (Levels and PerLevel), then Set by level and Set of a whole field.
-            Assert.Equal("100 250 300 3", Query(lua, "local t = Objects.Tuned(); local d = t:getDamage(); return d:get(1) .. ' ' .. d:get(2) .. ' ' .. d:get(3) .. ' ' .. d:getCount()"));
+            // The damage is a float, so Lua prints it with its point (C18); the count is an int.
+            Assert.Equal("100.0 250.0 300.0 3", Query(lua, "local t = Objects.Tuned(); local d = t:getDamage(); return d:get(1) .. ' ' .. d:get(2) .. ' ' .. d:get(3) .. ' ' .. d:getCount()"));
         }
 
         [Fact]
@@ -222,12 +224,24 @@ namespace Moonwell.Build.Tests
         [InlineData("int", "ap04", "0")]
         [InlineData("int", null, "0")]
         [InlineData("float", "0.25", "0.25")]
-        [InlineData("float", "#VALUE!", "0")]
-        [InlineData("float", "ap04", "0")]
+        [InlineData("float", "5", "5.0")]
+        [InlineData("float", "#VALUE!", "0.0")]
+        [InlineData("float", "ap04", "0.0")]
         public void standard_text_that_is_not_a_number_reads_as_the_net_side_does(string type, string? text, string expected)
         {
             // The same texts as DeclaredTests.parse_int and parse_float_takes_zero_for_what_is_not_a_number: both sides agree.
             Assert.Equal(expected, FieldValues.Scalar(type, text));
+        }
+
+        [Theory]
+        [InlineData(5f, "5.0")]
+        [InlineData(-2f, "-2.0")]
+        [InlineData(1.5f, "1.5")]
+        [InlineData(1e20f, "1E+20")]
+        public void whole_number_float_values_keep_a_point(float value, string expected)
+        {
+            // Lua reads 5 as an integer, which does integer arithmetic (C18).
+            Assert.Equal(expected, FieldValues.Scalar("float", value));
         }
 
         [Fact]

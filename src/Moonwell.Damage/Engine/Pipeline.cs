@@ -328,7 +328,7 @@ namespace Moonwell
             var before = World.Armor(target);
             World.SetArmor(target, hit.Armor);
             var bonus = World.Armor(target) - hit.Armor;
-            if (bonus != 0f)
+            if (bonus != 0.0f)
             {
                 World.SetArmor(target, hit.Armor - bonus);
             }

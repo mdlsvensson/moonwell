@@ -5613,11 +5613,11 @@ namespace Moonwell
 
         public const float bj_E = 2.71828f;
 
-        public const float bj_CELLWIDTH = 128f;
+        public const float bj_CELLWIDTH = 128.0f;
 
-        public const float bj_CLIFFHEIGHT = 128f;
+        public const float bj_CLIFFHEIGHT = 128.0f;
 
-        public const float bj_UNIT_FACING = 270f;
+        public const float bj_UNIT_FACING = 270.0f;
 
         /// @CSharpLua.Get = "bj_RADTODEG"
         public static extern float bj_RADTODEG { get; }
@@ -5625,47 +5625,47 @@ namespace Moonwell
         /// @CSharpLua.Get = "bj_DEGTORAD"
         public static extern float bj_DEGTORAD { get; }
 
-        public const float bj_TEXT_DELAY_QUEST = 20f;
+        public const float bj_TEXT_DELAY_QUEST = 20.0f;
 
-        public const float bj_TEXT_DELAY_QUESTUPDATE = 20f;
+        public const float bj_TEXT_DELAY_QUESTUPDATE = 20.0f;
 
-        public const float bj_TEXT_DELAY_QUESTDONE = 20f;
+        public const float bj_TEXT_DELAY_QUESTDONE = 20.0f;
 
-        public const float bj_TEXT_DELAY_QUESTFAILED = 20f;
+        public const float bj_TEXT_DELAY_QUESTFAILED = 20.0f;
 
-        public const float bj_TEXT_DELAY_QUESTREQUIREMENT = 20f;
+        public const float bj_TEXT_DELAY_QUESTREQUIREMENT = 20.0f;
 
-        public const float bj_TEXT_DELAY_MISSIONFAILED = 20f;
+        public const float bj_TEXT_DELAY_MISSIONFAILED = 20.0f;
 
-        public const float bj_TEXT_DELAY_ALWAYSHINT = 12f;
+        public const float bj_TEXT_DELAY_ALWAYSHINT = 12.0f;
 
-        public const float bj_TEXT_DELAY_HINT = 12f;
+        public const float bj_TEXT_DELAY_HINT = 12.0f;
 
-        public const float bj_TEXT_DELAY_SECRET = 10f;
+        public const float bj_TEXT_DELAY_SECRET = 10.0f;
 
-        public const float bj_TEXT_DELAY_UNITACQUIRED = 15f;
+        public const float bj_TEXT_DELAY_UNITACQUIRED = 15.0f;
 
-        public const float bj_TEXT_DELAY_UNITAVAILABLE = 10f;
+        public const float bj_TEXT_DELAY_UNITAVAILABLE = 10.0f;
 
-        public const float bj_TEXT_DELAY_ITEMACQUIRED = 10f;
+        public const float bj_TEXT_DELAY_ITEMACQUIRED = 10.0f;
 
-        public const float bj_TEXT_DELAY_WARNING = 12f;
+        public const float bj_TEXT_DELAY_WARNING = 12.0f;
 
-        public const float bj_QUEUE_DELAY_QUEST = 5f;
+        public const float bj_QUEUE_DELAY_QUEST = 5.0f;
 
-        public const float bj_QUEUE_DELAY_HINT = 5f;
+        public const float bj_QUEUE_DELAY_HINT = 5.0f;
 
-        public const float bj_QUEUE_DELAY_SECRET = 3f;
+        public const float bj_QUEUE_DELAY_SECRET = 3.0f;
 
-        public const float bj_HANDICAP_EASY = 60f;
+        public const float bj_HANDICAP_EASY = 60.0f;
 
-        public const float bj_HANDICAP_NORMAL = 90f;
+        public const float bj_HANDICAP_NORMAL = 90.0f;
 
-        public const float bj_HANDICAPDAMAGE_EASY = 50f;
+        public const float bj_HANDICAPDAMAGE_EASY = 50.0f;
 
-        public const float bj_HANDICAPDAMAGE_NORMAL = 90f;
+        public const float bj_HANDICAPDAMAGE_NORMAL = 90.0f;
 
-        public const float bj_HANDICAPREVIVE_NOTHARD = 50f;
+        public const float bj_HANDICAPREVIVE_NOTHARD = 50.0f;
 
         public const float bj_GAME_STARTED_THRESHOLD = 0.01f;
 
@@ -5673,7 +5673,7 @@ namespace Moonwell
 
         public const float bj_POLLED_WAIT_INTERVAL = 0.1f;
 
-        public const float bj_POLLED_WAIT_SKIP_THRESHOLD = 2f;
+        public const float bj_POLLED_WAIT_SKIP_THRESHOLD = 2.0f;
 
         public const int bj_MAX_INVENTORY = 6;
 
@@ -5703,11 +5703,11 @@ namespace Moonwell
 
         public const int bj_MAX_CHECKPOINTS = 5;
 
-        public const float bj_TOD_DAWN = 6f;
+        public const float bj_TOD_DAWN = 6.0f;
 
-        public const float bj_TOD_DUSK = 18f;
+        public const float bj_TOD_DUSK = 18.0f;
 
-        public const float bj_MELEE_STARTING_TOD = 8f;
+        public const float bj_MELEE_STARTING_TOD = 8.0f;
 
         public const int bj_MELEE_STARTING_GOLD_V0 = 750;
 
@@ -5723,13 +5723,13 @@ namespace Moonwell
 
         public const int bj_MELEE_HERO_TYPE_LIMIT = 1;
 
-        public const float bj_MELEE_MINE_SEARCH_RADIUS = 2000f;
+        public const float bj_MELEE_MINE_SEARCH_RADIUS = 2000.0f;
 
-        public const float bj_MELEE_CLEAR_UNITS_RADIUS = 1500f;
+        public const float bj_MELEE_CLEAR_UNITS_RADIUS = 1500.0f;
 
-        public const float bj_MELEE_CRIPPLE_TIMEOUT = 120f;
+        public const float bj_MELEE_CRIPPLE_TIMEOUT = 120.0f;
 
-        public const float bj_MELEE_CRIPPLE_MSG_DURATION = 20f;
+        public const float bj_MELEE_CRIPPLE_MSG_DURATION = 20.0f;
 
         public const int bj_MELEE_MAX_TWINKED_HEROES_V0 = 3;
 
@@ -5737,9 +5737,9 @@ namespace Moonwell
 
         public const float bj_CREEP_ITEM_DELAY = 0.5f;
 
-        public const float bj_STOCK_RESTOCK_INITIAL_DELAY = 120f;
+        public const float bj_STOCK_RESTOCK_INITIAL_DELAY = 120.0f;
 
-        public const float bj_STOCK_RESTOCK_INTERVAL = 30f;
+        public const float bj_STOCK_RESTOCK_INTERVAL = 30.0f;
 
         public const int bj_STOCK_MAX_ITERATIONS = 20;
 
@@ -5759,11 +5759,11 @@ namespace Moonwell
 
         public const int bj_CAMERA_DEFAULT_ROTATION = 90;
 
-        public const float bj_RESCUE_PING_TIME = 2f;
+        public const float bj_RESCUE_PING_TIME = 2.0f;
 
-        public const float bj_NOTHING_SOUND_DURATION = 5f;
+        public const float bj_NOTHING_SOUND_DURATION = 5.0f;
 
-        public const float bj_TRANSMISSION_PING_TIME = 1f;
+        public const float bj_TRANSMISSION_PING_TIME = 1.0f;
 
         public const int bj_TRANSMISSION_IND_RED = 255;
 
@@ -5782,43 +5782,43 @@ namespace Moonwell
 
         public const float bj_CINEMODE_VOLUME_UNITMOVEMENT = 0.4f;
 
-        public const float bj_CINEMODE_VOLUME_UNITSOUNDS = 0f;
+        public const float bj_CINEMODE_VOLUME_UNITSOUNDS = 0.0f;
 
         public const float bj_CINEMODE_VOLUME_COMBAT = 0.4f;
 
         public const float bj_CINEMODE_VOLUME_SPELLS = 0.4f;
 
-        public const float bj_CINEMODE_VOLUME_UI = 0f;
+        public const float bj_CINEMODE_VOLUME_UI = 0.0f;
 
         public const float bj_CINEMODE_VOLUME_MUSIC = 0.55f;
 
-        public const float bj_CINEMODE_VOLUME_AMBIENTSOUNDS = 1f;
+        public const float bj_CINEMODE_VOLUME_AMBIENTSOUNDS = 1.0f;
 
         public const float bj_CINEMODE_VOLUME_FIRE = 0.6f;
 
         public const float bj_SPEECH_VOLUME_UNITMOVEMENT = 0.25f;
 
-        public const float bj_SPEECH_VOLUME_UNITSOUNDS = 0f;
+        public const float bj_SPEECH_VOLUME_UNITSOUNDS = 0.0f;
 
         public const float bj_SPEECH_VOLUME_COMBAT = 0.25f;
 
         public const float bj_SPEECH_VOLUME_SPELLS = 0.25f;
 
-        public const float bj_SPEECH_VOLUME_UI = 0f;
+        public const float bj_SPEECH_VOLUME_UI = 0.0f;
 
         public const float bj_SPEECH_VOLUME_MUSIC = 0.55f;
 
-        public const float bj_SPEECH_VOLUME_AMBIENTSOUNDS = 1f;
+        public const float bj_SPEECH_VOLUME_AMBIENTSOUNDS = 1.0f;
 
         public const float bj_SPEECH_VOLUME_FIRE = 0.6f;
 
-        public const float bj_SMARTPAN_TRESHOLD_PAN = 500f;
+        public const float bj_SMARTPAN_TRESHOLD_PAN = 500.0f;
 
-        public const float bj_SMARTPAN_TRESHOLD_SNAP = 3500f;
+        public const float bj_SMARTPAN_TRESHOLD_SNAP = 3500.0f;
 
         public const int bj_MAX_QUEUED_TRIGGERS = 100;
 
-        public const float bj_QUEUED_TRIGGER_TIMEOUT = 180f;
+        public const float bj_QUEUED_TRIGGER_TIMEOUT = 180.0f;
 
         public const int bj_CAMPAIGN_INDEX_T = 0;
 
@@ -6380,7 +6380,7 @@ namespace Moonwell
 
         public const int bj_CAMPPINGSTYLE_CONTROL_ENEMY = 8;
 
-        public const float bj_CORPSE_MAX_DEATH_TIME = 8f;
+        public const float bj_CORPSE_MAX_DEATH_TIME = 8.0f;
 
         public const int bj_CORPSETYPE_FLESH = 0;
 

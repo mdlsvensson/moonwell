@@ -135,11 +135,11 @@ namespace Moonwell
         internal int DefenseRestore;
 
         /// <summary>In the lethal stage: lowers the amount so that the target keeps that much life.</summary>
-        public void Spare(float life = 1f)
+        public void Spare(float life = 1.0f)
         {
             Dev.Check(Stage == Stage.Lethal, "Hit.Spare can be called only in the lethal stage (OnKilling, OnLethal)");
             var amount = LifeBefore - life;
-            Amount = amount < 0f ? 0f : amount;
+            Amount = amount < 0.0f ? 0.0f : amount;
         }
 
         /// <summary>Sets a type or the armor without the stage check; the package fills a new hit with it.</summary>

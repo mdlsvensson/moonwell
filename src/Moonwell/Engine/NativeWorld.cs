@@ -10,8 +10,11 @@ namespace Moonwell.Engine
         /// <summary>How many lines the log keeps; the file holds the last ones.</summary>
         private const int LogLines = 200;
 
-        /// <summary>The seconds the clock runs before it starts again: its elapsed time reads exact at 10 s, and steps by 0.0625 s at 604800 s.</summary>
-        private const float Lap = 10f;
+        /// <summary>
+        /// The seconds the clock runs before it starts again: its elapsed time reads exact at 10 s, and steps by 0.0625 s at 604800 s.
+        /// A field, not a const: CSharp.lua writes a const by its value, 10, which Lua reads as an integer (C18).
+        /// </summary>
+        private readonly float lap = 10.0f;
 
         /// <summary>The clock: the game time is the laps it has run plus its elapsed time.</summary>
         private readonly timer clock;
@@ -42,7 +45,7 @@ namespace Moonwell.Engine
         {
             bounds = Natives.GetWorldBounds();
             clock = Natives.CreateTimer();
-            Natives.TimerStart(clock, Lap, false, ClockLapped);
+            Natives.TimerStart(clock, lap, false, ClockLapped);
             wake = Natives.CreateTimer();
 
             var region = Natives.CreateRegion();
@@ -64,7 +67,7 @@ namespace Moonwell.Engine
         /// <summary>Calls Runtime.Wake once after the seconds; a later request replaces it.</summary>
         public void WakeIn(float seconds)
         {
-            Natives.TimerStart(wake, seconds < 0f ? 0f : seconds, false, WakeAction);
+            Natives.TimerStart(wake, seconds < 0.0f ? 0.0f : seconds, false, WakeAction);
         }
 
         /// <summary>Starts delivering an event to Inbound.</summary>
@@ -109,7 +112,7 @@ namespace Moonwell.Engine
         /// <summary>Shows a line on the screen of the local player.</summary>
         public void Print(string text)
         {
-            Natives.DisplayTimedTextToPlayer(Natives.GetLocalPlayer(), 0f, 0f, 30f, text);
+            Natives.DisplayTimedTextToPlayer(Natives.GetLocalPlayer(), 0.0f, 0.0f, 30.0f, text);
         }
 
         /// <summary>The slot state of a player, from the game.</summary>
@@ -191,13 +194,13 @@ namespace Moonwell.Engine
         /// <summary>Shows a line to one player: the game shows it only on that player's machine.</summary>
         public void PrintTo(player player, string text, float seconds)
         {
-            if (seconds < 0f)
+            if (seconds < 0.0f)
             {
-                Natives.DisplayTextToPlayer(player, 0f, 0f, text);
+                Natives.DisplayTextToPlayer(player, 0.0f, 0.0f, text);
             }
             else
             {
-                Natives.DisplayTimedTextToPlayer(player, 0f, 0f, seconds, text);
+                Natives.DisplayTimedTextToPlayer(player, 0.0f, 0.0f, seconds, text);
             }
         }
 
@@ -552,14 +555,14 @@ namespace Moonwell.Engine
         /// <summary>Runs a callback once, after the map's main function has returned.</summary>
         internal static void Later(Action callback)
         {
-            Natives.TimerStart(Natives.CreateTimer(), 0f, false, callback);
+            Natives.TimerStart(Natives.CreateTimer(), 0.0f, false, callback);
         }
 
         /// <summary>The clock's callback: counts the lap and starts the clock again.</summary>
         private void ClockLapped()
         {
-            lapStart += Lap;
-            Natives.TimerStart(clock, Lap, false, ClockLapped);
+            lapStart += lap;
+            Natives.TimerStart(clock, lap, false, ClockLapped);
         }
 
         /// <summary>Registers a player unit event for every player slot, with one trigger that runs the action.</summary>

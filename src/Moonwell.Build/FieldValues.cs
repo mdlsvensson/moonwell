@@ -176,7 +176,7 @@ namespace Moonwell.Build
 
                     return float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var truncated) ? ((int)truncated).ToString(CultureInfo.InvariantCulture) : "0";
                 case "float":
-                    return float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed) ? Real(parsed) : "0";
+                    return Real(float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed) ? parsed : 0f);
                 case "bool":
                     return text == "1" ? "true" : "false";
                 default:
@@ -184,6 +184,7 @@ namespace Moonwell.Build
             }
         }
 
+        // A whole number keeps a point (5.0): Lua reads 5 as an integer, which does integer arithmetic (C18).
         private static string Real(float value)
         {
             if (float.IsNaN(value))
@@ -196,7 +197,8 @@ namespace Moonwell.Build
                 return value > 0 ? "math.huge" : "-math.huge";
             }
 
-            return value.ToString("R", CultureInfo.InvariantCulture);
+            var text = value.ToString("R", CultureInfo.InvariantCulture);
+            return text.IndexOfAny(new[] { '.', 'E' }) < 0 ? text + ".0" : text;
         }
     }
 }

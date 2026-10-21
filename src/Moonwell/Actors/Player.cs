@@ -267,7 +267,7 @@ namespace Moonwell
 
         /// <summary>Shows a line to the player, for the seconds, or for the game's own time without them; it changes nothing in the game.</summary>
         [LocalSafe]
-        public void Print(string text, float seconds = -1f)
+        public void Print(string text, float seconds = -1.0f)
         {
             Runtime.World.PrintTo(Handle, text, seconds);
         }

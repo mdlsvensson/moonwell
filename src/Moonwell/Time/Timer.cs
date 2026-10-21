@@ -34,21 +34,21 @@ namespace Moonwell
         {
             get
             {
-                return HasEnded ? 0f : due - Runtime.World.Now();
+                return HasEnded ? 0.0f : due - Runtime.World.Now();
             }
         }
 
         /// <summary>Runs an action once after the seconds, for the owner or else the current owner.</summary>
         public static Timer After(float seconds, Action action, Owner? owner = null)
         {
-            Dev.Check(seconds >= 0f, "Timer.After: seconds must be 0 or more");
-            return Start(new Timer(Runtime.World.Now() + seconds, 0f, false, action), owner);
+            Dev.Check(seconds >= 0.0f, "Timer.After: seconds must be 0 or more");
+            return Start(new Timer(Runtime.World.Now() + seconds, 0.0f, false, action), owner);
         }
 
         /// <summary>Runs an action at every interval of the seconds, for the owner or else the current owner.</summary>
         public static Timer Every(float seconds, Action action, Owner? owner = null)
         {
-            Dev.Check(seconds > 0f, "Timer.Every: seconds must be more than 0");
+            Dev.Check(seconds > 0.0f, "Timer.Every: seconds must be more than 0");
             return Start(new Timer(Runtime.World.Now() + seconds, seconds, true, action), owner);
         }
 

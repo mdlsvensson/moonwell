@@ -34,7 +34,7 @@ namespace Moonwell
         {
             get
             {
-                return expiry != null && !expiry.HasEnded ? expiry.Remaining : 0f;
+                return expiry != null && !expiry.HasEnded ? expiry.Remaining : 0.0f;
             }
         }
 
@@ -79,12 +79,12 @@ namespace Moonwell
                 Show();
             }
 
-            if (Tick > 0f)
+            if (Tick > 0.0f)
             {
                 Timer.Every(Tick, () => CallTick(), this);
             }
 
-            if (Duration > 0f)
+            if (Duration > 0.0f)
             {
                 StartExpiry();
             }
@@ -95,7 +95,7 @@ namespace Moonwell
         /// <summary>Gives a buff already on its unit a new expiry, and runs OnApply again.</summary>
         internal void Reapply()
         {
-            if (Duration > 0f)
+            if (Duration > 0.0f)
             {
                 StartExpiry();
             }

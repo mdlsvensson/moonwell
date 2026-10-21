@@ -80,7 +80,7 @@ namespace Moonwell
         }
 
         /// <summary>The facing of a unit made without one, in degrees: the game's bj_UNIT_FACING.</summary>
-        public const float DefaultFacing = 270f;
+        public const float DefaultFacing = 270.0f;
 
         /// <summary>Creates a unit of a type for a player at a place and facing (270 degrees without one); owner, when given, owns it.</summary>
         public static Unit Create(int typeId, Player player, float x, float y, float facing = DefaultFacing, Owner? owner = null)
@@ -133,7 +133,7 @@ namespace Moonwell
         public T Apply<T>(T buff, Unit? source = null)
             where T : Buff
         {
-            Dev.Check(buff.Duration >= 0f && buff.Tick >= 0f, "Unit.Apply: Duration and Tick must be 0 or more");
+            Dev.Check(buff.Duration >= 0.0f && buff.Tick >= 0.0f, "Unit.Apply: Duration and Tick must be 0 or more");
             var existing = StackedWith(buff, source);
             if (existing != null)
             {

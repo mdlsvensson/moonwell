@@ -87,7 +87,12 @@ internal static class LuaScript
         var tested = Path.GetFileNameWithoutExtension(csproj);
         var references = Directory.EnumerateFiles(AppContext.BaseDirectory, "Moonwell*.dll")
             .Where(path => Path.GetFileNameWithoutExtension(path) is var name && name != tested && name != "Moonwell.Lua.Tests" && name != "Moonwell.Build");
-        FloatLiterals.Rewrite(folder, files, references, Array.Empty<string>());
+        var errors = FloatLiterals.Rewrite(folder, files, tested, references, Array.Empty<string>());
+        if (errors.Count > 0)
+        {
+            throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
+        }
+
         return project;
     }
 

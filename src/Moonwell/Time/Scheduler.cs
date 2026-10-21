@@ -42,9 +42,9 @@ namespace Moonwell
             if (heap[0] == entry)
             {
                 var wait = entry.due - Runtime.World.Now();
-                if (wait < 0f)
+                if (wait < 0.0f)
                 {
-                    wait = 0f;
+                    wait = 0.0f;
                 }
 
                 Runtime.World.WakeIn(wait);

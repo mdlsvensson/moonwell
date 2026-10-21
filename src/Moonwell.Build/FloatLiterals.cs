@@ -19,28 +19,22 @@ namespace Moonwell.Build
         /// <summary>Rewrites files of a folder in place.</summary>
         /// <param name="folder">The folder; every <c>*.cs</c> under it is compiled with the files, so names they use resolve.</param>
         /// <param name="files">The files to rewrite, relative to the folder.</param>
+        /// <param name="assemblyName">The project's assembly name, which the libraries' <c>InternalsVisibleTo</c> name.</param>
         /// <param name="references">The libraries the code references, beside the .NET libraries, which are added.</param>
         /// <param name="symbols">The preprocessor symbols CSharp.lua compiles with.</param>
-        public static void Rewrite(string folder, IEnumerable<string> files, IEnumerable<string> references, IEnumerable<string> symbols)
+        /// <returns>
+        /// The compiler's errors in the files, as <c>path(line,col): error ...</c>: a name that does not resolve has no constant to
+        /// rewrite, so the caller fails on them rather than give Lua integers.
+        /// </returns>
+        public static IReadOnlyList<string> Rewrite(string folder, IEnumerable<string> files, string assemblyName, IEnumerable<string> references, IEnumerable<string> symbols)
         {
-            var options = CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Latest).WithPreprocessorSymbols(symbols);
-            var trees = Directory.EnumerateFiles(folder, "*.cs", SearchOption.AllDirectories)
-                .Select(path => CSharpSyntaxTree.ParseText(File.ReadAllText(path), options, Path.GetFullPath(path)))
-                .ToList();
-            var libraries = references.Concat(FrameworkLibraries())
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .Select(path => MetadataReference.CreateFromFile(path));
-            var compilation = CSharpCompilation.Create(
-                "FloatLiterals",
-                trees,
-                libraries,
-                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true));
-
-            var byPath = trees.ToDictionary(tree => tree.FilePath, StringComparer.OrdinalIgnoreCase);
-            foreach (var file in files)
+            var errors = new List<string>();
+            var sources = Directory.EnumerateFiles(folder, "*.cs", SearchOption.AllDirectories);
+            var rewritten = files.Select(file => Path.Combine(folder, file));
+            foreach (var (tree, model) in Models(sources, rewritten, assemblyName, references, symbols))
             {
-                var tree = byPath[Path.GetFullPath(Path.Combine(folder, file))];
-                var edits = Edits(tree.GetRoot(), compilation.GetSemanticModel(tree));
+                errors.AddRange(Errors(model));
+                var edits = Edits(tree.GetRoot(), model);
                 if (edits.Count == 0)
                 {
                     continue;
@@ -54,6 +48,68 @@ namespace Moonwell.Build
 
                 File.WriteAllText(tree.FilePath, text);
             }
+
+            return errors;
+        }
+
+        /// <summary>
+        /// What <see cref="Rewrite"/> would change in files written by hand, as <c>file(line): old -> new</c>, and the compiler's
+        /// errors in them; the files are left as they are.
+        /// </summary>
+        /// <param name="files">The files, compiled together and each looked at, as CSharp.lua compiles a project with its references.</param>
+        /// <param name="symbols">The preprocessor symbols CSharp.lua compiles with.</param>
+        internal static (IReadOnlyList<string> Changes, IReadOnlyList<string> Errors) Check(IReadOnlyList<string> files, IEnumerable<string> symbols)
+        {
+            var changes = new List<string>();
+            var errors = new List<string>();
+            foreach (var (tree, model) in Models(files, files, "Moonwell", Array.Empty<string>(), symbols))
+            {
+                errors.AddRange(Errors(model));
+                foreach (var edit in Edits(tree.GetRoot(), model).OrderBy(edit => edit.Span.Start))
+                {
+                    var line = tree.GetLineSpan(edit.Span).StartLinePosition.Line + 1;
+                    var old = tree.GetText().ToString(edit.Span);
+                    changes.Add(tree.FilePath + "(" + line + "): " + (old.Length == 0 ? "a left-out argument" : old) + " -> " + edit.Text.Trim());
+                }
+            }
+
+            return (changes, errors);
+        }
+
+        // Each file's tree and semantic model, in a compilation of every source.
+        private static IEnumerable<(SyntaxTree Tree, SemanticModel Model)> Models(
+            IEnumerable<string> sources,
+            IEnumerable<string> files,
+            string assemblyName,
+            IEnumerable<string> references,
+            IEnumerable<string> symbols)
+        {
+            var options = CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Latest).WithPreprocessorSymbols(symbols);
+            var trees = sources
+                .Select(path => CSharpSyntaxTree.ParseText(File.ReadAllText(path), options, Path.GetFullPath(path)))
+                .ToList();
+            var libraries = references.Concat(FrameworkLibraries())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Select(path => MetadataReference.CreateFromFile(path));
+            var compilation = CSharpCompilation.Create(
+                assemblyName,
+                trees,
+                libraries,
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true));
+
+            var byPath = trees.ToDictionary(tree => tree.FilePath, StringComparer.OrdinalIgnoreCase);
+            foreach (var file in files)
+            {
+                var tree = byPath[Path.GetFullPath(file)];
+                yield return (tree, compilation.GetSemanticModel(tree));
+            }
+        }
+
+        private static IEnumerable<string> Errors(SemanticModel model)
+        {
+            return model.GetDiagnostics()
+                .Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error)
+                .Select(diagnostic => diagnostic.ToString());
         }
 
         // The libraries of the .NET the build runs on, which is the one the map targets.
@@ -65,13 +121,15 @@ namespace Moonwell.Build
                 .Where(path => string.Equals(Path.GetDirectoryName(path), runtime, StringComparison.OrdinalIgnoreCase));
         }
 
-        // A constant expression is rewritten whole, as CSharp.lua folds it whole; what is inside it is not looked at.
+        // A constant expression is rewritten whole, as CSharp.lua folds it whole; what is inside it is not looked at. A parameter's
+        // default is left as written: CSharp.lua writes it only where a call leaves it out, by value, so the call gets it.
         private static List<(TextSpan Span, string Text)> Edits(SyntaxNode root, SemanticModel model)
         {
             bool IsConstant(SyntaxNode node) => node is ExpressionSyntax expression && model.GetConstantValue(expression).HasValue;
+            bool IsDefault(SyntaxNode node) => node is EqualsValueClauseSyntax { Parent: ParameterSyntax };
 
             var edits = new List<(TextSpan Span, string Text)>();
-            foreach (var node in root.DescendantNodes(node => !IsConstant(node)))
+            foreach (var node in root.DescendantNodes(node => !IsConstant(node) && !IsDefault(node)))
             {
                 if (!IsConstant(node))
                 {

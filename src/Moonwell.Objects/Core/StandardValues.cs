@@ -46,7 +46,7 @@ namespace Moonwell.Objects
 
             if (typeof(T) == typeof(float))
             {
-                return (T)(object)(float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed) ? parsed : 0f);
+                return (T)(object)(float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed) ? parsed : 0.0f);
             }
 
             if (typeof(T) == typeof(bool))

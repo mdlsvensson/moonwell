@@ -136,7 +136,7 @@ namespace Moonwell.Engine
                 zero = Natives.CreateTimer();
             }
 
-            Natives.TimerStart(zero, 0f, false, ZeroAction);
+            Natives.TimerStart(zero, 0.0f, false, ZeroAction);
         }
 
         /// <summary>The 0 s timer's callback.</summary>
