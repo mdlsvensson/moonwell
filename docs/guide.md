@@ -18,8 +18,8 @@ cd MyMap
 moonwell run
 ```
 
-The game opens the map. Player 1 has a Champion, a Paladin of the map's own, with three footmen to fight. Learn Smite
-and cast it: the screen names the target. Each kill shows the Champion's count and heals it a tenth of its life.
+The game opens the map and shows the Moonwell version. Player 1 has a Champion, a Paladin of the map's own, with
+three footmen to fight. Learn Smite and cast it: the screen names the target. Each kill shows the Champion's count and heals it a tenth of its life.
 
 ## The project
 
@@ -72,7 +72,8 @@ public sealed class Champion : Human.Units.Paladin
 }
 ```
 
-- A field with levels takes `Levels(75f, 150f, 225f)`, or `PerLevel(level => ...)` to compute each level.
+- A field with levels takes `Levels(75f, 150f, 225f)`, `PerLevel(level => ...)` to compute each level, or one value
+  for every level: an upgrade's `Name = "Sharpened Blades"`.
 - A field World Editor offers a list of values for holds an enum of them, named as the game's data spells them:
   `AttackType = AttackType.Magic`. One that takes several, such as the targets, holds flags:
   `Attack1TargetsAllowed = Targets.Air | Targets.Ground`. A flags field of 0 has none of them; `Targets.None` is
@@ -97,11 +98,12 @@ public sealed class Champion : Human.Units.Paladin
 - A field with no name of its own is set by its id: `Set("Htb1", 2, 250f)`.
 - A constructor may compute, but must not call the game: the build fails at such a line. A live value or action of the
   unit, hero or item there (`Mana = 300`, `Kill()`) is error MW0012, which names the declared field to set instead.
-- A class with no `[ObjectId]` fails the build, which names a free id to use. A buff also names its carrier, the
-  hidden ability that shows its icon: `[ObjectId("B001", Carrier = "A002")]`, or `[ObjectId(Carrier = "A002")]` with
-  `[Replaces]`.
+- A class with no `[ObjectId]` is error MW0013, and the build names a free id to use. A buff also names its carrier,
+  the hidden ability that shows its icon: `[ObjectId("B001", Carrier = "A002")]`, or `[ObjectId(Carrier = "A002")]`
+  with `[Replaces]`. An id is four characters, and only a hero's starts with an upper-case letter (MW0014).
 - `[Replaces]` makes the class the game's object itself: every unit of that type is made as the class.
-- `Unit.Create<Champion>(player, x, y)` makes one in the game, facing 270 degrees unless a facing follows.
+- `Unit.Create<Champion>(player, x, y)` makes one in the game, facing 270 degrees unless a facing follows;
+  `Item.Create<EmberBlade>(x, y)` makes an item.
 
 Each value a class sets is checked against World Editor's limits. One outside them fails the build with its line, and
 a constant is marked in the editor as error MW0009:
@@ -131,7 +133,7 @@ public sealed class KillCounter : UnitComponent
 {
     private int kills;
 
-    public override void OnKill(Unit victim)
+    public override void OnKill(Unit killedUnit)
     {
         kills++;
         Unit.Player.Print("Kills: " + kills);
@@ -140,8 +142,11 @@ public sealed class KillCounter : UnitComponent
 ```
 
 - A type lists the components its instances start with in its constructor. `unit.Add(new KillCounter())` adds one in the
-  game, and `End()` removes it.
-- Reactions to the whole map (`OnGameStart`, `OnUnitDied`, `OnUnitCast`, `OnLeave`) go on a game or player component.
+  game, and `unit.Remove<KillCounter>()` removes it (`End()` ends a component from inside).
+- Reactions to the whole map (`OnGameStart`, `OnUnitCreated`, `OnUnitDied`, `OnUnitCast`, `OnLeave`) go on a game or
+  player component. `OnUnitCreated` runs once for each unit, when it comes into the game; a unit's own is `OnCreated`.
+- A reaction's parameters say the role: `OnPickedUp(Unit carrierUnit)`, `OnUnitDied(Unit dyingUnit, Unit? killerUnit)`,
+  `OnKill(Unit killedUnit)`. The killer is null when no unit killed, as for `Kill()` from code.
 - An event runs the type's reaction first, then its components' in the order added, then the game's and the
   players'. A reaction that fails is reported, and the others still run.
 - A buff is a class that inherits `Buff`, or a standard buff to show its icon. `Duration` and `Tick` set its time,
@@ -193,7 +198,12 @@ behaviour is in its comment.
 
 ## Damage
 
-`OnDamaged` sees a hit after armor. For more, add the `Moonwell.Damage` package to the project, at the same version as
+`OnDamaged` sees a hit after armor. `source.Damage(target, 10f)` deals damage from code, as a spell does: magic,
+of the spells attack type. `DamageKind.Fire`, `attackType:`, `isAttack:`, `ranged:`, `sound:` and `tag:` (read back as
+`damage.Tag`) change it. The reactions run inside the call, which returns the damage they saw, or null when the game
+dealt nothing.
+
+For more, add the `Moonwell.Damage` package to the project, at the same version as
 Moonwell (the template's `.csproj` has the line, commented). The build starts it once the map's code uses one of its
 types, and a map that does not carries none of its code. Its reactions come through interfaces, which a unit's class,
 its components and buffs implement, writing only the methods they need as public methods:
@@ -220,8 +230,7 @@ public sealed class Shield : Buff, IDamageTarget
   a reaction may also change `DamageKind`, `WeaponSound`, `AttackType`, the target's `DefenseType` and its `Armor` for
   this hit; the target has its own defense type and armor back afterwards. In the lethal stage
   `hit.Spare()` keeps the target alive; `hit.Killed` tells in the landed stage.
-- `source.Damage(target, 10f, DamageKind.Fire, tag: MyTag.Firebolt)` deals damage from code and returns the `Hit`;
-  `attackType:` (default `AttackType.Spells`) sets its attack type.
+- `source.Damage(...)` goes through the stages too, and what it returns is the `Hit`: `(Hit?)source.Damage(target, 10f)`.
 - Damage dealt from a reaction belongs to the hit it reacted to; a chain of 8 such hits ends with an error, so two
   units that hit each other back never loop.
 - A hit spell immunity stops runs before armor only.
@@ -234,7 +243,7 @@ slot from 0, so `Player.Get(0)` is `Player.One`. A slot is not a colour: a map c
 `StartX` and `StartY` a player's start location.
 
 `player.Print("Kills: 3")` shows a line to one player and `Game.Print("Wave 2")` to everyone; both take a time on
-screen, `seconds: 10f`. `Gold`, `Lumber`, `FoodUsed`, `FoodCap`, `FoodCapCeiling`, `GoldGathered`, `LumberGathered`,
+screen, `seconds: 10f`. `Package.Version` is the version of Moonwell the map is built with. `Gold`, `Lumber`, `FoodUsed`, `FoodCap`, `FoodCapCeiling`, `GoldGathered`, `LumberGathered`,
 `GoldUpkeepRate` and `LumberUpkeepRate` are the player's own: `player.Gold += 25`.
 
 `Player.Playing` is every player in the game, people and computers, and `Player.Users` the people:

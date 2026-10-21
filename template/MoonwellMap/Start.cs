@@ -4,11 +4,13 @@ using MoonwellMap.Heroes;
 
 namespace MoonwellMap
 {
-    /// <summary>Gives the first player a champion at their start location, and puts three footmen nearby to fight.</summary>
+    /// <summary>Shows everyone the Moonwell version, gives the first player a champion at their start location, and puts three footmen nearby to fight.</summary>
     public sealed class Start : GameComponent
     {
         public override void OnGameStart()
         {
+            Game.Print("Moonwell " + Package.Version);
+
             var player = Player.One;
             var x = player.StartX;
             var y = player.StartY;
