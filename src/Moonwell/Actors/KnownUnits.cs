@@ -39,20 +39,7 @@ namespace Moonwell
             }
 
             var maker = ObjectTypes.UnitMaker(typeId);
-            Unit made;
-            if (maker != null)
-            {
-                made = maker();
-            }
-            else if (Runtime.World.IsHero(handle))
-            {
-                made = new Hero();
-            }
-            else
-            {
-                made = new Unit();
-            }
-
+            var made = maker != null ? maker() : Plain(Runtime.World.IsHero(handle));
             made.Handle = handle;
             made.TypeId = typeId;
             made.owner = Runtime.World.OwnerOf(handle);
@@ -93,6 +80,12 @@ namespace Moonwell
             }
 
             return made;
+        }
+
+        /// <summary>The object of a unit whose type no class is registered for: a Hero for a hero, a Unit for any other.</summary>
+        internal static Unit Plain(bool hero)
+        {
+            return hero ? new Hero() : new Unit();
         }
 
         /// <summary>Forgets a unit the game has removed, so that its handle makes no object again.</summary>

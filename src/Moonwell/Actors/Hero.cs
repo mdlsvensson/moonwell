@@ -27,6 +27,48 @@ namespace Moonwell
         /// <summary>The skill points last read or set.</summary>
         private int lastSkillPoints;
 
+        /// <summary>The proper name last read or set.</summary>
+        private string lastProperName = "";
+
+        /// <summary>The default object of the hero's type (see Unit.Default), a Hero.</summary>
+        [LocalSafe]
+        public new Hero Default => (Hero)base.Default;
+
+        /// <summary>The hero's proper name (GetHeroProperName), shown above its type's name. The game gives it in each player's language, so it is read only inside Local.For. Setting it (BlzSetHeroProperName) changes only the proper name, the same on every machine. Once the game has removed the hero, the last value read or set, and setting does nothing.</summary>
+        public string ProperName
+        {
+            [MachineLocal]
+            get
+            {
+                if (IsGone)
+                {
+                    return lastProperName;
+                }
+
+                var now = Runtime.World.ProperNameOf(Handle);
+                if (string.IsNullOrEmpty(now) && RemovedByGame())
+                {
+                    return lastProperName;
+                }
+
+                if (Local.Depth == 0)
+                {
+                    lastProperName = now;
+                }
+
+                return now;
+            }
+
+            set
+            {
+                if (!IsGone)
+                {
+                    lastProperName = value;
+                    Runtime.World.SetProperName(Handle, value);
+                }
+            }
+        }
+
         /// <summary>The hero's experience. Setting it makes the game give the levels that come with it, with the level-up effect. Once the game has removed the hero, the last value read or set, and setting does nothing.</summary>
         [LocalSafe]
         public int Experience
@@ -71,12 +113,17 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The hero's base strength, without what items and auras add. Setting it changes the base for good. Once the game has removed the hero, the last value read or set, and setting does nothing.</summary>
+        /// <summary>The hero's base strength, without what items and auras add. Setting it changes the base for good. Once the game has removed the hero, the last value read or set, and setting does nothing. In a declared class's constructor, the strength every hero of the class starts with (ustr); on a default object, its type's.</summary>
         [LocalSafe]
         public int Strength
         {
             get
             {
+                if (Handle == null)
+                {
+                    return DeclaredValue<int>("ustr");
+                }
+
                 if (IsGone)
                 {
                     return lastStrength;
@@ -98,6 +145,12 @@ namespace Moonwell
 
             set
             {
+                if (Handle == null)
+                {
+                    Declare("ustr", value);
+                    return;
+                }
+
                 if (!IsGone)
                 {
                     lastStrength = value;
@@ -106,12 +159,17 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The hero's base agility, without what items and auras add. Setting it changes the base for good. Once the game has removed the hero, the last value read or set, and setting does nothing.</summary>
+        /// <summary>The hero's base agility, without what items and auras add. Setting it changes the base for good. Once the game has removed the hero, the last value read or set, and setting does nothing. In a declared class's constructor, the agility every hero of the class starts with (uagi); on a default object, its type's.</summary>
         [LocalSafe]
         public int Agility
         {
             get
             {
+                if (Handle == null)
+                {
+                    return DeclaredValue<int>("uagi");
+                }
+
                 if (IsGone)
                 {
                     return lastAgility;
@@ -133,6 +191,12 @@ namespace Moonwell
 
             set
             {
+                if (Handle == null)
+                {
+                    Declare("uagi", value);
+                    return;
+                }
+
                 if (!IsGone)
                 {
                     lastAgility = value;
@@ -141,12 +205,17 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The hero's base intelligence, without what items and auras add. Setting it changes the base for good. Once the game has removed the hero, the last value read or set, and setting does nothing.</summary>
+        /// <summary>The hero's base intelligence, without what items and auras add. Setting it changes the base for good. Once the game has removed the hero, the last value read or set, and setting does nothing. In a declared class's constructor, the intelligence every hero of the class starts with (uint); on a default object, its type's.</summary>
         [LocalSafe]
         public int Intelligence
         {
             get
             {
+                if (Handle == null)
+                {
+                    return DeclaredValue<int>("uint");
+                }
+
                 if (IsGone)
                 {
                     return lastIntelligence;
@@ -168,6 +237,12 @@ namespace Moonwell
 
             set
             {
+                if (Handle == null)
+                {
+                    Declare("uint", value);
+                    return;
+                }
+
                 if (!IsGone)
                 {
                     lastIntelligence = value;

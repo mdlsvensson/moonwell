@@ -215,6 +215,21 @@ namespace Moonwell.Hosting
         /// <summary>The level of a unit; a hero's hero level.</summary>
         int LevelOf(unit unit);
 
+        /// <summary>The name of a unit, in this machine's language; a hero's is its type's name, not its proper name.</summary>
+        string UnitNameOf(unit unit);
+
+        /// <summary>Sets the name of one unit.</summary>
+        void RenameUnit(unit unit, string name);
+
+        /// <summary>A hero's proper name.</summary>
+        string ProperNameOf(unit hero);
+
+        /// <summary>Sets a hero's proper name.</summary>
+        void SetProperName(unit hero, string name);
+
+        /// <summary>The value a type declares for a field, as the build wrote it for the map; null when it wrote none.</summary>
+        object? TypeValue(int typeId, string field);
+
         /// <summary>Deals damage from a unit to another, with the game's attack, damage and weapon numbers; the damage event runs inside the call. Whether the game dealt it.</summary>
         bool DealDamage(unit source, unit target, float amount, bool attack, bool ranged, int attackType, int damageType, int weaponType);
 

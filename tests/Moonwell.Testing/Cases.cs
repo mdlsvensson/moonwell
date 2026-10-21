@@ -156,6 +156,13 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "units.order-point", Run = UnitCases.OrderPoint });
             list.Add(new Case { Name = "units.order-target", Run = UnitCases.OrderTarget });
             list.Add(new Case { Name = "units.order-gone", Run = UnitCases.OrderGone });
+            list.Add(new Case { Name = "units.level-set-with-handle", Run = UnitCases.LevelSetWithHandleDoesNothing });
+            list.Add(new Case { Name = "units.shared-without-handle", Run = UnitCases.SharedWithoutHandle });
+            list.Add(new Case { Name = "defaults.reads-type-values", Run = UnitCases.DefaultReadsTypeValues });
+            list.Add(new Case { Name = "defaults.once-per-type", Run = UnitCases.DefaultOncePerType });
+            list.Add(new Case { Name = "defaults.removed-unit", Run = UnitCases.DefaultOfRemovedUnit });
+            list.Add(new Case { Name = "defaults.live-actions-do-nothing", Run = UnitCases.DefaultLiveActionsDoNothing });
+            list.Add(new Case { Name = "defaults.remove-does-nothing", Run = UnitCases.DefaultRemoveDoesNothing });
             list.Add(new Case { Name = "units.inventory", Run = ItemCases.Inventory });
             list.Add(new Case { Name = "units.inventory-limits", Run = ItemCases.InventoryLimits });
             list.Add(new Case { Name = "units.inventory-gone", Run = ItemCases.InventoryGone });
@@ -172,6 +179,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "heroes.revive", Run = HeroCases.Revive });
             list.Add(new Case { Name = "heroes.gone", Run = HeroCases.Gone });
             list.Add(new Case { Name = "heroes.gone-before-sweep", Run = HeroCases.GoneBeforeSweep });
+            list.Add(new Case { Name = "heroes.proper-name", Run = HeroCases.ProperName });
+            list.Add(new Case { Name = "heroes.shared-without-handle", Run = HeroCases.SharedWithoutHandle });
             list.Add(new Case { Name = "items.registered-class", Run = ItemCases.RegisteredClass });
             list.Add(new Case { Name = "items.fallback-class", Run = ItemCases.FallbackClass });
             list.Add(new Case { Name = "items.pickup-order", Run = ItemCases.PickupOrder });
@@ -203,6 +212,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "items.player-gone-before-read", Run = ItemCases.PlayerGoneBeforeRead });
             list.Add(new Case { Name = "items.gone-reads-last", Run = ItemCases.ItemGoneReadsLast });
             list.Add(new Case { Name = "items.gone-before-sweep", Run = ItemCases.GoneBeforeSweep });
+            list.Add(new Case { Name = "items.shared-without-handle", Run = ItemCases.SharedWithoutHandle });
             list.Add(new Case { Name = "destructables.watch", Run = DestructableCases.Watch });
             list.Add(new Case { Name = "destructables.sweep", Run = DestructableCases.SweepDetectsRemoval });
             list.Add(new Case { Name = "damage.order", Run = DamageCases.Order });

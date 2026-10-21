@@ -902,6 +902,226 @@ namespace Moonwell.Testing
             Expect.Near(1.0f, untouched.Scale, "an unset scale outside");
         }
 
+        /// <summary>A unit's default object reads its type's declared values, whatever the unit's own are now.</summary>
+        public static void DefaultReadsTypeValues(FakeWorld world)
+        {
+            var paladin = ObjectTypes.FourCC("Hpal");
+            world.SetTypeValue(paladin, "umpm", 300);
+            var unit = Unit.Of(world.NewUnit(paladin, hero: true))!;
+
+            unit.MaxMana = 50.0f;
+
+            Expect.Near(50.0f, unit.MaxMana, "the unit's own most mana");
+            Expect.Near(300.0f, unit.Default.MaxMana, "the default's most mana");
+            Expect.True(unit.Default is Hero, "a hero's default object is a Hero");
+            Expect.Equal(paladin, unit.Default.TypeId, "the default's type id");
+            Expect.True(unit.Default.IsGone, "the default object is gone");
+            Expect.True(unit.Default.Handle == null, "the default object has no handle");
+        }
+
+        /// <summary>There is one default object per type: units of a type share it, a registered class's is made by its maker and is the one Default gives for the class, and a class never registered has one of its own.</summary>
+        public static void DefaultOncePerType(FakeWorld world)
+        {
+            var footman = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var other = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var knight = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hkni")))!;
+            Expect.Same(footman.Default, other.Default, "two footmen's default");
+            Expect.True(!object.ReferenceEquals(footman.Default, knight.Default), "a knight's default is its own");
+            Expect.Equal("Unit", Names.NameOf(footman.Default), "a footman's default is a plain Unit");
+
+            ObjectTypes.Unit(ObjectTypes.FourCC("H001"), () => new TestHero());
+            var hero = (Hero)Unit.Of(world.NewUnit(ObjectTypes.FourCC("H001"), hero: true))!;
+            var declared = Unit.Default<TestHero>();
+            Expect.Same(declared, hero.Default, "a registered class's default and its unit's");
+            Expect.Same(declared, new TestHero().Default, "the default of a TestHero made with no handle");
+            Expect.Same(declared, declared.Default, "the default's own default");
+            Expect.Equal(ObjectTypes.FourCC("H001"), declared.TypeId, "the registered default's type id");
+
+            var unregistered = Unit.Default<Unregistered>();
+            Expect.Same(unregistered, Unit.Default<Unregistered>(), "an unregistered class's default asked again");
+            Expect.Same(unregistered, unregistered.Default, "the unregistered default's own default");
+            Expect.True(unregistered.IsGone, "the unregistered default is gone");
+
+            ObjectTypes.Item(ObjectTypes.FourCC("I001"), () => new TestOrb());
+            var orb = Item.Of(world.NewItem(ObjectTypes.FourCC("I001")))!;
+            Expect.Same(Item.Default<TestOrb>(), orb.Default, "a registered item class's default and its item's");
+            Expect.True(orb.Default is TestOrb, "the orb's default is a TestOrb");
+            var potion = Item.Of(world.NewItem(ObjectTypes.FourCC("phea")))!;
+            Expect.Same(potion.Default, Item.Of(world.NewItem(ObjectTypes.FourCC("phea")))!.Default, "two potions' default");
+            Expect.Equal("Item", Names.NameOf(potion.Default), "a potion's default is a plain Item");
+            Expect.True(potion.Default.IsGone && potion.Default.Handle == null, "the potion's default is gone, with no handle");
+        }
+
+        /// <summary>The default object of a unit the runtime or the game has removed still reads its type's values, not the unit's last ones.</summary>
+        public static void DefaultOfRemovedUnit(FakeWorld world)
+        {
+            var footman = ObjectTypes.FourCC("hfoo");
+            world.SetTypeValue(footman, "uhpm", 420);
+            var removed = Unit.Of(world.NewUnit(footman))!;
+            var handle = world.NewUnit(footman);
+            var vanished = Unit.Of(handle)!;
+            removed.MaxLife = 100.0f;
+            vanished.MaxLife = 200.0f;
+
+            removed.Remove();
+            world.VanishUnit(handle);
+
+            Expect.Near(100.0f, removed.MaxLife, "the removed unit's last most life");
+            Expect.Near(420.0f, removed.Default.MaxLife, "the removed unit's default");
+            Expect.Near(420.0f, vanished.Default.MaxLife, "the vanished unit's default before the sweep");
+            world.Advance(0.3f);
+            Expect.True(vanished.IsGone, "the sweep found the unit gone");
+            Expect.Near(420.0f, vanished.Default.MaxLife, "the vanished unit's default after the sweep");
+        }
+
+        /// <summary>A default object is gone, so its live actions call no native and change nothing.</summary>
+        public static void DefaultLiveActionsDoNothing(FakeWorld world)
+        {
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var hero = (Hero)Unit.Of(world.NewUnit(ObjectTypes.FourCC("Hpal"), hero: true))!;
+            var item = Item.Of(world.NewItem(ObjectTypes.FourCC("phea")))!;
+            var unitDefault = unit.Default;
+            var heroDefault = hero.Default;
+            var itemDefault = item.Default;
+            world.CallsThrow = true;
+
+            unitDefault.Kill();
+            unitDefault.Life = 0.0f;
+            unitDefault.MoveTo(10.0f, 20.0f);
+            unitDefault.PlaceAt(10.0f, 20.0f);
+            unitDefault.Facing = 90.0f;
+            unitDefault.IsPaused = true;
+            unitDefault.Tint(1, 2, 3);
+            var ordered = unitDefault.Order("stop");
+            heroDefault.Experience = 500;
+            heroDefault.SetLevel(5);
+            var revived = heroDefault.Revive(0.0f, 0.0f);
+            itemDefault.MoveTo(10.0f, 20.0f);
+            itemDefault.Player = Player.Get(1);
+
+            world.CallsThrow = false;
+            Expect.True(!ordered, "an order to the default object");
+            Expect.True(!revived, "a revive of the default hero");
+            Expect.True(!unitDefault.IsAlive, "the default object is not alive");
+            Expect.True(!unitDefault.HasEnded, "the default object has not ended");
+            Expect.Equal(0, world.KillCalls, "calls to the game's KillUnit");
+            Expect.True(unit.IsAlive, "the unit is still alive");
+            Expect.Equal(0, world.HeroCalls.Count, "calls that changed a hero");
+            Expect.Equal(0, world.ItemCalls.Count, "calls that changed an item");
+        }
+
+        /// <summary>A unit that logs when it leaves.</summary>
+        private sealed class LeavingUnit : Unit
+        {
+            /// <summary>Logs leave.</summary>
+            protected override void OnLeave()
+            {
+                TestLog.Lines.Add("leave");
+            }
+        }
+
+        /// <summary>Remove on a default object does nothing: it is not in the game, so it does not end, its OnLeave does not run and nothing is forgotten or removed.</summary>
+        public static void DefaultRemoveDoesNothing(FakeWorld world)
+        {
+            ObjectTypes.Unit(ObjectTypes.FourCC("h0lv"), () => new LeavingUnit());
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("h0lv")))!;
+            var item = Item.Of(world.NewItem(ObjectTypes.FourCC("phea")))!;
+            var unitDefault = unit.Default;
+            var itemDefault = item.Default;
+            TestLog.Lines.Clear();
+            world.CallsThrow = true;
+
+            unitDefault.Remove();
+            itemDefault.Remove();
+
+            world.CallsThrow = false;
+            Expect.True(!unitDefault.HasEnded, "the default unit has not ended");
+            Expect.True(!itemDefault.HasEnded, "the default item has not ended");
+            Expect.Equal(0, TestLog.Lines.Count, "OnLeave runs");
+            Expect.Equal(0, world.Logged.Count, "errors reported");
+            Expect.Equal(0, world.RemovedUnits.Count + world.RemovedItems.Count, "objects the game was asked to remove");
+            Expect.Same(unit, Unit.Of(unit.Handle), "the unit is still known");
+            Expect.Same(unitDefault, unit.Default, "the default after the remove");
+        }
+
+        /// <summary>A unit that records what its shared members ask of the hooks, and reads each declared value as Unit does.</summary>
+        private sealed class RecordingUnit : Unit
+        {
+            /// <summary>The hook calls, in turn, as "read" or "declare", the field id, and the value declared.</summary>
+            public List<string> Asked = new List<string>();
+
+            /// <summary>Records the read, and reads the value as Unit does.</summary>
+            protected override T DeclaredValue<T>(string field)
+            {
+                Asked.Add("read " + field);
+                return base.DeclaredValue<T>(field);
+            }
+
+            /// <summary>Records the declared value.</summary>
+            protected override void Declare(string field, object value)
+            {
+                Asked.Add("declare " + field + " " + value);
+            }
+        }
+
+        /// <summary>A unit with no handle, as one is while its constructor runs, calls no native for its shared members: a set goes to Declare, a float into an int field as a whole number, and a read to DeclaredValue, which reads the values of the type its class is registered with.</summary>
+        public static void SharedWithoutHandle(FakeWorld world)
+        {
+            var id = ObjectTypes.FourCC("h0rc");
+            ObjectTypes.Unit(id, () => new RecordingUnit());
+            world.SetTypeValue(id, "umpm", 300);
+            world.SetTypeValue(id, "usca", 1.5f);
+            var unit = new RecordingUnit();
+            world.CallsThrow = true;
+
+            unit.MaxLife = 800.7f;
+            unit.MaxMana = 5.0f;
+            unit.Mana = 4.0f;
+            unit.Level = 3;
+            unit.Scale = 2.5f;
+            unit.FlyHeight = 150.5f;
+            var maxMana = unit.MaxMana;
+            var maxLife = unit.MaxLife;
+            var mana = unit.Mana;
+            var level = unit.Level;
+            var scale = unit.Scale;
+            var flyHeight = unit.FlyHeight;
+            var plain = new Unit();
+            plain.MaxMana = 5.0f;
+            var plainMaxMana = plain.MaxMana;
+
+            world.CallsThrow = false;
+            Expect.Near(300.0f, maxMana, "the most mana its type declares");
+            Expect.Near(0.0f, maxLife, "a value its type does not declare");
+            Expect.Near(0.0f, mana, "mana");
+            Expect.Equal(0, level, "level");
+            Expect.Near(1.5f, scale, "scale");
+            Expect.Near(0.0f, flyHeight, "fly height");
+            Expect.Near(0.0f, plainMaxMana, "a plain unit's most mana, with no type");
+            var expected = new string[]
+            {
+                "declare uhpm 800", "declare umpm 5", "declare umpi 4", "declare ulev 3", "declare usca 2.5",
+                "declare umvh 150.5", "read umpm", "read uhpm", "read umpi", "read ulev", "read usca", "read umvh",
+            };
+            Expect.Equal(expected.Length, unit.Asked.Count, "hook calls");
+            for (var i = 0; i < expected.Length; i++)
+            {
+                Expect.Equal(expected[i], unit.Asked[i], "hook call " + i);
+            }
+        }
+
+        /// <summary>A unit's level has no live setter: on a unit with a handle a set does nothing.</summary>
+        public static void LevelSetWithHandleDoesNothing(FakeWorld world)
+        {
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var unit = Unit.Of(handle)!;
+
+            unit.Level = 5;
+
+            Expect.Equal(1, unit.Level, "the level");
+            Expect.Equal(1, world.LevelOf(handle), "the game's level");
+        }
+
         /// <summary>The values SetAndRead left, as a unit the game removed gives them.</summary>
         private static void ExpectLastValues(Unit unit, string what)
         {

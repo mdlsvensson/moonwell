@@ -649,6 +649,44 @@ namespace Moonwell.Engine
             return Natives.GetUnitLevel(unit);
         }
 
+        /// <summary>The name of a unit, from the game: GetUnitName.</summary>
+        public string UnitNameOf(unit unit)
+        {
+            return Natives.GetUnitName(unit);
+        }
+
+        /// <summary>Sets the name of one unit: BlzSetUnitName.</summary>
+        public void RenameUnit(unit unit, string name)
+        {
+            Natives.BlzSetUnitName(unit, name);
+        }
+
+        /// <summary>A hero's proper name, from the game: GetHeroProperName.</summary>
+        public string ProperNameOf(unit hero)
+        {
+            return Natives.GetHeroProperName(hero);
+        }
+
+        /// <summary>Sets a hero's proper name: BlzSetHeroProperName.</summary>
+        public void SetProperName(unit hero, string name)
+        {
+            Natives.BlzSetHeroProperName(hero, name);
+        }
+
+        /// <summary>The value a type declares for a field, from the table the build appends to the script.</summary>
+        public object? TypeValue(int typeId, string field)
+        {
+            return TypeValueOf(typeId, field);
+        }
+
+        // MoonwellTypeValues = { [typeId] = { [fieldId] = value } }, written by the build only for a map that reads Default;
+        // nil when there is no table or no entry.
+        /// @CSharpLua.Template = "(MoonwellTypeValues and MoonwellTypeValues[{0}] and MoonwellTypeValues[{0}][{1}])"
+        private static object? TypeValueOf(int typeId, string field)
+        {
+            return null;
+        }
+
         /// <summary>Deals damage from a unit to another, with the game's attack, damage and weapon numbers; the damage event runs inside the call. Whether the game dealt it.</summary>
         public bool DealDamage(unit source, unit target, float amount, bool attack, bool ranged, int attackType, int damageType, int weaponType)
         {

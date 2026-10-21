@@ -598,5 +598,46 @@ namespace Moonwell.Testing
             Expect.Equal(4, item.Charges, "charges after the sweep");
             Expect.Near(10.0f, item.X, "x after the sweep");
         }
+
+        /// <summary>An item that records what its charges ask of the hooks, and reads the declared value as Item does.</summary>
+        private sealed class RecordingItem : Item
+        {
+            /// <summary>The hook calls, in turn, as "read" or "declare", the field id, and the value declared.</summary>
+            public List<string> Asked = new List<string>();
+
+            /// <summary>Records the read, and reads the value as Item does.</summary>
+            protected override T DeclaredValue<T>(string field)
+            {
+                Asked.Add("read " + field);
+                return base.DeclaredValue<T>(field);
+            }
+
+            /// <summary>Records the declared value.</summary>
+            protected override void Declare(string field, object value)
+            {
+                Asked.Add("declare " + field + " " + value);
+            }
+        }
+
+        /// <summary>An item with no handle calls no native for its charges: a set goes to Declare and a read to DeclaredValue, which reads the values of the type its class is registered with; its default object reads them too.</summary>
+        public static void SharedWithoutHandle(FakeWorld world)
+        {
+            var id = ObjectTypes.FourCC("I0rc");
+            ObjectTypes.Item(id, () => new RecordingItem());
+            world.SetTypeValue(id, "iuse", 3);
+            var item = new RecordingItem();
+            world.CallsThrow = true;
+
+            item.Charges = 5;
+            var charges = item.Charges;
+            var declared = Item.Default<RecordingItem>().Charges;
+
+            world.CallsThrow = false;
+            Expect.Equal(3, charges, "the charges its type declares");
+            Expect.Equal(3, declared, "the default's charges");
+            Expect.Equal(2, item.Asked.Count, "hook calls");
+            Expect.Equal("declare iuse 5", item.Asked[0], "the set");
+            Expect.Equal("read iuse", item.Asked[1], "the read");
+        }
     }
 }

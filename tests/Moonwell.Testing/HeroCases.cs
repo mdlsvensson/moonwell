@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Moonwell.Testing
 {
     /// <summary>Cases that check a hero: its experience, level, stats, skill points and revive.</summary>
@@ -218,6 +220,80 @@ namespace Moonwell.Testing
             Expect.True(hero.IsGone, "the sweep found the hero gone");
             Expect.Equal(22, hero.Strength, "strength after the sweep");
             Expect.Equal(700, hero.Experience, "experience after the sweep");
+        }
+
+        /// <summary>A hero's proper name is the game's: read inside Local.For, set for every machine; once the hero is gone, the last name read or set, and a set calls nothing.</summary>
+        public static void ProperName(FakeWorld world)
+        {
+            var hero = NewHero(world, out var handle);
+            world.SetProperName(handle, "Uther");
+            world.HeroCalls.Clear();
+            var seen = "";
+            Local.For(Player.Get(0), () => seen = hero.ProperName);
+            Expect.Equal("Uther", seen, "the game's proper name");
+
+            hero.ProperName = "Arthas";
+
+            Local.For(Player.Get(0), () => seen = hero.ProperName);
+            Expect.Equal("Arthas", seen, "the new proper name");
+            Expect.Equal("Arthas", world.ProperNameOf(handle), "the game's proper name after the set");
+            Expect.Equal(1, world.HeroCalls.Count, "calls that changed the hero");
+            Expect.Equal("proper-name Arthas", world.HeroCalls[0], "the call");
+
+            hero.Remove();
+            hero.ProperName = "Later";
+
+            Local.For(Player.Get(0), () => seen = hero.ProperName);
+            Expect.Equal("Arthas", seen, "the gone hero's last proper name");
+            Expect.Equal(1, world.HeroCalls.Count, "no call for the gone hero");
+        }
+
+        /// <summary>A hero that records what its shared members ask of the hooks, and reads each declared value as Unit does.</summary>
+        private sealed class RecordingHero : Hero
+        {
+            /// <summary>The hook calls, in turn, as "read" or "declare", the field id, and the value declared.</summary>
+            public List<string> Asked = new List<string>();
+
+            /// <summary>Records the read, and reads the value as Unit does.</summary>
+            protected override T DeclaredValue<T>(string field)
+            {
+                Asked.Add("read " + field);
+                return base.DeclaredValue<T>(field);
+            }
+
+            /// <summary>Records the declared value.</summary>
+            protected override void Declare(string field, object value)
+            {
+                Asked.Add("declare " + field + " " + value);
+            }
+        }
+
+        /// <summary>A hero with no handle calls no native for its stats: a set goes to Declare and a read to DeclaredValue.</summary>
+        public static void SharedWithoutHandle(FakeWorld world)
+        {
+            var id = ObjectTypes.FourCC("H0rc");
+            ObjectTypes.Unit(id, () => new RecordingHero());
+            world.SetTypeValue(id, "ustr", 22);
+            var hero = new RecordingHero();
+            world.CallsThrow = true;
+
+            hero.Strength = 30;
+            hero.Agility = 31;
+            hero.Intelligence = 32;
+            var strength = hero.Strength;
+            var agility = hero.Agility;
+            var intelligence = hero.Intelligence;
+
+            world.CallsThrow = false;
+            Expect.Equal(22, strength, "the strength its type declares");
+            Expect.Equal(0, agility, "an agility its type does not declare");
+            Expect.Equal(0, intelligence, "intelligence");
+            var expected = new string[] { "declare ustr 30", "declare uagi 31", "declare uint 32", "read ustr", "read uagi", "read uint" };
+            Expect.Equal(expected.Length, hero.Asked.Count, "hook calls");
+            for (var i = 0; i < expected.Length; i++)
+            {
+                Expect.Equal(expected[i], hero.Asked[i], "hook call " + i);
+            }
         }
     }
 }
