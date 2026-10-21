@@ -463,7 +463,13 @@ namespace Moonwell
                 return null;
             }
 
-            return Item.Of(Runtime.World.ItemInSlot(Handle, slot));
+            var found = Item.Of(Runtime.World.ItemInSlot(Handle, slot));
+            if (found != null)
+            {
+                found.CarrierUnit = this;
+            }
+
+            return found;
         }
 
         /// <summary>Gives the unit an item to pick up into its first free slot, and returns the game's answer (false when the inventory is full). The game counts it as a pick-up, so OnPickedUp and OnItemPickedUp run, inside this call. False, and no call to the game, once the unit or the item is gone.</summary>

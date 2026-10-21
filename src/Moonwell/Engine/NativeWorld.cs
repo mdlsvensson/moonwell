@@ -817,6 +817,48 @@ namespace Moonwell.Engine
             Natives.UnitRemoveItem(unit, item);
         }
 
+        /// <summary>The charges of an item, from the game.</summary>
+        public int ChargesOf(item item)
+        {
+            return Natives.GetItemCharges(item);
+        }
+
+        /// <summary>Sets the charges of an item: SetItemCharges.</summary>
+        public void SetCharges(item item, int charges)
+        {
+            Natives.SetItemCharges(item, charges);
+        }
+
+        /// <summary>The player that owns an item, from the game.</summary>
+        public player ItemOwnerOf(item item)
+        {
+            return Natives.GetItemPlayer(item);
+        }
+
+        /// <summary>Sets the owner of an item without changing its colour: SetItemPlayer.</summary>
+        public void SetItemOwner(item item, player player)
+        {
+            Natives.SetItemPlayer(item, player, false);
+        }
+
+        /// <summary>The x of an item, from the game.</summary>
+        public float ItemX(item item)
+        {
+            return Natives.GetItemX(item);
+        }
+
+        /// <summary>The y of an item, from the game.</summary>
+        public float ItemY(item item)
+        {
+            return Natives.GetItemY(item);
+        }
+
+        /// <summary>Moves an item to a place: SetItemPosition.</summary>
+        public void MoveItem(item item, float x, float y)
+        {
+            Natives.SetItemPosition(item, x, y);
+        }
+
         /// <summary>Runs a callback once, after the map's main function has returned.</summary>
         internal static void Later(Action callback)
         {

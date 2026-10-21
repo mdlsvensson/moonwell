@@ -37,6 +37,133 @@ namespace Moonwell
         [LocalSafe]
         public int TypeId { get; internal set; }
 
+        /// <summary>The charges last read or set.</summary>
+        private int lastCharges;
+
+        /// <summary>The game's player that owned the item when it was last read or set; kept for when the game no longer gives it.</summary>
+        private player owningPlayer = null!;
+
+        /// <summary>The x last read or set.</summary>
+        private float lastX;
+
+        /// <summary>The y last read or set.</summary>
+        private float lastY;
+
+        /// <summary>The unit that carries the item, as the pick-ups and drops Moonwell has seen say; null when none.</summary>
+        internal Unit? CarrierUnit;
+
+        /// <summary>The item's charges. Once the game has removed the item, the last value read or set, and setting does nothing.</summary>
+        [LocalSafe]
+        public int Charges
+        {
+            get
+            {
+                if (!IsGone)
+                {
+                    lastCharges = Runtime.World.ChargesOf(Handle);
+                }
+
+                return lastCharges;
+            }
+
+            set
+            {
+                if (!IsGone)
+                {
+                    lastCharges = value;
+                    Runtime.World.SetCharges(Handle, value);
+                }
+            }
+        }
+
+        /// <summary>The player that owns the item; setting it leaves the item's colour as it is. Once the game has removed the item, the last player read or set, and setting does nothing.</summary>
+        [LocalSafe]
+        public Player Player
+        {
+            get
+            {
+                if (!IsGone)
+                {
+                    var now = Runtime.World.ItemOwnerOf(Handle);
+                    if (now != null)
+                    {
+                        owningPlayer = now;
+                    }
+                }
+
+                return Player.Of(owningPlayer)!;
+            }
+
+            set
+            {
+                if (!IsGone)
+                {
+                    owningPlayer = value.Handle;
+                    Runtime.World.SetItemOwner(Handle, value.Handle);
+                }
+            }
+        }
+
+        /// <summary>The x of the item. Once the game has removed it, the last x read or set.</summary>
+        [LocalSafe]
+        public float X
+        {
+            get
+            {
+                if (!IsGone)
+                {
+                    lastX = Runtime.World.ItemX(Handle);
+                }
+
+                return lastX;
+            }
+        }
+
+        /// <summary>The y of the item. Once the game has removed it, the last y read or set.</summary>
+        [LocalSafe]
+        public float Y
+        {
+            get
+            {
+                if (!IsGone)
+                {
+                    lastY = Runtime.World.ItemY(Handle);
+                }
+
+                return lastY;
+            }
+        }
+
+        /// <summary>Moves the item to a place (SetItemPosition). Does nothing once the item is gone.</summary>
+        public void MoveTo(float x, float y)
+        {
+            if (!IsGone)
+            {
+                lastX = x;
+                lastY = y;
+                Runtime.World.MoveItem(Handle, x, y);
+            }
+        }
+
+        /// <summary>The unit that carries the item: set when the unit picks it up, null after it drops it, and found when a unit's slot is read with ItemIn. Null for an item that was picked up before Moonwell saw it and has not been found through ItemIn, and once the item or its carrier is gone.</summary>
+        [LocalSafe]
+        public Unit? Carrier
+        {
+            get
+            {
+                if (IsGone || CarrierUnit == null || CarrierUnit.IsGone)
+                {
+                    return null;
+                }
+
+                return CarrierUnit;
+            }
+        }
+
+        /// <summary>Whether a unit carries the item; see Carrier.</summary>
+        [LocalSafe]
+        public bool IsCarried => Carrier != null;
+
         /// <summary>The starting components, which the runtime adds in order when the item is taken in.</summary>
         internal List<ItemComponent> StartComponents => Components;
 

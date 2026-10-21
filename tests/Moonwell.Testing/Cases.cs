@@ -165,6 +165,14 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "items.listen", Run = ItemCases.Listens });
             list.Add(new Case { Name = "items.sweep", Run = ItemCases.SweepDetectsRemoval });
             list.Add(new Case { Name = "items.owned-create", Run = ItemCases.OwnedByOwner });
+            list.Add(new Case { Name = "items.charges", Run = ItemCases.Charges });
+            list.Add(new Case { Name = "items.player", Run = ItemCases.PlayerOf });
+            list.Add(new Case { Name = "items.position", Run = ItemCases.Position });
+            list.Add(new Case { Name = "items.carrier", Run = ItemCases.Carrier });
+            list.Add(new Case { Name = "items.carrier-in-hooks", Run = ItemCases.CarrierInHooks });
+            list.Add(new Case { Name = "items.carrier-dies", Run = ItemCases.CarrierDies });
+            list.Add(new Case { Name = "items.carrier-found", Run = ItemCases.CarrierFound });
+            list.Add(new Case { Name = "items.gone-reads-last", Run = ItemCases.ItemGoneReadsLast });
             list.Add(new Case { Name = "destructables.watch", Run = DestructableCases.Watch });
             list.Add(new Case { Name = "destructables.sweep", Run = DestructableCases.SweepDetectsRemoval });
             list.Add(new Case { Name = "damage.order", Run = DamageCases.Order });

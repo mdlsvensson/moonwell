@@ -48,6 +48,7 @@ namespace Moonwell
                 return;
             }
 
+            picked.CarrierUnit = by;
             ItemPickedUp(picked, by);
             UnitItemPickedUp(by, picked);
         }
@@ -67,6 +68,7 @@ namespace Moonwell
                 return;
             }
 
+            dropped.CarrierUnit = null;
             ItemDropped(dropped, by);
             UnitItemDropped(by, dropped);
         }

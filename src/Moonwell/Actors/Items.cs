@@ -55,7 +55,8 @@ namespace Moonwell
             Live.Add(made);
             owner?.Adopt(made);
             made.Mask = Hooks.MaskOf(made, Item.ItemHooks);
-            Events.Need(made.Mask);
+            // Every item listens for pick-ups and drops: they are how the item's carrier is kept (Item.Carrier).
+            Events.Need(made.Mask | Hook.OnPickedUp | Hook.OnDropped);
             for (var i = 0; i < made.StartComponents.Count; i++)
             {
                 made.Add(made.StartComponents[i]);

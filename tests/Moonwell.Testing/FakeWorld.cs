@@ -135,6 +135,18 @@ namespace Moonwell.Testing
         /// <summary>How many times a slot of an inventory was read.</summary>
         public int ItemSlotReads;
 
+        /// <summary>The calls that changed an item, as "charges 5", "owner 3 False" (slot and colour change) or "move".</summary>
+        public List<string> ItemCalls = new List<string>();
+
+        /// <summary>The charges of each item, 1 until set.</summary>
+        private readonly Dictionary<item, int> itemCharges = new Dictionary<item, int>();
+
+        /// <summary>The player slot of each item, 0 until set.</summary>
+        private readonly Dictionary<item, int> itemSlots = new Dictionary<item, int>();
+
+        /// <summary>The x and y of each item, 0 until placed.</summary>
+        private readonly Dictionary<item, float[]> itemPlaces = new Dictionary<item, float[]>();
+
         /// <summary>The items in each unit's slots; null for an empty slot.</summary>
         private readonly Dictionary<unit, item[]> inventories = new Dictionary<unit, item[]>();
 
@@ -494,7 +506,9 @@ namespace Moonwell.Testing
         /// <summary>Makes an item; the place is not kept.</summary>
         public item SpawnItem(int typeId, float x, float y)
         {
-            return NewItem(typeId);
+            var created = NewItem(typeId);
+            itemPlaces[created] = new float[] { x, y };
+            return created;
         }
 
         /// <summary>The type id of a unit; 0 once it is removed or vanished.</summary>
@@ -717,6 +731,73 @@ namespace Moonwell.Testing
             AbilityCalls.Add("remove " + abilityId);
         }
 
+        /// <summary>Counts a call on an item the world has removed.</summary>
+        private void NoteGoneItem(item item)
+        {
+            if (ItemTypeId(item) == 0)
+            {
+                GoneCalls++;
+            }
+        }
+
+        /// <summary>The charges of an item; 1 until set.</summary>
+        public int ChargesOf(item item)
+        {
+            NoteGoneItem(item);
+            return itemCharges.TryGetValue(item, out var charges) ? charges : 1;
+        }
+
+        /// <summary>Sets the charges of an item and records "charges".</summary>
+        public void SetCharges(item item, int charges)
+        {
+            NoteGoneItem(item);
+            itemCharges[item] = charges;
+            ItemCalls.Add("charges " + charges);
+        }
+
+        /// <summary>The player that owns an item; slot 0 until set.</summary>
+        public player ItemOwnerOf(item item)
+        {
+            NoteGoneItem(item);
+            return PlayerAt(itemSlots.TryGetValue(item, out var slot) ? slot : 0);
+        }
+
+        /// <summary>Sets the player of an item and records "owner" with the slot and False, since the item's colour is left alone.</summary>
+        public void SetItemOwner(item item, player player)
+        {
+            NoteGoneItem(item);
+            itemSlots[item] = SlotOf(player);
+            ItemCalls.Add("owner " + SlotOf(player) + " False");
+        }
+
+        /// <summary>The x of an item; 0 until placed.</summary>
+        public float ItemX(item item)
+        {
+            NoteGoneItem(item);
+            return itemPlaces.TryGetValue(item, out var place) ? place[0] : 0.0f;
+        }
+
+        /// <summary>The y of an item; 0 until placed.</summary>
+        public float ItemY(item item)
+        {
+            NoteGoneItem(item);
+            return itemPlaces.TryGetValue(item, out var place) ? place[1] : 0.0f;
+        }
+
+        /// <summary>Moves an item to the place given and records "move".</summary>
+        public void MoveItem(item item, float x, float y)
+        {
+            NoteGoneItem(item);
+            itemPlaces[item] = new float[] { x, y };
+            ItemCalls.Add("move");
+        }
+
+        /// <summary>Puts an item in a slot of a unit without the game telling anyone, as when the item was there before the runtime came.</summary>
+        public void PutInSlot(unit unit, int slot, item item)
+        {
+            SlotsOf(unit)[slot] = item;
+        }
+
         /// <summary>Counts a call on a unit the world has removed.</summary>
         private void NoteGone(unit unit)
         {
@@ -866,6 +947,26 @@ namespace Moonwell.Testing
             if (Listening.Contains(GameEvent.Death))
             {
                 Inbound.Died(unit, null);
+            }
+
+            DropAll(unit);
+        }
+
+        /// <summary>Empties a dead unit's slots as the game drops a dead unit's items, delivering each drop when it is listened for (assumed, not seen: see unseen.md).</summary>
+        private void DropAll(unit unit)
+        {
+            var slots = SlotsOf(unit);
+            for (var i = 0; i < slots.Length; i++)
+            {
+                var carried = slots[i];
+                if (carried != null)
+                {
+                    slots[i] = null!;
+                    if (Listening.Contains(GameEvent.Drop))
+                    {
+                        Inbound.Dropped(unit, carried);
+                    }
+                }
             }
         }
 

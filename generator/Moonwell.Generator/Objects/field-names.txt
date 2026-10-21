@@ -53,7 +53,7 @@ item utub TooltipExtended
 item ides Description
 item uhot Hotkey
 item ureq Requires
-item iuse Charges
+item iuse NumberOfCharges
 destructable bnam Name
 destructable bhps HitPoints
 destructable bfil Model

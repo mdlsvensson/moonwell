@@ -298,5 +298,26 @@ namespace Moonwell.Hosting
 
         /// <summary>Makes a unit drop an item from its inventory, which the game counts as a drop.</summary>
         void DropItem(unit unit, item item);
+
+        /// <summary>The number of charges of an item.</summary>
+        int ChargesOf(item item);
+
+        /// <summary>Sets the number of charges of an item.</summary>
+        void SetCharges(item item, int charges);
+
+        /// <summary>The player that owns an item.</summary>
+        player ItemOwnerOf(item item);
+
+        /// <summary>Sets the player that owns an item, leaving the item's colour as it is.</summary>
+        void SetItemOwner(item item, player player);
+
+        /// <summary>The x of an item.</summary>
+        float ItemX(item item);
+
+        /// <summary>The y of an item.</summary>
+        float ItemY(item item);
+
+        /// <summary>Moves an item to a place.</summary>
+        void MoveItem(item item, float x, float y);
     }
 }

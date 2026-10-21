@@ -395,7 +395,7 @@ namespace Moonwell.Objects
         /// <summary>The field <c>iuse</c>.</summary>
         [global::Moonwell.Objects.Field("iuse", Label = "Number of Charges")]
         [global::Moonwell.Objects.Limits(0, 1000)]
-        public int Charges
+        public int NumberOfCharges
         {
             get { return Fields.Get<int>(this, "iuse"); }
             protected set { Fields.Put("iuse", value); }

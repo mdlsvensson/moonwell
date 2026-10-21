@@ -57,12 +57,14 @@ namespace Moonwell.Testing
             ExpectLog(new string[] { "glow dropped", "hero dropped orb", "tally dropped orb" }, "the log");
         }
 
-        /// <summary>A registered item that overrides OnPickedUp listens for pick-ups, and not for drops until a drop hook is overridden.</summary>
+        /// <summary>An item taken in makes the runtime listen for pick-ups and drops, which is how it keeps the item's carrier, even when its class overrides neither hook.</summary>
         public static void Listens(FakeWorld world)
         {
-            ObjectTypes.Item(ObjectTypes.FourCC("I001"), () => new TestOrb());
+            Expect.True(!world.Listening.Contains(GameEvent.PickUp), "PickUp is not listened for before an item is taken in");
+            Expect.True(!world.Listening.Contains(GameEvent.Drop), "Drop is not listened for before an item is taken in");
+            Item.Of(world.NewItem(ObjectTypes.FourCC("ofoo")));
             Expect.True(world.Listening.Contains(GameEvent.PickUp), "PickUp is listened for");
-            Expect.True(!world.Listening.Contains(GameEvent.Drop), "Drop is not listened for");
+            Expect.True(world.Listening.Contains(GameEvent.Drop), "Drop is listened for");
         }
 
         /// <summary>An item that vanishes is ended by the sweep, and the game is not asked to remove it.</summary>
@@ -167,6 +169,184 @@ namespace Moonwell.Testing
             Expect.Equal(0, world.InventoryCalls.Count, "no inventory call for the removed unit");
             Expect.Equal(0, world.ItemSlotReads, "no slot read for the removed unit");
             Expect.Equal(0, world.GoneCalls, "no call to the game for the gone unit");
+        }
+
+        /// <summary>An item's charges are the game's: read and set, and a set keeps what was given.</summary>
+        public static void Charges(FakeWorld world)
+        {
+            var handle = world.NewItem(ObjectTypes.FourCC("ofoo"));
+            var item = Item.Of(handle)!;
+            Expect.Equal(1, item.Charges, "the charges before");
+
+            item.Charges = 5;
+
+            Expect.Equal(5, item.Charges, "the new charges");
+            Expect.Equal(5, world.ChargesOf(handle), "the game's charges");
+            Expect.Equal(1, world.ItemCalls.Count, "calls that changed the item");
+            Expect.Equal("charges 5", world.ItemCalls[0], "the call");
+
+            item.Charges = 0;
+            Expect.Equal(0, item.Charges, "the charges used up");
+        }
+
+        /// <summary>An item's player is the game's: read and set, and the item's colour is left alone.</summary>
+        public static void PlayerOf(FakeWorld world)
+        {
+            var handle = world.NewItem(ObjectTypes.FourCC("ofoo"));
+            var item = Item.Of(handle)!;
+            Expect.Equal(0, item.Player.Slot, "the player before");
+
+            item.Player = Player.Get(3);
+
+            Expect.Equal(3, item.Player.Slot, "the new player");
+            Expect.Equal(3, world.SlotOf(world.ItemOwnerOf(handle)), "the game's player");
+            Expect.Equal("owner 3 False", world.ItemCalls[0], "the call keeps the colour");
+        }
+
+        /// <summary>An item is created at its place; X and Y read it, and MoveTo moves it.</summary>
+        public static void Position(FakeWorld world)
+        {
+            var item = Item.Create(ObjectTypes.FourCC("ofoo"), 100.5f, -50.0f);
+            Expect.Near(100.5f, item.X, "x at creation");
+            Expect.Near(-50.0f, item.Y, "y at creation");
+
+            item.MoveTo(-300.0f, 64.25f);
+
+            Expect.Near(-300.0f, item.X, "the new x");
+            Expect.Near(64.25f, item.Y, "the new y");
+            Expect.Equal(1, world.ItemCalls.Count, "calls that changed the item");
+            Expect.Equal("move", world.ItemCalls[0], "the call");
+        }
+
+        /// <summary>The carrier is the unit that picked the item up, until a drop; an item nobody has picked up has none.</summary>
+        public static void Carrier(FakeWorld world)
+        {
+            var hero = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var orb = Item.Of(world.NewItem(ObjectTypes.FourCC("ofoo")))!;
+            Expect.True(!orb.IsCarried, "carried before");
+            Expect.True(orb.Carrier == null, "no carrier before");
+
+            hero.Give(orb);
+
+            Expect.True(orb.IsCarried, "carried after Give");
+            Expect.Same(hero, orb.Carrier, "the carrier after Give");
+
+            hero.Drop(orb);
+
+            Expect.True(!orb.IsCarried, "carried after Drop");
+            Expect.True(orb.Carrier == null, "no carrier after Drop");
+        }
+
+        /// <summary>The carrier is already set when the item's own OnPickedUp runs, and already null when its OnDropped runs.</summary>
+        public static void CarrierInHooks(FakeWorld world)
+        {
+            ObjectTypes.Item(ObjectTypes.FourCC("I001"), () => new CarrierWatch());
+            var hero = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var watch = (CarrierWatch)Item.Of(world.NewItem(ObjectTypes.FourCC("I001")))!;
+
+            hero.Give(watch);
+            Expect.Same(hero, watch.CarrierAtPickup, "the carrier seen in OnPickedUp");
+
+            hero.Drop(watch);
+            Expect.True(watch.DropSeen, "OnDropped ran");
+            Expect.True(watch.CarrierAtDrop == null, "the carrier seen in OnDropped");
+        }
+
+        /// <summary>A carrier that dies drops the item (the game tells Moonwell as for any drop), so the item has no carrier then.</summary>
+        public static void CarrierDies(FakeWorld world)
+        {
+            var hero = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var orb = Item.Of(world.NewItem(ObjectTypes.FourCC("ofoo")))!;
+            hero.Give(orb);
+            Expect.Same(hero, orb.Carrier, "the carrier before the death");
+
+            hero.Kill();
+
+            Expect.True(orb.Carrier == null, "no carrier after the carrier died");
+            Expect.True(!orb.IsCarried, "not carried after the carrier died");
+        }
+
+        /// <summary>An item found in a slot (ItemIn) is carried by that unit, even though Moonwell never saw it picked up; a carrier the game has removed carries nothing.</summary>
+        public static void CarrierFound(FakeWorld world)
+        {
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var unit = Unit.Of(handle)!;
+            var placed = world.NewItem(ObjectTypes.FourCC("ofoo"));
+            world.PutInSlot(handle, 0, placed);
+
+            var found = unit.ItemIn(0)!;
+
+            Expect.Same(unit, found.Carrier, "the carrier of an item found in a slot");
+            Expect.True(found.IsCarried, "carried");
+
+            unit.Remove();
+
+            Expect.True(found.Carrier == null, "no carrier once the carrier is gone");
+            Expect.True(!found.IsCarried, "not carried once the carrier is gone");
+        }
+
+        /// <summary>A removed item gives the last charges, player and place read or set, has no carrier, changes nothing and asks the game nothing.</summary>
+        public static void ItemGoneReadsLast(FakeWorld world)
+        {
+            var handle = world.NewItem(ObjectTypes.FourCC("ofoo"));
+            var swept = Item.Of(handle)!;
+            swept.Charges = 4;
+            swept.Player = Player.Get(2);
+            swept.MoveTo(10.0f, 20.0f);
+            Expect.Equal(4, swept.Charges, "read: charges");
+            Expect.Near(10.0f, swept.X, "read: x");
+            Expect.Near(20.0f, swept.Y, "read: y");
+            Expect.Equal(2, swept.Player.Slot, "read: player");
+            var carrier = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            carrier.Give(swept);
+            Expect.True(swept.IsCarried, "carried before the removal");
+            var calls = world.ItemCalls.Count;
+
+            world.VanishItem(handle);
+            world.Advance(0.3f);
+            Expect.True(swept.IsGone, "the sweep found the item gone");
+            world.GoneCalls = 0;
+            Expect.Equal(4, swept.Charges, "swept: charges");
+            Expect.Equal(2, swept.Player.Slot, "swept: player");
+            Expect.Near(10.0f, swept.X, "swept: x");
+            Expect.Near(20.0f, swept.Y, "swept: y");
+            Expect.True(swept.Carrier == null, "swept: no carrier");
+            Expect.True(!swept.IsCarried, "swept: not carried");
+            ExpectNoCalls(world, swept, calls, "swept");
+
+            var removed = Item.Create(ObjectTypes.FourCC("ofoo"), 5.0f, 6.0f);
+            removed.Charges = 7;
+            Expect.Equal(7, removed.Charges, "removed: charges read");
+            Expect.Near(5.0f, removed.X, "removed: x read");
+            Expect.Near(6.0f, removed.Y, "removed: y read");
+            removed.Remove();
+            world.GoneCalls = 0;
+            calls = world.ItemCalls.Count;
+            Expect.Equal(7, removed.Charges, "removed: charges");
+            Expect.Near(5.0f, removed.X, "removed: x");
+            Expect.Near(6.0f, removed.Y, "removed: y");
+            ExpectNoCalls(world, removed, calls, "removed");
+
+            // Values set and never read: the setters keep them, so they are what a gone item gives.
+            var unread = Item.Of(world.NewItem(ObjectTypes.FourCC("ofoo")))!;
+            unread.Charges = 9;
+            unread.Player = Player.Get(4);
+            unread.MoveTo(1.5f, 2.5f);
+            unread.Remove();
+            Expect.Equal(9, unread.Charges, "unread: charges");
+            Expect.Equal(4, unread.Player.Slot, "unread: player");
+            Expect.Near(1.5f, unread.X, "unread: x");
+            Expect.Near(2.5f, unread.Y, "unread: y");
+        }
+
+        /// <summary>Sets every member of a gone item and checks that the game was neither asked nor told.</summary>
+        private static void ExpectNoCalls(FakeWorld world, Item item, int calls, string what)
+        {
+            item.Charges = 99;
+            item.Player = Player.Get(5);
+            item.MoveTo(500.0f, 600.0f);
+            Expect.Equal(calls, world.ItemCalls.Count, what + ": calls that changed the item");
+            Expect.Equal(0, world.GoneCalls, what + ": calls to the game for the gone item");
         }
     }
 }
