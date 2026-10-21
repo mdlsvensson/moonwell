@@ -19,7 +19,7 @@ moonwell run
 ```
 
 The game opens the map. Player 1 has a Champion, a Paladin of the map's own, with three footmen to fight. Learn Smite
-and cast it: the screen names the target. Each kill shows the Champion's count.
+and cast it: the screen names the target. Each kill shows the Champion's count and heals it a tenth of its life.
 
 ## The project
 
@@ -78,11 +78,18 @@ public sealed class Champion : Human.Units.Paladin
   `Attack1TargetsAllowed = Targets.Air | Targets.Ground`. A flags field of 0 has none of them; `Targets.None` is
   World Editor's target "none", a value of its own. The numbers are Moonwell's, in World Editor's order, not the
   natives' (JASS's `ATTACK_TYPE_MAGIC` is 4, `AttackType.Magic` is 6): never cast one to or from a native's value.
-  In the game an enum of `Moonwell.Objects` has its numbers only, no names: `ToString`, a string made with one and
-  `Enum.GetValues` are rejected as error MW0010; compare with its members, `|`, `&` and `HasFlag`.
+  In the game an enum of `Moonwell.Objects` has its numbers only, no names: `ToString` (also `choice?.ToString()`), a
+  string made with one (`+`, `+=`, interpolation, or a call that takes an `object`: `string.Format`,
+  `StringBuilder.Append`, a method of your own) and `Enum.GetValues` are rejected as error MW0010, a nullable choice
+  too; compare with its members, `|`, `&` and `HasFlag`.
 - `AttackType` and `DefenseType` are core Moonwell's (`Moonwell.AttackType`), shared with the damage package, and keep
   their names in the game. A file writes them with `using Moonwell;`; a name of the old `Moonwell.Objects.AttackType`
   is error MW0011.
+- A declared field that a `Unit`, `Hero` or `Item` also has as a live value is named apart: `ManaPoints` (the unit's
+  `Mana` in the game), `UnitLevel` (`Level`), `ScalingValue` (`Scale`; a doodad keeps `Scale`), `StartingStrength`,
+  `StartingAgility` and `StartingIntelligence` (`Strength`, ...) and, on an item, `NumberOfCharges` (`Charges`). Six
+  ability fields are named apart as well: `Inferno.InfernalDuration`, `Taunt.PreferHostiles` and `PreferFriendlies`,
+  `WindWalk.BackstabDamage` and `Backstab`, `HealingModifier.HealingPercent`.
 - A list takes `Set<A, B, C>()` (the whole list, in order), `Replace<Old, New>()` (in the old one's place), `Add<T>()`
   and `Remove<T>()`.
 - The tooltips are World Editor's four: `Tooltip` (Tooltip - Normal), `TooltipExtended` (Tooltip - Normal - Extended),
@@ -141,11 +148,48 @@ public sealed class KillCounter : UnitComponent
   belongs to whatever made it, and ends with it.
 - Game work starts in a reaction. Top-level code and static fields make nothing in the game.
 
+## Units, heroes and items
+
+A unit's members read and change the game's. Once the game has removed a unit or item they give the last value read or
+set (0 when never read, as in `OnLeave` after the game removed it), and setting does nothing. A read is safe in
+`Local.For`, a change is not.
+
+| Unit | |
+|---|---|
+| `Life`, `MaxLife`, `Mana`, `MaxMana` | read and set; a `Life` under 0.405 kills |
+| `X`, `Y` | read; `MoveTo(x, y)` through the game's pathing, `PlaceAt(x, y)` with none |
+| `Facing` | read and set (the unit turns); `FaceNow(degrees)` turns at once |
+| `Level` | read; a hero's hero level |
+| `IsAlive`, `Kill()` | whether it lives; kills it, with `OnDeath` run |
+| `IsPaused`, `Scale`, `FlyHeight` | read and set |
+| `Tint(red, green, blue, alpha)` | colours the model, 0-255 |
+| `Order(order)`, `OrderAt(order, x, y)`, `OrderOn(order, target)`, `Stop()` | orders by the game's order string (`"move"`, `"attack"`) |
+| `InventorySize`, `ItemIn(slot)`, `Give(item)`, `Drop(item)` | the inventory; `Give` and `Drop` run the pick-up and drop reactions |
+
+| Hero (a unit the game makes as a hero) | |
+|---|---|
+| `Experience` | read and set; the levels that come with it are given |
+| `SetLevel(level)`, `Revive(x, y)` | `showEffect:` turns the effect off |
+| `Strength`, `Agility`, `Intelligence` | the base, read and set |
+| `StrengthWithBonus`, `AgilityWithBonus`, `IntelligenceWithBonus` | with items and auras, read |
+| `SkillPoints` | read and set |
+
+| Item | |
+|---|---|
+| `Charges`, `Player` | read and set |
+| `X`, `Y` | read; `MoveTo(x, y)` |
+| `Carrier`, `IsCarried` | the unit that picked it up, while it still holds it |
+
+`ItemIn` is not for `Local.For`: it takes in an item Moonwell has not seen, which has to happen on every machine.
+Moonwell listens for pick-ups and drops from the start, so an item a unit picks up is taken in; one a unit held before
+the map began has no `Carrier`. A member's exact behaviour is in its comment.
+
 ## Damage
 
 `OnDamaged` sees a hit after armor. For more, add the `Moonwell.Damage` package to the project, at the same version as
-Moonwell; the build starts it, and a map without it carries none of its code. Its reactions come through interfaces,
-which a unit's class, its components and buffs implement, writing only the methods they need as public methods:
+Moonwell (the template's `.csproj` has the line, commented). The build starts it once the map's code uses one of its
+types, and a map that does not carries none of its code. Its reactions come through interfaces, which a unit's class,
+its components and buffs implement, writing only the methods they need as public methods:
 
 ```csharp
 public sealed class Shield : Buff, IDamageTarget
@@ -216,6 +260,9 @@ The build also rejects what CSharp.lua cannot compile: collection expressions, `
 and `using static Moonwell.Natives` (write `Natives.X`). It does not catch a `Dictionary` keyed by a map's own class
 that has a static field with a value: the map can stop while it loads, with nothing on the screen. Key by the handle,
 or set the field on first use. Moonwell's classes, `Unit` and the rest, are safe keys.
+
+A whole-number `float` stays a float in the game, and prints as `50.0` where C# prints `50`. A float made from an `int`
+at run time (`(float)count`) stays an integer.
 
 An error in a reaction shows on the screen with its C# file and line, and is written in full to
 `Documents\Warcraft III\CustomMapData\Moonwell\log.txt`. A release build leaves the message off the screen and keeps

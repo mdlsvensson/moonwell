@@ -190,6 +190,75 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void template_map_calls_no_native_but_the_unit_name()
+        {
+            var template = Path.Combine(TestFolders.Fixture("."), "..", "..", "..", "template", "MoonwellMap");
+            var calls = Directory.GetFiles(template, "*.cs", SearchOption.AllDirectories)
+                .Where(file => !file.Contains(Path.DirectorySeparatorChar + "obj" + Path.DirectorySeparatorChar) && !file.Contains(Path.DirectorySeparatorChar + "bin" + Path.DirectorySeparatorChar))
+                .SelectMany(file => Regex.Matches(File.ReadAllText(file), @"Natives\.\w+").Select(match => match.Value))
+                .ToList();
+
+            // There is no Unit.Name in this release, so Smite reads the target's name with the one native.
+            Assert.Equal(new[] { "Natives.GetUnitName" }, calls);
+        }
+
+        [Fact]
+        public void template_map_shows_adding_the_damage_package_and_builds_with_it()
+        {
+            var hive = folders.TemporaryFolderOutsideRepository();
+            var parent = folders.TemporaryFolderOutsideRepository();
+            PackedMoonwell.Dotnet(parent, "new", "install", packed.TemplatesPackage, "--debug:custom-hive", hive);
+            PackedMoonwell.Dotnet(parent, "new", "moonwell", "-n", "Keep", "--debug:custom-hive", hive);
+            var map = Path.Combine(parent, "Keep");
+            WriteFeedConfig(map);
+
+            // The guide's one line: take the comment off the project's Moonwell.Damage line.
+            var csproj = Path.Combine(map, "Keep.csproj");
+            var text = File.ReadAllText(csproj);
+            var uncommented = Regex.Replace(text, @"<!--\s*(<PackageReference Include=""Moonwell\.Damage"" [^>]*/>)\s*-->", "$1");
+            Assert.NotEqual(text, uncommented);
+            Assert.Contains("<PackageReference Include=\"Moonwell.Damage\" Version=\"" + packed.Version + "\" />", uncommented);
+            File.WriteAllText(csproj, uncommented);
+
+            // The build starts the package once the map's code uses one of its types, as the guide's Shield does.
+            File.WriteAllText(
+                Path.Combine(map, "Shield.cs"),
+                "namespace Keep\n{\n    public sealed class Shield : Moonwell.Buff, Moonwell.IDamageTarget\n    {\n        public void OnTaken(Moonwell.Hit hit) { hit.Amount *= 0.5f; }\n    }\n}\n");
+
+            var log = new StringWriter();
+            string archive;
+            try
+            {
+                archive = MapBuild.Run(map, new BuildOptions(), log);
+            }
+            catch (BuildException failure)
+            {
+                throw new Xunit.Sdk.XunitException(failure.Message + "\n" + log);
+            }
+
+            Assert.True(File.Exists(archive), log.ToString());
+            var script = File.ReadAllText(Path.Combine(map, "build", "Keep", "war3map.lua"));
+            Assert.Contains("DamageSystem.Install()", script);
+        }
+
+        [Fact]
+        public void template_map_release_carries_no_damage_package()
+        {
+            var hive = folders.TemporaryFolderOutsideRepository();
+            var parent = folders.TemporaryFolderOutsideRepository();
+            PackedMoonwell.Dotnet(parent, "new", "install", packed.TemplatesPackage, "--debug:custom-hive", hive);
+            PackedMoonwell.Dotnet(parent, "new", "moonwell", "-n", "Keep", "--debug:custom-hive", hive);
+            var map = Path.Combine(parent, "Keep");
+            WriteFeedConfig(map);
+
+            var log = new StringWriter();
+            MapBuild.Run(map, new BuildOptions { Release = true }, log);
+
+            var script = File.ReadAllText(Path.Combine(map, "build", "Keep", "war3map.lua"));
+            Assert.DoesNotContain("DamageSystem", script);
+        }
+
+        [Fact]
         public void package_folder_elsewhere_is_reported()
         {
             var copy = folders.TemporaryCopyOfSample();

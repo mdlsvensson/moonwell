@@ -2,7 +2,7 @@ using Moonwell;
 
 namespace MoonwellMap.Heroes
 {
-    /// <summary>Counts the unit's kills and tells its owner each time.</summary>
+    /// <summary>Counts the unit's kills, tells its owner each time, and heals the unit a tenth of its life.</summary>
     public sealed class KillCounter : UnitComponent
     {
         private int kills;
@@ -11,6 +11,7 @@ namespace MoonwellMap.Heroes
         {
             kills++;
             Unit.Player.Print("Kills: " + kills);
+            Unit.Life += Unit.MaxLife * 0.1f;
         }
     }
 }
