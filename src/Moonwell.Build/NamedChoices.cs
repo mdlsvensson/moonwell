@@ -18,16 +18,14 @@ namespace Moonwell.Build
         public static IReadOnlySet<string> Read(MapProject project, string assemblyPath, IReadOnlySet<string> candidates)
         {
             var found = new HashSet<string>(StringComparer.Ordinal);
-            var sources = Sources(project).ToList();
+            var sources = CompiledFiles.Sources(project.Folder, project.BuildFolder).ToList();
             if (sources.Count == 0 || candidates.Count == 0)
             {
                 return found;
             }
 
             var assembly = Path.GetFullPath(assemblyPath);
-            var libraries = Directory.EnumerateFiles(Path.GetDirectoryName(assembly)!, "*.dll")
-                .Where(path => !string.Equals(Path.GetFullPath(path), assembly, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+            var libraries = CompiledFiles.LibrariesBeside(assemblyPath).ToList();
 
             // CSharp.lua compiles with MOONWELL_LUA, and a debug build with DEBUG too; the stubs serve both kinds of build, so code
             // that only one of them has is looked at with its own symbols.
@@ -67,30 +65,6 @@ namespace Moonwell.Build
                 INamedTypeSymbol { TypeKind: TypeKind.Enum } type => type,
                 _ => null,
             };
-        }
-
-        // The files dotnet build compiles: every C# file under the project but the top-level bin and obj, and the build folder.
-        private static IEnumerable<string> Sources(MapProject project)
-        {
-            foreach (var file in Directory.EnumerateFiles(project.Folder, "*.cs", SearchOption.TopDirectoryOnly))
-            {
-                yield return file;
-            }
-
-            foreach (var sub in Directory.EnumerateDirectories(project.Folder))
-            {
-                var name = Path.GetFileName(sub);
-                if (name.Equals("bin", StringComparison.OrdinalIgnoreCase) || name.Equals("obj", StringComparison.OrdinalIgnoreCase)
-                    || name.Equals("build", StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                foreach (var file in Directory.EnumerateFiles(sub, "*.cs", SearchOption.AllDirectories))
-                {
-                    yield return file;
-                }
-            }
         }
     }
 }

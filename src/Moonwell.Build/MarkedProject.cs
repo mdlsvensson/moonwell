@@ -42,7 +42,7 @@ namespace Moonwell.Build
 
             Directory.CreateDirectory(folder);
             var symbolList = symbols.ToList();
-            var sources = SourceFiles(project.Folder, folder)
+            var sources = CompiledFiles.Sources(project.Folder, folder)
                 .Select(path => Path.GetRelativePath(project.Folder, path).Replace('\\', '/'))
                 .OrderBy(path => path, StringComparer.Ordinal)
                 .ToList();
@@ -72,31 +72,6 @@ namespace Moonwell.Build
             var marked = Path.DirectorySeparatorChar + "build" + Path.DirectorySeparatorChar + "marked";
             var pattern = Regex.Escape(projectFolder).Replace(@"\\", @"[\\/]") + Regex.Escape(marked).Replace(@"\\", @"[\\/]");
             return Regex.Replace(message, pattern, projectFolder.Replace("$", "$$"), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-        }
-
-        private static IEnumerable<string> SourceFiles(string projectFolder, string markedFolder)
-        {
-            foreach (var file in Directory.EnumerateFiles(projectFolder, "*.cs", SearchOption.TopDirectoryOnly))
-            {
-                yield return file;
-            }
-
-            foreach (var sub in Directory.EnumerateDirectories(projectFolder))
-            {
-                var name = Path.GetFileName(sub);
-                if (name.Equals("bin", StringComparison.OrdinalIgnoreCase) || name.Equals("obj", StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                foreach (var file in Directory.EnumerateFiles(sub, "*.cs", SearchOption.AllDirectories))
-                {
-                    if (!file.StartsWith(markedFolder + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
-                    {
-                        yield return file;
-                    }
-                }
-            }
         }
 
         // The copy is deeper than the project, so its relative project references would point elsewhere.

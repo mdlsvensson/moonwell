@@ -29,7 +29,7 @@ namespace Moonwell.Build
         public static IReadOnlyList<string> Rewrite(string folder, IEnumerable<string> files, string assemblyName, IEnumerable<string> references, IEnumerable<string> symbols)
         {
             var errors = new List<string>();
-            var sources = Directory.EnumerateFiles(folder, "*.cs", SearchOption.AllDirectories);
+            var sources = CompiledFiles.Sources(folder);
             var rewritten = files.Select(file => Path.Combine(folder, file));
             foreach (var (tree, model) in Models(sources, rewritten, assemblyName, references, symbols))
             {

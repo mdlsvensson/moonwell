@@ -88,7 +88,7 @@ namespace Moonwell.Build
             var marked = MarkedProject.Stage(project, symbols);
             files = marked.Files;
             LiteralCheck.Check(project.Folder, marked.Files, symbols);
-            var unread = FloatLiterals.Rewrite(marked.Folder, marked.Files, Path.GetFileNameWithoutExtension(targetPath), LibrariesBeside(targetPath), symbols);
+            var unread = FloatLiterals.Rewrite(marked.Folder, marked.Files, Path.GetFileNameWithoutExtension(targetPath), CompiledFiles.LibrariesBeside(targetPath), symbols);
             var compiler = new Compiler(marked.ProjectFile, project.GeneratedFolder, string.Empty, null!, null!, "*", "-define:" + string.Join(";", symbols), false, null!, string.Empty)
             {
                 IsExportMetadata = false,
@@ -142,14 +142,6 @@ namespace Moonwell.Build
             }
 
             return script;
-        }
-
-        // The libraries dotnet build put beside the map's assembly, which the map's code references.
-        private static IEnumerable<string> LibrariesBeside(string targetPath)
-        {
-            var assembly = Path.GetFullPath(targetPath);
-            return Directory.EnumerateFiles(Path.GetDirectoryName(assembly)!, "*.dll")
-                .Where(path => !string.Equals(Path.GetFullPath(path), assembly, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
