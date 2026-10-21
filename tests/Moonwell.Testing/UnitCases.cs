@@ -714,6 +714,13 @@ namespace Moonwell.Testing
             world.VanishUnit(second);
             Expect.Near(300.0f, lowered.Life, "life: falls to the lowered most");
             Expect.Near(100.0f, lowered.Mana, "mana: falls to the lowered most");
+
+            var third = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var manaless = Unit.Of(third)!;
+            manaless.MaxMana = 0.0f;
+            manaless.Mana = -5.0f;
+            world.VanishUnit(third);
+            Expect.Near(0.0f, manaless.Mana, "mana of a unit without mana: 0, not negative");
         }
 
         /// <summary>A unit that already has Amrf gets no add and remove (the remove would take its own ability away), and floats at once.</summary>

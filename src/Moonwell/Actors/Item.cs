@@ -58,7 +58,7 @@ namespace Moonwell
             return Runtime.World.ItemTypeId(Handle) == 0;
         }
 
-        /// <summary>The item's charges (what the type gives: a healing potion 1, a ring 0). Any value is taken at once; 0 does not remove the item, it stays where it is, on the ground or in an inventory, and a carried potion of 0 charges can still be used. Once the game has removed the item, the last value read or set, and setting does nothing.</summary>
+        /// <summary>The item's charges (what the type gives: a healing potion 1, Claws of Attack 0). Any value is taken at once; 0 does not remove the item, it stays where it is, on the ground or in an inventory, and a carried potion of 0 charges can still be used. Once the game has removed the item, the last value read or set, and setting does nothing.</summary>
         [LocalSafe]
         public int Charges
         {
@@ -178,7 +178,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Moves the item to a place (SetItemPosition), through the game's pathing: a place on a tree, a building or unwalkable ground becomes a pathable spot nearby, and past the edge it stops inside the playable area, so X and Y may read other than what was given. Does nothing once the item is gone.</summary>
+        /// <summary>Moves the item to a place (SetItemPosition), through the game's pathing: a place on a tree or a farm becomes a pathable spot nearby, and past the edge it stops inside the playable area (seen), so X and Y may read other than what was given. Does nothing once the item is gone.</summary>
         public void MoveTo(float x, float y)
         {
             if (!IsGone)
@@ -189,7 +189,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The unit that carries the item: the last unit seen picking it up, as long as the game says it still has the item (UnitHasItem), so a drop the game fires when an item only moves between slots does not make it uncarried. Null for an item picked up before Moonwell saw it (Moonwell does not look through inventories), for an item in a bag or equipped (the 3.0 extended inventory: the unit does not count it as held), and once the item or the carrier is gone. Inside OnDropped it is still the unit, since the game takes the item out of the slot after the drop event, and it is null after the call; after a hero dies it stays the hero, which keeps its items, but a unit that dies or is removed from the game no longer has them.</summary>
+        /// <summary>The unit that carries the item: the last unit seen picking it up, as long as the game says it still has the item (UnitHasItem), so a drop the game fires when an item only moves between slots does not make it uncarried. Null for an item picked up before Moonwell saw it (Moonwell does not look through inventories), for an item in a bag or equipped (the 3.0 extended inventory: the unit does not count it as held), and once the item or the carrier is gone. Inside OnDropped it is still the unit, since the game takes the item out of the slot after the drop event, and it is null after the call. The exception is a drop after a unit was removed from the game (RemoveUnit): the game fires it after the call, when the unit no longer has the item, so Carrier is already null in OnDropped. After a hero dies it stays the hero, which keeps its items; a unit that is not a hero drops them when it dies, so it is no longer the carrier.</summary>
         [LocalSafe]
         public Unit? Carrier
         {
@@ -264,7 +264,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the item is dropped by a unit, before the components see it, while the unit still has it (Carrier is the unit). Not run when a unit that is not a hero dies and drops its items; see Unit.Drop.</summary>
+        /// <summary>Runs when the item is dropped by a unit, before the components see it. Inside the call that drops it (Drop, UnitRemoveItem) Carrier is still the unit; for the drops the game fires after RemoveUnit it is already null (see Unit.Drop). Not run when a unit that is not a hero dies and drops its items.</summary>
         public virtual void OnDropped(Unit by)
         {
         }

@@ -250,7 +250,7 @@ namespace Moonwell.Testing
             Expect.True(watch.Carrier == null, "no carrier after the drop");
         }
 
-        /// <summary>A carrier that dies drops the item (the game tells Moonwell as for any drop), so the item has no carrier then.</summary>
+        /// <summary>A carrier that is not a hero drops its item when it dies, with no drop event (seen 10-21), so the item has no carrier then.</summary>
         public static void CarrierDies(FakeWorld world)
         {
             var hero = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;

@@ -228,6 +228,11 @@ namespace Moonwell
                     // The game clamps to the most mana (0 for a unit without mana), so that is what a removed unit gives back.
                     var most = MaxMana;
                     lastMana = value < most ? value : most;
+                    if (lastMana < 0.0f)
+                    {
+                        lastMana = 0.0f;
+                    }
+
                     Runtime.World.SetMana(Handle, value);
                 }
             }
@@ -541,13 +546,15 @@ namespace Moonwell
                     if (!flyReady)
                     {
                         flyReady = true;
-                        var crowForm = ObjectTypes.FourCC("Amrf");
-
                         // A unit that flies shows the height as it is; one that has Amrf must not lose it to the remove.
-                        if (!Runtime.World.CanFly(Handle) && Runtime.World.AbilityLevel(Handle, crowForm) <= 0)
+                        if (!Runtime.World.CanFly(Handle))
                         {
-                            Runtime.World.AddAbility(Handle, crowForm);
-                            Runtime.World.RemoveAbility(Handle, crowForm);
+                            var crowForm = ObjectTypes.FourCC("Amrf");
+                            if (Runtime.World.AbilityLevel(Handle, crowForm) <= 0)
+                            {
+                                Runtime.World.AddAbility(Handle, crowForm);
+                                Runtime.World.RemoveAbility(Handle, crowForm);
+                            }
                         }
                     }
 
@@ -640,13 +647,13 @@ namespace Moonwell
             return Item.Of(Runtime.World.ItemInSlot(Handle, slot));
         }
 
-        /// <summary>Gives the unit an item to pick up into its first free slot (a slot a drop freed is filled first), and returns the game's answer. The game counts it as a pick-up, so OnPickedUp and OnItemPickedUp run, inside this call. The answer is false, with no event and the item left where it is, when the inventory is full or the unit has none. Giving an item the unit already holds answers true, keeps its slot and runs the drop reactions and then the pick-up reactions. An item that goes to a bag or is equipped (the 3.0 extended inventory) runs the same reactions, but the unit does not count it as held, so its Carrier is null. False, and no call to the game, once the unit or the item is gone.</summary>
+        /// <summary>Gives the unit an item to pick up into its first free slot (a slot a drop freed is filled first), and returns the game's answer. The game counts it as a pick-up, so OnPickedUp and OnItemPickedUp run, inside this call. The answer is false, with no event and the item left where it is, when the inventory is full or the unit has none. Giving an item the unit already holds keeps its slot and runs the drop reactions and then the pick-up reactions (seen; the answer it gives was not recorded). False, and no call to the game, once the unit or the item is gone.</summary>
         public bool Give(Item item)
         {
             return !IsGone && !item.IsGone && Runtime.World.GiveItem(Handle, item.Handle);
         }
 
-        /// <summary>Makes the unit drop an item from its inventory where it stands (UnitRemoveItem). The game counts it as a drop, so OnDropped and OnItemDropped run, inside this call and while the unit still has the item: the item's Carrier is the unit there, and null after the call. Does nothing for an item that lies on the ground, and once the unit or the item is gone. A unit that dies drops its items (a hero keeps them) with no drop reactions, and the items of a unit removed from the game leave it with their drop events after the call, when the unit has ended: Moonwell runs no reactions for those.</summary>
+        /// <summary>Makes the unit drop an item from its inventory where it stands (UnitRemoveItem). The game counts it as a drop, so OnDropped and OnItemDropped run, inside this call and while the unit still has the item: the item's Carrier is the unit there, and null after the call. Does nothing for an item that lies on the ground, and once the unit or the item is gone. A unit that dies drops its items (a hero keeps them) with no drop reactions, and the items of a unit removed with RemoveUnit leave it inside that call, but the game fires their drop events after the call: Carrier is already null then, and the item's and the unit's drop reactions run for an object that is about to be swept (a unit that Remove() has already ended runs none). Seen for a hero, whose items are then removed with it; other units are assumed to do the same.</summary>
         public void Drop(Item item)
         {
             if (!IsGone && !item.IsGone)
