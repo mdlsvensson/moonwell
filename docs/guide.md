@@ -181,7 +181,7 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 |---|---|
 | `Charges`, `Player` | read and set; 0 charges leaves the item in place; `Player` is the owner, which picking up or dropping does not change |
 | `X`, `Y` | read; `MoveTo(x, y)` goes to a pathable spot; while a unit carries the item they are where it was picked up, so read the carrier's place |
-| `Carrier`, `IsCarried` | the unit that picked it up, while it still holds it: null for an item in a bag or equipped (the 3.0 inventory), and in `OnDropped` it is still the unit |
+| `Carrier`, `IsCarried` | the unit that picked it up, while it still holds it: null for an item in a bag or equipped (the 3.0 inventory), and in `OnDropped` it is still the unit, except for a drop after `RemoveUnit` (below), where it is already null |
 
 `ItemIn` is not for `Local.For`: it takes in an item Moonwell has not seen, which has to happen on every machine.
 Moonwell listens for pick-ups and drops from the start, so an item a unit picks up is taken in; one a unit held before
@@ -269,8 +269,9 @@ that has a static field with a value: the map can stop while it loads, with noth
 or set the field on first use. Moonwell's classes, `Unit` and the rest, are safe keys.
 
 A whole-number `float` stays a float in the game, and prints as `50.0` where C# prints `50`; so does an `int` made a
-float (`(float)count`) and a `float` field without an initializer. A float array's items, and `Math.Floor` or
-`Math.Ceiling`, are integers in the game: add `+ 0.0f` where a product could pass 2^31.
+float (`(float)count`) and a `float` field without an initializer. An `int?` made a `float?` (`float? f = maybe;`),
+`foreach (float f in ints)`, a float array's items, and `Math.Floor` or `Math.Ceiling`, are integers in the game: add
+`+ 0.0f` where a product could pass 2^31.
 
 An error in a reaction shows on the screen with its C# file and line, and is written in full to
 `Documents\Warcraft III\CustomMapData\Moonwell\log.txt`. A release build leaves the message off the screen and keeps
