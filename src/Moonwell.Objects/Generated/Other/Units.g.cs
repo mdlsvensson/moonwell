@@ -93,7 +93,6 @@ namespace Moonwell.Objects
                     HitPoints = 700;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     IsABuilding = false;
-                    Level = 6;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -151,6 +150,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitLevel = 6;
                     UnitSoundSet = "QuillBeast";
                     UpgradesUsed.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseClickHelper = false;
@@ -931,7 +931,6 @@ namespace Moonwell.Objects
                     Hotkey = "C";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNClockWerkGoblin.blp";
                     IsABuilding = false;
-                    Level = 0;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -988,6 +987,7 @@ namespace Moonwell.Objects
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
                     UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
+                    UnitLevel = 0;
                     UnitSoundSet = "ClockwerkGoblin";
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
@@ -1067,7 +1067,6 @@ namespace Moonwell.Objects
                     Hotkey = "C";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNClockWerkGoblin.blp";
                     IsABuilding = false;
-                    Level = 0;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -1124,6 +1123,7 @@ namespace Moonwell.Objects
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
                     UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
+                    UnitLevel = 0;
                     UnitSoundSet = "ClockwerkGoblin";
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
@@ -1203,7 +1203,6 @@ namespace Moonwell.Objects
                     Hotkey = "C";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNClockWerkGoblin.blp";
                     IsABuilding = false;
-                    Level = 0;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -1260,6 +1259,7 @@ namespace Moonwell.Objects
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
                     UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
+                    UnitLevel = 0;
                     UnitSoundSet = "ClockwerkGoblin";
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
@@ -1339,7 +1339,6 @@ namespace Moonwell.Objects
                     Hotkey = "C";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNClockWerkGoblin.blp";
                     IsABuilding = false;
-                    Level = 0;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -1396,6 +1395,7 @@ namespace Moonwell.Objects
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
                     UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
+                    UnitLevel = 0;
                     UnitSoundSet = "ClockwerkGoblin";
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
@@ -1471,7 +1471,6 @@ namespace Moonwell.Objects
                     HitPoints = 290;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
                     IsABuilding = false;
-                    Level = 3;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -1525,6 +1524,7 @@ namespace Moonwell.Objects
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
                     UnitClassification = global::Moonwell.Objects.UnitClass.Undead;
+                    UnitLevel = 3;
                     UnitSoundSet = "Skeleton";
                     UpgradesUsed.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseClickHelper = false;
@@ -1605,7 +1605,6 @@ namespace Moonwell.Objects
                     HitPoints = 515;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     IsABuilding = false;
-                    Level = 4;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -1663,6 +1662,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitLevel = 4;
                     UnitSoundSet = "QuillBeast";
                     UpgradesUsed.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseClickHelper = false;
@@ -2090,7 +2090,6 @@ namespace Moonwell.Objects
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNTemp.blp";
                     IsABuilding = false;
-                    Level = 1;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -2145,6 +2144,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Fly;
+                    UnitLevel = 1;
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
                 }
@@ -2240,8 +2240,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 3;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 3.5f;
@@ -2356,8 +2356,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 3;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 3.5f;
@@ -3410,8 +3410,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 4.75f;
@@ -3628,7 +3628,6 @@ namespace Moonwell.Objects
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNZigguratUpgrade.blp";
                     IsABuilding = false;
-                    Level = 0;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -3656,8 +3655,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 1f;
@@ -3689,6 +3688,7 @@ namespace Moonwell.Objects
                     TurnRate = 0.2f;
                     Type = global::Moonwell.Objects.MoveType.Fly;
                     UnitClassification = global::Moonwell.Objects.UnitClass.Summoned;
+                    UnitLevel = 0;
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
                 }
@@ -3763,7 +3763,6 @@ namespace Moonwell.Objects
                     HitPoints = 405;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
                     IsABuilding = false;
-                    Level = 4;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -3817,6 +3816,7 @@ namespace Moonwell.Objects
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
                     UnitClassification = global::Moonwell.Objects.UnitClass.Undead;
+                    UnitLevel = 4;
                     UnitSoundSet = "Skeleton";
                     UpgradesUsed.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseClickHelper = false;
@@ -4034,8 +4034,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 3;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 3.5f;
@@ -4234,7 +4234,6 @@ namespace Moonwell.Objects
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNWarEagle.blp";
                     IsABuilding = false;
-                    Level = 2;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -4292,6 +4291,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Fly;
+                    UnitLevel = 2;
                     UnitSoundSet = "WarEagle";
                     UpgradesUsed.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseClickHelper = false;
@@ -4389,8 +4389,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 3;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 3.5f;
@@ -4503,8 +4503,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 3;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 3.5f;
@@ -4601,7 +4601,6 @@ namespace Moonwell.Objects
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNEarthquake.blp";
                     IsABuilding = false;
-                    Level = 0;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -4629,8 +4628,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 1f;
@@ -4662,6 +4661,7 @@ namespace Moonwell.Objects
                     TurnRate = 3f;
                     Type = global::Moonwell.Objects.MoveType.Fly;
                     UnitClassification = global::Moonwell.Objects.UnitClass.Summoned;
+                    UnitLevel = 0;
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
                 }
@@ -4740,7 +4740,6 @@ namespace Moonwell.Objects
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNEarthquake.blp";
                     IsABuilding = false;
-                    Level = 0;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -4768,8 +4767,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 1f;
@@ -4801,6 +4800,7 @@ namespace Moonwell.Objects
                     TurnRate = 3f;
                     Type = global::Moonwell.Objects.MoveType.Fly;
                     UnitClassification = global::Moonwell.Objects.UnitClass.Summoned;
+                    UnitLevel = 0;
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
                 }
@@ -4879,7 +4879,6 @@ namespace Moonwell.Objects
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNEarthquake.blp";
                     IsABuilding = false;
-                    Level = 0;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -4907,8 +4906,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 1f;
@@ -4940,6 +4939,7 @@ namespace Moonwell.Objects
                     TurnRate = 3f;
                     Type = global::Moonwell.Objects.MoveType.Fly;
                     UnitClassification = global::Moonwell.Objects.UnitClass.Summoned;
+                    UnitLevel = 0;
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
                 }
@@ -5018,7 +5018,6 @@ namespace Moonwell.Objects
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNEarthquake.blp";
                     IsABuilding = false;
-                    Level = 0;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -5046,8 +5045,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 1f;
@@ -5079,6 +5078,7 @@ namespace Moonwell.Objects
                     TurnRate = 3f;
                     Type = global::Moonwell.Objects.MoveType.Fly;
                     UnitClassification = global::Moonwell.Objects.UnitClass.Summoned;
+                    UnitLevel = 0;
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
                 }
@@ -5163,7 +5163,6 @@ namespace Moonwell.Objects
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNCrate.blp";
                     IsABuilding = false;
-                    Level = 3;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -5223,6 +5222,7 @@ namespace Moonwell.Objects
                     TurnRate = 3f;
                     Type = global::Moonwell.Objects.MoveType.Fly;
                     UnitClassification = global::Moonwell.Objects.UnitClass.Summoned;
+                    UnitLevel = 3;
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
                 }
@@ -5301,7 +5301,6 @@ namespace Moonwell.Objects
                     Hotkey = "K";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNTemp.blp";
                     IsABuilding = false;
-                    Level = 10;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -5360,6 +5359,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitLevel = 10;
                     UnitSoundSet = "Kobold";
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
@@ -5445,7 +5445,6 @@ namespace Moonwell.Objects
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNLavaSpawn.blp";
                     IsABuilding = false;
-                    Level = 4;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -5503,6 +5502,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitLevel = 4;
                     UnitSoundSet = "LavaSpawn";
                     UpgradesUsed.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseClickHelper = false;
@@ -5588,7 +5588,6 @@ namespace Moonwell.Objects
                     HitPoints = 550;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     IsABuilding = false;
-                    Level = 5;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -5645,6 +5644,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitLevel = 5;
                     UnitSoundSet = "LavaSpawn";
                     UpgradesUsed.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseClickHelper = false;
@@ -5730,7 +5730,6 @@ namespace Moonwell.Objects
                     HitPoints = 700;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     IsABuilding = false;
-                    Level = 6;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -5787,6 +5786,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitLevel = 6;
                     UnitSoundSet = "LavaSpawn";
                     UpgradesUsed.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseClickHelper = false;
@@ -5863,7 +5863,6 @@ namespace Moonwell.Objects
                     HitPoints = 215;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
                     IsABuilding = false;
-                    Level = 2;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -5917,6 +5916,7 @@ namespace Moonwell.Objects
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
                     UnitClassification = global::Moonwell.Objects.UnitClass.Undead;
+                    UnitLevel = 2;
                     UnitSoundSet = "Skeleton";
                     UpgradesUsed.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseClickHelper = false;
@@ -6018,8 +6018,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 6f;
@@ -8033,7 +8033,6 @@ namespace Moonwell.Objects
                     HitPoints = 2250;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     IsABuilding = false;
-                    Level = 7;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -8090,6 +8089,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitLevel = 7;
                     UnitSoundSet = "GrizzlyBear";
                     UpgradesUsed.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseClickHelper = false;
@@ -8167,7 +8167,6 @@ namespace Moonwell.Objects
                     HitPoints = 1800;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     IsABuilding = false;
-                    Level = 6;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -8224,6 +8223,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitLevel = 6;
                     UnitSoundSet = "GrizzlyBear";
                     UpgradesUsed.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseClickHelper = false;
@@ -8301,7 +8301,6 @@ namespace Moonwell.Objects
                     HitPoints = 900;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     IsABuilding = false;
-                    Level = 4;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -8358,6 +8357,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitLevel = 4;
                     UnitSoundSet = "GrizzlyBear";
                     UpgradesUsed.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseClickHelper = false;
@@ -8435,7 +8435,6 @@ namespace Moonwell.Objects
                     HitPoints = 1200;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     IsABuilding = false;
-                    Level = 5;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -8492,6 +8491,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitLevel = 5;
                     UnitSoundSet = "GrizzlyBear";
                     UpgradesUsed.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseClickHelper = false;
@@ -8589,8 +8589,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 3;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 3.5f;
@@ -8704,8 +8704,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 3;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 3.5f;
@@ -8820,8 +8820,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 3;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 3.5f;
@@ -9374,7 +9374,6 @@ namespace Moonwell.Objects
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
                     Hotkey = "F";
                     IsABuilding = false;
-                    Level = 5;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -9421,6 +9420,7 @@ namespace Moonwell.Objects
                     TooltipExtended = "Factory unit for spawning Clockwerk Goblins via the Pocket Factory ability.";
                     Type = global::Moonwell.Objects.MoveType.Foot;
                     UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
+                    UnitLevel = 5;
                     UnitSoundSet = "PocketFactory";
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
@@ -9492,7 +9492,6 @@ namespace Moonwell.Objects
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
                     Hotkey = "F";
                     IsABuilding = false;
-                    Level = 6;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -9539,6 +9538,7 @@ namespace Moonwell.Objects
                     TooltipExtended = "Factory unit for spawning Clockwerk Goblins via the Pocket Factory ability.";
                     Type = global::Moonwell.Objects.MoveType.Foot;
                     UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
+                    UnitLevel = 6;
                     UnitSoundSet = "PocketFactory";
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
@@ -9611,7 +9611,6 @@ namespace Moonwell.Objects
                     Hotkey = "F";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNPocketFactory.blp";
                     IsABuilding = false;
-                    Level = 4;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -9659,6 +9658,7 @@ namespace Moonwell.Objects
                     TooltipExtended = "Factory unit for spawning Clockwerk Goblins via the Pocket Factory ability.";
                     Type = global::Moonwell.Objects.MoveType.Foot;
                     UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
+                    UnitLevel = 4;
                     UnitSoundSet = "PocketFactory";
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
@@ -9736,7 +9736,6 @@ namespace Moonwell.Objects
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNQuillBeast.blp";
                     IsABuilding = false;
-                    Level = 3;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -9794,6 +9793,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitLevel = 3;
                     UnitSoundSet = "QuillBeast";
                     UpgradesUsed.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseClickHelper = false;
@@ -9880,7 +9880,6 @@ namespace Moonwell.Objects
                     HitPoints = 600;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     IsABuilding = false;
-                    Level = 5;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -9938,6 +9937,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitLevel = 5;
                     UnitSoundSet = "QuillBeast";
                     UpgradesUsed.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseClickHelper = false;
@@ -10135,7 +10135,6 @@ namespace Moonwell.Objects
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNFireBolt.blp";
                     IsABuilding = false;
-                    Level = 0;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -10163,8 +10162,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 1f;
@@ -10196,6 +10195,7 @@ namespace Moonwell.Objects
                     TurnRate = 0.2f;
                     Type = global::Moonwell.Objects.MoveType.Fly;
                     UnitClassification = global::Moonwell.Objects.UnitClass.Summoned;
+                    UnitLevel = 0;
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
                 }
@@ -10274,7 +10274,6 @@ namespace Moonwell.Objects
                     Hotkey = "M";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNTemp.blp";
                     IsABuilding = false;
-                    Level = 6;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -10301,8 +10300,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 425;
                     RepairLumberCost = 150;
                     RepairTime = 26;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 1.2f;
@@ -10333,6 +10332,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitLevel = 6;
                     UnitSoundSet = "SammyCube";
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
@@ -10418,7 +10418,6 @@ namespace Moonwell.Objects
                     HitPoints = 650;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     IsABuilding = false;
-                    Level = 6;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -10475,6 +10474,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Fly;
+                    UnitLevel = 6;
                     UnitSoundSet = "WarEagle";
                     UpgradesUsed.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseClickHelper = false;
@@ -11152,8 +11152,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 3;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 3f;
@@ -11255,7 +11255,6 @@ namespace Moonwell.Objects
                     HitPoints = 450;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     IsABuilding = false;
-                    Level = 5;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -11312,6 +11311,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Fly;
+                    UnitLevel = 5;
                     UnitSoundSet = "WarEagle";
                     UpgradesUsed.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseClickHelper = false;
@@ -11377,7 +11377,6 @@ namespace Moonwell.Objects
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNTornado.blp";
                     IsABuilding = false;
-                    Level = 4;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
@@ -11405,8 +11404,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 20;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 1f;
@@ -11430,6 +11429,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitLevel = 4;
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
                 }

@@ -206,12 +206,132 @@ namespace Moonwell.Testing
             Expect.Near(270.0f, unit.Facing, "the facing after the second FaceNow");
         }
 
+        /// <summary>A unit's level is the game's: a hero's hero level.</summary>
+        public static void Level(FakeWorld world)
+        {
+            var handle = world.NewUnit(ObjectTypes.FourCC("Hpal"), hero: true);
+            var unit = Unit.Of(handle)!;
+            Expect.Equal(1, unit.Level, "the level before");
+
+            world.SetLevel(handle, 7);
+
+            Expect.Equal(7, unit.Level, "the level the game gives");
+            Expect.Equal(1, Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!.Level, "another unit's level");
+        }
+
+        /// <summary>Kill goes through the game; the death comes back as the game's own event, once, with no killer, and the unit is no longer alive.</summary>
+        public static void Kill(FakeWorld world)
+        {
+            ObjectTypes.Unit(ObjectTypes.FourCC("h000"), () => new Dummy());
+            var dummy = (Dummy)Unit.Of(world.NewUnit(ObjectTypes.FourCC("h000")))!;
+            TestLog.Lines.Clear();
+            Expect.True(dummy.IsAlive, "alive before");
+
+            dummy.Kill();
+
+            Expect.Equal(1, world.KillCalls, "calls to the game's KillUnit");
+            Expect.Equal(2, TestLog.Lines.Count, "reactions to the death");
+            Expect.Equal("dummy died", TestLog.Lines[0], "the unit's reaction, once");
+            Expect.Equal("dummy comp died", TestLog.Lines[1], "the component's reaction, once");
+            Expect.True(dummy.LastKiller == null, "the killer given to OnDeath");
+            Expect.True(!dummy.IsAlive, "alive after");
+            Expect.True(!dummy.HasEnded, "a death is not an end");
+        }
+
+        /// <summary>A unit the game has removed is not alive, and Kill does not reach the game.</summary>
+        public static void KillGone(FakeWorld world)
+        {
+            ObjectTypes.Unit(ObjectTypes.FourCC("h000"), () => new Dummy());
+            var handle = world.NewUnit(ObjectTypes.FourCC("h000"));
+            var dummy = (Dummy)Unit.Of(handle)!;
+            TestLog.Lines.Clear();
+            world.VanishUnit(handle);
+            world.Advance(0.3f);
+            Expect.True(dummy.IsGone, "the sweep found the unit gone");
+            world.GoneCalls = 0;
+
+            dummy.Kill();
+
+            Expect.True(!dummy.IsAlive, "a gone unit is not alive");
+            Expect.Equal(0, world.KillCalls, "calls to the game's KillUnit");
+            Expect.Equal(0, world.GoneCalls, "no call to the game for the gone unit");
+            Expect.Equal(0, TestLog.Lines.Count, "no reaction");
+        }
+
+        /// <summary>IsPaused pauses and unpauses the unit in the game, and reads the game.</summary>
+        public static void Pause(FakeWorld world)
+        {
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var unit = Unit.Of(handle)!;
+            Expect.True(!unit.IsPaused, "not paused before");
+
+            unit.IsPaused = true;
+
+            Expect.True(unit.IsPaused, "paused");
+            Expect.True(world.PausedUnits.Contains(handle), "the game has the unit paused");
+
+            unit.IsPaused = false;
+
+            Expect.True(!unit.IsPaused, "unpaused");
+            Expect.True(!world.PausedUnits.Contains(handle), "the game has the unit unpaused");
+        }
+
+        /// <summary>Scale sets the size of the unit's model in the game, and reads back.</summary>
+        public static void Scale(FakeWorld world)
+        {
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var unit = Unit.Of(handle)!;
+            Expect.Near(1.0f, unit.Scale, "the scale before");
+
+            unit.Scale = 1.75f;
+
+            Expect.Near(1.75f, unit.Scale, "the new scale");
+            Expect.Equal(1, world.ScaleCalls, "calls to the game");
+            Expect.Near(1.75f, world.ScaleOf(handle), "the game's scale");
+        }
+
+        /// <summary>Tint hands the four values to the game; the alpha is opaque when left out.</summary>
+        public static void Tint(FakeWorld world)
+        {
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var unit = Unit.Of(handle)!;
+
+            unit.Tint(255, 128, 0, 64);
+
+            Expect.Equal(1, world.Tints.Count, "units tinted");
+            Expect.Equal(4, world.Tints[handle].Length, "values");
+            Expect.Equal(255, world.Tints[handle][0], "red");
+            Expect.Equal(128, world.Tints[handle][1], "green");
+            Expect.Equal(0, world.Tints[handle][2], "blue");
+            Expect.Equal(64, world.Tints[handle][3], "alpha");
+
+            unit.Tint(10, 20, 30);
+
+            Expect.Equal(10, world.Tints[handle][0], "red, second call");
+            Expect.Equal(20, world.Tints[handle][1], "green, second call");
+            Expect.Equal(30, world.Tints[handle][2], "blue, second call");
+            Expect.Equal(255, world.Tints[handle][3], "alpha defaults to opaque");
+        }
+
+        /// <summary>FlyHeight is set in the game and read from it.</summary>
+        public static void FlyHeight(FakeWorld world)
+        {
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var unit = Unit.Of(handle)!;
+            Expect.Near(0.0f, unit.FlyHeight, "the height before");
+
+            unit.FlyHeight = 250.5f;
+
+            Expect.Near(250.5f, unit.FlyHeight, "the new height");
+            Expect.Near(250.5f, world.FlyHeightOf(handle), "the game's height");
+        }
+
         /// <summary>A unit the game has removed, found by the sweep or removed by Remove, gives the values it last read, ignores setters and actions, and the game is not asked.</summary>
         public static void GoneReadsLast(FakeWorld world)
         {
             var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
             var swept = Unit.Of(handle)!;
-            SetAndRead(swept);
+            SetAndRead(world, swept);
             var calls = world.UnitCalls.Count;
 
             world.VanishUnit(handle);
@@ -221,16 +341,40 @@ namespace Moonwell.Testing
             ExpectGoneIsQuiet(world, swept, calls, "swept");
 
             var removed = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
-            SetAndRead(removed);
+            SetAndRead(world, removed);
             calls = world.UnitCalls.Count;
             removed.Remove();
             world.GoneCalls = 0;
             ExpectGoneIsQuiet(world, removed, calls, "removed");
+
+            // Values set and never read: the setters keep them, so they are what a gone unit gives.
+            var unread = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            unread.MaxLife = 500.0f;
+            unread.Life = 450.0f;
+            unread.MaxMana = 200.0f;
+            unread.Mana = 150.0f;
+            unread.Facing = 45.0f;
+            unread.IsPaused = true;
+            unread.Scale = 2.5f;
+            unread.FlyHeight = 120.0f;
+            unread.Remove();
+            Expect.Near(450.0f, unread.Life, "unread: life");
+            Expect.Near(500.0f, unread.MaxLife, "unread: most life");
+            Expect.Near(150.0f, unread.Mana, "unread: mana");
+            Expect.Near(200.0f, unread.MaxMana, "unread: most mana");
+            Expect.Near(45.0f, unread.Facing, "unread: facing");
+            Expect.True(unread.IsPaused, "unread: paused");
+            Expect.Near(2.5f, unread.Scale, "unread: scale");
+            Expect.Near(120.0f, unread.FlyHeight, "unread: fly height");
         }
 
-        /// <summary>Sets a unit's life, mana, place and facing and reads each back, so the unit has seen them.</summary>
-        private static void SetAndRead(Unit unit)
+        /// <summary>Sets a unit's life, mana, place, facing, pause, scale and fly height and reads each back, so the unit has seen them; the game gives it level 3.</summary>
+        private static void SetAndRead(FakeWorld world, Unit unit)
         {
+            world.SetLevel(unit.Handle, 3);
+            unit.IsPaused = true;
+            unit.Scale = 2.5f;
+            unit.FlyHeight = 120.0f;
             unit.MaxLife = 500.0f;
             unit.Life = 450.0f;
             unit.MaxMana = 200.0f;
@@ -244,6 +388,11 @@ namespace Moonwell.Testing
             Expect.Near(10.0f, unit.X, "x read");
             Expect.Near(20.0f, unit.Y, "y read");
             Expect.Near(45.0f, unit.Facing, "facing read");
+            Expect.True(unit.IsPaused, "paused read");
+            Expect.Near(2.5f, unit.Scale, "scale read");
+            Expect.Near(120.0f, unit.FlyHeight, "fly height read");
+            Expect.Equal(3, unit.Level, "level read");
+            Expect.True(unit.IsAlive, "alive read");
         }
 
         /// <summary>Checks that a gone unit gives the values SetAndRead left and that its setters and actions do not reach the game.</summary>
@@ -256,6 +405,11 @@ namespace Moonwell.Testing
             Expect.Near(10.0f, unit.X, what + ": x");
             Expect.Near(20.0f, unit.Y, what + ": y");
             Expect.Near(45.0f, unit.Facing, what + ": facing");
+            Expect.True(unit.IsPaused, what + ": paused");
+            Expect.Near(2.5f, unit.Scale, what + ": scale");
+            Expect.Near(120.0f, unit.FlyHeight, what + ": fly height");
+            Expect.Equal(3, unit.Level, what + ": level");
+            Expect.True(!unit.IsAlive, what + ": a gone unit is not alive");
 
             unit.Life = 1.0f;
             unit.MaxLife = 1.0f;
@@ -265,8 +419,18 @@ namespace Moonwell.Testing
             unit.MoveTo(99.0f, 99.0f);
             unit.Facing = 99.0f;
             unit.FaceNow(99.0f);
+            unit.IsPaused = false;
+            unit.Scale = 9.0f;
+            unit.FlyHeight = 9.0f;
+            unit.Tint(1, 2, 3, 4);
+            unit.Kill();
 
             Expect.Near(450.0f, unit.Life, what + ": life after a set");
+            Expect.True(unit.IsPaused, what + ": paused after a set");
+            Expect.Near(2.5f, unit.Scale, what + ": scale after a set");
+            Expect.Near(120.0f, unit.FlyHeight, what + ": fly height after a set");
+            Expect.Equal(0, world.Tints.Count, what + ": no tint reached the game");
+            Expect.Equal(0, world.KillCalls, what + ": no kill reached the game");
             Expect.Near(10.0f, unit.X, what + ": x after PlaceAt");
             Expect.Near(45.0f, unit.Facing, what + ": facing after a set");
             Expect.Equal(0, world.GoneCalls, what + ": no call to the game for the gone unit");

@@ -117,6 +117,13 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "units.position", Run = UnitCases.Position });
             list.Add(new Case { Name = "units.move-to", Run = UnitCases.MoveTo });
             list.Add(new Case { Name = "units.facing", Run = UnitCases.Facing });
+            list.Add(new Case { Name = "units.level", Run = UnitCases.Level });
+            list.Add(new Case { Name = "units.kill", Run = UnitCases.Kill });
+            list.Add(new Case { Name = "units.kill-gone", Run = UnitCases.KillGone });
+            list.Add(new Case { Name = "units.pause", Run = UnitCases.Pause });
+            list.Add(new Case { Name = "units.scale", Run = UnitCases.Scale });
+            list.Add(new Case { Name = "units.tint", Run = UnitCases.Tint });
+            list.Add(new Case { Name = "units.fly-height", Run = UnitCases.FlyHeight });
             list.Add(new Case { Name = "units.gone-reads-last", Run = UnitCases.GoneReadsLast });
             list.Add(new Case { Name = "items.registered-class", Run = ItemCases.RegisteredClass });
             list.Add(new Case { Name = "items.fallback-class", Run = ItemCases.FallbackClass });

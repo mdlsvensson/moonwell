@@ -93,6 +93,30 @@ namespace Moonwell.Testing
         /// <summary>The facing each unit was last ordered to turn to; its own facing does not change by it, since turning takes time.</summary>
         public Dictionary<unit, float> TurnTargets = new Dictionary<unit, float>();
 
+        /// <summary>How many times the runtime asked the game to kill a unit.</summary>
+        public int KillCalls;
+
+        /// <summary>The units that are paused.</summary>
+        public List<unit> PausedUnits = new List<unit>();
+
+        /// <summary>How many times a unit's scale was set.</summary>
+        public int ScaleCalls;
+
+        /// <summary>The red, green, blue and alpha each unit was last tinted with.</summary>
+        public Dictionary<unit, int[]> Tints = new Dictionary<unit, int[]>();
+
+        /// <summary>The units that have been killed.</summary>
+        private readonly HashSet<unit> dead = new HashSet<unit>();
+
+        /// <summary>The level of each unit, 1 until set.</summary>
+        private readonly Dictionary<unit, int> levels = new Dictionary<unit, int>();
+
+        /// <summary>The scale of each unit, 1 until set.</summary>
+        private readonly Dictionary<unit, float> scales = new Dictionary<unit, float>();
+
+        /// <summary>The fly height of each unit, 0 until set.</summary>
+        private readonly Dictionary<unit, float> flyHeights = new Dictionary<unit, float>();
+
         /// <summary>The life of each unit, 0 until set.</summary>
         private readonly Dictionary<unit, float> lives = new Dictionary<unit, float>();
 
@@ -787,6 +811,91 @@ namespace Moonwell.Testing
             NoteGone(unit);
             UnitCalls.Add("face-now");
             facings[unit] = degrees;
+        }
+
+        /// <summary>Sets the level the world gives a unit.</summary>
+        public void SetLevel(unit unit, int level)
+        {
+            levels[unit] = level;
+        }
+
+        /// <summary>The level of a unit; 1 until set.</summary>
+        public int LevelOf(unit unit)
+        {
+            NoteGone(unit);
+            return levels.TryGetValue(unit, out var level) ? level : 1;
+        }
+
+        /// <summary>Whether a unit has not been killed.</summary>
+        public bool IsAlive(unit unit)
+        {
+            NoteGone(unit);
+            return !dead.Contains(unit);
+        }
+
+        /// <summary>Kills a unit as the game does: the unit is dead, and when deaths are listened for, its death is delivered inside the call, with no killer.</summary>
+        public void SlayUnit(unit unit)
+        {
+            NoteGone(unit);
+            KillCalls++;
+            dead.Add(unit);
+            if (Listening.Contains(GameEvent.Death))
+            {
+                Inbound.Died(unit, null);
+            }
+        }
+
+        /// <summary>Whether a unit is paused.</summary>
+        public bool IsPausedUnit(unit unit)
+        {
+            NoteGone(unit);
+            return PausedUnits.Contains(unit);
+        }
+
+        /// <summary>Pauses or unpauses a unit.</summary>
+        public void SetPaused(unit unit, bool paused)
+        {
+            NoteGone(unit);
+            PausedUnits.Remove(unit);
+            if (paused)
+            {
+                PausedUnits.Add(unit);
+            }
+        }
+
+        /// <summary>The scale of a unit; 1 until set.</summary>
+        public float ScaleOf(unit unit)
+        {
+            NoteGone(unit);
+            return scales.TryGetValue(unit, out var scale) ? scale : 1.0f;
+        }
+
+        /// <summary>Sets the scale of a unit, and counts the call.</summary>
+        public void ScaleUnit(unit unit, float scale)
+        {
+            NoteGone(unit);
+            ScaleCalls++;
+            scales[unit] = scale;
+        }
+
+        /// <summary>Keeps the four values a unit was tinted with.</summary>
+        public void TintUnit(unit unit, int red, int green, int blue, int alpha)
+        {
+            NoteGone(unit);
+            Tints[unit] = new int[] { red, green, blue, alpha };
+        }
+
+        /// <summary>The fly height of a unit; 0 until set.</summary>
+        public float FlyHeightOf(unit unit)
+        {
+            return Kept(flyHeights, unit);
+        }
+
+        /// <summary>Sets the fly height of a unit.</summary>
+        public void SetFlyHeight(unit unit, float height)
+        {
+            NoteGone(unit);
+            flyHeights[unit] = height;
         }
     }
 }

@@ -1315,7 +1315,7 @@ namespace Moonwell.Objects
         /// <summary>The field <c>ulev</c>.</summary>
         [global::Moonwell.Objects.Field("ulev", Label = "Level")]
         [global::Moonwell.Objects.Limits(1, 100)]
-        public int Level
+        public int UnitLevel
         {
             get { return Fields.Get<int>(this, "ulev"); }
             protected set { Fields.Put("ulev", value); }
@@ -1960,7 +1960,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.Field("usca", Label = "Scaling Value")]
         [global::Moonwell.Objects.Limits(0.1, 10)]
         [global::Moonwell.Objects.NonNegative]
-        public float Scale
+        public float ScalingValue
         {
             get { return Fields.Get<float>(this, "usca"); }
             protected set { Fields.Put("usca", value); }

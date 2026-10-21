@@ -477,8 +477,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     ShadowImageCenterX = 35f;
@@ -1704,8 +1704,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 0.9f;
@@ -2939,8 +2939,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
-                    Scale = 1f;
                     ScaleProjectiles = true;
+                    ScalingValue = 1f;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 1f;

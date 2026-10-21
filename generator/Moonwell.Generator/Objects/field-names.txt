@@ -12,12 +12,12 @@ unit ulum LumberCost
 unit ufoo Food
 unit ufma FoodProduced
 unit ubld BuildTime
-unit ulev Level
+unit ulev UnitLevel
 unit uabi Abilities
 unit uhab HeroAbilities
 unit ureq Requires
 unit umdl Model
-unit usca Scale
+unit usca ScalingValue
 unit uico Icon
 unit utip Tooltip
 unit utub TooltipExtended

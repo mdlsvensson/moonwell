@@ -211,5 +211,35 @@ namespace Moonwell.Hosting
 
         /// <summary>Sets the facing of a unit, in degrees, at once.</summary>
         void FaceUnitNow(unit unit, float degrees);
+
+        /// <summary>The level of a unit; a hero's hero level.</summary>
+        int LevelOf(unit unit);
+
+        /// <summary>Whether a unit is alive.</summary>
+        bool IsAlive(unit unit);
+
+        /// <summary>Kills a unit through the game; the game then delivers the unit's death, with no killer, before the call returns.</summary>
+        void SlayUnit(unit unit);
+
+        /// <summary>Whether a unit is paused.</summary>
+        bool IsPausedUnit(unit unit);
+
+        /// <summary>Pauses or unpauses a unit.</summary>
+        void SetPaused(unit unit, bool paused);
+
+        /// <summary>The size of a unit's model, as a factor.</summary>
+        float ScaleOf(unit unit);
+
+        /// <summary>Sets the size of a unit's model on all three axes.</summary>
+        void ScaleUnit(unit unit, float scale);
+
+        /// <summary>Tints a unit's model; each value is 0-255.</summary>
+        void TintUnit(unit unit, int red, int green, int blue, int alpha);
+
+        /// <summary>The height a unit flies at above the ground.</summary>
+        float FlyHeightOf(unit unit);
+
+        /// <summary>Sets the height a unit flies at, at once.</summary>
+        void SetFlyHeight(unit unit, float height);
     }
 }

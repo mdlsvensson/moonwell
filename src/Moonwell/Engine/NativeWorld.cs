@@ -643,6 +643,66 @@ namespace Moonwell.Engine
             Natives.BlzSetUnitFacingEx(unit, degrees);
         }
 
+        /// <summary>The level of a unit, from the game.</summary>
+        public int LevelOf(unit unit)
+        {
+            return Natives.GetUnitLevel(unit);
+        }
+
+        /// <summary>Whether the game counts a unit as alive.</summary>
+        public bool IsAlive(unit unit)
+        {
+            return Natives.UnitAlive(unit);
+        }
+
+        /// <summary>Kills a unit in the game: KillUnit.</summary>
+        public void SlayUnit(unit unit)
+        {
+            Natives.KillUnit(unit);
+        }
+
+        /// <summary>Whether a unit is paused, from the game.</summary>
+        public bool IsPausedUnit(unit unit)
+        {
+            return Natives.IsUnitPaused(unit);
+        }
+
+        /// <summary>Pauses or unpauses a unit in the game.</summary>
+        public void SetPaused(unit unit, bool paused)
+        {
+            Natives.PauseUnit(unit, paused);
+        }
+
+        /// <summary>The scaling value of a unit, from the game.</summary>
+        public float ScaleOf(unit unit)
+        {
+            return Natives.BlzGetUnitRealField(unit, Natives.UNIT_RF_SCALING_VALUE);
+        }
+
+        /// <summary>Sets the scale of a unit on all three axes: SetUnitScale.</summary>
+        public void ScaleUnit(unit unit, float scale)
+        {
+            Natives.SetUnitScale(unit, scale, scale, scale);
+        }
+
+        /// <summary>Tints a unit: SetUnitVertexColor.</summary>
+        public void TintUnit(unit unit, int red, int green, int blue, int alpha)
+        {
+            Natives.SetUnitVertexColor(unit, red, green, blue, alpha);
+        }
+
+        /// <summary>The fly height of a unit, from the game.</summary>
+        public float FlyHeightOf(unit unit)
+        {
+            return Natives.GetUnitFlyHeight(unit);
+        }
+
+        /// <summary>Sets the fly height of a unit with a rate of 0: SetUnitFlyHeight.</summary>
+        public void SetFlyHeight(unit unit, float height)
+        {
+            Natives.SetUnitFlyHeight(unit, height, 0.0f);
+        }
+
         /// <summary>Runs a callback once, after the map's main function has returned.</summary>
         internal static void Later(Action callback)
         {
