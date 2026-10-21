@@ -127,4 +127,16 @@ public static class Rules
 
     /// <summary>The rules for names that moved between Moonwell's namespaces.</summary>
     public static ImmutableArray<DiagnosticDescriptor> Moved { get; } = ImmutableArray.Create(MovedChoice);
+
+    public static readonly DiagnosticDescriptor LiveInDeclaration = new(
+        "MW0012",
+        "The game in a declared class's constructor",
+        "'{0}' {1}",
+        ObjectsCategory,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "The build runs the constructor of a class that inherits a standard unit, hero or item to read its fields, before there is a game. A live value or action of Unit, Hero or Item there (Mana, Scale, Strength, Charges, Kill) fails the build with only an exception's message. Each live value a declared field shares a name with has the field named apart: ManaPoints for Mana and MaxMana, HitPoints for Life and MaxLife, ScalingValue for Scale, StartingStrength, StartingAgility and StartingIntelligence, and NumberOfCharges for Charges. Code in a lambda or a local function is left alone, since it may run later in the game.");
+
+    /// <summary>The rules for the constructor of a declared object class.</summary>
+    public static ImmutableArray<DiagnosticDescriptor> Declared { get; } = ImmutableArray.Create(LiveInDeclaration);
 }

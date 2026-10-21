@@ -501,6 +501,31 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_live_member_in_a_declared_class_constructor_is_an_error_naming_the_declared_field()
+        {
+            // Mana is the unit's mana in the game; the build runs the constructor with no game, so the declared field is ManaPoints.
+            var copy = folders.TemporaryCopyOfSample();
+            File.WriteAllText(Path.Combine(copy, "Objects.cs"), """
+                namespace Sample
+                {
+                    [Moonwell.Objects.ObjectId("h001")]
+                    public sealed class Caster : Moonwell.Objects.Human.Units.Footman
+                    {
+                        public Caster()
+                        {
+                            Mana = 300;
+                        }
+                    }
+                }
+                """);
+            var log = new StringWriter();
+
+            Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), log));
+
+            Assert.Contains("error MW0012: 'Mana' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is ManaPoints", log.ToString());
+        }
+
+        [Fact]
         public void a_name_of_the_attack_type_of_moonwell_objects_is_an_error_naming_the_core_enum()
         {
             // AttackType and DefenseType are core Moonwell's since 0.2.1; the compiler's own error says only that the name is gone.

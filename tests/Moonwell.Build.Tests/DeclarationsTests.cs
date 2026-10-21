@@ -492,6 +492,15 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_live_member_of_the_unit_names_line_as_a_game_call()
+        {
+            // Mana is the unit's mana in the game, whose setter reaches for the game that is not there yet (MW0012 turned off).
+            AssertFails(
+                "LiveMember",
+                "Objects.cs:13: LiveMember.Caster calls the game while it is declared; game work starts from a reaction or the game's start");
+        }
+
+        [Fact]
         public void a_value_out_of_range_names_the_line_of_the_assignment()
         {
             AssertFails(

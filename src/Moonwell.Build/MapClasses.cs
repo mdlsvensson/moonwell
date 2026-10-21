@@ -33,12 +33,25 @@ namespace Moonwell.Build
             }
 
             var prefix = place == null ? string.Empty : place + ": ";
-            if (inner is BadImageFormatException)
+            if (inner is BadImageFormatException || IsLiveMemberWithoutGame(inner))
             {
                 return new BuildException($"{prefix}{name} calls the game while it is declared; game work starts from a reaction or the game's start");
             }
 
             return new BuildException($"{prefix}{name}'s constructor threw: {inner.Message}");
+        }
+
+        // A unit's, hero's or item's live value or action (Mana = 300, which MW0012 rejects) reaches for the game, which is not
+        // there while the class is declared: a NullReferenceException thrown in Moonwell's Unit, Hero or Item itself.
+        private static bool IsLiveMemberWithoutGame(Exception inner)
+        {
+            if (inner is not NullReferenceException)
+            {
+                return false;
+            }
+
+            var thrownIn = new StackTrace(inner, false).GetFrame(0)?.GetMethod()?.DeclaringType?.FullName;
+            return thrownIn == "Moonwell.Unit" || thrownIn == "Moonwell.Hero" || thrownIn == "Moonwell.Item";
         }
 
         private static string? FirstLineInProject(StackTrace trace, MapProject project)

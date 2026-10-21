@@ -95,7 +95,8 @@ public sealed class Champion : Human.Units.Paladin
 - The tooltips are World Editor's four: `Tooltip` (Tooltip - Normal), `TooltipExtended` (Tooltip - Normal - Extended),
   `TooltipLearn` (Tooltip - Learn) and `TooltipLearnExtended` (Tooltip - Learn - Extended).
 - A field with no name of its own is set by its id: `Set("Htb1", 2, 250f)`.
-- A constructor may compute, but must not call the game: the build fails at such a line.
+- A constructor may compute, but must not call the game: the build fails at such a line. A live value or action of the
+  unit, hero or item there (`Mana = 300`, `Kill()`) is error MW0012, which names the declared field to set instead.
 - A class with no `[ObjectId]` fails the build, which names a free id to use. A buff also names its carrier, the
   hidden ability that shows its icon: `[ObjectId("B001", Carrier = "A002")]`, or `[ObjectId(Carrier = "A002")]` with
   `[Replaces]`.
