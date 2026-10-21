@@ -40,29 +40,22 @@ namespace Moonwell.Build.Tests
         /// <summary>The path of the Moonwell.Templates package.</summary>
         public string TemplatesPackage => Path.Combine(Feed, "Moonwell.Templates." + Version + ".nupkg");
 
-        /// <summary>Deletes the feed and the packages the restore copied into the NuGet folder.</summary>
+        /// <summary>Deletes the feed and the packages the restore copied into the NuGet folder (see TestFolders.Delete for a folder still in use).</summary>
         public void Dispose()
         {
             var packages = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
             foreach (var id in new[] { "moonwell", "moonwell.natives", "moonwell.objects", "moonwell.damage" })
             {
-                var version = Path.Combine(packages, id, Version.ToLowerInvariant());
-                if (Directory.Exists(version))
-                {
-                    Directory.Delete(version, true);
-                }
+                TestFolders.Delete(Path.Combine(packages, id, Version.ToLowerInvariant()));
 
                 var idFolder = Path.Combine(packages, id);
                 if (Directory.Exists(idFolder) && !Directory.EnumerateFileSystemEntries(idFolder).Any())
                 {
-                    Directory.Delete(idFolder);
+                    TestFolders.Delete(idFolder, false);
                 }
             }
 
-            if (Directory.Exists(root))
-            {
-                Directory.Delete(root, true);
-            }
+            TestFolders.Delete(root);
         }
 
         /// <summary>Runs dotnet in a folder, and fails with its output when it fails.</summary>

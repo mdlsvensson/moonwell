@@ -49,9 +49,32 @@ namespace Moonwell.Build.Tests
         {
             foreach (var folder in folders)
             {
-                if (Directory.Exists(folder))
+                Delete(folder);
+            }
+        }
+
+        /// <summary>
+        /// Deletes a temporary folder of a test's own, and what is in it, if it is there. On Windows a process the test started
+        /// (a build server, an MSBuild node) may still hold a file in it for a moment: the delete is tried again for two seconds,
+        /// then the folder is left, since a leftover temporary folder is not a test's failure.
+        /// </summary>
+        public static void Delete(string folder, bool recursive = true)
+        {
+            for (var attempt = 1; Directory.Exists(folder); attempt++)
+            {
+                try
                 {
-                    Directory.Delete(folder, true);
+                    Directory.Delete(folder, recursive);
+                    return;
+                }
+                catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+                {
+                    if (attempt == 20)
+                    {
+                        return;
+                    }
+
+                    Thread.Sleep(100);
                 }
             }
         }
