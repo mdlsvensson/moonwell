@@ -564,16 +564,16 @@ namespace Moonwell.Engine
             Natives.SetWidgetLife(unit, life);
         }
 
-        /// <summary>The most life a unit can have, from the game.</summary>
+        /// <summary>The most life a unit can have, from the game: BlzGetUnitMaxHP (SetUnitState does not change the most, seen 10-21).</summary>
         public float MaxLifeOf(unit unit)
         {
-            return Natives.GetUnitState(unit, Natives.UNIT_STATE_MAX_LIFE);
+            return Natives.BlzGetUnitMaxHP(unit);
         }
 
-        /// <summary>Sets the most life a unit can have in the game.</summary>
+        /// <summary>Sets the most life a unit can have in the game: BlzSetUnitMaxHP, which takes a whole number.</summary>
         public void SetMaxLife(unit unit, float life)
         {
-            Natives.SetUnitState(unit, Natives.UNIT_STATE_MAX_LIFE, life);
+            Natives.BlzSetUnitMaxHP(unit, (int)life);
         }
 
         /// <summary>The mana of a unit, from the game.</summary>
@@ -588,16 +588,16 @@ namespace Moonwell.Engine
             Natives.SetUnitState(unit, Natives.UNIT_STATE_MANA, mana);
         }
 
-        /// <summary>The most mana a unit can have, from the game.</summary>
+        /// <summary>The most mana a unit can have, from the game: BlzGetUnitMaxMana (SetUnitState does not change the most, seen 10-21).</summary>
         public float MaxManaOf(unit unit)
         {
-            return Natives.GetUnitState(unit, Natives.UNIT_STATE_MAX_MANA);
+            return Natives.BlzGetUnitMaxMana(unit);
         }
 
-        /// <summary>Sets the most mana a unit can have in the game.</summary>
+        /// <summary>Sets the most mana a unit can have in the game: BlzSetUnitMaxMana, which takes a whole number.</summary>
         public void SetMaxMana(unit unit, float mana)
         {
-            Natives.SetUnitState(unit, Natives.UNIT_STATE_MAX_MANA, mana);
+            Natives.BlzSetUnitMaxMana(unit, (int)mana);
         }
 
         /// <summary>The x of a unit, from the game.</summary>
@@ -767,6 +767,12 @@ namespace Moonwell.Engine
         public float FlyHeightOf(unit unit)
         {
             return Natives.GetUnitFlyHeight(unit);
+        }
+
+        /// <summary>Whether the unit's type flies: IsUnitType with UNIT_TYPE_FLYING.</summary>
+        public bool CanFly(unit unit)
+        {
+            return Natives.IsUnitType(unit, Natives.UNIT_TYPE_FLYING);
         }
 
         /// <summary>Sets the fly height of a unit with a rate of 0: SetUnitFlyHeight.</summary>

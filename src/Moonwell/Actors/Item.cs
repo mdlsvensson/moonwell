@@ -52,6 +52,12 @@ namespace Moonwell
         /// <summary>The unit that last picked the item up, as the pick-up events Moonwell has seen say; a candidate that Carrier checks with the game.</summary>
         internal Unit? CarrierUnit;
 
+        /// <summary>Whether a getter that read 0 read it from an item the game has removed: the game gives 0 for everything then, and the type id 0, before the sweep finds the item. The getter then keeps the last value instead of the 0.</summary>
+        internal bool RemovedByGame()
+        {
+            return Runtime.World.ItemTypeId(Handle) == 0;
+        }
+
         /// <summary>The item's charges. Once the game has removed the item, the last value read or set, and setting does nothing.</summary>
         [LocalSafe]
         public int Charges
@@ -64,6 +70,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.ChargesOf(Handle);
+                if (now == 0 && RemovedByGame())
+                {
+                    return lastCharges;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastCharges = now;
@@ -127,6 +138,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.ItemX(Handle);
+                if (now == 0.0f && RemovedByGame())
+                {
+                    return lastX;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastX = now;
@@ -148,6 +164,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.ItemY(Handle);
+                if (now == 0.0f && RemovedByGame())
+                {
+                    return lastY;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastY = now;

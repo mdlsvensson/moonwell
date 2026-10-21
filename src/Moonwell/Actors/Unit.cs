@@ -109,7 +109,16 @@ namespace Moonwell
         /// <summary>The inventory size last read.</summary>
         private int lastInventorySize;
 
-        /// <summary>The unit's life; setting it to less than 0.405 kills the unit. Once the game has removed the unit, the last life read or set, and setting does nothing.</summary>
+        /// <summary>Whether the unit can show a fly height: it flies, or FlyHeight has done the Amrf trick on it.</summary>
+        private bool flyReady;
+
+        /// <summary>Whether a getter that read 0 read it from a unit the game has removed: the game gives 0 for everything then, and the type id 0, before the sweep finds the unit. The getter then keeps the last value instead of the 0.</summary>
+        internal bool RemovedByGame()
+        {
+            return Runtime.World.UnitTypeId(Handle) == 0;
+        }
+
+        /// <summary>The unit's life; a value above the most life is clamped to it, and setting it to less than 0.405 kills the unit (the death event runs inside the call, with life 0). Once the game has removed the unit, the last life read or set, and setting does nothing.</summary>
         [LocalSafe]
         public float Life
         {
@@ -121,6 +130,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.LifeOf(Handle);
+                if (now == 0.0f && RemovedByGame())
+                {
+                    return lastLife;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastLife = now;
@@ -139,7 +153,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The most life the unit can have. Once the game has removed the unit, the last value read or set, and setting does nothing.</summary>
+        /// <summary>The most life the unit can have, a whole number (BlzSetUnitMaxHP; SetUnitState does not change it). The life stays unless the new most is below it, and then falls to it. Once the game has removed the unit, the last value read or set, and setting does nothing.</summary>
         [LocalSafe]
         public float MaxLife
         {
@@ -151,6 +165,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.MaxLifeOf(Handle);
+                if (now == 0.0f && RemovedByGame())
+                {
+                    return lastMaxLife;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastMaxLife = now;
@@ -169,7 +188,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The unit's mana. Once the game has removed the unit, the last mana read or set, and setting does nothing.</summary>
+        /// <summary>The unit's mana; a value above the most mana is clamped to it, and a unit without mana reads 0 and ignores a set. Once the game has removed the unit, the last mana read or set, and setting does nothing.</summary>
         [LocalSafe]
         public float Mana
         {
@@ -181,6 +200,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.ManaOf(Handle);
+                if (now == 0.0f && RemovedByGame())
+                {
+                    return lastMana;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastMana = now;
@@ -199,7 +223,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The most mana the unit can have. Once the game has removed the unit, the last value read or set, and setting does nothing.</summary>
+        /// <summary>The most mana the unit can have, a whole number (BlzSetUnitMaxMana; SetUnitState does not change it). The mana stays unless the new most is below it, and then falls to it. Once the game has removed the unit, the last value read or set, and setting does nothing.</summary>
         [LocalSafe]
         public float MaxMana
         {
@@ -211,6 +235,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.MaxManaOf(Handle);
+                if (now == 0.0f && RemovedByGame())
+                {
+                    return lastMaxMana;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastMaxMana = now;
@@ -241,6 +270,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.UnitX(Handle);
+                if (now == 0.0f && RemovedByGame())
+                {
+                    return lastX;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastX = now;
@@ -262,6 +296,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.UnitY(Handle);
+                if (now == 0.0f && RemovedByGame())
+                {
+                    return lastY;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastY = now;
@@ -280,7 +319,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Puts the unit at a place with no pathing (SetUnitX and SetUnitY): it may stand where it could not walk, and its order goes on. Does nothing once the unit is gone.</summary>
+        /// <summary>Puts the unit at a place with no pathing and no bounds (SetUnitX and SetUnitY): it may stand where it could not walk, or past the edge of the world, and its order goes on. Keep it inside the map yourself. Does nothing once the unit is gone.</summary>
         public void PlaceAt(float x, float y)
         {
             if (!IsGone)
@@ -289,7 +328,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The unit's facing in degrees. Setting it makes the unit turn at its turn rate (SetUnitFacing), so a read just after still gives the old facing; FaceNow turns at once. Once the game has removed the unit, the last facing read or set, and setting does nothing.</summary>
+        /// <summary>The unit's facing in degrees, within 0 to 360 (400 reads 40, -90 reads 270). Setting it makes the unit turn at its turn rate (SetUnitFacing), so a read just after still gives the old facing; FaceNow turns at once. Once the game has removed the unit, the last facing read or set, and setting does nothing.</summary>
         [LocalSafe]
         public float Facing
         {
@@ -301,6 +340,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.FacingOf(Handle);
+                if (now == 0.0f && RemovedByGame())
+                {
+                    return lastFacing;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastFacing = now;
@@ -319,7 +363,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Turns the unit to a facing in degrees at once (BlzSetUnitFacingEx). Does nothing once the unit is gone.</summary>
+        /// <summary>Turns the unit to a facing in degrees at once (BlzSetUnitFacingEx), so a read just after gives it. A unit that is walking turns back toward where it walks, and its order goes on. Does nothing once the unit is gone.</summary>
         public void FaceNow(float degrees)
         {
             if (!IsGone)
@@ -340,6 +384,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.LevelOf(Handle);
+                if (now == 0 && RemovedByGame())
+                {
+                    return lastLevel;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastLevel = now;
@@ -362,7 +411,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Whether the unit is paused (PauseUnit). Once the game has removed the unit, the last value read or set, and setting does nothing.</summary>
+        /// <summary>Whether the unit is paused (PauseUnit), a flag and not a count. A paused unit takes no orders (they answer false) and stays where it is, but its stand animation goes on. Once the game has removed the unit, the last value read or set, and setting does nothing.</summary>
         [LocalSafe]
         public bool IsPaused
         {
@@ -392,7 +441,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The size of the unit's model as a factor of its normal size, set on all three axes (SetUnitScale). Once the game has removed the unit, the last value read or set, and setting does nothing.</summary>
+        /// <summary>The size of the unit's model as a factor of its normal size, set on all three axes (SetUnitScale). Until it is set, it reads the scale of the unit's type (0.8 for a footman), which is not 1. Once the game has removed the unit, the last value read or set, and setting does nothing.</summary>
         [LocalSafe]
         public float Scale
         {
@@ -404,6 +453,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.ScaleOf(Handle);
+                if (now == 0.0f && RemovedByGame())
+                {
+                    return lastScale;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastScale = now;
@@ -424,7 +478,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Tints the unit's model (SetUnitVertexColor); each value is 0-255 and an alpha of 0 makes the unit invisible. The game keeps no tint to read back. Does nothing once the unit is gone.</summary>
+        /// <summary>Tints the unit's model (SetUnitVertexColor); each value is clamped to 0-255, and an alpha of 0 makes the unit and its shadow invisible, though its selection circle and health bar still show. The game keeps no tint to read back. Does nothing once the unit is gone.</summary>
         public void Tint(int red, int green, int blue, int alpha = 255)
         {
             if (!IsGone)
@@ -433,7 +487,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>How high the unit flies above the ground, set at once (SetUnitFlyHeight with a rate of 0). Once the game has removed the unit, the last value read or set, and setting does nothing.</summary>
+        /// <summary>How high the unit flies above the ground, set at once (SetUnitFlyHeight with a rate of 0). A unit that does not fly only shows the height once Amrf has been added to it and removed (seen 10-21), so the first set on such a unit does that; reading gives the height set either way. Once the game has removed the unit, the last value read or set, and setting does nothing.</summary>
         [LocalSafe]
         public float FlyHeight
         {
@@ -445,6 +499,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.FlyHeightOf(Handle);
+                if (now == 0.0f && RemovedByGame())
+                {
+                    return lastFlyHeight;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastFlyHeight = now;
@@ -458,6 +517,17 @@ namespace Moonwell
                 if (!IsGone)
                 {
                     lastFlyHeight = value;
+                    if (!flyReady)
+                    {
+                        flyReady = true;
+                        if (!Runtime.World.CanFly(Handle))
+                        {
+                            var crowForm = ObjectTypes.FourCC("Amrf");
+                            Runtime.World.AddAbility(Handle, crowForm);
+                            Runtime.World.RemoveAbility(Handle, crowForm);
+                        }
+                    }
+
                     Runtime.World.SetFlyHeight(Handle, value);
                 }
             }
@@ -522,6 +592,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.InventorySizeOf(Handle);
+                if (now == 0 && RemovedByGame())
+                {
+                    return lastInventorySize;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastInventorySize = now;

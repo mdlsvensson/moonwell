@@ -152,18 +152,19 @@ public sealed class KillCounter : UnitComponent
 ## Units, heroes and items
 
 A unit's members read and change the game's. Once the game has removed a unit or item they give the last value read or
-set (0 when never read, as in `OnLeave` after the game removed it), and setting does nothing. A read is safe in
+set (0 when never read, as in `OnLeave` after the game removed it), and setting does nothing. In the quarter second
+before Moonwell notices a removal, a read that gives 0 on a removed unit keeps the last value too. A read is safe in
 `Local.For`, a change is not.
 
 | Unit | |
 |---|---|
-| `Life`, `MaxLife`, `Mana`, `MaxMana` | read and set; a `Life` under 0.405 kills |
-| `X`, `Y` | read; `MoveTo(x, y)` through the game's pathing, `PlaceAt(x, y)` with none |
-| `Facing` | read and set (the unit turns); `FaceNow(degrees)` turns at once |
+| `Life`, `MaxLife`, `Mana`, `MaxMana` | read and set; a `Life` under 0.405 kills, above the most it clamps; the most are whole numbers |
+| `X`, `Y` | read; `MoveTo(x, y)` through the game's pathing, `PlaceAt(x, y)` with none, not even the map's edge |
+| `Facing` | read and set (the unit turns, so a read at once gives the old one); `FaceNow(degrees)` turns at once, a walking unit turns back |
 | `Level` | read; a hero's hero level |
 | `IsAlive`, `Kill()` | whether it lives; kills it, with `OnDeath` run |
-| `IsPaused`, `Scale`, `FlyHeight` | read and set |
-| `Tint(red, green, blue, alpha)` | colours the model, 0-255 |
+| `IsPaused`, `Scale`, `FlyHeight` | read and set; a paused unit takes no orders but still animates; `Scale` reads its type's scale until set; `FlyHeight` also lifts a ground unit |
+| `Tint(red, green, blue, alpha)` | colours the model, each value clamped to 0-255 |
 | `Order(order)`, `OrderAt(order, x, y)`, `OrderOn(order, target)`, `Stop()` | orders by the game's order string (`"move"`, `"attack"`) |
 | `InventorySize`, `ItemIn(slot)`, `Give(item)`, `Drop(item)` | the inventory; `Give` and `Drop` run the pick-up and drop reactions |
 

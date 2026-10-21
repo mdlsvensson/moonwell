@@ -181,5 +181,43 @@ namespace Moonwell.Testing
             Expect.Equal(0, world.GoneCalls, "no call to the game for the gone hero");
             Expect.Equal(calls, world.HeroCalls.Count, "no call that changes the hero");
         }
+
+
+        /// <summary>The game removes a hero and every number reads 0 before the sweep finds it (seen 10-21): the stats, experience, level and skill points stay as last read.</summary>
+        public static void GoneBeforeSweep(FakeWorld world)
+        {
+            var hero = NewHero(world, out var handle);
+            world.SetStats(handle, 22, 13, 17);
+            world.SetStatBonuses(handle, 4, 5, 6);
+            world.SetSkillPoints(handle, 2);
+            hero.Experience = 700;
+            hero.SetLevel(6);
+            Expect.Equal(22, hero.Strength, "strength read");
+            Expect.Equal(13, hero.Agility, "agility read");
+            Expect.Equal(17, hero.Intelligence, "intelligence read");
+            Expect.Equal(26, hero.StrengthWithBonus, "strength with bonus read");
+            Expect.Equal(18, hero.AgilityWithBonus, "agility with bonus read");
+            Expect.Equal(23, hero.IntelligenceWithBonus, "intelligence with bonus read");
+            Expect.Equal(2, hero.SkillPoints, "skill points read");
+            Expect.Equal(700, hero.Experience, "experience read");
+            Expect.Equal(6, hero.Level, "level read");
+
+            world.VanishUnit(handle);
+
+            Expect.True(!hero.IsGone, "the sweep has not run");
+            Expect.Equal(22, hero.Strength, "strength");
+            Expect.Equal(13, hero.Agility, "agility");
+            Expect.Equal(17, hero.Intelligence, "intelligence");
+            Expect.Equal(26, hero.StrengthWithBonus, "strength with bonus");
+            Expect.Equal(18, hero.AgilityWithBonus, "agility with bonus");
+            Expect.Equal(23, hero.IntelligenceWithBonus, "intelligence with bonus");
+            Expect.Equal(2, hero.SkillPoints, "skill points");
+            Expect.Equal(700, hero.Experience, "experience");
+            Expect.Equal(6, hero.Level, "level");
+            world.Advance(0.3f);
+            Expect.True(hero.IsGone, "the sweep found the hero gone");
+            Expect.Equal(22, hero.Strength, "strength after the sweep");
+            Expect.Equal(700, hero.Experience, "experience after the sweep");
+        }
     }
 }

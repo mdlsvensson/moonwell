@@ -105,6 +105,21 @@ namespace Moonwell.Testing
         /// <summary>The red, green, blue and alpha each unit was last tinted with.</summary>
         public Dictionary<unit, int[]> Tints = new Dictionary<unit, int[]>();
 
+        /// <summary>The units the game has removed but whose handles still answer: every number reads 0, as the game gives in the quarter second before the sweep.</summary>
+        private readonly HashSet<unit> vanishedUnits = new HashSet<unit>();
+
+        /// <summary>The items the game has removed but whose handles still answer: every number reads 0.</summary>
+        private readonly HashSet<item> vanishedItems = new HashSet<item>();
+
+        /// <summary>The units whose type flies (UNIT_TYPE_FLYING).</summary>
+        private readonly HashSet<unit> flyers = new HashSet<unit>();
+
+        /// <summary>The units that have been given the Amrf ability.</summary>
+        private readonly HashSet<unit> crowFormed = new HashSet<unit>();
+
+        /// <summary>The units that can show a fly height: those whose type flies and those that had Amrf added and removed.</summary>
+        private readonly HashSet<unit> floaters = new HashSet<unit>();
+
         /// <summary>The units that have been killed.</summary>
         private readonly HashSet<unit> dead = new HashSet<unit>();
 
@@ -256,18 +271,33 @@ namespace Moonwell.Testing
         {
             unitTypes[u] = 0;
             ownerless.Add(u);
+            vanishedUnits.Add(u);
         }
 
         /// <summary>Makes an item vanish the way the game does: its type id reads 0 and nothing is told.</summary>
         public void VanishItem(item i)
         {
             itemTypes[i] = 0;
+            vanishedItems.Add(i);
         }
 
         /// <summary>Makes a destructable vanish the way the game does: its type id reads 0 and nothing is told.</summary>
         public void VanishDestructable(destructable d)
         {
             destructableTypes[d] = 0;
+        }
+
+        /// <summary>Makes a unit one whose type flies: CanFly answers true and it shows a fly height at once.</summary>
+        public void MakeFlying(unit u)
+        {
+            flyers.Add(u);
+            floaters.Add(u);
+        }
+
+        /// <summary>Whether the unit would be seen above the ground: its type flies, or Amrf was added and removed (seen 10-21: a ground unit's fly height reads back but shows only then), and a height is set.</summary>
+        public bool Floats(unit u)
+        {
+            return floaters.Contains(u) && flyHeights.TryGetValue(u, out var height) && height != 0.0f;
         }
 
         /// <summary>Sets the level an ability has on a unit.</summary>
@@ -718,6 +748,10 @@ namespace Moonwell.Testing
         public void AddAbility(unit unit, int abilityId)
         {
             AbilityCalls.Add("add " + abilityId);
+            if (abilityId == CrowForm)
+            {
+                crowFormed.Add(unit);
+            }
         }
 
         /// <summary>Records a hide-ability call.</summary>
@@ -730,7 +764,14 @@ namespace Moonwell.Testing
         public void RemoveAbility(unit unit, int abilityId)
         {
             AbilityCalls.Add("remove " + abilityId);
+            if (abilityId == CrowForm && crowFormed.Remove(unit))
+            {
+                floaters.Add(unit);
+            }
         }
+
+        /// <summary>The id of Crow Form (Amrf), whose adding and removing lets a ground unit show a fly height.</summary>
+        public static readonly int CrowForm = ObjectTypes.FourCC("Amrf");
 
         /// <summary>Counts a call on an item the world has removed.</summary>
         private void NoteGoneItem(item item)
@@ -745,6 +786,11 @@ namespace Moonwell.Testing
         public int ChargesOf(item item)
         {
             NoteGoneItem(item);
+            if (vanishedItems.Contains(item))
+            {
+                return 0;
+            }
+
             return itemCharges.TryGetValue(item, out var charges) ? charges : 1;
         }
 
@@ -823,14 +869,14 @@ namespace Moonwell.Testing
         public float ItemX(item item)
         {
             NoteGoneItem(item);
-            return itemPlaces.TryGetValue(item, out var place) ? place[0] : 0.0f;
+            return !vanishedItems.Contains(item) && itemPlaces.TryGetValue(item, out var place) ? place[0] : 0.0f;
         }
 
         /// <summary>The y of an item; 0 until placed.</summary>
         public float ItemY(item item)
         {
             NoteGoneItem(item);
-            return itemPlaces.TryGetValue(item, out var place) ? place[1] : 0.0f;
+            return !vanishedItems.Contains(item) && itemPlaces.TryGetValue(item, out var place) ? place[1] : 0.0f;
         }
 
         /// <summary>Moves an item to the place given and records "move".</summary>
@@ -860,6 +906,11 @@ namespace Moonwell.Testing
         private float Kept(Dictionary<unit, float> values, unit unit)
         {
             NoteGone(unit);
+            if (vanishedUnits.Contains(unit))
+            {
+                return 0.0f;
+            }
+
             return values.TryGetValue(unit, out var value) ? value : 0.0f;
         }
 
@@ -886,7 +937,11 @@ namespace Moonwell.Testing
         public void SetMaxLife(unit unit, float life)
         {
             NoteGone(unit);
-            maxLives[unit] = life;
+            maxLives[unit] = (int)life;
+            if (lives.TryGetValue(unit, out var kept) && kept > (int)life)
+            {
+                lives[unit] = (int)life;
+            }
         }
 
         /// <summary>The mana of a unit; 0 until set.</summary>
@@ -912,7 +967,11 @@ namespace Moonwell.Testing
         public void SetMaxMana(unit unit, float mana)
         {
             NoteGone(unit);
-            maxManas[unit] = mana;
+            maxManas[unit] = (int)mana;
+            if (manas.TryGetValue(unit, out var kept) && kept > (int)mana)
+            {
+                manas[unit] = (int)mana;
+            }
         }
 
         /// <summary>The x of a unit; 0 until set.</summary>
@@ -977,6 +1036,11 @@ namespace Moonwell.Testing
         public int LevelOf(unit unit)
         {
             NoteGone(unit);
+            if (vanishedUnits.Contains(unit))
+            {
+                return 0;
+            }
+
             return levels.TryGetValue(unit, out var level) ? level : 1;
         }
 
@@ -1061,7 +1125,7 @@ namespace Moonwell.Testing
         public int ExperienceOf(unit hero)
         {
             NoteGone(hero);
-            return experiences.TryGetValue(hero, out var experience) ? experience : 0;
+            return !vanishedUnits.Contains(hero) && experiences.TryGetValue(hero, out var experience) ? experience : 0;
         }
 
         /// <summary>Sets the experience of a hero, and records an "experience".</summary>
@@ -1084,6 +1148,11 @@ namespace Moonwell.Testing
         private int StatOf(unit hero, int which, bool withBonus)
         {
             NoteGone(hero);
+            if (vanishedUnits.Contains(hero))
+            {
+                return 0;
+            }
+
             var value = stats.TryGetValue(hero, out var set) ? set[which] : 0;
             if (withBonus && statBonuses.TryGetValue(hero, out var bonus))
             {
@@ -1147,7 +1216,7 @@ namespace Moonwell.Testing
         public int SkillPointsOf(unit hero)
         {
             NoteGone(hero);
-            return skillPoints.TryGetValue(hero, out var points) ? points : 0;
+            return !vanishedUnits.Contains(hero) && skillPoints.TryGetValue(hero, out var points) ? points : 0;
         }
 
         /// <summary>Adds skill points to a hero and records "skill-points"; true unless the points would go below 0, which leaves them as they were.</summary>
@@ -1208,6 +1277,11 @@ namespace Moonwell.Testing
         public float ScaleOf(unit unit)
         {
             NoteGone(unit);
+            if (vanishedUnits.Contains(unit))
+            {
+                return 0.0f;
+            }
+
             return scales.TryGetValue(unit, out var scale) ? scale : 1.0f;
         }
 
@@ -1230,6 +1304,13 @@ namespace Moonwell.Testing
         public float FlyHeightOf(unit unit)
         {
             return Kept(flyHeights, unit);
+        }
+
+        /// <summary>Whether the unit's type flies.</summary>
+        public bool CanFly(unit unit)
+        {
+            NoteGone(unit);
+            return flyers.Contains(unit);
         }
 
         /// <summary>Sets the fly height of a unit.</summary>
@@ -1288,6 +1369,11 @@ namespace Moonwell.Testing
         public int InventorySizeOf(unit unit)
         {
             NoteGone(unit);
+            if (vanishedUnits.Contains(unit))
+            {
+                return 0;
+            }
+
             return inventorySizes.TryGetValue(unit, out var size) ? size : 6;
         }
 

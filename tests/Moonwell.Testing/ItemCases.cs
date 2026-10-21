@@ -399,5 +399,29 @@ namespace Moonwell.Testing
             Expect.Equal(calls, world.ItemCalls.Count, what + ": calls that changed the item");
             Expect.Equal(0, world.GoneCalls, what + ": calls to the game for the gone item");
         }
+
+
+        /// <summary>The game removes an item and its place and charges read 0 before the sweep finds it (seen 10-21): the last place and charges stay.</summary>
+        public static void GoneBeforeSweep(FakeWorld world)
+        {
+            var handle = world.NewItem(ObjectTypes.FourCC("ofoo"));
+            var item = Item.Of(handle)!;
+            item.Charges = 4;
+            item.MoveTo(10.0f, 20.0f);
+            Expect.Equal(4, item.Charges, "charges read");
+            Expect.Near(10.0f, item.X, "x read");
+            Expect.Near(20.0f, item.Y, "y read");
+
+            world.VanishItem(handle);
+
+            Expect.True(!item.IsGone, "the sweep has not run");
+            Expect.Equal(4, item.Charges, "charges before the sweep");
+            Expect.Near(10.0f, item.X, "x before the sweep");
+            Expect.Near(20.0f, item.Y, "y before the sweep");
+            world.Advance(0.3f);
+            Expect.True(item.IsGone, "the sweep found the item gone");
+            Expect.Equal(4, item.Charges, "charges after the sweep");
+            Expect.Near(10.0f, item.X, "x after the sweep");
+        }
     }
 }

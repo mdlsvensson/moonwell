@@ -39,6 +39,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.ExperienceOf(Handle);
+                if (now == 0 && RemovedByGame())
+                {
+                    return lastExperience;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastExperience = now;
@@ -78,6 +83,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.StrengthOf(Handle, false);
+                if (now == 0 && RemovedByGame())
+                {
+                    return lastStrength;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastStrength = now;
@@ -108,6 +118,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.AgilityOf(Handle, false);
+                if (now == 0 && RemovedByGame())
+                {
+                    return lastAgility;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastAgility = now;
@@ -138,6 +153,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.IntelligenceOf(Handle, false);
+                if (now == 0 && RemovedByGame())
+                {
+                    return lastIntelligence;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastIntelligence = now;
@@ -168,6 +188,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.StrengthOf(Handle, true);
+                if (now == 0 && RemovedByGame())
+                {
+                    return lastStrengthWithBonus;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastStrengthWithBonus = now;
@@ -189,6 +214,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.AgilityOf(Handle, true);
+                if (now == 0 && RemovedByGame())
+                {
+                    return lastAgilityWithBonus;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastAgilityWithBonus = now;
@@ -210,6 +240,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.IntelligenceOf(Handle, true);
+                if (now == 0 && RemovedByGame())
+                {
+                    return lastIntelligenceWithBonus;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastIntelligenceWithBonus = now;
@@ -231,6 +266,11 @@ namespace Moonwell
                 }
 
                 var now = Runtime.World.SkillPointsOf(Handle);
+                if (now == 0 && RemovedByGame())
+                {
+                    return lastSkillPoints;
+                }
+
                 if (Local.Depth == 0)
                 {
                     lastSkillPoints = now;

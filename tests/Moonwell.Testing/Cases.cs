@@ -141,6 +141,10 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "units.tint", Run = UnitCases.Tint });
             list.Add(new Case { Name = "units.fly-height", Run = UnitCases.FlyHeight });
             list.Add(new Case { Name = "units.gone-reads-last", Run = UnitCases.GoneReadsLast });
+            list.Add(new Case { Name = "units.fly-height-ground", Run = UnitCases.FlyHeightGroundUnit });
+            list.Add(new Case { Name = "units.max-clamps", Run = UnitCases.MaxClampsLifeAndMana });
+            list.Add(new Case { Name = "units.gone-before-sweep", Run = UnitCases.GoneBeforeSweep });
+            list.Add(new Case { Name = "units.gone-before-sweep-local", Run = UnitCases.GoneBeforeSweepInLocal });
             list.Add(new Case { Name = "units.order-immediate", Run = UnitCases.OrderImmediate });
             list.Add(new Case { Name = "units.order-point", Run = UnitCases.OrderPoint });
             list.Add(new Case { Name = "units.order-target", Run = UnitCases.OrderTarget });
@@ -160,6 +164,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "heroes.skill-points", Run = HeroCases.SkillPoints });
             list.Add(new Case { Name = "heroes.revive", Run = HeroCases.Revive });
             list.Add(new Case { Name = "heroes.gone", Run = HeroCases.Gone });
+            list.Add(new Case { Name = "heroes.gone-before-sweep", Run = HeroCases.GoneBeforeSweep });
             list.Add(new Case { Name = "items.registered-class", Run = ItemCases.RegisteredClass });
             list.Add(new Case { Name = "items.fallback-class", Run = ItemCases.FallbackClass });
             list.Add(new Case { Name = "items.pickup-order", Run = ItemCases.PickupOrder });
@@ -178,6 +183,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "items.carrier-hero-dies", Run = ItemCases.CarrierHeroDies });
             list.Add(new Case { Name = "items.player-gone-before-read", Run = ItemCases.PlayerGoneBeforeRead });
             list.Add(new Case { Name = "items.gone-reads-last", Run = ItemCases.ItemGoneReadsLast });
+            list.Add(new Case { Name = "items.gone-before-sweep", Run = ItemCases.GoneBeforeSweep });
             list.Add(new Case { Name = "destructables.watch", Run = DestructableCases.Watch });
             list.Add(new Case { Name = "destructables.sweep", Run = DestructableCases.SweepDetectsRemoval });
             list.Add(new Case { Name = "damage.order", Run = DamageCases.Order });

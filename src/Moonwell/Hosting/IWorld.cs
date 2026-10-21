@@ -176,7 +176,7 @@ namespace Moonwell.Hosting
         /// <summary>The most life a unit can have.</summary>
         float MaxLifeOf(unit unit);
 
-        /// <summary>Sets the most life a unit can have.</summary>
+        /// <summary>Sets the most life a unit can have, as a whole number; a life above it falls to it.</summary>
         void SetMaxLife(unit unit, float life);
 
         /// <summary>The mana of a unit.</summary>
@@ -188,7 +188,7 @@ namespace Moonwell.Hosting
         /// <summary>The most mana a unit can have.</summary>
         float MaxManaOf(unit unit);
 
-        /// <summary>Sets the most mana a unit can have.</summary>
+        /// <summary>Sets the most mana a unit can have, as a whole number; a mana above it falls to it.</summary>
         void SetMaxMana(unit unit, float mana);
 
         /// <summary>The x of a unit.</summary>
@@ -274,6 +274,9 @@ namespace Moonwell.Hosting
 
         /// <summary>The height a unit flies at above the ground.</summary>
         float FlyHeightOf(unit unit);
+
+        /// <summary>Whether the unit's type flies.</summary>
+        bool CanFly(unit unit);
 
         /// <summary>Sets the height a unit flies at, at once.</summary>
         void SetFlyHeight(unit unit, float height);
