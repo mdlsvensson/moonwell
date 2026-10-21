@@ -48,14 +48,20 @@ namespace Moonwell.Build
             }
         }
 
-        // A declared class, or a class the compiler made inside one for its lambdas.
+        // A class that declares fields, or a class the compiler made inside one for its lambdas (its name starts with <). An abstract
+        // or generic class under a kind base declares too: its constructor runs in each class that inherits it.
         private static bool InDeclaredClass(Type type)
         {
             for (var outer = type; outer != null; outer = outer.DeclaringType)
             {
-                if (Declarations.IsDeclaredClass(outer))
+                if (Declarations.KindBaseOf(outer) != null && Declarations.StandardIdOf(outer) == null)
                 {
                     return true;
+                }
+
+                if (!outer.Name.StartsWith("<", StringComparison.Ordinal))
+                {
+                    return false;
                 }
             }
 

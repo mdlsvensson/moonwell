@@ -596,7 +596,26 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void a_units_level_set_in_the_constructor_of_a_class_that_declares_nothing_is_an_error()
         {
+            // The map has no class of Moonwell.Objects, so its assembly does not reference the library.
             AssertFails("LevelInOtherCtor", "LevelInOtherCtor.Drill's constructor sets Level; a unit's level is set only in its class's constructor");
+        }
+
+        [Fact]
+        public void a_units_level_set_in_the_constructor_of_an_abstract_or_generic_base_is_declared()
+        {
+            var project = MapProject.Find(Path.Combine(TestFolders.Fixture("ObjectErrors"), "LevelInAbstractBase"));
+            var assembly = DotnetBuild.Run(project, false, TextWriter.Null);
+
+            var declared = Declarations.Read(assembly, project, built.Standard, null);
+
+            Assert.Equal(3, Find(declared.Objects, "LevelInAbstractBase.Veteran").Changed["ulev"]);
+            Assert.Equal(4, Find(declared.Objects, "LevelInAbstractBase.Sergeant").Changed["ulev"]);
+        }
+
+        [Fact]
+        public void a_units_level_set_in_a_class_of_its_own_inside_a_declared_class_is_an_error()
+        {
+            AssertFails("LevelInNestedHelper", "LevelInNestedHelper.Veteran.Promoter's constructor sets Level; a unit's level is set only in its class's constructor");
         }
 
         [Fact]

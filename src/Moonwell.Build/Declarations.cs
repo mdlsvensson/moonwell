@@ -52,6 +52,32 @@ namespace Moonwell.Build
             return false;
         }
 
+        /// <summary>
+        /// Checks the setters a map without <c>Moonwell.Objects</c> calls: a unit's Level has no live setter, and such a map has no
+        /// class whose constructor may set it (<see cref="Read"/> checks a map that uses the library).
+        /// </summary>
+        /// <param name="assemblyPath">The map's built assembly.</param>
+        /// <exception cref="BuildException">A method sets a unit's Level.</exception>
+        public static void CheckSetters(string assemblyPath)
+        {
+            var context = new MapLoadContext(Path.GetDirectoryName(Path.GetFullPath(assemblyPath))!);
+            try
+            {
+                CheckSettersIn(context, assemblyPath);
+            }
+            finally
+            {
+                context.Unload();
+            }
+        }
+
+        // Kept apart from CheckSetters so that nothing of the loaded assembly is on its frame when the context unloads.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void CheckSettersIn(MapLoadContext context, string assemblyPath)
+        {
+            SetterScan.Check(context.Open(assemblyPath));
+        }
+
         /// <summary>Loads the built assembly, constructs every declared object class and collects what each changed from its standard object.</summary>
         /// <param name="assemblyPath">The map's built assembly; <c>Moonwell.Objects.dll</c> is beside it.</param>
         /// <param name="project">The map project; lines in messages are relative to its folder.</param>
@@ -82,13 +108,13 @@ namespace Moonwell.Build
         private static DeclarationSet ReadIn(MapLoadContext context, string assemblyPath, MapProject project, StandardData standard, string? set)
         {
             var map = context.Open(assemblyPath);
+            SetterScan.Check(map);
             if (!map.GetReferencedAssemblies().Any(name => name.Name == ObjectsAssemblyName))
             {
                 return new DeclarationSet(Array.Empty<DeclaredObject>(), new Dictionary<string, string>(), Array.Empty<UsedClass>(), string.Empty, new HeroBonus(0f, 0f), new Dictionary<string, IReadOnlyList<string>>());
             }
 
             var objects = context.LoadFromAssemblyName(new AssemblyName(ObjectsAssemblyName));
-            SetterScan.Check(map);
             var used = ObjectLua.UsedClasses(project, map, objects, assemblyPath, out var support);
 
             var classNames = new Dictionary<string, string>(StringComparer.Ordinal);

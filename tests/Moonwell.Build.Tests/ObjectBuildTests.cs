@@ -343,6 +343,35 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_units_level_set_in_a_map_without_objects_fails_the_build()
+        {
+            // The build reads no declarations of a map without Moonwell.Objects, but the game has no setter of a unit's level.
+            var copy = folders.TemporaryCopyOfSample();
+            File.Delete(Path.Combine(copy, "Objects.cs"));
+            File.Delete(Path.Combine(copy, "ids.json"));
+            var project = Path.Combine(copy, "Sample.csproj");
+            File.WriteAllText(project, Regex.Replace(File.ReadAllText(project), @"[ \t]*<ProjectReference [^>]*Moonwell\.Objects\.csproj"" />\r?\n", string.Empty));
+            File.WriteAllText(Path.Combine(copy, "Drill.cs"), """
+                using Moonwell;
+
+                namespace Sample
+                {
+                    public sealed class Drill : GameComponent
+                    {
+                        public override void OnUnitDied(Unit dying, Unit? killer)
+                        {
+                            dying.Level = 2;
+                        }
+                    }
+                }
+                """);
+
+            var error = Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), new StringWriter()));
+
+            Assert.Equal("Sample.Drill.OnUnitDied sets Level; a unit's level is set only in its class's constructor", error.Message);
+        }
+
+        [Fact]
         public void a_class_nested_in_the_map_and_a_using_static_of_a_group_build()
         {
             var copy = folders.TemporaryCopyOfSample();

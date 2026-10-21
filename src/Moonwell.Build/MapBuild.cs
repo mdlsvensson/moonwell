@@ -80,6 +80,9 @@ namespace Moonwell.Build
 
             ObjectStubs.Delete(project);
 
+            // The build reads no declarations, but a unit's Level is still set only in a declared class's constructor.
+            Declarations.CheckSetters(targetPath);
+
             EntryWriter.Write(project, settings, false, Declarations.References(targetPath, DamageAssemblyName));
             LuaCompiler.Compile(project, map, targetPath, options.Release);
             StageWith(project, () => Stage.WriteWithoutObjects(project, map, log));
