@@ -73,7 +73,7 @@ namespace Moonwell.Objects
             return type;
         }
 
-        /// <summary>The ids of the fields that the standard classes in <paramref name="type"/>'s base chain have as properties.</summary>
+        /// <summary>The ids of the fields that the standard classes in <paramref name="type"/>'s base chain have as properties, and of its shared fields.</summary>
         private static HashSet<string> PropertyFieldsOf(Type type)
         {
             lock (propertyFields)
@@ -90,6 +90,14 @@ namespace Moonwell.Objects
         private static HashSet<string> ReadPropertyFields(Type type)
         {
             var ids = new HashSet<string>(StringComparer.Ordinal);
+#if !MOONWELL_LUA
+            // A shared field has no property: its id is on the attribute of a class in the chain.
+            foreach (SharedFieldAttribute shared in type.GetCustomAttributes(typeof(SharedFieldAttribute), true))
+            {
+                ids.Add(shared.Id);
+            }
+#endif
+
             for (var parent = type; parent != null; parent = parent.BaseType)
             {
                 if (parent.Assembly != typeof(FieldChecks).Assembly)

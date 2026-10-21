@@ -1,6 +1,7 @@
 namespace Moonwell.Objects.Tests
 {
     /// <summary>A kind base written by hand, in the pattern the generated kind bases follow.</summary>
+    [SharedField("umpm", "MaxMana", Label = "Mana Maximum", Min = 0, Max = 100000, HasLimits = true)]
     public class TestUnitBase : Moonwell.Unit
     {
         private Declared? declared;

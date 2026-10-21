@@ -11,7 +11,7 @@ namespace Moonwell.Objects
     /// <summary>
     /// Checks a value a declared class puts against the rules its field's property carries (<see cref="LimitsAttribute"/>,
     /// <see cref="NonNegativeAttribute"/>, <see cref="RequiredAttribute"/>, <see cref="MaxLengthAttribute"/>,
-    /// <see cref="MaxEntriesAttribute"/>) and, for a choice, against its enum; a value that breaks one throws a
+    /// <see cref="MaxEntriesAttribute"/>; a shared field has them on its class's <see cref="SharedFieldAttribute"/>) and, for a choice, against its enum; a value that breaks one throws a
     /// <see cref="FieldRuleException"/> from where it was put. A value is never changed.
     /// </summary>
     /// <remarks>
@@ -249,7 +249,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>The rules of the property of <paramref name="field"/> in <paramref name="type"/>'s base chain; null when no property is the field.</summary>
+        /// <summary>The rules of the property of <paramref name="field"/> in <paramref name="type"/>'s base chain, else those of a <see cref="SharedFieldAttribute"/> on the chain; null when neither is the field.</summary>
         private static Rules? ReadRules(Type type, string field)
         {
             for (var parent = type; parent != null; parent = parent.BaseType)
@@ -261,6 +261,14 @@ namespace Moonwell.Objects
                     {
                         return new Rules(ClassName(type), property, attribute, Lifted(type, property.Name));
                     }
+                }
+            }
+
+            foreach (SharedFieldAttribute shared in type.GetCustomAttributes(typeof(SharedFieldAttribute), true))
+            {
+                if (shared.Id == field)
+                {
+                    return new Rules(ClassName(type), shared, Lifted(type, shared.Member));
                 }
             }
 
@@ -315,6 +323,19 @@ namespace Moonwell.Objects
                 Required = info.IsDefined(typeof(RequiredAttribute), false);
                 MaxLength = info.GetCustomAttribute<MaxLengthAttribute>(false)?.Length;
                 MaxEntries = info.GetCustomAttribute<MaxEntriesAttribute>(false)?.Count;
+            }
+
+            public Rules(string className, SharedFieldAttribute shared, bool lifted)
+            {
+                property = className + "." + shared.Member;
+                fieldId = shared.Id;
+                label = shared.Label;
+                Lifted = lifted;
+                HasLimits = shared.HasLimits;
+                Min = shared.HasLimits ? shared.Min : double.NegativeInfinity;
+                Max = shared.HasLimits ? shared.Max : double.PositiveInfinity;
+                NonNegative = shared.NonNegative;
+                Required = shared.Required;
             }
 
             public bool Lifted { get; }
