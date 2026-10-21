@@ -326,6 +326,98 @@ namespace Moonwell.Testing
             Expect.Near(250.5f, world.FlyHeightOf(handle), "the game's height");
         }
 
+        /// <summary>Order and Stop give the game an order string with no place and no target, and return the game's answer.</summary>
+        public static void OrderImmediate(FakeWorld world)
+        {
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+
+            Expect.True(unit.Order("holdposition"), "the game accepts the order");
+            Expect.Equal(1, world.Orders.Count, "orders given");
+            Expect.Equal("immediate holdposition", world.Orders[0], "the order as given");
+
+            world.OrderAnswer = false;
+            Expect.True(!unit.Order("stop"), "the game's refusal is returned");
+
+            world.OrderAnswer = true;
+            unit.Stop();
+            Expect.Equal(3, world.Orders.Count, "orders given after Stop");
+            Expect.Equal("immediate stop", world.Orders[2], "Stop is the stop order");
+        }
+
+        /// <summary>OrderAt gives the game an order string and a place, and returns the game's answer.</summary>
+        public static void OrderPoint(FakeWorld world)
+        {
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+
+            Expect.True(unit.OrderAt("move", 100.5f, -200.0f), "the game accepts the order");
+            Expect.Equal(1, world.Orders.Count, "orders given");
+            Expect.Equal("point move", world.Orders[0], "the order as given");
+            Expect.Near(100.5f, world.OrderPoints[0], "x");
+            Expect.Near(-200.0f, world.OrderPoints[1], "y");
+
+            world.OrderAnswer = false;
+            Expect.True(!unit.OrderAt("attack", 1.0f, 2.0f), "the game's refusal is returned");
+            Expect.Equal("point attack", world.Orders[1], "the second order as given");
+        }
+
+        /// <summary>OrderOn gives the game the widget of a unit, an item or a destructable, and returns the game's answer.</summary>
+        public static void OrderTarget(FakeWorld world)
+        {
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var targetHandle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var target = Unit.Of(targetHandle)!;
+            var itemHandle = world.NewItem(ObjectTypes.FourCC("ofoo"));
+            var item = Item.Of(itemHandle)!;
+            var treeHandle = world.NewDestructable(ObjectTypes.FourCC("LTlt"));
+            var tree = Destructable.Of(treeHandle)!;
+
+            Expect.True(unit.OrderOn("attack", target), "the game accepts the order on a unit");
+            Expect.True(unit.OrderOn("smart", item), "the game accepts the order on an item");
+            Expect.True(unit.OrderOn("harvest", tree), "the game accepts the order on a destructable");
+
+            Expect.Equal(3, world.Orders.Count, "orders given");
+            Expect.Equal("target attack", world.Orders[0], "the order on the unit");
+            Expect.Equal("target smart", world.Orders[1], "the order on the item");
+            Expect.Equal("target harvest", world.Orders[2], "the order on the destructable");
+            Expect.Same(targetHandle, world.OrderTargets[0], "the unit's handle reached the game");
+            Expect.Same(itemHandle, world.OrderTargets[1], "the item's handle reached the game");
+            Expect.Same(treeHandle, world.OrderTargets[2], "the destructable's handle reached the game");
+
+            world.OrderAnswer = false;
+            Expect.True(!unit.OrderOn("attack", target), "the game's refusal is returned");
+        }
+
+        /// <summary>A removed unit takes no order and a removed target is not ordered on: false, and the game is not called.</summary>
+        public static void OrderGone(FakeWorld world)
+        {
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var targetHandle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var target = Unit.Of(targetHandle)!;
+            var itemHandle = world.NewItem(ObjectTypes.FourCC("ofoo"));
+            var item = Item.Of(itemHandle)!;
+            var other = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+
+            world.VanishUnit(targetHandle);
+            world.VanishItem(itemHandle);
+            world.Advance(0.3f);
+            Expect.True(target.IsGone && item.IsGone, "the sweep found the target and the item gone");
+            world.GoneCalls = 0;
+
+            Expect.True(!other.OrderOn("attack", target), "no order on a removed unit");
+            Expect.True(!other.OrderOn("smart", item), "no order on a removed item");
+            Expect.Equal(0, world.Orders.Count, "no order reached the game for a removed target");
+
+            other.Remove();
+            world.GoneCalls = 0;
+
+            Expect.True(!other.Order("stop"), "a removed unit takes no immediate order");
+            Expect.True(!other.OrderAt("move", 1.0f, 2.0f), "a removed unit takes no point order");
+            Expect.True(!other.OrderOn("attack", unit), "a removed unit takes no target order");
+            other.Stop();
+            Expect.Equal(0, world.Orders.Count, "no order reached the game from a removed unit");
+            Expect.Equal(0, world.GoneCalls, "no call to the game for the gone unit");
+        }
+
         /// <summary>A unit the game has removed, found by the sweep or removed by Remove, gives the values it last read, ignores setters and actions, and the game is not asked.</summary>
         public static void GoneReadsLast(FakeWorld world)
         {

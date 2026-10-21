@@ -101,6 +101,9 @@ namespace Moonwell
         /// <summary>The fly height last read or set.</summary>
         private float lastFlyHeight;
 
+        /// <summary>The inventory size last read.</summary>
+        private int lastInventorySize;
+
         /// <summary>The unit's life; setting it to less than 0.405 kills the unit. Once the game has removed the unit, the last life read or set, and setting does nothing.</summary>
         [LocalSafe]
         public float Life
@@ -386,6 +389,95 @@ namespace Moonwell
                     lastFlyHeight = value;
                     Runtime.World.SetFlyHeight(Handle, value);
                 }
+            }
+        }
+
+        /// <summary>Gives the unit an order with no place and no target, by the game's order string ("stop", "holdposition"), and returns the game's answer. False, and no call to the game, once the unit is gone.</summary>
+        public bool Order(string order)
+        {
+            return !IsGone && Runtime.World.OrderUnit(Handle, order);
+        }
+
+        /// <summary>Gives the unit an order to a place, by the game's order string ("move", "attack", "smart"), and returns the game's answer. False, and no call to the game, once the unit is gone.</summary>
+        public bool OrderAt(string order, float x, float y)
+        {
+            return !IsGone && Runtime.World.OrderUnitAt(Handle, order, x, y);
+        }
+
+        /// <summary>Gives the unit an order on a unit, an item or a destructable, by the game's order string ("attack", "smart"), and returns the game's answer. False, and no call to the game, once the unit or the target is gone.</summary>
+        public bool OrderOn(string order, Widget target)
+        {
+            if (IsGone || target.IsGone)
+            {
+                return false;
+            }
+
+            var unit = target as Unit;
+            if (unit != null)
+            {
+                return Runtime.World.OrderUnitOn(Handle, order, unit.Handle);
+            }
+
+            var item = target as Item;
+            if (item != null)
+            {
+                return Runtime.World.OrderUnitOn(Handle, order, item.Handle);
+            }
+
+            var destructable = target as Destructable;
+            if (destructable != null)
+            {
+                return Runtime.World.OrderUnitOn(Handle, order, destructable.Handle);
+            }
+
+            return false;
+        }
+
+        /// <summary>Orders the unit to stop. Does nothing once the unit is gone.</summary>
+        public void Stop()
+        {
+            Order("stop");
+        }
+
+        /// <summary>The number of inventory slots of the unit. Once the game has removed the unit, the last size read.</summary>
+        [LocalSafe]
+        public int InventorySize
+        {
+            get
+            {
+                if (!IsGone)
+                {
+                    lastInventorySize = Runtime.World.InventorySizeOf(Handle);
+                }
+
+                return lastInventorySize;
+            }
+        }
+
+        /// <summary>The item in a slot of the unit's inventory, counting from 0; null when the slot is empty, when there is no such slot, and once the unit is gone.</summary>
+        [LocalSafe]
+        public Item? ItemIn(int slot)
+        {
+            if (IsGone || slot < 0 || slot >= InventorySize)
+            {
+                return null;
+            }
+
+            return Item.Of(Runtime.World.ItemInSlot(Handle, slot));
+        }
+
+        /// <summary>Gives the unit an item to pick up into its first free slot, and returns the game's answer (false when the inventory is full). The game counts it as a pick-up, so OnPickedUp and OnItemPickedUp run, inside this call. False, and no call to the game, once the unit or the item is gone.</summary>
+        public bool Give(Item item)
+        {
+            return !IsGone && !item.IsGone && Runtime.World.GiveItem(Handle, item.Handle);
+        }
+
+        /// <summary>Makes the unit drop an item from its inventory where it stands. The game counts it as a drop, so OnDropped and OnItemDropped run, inside this call. Does nothing once the unit or the item is gone.</summary>
+        public void Drop(Item item)
+        {
+            if (!IsGone && !item.IsGone)
+            {
+                Runtime.World.DropItem(Handle, item.Handle);
             }
         }
 

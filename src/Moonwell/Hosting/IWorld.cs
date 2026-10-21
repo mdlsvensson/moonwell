@@ -241,5 +241,26 @@ namespace Moonwell.Hosting
 
         /// <summary>Sets the height a unit flies at, at once.</summary>
         void SetFlyHeight(unit unit, float height);
+
+        /// <summary>Gives a unit an order that needs no place and no target; the game's answer.</summary>
+        bool OrderUnit(unit unit, string order);
+
+        /// <summary>Gives a unit an order to a place; the game's answer.</summary>
+        bool OrderUnitAt(unit unit, string order, float x, float y);
+
+        /// <summary>Gives a unit an order on a widget (a unit, an item or a destructable); the game's answer.</summary>
+        bool OrderUnitOn(unit unit, string order, widget target);
+
+        /// <summary>The number of inventory slots of a unit.</summary>
+        int InventorySizeOf(unit unit);
+
+        /// <summary>The item in a slot of a unit's inventory (0-based); null when the slot is empty.</summary>
+        item ItemInSlot(unit unit, int slot);
+
+        /// <summary>Gives a unit an item to pick up into its inventory, which the game counts as a pick-up; the game's answer.</summary>
+        bool GiveItem(unit unit, item item);
+
+        /// <summary>Makes a unit drop an item from its inventory, which the game counts as a drop.</summary>
+        void DropItem(unit unit, item item);
     }
 }

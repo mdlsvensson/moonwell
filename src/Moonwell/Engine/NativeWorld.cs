@@ -703,6 +703,48 @@ namespace Moonwell.Engine
             Natives.SetUnitFlyHeight(unit, height, 0.0f);
         }
 
+        /// <summary>Gives a unit an order with no place and no target: IssueImmediateOrder.</summary>
+        public bool OrderUnit(unit unit, string order)
+        {
+            return Natives.IssueImmediateOrder(unit, order);
+        }
+
+        /// <summary>Gives a unit an order to a place: IssuePointOrder.</summary>
+        public bool OrderUnitAt(unit unit, string order, float x, float y)
+        {
+            return Natives.IssuePointOrder(unit, order, x, y);
+        }
+
+        /// <summary>Gives a unit an order on a widget: IssueTargetOrder.</summary>
+        public bool OrderUnitOn(unit unit, string order, widget target)
+        {
+            return Natives.IssueTargetOrder(unit, order, target);
+        }
+
+        /// <summary>The number of inventory slots of a unit, from the game.</summary>
+        public int InventorySizeOf(unit unit)
+        {
+            return Natives.UnitInventorySize(unit);
+        }
+
+        /// <summary>The item in a slot of a unit's inventory, from the game.</summary>
+        public item ItemInSlot(unit unit, int slot)
+        {
+            return Natives.UnitItemInSlot(unit, slot);
+        }
+
+        /// <summary>Gives a unit an item: UnitAddItem.</summary>
+        public bool GiveItem(unit unit, item item)
+        {
+            return Natives.UnitAddItem(unit, item);
+        }
+
+        /// <summary>Takes an item out of a unit's inventory and drops it where the unit stands: UnitRemoveItem.</summary>
+        public void DropItem(unit unit, item item)
+        {
+            Natives.UnitRemoveItem(unit, item);
+        }
+
         /// <summary>Runs a callback once, after the map's main function has returned.</summary>
         internal static void Later(Action callback)
         {

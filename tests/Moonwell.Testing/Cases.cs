@@ -125,6 +125,13 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "units.tint", Run = UnitCases.Tint });
             list.Add(new Case { Name = "units.fly-height", Run = UnitCases.FlyHeight });
             list.Add(new Case { Name = "units.gone-reads-last", Run = UnitCases.GoneReadsLast });
+            list.Add(new Case { Name = "units.order-immediate", Run = UnitCases.OrderImmediate });
+            list.Add(new Case { Name = "units.order-point", Run = UnitCases.OrderPoint });
+            list.Add(new Case { Name = "units.order-target", Run = UnitCases.OrderTarget });
+            list.Add(new Case { Name = "units.order-gone", Run = UnitCases.OrderGone });
+            list.Add(new Case { Name = "units.inventory", Run = ItemCases.Inventory });
+            list.Add(new Case { Name = "units.inventory-limits", Run = ItemCases.InventoryLimits });
+            list.Add(new Case { Name = "units.inventory-gone", Run = ItemCases.InventoryGone });
             list.Add(new Case { Name = "items.registered-class", Run = ItemCases.RegisteredClass });
             list.Add(new Case { Name = "items.fallback-class", Run = ItemCases.FallbackClass });
             list.Add(new Case { Name = "items.pickup-order", Run = ItemCases.PickupOrder });

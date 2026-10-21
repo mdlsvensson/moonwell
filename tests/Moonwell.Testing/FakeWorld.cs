@@ -117,6 +117,30 @@ namespace Moonwell.Testing
         /// <summary>The fly height of each unit, 0 until set.</summary>
         private readonly Dictionary<unit, float> flyHeights = new Dictionary<unit, float>();
 
+        /// <summary>The orders given to units, as "immediate", "point" or "target", a space, and the order string.</summary>
+        public List<string> Orders = new List<string>();
+
+        /// <summary>The x and y of each point order, in turn.</summary>
+        public List<float> OrderPoints = new List<float>();
+
+        /// <summary>The widget each target order was given on, in turn.</summary>
+        public List<widget> OrderTargets = new List<widget>();
+
+        /// <summary>What the game answers to an order.</summary>
+        public bool OrderAnswer = true;
+
+        /// <summary>The inventory calls that changed something, as "give" or "drop".</summary>
+        public List<string> InventoryCalls = new List<string>();
+
+        /// <summary>How many times a slot of an inventory was read.</summary>
+        public int ItemSlotReads;
+
+        /// <summary>The items in each unit's slots; null for an empty slot.</summary>
+        private readonly Dictionary<unit, item[]> inventories = new Dictionary<unit, item[]>();
+
+        /// <summary>The number of inventory slots of each unit, 6 until set.</summary>
+        private readonly Dictionary<unit, int> inventorySizes = new Dictionary<unit, int>();
+
         /// <summary>The life of each unit, 0 until set.</summary>
         private readonly Dictionary<unit, float> lives = new Dictionary<unit, float>();
 
@@ -896,6 +920,111 @@ namespace Moonwell.Testing
         {
             NoteGone(unit);
             flyHeights[unit] = height;
+        }
+
+        /// <summary>Sets the number of inventory slots a unit has.</summary>
+        public void SetInventorySize(unit unit, int size)
+        {
+            inventorySizes[unit] = size;
+        }
+
+        /// <summary>The slots of a unit's inventory, made on first use.</summary>
+        private item[] SlotsOf(unit unit)
+        {
+            if (!inventories.TryGetValue(unit, out var slots))
+            {
+                slots = new item[InventorySizeOf(unit)];
+                inventories[unit] = slots;
+            }
+
+            return slots;
+        }
+
+        /// <summary>Records an order and gives the answer set in OrderAnswer.</summary>
+        public bool OrderUnit(unit unit, string order)
+        {
+            NoteGone(unit);
+            Orders.Add("immediate " + order);
+            return OrderAnswer;
+        }
+
+        /// <summary>Records an order to a place and gives the answer set in OrderAnswer.</summary>
+        public bool OrderUnitAt(unit unit, string order, float x, float y)
+        {
+            NoteGone(unit);
+            Orders.Add("point " + order);
+            OrderPoints.Add(x);
+            OrderPoints.Add(y);
+            return OrderAnswer;
+        }
+
+        /// <summary>Records an order on a widget and gives the answer set in OrderAnswer.</summary>
+        public bool OrderUnitOn(unit unit, string order, widget target)
+        {
+            NoteGone(unit);
+            Orders.Add("target " + order);
+            OrderTargets.Add(target);
+            return OrderAnswer;
+        }
+
+        /// <summary>The number of inventory slots of a unit; 6 until set.</summary>
+        public int InventorySizeOf(unit unit)
+        {
+            NoteGone(unit);
+            return inventorySizes.TryGetValue(unit, out var size) ? size : 6;
+        }
+
+        /// <summary>The item in a slot; null when empty or out of range.</summary>
+        public item ItemInSlot(unit unit, int slot)
+        {
+            NoteGone(unit);
+            ItemSlotReads++;
+            var slots = SlotsOf(unit);
+            return slot >= 0 && slot < slots.Length ? slots[slot] : null!;
+        }
+
+        /// <summary>Puts an item in the first free slot, and as the game does, delivers the pick-up when it is listened for; false when no slot is free.</summary>
+        public bool GiveItem(unit unit, item item)
+        {
+            NoteGone(unit);
+            var slots = SlotsOf(unit);
+            for (var i = 0; i < slots.Length; i++)
+            {
+                if (slots[i] == null)
+                {
+                    InventoryCalls.Add("give");
+                    slots[i] = item;
+                    if (Listening.Contains(GameEvent.PickUp))
+                    {
+                        Inbound.PickedUp(unit, item);
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>Takes an item out of its slot, and as the game does, delivers the drop when it is listened for.</summary>
+        public void DropItem(unit unit, item item)
+        {
+            NoteGone(unit);
+            var slots = SlotsOf(unit);
+            for (var i = 0; i < slots.Length; i++)
+            {
+                if (slots[i] == item)
+                {
+                    InventoryCalls.Add("drop");
+                    slots[i] = null!;
+                    if (Listening.Contains(GameEvent.Drop))
+                    {
+                        Inbound.Dropped(unit, item);
+                    }
+
+                    return;
+                }
+            }
         }
     }
 }
