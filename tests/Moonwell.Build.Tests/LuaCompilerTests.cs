@@ -305,6 +305,43 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_left_out_default_of_a_base_constructor_is_written_in()
+        {
+            // : base(...) and a primary constructor's base call the base constructor as a call does (C18).
+            var source = string.Join("\n", new[]
+            {
+                "public class Shape",
+                "{",
+                "    public Shape(int count, float scale = 2f) { }",
+                "}",
+                "public class Square : Shape",
+                "{",
+                "    public Square() : base(1) { }",
+                "    public Square(int count) : this() { }",
+                "}",
+                "public class Circle() : Shape(1);",
+                "public class Dot : Shape",
+                "{",
+                "    public Dot(float scale = 3f) : base(1, scale) { }",
+                "    public Dot(int count) : this() { }",
+                "}",
+            });
+            var expected = source
+                .Replace(": base(1) { }", ": base(1, scale: 2.0f) { }")
+                .Replace("Shape(1);", "Shape(1, scale: 2.0f);")
+                .Replace("public Dot(int count) : this()", "public Dot(int count) : this(scale: 3.0f)");
+            var folder = Path.Combine(Path.GetTempPath(), "moonwell-floats-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(folder);
+            temporaryFolders.Add(folder);
+            File.WriteAllText(Path.Combine(folder, "Bases.cs"), source);
+
+            var errors = FloatLiterals.Rewrite(folder, new[] { "Bases.cs" }, "Bases", Array.Empty<string>(), Array.Empty<string>());
+
+            Assert.Empty(errors);
+            Assert.Equal(expected, File.ReadAllText(Path.Combine(folder, "Bases.cs")));
+        }
+
+        [Fact]
         public void missing_libraries_are_an_error()
         {
             var empty = Path.Combine(Path.GetTempPath(), "moonwell-empty-" + Guid.NewGuid().ToString("N"));
