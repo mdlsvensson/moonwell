@@ -1148,7 +1148,7 @@ namespace Moonwell.Testing
             Expect.Same(item, Item.Default<ItemAskedFromObject>(), "the item class's default");
         }
 
-        /// <summary>A type no class declares and the build's table does not hold (one the map's World Editor data adds) has an empty name on its default, not none.</summary>
+        /// <summary>A type no class declares and the build's table does not hold has an empty name on its default, not none.</summary>
         public static void DefaultNameOfUnknownTypeIsEmpty(FakeWorld world)
         {
             var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("h0we")))!;

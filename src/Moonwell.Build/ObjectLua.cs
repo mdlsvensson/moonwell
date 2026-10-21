@@ -265,14 +265,15 @@ namespace Moonwell.Build
         /// most life, most mana and starting mana are its totals, as its MaxLife, MaxMana and Mana read them. Lists and references
         /// hold the objects' ids; a field with no value has its type's default, a string the empty text.
         /// When the map reads <c>Default</c> (<see cref="DeclarationSet.TypeFields"/>), appends <c>MoonwellTypeValues</c> too: by type
-        /// id, the shared fields the map's code reads of every unit, hero and item type of the data set and of every class of the
-        /// map, which a type's default object with no class of the map's reads.
+        /// id, the shared fields the map's code reads of every unit, hero and item type of the data set, of every type the map makes
+        /// or changes in World Editor and of every class of the map, which a type's default object with no class of the map's reads.
         /// </summary>
         /// <param name="script">The compiled script, with the library before its compiled code; the fields read are found after the library.</param>
         /// <param name="declarations">The used classes, the declared objects, the map's hero bonuses and the fields read of a type's default object.</param>
         /// <param name="ids">The object id of each declared class, and of each standard class the declarations name.</param>
         /// <param name="standard">The standard data.</param>
         /// <param name="set">The tables standard values are read from (<see cref="GameData.ValueSet"/>): null for the base tables.</param>
+        /// <param name="mapTypes">The types the map makes or changes in World Editor (<see cref="MapTypes.Read"/>); empty when the map does not read <c>Default</c>.</param>
         /// <returns>The script with the values table at its end.</returns>
         /// <exception cref="BuildException">A declared list or reference names a class that has no object id.</exception>
         public static string Values(
@@ -280,7 +281,8 @@ namespace Moonwell.Build
             DeclarationSet declarations,
             IReadOnlyDictionary<string, string> ids,
             StandardData standard,
-            string? set)
+            string? set,
+            IReadOnlyList<MapType> mapTypes)
         {
             var used = declarations.Used;
             var read = GettersCalled(script);
@@ -339,7 +341,7 @@ namespace Moonwell.Build
             text.Append("}\n");
             if (declarations.TypeFields.Count > 0)
             {
-                AppendTypeValues(text, declarations, ids, standard, set);
+                AppendTypeValues(text, declarations, ids, standard, set, mapTypes);
             }
 
             return text.ToString();
@@ -425,8 +427,16 @@ namespace Moonwell.Build
             text.Append(entries.Count > 0 ? " }" : "}");
         }
 
-        // MoonwellTypeValues: the standard types first, then the map's classes, which win where they replace a standard object.
-        private static void AppendTypeValues(StringBuilder text, DeclarationSet declarations, IReadOnlyDictionary<string, string> ids, StandardData standard, string? set)
+        // MoonwellTypeValues: the standard types first, then the types the map makes or changes in World Editor, then the map's
+        // classes, which win where they have the id of either. A World Editor type reads its root's standard values where it
+        // changes none, as the game does: a new type based on hfoo has the standard footman's, not the map's change to hfoo.
+        private static void AppendTypeValues(
+            StringBuilder text,
+            DeclarationSet declarations,
+            IReadOnlyDictionary<string, string> ids,
+            StandardData standard,
+            string? set,
+            IReadOnlyList<MapType> mapTypes)
         {
             var none = new Dictionary<string, object?>(StringComparer.Ordinal);
             var types = new SortedDictionary<string, SortedDictionary<string, string>>(StringComparer.Ordinal);
@@ -456,6 +466,11 @@ namespace Moonwell.Build
             foreach (var id in standard.Ids("item"))
             {
                 Add(id, id, "item", id, none);
+            }
+
+            foreach (var one in mapTypes)
+            {
+                Add(one.Id, one.Id, one.Kind, one.Root, one.Changed);
             }
 
             foreach (var one in declarations.Objects)

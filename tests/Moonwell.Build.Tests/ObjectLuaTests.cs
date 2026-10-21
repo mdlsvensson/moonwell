@@ -1,7 +1,11 @@
 using System.Globalization;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text;
 using System.Text.RegularExpressions;
+using War3Net.Build.Extensions;
+using War3Net.Build.Object;
+using War3Net.Build.Script;
 using Xunit;
 
 namespace Moonwell.Build.Tests
@@ -87,6 +91,104 @@ namespace Moonwell.Build.Tests
             Assert.Equal("885.0 Knight", Query(lua, "local u = Moonwell.Unit(); u.TypeId = Moonwell.ObjectTypes.FourCC('hkni'); return Objects.Report.DefaultOf(u)"));
             Assert.Equal("450.0 Archmage", Query(lua, "local h = Moonwell.Hero(); h.TypeId = Moonwell.ObjectTypes.FourCC('Hamg'); return Objects.Report.DefaultOf(h)"));
             Assert.Equal("600.0 Footman", Query(lua, "local u = Moonwell.Unit(); u.TypeId = Moonwell.ObjectTypes.FourCC('hfoo'); return Objects.Report.DefaultOf(u)"));
+        }
+
+        [Fact]
+        public void type_values_read_the_types_the_map_makes_or_changes_in_world_editor()
+        {
+            // World Editor changed the knight and made a recruit (a footman with a name only) and a hero on the paladin; it also
+            // has H001 and hfoo, which the map's Arthas and StrongFootman declare. The skin file holds the names.
+            using var folders = new TestFolders();
+            var map = folders.TemporaryFolderOutsideRepository();
+            var main = new UnitObjectData(ObjectDataFormatVersion.v3);
+            main.BaseUnits.Add(WorldEditorObject("hkni", string.Empty, Mod("uhpm", 500)));
+            main.BaseUnits.Add(WorldEditorObject("hfoo", string.Empty, Mod("uhpm", 1)));
+            main.NewUnits.Add(WorldEditorObject("hfoo", "h00R"));
+            main.NewUnits.Add(WorldEditorObject("Hpal", "H00A", Mod("uhpm", 200), Mod("umpi", 1000)));
+            main.NewUnits.Add(WorldEditorObject("Hpal", "H001", Mod("uhpm", 1)));
+            var skin = new UnitObjectData(ObjectDataFormatVersion.v3);
+            skin.BaseUnits.Add(WorldEditorObject("hkni", string.Empty, Mod("unam", "Edited Knight")));
+            skin.NewUnits.Add(WorldEditorObject("hfoo", "h00R", Mod("unam", "Recruit")));
+            skin.NewUnits.Add(WorldEditorObject("Hpal", "H001", Mod("unam", "Old name")));
+            WriteUnits(Path.Combine(map, "war3map.w3u"), main);
+            WriteUnits(Path.Combine(map, "war3mapSkin.w3u"), skin);
+
+            var values = TypeValuesOf(ObjectLua.Values(compiled.Script, compiled.Declarations, NamedIds(), compiled.Standard, null, MapTypes.Read(map, null, compiled.Standard)));
+
+            Assert.Contains($"[{ObjectLua.FourCC("hkni")}] = {{ [\"uhpm\"] = 500, [\"umpi\"] = 0, [\"unam\"] = \"Edited Knight\" }}", values);
+            // A new type reads its base's standard values where it changes none: the standard footman's, not StrongFootman's.
+            Assert.Contains($"[{ObjectLua.FourCC("h00R")}] = {{ [\"uhpm\"] = 420, [\"umpi\"] = 0, [\"unam\"] = \"Recruit\" }}", values);
+            // The hero's life is its total, 200 + 22 * 25; its mana starts at most at its most mana, 0 + 17 * 15.
+            Assert.Contains($"[{ObjectLua.FourCC("H00A")}] = {{ [\"uhpm\"] = 750, [\"umpi\"] = 255, [\"unam\"] = \"Paladin\" }}", values);
+            // The map's classes win over World Editor's objects of their ids.
+            Assert.Contains($"[{ObjectLua.FourCC("H001")}] = {{ [\"uhpm\"] = 1300, [\"umpi\"] = 255, [\"unam\"] = \"Arthas\" }}", values);
+            Assert.Contains($"[{ObjectLua.FourCC("hfoo")}] = {{ [\"uhpm\"] = 600, [\"umpi\"] = 0, [\"unam\"] = \"Footman\" }}", values);
+            Assert.Contains($"[{ObjectLua.FourCC("hpea")}] = {{ [\"uhpm\"] = 240, [\"umpi\"] = 0, [\"unam\"] = \"Peasant\" }}", values);
+        }
+
+        [Fact]
+        public void type_values_read_world_editor_items_and_reals()
+        {
+            // Fields of a kind the Objects map does not read: an item's charges, a unit's scale (a real in the object file).
+            using var folders = new TestFolders();
+            var map = folders.TemporaryFolderOutsideRepository();
+            var units = new UnitObjectData(ObjectDataFormatVersion.v3);
+            units.NewUnits.Add(WorldEditorObject("hkni", "h00S"));
+            var unitSkin = new UnitObjectData(ObjectDataFormatVersion.v3);
+            unitSkin.NewUnits.Add(WorldEditorObject("hkni", "h00S", new SimpleObjectDataModification { Id = IdOf("usca"), Type = ObjectDataType.Real, Value = 2f }));
+            var items = new ItemObjectData(ObjectDataFormatVersion.v3);
+            items.BaseItems.Add(WorldEditorObject("ratf", string.Empty, Mod("iuse", 3)));
+            items.NewItems.Add(WorldEditorObject("ratf", "I000"));
+            WriteUnits(Path.Combine(map, "war3map.w3u"), units);
+            WriteUnits(Path.Combine(map, "war3mapSkin.w3u"), unitSkin);
+            using (var stream = File.Create(Path.Combine(map, "war3map.w3t")))
+            using (var writer = new BinaryWriter(stream, Encoding.UTF8))
+            {
+                writer.Write(items);
+            }
+
+            var fields = new Dictionary<string, IReadOnlyList<string>>(StringComparer.Ordinal) { ["unit"] = new[] { "usca" }, ["item"] = new[] { "iuse" } };
+            var declarations = compiled.Declarations with { TypeFields = fields };
+
+            var values = TypeValuesOf(ObjectLua.Values(compiled.Script, declarations, NamedIds(), compiled.Standard, null, MapTypes.Read(map, null, compiled.Standard)));
+
+            Assert.Contains($"[{ObjectLua.FourCC("h00S")}] = {{ [\"usca\"] = 2.0 }}", values);
+            Assert.Contains($"[{ObjectLua.FourCC("ratf")}] = {{ [\"iuse\"] = 3 }}", values);
+            Assert.Contains($"[{ObjectLua.FourCC("I000")}] = {{ [\"iuse\"] = 0 }}", values);
+        }
+
+        [Fact]
+        public void type_values_read_world_editors_own_save_with_its_trigger_strings()
+        {
+            // World Editor keeps the new peasant's name in war3map.wts, as TRIGSTR_012.
+            var fixture = TestFolders.Fixture("WorldEditorObjects");
+            TriggerStrings strings;
+            using (var reader = new StreamReader(Path.Combine(fixture, "war3map.wts")))
+            {
+                strings = reader.ReadTriggerStrings();
+            }
+
+            var types = MapTypes.Read(fixture, strings, compiled.Standard);
+
+            var values = TypeValuesOf(ObjectLua.Values(compiled.Script, compiled.Declarations, NamedIds(), compiled.Standard, null, types));
+            Assert.Contains($"[{ObjectLua.FourCC("h000")}] = {{ [\"uhpm\"] = 240, [\"umpi\"] = 0, [\"unam\"] = \"Unit\" }}", values);
+            var item = Assert.Single(types, one => one.Id == "I000");
+            Assert.Equal(("item", "ratf", (object?)"Item"), (item.Kind, item.Root, item.Changed["unam"]));
+        }
+
+        [Fact]
+        public void a_map_that_does_not_read_default_writes_no_type_values()
+        {
+            using var folders = new TestFolders();
+            var map = folders.TemporaryFolderOutsideRepository();
+            var main = new UnitObjectData(ObjectDataFormatVersion.v3);
+            main.NewUnits.Add(WorldEditorObject("hfoo", "h00R", Mod("uhpm", 500)));
+            WriteUnits(Path.Combine(map, "war3map.w3u"), main);
+            var declarations = compiled.Declarations with { TypeFields = new Dictionary<string, IReadOnlyList<string>>(StringComparer.Ordinal) };
+
+            var script = ObjectLua.Values(compiled.Script, declarations, NamedIds(), compiled.Standard, null, MapTypes.Read(map, null, compiled.Standard));
+
+            Assert.DoesNotContain("MoonwellTypeValues = {", CompiledObjects.ValuesOf(script));
         }
 
         [Fact]
@@ -332,7 +434,7 @@ namespace Moonwell.Build.Tests
 
             var script = compiled.Script + "\nlocal text = \"local endOfMoonwellObjects = true\"\n";
 
-            var values = CompiledObjects.ValuesOf(ObjectLua.Values(script, compiled.Declarations, ids, compiled.Standard, null));
+            var values = CompiledObjects.ValuesOf(ObjectLua.Values(script, compiled.Declarations, ids, compiled.Standard, null, Array.Empty<MapType>()));
 
             Assert.Contains("[\"ugol\"] = ", values);
         }
@@ -491,6 +593,51 @@ namespace Moonwell.Build.Tests
             Assert.Equal("table", Query(lua, "return type(Moonwell.Objects.Levels_1(1))"));
             Assert.Equal("table", Query(lua, "return type(Moonwell.Objects.ObjectList_1(1))"));
             Assert.Equal("table", Query(lua, "return type(Moonwell.Objects.ObjectRef_1(1))"));
+        }
+
+        // The ids the build gives Values: the standard classes' and the declared classes'.
+        private Dictionary<string, string> NamedIds()
+        {
+            var ids = new Dictionary<string, string>(compiled.Declarations.StandardClassIds, StringComparer.Ordinal);
+            foreach (var entry in compiled.Ids)
+            {
+                ids[entry.Key] = entry.Value;
+            }
+
+            return ids;
+        }
+
+        // The table of the types' values appended to a script.
+        private static string TypeValuesOf(string script)
+        {
+            var at = script.LastIndexOf("MoonwellTypeValues = {", StringComparison.Ordinal);
+            Assert.True(at >= 0, "the script has no table of the types' values");
+            return script.Substring(at);
+        }
+
+        private static SimpleObjectModification WorldEditorObject(string oldId, string newId, params SimpleObjectDataModification[] modifications)
+        {
+            var one = new SimpleObjectModification { OldId = IdOf(oldId), NewId = newId.Length == 0 ? 0 : IdOf(newId) };
+            one.Unk.Add(0);
+            one.Modifications.AddRange(modifications);
+            return one;
+        }
+
+        private static SimpleObjectDataModification Mod(string field, object value)
+        {
+            return new SimpleObjectDataModification { Id = IdOf(field), Type = value is int ? ObjectDataType.Int : ObjectDataType.String, Value = value };
+        }
+
+        private static int IdOf(string text)
+        {
+            return BitConverter.ToInt32(Encoding.ASCII.GetBytes(text));
+        }
+
+        private static void WriteUnits(string path, UnitObjectData data)
+        {
+            using var stream = File.Create(path);
+            using var writer = new BinaryWriter(stream, Encoding.UTF8);
+            writer.Write(data);
         }
 
         private static bool Truth(NLua.Lua lua, string chunk)
