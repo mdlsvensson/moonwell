@@ -590,14 +590,14 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void a_units_level_set_outside_its_constructor_is_an_error()
         {
-            AssertFails("LevelOutsideCtor", "LevelOutsideCtor.Veteran.Promote sets Level; a unit's level is set only in its class's constructor");
+            AssertFails("LevelOutsideCtor", "LevelOutsideCtor.Veteran.Promote sets Level; a unit's level is set only in its declared class's constructor");
         }
 
         [Fact]
         public void a_units_level_set_in_the_constructor_of_a_class_that_declares_nothing_is_an_error()
         {
             // The map has no class of Moonwell.Objects, so its assembly does not reference the library.
-            AssertFails("LevelInOtherCtor", "LevelInOtherCtor.Drill's constructor sets Level; a unit's level is set only in its class's constructor");
+            AssertFails("LevelInOtherCtor", "LevelInOtherCtor.Drill's constructor sets Level; a unit's level is set only in its declared class's constructor");
         }
 
         [Fact]
@@ -615,7 +615,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void a_units_level_set_in_a_class_of_its_own_inside_a_declared_class_is_an_error()
         {
-            AssertFails("LevelInNestedHelper", "LevelInNestedHelper.Veteran.Promoter's constructor sets Level; a unit's level is set only in its class's constructor");
+            AssertFails("LevelInNestedHelper", "LevelInNestedHelper.Veteran.Promoter's constructor sets Level; a unit's level is set only in its declared class's constructor");
         }
 
         [Fact]

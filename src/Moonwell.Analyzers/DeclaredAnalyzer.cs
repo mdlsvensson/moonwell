@@ -14,8 +14,10 @@ namespace Moonwell.Analyzers;
 /// A member of <c>Unit</c>, <c>Hero</c> or <c>Item</c> on the object itself is reported, except <c>Components</c> and the
 /// live members a declared field shares (<c>MaxMana</c>, <c>Name</c>, <c>Strength</c>, <c>Charges</c>), which there are the
 /// class's declared values; a hero's <c>Level</c> (and <c>Set("ulev", ...)</c>) is not one, since a hero starts at level 1.
-/// Code in a lambda or a local function may run later in the game, and is left alone. Also MW0015: a unit's <c>Level</c>,
-/// which has no setter in the game, is set only in the constructor of its declared class.
+/// The class's own default object (<c>Default</c>, or <c>Unit.Default&lt;T&gt;()</c> of the class or a class under it) is
+/// what the constructor is making, and is reported too. Code in a lambda or a local function may run later in the game,
+/// and is left alone. Also MW0015: a unit's <c>Level</c>, which has no setter in the game, is set only in the constructor
+/// of its declared class.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
@@ -65,9 +67,34 @@ public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
             {
                 Check(context, name);
             }
-            else if (node is InvocationExpressionSyntax invocation && IsHero(type))
+            else if (node is InvocationExpressionSyntax invocation)
             {
-                CheckSetLevel(context, invocation);
+                CheckClassDefault(context, invocation, type);
+                if (IsHero(type))
+                {
+                    CheckSetLevel(context, invocation);
+                }
+            }
+        }
+    }
+
+    private const string DefaultWhy = "reads the class's default object: a class's default object is what its constructor is making; read the field itself";
+
+    // Unit.Default<T>() (Hero.Default<T>(), Item.Default<T>()) of the class, or of a class under it, whose default is made with this constructor.
+    private static void CheckClassDefault(SyntaxNodeAnalysisContext context, InvocationExpressionSyntax invocation, INamedTypeSymbol type)
+    {
+        if (context.SemanticModel.GetSymbolInfo(invocation, context.CancellationToken).Symbol is not IMethodSymbol { Name: "Default", IsStatic: true, TypeArguments.Length: 1 } method
+            || !IsNamed(method.ContainingType, "Widget"))
+        {
+            return;
+        }
+
+        for (var at = method.TypeArguments[0] as INamedTypeSymbol; at != null; at = at.BaseType)
+        {
+            if (SymbolEqualityComparer.Default.Equals(at.OriginalDefinition, type.OriginalDefinition))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rules.LiveInDeclaration, invocation.GetLocation(), invocation.ToString(), DefaultWhy));
+                return;
             }
         }
     }
@@ -146,6 +173,12 @@ public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
         }
 
         var symbol = context.SemanticModel.GetSymbolInfo(name, context.CancellationToken).Symbol;
+        if (symbol is IPropertySymbol { Name: "Default", IsStatic: false } && (IsRuntimeType(symbol.ContainingType) || IsKindBase(symbol.ContainingType)))
+        {
+            context.ReportDiagnostic(Diagnostic.Create(Rules.LiveInDeclaration, name.GetLocation(), name.Identifier.ValueText, DefaultWhy));
+            return;
+        }
+
         if (symbol is not (IPropertySymbol or IMethodSymbol) || symbol.IsStatic || symbol.Name == "Components" || !IsRuntimeType(symbol.ContainingType)
             || InNameOf(context, name))
         {
@@ -195,6 +228,10 @@ public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
 
         return false;
     }
+
+    // StandardUnit, StandardHero or StandardItem of Moonwell.Objects, whose Default hides the runtime's.
+    private static bool IsKindBase(INamedTypeSymbol? type) =>
+        type is { Name: "StandardUnit" or "StandardHero" or "StandardItem" } && IsObjects(type);
 
     // A class that inherits Moonwell's Hero.
     private static bool IsHero(INamedTypeSymbol? type)

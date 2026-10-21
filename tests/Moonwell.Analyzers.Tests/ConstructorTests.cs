@@ -105,6 +105,65 @@ public class ConstructorTests
     }
 
     [Fact]
+    public void a_classs_own_default_object_in_its_constructor_is_an_error()
+    {
+        // The default object is what the constructor is making: the build cannot make it while it runs.
+        var source = """
+            using System;
+            using Moonwell;
+            using Moonwell.Objects;
+
+            namespace Map
+            {
+                public class Mage : Human.Units.Footman
+                {
+                    public Mage()
+                    {
+                        Tooltip = "Has " + Default.MaxLife;
+                        var life = this.Default.MaxLife + base.Default.MaxMana;
+                        var same = Unit.Default<Mage>().MaxLife;
+                        var footman = Unit.Default<Human.Units.Footman>().MaxLife;
+                        Func<float> later = () => Default.MaxLife + Unit.Default<Mage>().MaxLife;
+                    }
+                }
+
+                public class Champion : Human.Units.Paladin
+                {
+                    public Champion()
+                    {
+                        var name = Default.Name;
+                        var mana = Hero.Default<Champion>().MaxMana + Unit.Default<Champion>().MaxMana;
+                        var other = Unit.Default<Mage>().MaxLife;
+                    }
+                }
+
+                public class Potion : Items.ClawsOfAttack15
+                {
+                    public Potion()
+                    {
+                        Charges = Default.Charges + Item.Default<Potion>().Charges;
+                    }
+                }
+            }
+            """;
+
+        Assert.Equal(new[]
+        {
+            "MW0012: Default",
+            "MW0012: Default",
+            "MW0012: Default",
+            "MW0012: Unit.Default<Mage>()",
+            "MW0012: Default",
+            "MW0012: Hero.Default<Champion>()",
+            "MW0012: Unit.Default<Champion>()",
+            "MW0012: Default",
+            "MW0012: Item.Default<Potion>()",
+        }, MapCode.CheckFile(source));
+        Assert.Equal("'Default' reads the class's default object: a class's default object is what its constructor is making; read the field itself", MapCode.MessagesOfFile(source)[0]);
+        Assert.Equal("'Unit.Default<Mage>()' reads the class's default object: a class's default object is what its constructor is making; read the field itself", MapCode.MessagesOfFile(source)[3]);
+    }
+
+    [Fact]
     public void declared_and_shared_fields_components_later_code_and_classes_the_game_makes_are_accepted()
     {
         Assert.Empty(MapCode.CheckFile("""
@@ -250,7 +309,7 @@ public class ConstructorTests
             """;
 
         Assert.Equal(new[] { "MW0015: Unit.Level", "MW0015: Unit.Level", "MW0015: Level" }, MapCode.CheckFile(source));
-        Assert.Equal("a unit's level is set only in its class's constructor", MapCode.MessagesOfFile(source)[0]);
+        Assert.Equal("a unit's level is set only in its declared class's constructor", MapCode.MessagesOfFile(source)[0]);
     }
 
     [Fact]

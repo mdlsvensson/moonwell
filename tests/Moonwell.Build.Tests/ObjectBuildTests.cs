@@ -370,7 +370,7 @@ namespace Moonwell.Build.Tests
 
             var error = Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), new StringWriter()));
 
-            Assert.Equal("Sample.Drill.OnUnitDied sets Level; a unit's level is set only in its class's constructor", error.Message);
+            Assert.Equal("Sample.Drill.OnUnitDied sets Level; a unit's level is set only in its declared class's constructor", error.Message);
         }
 
         [Fact]

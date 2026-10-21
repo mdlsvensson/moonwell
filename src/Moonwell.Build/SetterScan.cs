@@ -42,7 +42,7 @@ namespace Moonwell.Build
                     }
 
                     var where = method.Name == ".ctor" ? MapClasses.Describe(type) + "'s constructor" : MapClasses.Describe(type) + "." + method.Name;
-                    var rule = found.Value.Name == UnitLevel ? "a unit's level is set only in its class's constructor" : "declared fields are set only in the constructor";
+                    var rule = found.Value.Name == UnitLevel ? "a unit's level is set only in its declared class's constructor" : "declared fields are set only in the constructor";
                     throw new BuildException($"{where} {found.Value.Verb} {found.Value.Name}; {rule}");
                 }
             }

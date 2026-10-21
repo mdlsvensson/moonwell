@@ -309,6 +309,34 @@ public class LocalTests
     }
 
     [Fact]
+    public void a_name_read_outside_local_for_names_the_declared_name()
+    {
+        // 0.2.2's Name read the declared value outside the constructor; the message says where that is now.
+        var found = MapCode.MessagesOfFile("""
+            using Moonwell;
+
+            namespace Map
+            {
+                public static class Use
+                {
+                    public static string Run(Unit unit, Hero hero)
+                    {
+                        return unit.Name + hero.Name + hero.ProperName + Natives.GetUnitName(unit.Handle);
+                    }
+                }
+            }
+            """);
+
+        Assert.Equal(new[]
+        {
+            "'Unit.Name' gives a different answer on each machine; use it only inside Local.For or a [MachineLocal] method; the declared name is Default.Name",
+            "'Unit.Name' gives a different answer on each machine; use it only inside Local.For or a [MachineLocal] method; the declared name is Default.Name",
+            "'Hero.ProperName' gives a different answer on each machine; use it only inside Local.For or a [MachineLocal] method",
+            "'GetUnitName' gives a different answer on each machine; use it only inside Local.For or a [MachineLocal] method",
+        }, found);
+    }
+
+    [Fact]
     public void name_set_outside_local_for_is_accepted()
     {
         Assert.Empty(MapCode.Check("""

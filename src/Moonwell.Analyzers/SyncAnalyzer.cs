@@ -130,7 +130,9 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             }
             else if (IsMachineLocal(member, write) && !DeclaredName(operation, member, write) && !InNameOf(operation))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rules.LocalOutside, location, Name(member)));
+                // 0.2.2's Name read the declared name outside the constructor too; the message says where it is now.
+                var declared = member is IPropertySymbol { Name: "Name" } && IsRuntime(member) && member.ContainingType.Name == "Unit" ? "; the declared name is Default.Name" : string.Empty;
+                context.ReportDiagnostic(Diagnostic.Create(Rules.LocalOutside, location, Name(member), declared));
             }
         }
 
