@@ -114,7 +114,9 @@ namespace Moonwell.Build.Tests
 
             var hitPoints = Assert.Single(arthas.Modifications, one => one.Id == IdOf("uhpm"));
             Assert.Equal(ObjectDataType.Int, hitPoints.Type);
-            Assert.Equal(2 * int.Parse(built.Standard.Value("Hpal", "uhpm", 0, null)!), hitPoints.Value);
+            // Arthas doubles the Paladin's total life; the base field is that total less his strength's 25 a point.
+            var strength = 25 * int.Parse(built.Standard.Value("Hpal", "ustr", 0, null)!);
+            Assert.Equal((2 * (int.Parse(built.Standard.Value("Hpal", "uhpm", 0, null)!) + strength)) - strength, hitPoints.Value);
             Assert.DoesNotContain(arthas.Modifications, one => one.Id == IdOf("unam"));
 
             var name = Assert.Single(arthasSkin.Modifications, one => one.Id == IdOf("unam"));

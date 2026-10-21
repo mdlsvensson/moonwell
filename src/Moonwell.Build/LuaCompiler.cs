@@ -56,7 +56,7 @@ namespace Moonwell.Build
             }
 
             script = ObjectLua.AddToInit(script, declarations.Used);
-            script = ObjectLua.Values(script, declarations.Used, declarations.Objects, named, standard, set);
+            script = ObjectLua.Values(script, declarations, named, standard, set);
             script = LineTable.Apply(script, files);
             map.Script = script;
             return script;

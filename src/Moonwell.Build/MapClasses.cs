@@ -54,7 +54,7 @@ namespace Moonwell.Build
             return thrownIn == "Moonwell.Unit" || thrownIn == "Moonwell.Hero" || thrownIn == "Moonwell.Item";
         }
 
-        private static string? FirstLineInProject(StackTrace trace, MapProject project)
+        internal static string? FirstLineInProject(StackTrace trace, MapProject project)
         {
             var root = project.Folder + Path.DirectorySeparatorChar;
             foreach (var frame in trace.GetFrames())

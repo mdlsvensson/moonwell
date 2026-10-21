@@ -403,6 +403,61 @@ namespace Moonwell.Build.Tests
             Assert.Contains("\"Sample.Arthas\"", script);
         }
 
+        [Fact]
+        public void a_heros_total_becomes_its_base_in_the_object_file()
+        {
+            // The Paladin has 22 strength and 17 intelligence: 550 life and 255 mana of his start come from them (25 and 15 a
+            // point). Mana is what he starts with, his field plus his intelligence's share (seen on 3.0.1, 10-21).
+            var copy = folders.TemporaryCopyOfSample();
+            File.WriteAllText(Path.Combine(copy, "Objects.cs"), """
+                namespace Sample
+                {
+                    [Moonwell.Objects.ObjectId("H001")]
+                    public sealed class Arthas : Moonwell.Objects.Human.Units.Paladin
+                    {
+                        public Arthas()
+                        {
+                            MaxLife = 800;
+                            MaxMana = 400;
+                            Mana = 300;
+                        }
+                    }
+                }
+                """);
+
+            MapBuild.Run(copy, new BuildOptions(), new StringWriter());
+
+            var arthas = Assert.Single(ReadUnits(copy).NewUnits);
+            Assert.Equal(250, Assert.Single(arthas.Modifications, one => one.Id == IdOf("uhpm")).Value);
+            Assert.Equal(145, Assert.Single(arthas.Modifications, one => one.Id == IdOf("umpm")).Value);
+            Assert.Equal(45, Assert.Single(arthas.Modifications, one => one.Id == IdOf("umpi")).Value);
+        }
+
+        [Fact]
+        public void a_float_on_an_int_field_is_truncated()
+        {
+            // MaxLife is a float, as the game gives it; the field is a whole number, and the setter drops the fraction.
+            var copy = folders.TemporaryCopyOfSample();
+            File.WriteAllText(Path.Combine(copy, "Objects.cs"), """
+                namespace Sample
+                {
+                    [Moonwell.Objects.ObjectId("h001")]
+                    public sealed class Sturdy : Moonwell.Objects.Human.Units.Footman
+                    {
+                        public Sturdy()
+                        {
+                            MaxLife = 800.7f;
+                        }
+                    }
+                }
+                """);
+
+            MapBuild.Run(copy, new BuildOptions(), new StringWriter());
+
+            var sturdy = Assert.Single(ReadUnits(copy).NewUnits);
+            Assert.Equal(800, Assert.Single(sturdy.Modifications, one => one.Id == IdOf("uhpm")).Value);
+        }
+
         [Theory]
         [InlineData("public const int Magic = (int)Moonwell.Objects.Targets.Air;")]
         [InlineData("public static int Pick(int value) { switch (value) { case (int)Moonwell.Objects.Targets.Air: return 1; default: return 0; } }")]
@@ -756,6 +811,13 @@ namespace Moonwell.Build.Tests
             var after = before.Replace(text, with, StringComparison.Ordinal);
             Assert.NotEqual(before, after);
             File.WriteAllText(path, after);
+        }
+
+        // The staged unit file of a built copy of the Sample.
+        private static War3Net.Build.Object.UnitObjectData ReadUnits(string copy)
+        {
+            using var reader = new BinaryReader(File.OpenRead(Path.Combine(copy, "build", "Sample", "war3map.w3u")), Encoding.UTF8);
+            return reader.ReadUnitObjectData();
         }
 
         private static Dictionary<string, string> ReadIds(string path)

@@ -646,7 +646,7 @@ namespace Moonwell.Objects.Tests
         }
     }
 
-    /// <summary>The tests that set <see cref="StandardValues.Read"/>, a static, run one after another.</summary>
+    /// <summary>The tests that set <see cref="StandardValues.Read"/> or <see cref="StandardValues.HeroBonus"/>, statics, or read a hero's totals, run one after another.</summary>
     [CollectionDefinition(Name)]
     public class StandardValuesCollection
     {

@@ -15,6 +15,8 @@ namespace Moonwell.Build
     public static class ObjectLua
     {
         private const string FieldAttributeName = "Moonwell.Objects.FieldAttribute";
+        private const string SharedFieldAttributeName = "Moonwell.Objects.SharedFieldAttribute";
+        private const string RuntimeAssemblyName = "Moonwell";
         // The library's last line: a statement, not a comment, so that a release build keeps it. The compiled code is after it.
         private const string LibraryEnd = "local endOfMoonwellObjects = true";
         private const string ObjectsNamespace = "Moonwell.Objects";
@@ -23,6 +25,26 @@ namespace Moonwell.Build
         private static readonly string[] Generics = { "Levels_1", "ObjectList_1", "ObjectRef_1" };
 
         private static readonly Regex Getter = new Regex("\\bget[A-Za-z_][A-Za-z0-9_]*", RegexOptions.CultureInvariant);
+
+        // The hooks a kind base overrides, which the core's shared members call for an object with no handle: its stub has them,
+        // so that CSharp.lua calls them on the object, and the library writes them.
+        private static readonly string[] Hooks = { "DeclaredValue", "Declare" };
+
+        // The classes whose Default, or Default<T>(), gives a type's default object.
+        private static readonly HashSet<string> DefaultOwners = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "Moonwell.Unit", "Moonwell.Hero", "Moonwell.Item", "Moonwell.Widget",
+            "Moonwell.Objects.StandardUnit", "Moonwell.Objects.StandardHero", "Moonwell.Objects.StandardItem",
+        };
+
+        // The kinds whose types have a default object, each with the kind base that carries its shared fields and the core
+        // classes whose members are their live values.
+        private static readonly (string Kind, string KindBase, string[] Owners)[] TypeKinds =
+        {
+            ("unit", "Moonwell.Objects.StandardUnit", new[] { "Moonwell.Unit" }),
+            ("hero", "Moonwell.Objects.StandardHero", new[] { "Moonwell.Unit", "Moonwell.Hero" }),
+            ("item", "Moonwell.Objects.StandardItem", new[] { "Moonwell.Item" }),
+        };
 
         /// <summary>
         /// The declared classes of the map, every class of <c>Moonwell.Objects</c> the map assembly's type references name that is
@@ -55,7 +77,7 @@ namespace Moonwell.Build
                 var reader = pe.GetMetadataReader();
                 foreach (var handle in reader.TypeReferences)
                 {
-                    var name = ObjectsTypeName(reader, handle);
+                    var name = TypeNameIn(reader, handle, Declarations.ObjectsAssemblyName);
                     var type = name == null ? null : objects.GetType(name);
                     if (type != null && (IsKindBase(type) || Declarations.KindBaseOf(type) != null))
                     {
@@ -75,7 +97,7 @@ namespace Moonwell.Build
                 foreach (var handle in reader.MemberReferences)
                 {
                     var member = reader.GetMemberReference(handle);
-                    var parent = member.Parent.Kind == HandleKind.TypeReference ? ObjectsTypeName(reader, (TypeReferenceHandle)member.Parent) : null;
+                    var parent = member.Parent.Kind == HandleKind.TypeReference ? TypeNameIn(reader, (TypeReferenceHandle)member.Parent, Declarations.ObjectsAssemblyName) : null;
                     if (parent == null)
                     {
                         continue;
@@ -121,8 +143,10 @@ namespace Moonwell.Build
         /// files evaluate when they load, then each class with its base, its methods the map calls (such as <c>Set</c>, which does
         /// nothing, and <c>Levels</c>, which gives nil) and, for each field of it the map names, a getter that reads the class's
         /// values (<c>MoonwellField</c> in <c>moonwell.lua</c>) and a setter that does nothing: the fields' values are written into
-        /// the object files, so what a constructor puts has no effect in the game. The members are those of the class's stub
-        /// (<see cref="ObjectStubs"/>), the only ones CSharp.lua can call.
+        /// the object files, so what a constructor puts has no effect in the game. A kind base gets the same for its shared fields
+        /// through its hooks: <c>DeclaredValue</c>, which the core's live member calls for an object with no handle, reads the
+        /// class's values, and <c>Declare</c> does nothing. The members are those of the class's stub (<see cref="ObjectStubs"/>),
+        /// the only ones CSharp.lua can call.
         /// </summary>
         /// <param name="used">The used classes.</param>
         /// <returns>The library's Lua.</returns>
@@ -235,13 +259,17 @@ namespace Moonwell.Build
 
         /// <summary>
         /// Appends <c>MoonwellObjectValues</c> to the script: for each used class that has an object (a declared class or a standard
-        /// class), the values of the fields its chain declares whose getter the compiled code calls. A declared class has its
-        /// changed values, else its standard root's; a standard class its own. Lists and references hold the objects' ids; a field
-        /// with no value has its type's default, a string the empty text.
+        /// class), the values of the fields its chain declares whose getter the compiled code calls, and every shared field of its
+        /// kind (the core's members read them through the kind base's hooks, which the scan of getters cannot tell from the core's
+        /// own live reads). A declared class has its changed values, else its standard root's; a standard class its own. A hero's
+        /// most life, most mana and starting mana are its totals, as its MaxLife, MaxMana and Mana read them. Lists and references
+        /// hold the objects' ids; a field with no value has its type's default, a string the empty text.
+        /// When the map reads <c>Default</c> (<see cref="DeclarationSet.TypeFields"/>), appends <c>MoonwellTypeValues</c> too: by type
+        /// id, the shared fields the map's code reads of every unit, hero and item type of the data set and of every class of the
+        /// map, which a type's default object with no class of the map's reads.
         /// </summary>
         /// <param name="script">The compiled script, with the library before its compiled code; the fields read are found after the library.</param>
-        /// <param name="used">The used classes.</param>
-        /// <param name="declared">The declared objects.</param>
+        /// <param name="declarations">The used classes, the declared objects, the map's hero bonuses and the fields read of a type's default object.</param>
         /// <param name="ids">The object id of each declared class, and of each standard class the declarations name.</param>
         /// <param name="standard">The standard data.</param>
         /// <param name="set">The tables standard values are read from (<see cref="GameData.ValueSet"/>): null for the base tables.</param>
@@ -249,15 +277,15 @@ namespace Moonwell.Build
         /// <exception cref="BuildException">A declared list or reference names a class that has no object id.</exception>
         public static string Values(
             string script,
-            IReadOnlyList<UsedClass> used,
-            IReadOnlyList<DeclaredObject> declared,
+            DeclarationSet declarations,
             IReadOnlyDictionary<string, string> ids,
             StandardData standard,
             string? set)
         {
+            var used = declarations.Used;
             var read = GettersCalled(script);
             var byName = used.ToDictionary(one => one.FullName, StringComparer.Ordinal);
-            var objects = declared.ToDictionary(one => one.ClassName, StringComparer.Ordinal);
+            var objects = declarations.Objects.ToDictionary(one => one.ClassName, StringComparer.Ordinal);
             var none = new Dictionary<string, object?>(StringComparer.Ordinal);
             var text = new StringBuilder(script);
             if (script.Length > 0 && script[script.Length - 1] != '\n')
@@ -285,7 +313,7 @@ namespace Moonwell.Build
                     continue;
                 }
 
-                var reader = new FieldValues(one, root, changed, ids, standard, set);
+                var reader = new FieldValues(one.FullName, one.Kind, root, changed, ids, standard, set);
                 var entries = new SortedDictionary<string, string>(StringComparer.Ordinal);
                 for (var chain = one; chain != null; chain = byName.GetValueOrDefault(chain.BaseFullName))
                 {
@@ -296,21 +324,157 @@ namespace Moonwell.Build
                             entries[field.FieldId] = reader.Literal(field);
                         }
                     }
+
+                    foreach (var field in chain.Shared)
+                    {
+                        entries[field.FieldId] = SharedLiteral(reader, one.Kind, field.FieldId, declarations.Bonus);
+                    }
                 }
 
-                text.Append("  [").Append(Quote(one.FullName)).Append("] = {");
-                var separator = " ";
-                foreach (var entry in entries)
-                {
-                    text.Append(separator).Append('[').Append(Quote(entry.Key)).Append("] = ").Append(entry.Value);
-                    separator = ", ";
-                }
-
-                text.Append(entries.Count > 0 ? " },\n" : "},\n");
+                text.Append("  [").Append(Quote(one.FullName)).Append("] = ");
+                AppendEntries(text, entries);
+                text.Append(",\n");
             }
 
             text.Append("}\n");
+            if (declarations.TypeFields.Count > 0)
+            {
+                AppendTypeValues(text, declarations, ids, standard, set);
+            }
+
             return text.ToString();
+        }
+
+        /// <summary>
+        /// The shared fields the map's code may read of a type's default object, by kind (<c>unit</c>, <c>hero</c>, <c>item</c>): the
+        /// fields whose live members' getters the map's assembly names. Empty when the assembly names no <c>Default</c> nor
+        /// <c>Default&lt;T&gt;()</c>, so that a map that never reads one gets no table of the types' values.
+        /// </summary>
+        /// <param name="objects">The map's copy of <c>Moonwell.Objects</c>, whose kind bases carry the shared fields.</param>
+        /// <param name="assemblyPath">The map assembly's file, whose metadata holds the member references.</param>
+        /// <returns>The field ids of each kind that has any, in ordinal order.</returns>
+        internal static IReadOnlyDictionary<string, IReadOnlyList<string>> TypeFields(Assembly objects, string assemblyPath)
+        {
+            var getters = new HashSet<string>(StringComparer.Ordinal);
+            var readsDefault = false;
+            using (var pe = new PEReader(new MemoryStream(File.ReadAllBytes(assemblyPath))))
+            {
+                var reader = pe.GetMetadataReader();
+                foreach (var handle in reader.MemberReferences)
+                {
+                    var member = reader.GetMemberReference(handle);
+                    if (member.Parent.Kind != HandleKind.TypeReference)
+                    {
+                        continue;
+                    }
+
+                    var parentHandle = (TypeReferenceHandle)member.Parent;
+                    var parent = TypeNameIn(reader, parentHandle, RuntimeAssemblyName) ?? TypeNameIn(reader, parentHandle, Declarations.ObjectsAssemblyName);
+                    if (parent == null)
+                    {
+                        continue;
+                    }
+
+                    var name = reader.GetString(member.Name);
+                    readsDefault |= DefaultOwners.Contains(parent) && (name == "get_Default" || name == "Default");
+                    if (name.StartsWith("get_", StringComparison.Ordinal))
+                    {
+                        getters.Add(parent + "." + name.Substring(4));
+                    }
+                }
+            }
+
+            var fields = new Dictionary<string, IReadOnlyList<string>>(StringComparer.Ordinal);
+            if (!readsDefault)
+            {
+                return fields;
+            }
+
+            foreach (var (kind, kindBase, owners) in TypeKinds)
+            {
+                var read = SharedFieldsOf(objects.GetType(kindBase, true)!)
+                    .Where(field => owners.Any(owner => getters.Contains(owner + "." + field.Property)))
+                    .Select(field => field.FieldId)
+                    .ToList();
+                if (read.Count > 0)
+                {
+                    fields[kind] = read;
+                }
+            }
+
+            return fields;
+        }
+
+        // A shared field's value: a hero's most life, most mana and starting mana as its totals.
+        private static string SharedLiteral(FieldValues reader, string kind, string field, HeroBonus bonus)
+        {
+            return kind == "hero" && HeroBonus.AttributeOf(field) != null ? reader.Total(field, bonus) : reader.Literal(new UsedField(field, field, "value"));
+        }
+
+        // A table of entries: { ["uhpm"] = 420, ["unam"] = "Footman" }, or {} for none.
+        private static void AppendEntries(StringBuilder text, IReadOnlyDictionary<string, string> entries)
+        {
+            text.Append('{');
+            var separator = " ";
+            foreach (var entry in entries)
+            {
+                text.Append(separator).Append('[').Append(Quote(entry.Key)).Append("] = ").Append(entry.Value);
+                separator = ", ";
+            }
+
+            text.Append(entries.Count > 0 ? " }" : "}");
+        }
+
+        // MoonwellTypeValues: the standard types first, then the map's classes, which win where they replace a standard object.
+        private static void AppendTypeValues(StringBuilder text, DeclarationSet declarations, IReadOnlyDictionary<string, string> ids, StandardData standard, string? set)
+        {
+            var none = new Dictionary<string, object?>(StringComparer.Ordinal);
+            var types = new SortedDictionary<string, SortedDictionary<string, string>>(StringComparer.Ordinal);
+            void Add(string id, string name, string kind, string root, IReadOnlyDictionary<string, object?> changed)
+            {
+                if (!declarations.TypeFields.TryGetValue(kind, out var fields))
+                {
+                    return;
+                }
+
+                var reader = new FieldValues(name, kind, root, changed, ids, standard, set);
+                var entries = new SortedDictionary<string, string>(StringComparer.Ordinal);
+                foreach (var field in fields)
+                {
+                    entries[field] = SharedLiteral(reader, kind, field, declarations.Bonus);
+                }
+
+                types[id] = entries;
+            }
+
+            // The generator's rule: a unit whose id starts with a capital letter is a hero.
+            foreach (var id in standard.Ids("unit"))
+            {
+                Add(id, id, char.IsUpper(id[0]) ? "hero" : "unit", id, none);
+            }
+
+            foreach (var id in standard.Ids("item"))
+            {
+                Add(id, id, "item", id, none);
+            }
+
+            foreach (var one in declarations.Objects)
+            {
+                if (one.Kind is "unit" or "hero" or "item")
+                {
+                    Add(ids[one.ClassName], one.ClassName, one.Kind, one.StandardRoot, one.Changed);
+                }
+            }
+
+            text.Append("MoonwellTypeValues = {\n");
+            foreach (var type in types)
+            {
+                text.Append("  [").Append(FourCC(type.Key).ToString(CultureInfo.InvariantCulture)).Append("] = ");
+                AppendEntries(text, type.Value);
+                text.Append(",\n");
+            }
+
+            text.Append("}\n");
         }
 
         /// <summary>A Lua string literal.</summary>
@@ -378,6 +542,8 @@ namespace Moonwell.Build
                 ObjectStubs.AddEnums(type, names, enums);
             }
 
+            var shared = inObjects ? SharedFieldsOf(type) : Array.Empty<UsedField>();
+            IReadOnlySet<string> stubbed = shared.Count > 0 ? new HashSet<string>(names.Concat(Hooks), StringComparer.Ordinal) : names;
             used.Add(new UsedClass(
                 name,
                 MapClasses.Describe(type.BaseType!),
@@ -386,18 +552,30 @@ namespace Moonwell.Build
                 inObjects,
                 inObjects ? FieldsOf(type, names) : Array.Empty<UsedField>(),
                 inObjects ? ObjectStubs.Methods(type, names) : Array.Empty<UsedMethod>(),
-                inObjects ? ObjectStubs.Class(type, names) : string.Empty));
+                inObjects ? ObjectStubs.Class(type, stubbed) : string.Empty,
+                shared));
         }
 
-        // The reflection name of a type a reference names in Moonwell.Objects (a nested type after a +); null for a type of another assembly.
-        private static string? ObjectsTypeName(MetadataReader reader, TypeReferenceHandle handle)
+        // The shared fields a class itself carries ([SharedField] on a kind base), each by its live member, in id order.
+        private static IReadOnlyList<UsedField> SharedFieldsOf(Type type)
+        {
+            return type.GetCustomAttributesData()
+                .Where(data => data.AttributeType.FullName == SharedFieldAttributeName)
+                .Select(data => new UsedField((string)data.ConstructorArguments[1].Value!, (string)data.ConstructorArguments[0].Value!, "value"))
+                .OrderBy(field => field.FieldId, StringComparer.Ordinal)
+                .ToList();
+        }
+
+        // The reflection name of a type a reference names in an assembly, such as Moonwell.Objects (a nested type after a +); null
+        // for a type of another assembly.
+        private static string? TypeNameIn(MetadataReader reader, TypeReferenceHandle handle, string assembly)
         {
             var reference = reader.GetTypeReference(handle);
 
             // A nested class (Moonwell.Objects.Human+Units+Paladin) is referenced through the class it is nested in.
             if (reference.ResolutionScope.Kind == HandleKind.TypeReference)
             {
-                var outer = ObjectsTypeName(reader, (TypeReferenceHandle)reference.ResolutionScope);
+                var outer = TypeNameIn(reader, (TypeReferenceHandle)reference.ResolutionScope, assembly);
                 return outer == null ? null : outer + "+" + reader.GetString(reference.Name);
             }
 
@@ -407,7 +585,7 @@ namespace Moonwell.Build
             }
 
             var scope = reader.GetAssemblyReference((AssemblyReferenceHandle)reference.ResolutionScope);
-            if (reader.GetString(scope.Name) != Declarations.ObjectsAssemblyName)
+            if (reader.GetString(scope.Name) != assembly)
             {
                 return null;
             }
@@ -470,6 +648,13 @@ namespace Moonwell.Build
                 {
                     text.Append(",\n      set").Append(field.Property).Append(" = nothing");
                 }
+            }
+
+            // A kind base's hooks: a shared member with no handle reads the class's value and puts nothing, as a field's accessors do.
+            if (one.Shared.Count > 0)
+            {
+                text.Append(",\n      DeclaredValue = function (this, field, T) return MoonwellField(this, field, \"value\") end");
+                text.Append(",\n      Declare = nothing");
             }
 
             text.Append("\n    }\n");

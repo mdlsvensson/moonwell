@@ -9,7 +9,29 @@ namespace Objects
         {
             var arthas = new Arthas();
             var firebolt = new Firebolt();
-            Natives.DisplayTextToPlayer(Natives.Player(0), 0f, 0f, "objects: " + arthas.GoldCost + " " + firebolt.Damage[2]);
+            Natives.DisplayTextToPlayer(Natives.Player(0), 0f, 0f, "objects: " + arthas.GoldCost + " " + firebolt.Damage[2] + " " + arthas.Default.MaxLife);
+        }
+
+        // A shared member with no handle reads the value the class declares: on an object its constructor made, and on the
+        // class's default object.
+        public static string Shared()
+        {
+            var arthas = new Arthas();
+            return arthas.MaxLife + " " + arthas.Mana + " " + Unit.Default<Arthas>().MaxLife + " " + Unit.Default<Arthas>().Name;
+        }
+
+        // One default object of a class: from its object, as the kind base's Default and as the core's, and from the class.
+        public static bool SameDefault()
+        {
+            var arthas = new Arthas();
+            Unit unit = arthas;
+            return arthas.Default == Unit.Default<Arthas>() && unit.Default == Unit.Default<Arthas>();
+        }
+
+        // A unit's default object: its type's values, from the build's table by type id for a type no class of the map's declares.
+        public static string DefaultOf(Unit unit)
+        {
+            return unit.Default.MaxLife + " " + unit.Default.Name;
         }
 
         // Arthas's description has no value: it reads as the empty text.

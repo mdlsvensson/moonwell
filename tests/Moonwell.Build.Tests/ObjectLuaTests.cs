@@ -24,8 +24,69 @@ namespace Moonwell.Build.Tests
             var run = compiled.Run();
 
             Assert.Empty(run.Errors);
-            // Damage is a float, so Lua prints it with its point (C18).
-            Assert.Contains($"objects: {2 * paladin} 200.0", run.Lines);
+            // Damage is a float, so Lua prints it with its point (C18); so is a unit's MaxLife, Arthas's doubled total.
+            Assert.Contains($"objects: {2 * paladin} 200.0 1300.0", run.Lines);
+        }
+
+        [Fact]
+        public void declared_shared_value_reads_in_lua()
+        {
+            using var lua = compiled.Start();
+
+            // The Paladin's total life is 100 + 22 * 25, which Arthas doubles; his mana starts full at 0 + 17 * 15. The values are
+            // the totals the build wrote, read through the kind base's hooks with no handle.
+            Assert.Equal("1300.0 255.0 1300.0 Arthas", Query(lua, "return Objects.Report.Shared()"));
+            Assert.Equal("1300.0 Arthas", Query(lua, "local a = Objects.Arthas(); return tostring(a:getMaxLife()) .. ' ' .. a:getName()"));
+            Assert.Equal("1300.0 Dark Arthas", Query(lua, "local a = Objects.DarkArthas(); return tostring(a:getMaxLife()) .. ' ' .. a:getName()"));
+            Assert.Equal("600.0", Query(lua, "return tostring(Objects.StrongFootman():getMaxLife())"));
+            Assert.Contains("[\"uhpm\"] = 1300", Regex.Match(CompiledObjects.ValuesOf(compiled.Script), "\\[\"Objects\\.Arthas\"\\] = \\{[^\\n]*").Value);
+        }
+
+        [Fact]
+        public void the_default_object_is_the_same_object_from_a_unit_and_from_its_class()
+        {
+            using var lua = compiled.Start();
+
+            Assert.True(Truth(lua, "return Objects.Report.SameDefault()"));
+            Assert.True(Truth(lua, "return System.is(Moonwell.Widget.Default(Objects.Arthas), Objects.Arthas)"));
+        }
+
+        [Fact]
+        public void shared_members_in_a_constructor_call_no_native_in_lua()
+        {
+            using var lua = compiled.Start();
+
+            // Every global the game would give is logged from here: a native called with no handle would show.
+            lua.DoString("natives = {}; setmetatable(_G, { __index = function(_, name) return function() natives[#natives + 1] = name; return nil end end })");
+            lua.DoString("for _, id in ipairs({ 'H001', 'H002', 'hfoo' }) do Moonwell.ObjectTypes.UnitMaker(Moonwell.ObjectTypes.FourCC(id))() end");
+
+            Assert.Equal(string.Empty, Query(lua, "return table.concat(natives, ',')"));
+        }
+
+        [Fact]
+        public void type_values_are_written_when_the_map_reads_default()
+        {
+            // Report reads Default, MaxLife, Mana and Name: every unit and hero type has those fields, a hero its totals, and a map's class its own values.
+            var values = compiled.Script.Substring(compiled.Script.LastIndexOf("MoonwellTypeValues = {", StringComparison.Ordinal));
+
+            Assert.Contains($"[{ObjectLua.FourCC("H001")}] = {{ [\"uhpm\"] = 1300, [\"umpi\"] = 255, [\"unam\"] = \"Arthas\" }}", values);
+            Assert.Contains($"[{ObjectLua.FourCC("hfoo")}] = {{ [\"uhpm\"] = 600, [\"umpi\"] = 0, [\"unam\"] = \"Footman\" }}", values);
+            Assert.Contains($"[{ObjectLua.FourCC("Hamg")}] = {{ [\"uhpm\"] = 450, [\"umpi\"] = 285, [\"unam\"] = \"Archmage\" }}", values);
+            // No item field is read.
+            Assert.DoesNotContain($"[{ObjectLua.FourCC("ratf")}] =", values);
+            Assert.DoesNotContain("umpm", values);
+        }
+
+        [Fact]
+        public void a_plain_footmans_default_reads_its_standard_value()
+        {
+            using var lua = compiled.Start();
+
+            // The Objects map's StrongFootman replaces the footman; the knight and the archmage have no class of the map's. A unit
+            // the game made has its type id and a plain class; its default object has neither handle nor class of the map's.
+            Assert.Equal("885.0 Knight", Query(lua, "local u = Moonwell.Unit(); u.TypeId = Moonwell.ObjectTypes.FourCC('hkni'); return Objects.Report.DefaultOf(u)"));
+            Assert.Equal("450.0 Archmage", Query(lua, "local h = Moonwell.Hero(); h.TypeId = Moonwell.ObjectTypes.FourCC('Hamg'); return Objects.Report.DefaultOf(h)"));
+            Assert.Equal("600.0 Footman", Query(lua, "local u = Moonwell.Unit(); u.TypeId = Moonwell.ObjectTypes.FourCC('hfoo'); return Objects.Report.DefaultOf(u)"));
         }
 
         [Fact]
@@ -215,7 +276,9 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void unused_standard_class_absent()
         {
-            Assert.DoesNotContain("Archmage", compiled.Script);
+            // The table by type id has every type's name.
+            var types = compiled.Script.LastIndexOf("MoonwellTypeValues = {", StringComparison.Ordinal);
+            Assert.DoesNotContain("Archmage", compiled.Script.Substring(0, types));
             Assert.DoesNotContain("Archmage", compiled.Registry);
         }
 
@@ -269,7 +332,7 @@ namespace Moonwell.Build.Tests
 
             var script = compiled.Script + "\nlocal text = \"local endOfMoonwellObjects = true\"\n";
 
-            var values = CompiledObjects.ValuesOf(ObjectLua.Values(script, compiled.Declarations.Used, compiled.Declarations.Objects, ids, compiled.Standard, null));
+            var values = CompiledObjects.ValuesOf(ObjectLua.Values(script, compiled.Declarations, ids, compiled.Standard, null));
 
             Assert.Contains("[\"ugol\"] = ", values);
         }

@@ -2,11 +2,12 @@ using System.Globalization;
 
 namespace Moonwell.Build
 {
-    // The values of one used class's fields as Lua literals: a declared class's changed values, else its standard root's; a
-    // standard class's own. Lists and references are the objects' ids as numbers.
+    // The values of one used class's fields (or one type's) as Lua literals: a declared class's changed values, else its
+    // standard root's; a standard class's own. Lists and references are the objects' ids as numbers.
     internal sealed class FieldValues
     {
-        private readonly UsedClass used;
+        private readonly string name;
+        private readonly string kind;
         private readonly string root;
         private readonly IReadOnlyDictionary<string, object?> changed;
         private readonly IReadOnlyDictionary<string, string> ids;
@@ -14,21 +15,23 @@ namespace Moonwell.Build
         private readonly string? set;
         private readonly Dictionary<string, StandardData.ObjectField> fields = new Dictionary<string, StandardData.ObjectField>(StringComparer.Ordinal);
 
-        /// <param name="used">The class.</param>
+        /// <param name="name">The class's full name, or the type's id, for messages.</param>
+        /// <param name="kind">The kind of its object.</param>
         /// <param name="root">The standard object whose values the class has where it changed none.</param>
         /// <param name="changed">The values the class changed, as <see cref="DeclaredObject.Changed"/>; empty for a standard class.</param>
         /// <param name="ids">The object id of each class a changed list or reference may name.</param>
         /// <param name="standard">The standard data.</param>
         /// <param name="set">The tables values are read from (<see cref="GameData.ValueSet"/>): null for the base tables.</param>
-        public FieldValues(UsedClass used, string root, IReadOnlyDictionary<string, object?> changed, IReadOnlyDictionary<string, string> ids, StandardData standard, string? set)
+        public FieldValues(string name, string kind, string root, IReadOnlyDictionary<string, object?> changed, IReadOnlyDictionary<string, string> ids, StandardData standard, string? set)
         {
-            this.used = used;
+            this.name = name;
+            this.kind = kind;
             this.root = root;
             this.changed = changed;
             this.ids = ids;
             this.standard = standard;
             this.set = set;
-            foreach (var field in standard.Fields(used.Kind))
+            foreach (var field in standard.Fields(kind))
             {
                 fields[field.Id] = field;
             }
@@ -51,6 +54,28 @@ namespace Moonwell.Build
                 default:
                     return Value(type, known?.Choice, Raw(field.FieldId, 0));
             }
+        }
+
+        /// <summary>
+        /// A hero's most life, most mana or starting mana as a Lua literal, as the hero starts with it and its MaxLife, MaxMana and
+        /// Mana read it: the base field plus its attribute's points times what each adds, starting mana up to the most.
+        /// </summary>
+        public string Total(string field, HeroBonus bonus)
+        {
+            return TotalOf(field, bonus).ToString(CultureInfo.InvariantCulture);
+        }
+
+        private int TotalOf(string field, HeroBonus bonus)
+        {
+            var attribute = HeroBonus.AttributeOf(field)!;
+            var total = HeroBonus.Total(Whole(field), Whole(attribute), bonus.PerPoint(field));
+            return field == "umpi" ? Math.Min(total, TotalOf("umpm", bonus)) : total;
+        }
+
+        // A whole-number field's value, read as its literal is.
+        private int Whole(string field)
+        {
+            return int.Parse(Scalar("int", Raw(field, 0)), CultureInfo.InvariantCulture);
         }
 
         // A value of the field; a choice is its enum's number, as CSharp.lua compiles the enum.
@@ -125,7 +150,7 @@ namespace Moonwell.Build
                 return name;
             }
 
-            throw new BuildException($"{used.FullName}: {field} names {name}, which no object declares");
+            throw new BuildException($"{this.name}: {field} names {name}, which no object declares");
         }
 
         // A changed value as it was put, else the standard object's text; null for neither.
@@ -137,7 +162,7 @@ namespace Moonwell.Build
 
         private int LevelCount()
         {
-            var field = ChangedFields.FieldOfLevelCount(used.Kind);
+            var field = ChangedFields.FieldOfLevelCount(kind);
             if (field.Length == 0)
             {
                 return 0;

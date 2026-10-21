@@ -9,6 +9,11 @@ namespace Moonwell.Build
     /// <param name="Fields">The object fields the class declares itself that the map's assembly names, in the order it declares them; none for a class of the map.</param>
     /// <param name="Methods">The methods the class declares itself that the map's assembly names, every overload of a name included; none for a class of the map.</param>
     /// <param name="Stub">The class as CSharp.lua compiles it (<see cref="ObjectStubs"/>), with only those members; empty for a class of the map.</param>
+    /// <param name="Shared">
+    /// For a kind base, its shared fields (its <c>[SharedField]</c>s), each by its live member (<c>MaxLife</c>, <c>uhpm</c>): the core's
+    /// member reads them through the kind base's hooks while the object has no handle, so the values of every class under it hold
+    /// them all. None for the other classes.
+    /// </param>
     public sealed record UsedClass(
         string FullName,
         string BaseFullName,
@@ -17,5 +22,6 @@ namespace Moonwell.Build
         bool InObjects,
         IReadOnlyList<UsedField> Fields,
         IReadOnlyList<UsedMethod> Methods,
-        string Stub);
+        string Stub,
+        IReadOnlyList<UsedField> Shared);
 }

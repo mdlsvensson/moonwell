@@ -41,6 +41,8 @@ namespace Moonwell.Objects.Tests
         }
     }
 
+    // A hero's MaxLife reads StandardValues.HeroBonus, a static the tests of the collection set.
+    [Collection(StandardValuesCollection.Name)]
     public class GeneratedTests
     {
         private static readonly Assembly Objects = typeof(StandardAttribute).Assembly;

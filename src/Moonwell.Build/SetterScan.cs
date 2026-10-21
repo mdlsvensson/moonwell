@@ -6,14 +6,19 @@ namespace Moonwell.Build
     // Finds a change to a declared field from a method that is not a constructor (design call 5): a call to its setter,
     // to Add or Remove of its list, to Set of its reference, or to a kind base's Set. Declared fields are class defaults,
     // set once while the class is declared. A lambda inside a constructor is compiled to a method whose name holds
-    // <.ctor>, and counts as the constructor.
+    // <.ctor>, and counts as the constructor. A shared field's live member (MaxLife) is this object's value outside the
+    // constructor, set anywhere; but a unit's Level has no live setter (the game has none), so it is set only in a
+    // declared class's constructor.
     internal static class SetterScan
     {
         private const string FieldAttributeName = "Moonwell.Objects.FieldAttribute";
 
+        // The name a set of a unit's Level is reported with.
+        private const string UnitLevel = "Level";
+
         private static readonly Dictionary<short, OpCode> OpCodesByValue = ReadOpCodes();
 
-        /// <summary>Throws for the first call to a declared field's setter outside a constructor.</summary>
+        /// <summary>Throws for the first call to a declared field's setter outside a constructor, or to a unit's Level setter outside a declared class's constructor.</summary>
         public static void Check(Assembly map)
         {
             const BindingFlags all = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
@@ -24,21 +29,41 @@ namespace Moonwell.Build
                 methods.AddRange(type.GetConstructors(all));
                 foreach (var method in methods.OrderBy(method => method.Name, StringComparer.Ordinal))
                 {
-                    if (method.Name == ".ctor" || method.Name.Contains("<.ctor>", StringComparison.Ordinal))
+                    var inConstructor = method.Name == ".ctor" || method.Name.Contains("<.ctor>", StringComparison.Ordinal);
+                    if (inConstructor && InDeclaredClass(type))
                     {
                         continue;
                     }
 
-                    var found = FirstChangeCalled(method);
-                    if (found != null)
+                    var found = FirstChangeCalled(method, inConstructor);
+                    if (found == null)
                     {
-                        throw new BuildException($"{MapClasses.Describe(type)}.{method.Name} {found.Value.Verb} {found.Value.Name}; declared fields are set only in the constructor");
+                        continue;
                     }
+
+                    var where = method.Name == ".ctor" ? MapClasses.Describe(type) + "'s constructor" : MapClasses.Describe(type) + "." + method.Name;
+                    var rule = found.Value.Name == UnitLevel ? "a unit's level is set only in its class's constructor" : "declared fields are set only in the constructor";
+                    throw new BuildException($"{where} {found.Value.Verb} {found.Value.Name}; {rule}");
                 }
             }
         }
 
-        private static (string Verb, string Name)? FirstChangeCalled(MethodBase method)
+        // A declared class, or a class the compiler made inside one for its lambdas.
+        private static bool InDeclaredClass(Type type)
+        {
+            for (var outer = type; outer != null; outer = outer.DeclaringType)
+            {
+                if (Declarations.IsDeclaredClass(outer))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // The first change a method makes; in the constructor of a class that declares nothing (levelOnly), only a set of a unit's Level.
+        private static (string Verb, string Name)? FirstChangeCalled(MethodBase method, bool levelOnly)
         {
             var il = method.GetMethodBody()?.GetILAsByteArray();
             if (il == null)
@@ -65,7 +90,12 @@ namespace Moonwell.Build
                 else if (opCode == OpCodes.Call || opCode == OpCodes.Callvirt)
                 {
                     var target = Resolve(method, BitConverter.ToInt32(il, position), typeArguments, methodArguments);
-                    if (target != null)
+                    if (target != null && target.Name == "set_Level" && target.DeclaringType?.FullName == "Moonwell.Unit")
+                    {
+                        return ("sets", UnitLevel);
+                    }
+
+                    if (target != null && !levelOnly)
                     {
                         var setter = FieldPropertyOf(target, "set_");
                         if (setter != null)

@@ -279,6 +279,29 @@ namespace Moonwell.Build.Tests
             Assert.Contains("Name = \"Keep\";", File.ReadAllText(Path.Combine(map, "Map.cs")));
             var script = File.ReadAllText(Path.Combine(map, "build", "Keep", "war3map.lua"));
             Assert.Contains("[\"Keep.Heroes.Champion\"]", script);
+
+            // The Champion is a Paladin whose MaxLife = MaxLife + 200 starts him at 850: his base field is that less his 22 strength's 550.
+            using var reader = new BinaryReader(File.OpenRead(Path.Combine(map, "build", "Keep", "war3map.w3u")), System.Text.Encoding.UTF8);
+            var champion = Assert.Single(reader.ReadUnitObjectData().NewUnits);
+            Assert.Equal(300, Assert.Single(champion.Modifications, one => one.Id == BitConverter.ToInt32(System.Text.Encoding.ASCII.GetBytes("uhpm"), 0)).Value);
+        }
+
+        [Fact]
+        public void type_values_are_written_only_when_the_map_reads_default()
+        {
+            // The template's code never reads Default: its release script has no table by type id (the runtime's own Lua names it).
+            var hive = folders.TemporaryFolderOutsideRepository();
+            var parent = folders.TemporaryFolderOutsideRepository();
+            PackedMoonwell.Dotnet(parent, "new", "install", packed.TemplatesPackage, "--debug:custom-hive", hive);
+            PackedMoonwell.Dotnet(parent, "new", "moonwell", "-n", "Keep", "--debug:custom-hive", hive);
+            var map = Path.Combine(parent, "Keep");
+            WriteFeedConfig(map);
+
+            MapBuild.Run(map, new BuildOptions { Release = true }, new StringWriter());
+
+            var script = File.ReadAllText(Path.Combine(map, "build", "Keep", "war3map.lua"));
+            Assert.Contains("MoonwellObjectValues = {", script);
+            Assert.DoesNotContain("MoonwellTypeValues = {", script);
         }
 
         [Fact]
