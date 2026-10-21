@@ -28,6 +28,12 @@ namespace Moonwell.Objects
             values = Array.Empty<T>();
         }
 
+        /// <summary>One value for every level: <c>Name = "Sharpened Blades"</c>, as <c>PerLevel(level => "Sharpened Blades")</c>.</summary>
+        public static implicit operator Levels<T>(T value)
+        {
+            return new Levels<T>(level => value);
+        }
+
         /// <summary>The number of levels; 0 for a formula that has not been resolved.</summary>
         public int Count
         {
