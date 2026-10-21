@@ -1,0 +1,6 @@
+{
+"base":{"IntManaBonus":"15","StrHitPointBonus":"25"},
+"custom_v0":{"IntManaBonus":"15","StrHitPointBonus":"25"},
+"custom_v1":{"IntManaBonus":"15","StrHitPointBonus":"25"},
+"melee_v0":{"IntManaBonus":"15","StrHitPointBonus":"25"}
+}

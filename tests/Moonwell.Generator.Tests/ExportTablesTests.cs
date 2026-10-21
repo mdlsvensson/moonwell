@@ -160,6 +160,15 @@ public class ExportTablesTests
     }
 
     [Fact]
+    public void the_gameplay_constants_are_the_misc_section_of_the_sets_miscgame()
+    {
+        var tables = ExportTables.Read(MiniExport());
+
+        Assert.Equal("25", tables.Misc(null)["StrHitPointBonus"]);
+        Assert.Equal("15", tables.Misc("melee_v0")["IntManaBonus"]);
+    }
+
+    [Fact]
     public void present_ids_need_a_row_in_every_table_the_set_replaces()
     {
         var tables = ExportTables.Read(MiniExport());

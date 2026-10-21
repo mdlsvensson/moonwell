@@ -410,6 +410,20 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void the_hero_bonuses_are_the_gameplay_constants_of_each_set()
+        {
+            var standard = built.Standard;
+
+            foreach (var set in new[] { null, "melee_v0", "custom_v0", "custom_v1" })
+            {
+                Assert.Equal(new HeroBonus(25f, 15f), standard.Misc(set));
+            }
+
+            Assert.Throws<BuildException>(() => standard.Misc("custom_v9"));
+            Assert.Throws<BuildException>(() => StandardData.Empty.Misc(null));
+        }
+
+        [Fact]
         public void setter_outside_ctor()
         {
             AssertFails(

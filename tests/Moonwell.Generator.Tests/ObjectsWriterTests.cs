@@ -148,6 +148,7 @@ public class ObjectsWriterTests
                 "Values/destructable.json",
                 "Values/doodad.json",
                 "Values/item.json",
+                "Values/misc.json",
                 "Values/unit.json",
                 "Values/upgrade.json",
             },
@@ -583,6 +584,21 @@ public class ObjectsWriterTests
         var keys = JsonDocument.Parse("{" + lines[2 + fields.Count].TrimEnd(',') + "}")
             .RootElement.GetProperty("Hpal").GetProperty("values").EnumerateObject().Select(p => p.Name).ToList();
         Assert.Equal(keys.OrderBy(k => k, StringComparer.Ordinal), keys);
+    }
+
+    [Fact]
+    public void misc_constants_are_exported_per_set()
+    {
+        using var document = JsonDocument.Parse(MiniFiles.Value["Values/misc.json"]);
+
+        // The fixture holds the base and two of the three balance sets; each has its own miscgame.txt.
+        Assert.Equal(new[] { "base", "custom_v0", "melee_v0" }, document.RootElement.EnumerateObject().Select(p => p.Name));
+        foreach (var set in document.RootElement.EnumerateObject())
+        {
+            Assert.Equal(new[] { "IntManaBonus", "StrHitPointBonus" }, set.Value.EnumerateObject().Select(p => p.Name));
+            Assert.Equal("25", set.Value.GetProperty("StrHitPointBonus").GetString());
+            Assert.Equal("15", set.Value.GetProperty("IntManaBonus").GetString());
+        }
     }
 
     [Fact]

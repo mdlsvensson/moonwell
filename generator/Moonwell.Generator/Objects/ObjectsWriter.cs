@@ -382,6 +382,25 @@ public static class ObjectsWriter
         return text.ToString();
     }
 
+    /// <summary>
+    /// The JSON of the gameplay constants: an object of the data sets (<c>base</c>, <c>custom_v0</c>), one per line, each
+    /// the constants by key. Sets and keys are in ordinal order.
+    /// </summary>
+    public static string Misc(IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> sets)
+    {
+        var text = new StringBuilder("{\n");
+        var ordered = sets.Keys.OrderBy(k => k, StringComparer.Ordinal).ToList();
+        for (var i = 0; i < ordered.Count; i++)
+        {
+            text.Append(Json(ordered[i])).Append(':');
+            AppendMap(text, sets[ordered[i]]);
+            text.Append(i + 1 < ordered.Count ? ",\n" : "\n");
+        }
+
+        text.Append("}\n");
+        return text.ToString();
+    }
+
     /// <summary>The name of a field type in the values JSON.</summary>
     public static string TypeName(FieldType type)
     {
