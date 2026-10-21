@@ -65,6 +65,16 @@ namespace Moonwell.Objects.Tests
         }
     }
 
+    /// <summary>A Paladin of a map's own that starts with more mana than its most.</summary>
+    public class Overfull : Moonwell.Objects.Human.Units.Paladin
+    {
+        public Overfull()
+        {
+            Mana = 1000;
+            MaxMana = 300;
+        }
+    }
+
     /// <summary>A Paladin of a map's own that reads its own default object in its constructor, which MW0012 rejects.</summary>
     public class ReadsOwnDefault : Moonwell.Objects.Human.Units.Paladin
     {
@@ -333,6 +343,15 @@ namespace Moonwell.Objects.Tests
             Assert.Equal(255, paladin.Mana);
             Assert.Equal(100, new Drained().Mana);
             Assert.Equal(100, new Drained().Totals["umpm"]);
+        }
+
+        [Fact]
+        public void a_heros_mana_put_above_its_most_reads_its_most()
+        {
+            StandardValues.HeroBonus = () => (25f, 15f);
+
+            Assert.Equal(300, new Overfull().Mana);
+            Assert.Equal(300, new Overfull().MaxMana);
         }
 
         [Fact]

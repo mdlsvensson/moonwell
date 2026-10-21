@@ -10,7 +10,7 @@ namespace Moonwell.Objects
     /// point of strength adds; most mana its base field (<c>umpm</c>) plus its intelligence times the mana a point adds; and
     /// starting mana its field (<c>umpi</c>) plus the same, up to its most mana. The bonuses are
     /// <see cref="StandardValues.HeroBonus"/>'s, 0 with none. A total the hero's class put (<see cref="Declared.Totals"/>)
-    /// is read as it was put.
+    /// is read as it was put, starting mana still up to the most.
     /// </summary>
     /// @CSharpLua.Ignore
     internal static class HeroTotals
@@ -29,11 +29,14 @@ namespace Moonwell.Objects
 
         private static int Total(Declared fields, object owner, string field)
         {
-            if (fields.Totals.TryGetValue(field, out var put))
-            {
-                return (int)put!;
-            }
+            var total = fields.Totals.TryGetValue(field, out var put) ? (int)put! : FromAttributes(fields, owner, field);
 
+            // Starting mana is never above the most, as the game starts the hero, put or not.
+            return field == "umpi" ? Math.Min(total, Total(fields, owner, "umpm")) : total;
+        }
+
+        private static int FromAttributes(Declared fields, object owner, string field)
+        {
             var bonus = StandardValues.HeroBonus?.Invoke() ?? (0.0f, 0.0f);
             switch (field)
             {
@@ -42,7 +45,7 @@ namespace Moonwell.Objects
                 case "umpm":
                     return Add(fields.Get<int>(owner, "umpm"), fields.Get<int>(owner, "uint"), bonus.ManaPerIntelligence);
                 default:
-                    return Math.Min(Add(fields.Get<int>(owner, "umpi"), fields.Get<int>(owner, "uint"), bonus.ManaPerIntelligence), Total(fields, owner, "umpm"));
+                    return Add(fields.Get<int>(owner, "umpi"), fields.Get<int>(owner, "uint"), bonus.ManaPerIntelligence);
             }
         }
 
