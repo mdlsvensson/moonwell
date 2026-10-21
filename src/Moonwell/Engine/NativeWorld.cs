@@ -20,7 +20,7 @@ namespace Moonwell.Engine
         private readonly timer clock;
 
         /// <summary>The game time the clock last started at, a whole number of laps.</summary>
-        private float lapStart;
+        private float lapStart = 0.0f;
 
         /// <summary>The timer that calls Runtime.Wake when the next wake is due.</summary>
         private readonly timer wake;
@@ -567,7 +567,7 @@ namespace Moonwell.Engine
         /// <summary>The most life a unit can have, from the game: BlzGetUnitMaxHP (SetUnitState does not change the most, seen 10-21).</summary>
         public float MaxLifeOf(unit unit)
         {
-            return Natives.BlzGetUnitMaxHP(unit);
+            return Natives.BlzGetUnitMaxHP(unit) + 0.0f;
         }
 
         /// <summary>Sets the most life a unit can have in the game: BlzSetUnitMaxHP, which takes a whole number.</summary>
@@ -591,7 +591,7 @@ namespace Moonwell.Engine
         /// <summary>The most mana a unit can have, from the game: BlzGetUnitMaxMana (SetUnitState does not change the most, seen 10-21).</summary>
         public float MaxManaOf(unit unit)
         {
-            return Natives.BlzGetUnitMaxMana(unit);
+            return Natives.BlzGetUnitMaxMana(unit) + 0.0f;
         }
 
         /// <summary>Sets the most mana a unit can have in the game: BlzSetUnitMaxMana, which takes a whole number.</summary>

@@ -256,6 +256,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "floats.no-wrap", Run = FloatCases.NoWrap });
             list.Add(new Case { Name = "floats.folded", Run = FloatCases.Folded });
             list.Add(new Case { Name = "floats.stored", Run = FloatCases.Stored });
+            list.Add(new Case { Name = "floats.converted", Run = FloatCases.Converted });
+            list.Add(new Case { Name = "floats.bare", Run = FloatCases.Bare });
             list.Add(new Case { Name = "floats.ints-stay", Run = FloatCases.IntsStay });
         }
 

@@ -25,10 +25,10 @@ namespace Moonwell
         public Unit? Target { get; }
 
         /// <summary>The x of the place the spell is cast at.</summary>
-        public float X { get; }
+        public float X { get; } = 0.0f;
 
         /// <summary>The y of the place the spell is cast at.</summary>
-        public float Y { get; }
+        public float Y { get; } = 0.0f;
 
         /// <summary>The level of the ability when the cast began.</summary>
         public int Level { get; }

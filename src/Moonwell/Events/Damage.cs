@@ -22,7 +22,7 @@ namespace Moonwell
 
         /// <summary>The amount of the damage; a reaction may change it.</summary>
         [LocalSafe]
-        public float Amount { get; set; }
+        public float Amount { get; set; } = 0.0f;
 
         /// <summary>Whether the damage is an attack.</summary>
         [LocalSafe]

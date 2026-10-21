@@ -9,7 +9,7 @@ namespace Moonwell
         internal readonly Action action;
 
         /// <summary>The game time the timer is next due.</summary>
-        internal float due;
+        internal float due = 0.0f;
 
         /// <summary>Makes a timer; it is not yet adopted or scheduled.</summary>
         private Timer(float due, float interval, bool periodic, Action action)
@@ -22,7 +22,7 @@ namespace Moonwell
 
         /// <summary>The seconds between runs of a repeating timer; 0 for a one-shot timer.</summary>
         [LocalSafe]
-        public float Interval { get; }
+        public float Interval { get; } = 0.0f;
 
         /// <summary>Whether the timer runs again at every interval.</summary>
         [LocalSafe]

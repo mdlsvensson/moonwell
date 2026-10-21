@@ -10,11 +10,11 @@ namespace Moonwell
 
         /// <summary>The seconds the buff lasts; 0 until it is removed.</summary>
         [LocalSafe]
-        public float Duration { get; protected set; }
+        public float Duration { get; protected set; } = 0.0f;
 
         /// <summary>The seconds between ticks; 0 for no ticks.</summary>
         [LocalSafe]
-        public float Tick { get; protected set; }
+        public float Tick { get; protected set; } = 0.0f;
 
         /// <summary>What a second apply of the buff does when the unit already has one of its class.</summary>
         [LocalSafe]

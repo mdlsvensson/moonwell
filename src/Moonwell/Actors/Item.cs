@@ -44,10 +44,10 @@ namespace Moonwell
         internal player OwningPlayer = null!;
 
         /// <summary>The x last read or set.</summary>
-        private float lastX;
+        private float lastX = 0.0f;
 
         /// <summary>The y last read or set.</summary>
-        private float lastY;
+        private float lastY = 0.0f;
 
         /// <summary>The unit that last picked the item up, as the pick-up events Moonwell has seen say; a candidate that Carrier checks with the game.</summary>
         internal Unit? CarrierUnit;

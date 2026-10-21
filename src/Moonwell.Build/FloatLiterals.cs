@@ -13,6 +13,7 @@ namespace Moonwell.Build
     /// a constant it folds or inlines (<c>16777216f + 1f</c>, a const, a cast, an int stored in a float) by its value, without
     /// one. Each such constant becomes the one literal of its value (<c>16777216.0f</c>), which CSharp.lua copies as written; a
     /// whole-number default value a call leaves out, which CSharp.lua also writes by value, is written into the call, named.
+    /// What is a float only at run time is rewritten too (<see cref="RunTimeFloats"/>).
     /// </summary>
     public static class FloatLiterals
     {
@@ -40,8 +41,10 @@ namespace Moonwell.Build
                     continue;
                 }
 
+                // From the end, so a span still points at its text; at one place a replaced constant goes first, then what is
+                // written in, by its order.
                 var text = tree.GetText().ToString();
-                foreach (var edit in edits.OrderByDescending(edit => edit.Span.Start))
+                foreach (var edit in edits.OrderByDescending(edit => edit.Span.Start).ThenByDescending(edit => edit.Span.Length).ThenBy(edit => edit.Order))
                 {
                     text = text.Remove(edit.Span.Start, edit.Span.Length).Insert(edit.Span.Start, edit.Text);
                 }
@@ -65,11 +68,12 @@ namespace Moonwell.Build
             foreach (var (tree, model) in Models(files, files, "Moonwell", Array.Empty<string>(), symbols))
             {
                 errors.AddRange(Errors(model));
-                foreach (var edit in Edits(tree.GetRoot(), model).OrderBy(edit => edit.Span.Start))
+                foreach (var edit in Edits(tree.GetRoot(), model).Where(edit => edit.Change != string.Empty).OrderBy(edit => edit.Span.Start))
                 {
                     var line = tree.GetLineSpan(edit.Span).StartLinePosition.Line + 1;
                     var old = tree.GetText().ToString(edit.Span);
-                    changes.Add(tree.FilePath + "(" + line + "): " + (old.Length == 0 ? "a left-out argument" : old) + " -> " + edit.Text.Trim());
+                    var change = edit.Change ?? (old.Length == 0 ? "a left-out argument" : old) + " -> " + edit.Text.Trim();
+                    changes.Add(tree.FilePath + "(" + line + "): " + change);
                 }
             }
 
@@ -123,12 +127,12 @@ namespace Moonwell.Build
 
         // A constant expression is rewritten whole, as CSharp.lua folds it whole; what is inside it is not looked at. A parameter's
         // default is left as written: CSharp.lua writes it only where a call leaves it out, by value, so the call gets it.
-        private static List<(TextSpan Span, string Text)> Edits(SyntaxNode root, SemanticModel model)
+        private static List<FloatEdit> Edits(SyntaxNode root, SemanticModel model)
         {
             bool IsConstant(SyntaxNode node) => node is ExpressionSyntax expression && model.GetConstantValue(expression).HasValue;
             bool IsDefault(SyntaxNode node) => node is EqualsValueClauseSyntax { Parent: ParameterSyntax };
 
-            var edits = new List<(TextSpan Span, string Text)>();
+            var edits = new List<FloatEdit>();
             foreach (var node in root.DescendantNodes(node => !IsConstant(node) && !IsDefault(node)))
             {
                 if (!IsConstant(node))
@@ -141,10 +145,11 @@ namespace Moonwell.Build
                 var literal = Literal(expression, model);
                 if (literal != null)
                 {
-                    edits.Add((expression.Span, literal + LineEnds(expression)));
+                    edits.Add(new FloatEdit(expression.Span, literal + LineEnds(expression)));
                 }
             }
 
+            RunTimeFloats.Edits(root, model, edits);
             return edits;
         }
 
@@ -241,7 +246,7 @@ namespace Moonwell.Build
         }
 
         // A call that leaves out a parameter with a whole-number float or double default gets it written in, as a named argument.
-        private static void LeftOutArguments(SyntaxNode node, SemanticModel model, List<(TextSpan Span, string Text)> edits)
+        private static void LeftOutArguments(SyntaxNode node, SemanticModel model, List<FloatEdit> edits)
         {
             if (node is not (InvocationExpressionSyntax or BaseObjectCreationExpressionSyntax or ConstructorInitializerSyntax or PrimaryConstructorBaseTypeSyntax or ElementAccessExpressionSyntax))
             {
@@ -300,12 +305,21 @@ namespace Moonwell.Build
             {
                 // new Thing { ... } has no brackets: they go after the type.
                 var type = ((ObjectCreationExpressionSyntax)node).Type;
-                edits.Add((new TextSpan(type.Span.End, 0), "(" + text + ")"));
+                edits.Add(new FloatEdit(new TextSpan(type.Span.End, 0), "(" + text + ")"));
                 return;
             }
 
             var close = list is ArgumentListSyntax brackets ? brackets.CloseParenToken : ((BracketedArgumentListSyntax)list).CloseBracketToken;
-            edits.Add((new TextSpan(close.SpanStart, 0), (list.Arguments.Count > 0 ? ", " : string.Empty) + text));
+            edits.Add(new FloatEdit(new TextSpan(close.SpanStart, 0), (list.Arguments.Count > 0 ? ", " : string.Empty) + text));
         }
     }
+
+    /// <summary>A change to a file: <paramref name="Text"/> in place of <paramref name="Span"/>.</summary>
+    /// <param name="Span">What is replaced; empty where the text is written in.</param>
+    /// <param name="Text">The text.</param>
+    /// <param name="Order">
+    /// Where several are written in at one place, the lower is written first, so it ends up to the right of the others.
+    /// </param>
+    /// <param name="Change">How the check names the change, or empty when it is part of another; null names it by its text.</param>
+    internal readonly record struct FloatEdit(TextSpan Span, string Text, int Order = 0, string? Change = null);
 }

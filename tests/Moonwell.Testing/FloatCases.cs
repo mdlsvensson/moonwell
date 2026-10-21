@@ -59,6 +59,38 @@ namespace Moonwell.Testing
             Expect.Equal("float", NumberType(Facing(90f)), "an argument");
         }
 
+        /// <summary>An int made a float at run time is a float, as each line run 4 saw in the game as an integer.</summary>
+        public static void Converted(FakeWorld world)
+        {
+            int count = 7;
+            Expect.Equal("float", NumberType((float)count), "(float)count");
+            Expect.Equal("float", NumberType((double)count), "(double)count");
+            float d = count * 1000000;
+            Expect.Equal("float", NumberType(d), "float d = count * 1000000");
+            int many = 5000;
+            float e = many * 1000000;
+            Expect.Equal("float", NumberType(e), "float e = many * 1000000");
+            int n = 50000;
+            Expect.Equal("float", NumberType((float)n * (float)n), "(float)n * (float)n");
+            Expect.True((float)n * (float)n > 2.49e9f && (float)n * (float)n < 2.51e9f, "(float)n * (float)n is 2.5e9");
+            Expect.Equal("float", NumberType(Facing(count)), "an int argument to a float parameter");
+            Expect.Equal("float", NumberType(Back(count)), "an int returned as a float");
+            float x = 0.5f;
+            x = count;
+            Expect.Equal("float", NumberType(x), "an int assigned to a float");
+            Expect.Equal("float", NumberType(count > 0 ? count : 2.5f), "an int chosen as a float");
+        }
+
+        /// <summary>A float or double field or auto-property without an initializer starts as the float 0.0.</summary>
+        public static void Bare(FakeWorld world)
+        {
+            var bare = new BareHolder();
+            Expect.Equal("float", NumberType(bare.Value), "a float field without an initializer");
+            Expect.True(bare.Value == 0f, "a float field without an initializer is 0");
+            Expect.Equal("float", NumberType(BareHolder.Shared), "a static double field without an initializer");
+            Expect.Equal("float", NumberType(bare.Auto), "a float auto-property without an initializer");
+        }
+
         /// <summary>Ints stay integers.</summary>
         public static void IntsStay(FakeWorld world)
         {
@@ -72,6 +104,11 @@ namespace Moonwell.Testing
         private static float Facing(float facing = 270f)
         {
             return facing;
+        }
+
+        private static float Back(int count)
+        {
+            return count;
         }
 
         /// @CSharpLua.Template = "math.type({0})"
@@ -96,5 +133,17 @@ namespace Moonwell.Testing
         {
             public float Value = 3f;
         }
+
+        // Never set: the cases read the value the field starts with.
+#pragma warning disable CS0649
+        private sealed class BareHolder
+        {
+            public static double Shared;
+
+            public float Value;
+
+            public float Auto { get; set; }
+        }
+#pragma warning restore CS0649
     }
 }

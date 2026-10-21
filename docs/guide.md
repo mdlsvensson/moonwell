@@ -265,9 +265,9 @@ and `using static Moonwell.Natives` (write `Natives.X`). It does not catch a `Di
 that has a static field with a value: the map can stop while it loads, with nothing on the screen. Key by the handle,
 or set the field on first use. Moonwell's classes, `Unit` and the rest, are safe keys.
 
-A whole-number `float` stays a float in the game, and prints as `50.0` where C# prints `50`. A float made from an `int`
-at run time (`(float)count`) stays an integer, and so does a `float` field without an initializer, which starts as the
-integer `0`: write `= 0.0f`.
+A whole-number `float` stays a float in the game, and prints as `50.0` where C# prints `50`; so does an `int` made a
+float (`(float)count`) and a `float` field without an initializer. A float array's items, and `Math.Floor` or
+`Math.Ceiling`, are integers in the game: add `+ 0.0f` where a product could pass 2^31.
 
 An error in a reaction shows on the screen with its C# file and line, and is written in full to
 `Documents\Warcraft III\CustomMapData\Moonwell\log.txt`. A release build leaves the message off the screen and keeps

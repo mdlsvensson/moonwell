@@ -305,6 +305,112 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void ints_made_floats_at_run_time_and_bare_float_fields_are_written_as_floats()
+        {
+            // CSharp.lua drops a cast or conversion from an int to a float, and starts a float field at 0 (C18). Where the other
+            // operand of + - * % is already a float, or the operator is / or a comparison, Lua gives a float or a bool anyway.
+            var source = string.Join("\n", new[]
+            {
+                "public enum Kind { A = 1 }",
+                "public interface IShape { float Size { get; } }",
+                "public abstract class Shape { public abstract float Size { get; } }",
+                "public struct Point { public float X; public static float Origin; }",
+                "public class Converted",
+                "{",
+                "    public float Bare;",
+                "    public static double Shared;",
+                "    public float Two, Three = 3.5f;",
+                "    public float Auto { get; set; }",
+                "    public static double SharedAuto { get; private set; }",
+                "    public float Computed => Bare;",
+                "    public float? Maybe;",
+                "    public const float Constant = 1.5f;",
+                "    public static float Take(float value) { return value; }",
+                "    public static float Scaled(float value, float scale = 2f) { return value * scale; }",
+                "    public static float Back(int count) { return count; }",
+                "    public static void Run(int count, long big, Kind kind, float x, int? maybe)",
+                "    {",
+                "        float cast = (float)count;",
+                "        double wide = (double)count;",
+                "        float stored = count * 1000000;",
+                "        float squared = (float)count * (float)count;",
+                "        float passed = Take(count);",
+                "        float defaulted = Scaled(count);",
+                "        float chosen = count > 0 ? count : 2.5f;",
+                "        float divided = (float)count / (float)count;",
+                "        float scaled = x * count;",
+                "        float added = (float)count + 1;",
+                "        bool less = (float)count < x;",
+                "        x += count;",
+                "        x = count;",
+                "        float shifted = count << 2;",
+                "        float negated = -(float)count;",
+                "        float longs = big;",
+                "        float kinds = (float)kind;",
+                "        float? lifted = maybe;",
+                "        float whole = (float)7;",
+                "        float written = count + 0.0f;",
+                "        float nested = (float)(int)(float)count;",
+                "    }",
+                "}",
+            });
+            var expected = string.Join("\n", new[]
+            {
+                "public enum Kind { A = 1 }",
+                "public interface IShape { float Size { get; } }",
+                "public abstract class Shape { public abstract float Size { get; } }",
+                "public struct Point { public float X; public static float Origin = 0.0f; }",
+                "public class Converted",
+                "{",
+                "    public float Bare = 0.0f;",
+                "    public static double Shared = 0.0;",
+                "    public float Two = 0.0f, Three = 3.5f;",
+                "    public float Auto { get; set; } = 0.0f;",
+                "    public static double SharedAuto { get; private set; } = 0.0;",
+                "    public float Computed => Bare;",
+                "    public float? Maybe;",
+                "    public const float Constant = 1.5f;",
+                "    public static float Take(float value) { return value; }",
+                "    public static float Scaled(float value, float scale = 2f) { return value * scale; }",
+                "    public static float Back(int count) { return (count + 0.0f); }",
+                "    public static void Run(int count, long big, Kind kind, float x, int? maybe)",
+                "    {",
+                "        float cast = ((float)count + 0.0f);",
+                "        double wide = ((double)count + 0.0);",
+                "        float stored = (count * 1000000 + 0.0f);",
+                "        float squared = ((float)count + 0.0f) * (float)count;",
+                "        float passed = Take((count + 0.0f));",
+                "        float defaulted = Scaled((count + 0.0f), scale: 2.0f);",
+                "        float chosen = count > 0 ? (count + 0.0f) : 2.5f;",
+                "        float divided = (float)count / (float)count;",
+                "        float scaled = x * count;",
+                "        float added = (float)count + 1.0f;",
+                "        bool less = (float)count < x;",
+                "        x += count;",
+                "        x = (count + 0.0f);",
+                "        float shifted = ((count << 2) + 0.0f);",
+                "        float negated = -((float)count + 0.0f);",
+                "        float longs = (big + 0.0f);",
+                "        float kinds = ((float)kind + 0.0f);",
+                "        float? lifted = maybe;",
+                "        float whole = 7.0f;",
+                "        float written = count + 0.0f;",
+                "        float nested = ((float)(int)((float)count + 0.0f) + 0.0f);",
+                "    }",
+                "}",
+            });
+            var folder = Path.Combine(Path.GetTempPath(), "moonwell-floats-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(folder);
+            temporaryFolders.Add(folder);
+            File.WriteAllText(Path.Combine(folder, "Converted.cs"), source);
+
+            var errors = FloatLiterals.Rewrite(folder, new[] { "Converted.cs" }, "Converted", Array.Empty<string>(), Array.Empty<string>());
+
+            Assert.Empty(errors);
+            Assert.Equal(expected, File.ReadAllText(Path.Combine(folder, "Converted.cs")));
+        }
+
+        [Fact]
         public void a_left_out_default_of_a_base_constructor_is_written_in()
         {
             // : base(...) and a primary constructor's base call the base constructor as a call does (C18).

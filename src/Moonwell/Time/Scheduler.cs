@@ -7,7 +7,7 @@ namespace Moonwell
     internal sealed class TimerEntry
     {
         /// <summary>The game time the timer is due.</summary>
-        internal readonly float due;
+        internal readonly float due = 0.0f;
 
         /// <summary>The order the timer was made in; a repeating timer keeps it across repeats.</summary>
         internal readonly int sequence;

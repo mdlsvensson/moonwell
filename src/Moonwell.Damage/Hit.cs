@@ -10,7 +10,7 @@ namespace Moonwell
         private WeaponSound weaponSound;
 
         /// <summary>The target's armor for this hit, kept behind the property that checks the stage.</summary>
-        private float armor;
+        private float armor = 0.0f;
 
         /// <summary>Makes a hit that starts with the amount.</summary>
         internal Hit(Unit target, Unit? source, float amount, bool isAttack)
@@ -21,7 +21,7 @@ namespace Moonwell
 
         /// <summary>The amount the hit started with, before any reaction changed it.</summary>
         [LocalSafe]
-        public float Original { get; }
+        public float Original { get; } = 0.0f;
 
         /// <summary>Whether the hit was dealt by code, through Unit.Damage.</summary>
         [LocalSafe]
@@ -120,13 +120,13 @@ namespace Moonwell
         internal Stage Stage;
 
         /// <summary>The target's life when the after-armor stage began, before the hit lowered it.</summary>
-        internal float LifeBefore;
+        internal float LifeBefore = 0.0f;
 
         /// <summary>Whether the package put armor on the target for this hit, to be put back.</summary>
         internal bool ArmorChanged;
 
         /// <summary>The armor to set on the target to put its own back.</summary>
-        internal float ArmorRestore;
+        internal float ArmorRestore = 0.0f;
 
         /// <summary>Whether the package put a defense type on the target for this hit, to be put back.</summary>
         internal bool DefenseChanged;

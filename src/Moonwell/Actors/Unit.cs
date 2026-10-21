@@ -71,25 +71,25 @@ namespace Moonwell
         }
 
         /// <summary>The life last read, kept for when the game no longer gives it.</summary>
-        private float lastLife;
+        private float lastLife = 0.0f;
 
         /// <summary>The most life last read.</summary>
-        private float lastMaxLife;
+        private float lastMaxLife = 0.0f;
 
         /// <summary>The mana last read.</summary>
-        private float lastMana;
+        private float lastMana = 0.0f;
 
         /// <summary>The most mana last read.</summary>
-        private float lastMaxMana;
+        private float lastMaxMana = 0.0f;
 
         /// <summary>The x last read.</summary>
-        private float lastX;
+        private float lastX = 0.0f;
 
         /// <summary>The y last read.</summary>
-        private float lastY;
+        private float lastY = 0.0f;
 
         /// <summary>The facing last read.</summary>
-        private float lastFacing;
+        private float lastFacing = 0.0f;
 
         /// <summary>The level last read.</summary>
         private int lastLevel;
@@ -104,7 +104,7 @@ namespace Moonwell
         private bool scaleKnown;
 
         /// <summary>The fly height last read or set.</summary>
-        private float lastFlyHeight;
+        private float lastFlyHeight = 0.0f;
 
         /// <summary>The inventory size last read.</summary>
         private int lastInventorySize;
@@ -185,7 +185,7 @@ namespace Moonwell
                 if (!IsGone)
                 {
                     // The game keeps the whole number, and lowers the life to it.
-                    lastMaxLife = (int)value;
+                    lastMaxLife = (int)value + 0.0f;
                     if (lastLife > lastMaxLife)
                     {
                         lastLife = lastMaxLife;
@@ -263,7 +263,7 @@ namespace Moonwell
                 if (!IsGone)
                 {
                     // The game keeps the whole number, and lowers the mana to it.
-                    lastMaxMana = (int)value;
+                    lastMaxMana = (int)value + 0.0f;
                     if (lastMana > lastMaxMana)
                     {
                         lastMana = lastMaxMana;
