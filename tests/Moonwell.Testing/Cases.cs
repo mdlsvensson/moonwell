@@ -180,6 +180,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "items.sweep", Run = ItemCases.SweepDetectsRemoval });
             list.Add(new Case { Name = "items.owned-create", Run = ItemCases.OwnedByOwner });
             list.Add(new Case { Name = "items.create-of-class", Run = ItemCases.CreateOfClass });
+            list.Add(new Case { Name = "damage.deal-from-code", Run = DamageCases.DealFromCode });
+            list.Add(new Case { Name = "damage.deal-runs-reactions", Run = DamageCases.DealRunsReactions });
+            list.Add(new Case { Name = "damage.deal-refused", Run = DamageCases.DealRefused });
             list.Add(new Case { Name = "items.charges", Run = ItemCases.Charges });
             list.Add(new Case { Name = "items.player", Run = ItemCases.PlayerOf });
             list.Add(new Case { Name = "items.position", Run = ItemCases.Position });

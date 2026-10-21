@@ -5,6 +5,8 @@ namespace Moonwell
     /// <summary>The events the world delivers to the runtime, and what the runtime does with each.</summary>
     internal static class Inbound
     {
+        /// <summary>The damage Unit.Damage is dealing, whose event keeps the damage it makes; null outside the call.</summary>
+        private static Dealing? dealing;
         /// <summary>Runs OnGameStart on the game's components, then on each existing player's, in slot order.</summary>
         internal static void GameStarted()
         {
@@ -139,8 +141,59 @@ namespace Moonwell
 
             Unit? from = source == null ? null : Unit.Of(source);
             var damage = new Damage(hit, from, amount, isAttack);
+            if (dealing != null && dealing.Damage == null && dealing.Target == target && dealing.Source == source)
+            {
+                dealing.Damage = damage;
+                damage.Tag = dealing.Tag;
+            }
+
             Dispatch(damage);
             return damage.Amount;
+        }
+
+        /// <summary>Deals damage from code through the world, and returns the damage the reactions saw; one made here when none ran, null when the game dealt nothing.</summary>
+        internal static Damage? Deal(Unit source, Unit target, float amount, DamageKind kind, AttackType attackType, bool isAttack, bool ranged, WeaponSound sound, object? tag)
+        {
+            var previous = dealing;
+            var deal = new Dealing(source.Handle, target.Handle, tag);
+            dealing = deal;
+            bool dealt;
+            try
+            {
+                dealt = Runtime.World.DealDamage(source.Handle, target.Handle, amount, isAttack, ranged, TypeCodes.AttackCode(attackType), (int)kind, (int)sound);
+            }
+            finally
+            {
+                dealing = previous;
+            }
+
+            if (!dealt)
+            {
+                return null;
+            }
+
+            var damage = deal.Damage ?? new Damage(target, source, amount, isAttack);
+            damage.Tag = tag;
+            return damage;
+        }
+
+        /// <summary>A damage Unit.Damage deals: its handles, and the damage its event made.</summary>
+        private sealed class Dealing
+        {
+            internal Dealing(unit source, unit target, object? tag)
+            {
+                Source = source;
+                Target = target;
+                Tag = tag;
+            }
+
+            internal object? Tag { get; }
+
+            internal unit Source { get; }
+
+            internal unit Target { get; }
+
+            internal Damage? Damage { get; set; }
         }
 
         /// <summary>Runs a damage's reactions: the source's type and components deal it, the target's take it, then the map's and the players' reactions; a damage package calls it with its own kind of damage.</summary>

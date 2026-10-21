@@ -14,7 +14,7 @@ namespace Moonwell.Testing
         {
             StageCases.Arena(world, out var source, out var target);
             var fake = StageCases.Fake;
-            var hit = source.Damage(target, 30f, DamageKind.Fire, tag: "t");
+            var hit = (Hit?)source.Damage(target, 30f, DamageKind.Fire, tag: "t");
             Expect.True(hit != null, "a hit is returned");
             Expect.True(hit!.IsCode, "the hit is code's");
             Expect.True((string?)hit.Tag == "t", "the hit has the tag");
@@ -30,11 +30,11 @@ namespace Moonwell.Testing
             var fake = StageCases.Fake;
             var during = -1;
             target.Taking = hit => during = fake.EventAttackType();
-            var siege = source.Damage(target, 10f, attackType: AttackType.Siege);
+            var siege = (Hit?)source.Damage(target, 10f, attackType: AttackType.Siege);
             Expect.Equal(3, during, "the game's attack type of the siege hit");
             Expect.Equal((int)AttackType.Siege, (int)siege!.AttackType, "the hit's attack type");
             Expect.True(!siege.IsSpell, "a siege hit is not a spell's");
-            var plain = source.Damage(target, 10f);
+            var plain = (Hit?)source.Damage(target, 10f);
             Expect.Equal(0, during, "the game's attack type of a hit with none");
             Expect.Equal((int)AttackType.Spells, (int)plain!.AttackType, "the hit's default attack type");
             Expect.True(plain.IsSpell, "a hit with none is a spell's");
@@ -65,7 +65,7 @@ namespace Moonwell.Testing
             {
                 if (inner == null)
                 {
-                    inner = target.Damage(source, 5f, DamageKind.Normal);
+                    inner = (Hit?)target.Damage(source, 5f, DamageKind.Normal);
                 }
             };
             target.Taken = hit => sourceLifeInTaken = fake.Body(source.Handle).Life;

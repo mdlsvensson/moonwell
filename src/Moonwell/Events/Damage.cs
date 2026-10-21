@@ -24,6 +24,10 @@ namespace Moonwell
         [LocalSafe]
         public float Amount { get; set; } = 0.0f;
 
+        /// <summary>The tag the code that dealt the damage gave it (Unit.Damage); null otherwise.</summary>
+        [LocalSafe]
+        public object? Tag { get; internal set; }
+
         /// <summary>Whether the damage is an attack.</summary>
         [LocalSafe]
         public bool IsAttack { get; }

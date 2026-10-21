@@ -649,6 +649,12 @@ namespace Moonwell.Engine
             return Natives.GetUnitLevel(unit);
         }
 
+        /// <summary>Deals damage from a unit to another, with the game's attack, damage and weapon numbers; the damage event runs inside the call. Whether the game dealt it.</summary>
+        public bool DealDamage(unit source, unit target, float amount, bool attack, bool ranged, int attackType, int damageType, int weaponType)
+        {
+            return Natives.UnitDamageTarget(source, target, amount, attack, ranged, Natives.ConvertAttackType(attackType), Natives.ConvertDamageType(damageType), Natives.ConvertWeaponType(weaponType));
+        }
+
         /// <summary>Whether the game counts a unit as alive.</summary>
         public bool IsAlive(unit unit)
         {

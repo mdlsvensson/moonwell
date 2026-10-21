@@ -56,6 +56,43 @@ namespace Moonwell.Testing
             Expect.True(KnownUnits.Find(source) == null, "the source is not made");
         }
 
+        /// <summary>Unit.Damage asks the game to deal the damage with the game's numbers: magic, spells and no sound unless given.</summary>
+        public static void DealFromCode(FakeWorld world)
+        {
+            var source = Unit.Of(world.NewUnit(ObjectTypes.FourCC("ofoo"), slot: 0))!;
+            var target = Unit.Of(world.NewUnit(ObjectTypes.FourCC("ofoo"), slot: 1))!;
+            var plain = source.Damage(target, 10f);
+            Expect.True(plain != null, "the damage was dealt");
+            Expect.Equal(1, world.Dealt.Count, "the damage the game was asked to deal");
+            Expect.Equal("10 attack:False ranged:False 0 14 0", world.Dealt[0], "the plain damage's numbers");
+            source.Damage(target, 5f, DamageKind.Fire, AttackType.Siege, isAttack: true, ranged: true, sound: WeaponSound.MetalLightChop);
+            Expect.Equal("5 attack:True ranged:True 3 8 1", world.Dealt[1], "the given numbers");
+        }
+
+        /// <summary>Damage dealt from code runs the reactions inside the call, and returns the damage they saw.</summary>
+        public static void DealRunsReactions(FakeWorld world)
+        {
+            Arena();
+            var striker = Unit.Of(world.NewUnit(ObjectTypes.FourCC("H001"), slot: 0))!;
+            var dummy = Unit.Of(world.NewUnit(ObjectTypes.FourCC("h000"), slot: 1))!;
+            dummy.Add(new Halver());
+            TestLog.Lines.Clear();
+            var damage = striker.Damage(dummy, 100f);
+            Expect.True(TestLog.Lines.Contains("dummy damaged"), "the target's reaction ran");
+            Expect.Same(dummy, damage!.Target, "the damage's target");
+            Expect.Same(striker, damage.Source, "the damage's source");
+            Expect.Near(50f, damage.Amount, "the amount after the reactions");
+        }
+
+        /// <summary>When the game deals nothing, Unit.Damage returns null.</summary>
+        public static void DealRefused(FakeWorld world)
+        {
+            var source = Unit.Of(world.NewUnit(ObjectTypes.FourCC("ofoo"), slot: 0))!;
+            var target = Unit.Of(world.NewUnit(ObjectTypes.FourCC("ofoo"), slot: 1))!;
+            world.RefuseDamage = true;
+            Expect.True(source.Damage(target, 10f) == null, "nothing was dealt");
+        }
+
         /// <summary>The world is asked to deliver damage only once a class overrides OnDamaged.</summary>
         public static void Listen(FakeWorld world)
         {

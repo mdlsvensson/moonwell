@@ -215,6 +215,9 @@ namespace Moonwell.Hosting
         /// <summary>The level of a unit; a hero's hero level.</summary>
         int LevelOf(unit unit);
 
+        /// <summary>Deals damage from a unit to another, with the game's attack, damage and weapon numbers; the damage event runs inside the call. Whether the game dealt it.</summary>
+        bool DealDamage(unit source, unit target, float amount, bool attack, bool ranged, int attackType, int damageType, int weaponType);
+
         /// <summary>Whether a unit is alive.</summary>
         bool IsAlive(unit unit);
 

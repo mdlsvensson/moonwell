@@ -38,6 +38,8 @@ namespace Moonwell
             pending = null;
             Reactions.Reset();
             Events.DamageListener = Listen;
+            Events.DamageDealer = (source, target, amount, kind, attackType, isAttack, ranged, sound, tag) =>
+                Deal(source, target, amount, TypeCodes.AttackCode(attackType), kind, isAttack, ranged, sound, tag);
             Hooks.Seen = Saw;
         }
 
