@@ -1078,6 +1078,87 @@ namespace Moonwell.Testing
             Expect.Same(unitDefault, unit.Default, "the default after the remove");
         }
 
+        /// <summary>A unit whose constructor reads its own default object.</summary>
+        private sealed class ReadsDefault : Unit
+        {
+            /// <summary>Reads the default's most life.</summary>
+            public ReadsDefault()
+            {
+                MaxMana = Default.MaxLife;
+            }
+        }
+
+        /// <summary>A unit whose constructor reads its class's default object.</summary>
+        private sealed class ReadsDefaultOfClass : Unit
+        {
+            /// <summary>Reads the class's default's most life.</summary>
+            public ReadsDefaultOfClass()
+            {
+                MaxMana = Unit.Default<ReadsDefaultOfClass>().MaxLife;
+            }
+        }
+
+        /// <summary>Fails unless the action throws a MoonwellException that says the class's default object is read while its constructor runs. In Lua a nested class's name starts with its outer class's (UnitCases+ReadsDefault).</summary>
+        private static void ExpectReadWhileMade(string className, System.Action action, string what)
+        {
+            var message = "";
+            try
+            {
+                action();
+            }
+            catch (MoonwellException error)
+            {
+                message = error.Message;
+            }
+
+            var expected = className + "'s default object is read while its constructor runs; read the field itself";
+            Expect.True(message.EndsWith(expected, System.StringComparison.Ordinal), what + ": expected " + expected + ", got " + message);
+        }
+
+        /// <summary>A class's default object read while its constructor runs is what the constructor is making: it fails with a message, not by making the default again and again.</summary>
+        public static void DefaultReadInItsConstructor(FakeWorld world)
+        {
+            ExpectReadWhileMade("ReadsDefault", () => new ReadsDefault(), "Default in the constructor of a class not registered");
+            ExpectReadWhileMade("ReadsDefaultOfClass", () => Unit.Default<ReadsDefaultOfClass>(), "Unit.Default<T>() in T's constructor");
+            ExpectReadWhileMade("ReadsDefault", () => ObjectTypes.Unit(ObjectTypes.FourCC("h0rd"), () => new ReadsDefault()), "Default in the constructor of a registered class");
+
+            // Nothing is left half made: a later ask gives the same message, not a default.
+            ExpectReadWhileMade("ReadsDefault", () => new ReadsDefault(), "Default in the constructor, asked again");
+        }
+
+        /// <summary>A unit class that is never registered, whose default is first asked for from an object of it.</summary>
+        private sealed class AskedFromObject : Unit
+        {
+        }
+
+        /// <summary>An item class that is never registered, whose default is first asked for from an object of it.</summary>
+        private sealed class ItemAskedFromObject : Item
+        {
+        }
+
+        /// <summary>The default object of a class that is not registered is the same whether it is first asked for from an object of the class or from the class.</summary>
+        public static void DefaultOfUnregisteredFromObject(FakeWorld world)
+        {
+            var first = new AskedFromObject().Default;
+            Expect.Same(first, Unit.Default<AskedFromObject>(), "the class's default");
+            Expect.True(first is AskedFromObject, "the default is an object of the class");
+            Expect.True(first.IsGone, "the default is gone");
+
+            var item = new ItemAskedFromObject().Default;
+            Expect.Same(item, Item.Default<ItemAskedFromObject>(), "the item class's default");
+        }
+
+        /// <summary>A type no class declares and the build's table does not hold (one the map's World Editor data adds) has an empty name on its default, not none.</summary>
+        public static void DefaultNameOfUnknownTypeIsEmpty(FakeWorld world)
+        {
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("h0we")))!;
+            var hero = (Hero)Unit.Of(world.NewUnit(ObjectTypes.FourCC("H0we"), hero: true))!;
+
+            Expect.Equal("", unit.Default.Name, "the unit's default name");
+            Expect.Equal("", hero.Default.Name, "the hero's default name");
+            Expect.Equal("Made in World Editor: ", "Made in World Editor: " + unit.Default.Name, "the name in a string");
+        }
+
         /// <summary>A unit that records what its shared members ask of the hooks, and reads each declared value as Unit does.</summary>
         private sealed class RecordingUnit : Unit
         {

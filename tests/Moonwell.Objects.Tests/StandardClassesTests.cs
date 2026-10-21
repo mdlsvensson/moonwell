@@ -65,6 +65,33 @@ namespace Moonwell.Objects.Tests
         }
     }
 
+    /// <summary>A Paladin of a map's own that reads its own default object in its constructor, which MW0012 rejects.</summary>
+    public class ReadsOwnDefault : Moonwell.Objects.Human.Units.Paladin
+    {
+        public ReadsOwnDefault()
+        {
+            Tooltip = "Has " + Default.MaxLife;
+        }
+    }
+
+    /// <summary>A Paladin of a map's own that reads its class's default object in its constructor, which MW0012 rejects.</summary>
+    public class ReadsOwnClassDefault : Moonwell.Objects.Human.Units.Paladin
+    {
+        public ReadsOwnClassDefault()
+        {
+            Tooltip = "Has " + Moonwell.Unit.Default<ReadsOwnClassDefault>().MaxLife;
+        }
+    }
+
+    /// <summary>A Footman of a map's own whose default is first asked for from an object of it.</summary>
+    public class Lookout : Moonwell.Objects.Human.Units.Footman
+    {
+        public Lookout()
+        {
+            MaxLife = 300;
+        }
+    }
+
     /// <summary>A Paladin of a map's own that sets its level, which a hero does not declare.</summary>
     public class Veteran : Moonwell.Objects.Human.Units.Paladin
     {
@@ -306,6 +333,26 @@ namespace Moonwell.Objects.Tests
             Assert.Equal(255, paladin.Mana);
             Assert.Equal(100, new Drained().Mana);
             Assert.Equal(100, new Drained().Totals["umpm"]);
+        }
+
+        [Fact]
+        public void a_classs_own_default_object_read_in_its_constructor_throws_with_what_to_read()
+        {
+            var error = Assert.Throws<MoonwellException>(() => new ReadsOwnDefault());
+            var byClass = Assert.Throws<MoonwellException>(() => Moonwell.Unit.Default<ReadsOwnClassDefault>());
+
+            Assert.Equal("ReadsOwnDefault's default object is read while its constructor runs; read the field itself", error.Message);
+            Assert.Equal("ReadsOwnClassDefault's default object is read while its constructor runs; read the field itself", byClass.Message);
+        }
+
+        [Fact]
+        public void a_classs_default_object_asked_first_from_an_object_is_the_classs()
+        {
+            var first = new Lookout().Default;
+
+            Assert.IsType<Lookout>(first);
+            Assert.Equal(300f, first.MaxLife);
+            Assert.Same(first, Moonwell.Unit.Default<Lookout>());
         }
 
         [Fact]

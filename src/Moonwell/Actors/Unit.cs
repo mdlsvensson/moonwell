@@ -496,7 +496,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The unit's name (GetUnitName): a hero's is its type's name, not its proper name (seen 10-21). The game gives it in each player's language, so it is read only inside Local.For. Setting it (BlzSetUnitName) renames this unit only, the same on every machine. Once the game has removed the unit, the last name set (a read keeps nothing, as it differs by machine), and setting does nothing. In a declared class's constructor, the name of the class's type (unam), the same on every machine; on a default object, its type's.</summary>
+        /// <summary>The unit's name (GetUnitName): a hero's is its type's name, not its proper name (seen 10-21). The game gives it in each player's language, so it is read only inside Local.For. Setting it (BlzSetUnitName) renames this unit only, the same on every machine. Once the game has removed the unit, the last name set (a read keeps nothing, as it differs by machine), and setting does nothing. In a declared class's constructor, the name of the class's type (unam), the same on every machine; on a default object, its type's, empty for a type the build's table does not hold (one the map's World Editor data adds).</summary>
         public string Name
         {
             [MachineLocal]
@@ -504,7 +504,7 @@ namespace Moonwell
             {
                 if (Handle == null)
                 {
-                    return DeclaredValue<string>("unam");
+                    return DeclaredValue<string>("unam") ?? string.Empty;
                 }
 
                 if (IsGone)
