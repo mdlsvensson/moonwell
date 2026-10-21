@@ -77,7 +77,7 @@ namespace Moonwell.Build
         }
 
         // Each file's tree and semantic model, in a compilation of every source.
-        private static IEnumerable<(SyntaxTree Tree, SemanticModel Model)> Models(
+        internal static IEnumerable<(SyntaxTree Tree, SemanticModel Model)> Models(
             IEnumerable<string> sources,
             IEnumerable<string> files,
             string assemblyName,

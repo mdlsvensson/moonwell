@@ -116,6 +116,54 @@ public class LuaTests
     }
 
     [Fact]
+    public void a_choice_enum_shown_through_an_object_a_compound_assignment_or_a_conditional_access_is_rejected()
+    {
+        // Each of these makes the string with the enum's ToString in .NET; in the game's Lua the enum is only its number.
+        Assert.Equal(new[]
+        {
+            "MW0010: choice",
+            "MW0010: choice",
+            "MW0010: choice",
+            "MW0010: choice",
+            "MW0010: choice",
+            "MW0010: choice",
+            "MW0010: choice?.ToString()",
+            "MW0010: choice",
+            "MW0010: {choice}",
+            "MW0010: choice.ToString()",
+        }, MapCode.Check("""
+            Moonwell.Objects.ArmorType? choice = Moonwell.Objects.ArmorType.Metal;
+            var s = "armor ";
+            s += choice;
+            var a = string.Format("{0}", choice);
+            var b = string.Concat("a", choice);
+            var c = new System.Text.StringBuilder().Append(choice);
+            Show(choice);
+            var d = string.Format("{0} {1}", 1, choice);
+            var e = choice?.ToString();
+            var f = "armor " + choice;
+            var g = $"{choice}";
+            var h = choice.ToString();
+            """, """
+                static void Show(object value) { }
+            """));
+    }
+
+    [Fact]
+    public void a_choice_enum_given_to_an_object_parameter_is_reported_once_and_equals_is_accepted()
+    {
+        Assert.Equal(new[] { "MW0010: Enum.IsDefined(typeof(Moonwell.Objects.ArmorType), armor)" }, MapCode.Check("""
+            var armor = Moonwell.Objects.ArmorType.Metal;
+            var a = Enum.IsDefined(typeof(Moonwell.Objects.ArmorType), armor);
+            var b = armor.Equals(Moonwell.Objects.ArmorType.Stone) || object.Equals(armor, Moonwell.Objects.ArmorType.Stone);
+            var c = new System.Text.StringBuilder().Append((int)armor).Append(DayOfWeek.Monday);
+            Show((int)armor);
+            """, """
+                static void Show(object value) { }
+            """));
+    }
+
+    [Fact]
     public void a_choice_enum_message_says_why_and_what_to_write()
     {
         Assert.Equal(

@@ -403,6 +403,103 @@ namespace Moonwell.Build.Tests
             Assert.Contains("\"Sample.Arthas\"", script);
         }
 
+        [Theory]
+        [InlineData("public const int Magic = (int)Moonwell.Objects.Targets.Air;")]
+        [InlineData("public static int Pick(int value) { switch (value) { case (int)Moonwell.Objects.Targets.Air: return 1; default: return 0; } }")]
+        [InlineData("public static readonly string Label = nameof(Moonwell.Objects.Targets.Air);")]
+        public void an_enum_the_map_names_only_in_a_constant_a_case_or_nameof_compiles_to_lua_through_the_stubs(string member)
+        {
+            // None of these leave a reference to the enum in the assembly: the build reads the map's source for them.
+            var copy = folders.TemporaryCopyOfSample();
+            File.AppendAllText(Path.Combine(copy, "Objects.cs"), "\nnamespace Sample\n{\n    public static class Names\n    {\n        " + member + "\n    }\n}\n");
+
+            MapBuild.Run(copy, new BuildOptions(), new StringWriter());
+
+            var stubs = File.ReadAllText(Path.Combine(copy, "build", "generated", "ObjectStubs.g.cs"));
+            Assert.Contains("    [global::System.Flags]\n    public enum Targets\n", stubs);
+            Assert.DoesNotContain("public enum ArmorType", stubs);
+        }
+
+        [Fact]
+        public void an_enum_named_only_in_code_for_a_debug_build_is_stubbed_for_the_release_build_too()
+        {
+            // The stubs are written once for both builds, so they hold what either build's code names.
+            var copy = folders.TemporaryCopyOfSample();
+            File.AppendAllText(Path.Combine(copy, "Objects.cs"), """
+
+                namespace Sample
+                {
+                    public static class Names
+                    {
+                #if DEBUG
+                        public const int Magic = (int)Moonwell.Objects.Targets.Air;
+                #else
+                        public const int Magic = (int)Moonwell.Objects.ArmorType.Metal;
+                #endif
+                    }
+                }
+                """);
+
+            MapBuild.Run(copy, new BuildOptions { Release = true }, new StringWriter());
+
+            var stubs = File.ReadAllText(Path.Combine(copy, "build", "generated", "ObjectStubs.g.cs"));
+            Assert.Contains("public enum Targets\n", stubs);
+            Assert.Contains("public enum ArmorType\n", stubs);
+        }
+
+        [Fact]
+        public void the_rule_attributes_and_the_field_rule_exception_compile_to_lua_through_the_stubs()
+        {
+            var copy = folders.TemporaryCopyOfSample();
+            File.AppendAllText(Path.Combine(copy, "Objects.cs"), """
+
+                namespace Sample
+                {
+                    public static class Rules
+                    {
+                        [Moonwell.Objects.NonNegative]
+                        public static int Count { get; set; }
+
+                        [Moonwell.Objects.Limits(1, 500000)]
+                        public static int Life { get; set; }
+
+                        [Moonwell.Objects.MaxLength(40)]
+                        public static string? Title { get; set; }
+
+                        [Moonwell.Objects.MaxEntries(12)]
+                        public static string[]? Names { get; set; }
+
+                        [Moonwell.Objects.Required]
+                        public static string? Label { get; set; }
+
+                        public static string? Run()
+                        {
+                            try
+                            {
+                                return Title;
+                            }
+                            catch (Moonwell.Objects.FieldRuleException failure)
+                            {
+                                return failure.FieldId + failure.Message;
+                            }
+                        }
+                    }
+                }
+                """);
+
+            MapBuild.Run(copy, new BuildOptions(), new StringWriter());
+
+            var stubs = File.ReadAllText(Path.Combine(copy, "build", "generated", "ObjectStubs.g.cs"));
+            foreach (var name in new[] { "NonNegative", "Limits", "MaxLength", "MaxEntries", "Required" })
+            {
+                Assert.Contains("public sealed class " + name + "Attribute : global::System.Attribute", stubs);
+            }
+
+            Assert.Contains("public class FieldRuleException : global::System.Exception", stubs);
+            Assert.Contains("public string FieldId", stubs);
+            Assert.DoesNotContain("BeyondLimitsAttribute", stubs);
+        }
+
         [Fact]
         public void a_name_of_the_attack_type_of_moonwell_objects_is_an_error_naming_the_core_enum()
         {

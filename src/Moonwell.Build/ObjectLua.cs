@@ -29,15 +29,16 @@ namespace Moonwell.Build
         /// a kind base or inherits one, and their bases up to the kind base; each base before the classes that inherit it. A class
         /// of <c>Moonwell.Objects</c> keeps the fields and methods the assembly's member references name.
         /// </summary>
+        /// <param name="project">The map project, whose source names the enums that a constant, a <c>case</c> or <c>nameof</c> leaves no reference to.</param>
         /// <param name="map">The map assembly, loaded in the build's load context.</param>
         /// <param name="objects">The map's copy of <c>Moonwell.Objects</c>, in the same context.</param>
         /// <param name="assemblyPath">The map assembly's file, whose metadata holds the type references.</param>
-        /// <param name="support">The stubs of the enums the map names and of <c>[BeyondLimits]</c> when it is named (<see cref="ObjectStubs.Support"/>).</param>
+        /// <param name="support">The stubs of the enums the map names, and of the rule attributes and <c>FieldRuleException</c> when it names them (<see cref="ObjectStubs.Support"/>).</param>
         /// <returns>The used classes.</returns>
-        internal static IReadOnlyList<UsedClass> UsedClasses(Assembly map, Assembly objects, string assemblyPath, out string support)
+        internal static IReadOnlyList<UsedClass> UsedClasses(MapProject project, Assembly map, Assembly objects, string assemblyPath, out string support)
         {
             var enums = new HashSet<Type>();
-            var beyondLimits = false;
+            var ignored = new HashSet<Type>();
             var starts = new List<Type>();
             foreach (var type in map.GetTypes())
             {
@@ -64,7 +65,10 @@ namespace Moonwell.Build
                     if (type != null)
                     {
                         ObjectStubs.AddEnums(type, enums);
-                        beyondLimits |= type.FullName == Declarations.ObjectsAssemblyName + ".BeyondLimitsAttribute";
+                        if (ObjectStubs.IsIgnoredType(type))
+                        {
+                            ignored.Add(type);
+                        }
                     }
                 }
 
@@ -101,7 +105,14 @@ namespace Moonwell.Build
                 Add(type, used, seen, members, enums);
             }
 
-            support = ObjectStubs.Support(enums, beyondLimits);
+            // An enum the assembly does not reference: the compiler folded its uses into numbers and text.
+            var choices = objects.GetTypes().Where(ObjectStubs.IsChoice).ToDictionary(type => type.Name, StringComparer.Ordinal);
+            foreach (var name in NamedChoices.Read(project, assemblyPath, new HashSet<string>(choices.Keys, StringComparer.Ordinal)))
+            {
+                ObjectStubs.AddEnums(choices[name], enums);
+            }
+
+            support = ObjectStubs.Support(enums, ignored, members);
             return used;
         }
 

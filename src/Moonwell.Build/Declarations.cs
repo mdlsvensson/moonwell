@@ -89,7 +89,7 @@ namespace Moonwell.Build
 
             var objects = context.LoadFromAssemblyName(new AssemblyName(ObjectsAssemblyName));
             SetterScan.Check(map);
-            var used = ObjectLua.UsedClasses(map, objects, assemblyPath, out var support);
+            var used = ObjectLua.UsedClasses(project, map, objects, assemblyPath, out var support);
 
             var classNames = new Dictionary<string, string>(StringComparer.Ordinal);
             var standardClasses = new Dictionary<string, string>(StringComparer.Ordinal);

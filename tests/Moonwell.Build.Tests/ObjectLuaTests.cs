@@ -1,4 +1,6 @@
 using System.Globalization;
+using System.Reflection;
+using System.Reflection.Emit;
 using System.Text.RegularExpressions;
 using Xunit;
 
@@ -144,6 +146,63 @@ namespace Moonwell.Build.Tests
             Assert.DoesNotContain("enum AttackType", compiled.Stubs);
             Assert.DoesNotContain("enum DefenseType", compiled.Stubs);
             Assert.Contains("public global::Moonwell.AttackType AttackType\n", compiled.Stubs);
+        }
+
+        [Fact]
+        public void only_enums_with_game_values_are_choices_to_stub()
+        {
+            // A public helper enum in Moonwell.Objects without [GameValue] members is compiled by CSharp.lua like any code, so a stub would be a second one.
+            var module = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName("Helpers"), AssemblyBuilderAccess.Run).DefineDynamicModule("Helpers");
+            var attribute = module.DefineType("Moonwell.Objects.GameValueAttribute", TypeAttributes.Public, typeof(Attribute));
+            var constructor = attribute.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { typeof(string) });
+            var il = constructor.GetILGenerator();
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Call, typeof(Attribute).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, Type.EmptyTypes)!);
+            il.Emit(OpCodes.Ret);
+            var gameValue = attribute.CreateType().GetConstructor(new[] { typeof(string) })!;
+
+            var choice = module.DefineEnum("Moonwell.Objects.Colour", TypeAttributes.Public, typeof(int));
+            choice.DefineLiteral("Red", 1).SetCustomAttribute(new CustomAttributeBuilder(gameValue, new object[] { "red" }));
+            var helper = module.DefineEnum("Moonwell.Objects.Helper", TypeAttributes.Public, typeof(int));
+            helper.DefineLiteral("One", 1);
+            var elsewhere = module.DefineEnum("Other.Colour", TypeAttributes.Public, typeof(int));
+            elsewhere.DefineLiteral("Red", 1).SetCustomAttribute(new CustomAttributeBuilder(gameValue, new object[] { "red" }));
+
+            var enums = new HashSet<Type>();
+            foreach (var type in new[] { choice.CreateType(), helper.CreateType(), elsewhere.CreateType() })
+            {
+                ObjectStubs.AddEnums(type, enums);
+            }
+
+            Assert.Equal(new[] { "Moonwell.Objects.Colour" }, enums.Select(type => type.FullName));
+        }
+
+        [Fact]
+        public void every_type_the_library_leaves_out_of_csharp_lua_has_a_stub_or_is_a_choice()
+        {
+            // A new attribute or exception in a file inside #if !MOONWELL_LUA would be unknown to CSharp.lua unless the stubs carry it.
+            var core = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "src", "Moonwell.Objects", "Core"));
+            var left = new List<string>();
+            foreach (var file in Directory.GetFiles(core, "*.cs"))
+            {
+                var text = File.ReadAllText(file);
+                if (!text.StartsWith("#if !MOONWELL_LUA", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                foreach (Match match in Regex.Matches(text, @"^    public (?:sealed )?class (\w+)", RegexOptions.Multiline | RegexOptions.CultureInvariant))
+                {
+                    left.Add(match.Groups[1].Value);
+                }
+            }
+
+            // GameValueAttribute marks the choices' members: no map has use for it.
+            Assert.Equal(
+                new[] { "GameValueAttribute" },
+                left.Where(name => !ObjectStubs.IsIgnoredName(name)).OrderBy(name => name, StringComparer.Ordinal));
+            Assert.Contains("FieldRuleException", left);
+            Assert.Contains("RequiredAttribute", left);
         }
 
         [Fact]

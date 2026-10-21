@@ -8,9 +8,9 @@ namespace Moonwell.Build
     /// The stubs CSharp.lua compiles in place of the generated classes of <c>Moonwell.Objects</c>, which it does not read (each
     /// generated file is inside <c>#if !MOONWELL_LUA</c>): the classes the map uses, each with only the members the map's assembly
     /// names. Compiling thousands of ignored classes cost CSharp.lua about ten seconds a build (findings.md). The choice enums the
-    /// map names and <c>[BeyondLimits]</c> are stubbed with them (<see cref="Support"/>): their own files are inside
-    /// <c>#if !MOONWELL_LUA</c> too, since CSharp.lua writes an empty namespace into the script for each file, and a blank line
-    /// for each type after the first of a namespace.
+    /// map names, the rule attributes (<c>[BeyondLimits]</c>, <c>[Limits]</c>, ...) and <c>FieldRuleException</c> are stubbed with
+    /// them (<see cref="Support"/>): their own files are inside <c>#if !MOONWELL_LUA</c> too, since CSharp.lua writes an empty
+    /// namespace into the script for each file, and a blank line for each type after the first of a namespace.
     /// </summary>
     public static class ObjectStubs
     {
@@ -18,6 +18,14 @@ namespace Moonwell.Build
         public const string FileName = "ObjectStubs.g.cs";
 
         private const string ObjectsNamespace = "Moonwell.Objects";
+        private const string GameValueAttributeName = "Moonwell.Objects.GameValueAttribute";
+        private const string FieldRuleExceptionName = "FieldRuleException";
+
+        // The attributes of Moonwell.Objects whose files are inside #if !MOONWELL_LUA: a map may name them, so CSharp.lua gets stubs.
+        private static readonly HashSet<string> RuleAttributes = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "BeyondLimitsAttribute", "LimitsAttribute", "MaxEntriesAttribute", "MaxLengthAttribute", "NonNegativeAttribute", "RequiredAttribute",
+        };
 
         private const BindingFlags DeclaredMembers =
             BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
@@ -82,12 +90,14 @@ namespace Moonwell.Build
 
         /// <summary>
         /// The stubs of what the map's code names in <c>Moonwell.Objects</c> besides the classes: the choice enums, with their members'
-        /// numbers (CSharp.lua writes a member as its number), and <c>BeyondLimitsAttribute</c>. Each is <c>@CSharpLua.Ignore</c>.
+        /// numbers (CSharp.lua writes a member as its number), the rule attributes and <c>FieldRuleException</c>. Each is
+        /// <c>@CSharpLua.Ignore</c>.
         /// </summary>
-        /// <param name="enums">The enums the map's assembly names or a stub's members have in their signatures.</param>
-        /// <param name="beyondLimits">Whether the map's assembly names <c>BeyondLimitsAttribute</c>.</param>
+        /// <param name="enums">The enums the map's assembly or source names or a stub's members have in their signatures.</param>
+        /// <param name="ignored">The rule attributes and <c>FieldRuleException</c> the map's assembly names (<see cref="IsIgnoredType"/>).</param>
+        /// <param name="members">The names of the members the map's assembly references, by the full name of the class.</param>
         /// <returns>The declarations, indented for a namespace block; empty when there are none.</returns>
-        internal static string Support(IEnumerable<Type> enums, bool beyondLimits)
+        internal static string Support(IEnumerable<Type> enums, IEnumerable<Type> ignored, IReadOnlyDictionary<string, HashSet<string>> members)
         {
             var text = new StringBuilder();
             foreach (var type in enums.OrderBy(type => type.Name, StringComparer.Ordinal))
@@ -108,15 +118,46 @@ namespace Moonwell.Build
                 text.Append("    }\n\n");
             }
 
-            if (beyondLimits)
+            foreach (var type in ignored.OrderBy(type => type.Name, StringComparer.Ordinal))
             {
-                text.Append("    /// @CSharpLua.Ignore\n");
-                text.Append("    [global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = true, Inherited = true)]\n");
-                text.Append("    public sealed class BeyondLimitsAttribute : global::System.Attribute\n    {\n");
-                text.Append("        public BeyondLimitsAttribute(params string[] properties) { }\n    }\n");
+                if (type.Name == FieldRuleExceptionName)
+                {
+                    text.Append(Class(type, members.TryGetValue(type.FullName!, out var names) ? names : new HashSet<string>())).Append('\n');
+                }
+                else
+                {
+                    WriteAttribute(text, type);
+                    text.Append('\n');
+                }
             }
 
             return text.ToString();
+        }
+
+        /// <summary>Tells whether a type is one of the rule attributes of <c>Moonwell.Objects</c> or <c>FieldRuleException</c>, whose stubs <see cref="Support"/> writes.</summary>
+        /// <param name="type">The type, loaded in the build's load context.</param>
+        /// <returns>True for those types.</returns>
+        internal static bool IsIgnoredType(Type type)
+        {
+            return type.Namespace == ObjectsNamespace && IsIgnoredName(type.Name);
+        }
+
+        /// <summary>Tells whether a name is that of one of the rule attributes of <c>Moonwell.Objects</c> or of <c>FieldRuleException</c>.</summary>
+        /// <param name="name">The type's simple name.</param>
+        /// <returns>True for those names.</returns>
+        internal static bool IsIgnoredName(string name)
+        {
+            return name == FieldRuleExceptionName || RuleAttributes.Contains(name);
+        }
+
+        /// <summary>Tells whether a type is a choice enum of <c>Moonwell.Objects</c>: a public enum with members that carry <c>[GameValue]</c>.</summary>
+        /// <param name="type">The type, loaded in the build's load context.</param>
+        /// <returns>True for those enums.</returns>
+        internal static bool IsChoice(Type type)
+        {
+            return type.IsEnum && type.IsPublic && type.Namespace == ObjectsNamespace
+                && type.GetFields(BindingFlags.Public | BindingFlags.Static)
+                    .Any(field => field.GetCustomAttributesData().Any(attribute => attribute.AttributeType.FullName == GameValueAttributeName));
         }
 
         /// <summary>Deletes the stubs an earlier build left: without <c>Moonwell.Objects</c> they would not compile.</summary>
@@ -188,7 +229,7 @@ namespace Moonwell.Build
             }
         }
 
-        /// <summary>Adds a type, when it is an enum of <c>Moonwell.Objects</c>, and the enums among its generic arguments or its elements.</summary>
+        /// <summary>Adds a type, when it is a choice enum of <c>Moonwell.Objects</c> (<see cref="IsChoice"/>), and the enums among its generic arguments or its elements.</summary>
         /// <param name="type">The type.</param>
         /// <param name="enums">The enums found so far.</param>
         internal static void AddEnums(Type type, ISet<Type> enums)
@@ -197,9 +238,12 @@ namespace Moonwell.Build
             {
                 AddEnums(type.GetElementType()!, enums);
             }
-            else if (type.IsEnum && type.IsPublic && type.Namespace == ObjectsNamespace)
+            else if (type.IsEnum)
             {
-                enums.Add(type);
+                if (IsChoice(type))
+                {
+                    enums.Add(type);
+                }
             }
             else if (type.IsGenericType)
             {
@@ -257,13 +301,40 @@ namespace Moonwell.Build
                 text.Append('<').Append(string.Join(", ", method.GetGenericArguments().Select(argument => argument.Name))).Append('>');
             }
 
+            text.Append(Parameters(method));
+            text.Append(method.ReturnType.FullName == "System.Void" ? " { }\n" : " { return default; }\n");
+        }
+
+        private static string Parameters(MethodBase method)
+        {
             var parameters = method.GetParameters().Select(parameter =>
             {
                 var many = parameter.GetCustomAttributesData().Any(attribute => attribute.AttributeType.FullName == "System.ParamArrayAttribute");
                 return (many ? "params " : string.Empty) + TypeName(parameter.ParameterType) + " " + parameter.Name;
             });
-            text.Append('(').Append(string.Join(", ", parameters)).Append(')');
-            text.Append(method.ReturnType.FullName == "System.Void" ? " { }\n" : " { return default; }\n");
+            return "(" + string.Join(", ", parameters) + ")";
+        }
+
+        // An attribute class with its usage and its public constructors, which take what the attribute takes and keep nothing.
+        private static void WriteAttribute(StringBuilder text, Type type)
+        {
+            text.Append("    /// @CSharpLua.Ignore\n");
+            var usage = type.GetCustomAttributesData().Single(attribute => attribute.AttributeType.FullName == "System.AttributeUsageAttribute");
+            var targets = (AttributeTargets)Convert.ToInt32(usage.ConstructorArguments[0].Value, CultureInfo.InvariantCulture);
+            var arguments = new List<string> { "global::System.AttributeTargets." + targets };
+            foreach (var named in usage.NamedArguments)
+            {
+                arguments.Add(named.MemberName + " = " + (true.Equals(named.TypedValue.Value) ? "true" : "false"));
+            }
+
+            text.Append("    [global::System.AttributeUsage(").Append(string.Join(", ", arguments)).Append(")]\n");
+            text.Append("    public sealed class ").Append(type.Name).Append(" : global::System.Attribute\n    {\n");
+            foreach (var constructor in type.GetConstructors(BindingFlags.Public | BindingFlags.Instance).OrderBy(constructor => constructor.MetadataToken))
+            {
+                text.Append("        public ").Append(type.Name).Append(Parameters(constructor)).Append(" { }\n");
+            }
+
+            text.Append("    }\n");
         }
 
         private static string Access(MethodInfo method)
