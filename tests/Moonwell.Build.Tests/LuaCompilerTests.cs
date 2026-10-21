@@ -411,6 +411,95 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void ints_made_floats_in_primary_constructor_classes_user_defined_operators_and_nullables_are_written_as_floats()
+        {
+            // A user-defined operator or conversion is a call in Lua: an int passed to its float parameter stays an integer.
+            var source = string.Join("\n", new[]
+            {
+                "public class Base { public Base(int count) { } }",
+                "public class Prim(int count) : Base(count)",
+                "{",
+                "    public float Field = (float)count;",
+                "    public float Run(int n) => n;",
+                "}",
+                "public class V",
+                "{",
+                "    public static V operator *(V v, float k) { return v; }",
+                "    public static V operator *(float k, V v) { return v; }",
+                "    public static bool operator <(V v, float k) { return true; }",
+                "    public static bool operator >(V v, float k) { return false; }",
+                "    public static implicit operator V(float k) { return new V(); }",
+                "}",
+                "public class W",
+                "{",
+                "    public static explicit operator W(double k) { return new W(); }",
+                "}",
+                "public static class Uses",
+                "{",
+                "    public static void Run(V v, int count, int? maybe, char letter)",
+                "    {",
+                "        V times = v * count;",
+                "        V before = count * v;",
+                "        v *= count;",
+                "        bool less = v < count;",
+                "        V made = count;",
+                "        W cast = (W)count;",
+                "        float? some = count;",
+                "        float unwrapped = (float)maybe;",
+                "        float? lifted = maybe;",
+                "        float character = letter;",
+                "    }",
+                "}",
+            });
+            var expected = string.Join("\n", new[]
+            {
+                "public class Base { public Base(int count) { } }",
+                "public class Prim(int count) : Base(count)",
+                "{",
+                "    public float Field = ((float)count + 0.0f);",
+                "    public float Run(int n) => (n + 0.0f);",
+                "}",
+                "public class V",
+                "{",
+                "    public static V operator *(V v, float k) { return v; }",
+                "    public static V operator *(float k, V v) { return v; }",
+                "    public static bool operator <(V v, float k) { return true; }",
+                "    public static bool operator >(V v, float k) { return false; }",
+                "    public static implicit operator V(float k) { return new V(); }",
+                "}",
+                "public class W",
+                "{",
+                "    public static explicit operator W(double k) { return new W(); }",
+                "}",
+                "public static class Uses",
+                "{",
+                "    public static void Run(V v, int count, int? maybe, char letter)",
+                "    {",
+                "        V times = v * (count + 0.0f);",
+                "        V before = (count + 0.0f) * v;",
+                "        v *= (count + 0.0f);",
+                "        bool less = v < (count + 0.0f);",
+                "        V made = (count + 0.0f);",
+                "        W cast = (W)(count + 0.0);",
+                "        float? some = (count + 0.0f);",
+                "        float unwrapped = ((float)maybe + 0.0f);",
+                "        float? lifted = maybe;",
+                "        float character = (letter + 0.0f);",
+                "    }",
+                "}",
+            });
+            var folder = Path.Combine(Path.GetTempPath(), "moonwell-floats-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(folder);
+            temporaryFolders.Add(folder);
+            File.WriteAllText(Path.Combine(folder, "Operators.cs"), source);
+
+            var errors = FloatLiterals.Rewrite(folder, new[] { "Operators.cs" }, "Operators", Array.Empty<string>(), Array.Empty<string>());
+
+            Assert.Empty(errors);
+            Assert.Equal(expected, File.ReadAllText(Path.Combine(folder, "Operators.cs")));
+        }
+
+        [Fact]
         public void a_left_out_default_of_a_base_constructor_is_written_in()
         {
             // : base(...) and a primary constructor's base call the base constructor as a call does (C18).

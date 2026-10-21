@@ -55,7 +55,7 @@ namespace Moonwell.Build.Tests
                     new[]
                     {
                         file + "(3): Value -> Value = 0.0f",
-                        file + "(4): { get; set; } -> { get; set; } = 0.0",
+                        file + "(4): Auto { get; set; } -> Auto { get; set; } = 0.0",
                         file + "(5): (float)count -> ((float)count + 0.0f)",
                     },
                     changes);

@@ -11,7 +11,8 @@ namespace Moonwell.Build
     /// integral type to <c>float</c> or <c>double</c> (<c>(float)count</c> and <c>float d = count * 1000000</c> give Lua the
     /// integer), so each gets <c>+ 0.0f</c> (<c>+ 0.0</c> for a double): the int is still worked out as an int first, as in C#,
     /// and the sum is a float in Lua. A conversion Lua gives a float or a bool anyway is left: an operand of <c>/</c>, of a
-    /// comparison, of a compound assignment, or of <c>+ - * %</c> beside a float. CSharp.lua starts a <c>float</c> or
+    /// comparison, of a compound assignment, or of <c>+ - * %</c> beside a float, unless the operator is user-defined (a call in
+    /// Lua). An int passed to a user-defined conversion that takes a float is rewritten too. CSharp.lua starts a <c>float</c> or
     /// <c>double</c> field, or auto-property, at the integer <c>0</c>, so one without an initializer gets <c>= 0.0f</c>.
     /// </summary>
     internal static class RunTimeFloats
@@ -19,11 +20,13 @@ namespace Moonwell.Build
         /// <summary>Adds the edits of a file to <paramref name="edits"/>.</summary>
         internal static void Edits(SyntaxNode root, SemanticModel model, List<FloatEdit> edits)
         {
+            // A primary constructor's operations may hold what its members' hold too: each conversion is rewritten once.
+            var done = new HashSet<TextSpan>();
             foreach (var operation in Roots(root, model))
             {
                 foreach (var conversion in operation.DescendantsAndSelf().OfType<IConversionOperation>())
                 {
-                    if (IsIntToFloat(conversion) && !LuaGivesFloat(conversion))
+                    if (FloatOf(conversion) != SpecialType.None && !LuaGivesFloat(conversion) && done.Add(conversion.Syntax.Span))
                     {
                         Converted(conversion, edits);
                     }
@@ -41,19 +44,24 @@ namespace Moonwell.Build
                         break;
                     case PropertyDeclarationSyntax { Initializer: null, ExpressionBody: null, AccessorList: { } accessors } property
                         when IsAuto(property) && Zero(model.GetDeclaredSymbol(property)) is { } zero:
-                        edits.Add(new FloatEdit(new TextSpan(accessors.Span.End, 0), " = " + zero + ";", 0, accessors + " -> " + accessors + " = " + zero));
+                        var named = property.Identifier.Text + " " + accessors;
+                        edits.Add(new FloatEdit(new TextSpan(accessors.Span.End, 0), " = " + zero + ";", 0, named + " -> " + named + " = " + zero));
                         break;
                 }
             }
         }
 
-        // The trees of operations of a file: member bodies and initializers.
+        // The trees of operations of a file: member bodies and initializers, and a primary constructor's, which is its class's
+        // while its members have their own.
         private static IEnumerable<IOperation> Roots(SyntaxNode node, SemanticModel model)
         {
             if (model.GetOperation(node) is { Parent: null } root)
             {
                 yield return root;
-                yield break;
+                if (node is not TypeDeclarationSyntax)
+                {
+                    yield break;
+                }
             }
 
             foreach (var child in node.ChildNodes())
@@ -65,26 +73,57 @@ namespace Moonwell.Build
             }
         }
 
-        // A conversion CSharp.lua drops from a value of an integral type (or an enum) to a float or double, known only at run time.
-        private static bool IsIntToFloat(IOperation operation)
+        // The float or double a value of an integral type (or an enum) becomes at run time in a conversion CSharp.lua drops, or
+        // None: a conversion to float, double or float?, an int? cast to a float (which fails on null, in C# and in Lua), or a
+        // user-defined conversion that takes a float. An int? made a float? keeps null, which + 0.0 would not, so it is left.
+        private static SpecialType FloatOf(IOperation operation)
         {
-            return operation is IConversionOperation { OperatorMethod: null, ConstantValue.HasValue: false } conversion
-                && conversion.Type?.SpecialType is SpecialType.System_Single or SpecialType.System_Double
-                && conversion.Operand.Type is { } type
-                && (type.TypeKind == TypeKind.Enum || type.SpecialType is SpecialType.System_SByte or SpecialType.System_Byte
-                    or SpecialType.System_Int16 or SpecialType.System_UInt16 or SpecialType.System_Int32 or SpecialType.System_UInt32
-                    or SpecialType.System_Int64 or SpecialType.System_UInt64 or SpecialType.System_Char);
+            if (operation is not IConversionOperation { ConstantValue.HasValue: false } conversion || conversion.Operand.Type is not { } source)
+            {
+                return SpecialType.None;
+            }
+
+            var method = conversion.OperatorMethod;
+            var target = method == null ? conversion.Type : method.Parameters.Length == 1 ? method.Parameters[0].Type : null;
+            var type = Unwrapped(target);
+            var nullable = IsNullable(source);
+            var inner = nullable ? ((INamedTypeSymbol)source).TypeArguments[0] : source;
+            if (type is not (SpecialType.System_Single or SpecialType.System_Double) || !IsIntegral(inner)
+                || (nullable && (method != null || IsNullable(conversion.Type))))
+            {
+                return SpecialType.None;
+            }
+
+            return type;
+        }
+
+        private static bool IsIntegral(ITypeSymbol type)
+        {
+            return type.TypeKind == TypeKind.Enum || type.SpecialType is SpecialType.System_SByte or SpecialType.System_Byte
+                or SpecialType.System_Int16 or SpecialType.System_UInt16 or SpecialType.System_Int32 or SpecialType.System_UInt32
+                or SpecialType.System_Int64 or SpecialType.System_UInt64 or SpecialType.System_Char;
+        }
+
+        private static bool IsNullable(ITypeSymbol? type)
+        {
+            return type?.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T;
+        }
+
+        private static SpecialType Unwrapped(ITypeSymbol? type)
+        {
+            return IsNullable(type) ? ((INamedTypeSymbol)type!).TypeArguments[0].SpecialType : type?.SpecialType ?? SpecialType.None;
         }
 
         // Lua gives a float (or a bool) without the rewrite: / always gives a float, a comparison a bool, and + - * % a float beside
-        // a float. Of two ints made floats, the left is rewritten, which makes the operation a float.
+        // a float. Of two ints made floats, the left is rewritten, which makes the operation a float. A user-defined operator is a
+        // call, which gets the int as it is.
         private static bool LuaGivesFloat(IConversionOperation conversion)
         {
             switch (conversion.Parent)
             {
-                case ICompoundAssignmentOperation:
-                    return true;
-                case IBinaryOperation binary:
+                case ICompoundAssignmentOperation compound:
+                    return compound.OperatorMethod == null;
+                case IBinaryOperation { OperatorMethod: null } binary:
                     switch (binary.OperatorKind)
                     {
                         case BinaryOperatorKind.Divide:
@@ -99,7 +138,7 @@ namespace Moonwell.Build
                         case BinaryOperatorKind.Subtract:
                         case BinaryOperatorKind.Multiply:
                         case BinaryOperatorKind.Remainder:
-                            return binary.RightOperand == conversion || !IsIntToFloat(binary.RightOperand);
+                            return binary.RightOperand == conversion || FloatOf(binary.RightOperand) == SpecialType.None;
                         default:
                             return false;
                     }
@@ -109,12 +148,12 @@ namespace Moonwell.Build
             }
         }
 
-        // (float)count becomes ((float)count + 0.0f); count, made a float without a cast, (count + 0.0f), with brackets around it
-        // where + would bind it apart (count << 2).
+        // (float)count becomes ((float)count + 0.0f); count, made a float without a cast or passed to a user-defined conversion,
+        // (count + 0.0f), with brackets around it where + would bind it apart (count << 2).
         private static void Converted(IConversionOperation conversion, List<FloatEdit> edits)
         {
             ExpressionSyntax target;
-            if (!conversion.IsImplicit)
+            if (!conversion.IsImplicit && conversion.OperatorMethod == null)
             {
                 if (conversion.Syntax is not CastExpressionSyntax cast)
                 {
@@ -133,7 +172,7 @@ namespace Moonwell.Build
             }
 
             var bracketed = !BindsBeforeAdd(target);
-            var zero = conversion.Type!.SpecialType == SpecialType.System_Single ? "0.0f" : "0.0";
+            var zero = FloatOf(conversion) == SpecialType.System_Single ? "0.0f" : "0.0";
             var open = bracketed ? "((" : "(";
             var close = (bracketed ? ")" : string.Empty) + " + " + zero + ")";
             // At one place, the brackets that close come first, inner before outer, then a left-out argument (order 0), then
