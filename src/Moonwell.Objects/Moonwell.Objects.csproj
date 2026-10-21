@@ -13,6 +13,8 @@
   <PropertyGroup>
     <DebugType>embedded</DebugType>
     <EmbedAllSources>true</EmbedAllSources>
+    <!-- A document's path in the debug information is only a name (the text is embedded): the repository's folder becomes /_/, so the package carries no local folder. -->
+    <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\'))=/_/</PathMap>
   </PropertyGroup>
 
   <ItemGroup>

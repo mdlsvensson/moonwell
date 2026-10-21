@@ -90,6 +90,17 @@ namespace Moonwell.Build.Tests
             using var provider = pe.ReadEmbeddedPortablePdbDebugDirectoryData(pdb);
             var reader = provider.GetMetadataReader();
 
+            // A document's path is only a name (the text is embedded), and a released package must not carry this machine's folders.
+            var names = reader.Documents.Select(handle => reader.GetString(reader.GetDocument(handle).Name)).ToList();
+            Assert.NotEmpty(names);
+            Assert.All(names, name =>
+            {
+                Assert.StartsWith("/_/", name, StringComparison.Ordinal);
+                Assert.DoesNotContain(":", name);
+                Assert.DoesNotContain("Users", name);
+                Assert.DoesNotContain(Environment.UserName, name, StringComparison.OrdinalIgnoreCase);
+            });
+
             // Go to Definition on Paladin opens this file's text from the library: its constructor sets the values.
             var document = reader.Documents
                 .Select(handle => (Handle: (EntityHandle)handle, Name: reader.GetString(reader.GetDocument(handle).Name)))
