@@ -238,6 +238,37 @@ namespace Moonwell.Testing
             Expect.True(!dummy.HasEnded, "a death is not an end");
         }
 
+        /// <summary>A second Kill on a dead unit fires no death event (seen 10-21): the unit's reaction runs once.</summary>
+        public static void KillTwice(FakeWorld world)
+        {
+            ObjectTypes.Unit(ObjectTypes.FourCC("h000"), () => new Dummy());
+            var dummy = (Dummy)Unit.Of(world.NewUnit(ObjectTypes.FourCC("h000")))!;
+            TestLog.Lines.Clear();
+
+            dummy.Kill();
+            dummy.Kill();
+
+            Expect.Equal(2, world.KillCalls, "calls to the game's KillUnit");
+            Expect.Equal(2, TestLog.Lines.Count, "reactions to the death, once for the unit and its component");
+            Expect.True(!dummy.IsAlive, "alive after");
+        }
+
+        /// <summary>After a Kill the life is 0 (seen 10-21), also the last life a unit gives once the game has removed it, whatever was read before.</summary>
+        public static void KillLeavesNoLife(FakeWorld world)
+        {
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var unit = Unit.Of(handle)!;
+            unit.Life = 100.0f;
+            Expect.Near(100.0f, unit.Life, "life before");
+
+            unit.Kill();
+            world.VanishUnit(handle);
+            world.Advance(0.3f);
+
+            Expect.True(unit.IsGone, "the sweep found the unit gone");
+            Expect.Near(0.0f, unit.Life, "the life a killed then removed unit gives");
+        }
+
         /// <summary>A unit the game has removed is not alive, and Kill does not reach the game.</summary>
         public static void KillGone(FakeWorld world)
         {

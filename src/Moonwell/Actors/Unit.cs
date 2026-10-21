@@ -149,7 +149,7 @@ namespace Moonwell
                 {
                     // The game clamps to the most life, so that is what a removed unit gives back.
                     var most = MaxLife;
-                    lastLife = value < most ? value : most;
+                    lastLife = value < 0.405f ? 0.0f : (value < most ? value : most);
                     Runtime.World.SetLife(Handle, value);
                 }
             }
@@ -429,6 +429,9 @@ namespace Moonwell
             if (!IsGone)
             {
                 Runtime.World.SlayUnit(Handle);
+
+                // The game leaves the life 0 (seen), so a unit that is killed and then removed reads 0, not the life it had.
+                lastLife = 0.0f;
             }
         }
 

@@ -183,9 +183,11 @@ namespace Moonwell
         {
             if (!IsGone)
             {
-                lastX = x;
-                lastY = y;
                 Runtime.World.MoveItem(Handle, x, y);
+
+                // The game snaps the place, so the last place is the one it gives back, not the one asked.
+                lastX = Runtime.World.ItemX(Handle);
+                lastY = Runtime.World.ItemY(Handle);
             }
         }
 

@@ -926,11 +926,14 @@ namespace Moonwell.Testing
             return !vanishedItems.Contains(item) && itemPlaces.TryGetValue(item, out var place) ? place[1] : 0.0f;
         }
 
-        /// <summary>Moves an item to the place given and records "move".</summary>
+        /// <summary>The place (x, y) the game puts every moved item at when set, as it snaps a place on a tree or past the edge to a pathable spot (seen 10-21); null puts it where it was asked.</summary>
+        public float[]? ItemLandsAt;
+
+        /// <summary>Moves an item to the place given, or to <see cref="ItemLandsAt"/> when set, and records "move".</summary>
         public void MoveItem(item item, float x, float y)
         {
             NoteGoneItem(item);
-            itemPlaces[item] = new float[] { x, y };
+            itemPlaces[item] = ItemLandsAt ?? new float[] { x, y };
             ItemCalls.Add("move");
         }
 
@@ -1098,12 +1101,18 @@ namespace Moonwell.Testing
             return !dead.Contains(unit);
         }
 
-        /// <summary>Kills a unit as the game does: the unit is dead, and when deaths are listened for, its death is delivered inside the call, with no killer.</summary>
+        /// <summary>Kills a unit as the game does: the unit is dead with life 0, and when deaths are listened for, its death is delivered inside the call, with no killer; killing a dead unit does nothing.</summary>
         public void SlayUnit(unit unit)
         {
             NoteGone(unit);
             KillCalls++;
-            dead.Add(unit);
+            if (!dead.Add(unit))
+            {
+                // A second KillUnit on the dead unit fires nothing (seen 10-21).
+                return;
+            }
+
+            lives[unit] = 0.0f;
             if (Listening.Contains(GameEvent.Death))
             {
                 Inbound.Died(unit, null);

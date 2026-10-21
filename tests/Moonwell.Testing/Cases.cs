@@ -136,6 +136,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "units.level", Run = UnitCases.Level });
             list.Add(new Case { Name = "units.kill", Run = UnitCases.Kill });
             list.Add(new Case { Name = "units.kill-gone", Run = UnitCases.KillGone });
+            list.Add(new Case { Name = "units.kill-twice", Run = UnitCases.KillTwice });
+            list.Add(new Case { Name = "units.kill-leaves-no-life", Run = UnitCases.KillLeavesNoLife });
             list.Add(new Case { Name = "units.pause", Run = UnitCases.Pause });
             list.Add(new Case { Name = "units.scale", Run = UnitCases.Scale });
             list.Add(new Case { Name = "units.tint", Run = UnitCases.Tint });
@@ -178,6 +180,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "items.charges", Run = ItemCases.Charges });
             list.Add(new Case { Name = "items.player", Run = ItemCases.PlayerOf });
             list.Add(new Case { Name = "items.position", Run = ItemCases.Position });
+            list.Add(new Case { Name = "items.move-keeps-the-place-the-game-gives", Run = ItemCases.MoveToKeepsThePlaceTheGameGives });
             list.Add(new Case { Name = "items.carrier", Run = ItemCases.Carrier });
             list.Add(new Case { Name = "items.carrier-in-hooks", Run = ItemCases.CarrierInHooks });
             list.Add(new Case { Name = "items.carrier-dies", Run = ItemCases.CarrierDies });

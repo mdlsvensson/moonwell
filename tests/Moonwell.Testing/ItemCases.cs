@@ -215,6 +215,29 @@ namespace Moonwell.Testing
             Expect.Equal("move", world.ItemCalls[0], "the call");
         }
 
+        /// <summary>MoveTo keeps the place the game gives, not the one asked (the game snaps it, seen 10-21), also as the last place once the game has removed the item.</summary>
+        public static void MoveToKeepsThePlaceTheGameGives(FakeWorld world)
+        {
+            var handle = world.NewItem(ObjectTypes.FourCC("ofoo"));
+            var item = Item.Of(handle)!;
+            world.ItemLandsAt = new float[] { 3312.0f, 40.0f };
+
+            item.MoveTo(5000.0f, 40.0f);
+
+            // Nothing read in between: the last place is the one MoveTo stored.
+            world.VanishItem(handle);
+            world.Advance(0.3f);
+
+            Expect.True(item.IsGone, "the sweep found the item gone");
+            Expect.Near(3312.0f, item.X, "the last x of the removed item");
+            Expect.Near(40.0f, item.Y, "the last y of the removed item");
+
+            var other = Item.Of(world.NewItem(ObjectTypes.FourCC("ofoo")))!;
+            other.MoveTo(5000.0f, 41.0f);
+            Expect.Near(3312.0f, other.X, "the x the game gives");
+            Expect.Near(40.0f, other.Y, "the y the game gives");
+        }
+
         /// <summary>The carrier is the unit that picked the item up, until a drop; an item nobody has picked up has none.</summary>
         public static void Carrier(FakeWorld world)
         {
