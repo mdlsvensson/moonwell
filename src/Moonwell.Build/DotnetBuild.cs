@@ -10,6 +10,9 @@ namespace Moonwell.Build
         // the project's path in brackets after the message is left out.
         private static readonly Regex MovedName = new Regex(@"error CS0234:[^\[]*\W(AttackType|DefenseType)\W[^\[]*\WMoonwell\.Objects\W", RegexOptions.CultureInvariant);
 
+        // CS0246 names a type that binds to nothing, such as AttackType in a file with only using Moonwell.Objects.
+        private static readonly Regex UnboundName = new Regex(@"error CS0246:[^\[]*\W(AttackType|DefenseType)\W", RegexOptions.CultureInvariant);
+
         /// <summary>Builds the project, streaming dotnet's output to the log, and returns the path of the built assembly.</summary>
         /// <param name="project">The map project.</param>
         /// <param name="release">True for the Release configuration, false for Debug.</param>
@@ -45,7 +48,8 @@ namespace Moonwell.Build
         }
 
         /// <summary>
-        /// The MW0011 text for each choice enum that left <c>Moonwell.Objects</c> and that an error CS0234 of the output names. The
+        /// The MW0011 text for each choice enum that left <c>Moonwell.Objects</c> and that an error CS0234
+        /// (<c>Moonwell.Objects.AttackType</c>) or CS0246 (<c>AttackType</c>, which binds to nothing) of the output names. The
         /// analyzer reports it in a method body; a name in a declaration (a field's type, a <c>using static</c>) stops the compiler
         /// before analyzers run, so the build says it here.
         /// </summary>
@@ -57,10 +61,17 @@ namespace Moonwell.Build
             foreach (var line in lines)
             {
                 var found = MovedName.Match(line);
+                var written = "Moonwell.Objects.";
+                if (!found.Success)
+                {
+                    found = UnboundName.Match(line);
+                    written = string.Empty;
+                }
+
                 if (found.Success)
                 {
                     var name = found.Groups[1].Value;
-                    var hint = $"Moonwell.Objects.{name} is Moonwell.{name} since Moonwell 0.2.1, which the damage package uses too: write Moonwell.{name}, or {name} with using Moonwell";
+                    var hint = $"{written}{name} is Moonwell.{name} since Moonwell 0.2.1, which the damage package uses too: write Moonwell.{name}, or {name} with using Moonwell";
                     if (!hints.Contains(hint))
                     {
                         hints.Add(hint);

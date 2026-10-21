@@ -577,6 +577,49 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void an_unqualified_attack_type_in_a_declaration_with_using_moonwell_objects_fails_with_the_core_enum_named()
+        {
+            // With only using Moonwell.Objects, AttackType binds to nothing (CS0246); a field's type stops the compiler before analyzers run.
+            var copy = folders.TemporaryCopyOfSample();
+            File.WriteAllText(Path.Combine(copy, "Kinds.cs"), """
+                using Moonwell.Objects;
+
+                namespace Sample
+                {
+                    public static class Kinds
+                    {
+                        public static AttackType Attack;
+                    }
+                }
+                """);
+            var log = new StringWriter();
+
+            var error = Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), log));
+
+            Assert.Contains("error CS0246", log.ToString());
+            Assert.Equal(
+                "dotnet build failed" + Environment.NewLine
+                + "AttackType is Moonwell.AttackType since Moonwell 0.2.1, which the damage package uses too: write Moonwell.AttackType, or AttackType with using Moonwell",
+                error.Message);
+        }
+
+        [Fact]
+        public void the_build_names_each_moved_enum_of_a_cs0246_once()
+        {
+            var hints = DotnetBuild.MovedHints(new[]
+            {
+                @"C:\Map\Kinds.cs(5,23): error CS0246: The type or namespace name 'DefenseType' could not be found (are you missing a using directive or an assembly reference?) [C:\Map\Map.csproj]",
+                @"C:\Map\Kinds.cs(6,23): error CS0246: The type or namespace name 'AttackType' could not be found (are you missing a using directive or an assembly reference?) [C:\Map\Map.csproj]",
+                @"C:\Map\Kinds.cs(6,23): error CS0246: The type or namespace name 'AttackType' could not be found (are you missing a using directive or an assembly reference?) [C:\Map\Map.csproj]",
+                @"C:\Map\Kinds.cs(7,23): error CS0246: The type or namespace name 'AttackTypes' could not be found (are you missing a using directive or an assembly reference?) [C:\Map\Map.csproj]",
+                @"C:\Map\Kinds.cs(8,23): error CS0246: The type or namespace name 'Other' could not be found (are you missing a using directive or an assembly reference?) [C:\AttackType\Map.csproj]",
+            });
+
+            Assert.Equal(new[] { "DefenseType is Moonwell.DefenseType", "AttackType is Moonwell.AttackType" },
+                hints.Select(hint => hint.Substring(0, hint.IndexOf(" since", StringComparison.Ordinal))));
+        }
+
+        [Fact]
         public void the_build_names_each_moved_enum_of_a_cs0234_once()
         {
             var hints = DotnetBuild.MovedHints(new[]
