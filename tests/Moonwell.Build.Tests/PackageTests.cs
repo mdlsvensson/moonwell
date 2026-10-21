@@ -1,4 +1,6 @@
 using System.IO.Compression;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using War3Net.Build.Extensions;
@@ -69,6 +71,60 @@ namespace Moonwell.Build.Tests
             var dependency = Assert.Single(nuspec.Descendants(), element => element.Name.LocalName == "dependency" && element.Attribute("id")!.Value == "Moonwell");
             Assert.Equal(packed.Version, dependency.Attribute("version")!.Value);
             Assert.DoesNotContain("Analyzers", dependency.Attribute("exclude")?.Value ?? string.Empty);
+        }
+
+        [Fact]
+        public void objects_library_embeds_the_source_a_language_server_opens()
+        {
+            using var archive = ZipFile.OpenRead(packed.ObjectsPackage);
+            var entry = archive.Entries.Single(candidate => candidate.FullName.StartsWith("lib/", StringComparison.Ordinal) && candidate.FullName.EndsWith("/Moonwell.Objects.dll", StringComparison.Ordinal));
+            using var library = new MemoryStream();
+            using (var stream = entry.Open())
+            {
+                stream.CopyTo(library);
+            }
+
+            library.Position = 0;
+            using var pe = new PEReader(library);
+            var pdb = Assert.Single(pe.ReadDebugDirectory(), candidate => candidate.Type == DebugDirectoryEntryType.EmbeddedPortablePdb);
+            using var provider = pe.ReadEmbeddedPortablePdbDebugDirectoryData(pdb);
+            var reader = provider.GetMetadataReader();
+
+            // Go to Definition on Paladin opens this file's text from the library: its constructor sets the values.
+            var document = reader.Documents
+                .Select(handle => (Handle: (EntityHandle)handle, Name: reader.GetString(reader.GetDocument(handle).Name)))
+                .Single(candidate => candidate.Name.Replace('\\', '/').EndsWith("/Generated/Human/Units.g.cs", StringComparison.Ordinal));
+            var source = EmbeddedSource(reader, document.Handle);
+            Assert.NotNull(source);
+            Assert.Contains("public Paladin()", source);
+            Assert.Contains("AcquisitionRange = 500f;", source);
+        }
+
+        // The text a portable PDB embeds for a document, or null when it embeds none (the format: Microsoft's PortablePdb-Metadata.md, "Embedded Source").
+        private static string? EmbeddedSource(MetadataReader reader, EntityHandle document)
+        {
+            var embeddedSource = new Guid("0E8A571B-6926-466E-B4AD-8AB04611F5FE");
+            foreach (var handle in reader.GetCustomDebugInformation(document))
+            {
+                var information = reader.GetCustomDebugInformation(handle);
+                if (reader.GetGuid(information.Kind) != embeddedSource)
+                {
+                    continue;
+                }
+
+                var blob = reader.GetBlobBytes(information.Value);
+                var uncompressedLength = BitConverter.ToInt32(blob, 0);
+                if (uncompressedLength == 0)
+                {
+                    return System.Text.Encoding.UTF8.GetString(blob, 4, blob.Length - 4);
+                }
+
+                using var deflate = new DeflateStream(new MemoryStream(blob, 4, blob.Length - 4), CompressionMode.Decompress);
+                using var text = new StreamReader(deflate, System.Text.Encoding.UTF8);
+                return text.ReadToEnd();
+            }
+
+            return null;
         }
 
         [Fact]

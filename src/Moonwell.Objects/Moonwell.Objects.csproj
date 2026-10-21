@@ -4,6 +4,17 @@
     <Description>Warcraft III's standard units, abilities, items, buffs and other objects as C# classes to inherit, for Moonwell.</Description>
   </PropertyGroup>
 
+  <!--
+    The library carries its debug information and the C# sources inside it, so that an editor's Go to Definition on a standard
+    class (Paladin) opens its source, where the constructor sets each value, not only the metadata's empty signature.
+    Roslyn's language server (Gram, VS Code) opens embedded sources; the map's Lua is compiled from the package's contentFiles,
+    not from the library, so it does not change.
+  -->
+  <PropertyGroup>
+    <DebugType>embedded</DebugType>
+    <EmbedAllSources>true</EmbedAllSources>
+  </PropertyGroup>
+
   <ItemGroup>
     <!-- PrivateAssets none, so that a map that references only Moonwell.Objects still gets Moonwell's analyzer. -->
     <ProjectReference Include="..\Moonwell\Moonwell.csproj" PrivateAssets="none" />
