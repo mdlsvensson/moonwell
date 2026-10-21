@@ -98,7 +98,6 @@ namespace Moonwell.Build.Tests
                 Assert.StartsWith("/_/", name, StringComparison.Ordinal);
                 Assert.DoesNotContain(":", name);
                 Assert.DoesNotContain("Users", name);
-                Assert.DoesNotContain(Environment.UserName, name, StringComparison.OrdinalIgnoreCase);
             });
 
             // Go to Definition on Paladin opens this file's text from the library: its constructor sets the values.

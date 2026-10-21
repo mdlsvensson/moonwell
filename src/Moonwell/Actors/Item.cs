@@ -185,9 +185,15 @@ namespace Moonwell
             {
                 Runtime.World.MoveItem(Handle, x, y);
 
-                // The game snaps the place, so the last place is the one it gives back, not the one asked.
-                lastX = Runtime.World.ItemX(Handle);
-                lastY = Runtime.World.ItemY(Handle);
+                // The game snaps the place, so the last place is the one it gives back, not the one asked. An item the
+                // game has removed reads 0 (the sweep has not found it yet): that keeps the last place.
+                var x2 = Runtime.World.ItemX(Handle);
+                var y2 = Runtime.World.ItemY(Handle);
+                if (!(x2 == 0.0f && y2 == 0.0f && RemovedByGame()))
+                {
+                    lastX = x2;
+                    lastY = y2;
+                }
             }
         }
 

@@ -238,6 +238,23 @@ namespace Moonwell.Testing
             Expect.Near(40.0f, other.Y, "the y the game gives");
         }
 
+        /// <summary>An item the game removed but the sweep has not found reads 0 (seen 10-21): MoveTo then does not overwrite the last place with that 0.</summary>
+        public static void MoveToOnARemovedItemKeepsTheLastPlace(FakeWorld world)
+        {
+            var handle = world.NewItem(ObjectTypes.FourCC("ofoo"));
+            var item = Item.Of(handle)!;
+            item.MoveTo(120.0f, 45.0f);
+
+            world.VanishItem(handle);
+            Expect.True(!item.IsGone, "the sweep has not found the item yet");
+            item.MoveTo(5000.0f, 41.0f);
+            world.Advance(0.3f);
+
+            Expect.True(item.IsGone, "the sweep found the item gone");
+            Expect.Near(120.0f, item.X, "the last x");
+            Expect.Near(45.0f, item.Y, "the last y");
+        }
+
         /// <summary>The carrier is the unit that picked the item up, until a drop; an item nobody has picked up has none.</summary>
         public static void Carrier(FakeWorld world)
         {

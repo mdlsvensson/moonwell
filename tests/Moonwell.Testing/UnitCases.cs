@@ -269,6 +269,41 @@ namespace Moonwell.Testing
             Expect.Near(0.0f, unit.Life, "the life a killed then removed unit gives");
         }
 
+        /// <summary>A life of 0.405 or less kills the unit and reads 0 (seen 10-20: 0.405 kills, 0.406 does not); the last life is 0 then too.</summary>
+        public static void LifeBelowThreshold(FakeWorld world)
+        {
+            ObjectTypes.Unit(ObjectTypes.FourCC("h000"), () => new Dummy());
+            var survivor = (Dummy)Unit.Of(world.NewUnit(ObjectTypes.FourCC("h000")))!;
+            survivor.Life = 100.0f;
+            TestLog.Lines.Clear();
+
+            survivor.Life = 0.406f;
+
+            Expect.True(survivor.IsAlive, "0.406 does not kill");
+            Expect.Near(0.406f, survivor.Life, "the life kept");
+            Expect.Equal(0, TestLog.Lines.Count, "no reaction");
+
+            var handle = world.NewUnit(ObjectTypes.FourCC("h000"));
+            var victim = (Dummy)Unit.Of(handle)!;
+            victim.Life = 100.0f;
+            Expect.Near(100.0f, victim.Life, "life before");
+            TestLog.Lines.Clear();
+
+            victim.Life = 0.405f;
+
+            Expect.True(!victim.IsAlive, "0.405 kills");
+            Expect.Equal(2, TestLog.Lines.Count, "the death, once for the unit and its component");
+            Expect.Near(0.0f, victim.Life, "the life of the dead unit");
+
+            var removed = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            removed.Life = 100.0f;
+            removed.Life = 0.405f;
+            world.VanishUnit(removed.Handle);
+            world.Advance(0.3f);
+            Expect.True(removed.IsGone, "the sweep found the unit gone");
+            Expect.Near(0.0f, removed.Life, "the last life after a kill by life");
+        }
+
         /// <summary>A unit the game has removed is not alive, and Kill does not reach the game.</summary>
         public static void KillGone(FakeWorld world)
         {

@@ -933,7 +933,7 @@ namespace Moonwell.Testing
         public void MoveItem(item item, float x, float y)
         {
             NoteGoneItem(item);
-            itemPlaces[item] = ItemLandsAt ?? new float[] { x, y };
+            itemPlaces[item] = ItemLandsAt != null ? new float[] { ItemLandsAt[0], ItemLandsAt[1] } : new float[] { x, y };
             ItemCalls.Add("move");
         }
 
@@ -970,10 +970,16 @@ namespace Moonwell.Testing
             return Kept(lives, unit);
         }
 
-        /// <summary>Sets the life of a unit; above the most life, once one is set, it is clamped to it (seen 10-21).</summary>
+        /// <summary>Sets the life of a unit; above the most life, once one is set, it is clamped to it (seen 10-21); 0.405 or less kills it as KillUnit does (seen 10-20).</summary>
         public void SetLife(unit unit, float life)
         {
             NoteGone(unit);
+            if (life <= 0.405f)
+            {
+                Die(unit);
+                return;
+            }
+
             lives[unit] = maxLives.TryGetValue(unit, out var most) && life > most ? most : life;
         }
 
@@ -1106,6 +1112,12 @@ namespace Moonwell.Testing
         {
             NoteGone(unit);
             KillCalls++;
+            Die(unit);
+        }
+
+        /// <summary>The death itself, for KillUnit and for a life set to 0.405 or less: life 0, the death inside the call when deaths are listened for, and nothing for a unit already dead (seen 10-21).</summary>
+        private void Die(unit unit)
+        {
             if (!dead.Add(unit))
             {
                 // A second KillUnit on the dead unit fires nothing (seen 10-21).
