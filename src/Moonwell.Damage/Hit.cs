@@ -79,6 +79,30 @@ namespace Moonwell
             }
         }
 
+        /// <summary>The attack type; a reaction may change it before armor only. A spell's is <see cref="AttackType.Spells"/>.</summary>
+        [LocalSafe]
+        public AttackType AttackType
+        {
+            get => TypeCodes.AttackOf(AttackTypeCode);
+            set
+            {
+                CheckBeforeArmor("AttackType");
+                AttackTypeCode = TypeCodes.AttackCode(value);
+            }
+        }
+
+        /// <summary>The target's defense type for this hit; a reaction may change it before armor only, and the target has its own defense type back after the hit.</summary>
+        [LocalSafe]
+        public DefenseType DefenseType
+        {
+            get => TypeCodes.DefenseOf(DefenseTypeCode);
+            set
+            {
+                CheckBeforeArmor("DefenseType");
+                DefenseTypeCode = TypeCodes.DefenseCode(value);
+            }
+        }
+
         /// <summary>Whether the hit killed its target; known once the hit has landed.</summary>
         [LocalSafe]
         public bool Killed { get; internal set; }

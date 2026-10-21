@@ -166,9 +166,11 @@ public sealed class Shield : Buff, IDamageTarget
   players' components that implement `IDamageWatch`. `OnDamaged` and `OnDealtDamage` still run, first in the
   after-armor stage.
 - A `Hit` has the amount, `Original`, `IsAttack`, `IsSpell`, `IsMelee`, `IsRanged`, `IsCode` and `Tag`. Before armor
-  a reaction may also change `DamageKind`, `WeaponSound` and the target's `Armor` for this hit. In the lethal stage
+  a reaction may also change `DamageKind`, `WeaponSound`, `AttackType`, the target's `DefenseType` and its `Armor` for
+  this hit; the target has its own defense type and armor back afterwards. In the lethal stage
   `hit.Spare()` keeps the target alive; `hit.Killed` tells in the landed stage.
-- `source.Damage(target, 10f, DamageKind.Fire, tag: MyTag.Firebolt)` deals damage from code and returns the `Hit`.
+- `source.Damage(target, 10f, DamageKind.Fire, tag: MyTag.Firebolt)` deals damage from code and returns the `Hit`;
+  `attackType:` (default `AttackType.Spells`) sets its attack type.
 - Damage dealt from a reaction belongs to the hit it reacted to; a chain of 8 such hits ends with an error, so two
   units that hit each other back never loop.
 - A hit spell immunity stops runs before armor only.

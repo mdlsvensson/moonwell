@@ -110,6 +110,56 @@ namespace Moonwell.Testing
             Expect.True(TestLog.Lines.Contains("target comp taken"), "the component's reaction still ran");
         }
 
+        /// <summary>An attack type set before armor reaches the game, in the game's number, and reads back as the same type after armor.</summary>
+        public static void AttackTypeChange(FakeWorld world)
+        {
+            Arena(world, out var source, out var target);
+            var during = -1;
+            var seen = AttackType.Unknown;
+            target.Taking = hit => hit.AttackType = AttackType.Chaos;
+            target.Taken = hit => seen = hit.AttackType;
+            fake.Hit(source.Handle, target.Handle, 10f, damageType: 4, inside: () => during = fake.EventAttackType());
+            Expect.Equal(5, during, "the game's attack type during the hit");
+            Expect.Equal((int)AttackType.Chaos, (int)seen, "the attack type after armor");
+        }
+
+        /// <summary>A defense type set before armor counts for the hit, and the target has its own back after.</summary>
+        public static void DefenseTypeForOneHit(FakeWorld world)
+        {
+            Arena(world, out var source, out var target);
+            var body = fake.Body(target.Handle);
+            var during = -1;
+            var seen = DefenseType.Normal;
+            target.Taking = hit => hit.DefenseType = DefenseType.Divine;
+            target.Taken = hit => seen = hit.DefenseType;
+            fake.Hit(source.Handle, target.Handle, 10f, damageType: 4, inside: () => during = fake.DefenseType(target.Handle));
+            Expect.Equal(6, during, "the game's defense type during the hit");
+            Expect.Equal((int)DefenseType.Divine, (int)seen, "the defense type after armor");
+            Expect.Equal(4, body.Defense, "the target's own defense type after the hit");
+        }
+
+        /// <summary>The types a hit came with read in their Moonwell names, and one set after armor is reported in a development build, since the game would ignore it.</summary>
+        public static void AttackTypeReadsLate(FakeWorld world)
+        {
+            Arena(world, out var source, out var target);
+            var read = AttackType.Unknown;
+            var defense = DefenseType.None;
+            target.Taken = hit =>
+            {
+                read = hit.AttackType;
+                defense = hit.DefenseType;
+                hit.AttackType = AttackType.Hero;
+            };
+            fake.Hit(source.Handle, target.Handle, 10f, attackType: 2, damageType: 4);
+            Expect.Equal((int)AttackType.Pierce, (int)read, "the attack type the hit came with");
+            Expect.Equal((int)DefenseType.Normal, (int)defense, "the defense type the hit came with");
+#if DEBUG
+            Expect.Equal(1, world.Logged.Count, "one error is logged in a development build");
+#else
+            Expect.Equal(0, world.Logged.Count, "a release build leaves the check out");
+#endif
+        }
+
         /// <summary>A reaction that removes its unit stops the unit's later reactions; the map's still run.</summary>
         public static void RemovedMidStage(FakeWorld world)
         {

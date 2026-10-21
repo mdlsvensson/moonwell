@@ -23,6 +23,23 @@ namespace Moonwell.Testing
             Expect.Near(70f, fake.Body(target.Handle).Life, "the target lost 30");
         }
 
+        /// <summary>The attack type given to Unit.Damage reaches the game in its number, and a hit with none is a spell's.</summary>
+        public static void DealAttackType(FakeWorld world)
+        {
+            StageCases.Arena(world, out var source, out var target);
+            var fake = StageCases.Fake;
+            var during = -1;
+            target.Taking = hit => during = fake.EventAttackType();
+            var siege = source.Damage(target, 10f, attackType: AttackType.Siege);
+            Expect.Equal(3, during, "the game's attack type of the siege hit");
+            Expect.Equal((int)AttackType.Siege, (int)siege!.AttackType, "the hit's attack type");
+            Expect.True(!siege.IsSpell, "a siege hit is not a spell's");
+            var plain = source.Damage(target, 10f);
+            Expect.Equal(0, during, "the game's attack type of a hit with none");
+            Expect.Equal((int)AttackType.Spells, (int)plain!.AttackType, "the hit's default attack type");
+            Expect.True(plain.IsSpell, "a hit with none is a spell's");
+        }
+
         /// <summary>With no reaction anywhere, the first Unit.Damage makes the package listen, so the hit is filled in.</summary>
         public static void DealStartsListening(FakeWorld world)
         {

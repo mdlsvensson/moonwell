@@ -139,6 +139,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "damage-package.type-set-after-armor-reported", Run = StageCases.TypeSetAfterArmorReported });
             list.Add(new Case { Name = "damage-package.removed-mid-stage", Run = StageCases.RemovedMidStage });
             list.Add(new Case { Name = "damage-package.melee-or-ranged", Run = StageCases.MeleeOrRanged });
+            list.Add(new Case { Name = "damage-package.attack-type-change", Run = StageCases.AttackTypeChange });
+            list.Add(new Case { Name = "damage-package.defense-type-for-one-hit", Run = StageCases.DefenseTypeForOneHit });
+            list.Add(new Case { Name = "damage-package.attack-type-reads-late", Run = StageCases.AttackTypeReadsLate });
             list.Add(new Case { Name = "damage-package.lethal-spare", Run = LandingCases.LethalSpare });
             list.Add(new Case { Name = "damage-package.lethal-only-when-lethal", Run = LandingCases.LethalOnlyWhenLethal });
             list.Add(new Case { Name = "damage-package.landed-after-zero", Run = LandingCases.LandedAfterZero });
@@ -149,6 +152,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "damage-package.nested-keeps-outer", Run = LandingCases.NestedKeepsOuter });
             list.Add(new Case { Name = "damage-package.stray-open-ended", Run = LandingCases.StrayOpenEnded });
             list.Add(new Case { Name = "damage-package.deal-returns-hit", Run = DealCases.DealReturnsHit });
+            list.Add(new Case { Name = "damage-package.deal-attack-type", Run = DealCases.DealAttackType });
             list.Add(new Case { Name = "damage-package.deal-starts-listening", Run = DealCases.DealStartsListening });
             list.Add(new Case { Name = "damage-package.deal-inside-reaction-nests", Run = DealCases.DealInsideReactionNests });
             list.Add(new Case { Name = "damage-package.chain-cut", Run = DealCases.ChainCut });
