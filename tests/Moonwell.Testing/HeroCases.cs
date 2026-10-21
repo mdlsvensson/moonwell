@@ -247,7 +247,7 @@ namespace Moonwell.Testing
             Expect.Equal("Arthas", seen, "the gone hero's last proper name");
             Expect.Equal(1, world.HeroCalls.Count, "no call for the gone hero");
 
-            var unset = (Hero)Unit.Of(world.NewUnit(ObjectTypes.FourCC("Hpal"), hero: true))!;
+            var unset = NewHero(world, out _);
             world.SetProperName(unset.Handle, "Read only");
             Local.For(Player.Get(0), () => seen = unset.ProperName);
             unset.Remove();

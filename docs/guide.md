@@ -140,16 +140,17 @@ Default. A map on another data set plays that set's values for the fields it lea
 
 `Default` is the class's declared values as an object, which never changes when the unit does. Every unit, hero and
 item has it, a plain standard unit too: `unit.Default.MaxMana` is 300 whatever this Champion's is now. From the class
-alone it is `Unit.Default<Champion>().MaxMana` (`Item.Default<EmberBlade>()` for an item class; `Unit.Default` takes
-a unit class). On a declared class `Default` is typed as its standard base, so it holds every field of it
-(`Default.Model`, `Default.GoldCost`); the class's own members come through `Unit.Default<T>()`. Its live actions do
-nothing.
+alone it is `Unit.Default<Champion>().MaxMana`: `Unit.Default<T>()` takes a unit class (`Hero.Default<T>()` works too),
+`Item.Default<T>()` an item class. On a declared class `Default` is typed as its kind base (`StandardUnit`,
+`StandardHero` or `StandardItem`), so it holds every field of it (`Default.Model`, `Default.GoldCost`); the class's own
+members come through `Unit.Default<T>()`. Its live actions do nothing.
 
 `unit.Name` reads the game's name, which is in each player's language, so reading it is error MW0002 outside
-`Local.For`; setting it is fine anywhere. Reading `Name` in a declared class's constructor, and on `Default`, is
-allowed, and the same on every machine. A local copy of a default (`var d = unit.Default; d.Name`) is still MW0002, a
-false alarm: write `unit.Default.Name`. A hero's `Name` is its type's ("Paladin"); `Hero.ProperName` ("Arius the
-Seeker") works the same way.
+`Local.For`; setting it is fine anywhere outside `Local.For`. Reading `Name` in a declared class's constructor, and on
+`Default`, is allowed, and the same on every machine. A local copy of a default (`var d = unit.Default; d.Name`) is
+still MW0002, a false alarm: write `unit.Default.Name`. A hero's `Name` is its type's ("Paladin"). `Hero.ProperName`
+("Arius the Seeker") has no declared value: it is read inside `Local.For` only, set anywhere outside it, and empty on a
+default.
 
 ## Components and reactions
 
@@ -201,7 +202,7 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 | `Level` | read; a hero's hero level; a unit's level is set only in its class's constructor |
 | `IsAlive`, `Kill()` | whether it lives; kills it, with `OnDeath` run |
 | `IsPaused`, `Scale`, `FlyHeight` | read and set; a paused unit takes no orders but still animates; `Scale` reads its type's scale until set; `FlyHeight` also lifts a ground unit |
-| `Name` | read inside `Local.For` only (each player's language), set anywhere |
+| `Name` | read inside `Local.For` only (each player's language), set anywhere outside it |
 | `Tint(red, green, blue, alpha)` | colours the model, each value clamped to 0-255 |
 | `Order(order)`, `OrderAt(order, x, y)`, `OrderOn(order, target)`, `Stop()` | orders by the game's order string (`"move"`, `"attack"`) |
 | `InventorySize`, `ItemIn(slot)`, `Give(item)`, `Drop(item)` | the inventory; `Give` and `Drop` run the pick-up and drop reactions inside the call; `Give` answers false, with no reaction, for a full inventory; giving an item the unit holds runs a drop and then a pick-up |
@@ -213,7 +214,7 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 | `Strength`, `Agility`, `Intelligence` | the base, read and set |
 | `StrengthWithBonus`, `AgilityWithBonus`, `IntelligenceWithBonus` | with items and auras, read |
 | `SkillPoints` | read and set |
-| `ProperName` | read inside `Local.For` only, set anywhere |
+| `ProperName` | read inside `Local.For` only, set anywhere outside it |
 
 | Item | |
 |---|---|
