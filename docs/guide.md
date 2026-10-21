@@ -114,9 +114,10 @@ Heroes/Giant.cs:12: Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) 
 only: an empty name, a negative on a field the game never lets go below 0, and a choice that is none of the enum's
 values still fail. The values a standard class has are the game's, and are never checked.
 
-To see a standard object's values, go to its class (Go to Definition on `Paladin`): its constructor sets each value
-of the base tables, World Editor's Default. A map on another data set plays that set's values for the fields it leaves
-unset.
+To see a standard object's values, go to its class: Go to Definition on `Paladin` opens the class's source, which
+`Moonwell.Objects` embeds in its library, in an editor that navigates to embedded sources (the editors on Microsoft's C#
+language server do). Its constructor sets each value of the base tables, World Editor's
+Default. A map on another data set plays that set's values for the fields it leaves unset.
 
 ## Components and reactions
 
