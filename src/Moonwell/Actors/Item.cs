@@ -58,12 +58,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastCharges = Runtime.World.ChargesOf(Handle);
+                    return lastCharges;
                 }
 
-                return lastCharges;
+                var now = Runtime.World.ChargesOf(Handle);
+                if (Local.Depth == 0)
+                {
+                    lastCharges = now;
+                }
+
+                return now;
             }
 
             set
@@ -87,6 +93,11 @@ namespace Moonwell
                     var now = Runtime.World.ItemOwnerOf(Handle);
                     if (now != null)
                     {
+                        if (Local.Depth != 0)
+                        {
+                            return Player.Of(now) ?? Player.NeutralPassive;
+                        }
+
                         OwningPlayer = now;
                     }
                 }
@@ -110,12 +121,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastX = Runtime.World.ItemX(Handle);
+                    return lastX;
                 }
 
-                return lastX;
+                var now = Runtime.World.ItemX(Handle);
+                if (Local.Depth == 0)
+                {
+                    lastX = now;
+                }
+
+                return now;
             }
         }
 
@@ -125,12 +142,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastY = Runtime.World.ItemY(Handle);
+                    return lastY;
                 }
 
-                return lastY;
+                var now = Runtime.World.ItemY(Handle);
+                if (Local.Depth == 0)
+                {
+                    lastY = now;
+                }
+
+                return now;
             }
         }
 

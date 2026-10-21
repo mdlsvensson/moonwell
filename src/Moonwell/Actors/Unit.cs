@@ -57,6 +57,11 @@ namespace Moonwell
                     var now = Runtime.World.OwnerOf(Handle);
                     if (now != null)
                     {
+                        if (Local.Depth != 0)
+                        {
+                            return Player.Of(now)!;
+                        }
+
                         owner = now;
                     }
                 }
@@ -110,12 +115,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastLife = Runtime.World.LifeOf(Handle);
+                    return lastLife;
                 }
 
-                return lastLife;
+                var now = Runtime.World.LifeOf(Handle);
+                if (Local.Depth == 0)
+                {
+                    lastLife = now;
+                }
+
+                return now;
             }
 
             set
@@ -134,12 +145,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastMaxLife = Runtime.World.MaxLifeOf(Handle);
+                    return lastMaxLife;
                 }
 
-                return lastMaxLife;
+                var now = Runtime.World.MaxLifeOf(Handle);
+                if (Local.Depth == 0)
+                {
+                    lastMaxLife = now;
+                }
+
+                return now;
             }
 
             set
@@ -158,12 +175,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastMana = Runtime.World.ManaOf(Handle);
+                    return lastMana;
                 }
 
-                return lastMana;
+                var now = Runtime.World.ManaOf(Handle);
+                if (Local.Depth == 0)
+                {
+                    lastMana = now;
+                }
+
+                return now;
             }
 
             set
@@ -182,12 +205,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastMaxMana = Runtime.World.MaxManaOf(Handle);
+                    return lastMaxMana;
                 }
 
-                return lastMaxMana;
+                var now = Runtime.World.MaxManaOf(Handle);
+                if (Local.Depth == 0)
+                {
+                    lastMaxMana = now;
+                }
+
+                return now;
             }
 
             set
@@ -206,12 +235,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastX = Runtime.World.UnitX(Handle);
+                    return lastX;
                 }
 
-                return lastX;
+                var now = Runtime.World.UnitX(Handle);
+                if (Local.Depth == 0)
+                {
+                    lastX = now;
+                }
+
+                return now;
             }
         }
 
@@ -221,12 +256,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastY = Runtime.World.UnitY(Handle);
+                    return lastY;
                 }
 
-                return lastY;
+                var now = Runtime.World.UnitY(Handle);
+                if (Local.Depth == 0)
+                {
+                    lastY = now;
+                }
+
+                return now;
             }
         }
 
@@ -254,12 +295,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastFacing = Runtime.World.FacingOf(Handle);
+                    return lastFacing;
                 }
 
-                return lastFacing;
+                var now = Runtime.World.FacingOf(Handle);
+                if (Local.Depth == 0)
+                {
+                    lastFacing = now;
+                }
+
+                return now;
             }
 
             set
@@ -287,12 +334,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastLevel = Runtime.World.LevelOf(Handle);
+                    return lastLevel;
                 }
 
-                return lastLevel;
+                var now = Runtime.World.LevelOf(Handle);
+                if (Local.Depth == 0)
+                {
+                    lastLevel = now;
+                }
+
+                return now;
             }
         }
 
@@ -315,12 +368,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastPaused = Runtime.World.IsPausedUnit(Handle);
+                    return lastPaused;
                 }
 
-                return lastPaused;
+                var now = Runtime.World.IsPausedUnit(Handle);
+                if (Local.Depth == 0)
+                {
+                    lastPaused = now;
+                }
+
+                return now;
             }
 
             set
@@ -339,13 +398,19 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone && !scaleKnown)
+                if (IsGone || scaleKnown)
                 {
-                    lastScale = Runtime.World.ScaleOf(Handle);
+                    return lastScale;
+                }
+
+                var now = Runtime.World.ScaleOf(Handle);
+                if (Local.Depth == 0)
+                {
+                    lastScale = now;
                     scaleKnown = true;
                 }
 
-                return lastScale;
+                return now;
             }
 
             set
@@ -374,12 +439,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastFlyHeight = Runtime.World.FlyHeightOf(Handle);
+                    return lastFlyHeight;
                 }
 
-                return lastFlyHeight;
+                var now = Runtime.World.FlyHeightOf(Handle);
+                if (Local.Depth == 0)
+                {
+                    lastFlyHeight = now;
+                }
+
+                return now;
             }
 
             set
@@ -445,12 +516,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastInventorySize = Runtime.World.InventorySizeOf(Handle);
+                    return lastInventorySize;
                 }
 
-                return lastInventorySize;
+                var now = Runtime.World.InventorySizeOf(Handle);
+                if (Local.Depth == 0)
+                {
+                    lastInventorySize = now;
+                }
+
+                return now;
             }
         }
 

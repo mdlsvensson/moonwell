@@ -33,12 +33,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastExperience = Runtime.World.ExperienceOf(Handle);
+                    return lastExperience;
                 }
 
-                return lastExperience;
+                var now = Runtime.World.ExperienceOf(Handle);
+                if (Local.Depth == 0)
+                {
+                    lastExperience = now;
+                }
+
+                return now;
             }
 
             set
@@ -66,12 +72,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastStrength = Runtime.World.StrengthOf(Handle, false);
+                    return lastStrength;
                 }
 
-                return lastStrength;
+                var now = Runtime.World.StrengthOf(Handle, false);
+                if (Local.Depth == 0)
+                {
+                    lastStrength = now;
+                }
+
+                return now;
             }
 
             set
@@ -90,12 +102,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastAgility = Runtime.World.AgilityOf(Handle, false);
+                    return lastAgility;
                 }
 
-                return lastAgility;
+                var now = Runtime.World.AgilityOf(Handle, false);
+                if (Local.Depth == 0)
+                {
+                    lastAgility = now;
+                }
+
+                return now;
             }
 
             set
@@ -114,12 +132,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastIntelligence = Runtime.World.IntelligenceOf(Handle, false);
+                    return lastIntelligence;
                 }
 
-                return lastIntelligence;
+                var now = Runtime.World.IntelligenceOf(Handle, false);
+                if (Local.Depth == 0)
+                {
+                    lastIntelligence = now;
+                }
+
+                return now;
             }
 
             set
@@ -138,12 +162,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastStrengthWithBonus = Runtime.World.StrengthOf(Handle, true);
+                    return lastStrengthWithBonus;
                 }
 
-                return lastStrengthWithBonus;
+                var now = Runtime.World.StrengthOf(Handle, true);
+                if (Local.Depth == 0)
+                {
+                    lastStrengthWithBonus = now;
+                }
+
+                return now;
             }
         }
 
@@ -153,12 +183,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastAgilityWithBonus = Runtime.World.AgilityOf(Handle, true);
+                    return lastAgilityWithBonus;
                 }
 
-                return lastAgilityWithBonus;
+                var now = Runtime.World.AgilityOf(Handle, true);
+                if (Local.Depth == 0)
+                {
+                    lastAgilityWithBonus = now;
+                }
+
+                return now;
             }
         }
 
@@ -168,12 +204,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastIntelligenceWithBonus = Runtime.World.IntelligenceOf(Handle, true);
+                    return lastIntelligenceWithBonus;
                 }
 
-                return lastIntelligenceWithBonus;
+                var now = Runtime.World.IntelligenceOf(Handle, true);
+                if (Local.Depth == 0)
+                {
+                    lastIntelligenceWithBonus = now;
+                }
+
+                return now;
             }
         }
 
@@ -183,12 +225,18 @@ namespace Moonwell
         {
             get
             {
-                if (!IsGone)
+                if (IsGone)
                 {
-                    lastSkillPoints = Runtime.World.SkillPointsOf(Handle);
+                    return lastSkillPoints;
                 }
 
-                return lastSkillPoints;
+                var now = Runtime.World.SkillPointsOf(Handle);
+                if (Local.Depth == 0)
+                {
+                    lastSkillPoints = now;
+                }
+
+                return now;
             }
 
             set
