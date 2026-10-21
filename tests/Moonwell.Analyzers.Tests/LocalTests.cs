@@ -359,8 +359,33 @@ public class LocalTests
                 {
                     public static string Run(Unit unit, Hero hero)
                     {
-                        return unit.Default.Name + hero.Default.Name + hero.Default.ProperName + Unit.Default<Mage>().Name
+                        return unit.Default.Name + hero.Default.Name + Unit.Default<Mage>().Name
                             + Hero.Default<Champion>().Name + Unit.Default<Mage>().Default.Name;
+                    }
+                }
+            }
+            """));
+    }
+
+    [Fact]
+    public void proper_name_on_default_is_mw0002()
+    {
+        // A proper name has no declared value: only Name is exempt.
+        Assert.Equal(new[] { "MW0002: hero.Default.ProperName", "MW0002: Hero.Default<Champion>().ProperName" }, MapCode.CheckFile("""
+            using Moonwell;
+            using Moonwell.Objects;
+
+            namespace Map
+            {
+                public class Champion : Human.Units.Paladin
+                {
+                }
+
+                public static class Use
+                {
+                    public static string Run(Hero hero)
+                    {
+                        return hero.Default.ProperName + Hero.Default<Champion>().ProperName;
                     }
                 }
             }

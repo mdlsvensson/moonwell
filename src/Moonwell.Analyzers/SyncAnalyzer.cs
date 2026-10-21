@@ -135,13 +135,13 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
         }
 
         /// <summary>
-        /// Whether a read of a unit's or hero's name is the declared one, the same on every machine: in a declared class's
+        /// Whether a read of a unit's name (not a hero's proper name, which has no declared value) is the declared one, the same on every machine: in a declared class's
         /// constructor on the object itself, or on a default object (<c>….Default</c> or <c>Unit.Default&lt;T&gt;()</c>).
         /// A copy of a default object in a variable is not known to be one.
         /// </summary>
         private bool DeclaredName(IOperation operation, ISymbol member, bool write)
         {
-            if (write || member is not IPropertySymbol { Name: "Name" or "ProperName" } property || !IsRuntime(property)
+            if (write || member is not IPropertySymbol { Name: "Name" } property || !IsRuntime(property)
                 || operation is not IPropertyReferenceOperation { Instance: { } instance })
             {
                 return false;
