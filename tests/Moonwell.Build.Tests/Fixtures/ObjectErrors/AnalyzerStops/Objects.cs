@@ -10,7 +10,7 @@ namespace AnalyzerStops
     {
         public Giant()
         {
-            HitPoints = 600000;
+            MaxLife = 600000;
         }
     }
 }

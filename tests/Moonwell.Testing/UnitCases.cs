@@ -484,6 +484,40 @@ namespace Moonwell.Testing
             Expect.Equal(0, world.GoneCalls, "no call to the game for the gone unit");
         }
 
+        /// <summary>A unit's name is the game's: read inside Local.For, set for every machine; once the unit is gone, the last name set (a read keeps nothing, as it differs by machine), and a set calls nothing.</summary>
+        public static void NameReadAndSet(FakeWorld world)
+        {
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var unit = Unit.Of(handle)!;
+            var unset = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            world.RenameUnit(handle, "Footman");
+            world.UnitCalls.Clear();
+            var seen = "";
+
+            Local.For(Player.Get(0), () => seen = unit.Name);
+            Expect.Equal("Footman", seen, "the game's name");
+
+            unit.Name = "Renamed";
+
+            Local.For(Player.Get(0), () => seen = unit.Name);
+            Expect.Equal("Renamed", seen, "the new name");
+            Expect.Equal("Renamed", world.UnitNameOf(handle), "the game's name after the set");
+            Expect.Equal(1, world.UnitCalls.Count, "calls that changed the unit");
+            Expect.Equal("rename", world.UnitCalls[0], "the call");
+
+            unit.Remove();
+            unit.Name = "Later";
+            Local.For(Player.Get(0), () => seen = unit.Name);
+            Expect.Equal("Renamed", seen, "the gone unit's last name set");
+            Expect.Equal(1, world.UnitCalls.Count, "no call for the gone unit");
+
+            world.RenameUnit(unset.Handle, "Read only");
+            Local.For(Player.Get(0), () => seen = unset.Name);
+            unset.Remove();
+            Local.For(Player.Get(0), () => seen = unset.Name);
+            Expect.Equal("", seen, "a gone unit whose name was only read");
+        }
+
         /// <summary>A unit the game has removed, found by the sweep or removed by Remove, gives the values it last read, ignores setters and actions, and the game is not asked.</summary>
         public static void GoneReadsLast(FakeWorld world)
         {
@@ -1071,6 +1105,7 @@ namespace Moonwell.Testing
             ObjectTypes.Unit(id, () => new RecordingUnit());
             world.SetTypeValue(id, "umpm", 300);
             world.SetTypeValue(id, "usca", 1.5f);
+            world.SetTypeValue(id, "unam", "Recorder");
             var unit = new RecordingUnit();
             world.CallsThrow = true;
 
@@ -1080,12 +1115,15 @@ namespace Moonwell.Testing
             unit.Level = 3;
             unit.Scale = 2.5f;
             unit.FlyHeight = 150.5f;
+            unit.Name = "Champion";
             var maxMana = unit.MaxMana;
             var maxLife = unit.MaxLife;
             var mana = unit.Mana;
             var level = unit.Level;
             var scale = unit.Scale;
             var flyHeight = unit.FlyHeight;
+            var name = "";
+            Local.For(Player.Get(0), () => name = unit.Name);
             var plain = new Unit();
             plain.MaxMana = 5.0f;
             var plainMaxMana = plain.MaxMana;
@@ -1097,11 +1135,13 @@ namespace Moonwell.Testing
             Expect.Equal(0, level, "level");
             Expect.Near(1.5f, scale, "scale");
             Expect.Near(0.0f, flyHeight, "fly height");
+            Expect.Equal("Recorder", name, "the name its type declares");
             Expect.Near(0.0f, plainMaxMana, "a plain unit's most mana, with no type");
             var expected = new string[]
             {
                 "declare uhpm 800", "declare umpm 5", "declare umpi 4", "declare ulev 3", "declare usca 2.5",
-                "declare umvh 150.5", "read umpm", "read uhpm", "read umpi", "read ulev", "read usca", "read umvh",
+                "declare umvh 150.5", "declare unam Champion", "read umpm", "read uhpm", "read umpi", "read ulev", "read usca", "read umvh",
+                "read unam",
             };
             Expect.Equal(expected.Length, unit.Asked.Count, "hook calls");
             for (var i = 0; i < expected.Length; i++)

@@ -6,21 +6,15 @@ public class ConstructorTests
     [Fact]
     public void a_live_member_in_a_declared_class_constructor_is_an_error()
     {
+        // The live members a declared field shares (Mana, MaxLife, Strength, Charges) are the class's declared values there.
         Assert.Equal(new[]
         {
-            "MW0012: Mana",
-            "MW0012: MaxMana",
             "MW0012: Life",
-            "MW0012: MaxLife",
-            "MW0012: Scale",
             "MW0012: Kill",
             "MW0012: X",
             "MW0012: Facing",
-            "MW0012: Strength",
-            "MW0012: Agility",
-            "MW0012: Intelligence",
+            "MW0012: Level",
             "MW0012: Revive",
-            "MW0012: Charges",
             "MW0012: Remove",
         }, MapCode.CheckFile("""
             using Moonwell;
@@ -51,6 +45,7 @@ public class ConstructorTests
                     {
                         Agility = stats;
                         Intelligence += stats;
+                        Level = 2;
                         Revive(0.0f, 0.0f);
                     }
                 }
@@ -68,24 +63,15 @@ public class ConstructorTests
     }
 
     [Fact]
-    public void the_message_names_the_declared_field()
+    public void the_message_says_what_to_set_instead()
     {
         Assert.Equal(
             new[]
             {
-                "'Mana' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is ManaPoints",
-                "'MaxMana' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is ManaPoints",
-                "'Life' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is HitPoints",
-                "'MaxLife' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is HitPoints",
-                "'Scale' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is ScalingValue",
-                "'Level' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is UnitLevel",
-                "'FlyHeight' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is Height",
+                "'Life' is the unit's value in the game: a unit starts with full life; set MaxLife",
                 "'Add' starts a component in the game, which a declared class's constructor cannot do; use Components.Add(...)",
                 "'Kill' calls the game, which a declared class's constructor cannot do; game work starts from a reaction or the game's start",
-                "'Strength' is the hero's value in the game, which a declared class's constructor cannot reach; the declared field is StartingStrength",
-                "'Agility' is the hero's value in the game, which a declared class's constructor cannot reach; the declared field is StartingAgility",
-                "'Intelligence' is the hero's value in the game, which a declared class's constructor cannot reach; the declared field is StartingIntelligence",
-                "'Charges' is the item's value in the game, which a declared class's constructor cannot reach; the declared field is NumberOfCharges",
+                "'Level' is the hero's level in the game: a hero starts at level 1; its level is not declared",
             },
             MapCode.MessagesOfFile("""
                 using Moonwell;
@@ -101,13 +87,7 @@ public class ConstructorTests
                     {
                         public Mage()
                         {
-                            Mana = 300;
-                            MaxMana = 300;
                             Life = 10.0f;
-                            MaxLife = 10.0f;
-                            Scale = 1.2f;
-                            var level = Level;
-                            FlyHeight = 100.0f;
                             Add(new Counter());
                             Kill();
                         }
@@ -117,17 +97,7 @@ public class ConstructorTests
                     {
                         public Champion()
                         {
-                            Strength = 22;
-                            Agility = 1;
-                            Intelligence = 2;
-                        }
-                    }
-
-                    public class Potion : Items.ClawsOfAttack15
-                    {
-                        public Potion()
-                        {
-                            Charges = 3;
+                            var level = Level;
                         }
                     }
                 }
@@ -135,7 +105,7 @@ public class ConstructorTests
     }
 
     [Fact]
-    public void declared_fields_components_later_code_and_classes_the_game_makes_are_accepted()
+    public void declared_and_shared_fields_components_later_code_and_classes_the_game_makes_are_accepted()
     {
         Assert.Empty(MapCode.CheckFile("""
             using System;
@@ -154,9 +124,14 @@ public class ConstructorTests
 
                     public Mage()
                     {
-                        ManaPoints = 300;
-                        HitPoints = HitPoints + 200;
-                        ScalingValue = 1.2f;
+                        Name = "Mage";
+                        MaxMana = 300;
+                        Mana = MaxMana;
+                        MaxLife = MaxLife + 200;
+                        this.Scale = 1.2f;
+                        base.FlyHeight = 50.0f;
+                        Level = 2;
+                        GoldCost = 100;
                         Components.Add(new Counter());
                         mana = () => Mana;
                         var named = nameof(Mana);
@@ -170,7 +145,7 @@ public class ConstructorTests
 
                     public Mage(Mage other)
                     {
-                        ManaPoints = (int)other.Mana;
+                        MaxMana = other.MaxMana;
                     }
 
                     protected override void OnCreated()
@@ -184,7 +159,10 @@ public class ConstructorTests
                 {
                     public Champion()
                     {
-                        StartingStrength = 22;
+                        Strength = 22;
+                        Agility = Strength;
+                        Intelligence += 2;
+                        MaxLife = 800;
                     }
                 }
 
@@ -192,7 +170,7 @@ public class ConstructorTests
                 {
                     public Potion()
                     {
-                        NumberOfCharges = 3;
+                        Charges = 3;
                     }
                 }
 

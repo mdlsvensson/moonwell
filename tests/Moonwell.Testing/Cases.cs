@@ -156,6 +156,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "units.order-point", Run = UnitCases.OrderPoint });
             list.Add(new Case { Name = "units.order-target", Run = UnitCases.OrderTarget });
             list.Add(new Case { Name = "units.order-gone", Run = UnitCases.OrderGone });
+            list.Add(new Case { Name = "units.name", Run = UnitCases.NameReadAndSet });
             list.Add(new Case { Name = "units.level-set-with-handle", Run = UnitCases.LevelSetWithHandleDoesNothing });
             list.Add(new Case { Name = "units.shared-without-handle", Run = UnitCases.SharedWithoutHandle });
             list.Add(new Case { Name = "defaults.reads-type-values", Run = UnitCases.DefaultReadsTypeValues });

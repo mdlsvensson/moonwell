@@ -428,7 +428,7 @@ namespace Moonwell.Build.Tests
         {
             AssertFails(
                 "SetOutsideCtor",
-                "SetOutsideCtor.Reset.Heal sets HitPoints; declared fields are set only in the constructor");
+                "SetOutsideCtor.Reset.Heal sets GoldCost; declared fields are set only in the constructor");
         }
 
         [Fact]
@@ -519,7 +519,7 @@ namespace Moonwell.Build.Tests
         {
             AssertFails(
                 "OutOfRange",
-                "Objects.cs:13: Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it");
+                "Objects.cs:13: Giant.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it");
         }
 
         [Fact]
@@ -527,7 +527,7 @@ namespace Moonwell.Build.Tests
         {
             AssertFails(
                 "OutOfRangeById",
-                "Heroes/Objects.cs:13: Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it");
+                "Heroes/Objects.cs:13: Giant.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it");
         }
 
         [Fact]
@@ -575,7 +575,7 @@ namespace Moonwell.Build.Tests
 
             Assert.Equal("dotnet build failed", error.Message);
             Assert.Contains(
-                "error MW0009: Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it",
+                "error MW0009: Giant.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it",
                 log.ToString());
         }
 

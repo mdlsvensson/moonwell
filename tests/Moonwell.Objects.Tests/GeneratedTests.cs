@@ -16,9 +16,9 @@ namespace Moonwell.Objects.Tests
             Set(field, level, value);
         }
 
-        public void SetHitPoints(int value)
+        public void SetMaxLife(int value)
         {
-            HitPoints = value;
+            MaxLife = value;
         }
     }
 
@@ -103,10 +103,12 @@ namespace Moonwell.Objects.Tests
         public void a_modder_class_inherits_a_standard_hero()
         {
             var arthas = new OpenPaladin();
-            arthas.SetHitPoints(1300);
+            arthas.SetMaxLife(1300);
 
-            Assert.Equal(1300, arthas.Declared["uhpm"]);
-            Assert.Equal(1300, arthas.HitPoints);
+            // A hero's life set by its live name is its total, kept apart from the base field.
+            Assert.Equal(1300, arthas.Totals["uhpm"]);
+            Assert.Empty(arthas.Declared);
+            Assert.Equal(1300, arthas.MaxLife);
         }
 
         [Fact]
@@ -228,7 +230,7 @@ namespace Moonwell.Objects.Tests
             var arthas = new OpenPaladin();
             arthas.Put("uhpm", 800);
 
-            Assert.Equal(800, arthas.HitPoints);
+            Assert.Equal(800, arthas.MaxLife);
             Assert.Equal(800, arthas.Declared["uhpm"]);
         }
 

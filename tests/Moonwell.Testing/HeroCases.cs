@@ -268,7 +268,7 @@ namespace Moonwell.Testing
             }
         }
 
-        /// <summary>A hero with no handle calls no native for its stats: a set goes to Declare and a read to DeclaredValue.</summary>
+        /// <summary>A hero with no handle calls no native for its stats: a set goes to Declare and a read to DeclaredValue. Its level is not declared: it reads 1, asking no hook.</summary>
         public static void SharedWithoutHandle(FakeWorld world)
         {
             var id = ObjectTypes.FourCC("H0rc");
@@ -283,11 +283,13 @@ namespace Moonwell.Testing
             var strength = hero.Strength;
             var agility = hero.Agility;
             var intelligence = hero.Intelligence;
+            var level = hero.Level;
 
             world.CallsThrow = false;
             Expect.Equal(22, strength, "the strength its type declares");
             Expect.Equal(0, agility, "an agility its type does not declare");
             Expect.Equal(0, intelligence, "intelligence");
+            Expect.Equal(1, level, "a hero's level");
             var expected = new string[] { "declare ustr 30", "declare uagi 31", "declare uint 32", "read ustr", "read uagi", "read uint" };
             Expect.Equal(expected.Length, hero.Asked.Count, "hook calls");
             for (var i = 0; i < expected.Length; i++)

@@ -19,7 +19,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void declared_value_reads_in_lua()
         {
-            var paladin = int.Parse(compiled.Standard.Value("Hpal", "uhpm", 0, null)!, CultureInfo.InvariantCulture);
+            var paladin = int.Parse(compiled.Standard.Value("Hpal", "ugol", 0, null)!, CultureInfo.InvariantCulture);
 
             var run = compiled.Run();
 
@@ -50,16 +50,16 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void setter_does_nothing_in_lua()
         {
-            var paladin = int.Parse(compiled.Standard.Value("Hpal", "uhpm", 0, null)!, CultureInfo.InvariantCulture);
+            var paladin = int.Parse(compiled.Standard.Value("Hpal", "ugol", 0, null)!, CultureInfo.InvariantCulture);
             using var lua = compiled.Start();
 
-            // Arthas's constructor runs HitPoints = HitPoints * 2: the value read is the declared one, and stays it.
+            // Arthas's constructor runs GoldCost = GoldCost * 2: the value read is the declared one, and stays it.
             Assert.Equal(
                 (2 * paladin).ToString(CultureInfo.InvariantCulture),
-                Query(lua, "local a = Objects.Arthas(); return tostring(a:getHitPoints())"));
+                Query(lua, "local a = Objects.Arthas(); return tostring(a:getGoldCost())"));
             Assert.Equal(
                 (2 * paladin).ToString(CultureInfo.InvariantCulture),
-                Query(lua, "local a = Objects.Arthas(); a:setHitPoints(5); return tostring(MoonwellObjectValues['Objects.Arthas']['uhpm'])"));
+                Query(lua, "local a = Objects.Arthas(); a:setGoldCost(5); return tostring(MoonwellObjectValues['Objects.Arthas']['ugol'])"));
         }
 
         [Fact]
@@ -105,20 +105,20 @@ namespace Moonwell.Build.Tests
             // A class with no entry of its own reads the entry of the nearest base that has one; a nested class's name has a +.
             lua.DoString("System.define('Test.Outer+Inner', { base = { Objects.Arthas } })");
             Assert.Equal(
-                Query(lua, "return tostring(MoonwellObjectValues['Objects.Arthas']['uhpm'])"),
-                Query(lua, "return tostring(Test.Outer.Inner():getHitPoints())"));
+                Query(lua, "return tostring(MoonwellObjectValues['Objects.Arthas']['ugol'])"),
+                Query(lua, "return tostring(Test.Outer.Inner():getGoldCost())"));
         }
 
         [Fact]
         public void stubs_have_only_the_members_the_map_references()
         {
-            // Arthas's constructor reads and sets HitPoints; no code names AnimationWalkSpeed.
+            // Arthas's constructor reads and sets GoldCost; no code names AnimationWalkSpeed.
             var hero = compiled.Declarations.Used.Single(one => one.FullName == "Moonwell.Objects.StandardHero");
-            Assert.Contains(hero.Fields, field => field.Property == "HitPoints");
+            Assert.Contains(hero.Fields, field => field.Property == "GoldCost");
             Assert.DoesNotContain(hero.Fields, field => field.Property == "AnimationWalkSpeed");
 
             Assert.Contains("    public abstract class StandardHero : global::Moonwell.Hero\n", compiled.Stubs);
-            Assert.Contains("        public int HitPoints\n        {\n            get { return default; }\n            protected set { }\n        }\n", compiled.Stubs);
+            Assert.Contains("        public int GoldCost\n        {\n            get { return default; }\n            protected set { }\n        }\n", compiled.Stubs);
             Assert.Contains(
                 "namespace Moonwell.Objects\n{\n"
                 + "    /// @CSharpLua.Ignore\n    public static partial class Human\n    {\n"
@@ -252,7 +252,7 @@ namespace Moonwell.Build.Tests
             var values = CompiledObjects.ValuesOf(release ? compiled.ReleaseScript : compiled.Script);
             var arthas = Regex.Match(values, "\\[\"Objects\\.Arthas\"\\] = \\{[^\\n]*").Value;
 
-            Assert.Contains("[\"uhpm\"] = ", arthas);
+            Assert.Contains("[\"ugol\"] = ", arthas);
             // No code reads Arthas's AI placement radius.
             Assert.DoesNotContain("[\"uabr\"]", values);
         }
@@ -271,7 +271,7 @@ namespace Moonwell.Build.Tests
 
             var values = CompiledObjects.ValuesOf(ObjectLua.Values(script, compiled.Declarations.Used, compiled.Declarations.Objects, ids, compiled.Standard, null));
 
-            Assert.Contains("[\"uhpm\"] = ", values);
+            Assert.Contains("[\"ugol\"] = ", values);
         }
 
         [Theory]

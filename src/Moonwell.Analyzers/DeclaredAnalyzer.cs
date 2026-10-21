@@ -10,26 +10,21 @@ namespace Moonwell.Analyzers;
 /// <summary>
 /// Rejects the game's live values and actions in the constructor of a declared object class (MW0012): a class that
 /// inherits <c>StandardUnit</c>, <c>StandardHero</c> or <c>StandardItem</c>, whose constructor the build runs with no game.
-/// A member of <c>Unit</c>, <c>Hero</c> or <c>Item</c> on the object itself is reported, except <c>Components</c>; code
-/// in a lambda or a local function may run later in the game, and is left alone.
+/// A member of <c>Unit</c>, <c>Hero</c> or <c>Item</c> on the object itself is reported, except <c>Components</c> and the
+/// live members a declared field shares (<c>MaxMana</c>, <c>Name</c>, <c>Strength</c>, <c>Charges</c>), which there are the
+/// class's declared values; a hero's <c>Level</c> is not one, since a hero starts at level 1. Code in a lambda or a local
+/// function may run later in the game, and is left alone.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
 {
-    // The declared field to set in place of a live value of the same meaning.
-    private static readonly Dictionary<string, string> DeclaredFields = new()
+    // The live members a declared field shares, by the runtime class that has them: in a declared class's constructor
+    // they are the class's declared values.
+    private static readonly Dictionary<string, HashSet<string>> SharedMembers = new()
     {
-        ["Mana"] = "ManaPoints",
-        ["MaxMana"] = "ManaPoints",
-        ["Life"] = "HitPoints",
-        ["MaxLife"] = "HitPoints",
-        ["Scale"] = "ScalingValue",
-        ["Level"] = "UnitLevel",
-        ["FlyHeight"] = "Height",
-        ["Strength"] = "StartingStrength",
-        ["Agility"] = "StartingAgility",
-        ["Intelligence"] = "StartingIntelligence",
-        ["Charges"] = "NumberOfCharges",
+        ["Unit"] = new HashSet<string> { "MaxLife", "MaxMana", "Mana", "Level", "Scale", "FlyHeight", "Name" },
+        ["Hero"] = new HashSet<string> { "Strength", "Agility", "Intelligence" },
+        ["Item"] = new HashSet<string> { "Charges" },
     };
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules.Declared;
@@ -93,12 +88,21 @@ public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
         }
 
         var text = name.Identifier.ValueText;
-        string why;
-        if (DeclaredFields.TryGetValue(text, out var field))
+        var hero = IsHero(context.ContainingSymbol?.ContainingType);
+        if (symbol is IPropertySymbol && SharedMembers.TryGetValue(symbol.ContainingType.Name, out var shared) && shared.Contains(text)
+            && !(hero && text == "Level"))
         {
-            // Strength, Agility and Intelligence are the hero's values; the rest are the unit's or the item's.
-            var owner = IsNamed(symbol.ContainingType, "Item") ? "item" : IsNamed(symbol.ContainingType, "Hero") ? "hero" : "unit";
-            why = $"is the {owner}'s value in the game, which a declared class's constructor cannot reach; the declared field is {field}";
+            return;
+        }
+
+        string why;
+        if (text == "Level")
+        {
+            why = "is the hero's level in the game: a hero starts at level 1; its level is not declared";
+        }
+        else if (text == "Life")
+        {
+            why = "is the unit's value in the game: a unit starts with full life; set MaxLife";
         }
         else if (text == "Add")
         {
@@ -119,6 +123,20 @@ public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
         {
             if ((at.Name == "StandardUnit" || at.Name == "StandardHero" || at.Name == "StandardItem")
                 && at.ContainingNamespace is { Name: "Objects", ContainingNamespace: { Name: "Moonwell", ContainingNamespace.IsGlobalNamespace: true } })
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // A class that inherits Moonwell's Hero.
+    private static bool IsHero(INamedTypeSymbol? type)
+    {
+        for (var at = type; at != null; at = at.BaseType)
+        {
+            if (IsNamed(at, "Hero"))
             {
                 return true;
             }

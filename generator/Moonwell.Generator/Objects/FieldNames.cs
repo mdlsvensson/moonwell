@@ -10,7 +10,11 @@ namespace Moonwell.Generator.Objects;
 /// <param name="Groups">
 /// The classes the field is a property of. Two fields can share a name only when they have no group in common.
 /// </param>
-public sealed record NameCandidate(string Id, string Name, bool Listed, IReadOnlyList<string> Groups);
+/// <param name="Shared">
+/// True for a shared field (<see cref="SharedFields"/>), whose name is its live member's: it may be a member of the runtime
+/// class, since the field has no property of its own.
+/// </param>
+public sealed record NameCandidate(string Id, string Name, bool Listed, IReadOnlyList<string> Groups, bool Shared = false);
 
 /// <summary>The C# property names of fields: the hand-picked ones, and names made from World Editor's labels.</summary>
 public static class FieldNames
@@ -18,7 +22,7 @@ public static class FieldNames
     private static readonly string[] Reserved =
     {
         "Declared", "Equals", "Fields", "Finalize", "GetHashCode", "GetType", "Levels", "MemberwiseClone", "PerLevel",
-        "ReferenceEquals", "Set", "ToString",
+        "ReferenceEquals", "Set", "ToString", "Totals",
     };
 
     private static readonly Lazy<Dictionary<Kind, Dictionary<string, string>>> Listed = new(ReadListed);
@@ -70,11 +74,12 @@ public static class FieldNames
     /// The final names of the candidates, in their order. A name two candidates share in a group gets the field id
     /// appended (<c>AreaOfEffect</c> and <c>AreaOfEffect</c> become <c>AreaOfEffectAare</c> and <c>AreaOfEffectHbz2</c>)
     /// except a hand-picked one, which keeps its name; a name that is a member of <c>object</c> or of the generated
-    /// kind bases (<c>Declared</c>, <c>Fields</c>, <c>Levels</c>, <c>PerLevel</c>, <c>Set</c>) gets the id too, as does
-    /// a name in <paramref name="reserved"/> (the members of the runtime class the objects inherit).
+    /// kind bases (<c>Declared</c>, <c>Fields</c>, <c>Levels</c>, <c>PerLevel</c>, <c>Set</c>, <c>Totals</c>) gets the id
+    /// too, as does a name in <paramref name="reserved"/> (the members of the runtime class the objects inherit), except a
+    /// shared field's, which is the runtime member's own.
     /// </summary>
     /// <exception cref="InvalidOperationException">
-    /// A name is still shared after that, or a hand-picked name is in <paramref name="reserved"/>.
+    /// A name is still shared after that, or a hand-picked name of a field that is not shared is in <paramref name="reserved"/>.
     /// </exception>
     public static IReadOnlyList<string> Assign(IReadOnlyList<NameCandidate> candidates, IReadOnlySet<string>? reserved = null)
     {
@@ -102,7 +107,7 @@ public static class FieldNames
                 shared.Add(i);
             }
 
-            if (reserved != null && reserved.Contains(candidates[i].Name))
+            if (reserved != null && reserved.Contains(candidates[i].Name) && !candidates[i].Shared)
             {
                 if (candidates[i].Listed)
                 {

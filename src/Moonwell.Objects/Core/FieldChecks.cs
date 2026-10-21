@@ -31,6 +31,20 @@ namespace Moonwell.Objects
             return value;
         }
 
+        /// <summary>
+        /// The value a shared member declares, in the type its field holds: a float put into an int field truncated, as the live
+        /// setters do; anything else as it is, its rules checked when it is put.
+        /// </summary>
+        internal static object Declared(IReadOnlyDictionary<string, Type> held, string field, object value)
+        {
+            if (value is float number && held.TryGetValue(field, out var type) && type == typeof(int))
+            {
+                return (int)number;
+            }
+
+            return value;
+        }
+
         /// <summary>Gives <paramref name="value"/> when <paramref name="target"/> has <paramref name="field"/> and it is of the type one level of the field holds; else throws naming the field.</summary>
         internal static object LevelValue(string owner, IReadOnlyDictionary<string, Type> held, object target, string field, int level, object? value)
         {

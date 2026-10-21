@@ -27,14 +27,14 @@ namespace Moonwell
         /// <summary>The skill points last read or set.</summary>
         private int lastSkillPoints;
 
-        /// <summary>The proper name last read or set.</summary>
+        /// <summary>The proper name last set.</summary>
         private string lastProperName = "";
 
         /// <summary>The default object of the hero's type (see Unit.Default), a Hero.</summary>
         [LocalSafe]
         public new Hero Default => (Hero)base.Default;
 
-        /// <summary>The hero's proper name (GetHeroProperName), shown above its type's name. The game gives it in each player's language, so it is read only inside Local.For. Setting it (BlzSetHeroProperName) changes only the proper name, the same on every machine. Once the game has removed the hero, the last value read or set, and setting does nothing.</summary>
+        /// <summary>The hero's proper name (GetHeroProperName), shown above its type's name. The game gives it in each player's language, so it is read only inside Local.For. Setting it (BlzSetHeroProperName) changes only the proper name, the same on every machine. Once the game has removed the hero, the last value set (a read keeps nothing, as it differs by machine), and setting does nothing.</summary>
         public string ProperName
         {
             [MachineLocal]
@@ -49,11 +49,6 @@ namespace Moonwell
                 if (string.IsNullOrEmpty(now) && RemovedByGame())
                 {
                     return lastProperName;
-                }
-
-                if (Local.Depth == 0)
-                {
-                    lastProperName = now;
                 }
 
                 return now;

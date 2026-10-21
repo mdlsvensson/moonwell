@@ -17,7 +17,7 @@ namespace SetOutsideCtor
 
         public void Heal()
         {
-            HitPoints = 1000;
+            GoldCost = 1000;
         }
     }
 }

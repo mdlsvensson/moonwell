@@ -132,8 +132,9 @@ public static class Fields
     private const int LabelDepth = 8;
 
     /// <summary>
-    /// The fields of <paramref name="kind"/>, ordered by field id. A name in <paramref name="reserved"/> (the members
-    /// of the runtime class the kind's objects inherit) is never given to a field: see <see cref="FieldNames.Assign"/>.
+    /// The fields of <paramref name="kind"/>, ordered by field id. A shared field (<see cref="SharedFields"/>) is named
+    /// like its live member; any other name in <paramref name="reserved"/> (the members of the runtime class the kind's
+    /// objects inherit) is never given to a field: see <see cref="FieldNames.Assign"/>.
     /// A field of a type in <paramref name="choices"/> holds its enum (<see cref="Choices.All"/> of the export when
     /// null), and no property is named like an enum it does not hold: see <see cref="BesideEnums"/>.
     /// </summary>
@@ -178,7 +179,10 @@ public static class Fields
                 fieldType = FieldType.Choice;
             }
 
-            var listed = handPicked.TryGetValue(row.Id, out var name);
+            // A shared field takes its live member's name, and keeps it as a hand-picked one.
+            var member = SharedFields.MemberOf(kind, row.Id);
+            var name = member ?? handPicked.GetValueOrDefault(row.Id);
+            var listed = name != null;
             if (!listed)
             {
                 name = FieldNames.FromLabel(LabelOf(tables, row));
@@ -210,7 +214,7 @@ public static class Fields
                 StoreOf(Value(row, "type")),
                 RulesOf(row, LabelOf(tables, row)),
                 choice));
-            candidates.Add(new NameCandidate(row.Id, name!, listed, GroupsOf(kind, row, specific, mentioned)));
+            candidates.Add(new NameCandidate(row.Id, name!, listed, GroupsOf(kind, row, specific, mentioned), member != null));
         }
 
         var names = FieldNames.Assign(candidates, reserved);

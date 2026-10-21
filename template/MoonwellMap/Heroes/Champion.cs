@@ -10,7 +10,7 @@ namespace MoonwellMap.Heroes
         public Champion()
         {
             Name = "Champion";
-            HitPoints = HitPoints + 200;
+            MaxLife = MaxLife + 200;
             HeroAbilities.Replace<Human.Abilities.HolyLight, Smite>();
             Components.Add(new KillCounter());
         }

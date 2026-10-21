@@ -24,7 +24,7 @@ namespace Moonwell.Objects.Tests
     {
         public Arthas()
         {
-            HitPoints = HitPoints * 2;
+            MaxLife = MaxLife * 2;
         }
     }
 
@@ -32,7 +32,7 @@ namespace Moonwell.Objects.Tests
     {
         public Uther()
         {
-            HitPoints = 900;
+            MaxLife = 900;
         }
 
         public void Put(int level, int value)
@@ -109,7 +109,7 @@ namespace Moonwell.Objects.Tests
     {
         public Giant()
         {
-            HitPoints = 600000;
+            MaxLife = 600000;
         }
     }
 
@@ -129,22 +129,22 @@ namespace Moonwell.Objects.Tests
         }
     }
 
-    [BeyondLimits(nameof(HitPoints))]
+    [BeyondLimits(nameof(MaxLife))]
     public class Titan : Moonwell.Objects.Human.Units.Footman
     {
         public Titan()
         {
-            HitPoints = 600000;
+            MaxLife = 600000;
         }
     }
 
     // Hit points have a minimum of 1, a range [BeyondLimits] lifts; collision size (ucol) is forced by the game never to go below 0.
-    [BeyondLimits(nameof(HitPoints), nameof(CollisionSize))]
+    [BeyondLimits(nameof(MaxLife), nameof(CollisionSize))]
     public class NegativeTitan : Moonwell.Objects.Human.Units.Footman
     {
         public NegativeTitan()
         {
-            HitPoints = -5;
+            MaxLife = -5;
             CollisionSize = -5f;
         }
     }
@@ -153,7 +153,7 @@ namespace Moonwell.Objects.Tests
     {
         public TitanChild()
         {
-            HitPoints = 700000;
+            MaxLife = 700000;
         }
     }
 
@@ -162,7 +162,7 @@ namespace Moonwell.Objects.Tests
     {
         public WrongLift()
         {
-            HitPoints = 600000;
+            MaxLife = 600000;
         }
     }
 
@@ -406,19 +406,19 @@ namespace Moonwell.Objects.Tests
         [Fact]
         public void put_then_get()
         {
-            Assert.Equal(900, new Uther().HitPoints);
+            Assert.Equal(900, new Uther().MaxLife);
         }
 
         [Fact]
         public void unset_reads_standard()
         {
-            Assert.Equal(650, new Paladin().HitPoints);
+            Assert.Equal(650, new Paladin().MaxLife);
         }
 
         [Fact]
         public void constructor_reads_standard_then_puts()
         {
-            Assert.Equal(1300, new Arthas().HitPoints);
+            Assert.Equal(1300, new Arthas().MaxLife);
         }
 
         [Fact]
@@ -431,11 +431,11 @@ namespace Moonwell.Objects.Tests
                 return "5";
             };
 
-            Assert.Equal(10, new Arthas().HitPoints);
+            Assert.Equal(10, new Arthas().MaxLife);
             Assert.Equal(new[] { "Hpal/uhpm/0" }, seen);
 
             seen.Clear();
-            Assert.Equal(5, new Sir().HitPoints);
+            Assert.Equal(5, new Sir().MaxLife);
             Assert.Equal(new[] { "Hkni/uhpm/0" }, seen);
         }
 
@@ -456,14 +456,14 @@ namespace Moonwell.Objects.Tests
         [Fact]
         public void no_standard_in_chain_reads_default()
         {
-            Assert.Equal(0, new Footman().HitPoints);
+            Assert.Equal(0, new Footman().MaxLife);
         }
 
         [Fact]
         public void read_returning_null_reads_default()
         {
             StandardValues.Read = (id, field, level) => null;
-            Assert.Equal(0, new Paladin().HitPoints);
+            Assert.Equal(0, new Paladin().MaxLife);
         }
 
         [Fact]
@@ -646,7 +646,7 @@ namespace Moonwell.Objects.Tests
         public void values_hold_only_put()
         {
             var plain = new Paladin();
-            Assert.Equal(650, plain.HitPoints);
+            Assert.Equal(650, plain.MaxLife);
             Assert.Empty(plain.Declared);
 
             var arthas = new Arthas();
@@ -660,7 +660,7 @@ namespace Moonwell.Objects.Tests
         [Fact]
         public void set_by_field_id()
         {
-            Assert.Equal(800, new Scholar().HitPoints);
+            Assert.Equal(800, new Scholar().MaxLife);
         }
 
         [Fact]
@@ -670,7 +670,7 @@ namespace Moonwell.Objects.Tests
             uther.Put(2, 1500);
 
             Assert.Equal(1500, uther.Declared["uhpm:2"]);
-            Assert.Equal(900, uther.HitPoints);
+            Assert.Equal(900, uther.MaxLife);
         }
 
         [Fact]
@@ -686,8 +686,8 @@ namespace Moonwell.Objects.Tests
         {
             var error = Assert.Throws<FieldRuleException>(() => new Giant());
 
-            Assert.Equal("Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it", error.Message);
-            Assert.Equal("Giant.HitPoints", error.Property);
+            Assert.Equal("Giant.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it", error.Message);
+            Assert.Equal("Giant.MaxLife", error.Property);
             Assert.Equal("uhpm", error.FieldId);
             Assert.Equal("Hit Points Maximum (Base)", error.Label);
             Assert.Equal("600000", error.Value);
@@ -709,7 +709,7 @@ namespace Moonwell.Objects.Tests
         {
             var error = Assert.Throws<FieldRuleException>(() => new GiantById());
 
-            Assert.Equal("GiantById.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it", error.Message);
+            Assert.Equal("GiantById.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it", error.Message);
         }
 
         [Fact]
@@ -723,8 +723,8 @@ namespace Moonwell.Objects.Tests
         [Fact]
         public void beyond_limits_lifts_the_range_but_never_a_negative()
         {
-            Assert.Equal(600000, new Titan().HitPoints);
-            Assert.Equal(700000, new TitanChild().HitPoints);
+            Assert.Equal(600000, new Titan().MaxLife);
+            Assert.Equal(700000, new TitanChild().MaxLife);
 
             var error = Assert.Throws<FieldRuleException>(() => new NegativeTitan());
             Assert.Equal("NegativeTitan.CollisionSize is -5; Collision Size (ucol) allows 0 or more, even with [BeyondLimits]", error.Message);
@@ -735,7 +735,7 @@ namespace Moonwell.Objects.Tests
         {
             var error = Assert.Throws<FieldRuleException>(() => new WrongLift());
 
-            Assert.Equal("WrongLift.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it", error.Message);
+            Assert.Equal("WrongLift.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it", error.Message);
         }
 
         [Fact]
@@ -872,7 +872,7 @@ namespace Moonwell.Objects.Tests
         {
             StandardValues.Read = (id, field, level) => field == "uhpm" ? "999999" : null;
 
-            Assert.Equal(999999, new Moonwell.Objects.Human.Units.Footman().HitPoints);
+            Assert.Equal(999999, new Moonwell.Objects.Human.Units.Footman().MaxLife);
         }
 
         [Theory]

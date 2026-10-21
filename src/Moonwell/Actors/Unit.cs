@@ -137,6 +137,9 @@ namespace Moonwell
         /// <summary>The inventory size last read.</summary>
         private int lastInventorySize;
 
+        /// <summary>The name last set.</summary>
+        private string lastName = "";
+
         /// <summary>Whether the unit can show a fly height: it flies, or FlyHeight has done the Amrf trick on it.</summary>
         private bool flyReady;
 
@@ -454,7 +457,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The unit's level; a hero's hero level. Once the game has removed the unit, the last level read. The game has no setter: a set in a declared class's constructor is the level every unit of the class has (ulev), and one on a unit in the game does nothing (the build rejects it). A hero's level is not declared: it starts at 1. On a default object, its type's.</summary>
+        /// <summary>The unit's level; a hero's hero level. Once the game has removed the unit, the last level read. The game has no setter: a set in a declared class's constructor is the level every unit of the class has (ulev), and one on a unit in the game does nothing (the build rejects it). A hero's level is not declared: it starts at 1, which a hero with no handle reads. On a default object, its type's.</summary>
         [LocalSafe]
         public int Level
         {
@@ -462,7 +465,7 @@ namespace Moonwell
             {
                 if (Handle == null)
                 {
-                    return DeclaredValue<int>("ulev");
+                    return this is Hero ? 1 : DeclaredValue<int>("ulev");
                 }
 
                 if (IsGone)
@@ -489,6 +492,47 @@ namespace Moonwell
                 if (Handle == null)
                 {
                     Declare("ulev", value);
+                }
+            }
+        }
+
+        /// <summary>The unit's name (GetUnitName): a hero's is its type's name, not its proper name (seen 10-21). The game gives it in each player's language, so it is read only inside Local.For. Setting it (BlzSetUnitName) renames this unit only, the same on every machine. Once the game has removed the unit, the last name set (a read keeps nothing, as it differs by machine), and setting does nothing. In a declared class's constructor, the name of the class's type (unam), the same on every machine; on a default object, its type's.</summary>
+        public string Name
+        {
+            [MachineLocal]
+            get
+            {
+                if (Handle == null)
+                {
+                    return DeclaredValue<string>("unam");
+                }
+
+                if (IsGone)
+                {
+                    return lastName;
+                }
+
+                var now = Runtime.World.UnitNameOf(Handle);
+                if (string.IsNullOrEmpty(now) && RemovedByGame())
+                {
+                    return lastName;
+                }
+
+                return now;
+            }
+
+            set
+            {
+                if (Handle == null)
+                {
+                    Declare("unam", value);
+                    return;
+                }
+
+                if (!IsGone)
+                {
+                    lastName = value;
+                    Runtime.World.RenameUnit(Handle, value);
                 }
             }
         }

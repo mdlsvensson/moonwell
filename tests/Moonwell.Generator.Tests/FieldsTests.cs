@@ -16,8 +16,6 @@ public class FieldsTests
     }
 
     [Theory]
-    [InlineData(Kind.Unit, "uhpm", "HitPoints")]
-    [InlineData(Kind.Unit, "unam", "Name")]
     [InlineData(Kind.Unit, "umvs", "Speed")]
     [InlineData(Kind.Unit, "udef", "Armor")]
     [InlineData(Kind.Unit, "uabi", "Abilities")]
@@ -40,6 +38,37 @@ public class FieldsTests
     {
         Assert.Equal(name, FieldNames.HandPicked(kind)[id]);
         Assert.Equal(name, Find(Fields.Of(MiniExport(), kind), id).Name);
+    }
+
+    [Theory]
+    [InlineData(Kind.Unit, "uhpm", "MaxLife")]
+    [InlineData(Kind.Unit, "umpm", "MaxMana")]
+    [InlineData(Kind.Unit, "ulev", "Level")]
+    [InlineData(Kind.Unit, "usca", "Scale")]
+    [InlineData(Kind.Unit, "unam", "Name")]
+    [InlineData(Kind.Unit, "ustr", "Strength")]
+    [InlineData(Kind.Unit, "uagi", "Agility")]
+    [InlineData(Kind.Unit, "uint", "Intelligence")]
+    [InlineData(Kind.Item, "iuse", "Charges")]
+    public void a_shared_field_takes_its_live_members_name_though_the_runtime_class_has_it(Kind kind, string id, string name)
+    {
+        var runtime = RuntimeMembers.Read(Path.Combine(AppContext.BaseDirectory, "Moonwell.dll")).Of(kind);
+
+        Assert.Contains(name, runtime);
+        Assert.Equal(name, SharedFields.MemberOf(kind, id));
+        Assert.False(FieldNames.HandPicked(kind).ContainsKey(id));
+        Assert.Equal(name, Find(Fields.Of(MiniExport(), kind, runtime), id).Name);
+    }
+
+    [Fact]
+    public void the_shared_fields_are_the_specs_table()
+    {
+        Assert.Equal(
+            new[] { "uagi Agility", "uhpm MaxLife", "uint Intelligence", "ulev Level", "umpi Mana", "umpm MaxMana", "umvh FlyHeight", "unam Name", "usca Scale", "ustr Strength" },
+            SharedFields.Of(Kind.Unit).OrderBy(p => p.Key, StringComparer.Ordinal).Select(p => p.Key + " " + p.Value));
+        Assert.Equal(new[] { "iuse Charges" }, SharedFields.Of(Kind.Item).Select(p => p.Key + " " + p.Value));
+        Assert.Empty(SharedFields.Of(Kind.Destructable));
+        Assert.Null(SharedFields.MemberOf(Kind.Item, "unam"));
     }
 
     [Theory]
@@ -287,6 +316,7 @@ public class FieldsTests
     [InlineData("Levels")]
     [InlineData("PerLevel")]
     [InlineData("Set")]
+    [InlineData("Totals")]
     public void a_name_of_a_kind_base_member_gets_its_id(string name)
     {
         var names = FieldNames.Assign(new[] { new NameCandidate("ulev", name, false, new[] { "unit" }) });
@@ -340,6 +370,20 @@ public class FieldsTests
             new HashSet<string> { "Handle" }));
 
         Assert.Equal("field uhpm is hand-picked as Handle, a member of the class it belongs to", error.Message);
+    }
+
+    [Fact]
+    public void a_shared_field_keeps_the_name_of_its_runtime_member()
+    {
+        var names = FieldNames.Assign(
+            new[]
+            {
+                new NameCandidate("umpm", "MaxMana", true, new[] { "unit" }, Shared: true),
+                new NameCandidate("umpr", "Handle", false, new[] { "unit" }),
+            },
+            new HashSet<string> { "MaxMana", "Handle" });
+
+        Assert.Equal(new[] { "MaxMana", "HandleUmpr" }, names);
     }
 
     [Fact]

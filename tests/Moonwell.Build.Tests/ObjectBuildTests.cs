@@ -381,12 +381,12 @@ namespace Moonwell.Build.Tests
                 namespace Sample
                 {
                     [Moonwell.Objects.ObjectId("H001")]
-                    [Moonwell.Objects.BeyondLimits(nameof(HitPoints))]
+                    [Moonwell.Objects.BeyondLimits(nameof(MaxLife))]
                     public sealed class Arthas : Moonwell.Objects.Human.Units.Paladin
                     {
                         public Arthas()
                         {
-                            HitPoints = 600000;
+                            MaxLife = 600000;
                             DeathType = Moonwell.Objects.DeathType.CanRaiseDoesNotDecay;
                         }
                     }
@@ -501,9 +501,9 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
-        public void a_live_member_in_a_declared_class_constructor_is_an_error_naming_the_declared_field()
+        public void a_live_member_in_a_declared_class_constructor_is_an_error_saying_what_to_set()
         {
-            // Mana is the unit's mana in the game; the build runs the constructor with no game, so the declared field is ManaPoints.
+            // Life has no field: a unit starts with full life, and the build runs the constructor with no game.
             var copy = folders.TemporaryCopyOfSample();
             File.WriteAllText(Path.Combine(copy, "Objects.cs"), """
                 namespace Sample
@@ -513,7 +513,7 @@ namespace Moonwell.Build.Tests
                     {
                         public Caster()
                         {
-                            Mana = 300;
+                            Life = 300;
                         }
                     }
                 }
@@ -522,7 +522,7 @@ namespace Moonwell.Build.Tests
 
             Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), log));
 
-            Assert.Contains("error MW0012: 'Mana' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is ManaPoints", log.ToString());
+            Assert.Contains("error MW0012: 'Life' is the unit's value in the game: a unit starts with full life; set MaxLife", log.ToString());
         }
 
         [Fact]
@@ -660,7 +660,7 @@ namespace Moonwell.Build.Tests
             var first = stubs.IndexOf("protected void Set(string field, object value)", StringComparison.Ordinal);
             var second = stubs.IndexOf("protected void Set(string field, int level, object value)", StringComparison.Ordinal);
             Assert.True(first >= 0 && second > first, stubs);
-            Assert.DoesNotContain("HitPoints", stubs);
+            Assert.DoesNotContain("GoldCost", stubs);
             var script = File.ReadAllText(Path.Combine(copy, "build", "Sample", "war3map.lua"));
             Assert.Contains("Set = nothing", script);
             Assert.Contains("Set1 = nothing", script);
@@ -669,7 +669,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void a_name_the_assembly_does_not_reference_is_an_error_that_says_why()
         {
-            // nameof leaves no reference in the assembly, so the stubs lack HitPoints and CSharp.lua cannot compile the map.
+            // nameof leaves no reference in the assembly, so the stubs lack GoldCost and CSharp.lua cannot compile the map.
             var copy = folders.TemporaryCopyOfSample();
             File.AppendAllText(Path.Combine(copy, "Objects.cs"), """
 
@@ -677,14 +677,14 @@ namespace Moonwell.Build.Tests
                 {
                     public static class Names
                     {
-                        public static readonly string Life = nameof(Moonwell.Objects.Human.Units.Paladin.HitPoints);
+                        public static readonly string Life = nameof(Moonwell.Objects.Human.Units.Paladin.GoldCost);
                     }
                 }
                 """);
 
             var error = Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), new StringWriter()));
 
-            Assert.Contains("HitPoints", error.Message);
+            Assert.Contains("GoldCost", error.Message);
             Assert.Contains("only the members of Moonwell.Objects that the map's assembly references", error.Message);
         }
 

@@ -37,6 +37,7 @@ namespace Moonwell.Objects
 
         private readonly Dictionary<string, object?> values = new Dictionary<string, object?>();
         private readonly Dictionary<string, object?> standard = new Dictionary<string, object?>();
+        private readonly Dictionary<string, object?> totals = new Dictionary<string, object?>();
         private readonly object? owner;
 
         // The puts still to come from the standard class's constructors: 0 when they are done, -1 while the standard class
@@ -72,6 +73,22 @@ namespace Moonwell.Objects
         public IReadOnlyDictionary<string, object?> Values
         {
             get { return values; }
+        }
+
+        /// <summary>
+        /// A hero's life and mana put as the totals it starts with (<c>MaxLife = 800</c>), by field id: kept apart from
+        /// <see cref="Values"/>, which hold base fields, for the build to turn into base fields by the hero's attributes. They
+        /// are not checked here: the base field the build makes of them is.
+        /// </summary>
+        internal IReadOnlyDictionary<string, object?> Totals
+        {
+            get { return totals; }
+        }
+
+        /// <summary>Puts a hero's total of a field (see <see cref="Totals"/>).</summary>
+        internal void PutTotal(string field, object? value)
+        {
+            totals[field] = value;
         }
 
         /// <summary>Gives the value put on a field, else the standard object's value of the field.</summary>

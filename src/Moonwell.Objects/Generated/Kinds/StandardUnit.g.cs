@@ -8,6 +8,13 @@ namespace Moonwell.Objects
 {
     /// <summary>The fields of a unit, which every standard unit class has.</summary>
     /// @CSharpLua.Ignore
+    [global::Moonwell.Objects.SharedField("uhpm", "MaxLife", Label = "Hit Points Maximum (Base)", Min = 1, Max = 500000, HasLimits = true)]
+    [global::Moonwell.Objects.SharedField("ulev", "Level", Label = "Level", Min = 1, Max = 100, HasLimits = true)]
+    [global::Moonwell.Objects.SharedField("umpi", "Mana", Label = "Mana Initial Amount", Min = 0, Max = 100000, HasLimits = true)]
+    [global::Moonwell.Objects.SharedField("umpm", "MaxMana", Label = "Mana Maximum", Min = 0, Max = 100000, HasLimits = true)]
+    [global::Moonwell.Objects.SharedField("umvh", "FlyHeight", Label = "Height", Min = -1000, Max = 1000, HasLimits = true)]
+    [global::Moonwell.Objects.SharedField("unam", "Name", Label = "Name", Required = true)]
+    [global::Moonwell.Objects.SharedField("usca", "Scale", Label = "Scaling Value", Min = 0.1, Max = 10, HasLimits = true, NonNegative = true)]
     public abstract class StandardUnit : global::Moonwell.Unit
     {
         private static readonly global::System.Collections.Generic.Dictionary<string, global::System.Type> fieldTypes =
@@ -244,6 +251,21 @@ namespace Moonwell.Objects
 
         /// <summary>The values put on this object so far, by field id; the build reads them.</summary>
         internal global::System.Collections.Generic.IReadOnlyDictionary<string, object?> Declared => Fields.Values;
+
+        /// <summary>The default object of the type, as the runtime class gives it, with every field of the kind.</summary>
+        public new global::Moonwell.Objects.StandardUnit Default => (global::Moonwell.Objects.StandardUnit)base.Default;
+
+        /// <summary>A shared field's declared value, which its live member reads with no handle.</summary>
+        protected override T DeclaredValue<T>(string field)
+        {
+            return Fields.Get<T>(this, field);
+        }
+
+        /// <summary>Puts a shared field's value, which its live member does when set with no handle.</summary>
+        protected override void Declare(string field, object value)
+        {
+            Fields.Put(field, global::Moonwell.Objects.FieldChecks.Declared(fieldTypes, field, value));
+        }
 
         /// <summary>The field <c>ides</c>.</summary>
         [global::Moonwell.Objects.Field("ides", Label = "Description")]
@@ -1116,15 +1138,6 @@ namespace Moonwell.Objects
             protected set { Fields.Put("uhot", value); }
         }
 
-        /// <summary>The field <c>uhpm</c>.</summary>
-        [global::Moonwell.Objects.Field("uhpm", Label = "Hit Points Maximum (Base)")]
-        [global::Moonwell.Objects.Limits(1, 500000)]
-        public int HitPoints
-        {
-            get { return Fields.Get<int>(this, "uhpm"); }
-            protected set { Fields.Put("uhpm", value); }
-        }
-
         /// <summary>The field <c>uhpr</c>.</summary>
         [global::Moonwell.Objects.Field("uhpr", Label = "Hit Points Regeneration Rate")]
         [global::Moonwell.Objects.Limits(0, 1000)]
@@ -1209,15 +1222,6 @@ namespace Moonwell.Objects
         {
             get { return Fields.Get<int>(this, "ulbs"); }
             protected set { Fields.Put("ulbs", value); }
-        }
-
-        /// <summary>The field <c>ulev</c>.</summary>
-        [global::Moonwell.Objects.Field("ulev", Label = "Level")]
-        [global::Moonwell.Objects.Limits(1, 100)]
-        public int UnitLevel
-        {
-            get { return Fields.Get<int>(this, "ulev"); }
-            protected set { Fields.Put("ulev", value); }
         }
 
         /// <summary>The field <c>ulfi</c>.</summary>
@@ -1384,24 +1388,6 @@ namespace Moonwell.Objects
             get { return Fields.GetList<global::Moonwell.Item>(this, "umki"); }
         }
 
-        /// <summary>The field <c>umpi</c>.</summary>
-        [global::Moonwell.Objects.Field("umpi", Label = "Mana Initial Amount")]
-        [global::Moonwell.Objects.Limits(0, 100000)]
-        public int ManaInitialAmount
-        {
-            get { return Fields.Get<int>(this, "umpi"); }
-            protected set { Fields.Put("umpi", value); }
-        }
-
-        /// <summary>The field <c>umpm</c>.</summary>
-        [global::Moonwell.Objects.Field("umpm", Label = "Mana Maximum")]
-        [global::Moonwell.Objects.Limits(0, 100000)]
-        public int ManaPoints
-        {
-            get { return Fields.Get<int>(this, "umpm"); }
-            protected set { Fields.Put("umpm", value); }
-        }
-
         /// <summary>The field <c>umpr</c>.</summary>
         [global::Moonwell.Objects.Field("umpr", Label = "Mana Regeneration")]
         [global::Moonwell.Objects.Limits(0, 1000)]
@@ -1426,15 +1412,6 @@ namespace Moonwell.Objects
         {
             get { return Fields.Get<float>(this, "umvf"); }
             protected set { Fields.Put("umvf", value); }
-        }
-
-        /// <summary>The field <c>umvh</c>.</summary>
-        [global::Moonwell.Objects.Field("umvh", Label = "Height")]
-        [global::Moonwell.Objects.Limits(-1000, 1000)]
-        public float Height
-        {
-            get { return Fields.Get<float>(this, "umvh"); }
-            protected set { Fields.Put("umvh", value); }
         }
 
         /// <summary>The field <c>umvr</c>.</summary>
@@ -1482,15 +1459,6 @@ namespace Moonwell.Objects
         {
             get { return Fields.Get<float>(this, "umxr"); }
             protected set { Fields.Put("umxr", value); }
-        }
-
-        /// <summary>The field <c>unam</c>.</summary>
-        [global::Moonwell.Objects.Field("unam", Label = "Name")]
-        [global::Moonwell.Objects.Required]
-        public string Name
-        {
-            get { return Fields.Get<string>(this, "unam"); }
-            protected set { Fields.Put("unam", value); }
         }
 
         /// <summary>The field <c>unbm</c>.</summary>
@@ -1755,16 +1723,6 @@ namespace Moonwell.Objects
         {
             get { return Fields.Get<float>(this, "urun"); }
             protected set { Fields.Put("urun", value); }
-        }
-
-        /// <summary>The field <c>usca</c>.</summary>
-        [global::Moonwell.Objects.Field("usca", Label = "Scaling Value")]
-        [global::Moonwell.Objects.Limits(0.1, 10)]
-        [global::Moonwell.Objects.NonNegative]
-        public float ScalingValue
-        {
-            get { return Fields.Get<float>(this, "usca"); }
-            protected set { Fields.Put("usca", value); }
         }
 
         /// <summary>The field <c>uscb</c>.</summary>
