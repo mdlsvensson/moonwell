@@ -305,7 +305,7 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
-        public void template_map_calls_no_native_but_the_unit_name()
+        public void template_map_calls_no_native()
         {
             var template = Path.Combine(TestFolders.Fixture("."), "..", "..", "..", "template", "MoonwellMap");
             var calls = Directory.GetFiles(template, "*.cs", SearchOption.AllDirectories)
@@ -313,8 +313,8 @@ namespace Moonwell.Build.Tests
                 .SelectMany(file => Regex.Matches(File.ReadAllText(file), @"Natives\.\w+").Select(match => match.Value))
                 .ToList();
 
-            // There is no Unit.Name in this release, so Smite reads the target's name with the one native.
-            Assert.Equal(new[] { "Natives.GetUnitName" }, calls);
+            // Smite reads the target's name as Unit.Name inside Local.For; the template calls no native at all.
+            Assert.Empty(calls);
         }
 
         [Fact]

@@ -22,7 +22,7 @@ namespace MoonwellMap.Heroes
             // A unit's name is in each player's own language, so it is read on the owner's machine only.
             Local.For(cast.Caster.Player, () =>
             {
-                var target = cast.Target == null ? "nothing" : Natives.GetUnitName(cast.Target.Handle);
+                var target = cast.Target == null ? "nothing" : cast.Target.Name;
                 cast.Caster.Player.Print("Smite, level " + cast.Level + ", at " + target);
             });
         }
