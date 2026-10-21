@@ -177,6 +177,50 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_trigger_string_reference_to_no_string_stays_as_it_is()
+        {
+            using var folders = new TestFolders();
+            var map = folders.TemporaryFolderOutsideRepository();
+            var skin = new UnitObjectData(ObjectDataFormatVersion.v3);
+            skin.NewUnits.Add(WorldEditorObject("hfoo", "h00R", Mod("unam", "TRIGSTR_999")));
+            WriteUnits(Path.Combine(map, "war3mapSkin.w3u"), skin);
+            var strings = new TriggerStrings();
+            strings.Strings.Add(new TriggerString { Key = 12, Value = "Unit" });
+
+            var recruit = Assert.Single(MapTypes.Read(map, strings, compiled.Standard));
+
+            Assert.Equal("TRIGSTR_999", recruit.Changed["unam"]);
+        }
+
+        [Fact]
+        public void a_standard_class_reads_its_type_as_world_editor_changed_it()
+        {
+            // The map's code names Rifleman, and Paladin and Footman as bases of its classes; World Editor changed all three types.
+            using var folders = new TestFolders();
+            var map = folders.TemporaryFolderOutsideRepository();
+            var main = new UnitObjectData(ObjectDataFormatVersion.v3);
+            main.BaseUnits.Add(WorldEditorObject("hrif", string.Empty, Mod("uhpm", 777)));
+            main.BaseUnits.Add(WorldEditorObject("Hpal", string.Empty, Mod("uhpm", 300)));
+            main.BaseUnits.Add(WorldEditorObject("hfoo", string.Empty, Mod("uhpm", 1)));
+            var skin = new UnitObjectData(ObjectDataFormatVersion.v3);
+            skin.BaseUnits.Add(WorldEditorObject("hrif", string.Empty, Mod("unam", "Edited Rifleman")));
+            WriteUnits(Path.Combine(map, "war3map.w3u"), main);
+            WriteUnits(Path.Combine(map, "war3mapSkin.w3u"), skin);
+
+            var values = CompiledObjects.ValuesOf(ObjectLua.Values(compiled.Script, compiled.Declarations, NamedIds(), compiled.Standard, null, MapTypes.Read(map, null, compiled.Standard)));
+
+            string Of(string name) => Regex.Match(values, "\\[\"" + Regex.Escape(name) + "\"\\] = \\{[^\\n]*").Value;
+            Assert.Contains("[\"uhpm\"] = 777", Of("Moonwell.Objects.Human.Units.Rifleman"));
+            Assert.Contains("[\"unam\"] = \"Edited Rifleman\"", Of("Moonwell.Objects.Human.Units.Rifleman"));
+            // The hero's total: 300 + 22 * 25.
+            Assert.Contains("[\"uhpm\"] = 850", Of("Moonwell.Objects.Human.Units.Paladin"));
+            // A class based on the paladin has the standard paladin's values, which Arthas doubles: (100 + 22 * 25) * 2.
+            Assert.Contains("[\"uhpm\"] = 1300", Of("Objects.Arthas"));
+            // StrongFootman replaces the footman, so World Editor's change to it is not in the map.
+            Assert.Contains("[\"uhpm\"] = 420", Of("Moonwell.Objects.Human.Units.Footman"));
+        }
+
+        [Fact]
         public void a_map_that_does_not_read_default_writes_no_type_values()
         {
             using var folders = new TestFolders();

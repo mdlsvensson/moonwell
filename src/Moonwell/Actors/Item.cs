@@ -38,7 +38,7 @@ namespace Moonwell
         [LocalSafe]
         public int TypeId { get; internal set; }
 
-        /// <summary>The default object of the item's type, as Unreal's class default object: the values its class declares (a type no class of the map's declares, its standard ones), the same whatever this item's are now and once it is gone. One per type, shared by its items, with no handle; it is gone, so its live actions do nothing.</summary>
+        /// <summary>The default object of the item's type, as Unreal's class default object: the values its class declares (a type no class of the map's declares, its values as World Editor made them, standard where World Editor left them), the same whatever this item's are now and once it is gone. One per type, shared by its items, with no handle; it is gone, so its live actions do nothing.</summary>
         [LocalSafe]
         public Item Default => ObjectTypes.DefaultOf(this, DeclaredTypeId);
 

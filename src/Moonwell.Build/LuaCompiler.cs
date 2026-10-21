@@ -56,7 +56,8 @@ namespace Moonwell.Build
             }
 
             script = ObjectLua.AddToInit(script, declarations.Used);
-            var mapTypes = declarations.TypeFields.Count > 0 ? MapTypes.Read(project.MapFolder, map.TriggerStrings, standard) : Array.Empty<MapType>();
+            // A standard class reads its type as World Editor changed it, and a type's default object any type World Editor makes.
+            var mapTypes = MapTypes.Read(project.MapFolder, map.TriggerStrings, standard);
             script = ObjectLua.Values(script, declarations, named, standard, set, mapTypes);
             script = LineTable.Apply(script, files);
             map.Script = script;

@@ -261,7 +261,8 @@ namespace Moonwell.Build
         /// Appends <c>MoonwellObjectValues</c> to the script: for each used class that has an object (a declared class or a standard
         /// class), the values of the fields its chain declares whose getter the compiled code calls, and every shared field of its
         /// kind (the core's members read them through the kind base's hooks, which the scan of getters cannot tell from the core's
-        /// own live reads). A declared class has its changed values, else its standard root's; a standard class its own. A hero's
+        /// own live reads). A declared class has its changed values, else its standard root's; a standard class its type's as the
+        /// map's World Editor changes it, unless a class of the map's replaces the type, else its standard values. A hero's
         /// most life, most mana and starting mana are its totals, as its MaxLife, MaxMana and Mana read them. Lists and references
         /// hold the objects' ids; a field with no value has its type's default, a string the empty text.
         /// When the map reads <c>Default</c> (<see cref="DeclarationSet.TypeFields"/>), appends <c>MoonwellTypeValues</c> too: by type
@@ -273,7 +274,7 @@ namespace Moonwell.Build
         /// <param name="ids">The object id of each declared class, and of each standard class the declarations name.</param>
         /// <param name="standard">The standard data.</param>
         /// <param name="set">The tables standard values are read from (<see cref="GameData.ValueSet"/>): null for the base tables.</param>
-        /// <param name="mapTypes">The types the map makes or changes in World Editor (<see cref="MapTypes.Read"/>); empty when the map does not read <c>Default</c>.</param>
+        /// <param name="mapTypes">The types the map makes or changes in World Editor (<see cref="MapTypes.Read"/>).</param>
         /// <returns>The script with the values table at its end.</returns>
         /// <exception cref="BuildException">A declared list or reference names a class that has no object id.</exception>
         public static string Values(
@@ -289,6 +290,7 @@ namespace Moonwell.Build
             var byName = used.ToDictionary(one => one.FullName, StringComparer.Ordinal);
             var objects = declarations.Objects.ToDictionary(one => one.ClassName, StringComparer.Ordinal);
             var none = new Dictionary<string, object?>(StringComparer.Ordinal);
+            var edited = EditedStandardTypes(declarations, ids, mapTypes);
             var text = new StringBuilder(script);
             if (script.Length > 0 && script[script.Length - 1] != '\n')
             {
@@ -308,7 +310,7 @@ namespace Moonwell.Build
                 else if (one.StandardId != null)
                 {
                     root = one.StandardId;
-                    changed = none;
+                    changed = edited.GetValueOrDefault(one.StandardId) ?? none;
                 }
                 else
                 {
@@ -405,6 +407,35 @@ namespace Moonwell.Build
             }
 
             return fields;
+        }
+
+        // The changes the map's World Editor makes to standard types, by id, but to those a class of the map's has the id of: the
+        // object files keep the class's object there (ObjectFiles), so the class wins. A new type of World Editor's is not one, and
+        // a declared class based on a standard type reads its standard values, as the game does.
+        private static Dictionary<string, IReadOnlyDictionary<string, object?>> EditedStandardTypes(
+            DeclarationSet declarations,
+            IReadOnlyDictionary<string, string> ids,
+            IReadOnlyList<MapType> mapTypes)
+        {
+            var declared = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var one in declarations.Objects)
+            {
+                if (ids.TryGetValue(one.ClassName, out var id))
+                {
+                    declared.Add(id);
+                }
+            }
+
+            var edited = new Dictionary<string, IReadOnlyDictionary<string, object?>>(StringComparer.Ordinal);
+            foreach (var type in mapTypes)
+            {
+                if (type.Id == type.Root && !declared.Contains(type.Id))
+                {
+                    edited[type.Id] = type.Changed;
+                }
+            }
+
+            return edited;
         }
 
         // A shared field's value: a hero's most life, most mana and starting mana as its totals.

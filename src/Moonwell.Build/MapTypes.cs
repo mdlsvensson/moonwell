@@ -50,10 +50,10 @@ namespace Moonwell.Build
                             order.Add(entry.Id);
                         }
 
+                        // A unit's or an item's fields have no levels: the files hold level 0 for each (ObjectTable).
                         foreach (var modification in entry.Modifications)
                         {
-                            var key = modification.Level > 0 ? modification.Field + ":" + modification.Level.ToString(CultureInfo.InvariantCulture) : modification.Field;
-                            one.Changed[key] = ValueOf(fields.GetValueOrDefault(modification.Field), modification.Value, texts);
+                            one.Changed[modification.Field] = ValueOf(fields.GetValueOrDefault(modification.Field), modification.Value, texts);
                         }
                     }
                 }
