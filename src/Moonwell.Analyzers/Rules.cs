@@ -135,7 +135,7 @@ public static class Rules
         ObjectsCategory,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "The build runs the constructor of a class that inherits a standard unit, hero or item to read its fields, before there is a game. A live value or action of Unit, Hero or Item there (Mana, Scale, Strength, Charges, Kill) fails the build with only an exception's message. Each live value a declared field shares a name with has the field named apart: ManaPoints for Mana and MaxMana, HitPoints for Life and MaxLife, ScalingValue for Scale, StartingStrength, StartingAgility and StartingIntelligence, and NumberOfCharges for Charges. Code in a lambda or a local function is left alone, since it may run later in the game.");
+        description: "The build runs the constructor of a class that inherits a standard unit, hero or item to read its fields, before there is a game. A live value or action of Unit, Hero or Item there (Mana, Scale, Strength, Charges, Kill, Add) fails the build with only an exception's message. Each live value a declared field shares a name with has the field named apart: ManaPoints for Mana and MaxMana, HitPoints for Life and MaxLife, ScalingValue for Scale, UnitLevel for Level, Height for FlyHeight, StartingStrength, StartingAgility and StartingIntelligence, and NumberOfCharges for Charges; a component goes to Components.Add(...). Code in a lambda or a local function is left alone, since it may run later in the game.");
 
     /// <summary>The rules for the constructor of a declared object class.</summary>
     public static ImmutableArray<DiagnosticDescriptor> Declared { get; } = ImmutableArray.Create(LiveInDeclaration);

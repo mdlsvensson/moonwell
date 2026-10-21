@@ -78,17 +78,25 @@ public class ConstructorTests
                 "'Life' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is HitPoints",
                 "'MaxLife' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is HitPoints",
                 "'Scale' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is ScalingValue",
+                "'Level' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is UnitLevel",
+                "'FlyHeight' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is Height",
+                "'Add' starts a component in the game, which a declared class's constructor cannot do; use Components.Add(...)",
                 "'Kill' calls the game, which a declared class's constructor cannot do; game work starts from a reaction or the game's start",
-                "'Strength' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is StartingStrength",
-                "'Agility' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is StartingAgility",
-                "'Intelligence' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is StartingIntelligence",
+                "'Strength' is the hero's value in the game, which a declared class's constructor cannot reach; the declared field is StartingStrength",
+                "'Agility' is the hero's value in the game, which a declared class's constructor cannot reach; the declared field is StartingAgility",
+                "'Intelligence' is the hero's value in the game, which a declared class's constructor cannot reach; the declared field is StartingIntelligence",
                 "'Charges' is the item's value in the game, which a declared class's constructor cannot reach; the declared field is NumberOfCharges",
             },
             MapCode.MessagesOfFile("""
+                using Moonwell;
                 using Moonwell.Objects;
 
                 namespace Map
                 {
+                    public sealed class Counter : UnitComponent
+                    {
+                    }
+
                     public class Mage : Human.Units.Footman
                     {
                         public Mage()
@@ -98,6 +106,9 @@ public class ConstructorTests
                             Life = 10.0f;
                             MaxLife = 10.0f;
                             Scale = 1.2f;
+                            var level = Level;
+                            FlyHeight = 100.0f;
+                            Add(new Counter());
                             Kill();
                         }
                     }

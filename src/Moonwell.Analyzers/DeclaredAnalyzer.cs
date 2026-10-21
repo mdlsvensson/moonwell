@@ -24,6 +24,8 @@ public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
         ["Life"] = "HitPoints",
         ["MaxLife"] = "HitPoints",
         ["Scale"] = "ScalingValue",
+        ["Level"] = "UnitLevel",
+        ["FlyHeight"] = "Height",
         ["Strength"] = "StartingStrength",
         ["Agility"] = "StartingAgility",
         ["Intelligence"] = "StartingIntelligence",
@@ -91,9 +93,22 @@ public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
         }
 
         var text = name.Identifier.ValueText;
-        var why = DeclaredFields.TryGetValue(text, out var field)
-            ? $"is the {(IsNamed(symbol.ContainingType, "Item") ? "item" : "unit")}'s value in the game, which a declared class's constructor cannot reach; the declared field is {field}"
-            : "calls the game, which a declared class's constructor cannot do; game work starts from a reaction or the game's start";
+        string why;
+        if (DeclaredFields.TryGetValue(text, out var field))
+        {
+            // Strength, Agility and Intelligence are the hero's values; the rest are the unit's or the item's.
+            var owner = IsNamed(symbol.ContainingType, "Item") ? "item" : IsNamed(symbol.ContainingType, "Hero") ? "hero" : "unit";
+            why = $"is the {owner}'s value in the game, which a declared class's constructor cannot reach; the declared field is {field}";
+        }
+        else if (text == "Add")
+        {
+            why = "starts a component in the game, which a declared class's constructor cannot do; use Components.Add(...)";
+        }
+        else
+        {
+            why = "calls the game, which a declared class's constructor cannot do; game work starts from a reaction or the game's start";
+        }
+
         context.ReportDiagnostic(Diagnostic.Create(Rules.LiveInDeclaration, name.GetLocation(), text, why));
     }
 
