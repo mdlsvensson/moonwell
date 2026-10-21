@@ -166,7 +166,7 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 | `IsPaused`, `Scale`, `FlyHeight` | read and set; a paused unit takes no orders but still animates; `Scale` reads its type's scale until set; `FlyHeight` also lifts a ground unit |
 | `Tint(red, green, blue, alpha)` | colours the model, each value clamped to 0-255 |
 | `Order(order)`, `OrderAt(order, x, y)`, `OrderOn(order, target)`, `Stop()` | orders by the game's order string (`"move"`, `"attack"`) |
-| `InventorySize`, `ItemIn(slot)`, `Give(item)`, `Drop(item)` | the inventory; `Give` and `Drop` run the pick-up and drop reactions |
+| `InventorySize`, `ItemIn(slot)`, `Give(item)`, `Drop(item)` | the inventory; `Give` and `Drop` run the pick-up and drop reactions inside the call; `Give` answers false, with no reaction, for a full inventory; giving an item the unit holds runs a drop and then a pick-up |
 
 | Hero (a unit the game makes as a hero) | |
 |---|---|
@@ -178,13 +178,15 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 
 | Item | |
 |---|---|
-| `Charges`, `Player` | read and set |
-| `X`, `Y` | read; `MoveTo(x, y)` |
-| `Carrier`, `IsCarried` | the unit that picked it up, while it still holds it |
+| `Charges`, `Player` | read and set; 0 charges leaves the item in place; `Player` is the owner, which picking up or dropping does not change |
+| `X`, `Y` | read; `MoveTo(x, y)` goes to a pathable spot; while a unit carries the item they are where it was picked up, so read the carrier's place |
+| `Carrier`, `IsCarried` | the unit that picked it up, while it still holds it: null for an item in a bag or equipped (the 3.0 inventory), and in `OnDropped` it is still the unit |
 
 `ItemIn` is not for `Local.For`: it takes in an item Moonwell has not seen, which has to happen on every machine.
 Moonwell listens for pick-ups and drops from the start, so an item a unit picks up is taken in; one a unit held before
-the map began has no `Carrier`. A member's exact behaviour is in its comment.
+the map began has no `Carrier`. A unit that is not a hero drops its items when it dies, with no drop reactions; a hero
+keeps them. The items of a unit removed from the game leave it, and are removed with it, without drop reactions in
+Moonwell (the game fires the drops after the call). A member's exact behaviour is in its comment.
 
 ## Damage
 
