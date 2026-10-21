@@ -544,7 +544,6 @@ namespace Moonwell.Objects
                 {
                     Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
                     AcquisitionRange = 600f;
-                    Agility = 17;
                     AgilityPerLevel = 1f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -629,7 +628,6 @@ namespace Moonwell.Objects
                     Hotkey = "A";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroArchMage.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-archmage.blp";
-                    Intelligence = 19;
                     IntelligencePerLevel = 3.2f;
                     IsABuilding = false;
                     LoopingFadeInRate = 512;
@@ -689,11 +687,13 @@ namespace Moonwell.Objects
                     Speed = 320;
                     SpeedMaximum = 0;
                     SpeedMinimum = 0;
+                    StartingAgility = 17;
+                    StartingIntelligence = 19;
+                    StartingStrength = 14;
                     StockInitialAfterStartDelay = 1;
                     StockMaximum = 3;
                     StockReplenishInterval = 30;
                     StockStartDelay = 0;
-                    Strength = 14;
                     StrengthPerLevel = 2f;
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
@@ -976,7 +976,6 @@ namespace Moonwell.Objects
                 {
                     Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory, global::Moonwell.Objects.Human.Abilities.Sphere>();
                     AcquisitionRange = 600f;
-                    Agility = 14;
                     AgilityPerLevel = 1f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -1061,7 +1060,6 @@ namespace Moonwell.Objects
                     Hotkey = "B";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroBloodElfPrince.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-sorceror.blp";
-                    Intelligence = 19;
                     IntelligencePerLevel = 3f;
                     IsABuilding = false;
                     LumberBountyAwardedBase = 0;
@@ -1117,11 +1115,13 @@ namespace Moonwell.Objects
                     Speed = 300;
                     SpeedMaximum = 0;
                     SpeedMinimum = 0;
+                    StartingAgility = 14;
+                    StartingIntelligence = 19;
+                    StartingStrength = 18;
                     StockInitialAfterStartDelay = 1;
                     StockMaximum = 3;
                     StockReplenishInterval = 30;
                     StockStartDelay = 0;
-                    Strength = 18;
                     StrengthPerLevel = 2f;
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
@@ -2880,7 +2880,6 @@ namespace Moonwell.Objects
                 {
                     Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
                     AcquisitionRange = 600f;
-                    Agility = 17;
                     AgilityPerLevel = 1f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2963,7 +2962,6 @@ namespace Moonwell.Objects
                     HitPoints = 100;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-archmage.blp";
-                    Intelligence = 19;
                     IntelligencePerLevel = 3.2f;
                     IsABuilding = false;
                     LoopingFadeInRate = 512;
@@ -3022,11 +3020,13 @@ namespace Moonwell.Objects
                     Speed = 320;
                     SpeedMaximum = 0;
                     SpeedMinimum = 0;
+                    StartingAgility = 17;
+                    StartingIntelligence = 19;
+                    StartingStrength = 14;
                     StockInitialAfterStartDelay = 1;
                     StockMaximum = 3;
                     StockReplenishInterval = 30;
                     StockStartDelay = 0;
-                    Strength = 14;
                     StrengthPerLevel = 1.8f;
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
@@ -3627,7 +3627,6 @@ namespace Moonwell.Objects
                 {
                     Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
                     AcquisitionRange = 500f;
-                    Agility = 11;
                     AgilityPerLevel = 1.5f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -3709,7 +3708,6 @@ namespace Moonwell.Objects
                     Hotkey = "M";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroMountainKing.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-mountainking.blp";
-                    Intelligence = 15;
                     IntelligencePerLevel = 1.5f;
                     IsABuilding = false;
                     LumberBountyAwardedBase = 0;
@@ -3765,11 +3763,13 @@ namespace Moonwell.Objects
                     Speed = 290;
                     SpeedMaximum = 0;
                     SpeedMinimum = 0;
+                    StartingAgility = 11;
+                    StartingIntelligence = 15;
+                    StartingStrength = 24;
                     StockInitialAfterStartDelay = 1;
                     StockMaximum = 3;
                     StockReplenishInterval = 30;
                     StockStartDelay = 0;
-                    Strength = 24;
                     StrengthPerLevel = 3f;
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
@@ -3956,7 +3956,6 @@ namespace Moonwell.Objects
                 {
                     Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
                     AcquisitionRange = 500f;
-                    Agility = 13;
                     AgilityPerLevel = 1.5f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -4038,7 +4037,6 @@ namespace Moonwell.Objects
                     Hotkey = "L";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroPaladin.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-paladin.blp";
-                    Intelligence = 17;
                     IntelligencePerLevel = 1.8f;
                     IsABuilding = false;
                     LumberBountyAwardedBase = 0;
@@ -4094,11 +4092,13 @@ namespace Moonwell.Objects
                     Speed = 300;
                     SpeedMaximum = 0;
                     SpeedMinimum = 0;
+                    StartingAgility = 13;
+                    StartingIntelligence = 17;
+                    StartingStrength = 22;
                     StockInitialAfterStartDelay = 1;
                     StockMaximum = 3;
                     StockReplenishInterval = 30;
                     StockStartDelay = 120;
-                    Strength = 22;
                     StrengthPerLevel = 2.7f;
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;

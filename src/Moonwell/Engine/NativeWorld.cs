@@ -661,6 +661,78 @@ namespace Moonwell.Engine
             Natives.KillUnit(unit);
         }
 
+        /// <summary>A hero's experience, from the game.</summary>
+        public int ExperienceOf(unit hero)
+        {
+            return Natives.GetHeroXP(hero);
+        }
+
+        /// <summary>Sets a hero's experience in the game.</summary>
+        public void SetExperience(unit hero, int experience, bool showEffect)
+        {
+            Natives.SetHeroXP(hero, experience, showEffect);
+        }
+
+        /// <summary>Gives a hero a level in the game.</summary>
+        public void LevelHero(unit hero, int level, bool showEffect)
+        {
+            Natives.SetHeroLevel(hero, level, showEffect);
+        }
+
+        /// <summary>A hero's strength, from the game.</summary>
+        public int StrengthOf(unit hero, bool withBonus)
+        {
+            return Natives.GetHeroStr(hero, withBonus);
+        }
+
+        /// <summary>A hero's agility, from the game.</summary>
+        public int AgilityOf(unit hero, bool withBonus)
+        {
+            return Natives.GetHeroAgi(hero, withBonus);
+        }
+
+        /// <summary>A hero's intelligence, from the game.</summary>
+        public int IntelligenceOf(unit hero, bool withBonus)
+        {
+            return Natives.GetHeroInt(hero, withBonus);
+        }
+
+        /// <summary>Sets a hero's base strength for good, in the game.</summary>
+        public void SetStrength(unit hero, int strength)
+        {
+            Natives.SetHeroStr(hero, strength, true);
+        }
+
+        /// <summary>Sets a hero's base agility for good, in the game.</summary>
+        public void SetAgility(unit hero, int agility)
+        {
+            Natives.SetHeroAgi(hero, agility, true);
+        }
+
+        /// <summary>Sets a hero's base intelligence for good, in the game.</summary>
+        public void SetIntelligence(unit hero, int intelligence)
+        {
+            Natives.SetHeroInt(hero, intelligence, true);
+        }
+
+        /// <summary>The skill points a hero has, from the game.</summary>
+        public int SkillPointsOf(unit hero)
+        {
+            return Natives.GetHeroSkillPoints(hero);
+        }
+
+        /// <summary>Adds skill points to a hero in the game.</summary>
+        public bool AddSkillPoints(unit hero, int delta)
+        {
+            return Natives.UnitModifySkillPoints(hero, delta);
+        }
+
+        /// <summary>Revives a hero at a place in the game.</summary>
+        public bool ReviveAt(unit hero, float x, float y, bool showEffect)
+        {
+            return Natives.ReviveHero(hero, x, y, showEffect);
+        }
+
         /// <summary>Whether a unit is paused, from the game.</summary>
         public bool IsPausedUnit(unit unit)
         {

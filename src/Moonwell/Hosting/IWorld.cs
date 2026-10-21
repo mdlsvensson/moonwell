@@ -221,6 +221,42 @@ namespace Moonwell.Hosting
         /// <summary>Kills a unit through the game; the game then delivers the unit's death, with no killer, before the call returns.</summary>
         void SlayUnit(unit unit);
 
+        /// <summary>A hero's experience.</summary>
+        int ExperienceOf(unit hero);
+
+        /// <summary>Sets a hero's experience; the game gives the levels that come with it, with the level-up effect when asked.</summary>
+        void SetExperience(unit hero, int experience, bool showEffect);
+
+        /// <summary>Gives a hero a level, with the level-up effect when asked.</summary>
+        void LevelHero(unit hero, int level, bool showEffect);
+
+        /// <summary>A hero's strength; with the bonus items and auras give when asked.</summary>
+        int StrengthOf(unit hero, bool withBonus);
+
+        /// <summary>A hero's agility; with the bonus items and auras give when asked.</summary>
+        int AgilityOf(unit hero, bool withBonus);
+
+        /// <summary>A hero's intelligence; with the bonus items and auras give when asked.</summary>
+        int IntelligenceOf(unit hero, bool withBonus);
+
+        /// <summary>Sets a hero's base strength for good.</summary>
+        void SetStrength(unit hero, int strength);
+
+        /// <summary>Sets a hero's base agility for good.</summary>
+        void SetAgility(unit hero, int agility);
+
+        /// <summary>Sets a hero's base intelligence for good.</summary>
+        void SetIntelligence(unit hero, int intelligence);
+
+        /// <summary>The skill points a hero has to spend.</summary>
+        int SkillPointsOf(unit hero);
+
+        /// <summary>Adds skill points to a hero, or takes them with a negative number; the game's answer.</summary>
+        bool AddSkillPoints(unit hero, int delta);
+
+        /// <summary>Revives a dead hero at a place, with the revive effect when asked; the game's answer.</summary>
+        bool ReviveAt(unit hero, float x, float y, bool showEffect);
+
         /// <summary>Whether a unit is paused.</summary>
         bool IsPausedUnit(unit unit);
 

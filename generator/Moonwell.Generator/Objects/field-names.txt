@@ -28,9 +28,9 @@ unit ua1d DamageDice
 unit ua1s DamageSides
 unit ua1c AttackCooldown
 unit ua1r AttackRange
-unit ustr Strength
-unit uagi Agility
-unit uint Intelligence
+unit ustr StartingStrength
+unit uagi StartingAgility
+unit uint StartingIntelligence
 unit ustp StrengthPerLevel
 unit uagp AgilityPerLevel
 unit uinp IntelligencePerLevel

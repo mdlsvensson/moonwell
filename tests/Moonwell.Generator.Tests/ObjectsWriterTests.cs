@@ -389,7 +389,7 @@ public class ObjectsWriterTests
 
         Assert.DoesNotContain("\"ustr\"", unit);
         Assert.DoesNotContain("Strength", unit);
-        Assert.Contains("public int Strength\n", hero);
+        Assert.Contains("public int StartingStrength\n", hero);
         Assert.Contains("public int HitPoints\n", hero);
         Assert.Contains("public abstract class StandardHero : global::Moonwell.Hero\n", hero);
     }

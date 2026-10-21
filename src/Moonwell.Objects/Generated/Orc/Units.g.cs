@@ -842,7 +842,6 @@ namespace Moonwell.Objects
                 {
                     Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
                     AcquisitionRange = 500f;
-                    Agility = 22;
                     AgilityPerLevel = 1.75f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -924,7 +923,6 @@ namespace Moonwell.Objects
                     Hotkey = "B";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroBlademaster.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-blademaster.blp";
-                    Intelligence = 16;
                     IntelligencePerLevel = 2.25f;
                     IsABuilding = false;
                     LumberBountyAwardedBase = 0;
@@ -980,11 +978,13 @@ namespace Moonwell.Objects
                     Speed = 320;
                     SpeedMaximum = 0;
                     SpeedMinimum = 0;
+                    StartingAgility = 22;
+                    StartingIntelligence = 16;
+                    StartingStrength = 18;
                     StockInitialAfterStartDelay = 1;
                     StockMaximum = 3;
                     StockReplenishInterval = 30;
                     StockStartDelay = 0;
-                    Strength = 18;
                     StrengthPerLevel = 2f;
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
@@ -1446,7 +1446,6 @@ namespace Moonwell.Objects
                 {
                     Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
                     AcquisitionRange = 600f;
-                    Agility = 18;
                     AgilityPerLevel = 1f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -1531,7 +1530,6 @@ namespace Moonwell.Objects
                     Hotkey = "F";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroFarseer.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-farseer.blp";
-                    Intelligence = 19;
                     IntelligencePerLevel = 3f;
                     IsABuilding = false;
                     LumberBountyAwardedBase = 0;
@@ -1588,11 +1586,13 @@ namespace Moonwell.Objects
                     Speed = 320;
                     SpeedMaximum = 0;
                     SpeedMinimum = 0;
+                    StartingAgility = 18;
+                    StartingIntelligence = 19;
+                    StartingStrength = 15;
                     StockInitialAfterStartDelay = 1;
                     StockMaximum = 3;
                     StockReplenishInterval = 30;
                     StockStartDelay = 120;
-                    Strength = 15;
                     StrengthPerLevel = 2f;
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
@@ -3398,7 +3398,6 @@ namespace Moonwell.Objects
                 {
                     Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
                     AcquisitionRange = 600f;
-                    Agility = 20;
                     AgilityPerLevel = 1.5f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -3482,7 +3481,6 @@ namespace Moonwell.Objects
                     Hotkey = "H";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNShadowHunter.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-shadowhunter.blp";
-                    Intelligence = 17;
                     IntelligencePerLevel = 2.5f;
                     IsABuilding = false;
                     LumberBountyAwardedBase = 0;
@@ -3538,11 +3536,13 @@ namespace Moonwell.Objects
                     Speed = 320;
                     SpeedMaximum = 0;
                     SpeedMinimum = 0;
+                    StartingAgility = 20;
+                    StartingIntelligence = 17;
+                    StartingStrength = 15;
                     StockInitialAfterStartDelay = 1;
                     StockMaximum = 3;
                     StockReplenishInterval = 30;
                     StockStartDelay = 0;
-                    Strength = 15;
                     StrengthPerLevel = 2f;
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
@@ -4945,7 +4945,6 @@ namespace Moonwell.Objects
                 {
                     Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
                     AcquisitionRange = 500f;
-                    Agility = 10;
                     AgilityPerLevel = 1.5f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.3f;
@@ -5027,7 +5026,6 @@ namespace Moonwell.Objects
                     Hotkey = "T";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroTaurenChieftain.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-taurenchieftain.blp";
-                    Intelligence = 15;
                     IntelligencePerLevel = 1.3f;
                     IsABuilding = false;
                     LumberBountyAwardedBase = 0;
@@ -5084,11 +5082,13 @@ namespace Moonwell.Objects
                     Speed = 290;
                     SpeedMaximum = 0;
                     SpeedMinimum = 0;
+                    StartingAgility = 10;
+                    StartingIntelligence = 15;
+                    StartingStrength = 25;
                     StockInitialAfterStartDelay = 1;
                     StockMaximum = 3;
                     StockReplenishInterval = 30;
                     StockStartDelay = 0;
-                    Strength = 25;
                     StrengthPerLevel = 3.2f;
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;

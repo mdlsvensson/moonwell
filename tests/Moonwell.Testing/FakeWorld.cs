@@ -869,6 +869,168 @@ namespace Moonwell.Testing
             }
         }
 
+        /// <summary>The calls that changed a hero, in turn, as a word and its values: "experience 500 True", "level 5 True", "strength 30 True", "skill-points 3", "revive 100 200 True".</summary>
+        public List<string> HeroCalls = new List<string>();
+
+        /// <summary>The experience of each hero, 0 until set.</summary>
+        private readonly Dictionary<unit, int> experiences = new Dictionary<unit, int>();
+
+        /// <summary>The base strength, agility and intelligence of each hero, 0 until set.</summary>
+        private readonly Dictionary<unit, int[]> stats = new Dictionary<unit, int[]>();
+
+        /// <summary>The bonus to strength, agility and intelligence of each hero, 0 until set.</summary>
+        private readonly Dictionary<unit, int[]> statBonuses = new Dictionary<unit, int[]>();
+
+        /// <summary>The skill points of each hero, 0 until set.</summary>
+        private readonly Dictionary<unit, int> skillPoints = new Dictionary<unit, int>();
+
+        /// <summary>Sets the base strength, agility and intelligence the world gives a hero.</summary>
+        public void SetStats(unit hero, int strength, int agility, int intelligence)
+        {
+            stats[hero] = new int[] { strength, agility, intelligence };
+        }
+
+        /// <summary>Sets the bonus to strength, agility and intelligence the world gives a hero.</summary>
+        public void SetStatBonuses(unit hero, int strength, int agility, int intelligence)
+        {
+            statBonuses[hero] = new int[] { strength, agility, intelligence };
+        }
+
+        /// <summary>Sets the skill points the world gives a hero.</summary>
+        public void SetSkillPoints(unit hero, int points)
+        {
+            skillPoints[hero] = points;
+        }
+
+        /// <summary>The experience of a hero; 0 until set.</summary>
+        public int ExperienceOf(unit hero)
+        {
+            NoteGone(hero);
+            return experiences.TryGetValue(hero, out var experience) ? experience : 0;
+        }
+
+        /// <summary>Sets the experience of a hero, and records an "experience".</summary>
+        public void SetExperience(unit hero, int experience, bool showEffect)
+        {
+            NoteGone(hero);
+            HeroCalls.Add("experience " + experience + " " + Flag(showEffect));
+            experiences[hero] = experience;
+        }
+
+        /// <summary>Gives a hero the level, and records a "level".</summary>
+        public void LevelHero(unit hero, int level, bool showEffect)
+        {
+            NoteGone(hero);
+            HeroCalls.Add("level " + level + " " + Flag(showEffect));
+            levels[hero] = level;
+        }
+
+        /// <summary>A stat of a hero, 0 until set: which is 0 for strength, 1 for agility and 2 for intelligence.</summary>
+        private int StatOf(unit hero, int which, bool withBonus)
+        {
+            NoteGone(hero);
+            var value = stats.TryGetValue(hero, out var set) ? set[which] : 0;
+            if (withBonus && statBonuses.TryGetValue(hero, out var bonus))
+            {
+                value += bonus[which];
+            }
+
+            return value;
+        }
+
+        /// <summary>Sets a base stat of a hero, and records its name with the value and that it is for good.</summary>
+        private void SetStat(unit hero, int which, string name, int value)
+        {
+            NoteGone(hero);
+            HeroCalls.Add(name + " " + value + " " + Flag(true));
+            if (!stats.TryGetValue(hero, out var set))
+            {
+                set = new int[3];
+                stats[hero] = set;
+            }
+
+            set[which] = value;
+        }
+
+        /// <summary>The strength of a hero.</summary>
+        public int StrengthOf(unit hero, bool withBonus)
+        {
+            return StatOf(hero, 0, withBonus);
+        }
+
+        /// <summary>The agility of a hero.</summary>
+        public int AgilityOf(unit hero, bool withBonus)
+        {
+            return StatOf(hero, 1, withBonus);
+        }
+
+        /// <summary>The intelligence of a hero.</summary>
+        public int IntelligenceOf(unit hero, bool withBonus)
+        {
+            return StatOf(hero, 2, withBonus);
+        }
+
+        /// <summary>Sets the base strength of a hero.</summary>
+        public void SetStrength(unit hero, int strength)
+        {
+            SetStat(hero, 0, "strength", strength);
+        }
+
+        /// <summary>Sets the base agility of a hero.</summary>
+        public void SetAgility(unit hero, int agility)
+        {
+            SetStat(hero, 1, "agility", agility);
+        }
+
+        /// <summary>Sets the base intelligence of a hero.</summary>
+        public void SetIntelligence(unit hero, int intelligence)
+        {
+            SetStat(hero, 2, "intelligence", intelligence);
+        }
+
+        /// <summary>The skill points of a hero; 0 until set.</summary>
+        public int SkillPointsOf(unit hero)
+        {
+            NoteGone(hero);
+            return skillPoints.TryGetValue(hero, out var points) ? points : 0;
+        }
+
+        /// <summary>Adds skill points to a hero and records "skill-points"; true unless the points would go below 0, which leaves them as they were.</summary>
+        public bool AddSkillPoints(unit hero, int delta)
+        {
+            NoteGone(hero);
+            HeroCalls.Add("skill-points " + delta);
+            var now = SkillPointsOf(hero) + delta;
+            if (now < 0)
+            {
+                return false;
+            }
+
+            skillPoints[hero] = now;
+            return true;
+        }
+
+        /// <summary>Revives a dead hero at the place and records a "revive"; false for a hero that is not dead.</summary>
+        public bool ReviveAt(unit hero, float x, float y, bool showEffect)
+        {
+            NoteGone(hero);
+            HeroCalls.Add("revive " + (int)x + " " + (int)y + " " + Flag(showEffect));
+            if (!dead.Remove(hero))
+            {
+                return false;
+            }
+
+            unitXs[hero] = x;
+            unitYs[hero] = y;
+            return true;
+        }
+
+        /// <summary>A flag as the hero calls record it: "True" or "False", the same on .NET and in Lua.</summary>
+        private static string Flag(bool value)
+        {
+            return value ? "True" : "False";
+        }
+
         /// <summary>Whether a unit is paused.</summary>
         public bool IsPausedUnit(unit unit)
         {

@@ -10,6 +10,15 @@ namespace Moonwell.Testing
         public static List<Case> All()
         {
             var list = new List<Case>();
+            AddFirst(list);
+            AddMiddle(list);
+            AddLast(list);
+            return list;
+        }
+
+        /// <summary>Adds the first cases: the harness, collections, errors, ownership, timers, hooks, actors and objects (Lua allows 200 locals in a function, and each case made here is one).</summary>
+        private static void AddFirst(List<Case> list)
+        {
             list.Add(new Case { Name = "harness.handles-are-keys", Run = HarnessCases.HandlesAreKeys });
             list.Add(new Case { Name = "harness.expect-fails", Run = HarnessCases.ExpectFails });
             list.Add(new Case { Name = "collections.set-keeps-order", Run = CollectionCases.SetKeepsOrder });
@@ -69,6 +78,11 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "players.print", Run = PlayerCases.PlayersPrint });
             list.Add(new Case { Name = "players.print-seconds", Run = PlayerCases.PlayersPrintSeconds });
             list.Add(new Case { Name = "game.print", Run = PlayerCases.GamePrint });
+        }
+
+        /// <summary>Adds the player, local, unit and inventory cases (Lua allows 200 locals in a function, and each case made here is one).</summary>
+        private static void AddMiddle(List<Case> list)
+        {
             list.Add(new Case { Name = "players.gold", Run = PlayerCases.PlayersGold });
             list.Add(new Case { Name = "players.states", Run = PlayerCases.PlayersStates });
             list.Add(new Case { Name = "players.playing", Run = PlayerCases.PlayersPlaying });
@@ -132,6 +146,18 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "units.inventory", Run = ItemCases.Inventory });
             list.Add(new Case { Name = "units.inventory-limits", Run = ItemCases.InventoryLimits });
             list.Add(new Case { Name = "units.inventory-gone", Run = ItemCases.InventoryGone });
+        }
+
+        /// <summary>Adds the hero, item, destructable, damage, ability and buff cases, and the rest.</summary>
+        private static void AddLast(List<Case> list)
+        {
+            list.Add(new Case { Name = "heroes.unregistered-is-hero", Run = HeroCases.UnregisteredIsHero });
+            list.Add(new Case { Name = "heroes.experience", Run = HeroCases.Experience });
+            list.Add(new Case { Name = "heroes.level", Run = HeroCases.Level });
+            list.Add(new Case { Name = "heroes.stats", Run = HeroCases.Stats });
+            list.Add(new Case { Name = "heroes.skill-points", Run = HeroCases.SkillPoints });
+            list.Add(new Case { Name = "heroes.revive", Run = HeroCases.Revive });
+            list.Add(new Case { Name = "heroes.gone", Run = HeroCases.Gone });
             list.Add(new Case { Name = "items.registered-class", Run = ItemCases.RegisteredClass });
             list.Add(new Case { Name = "items.fallback-class", Run = ItemCases.FallbackClass });
             list.Add(new Case { Name = "items.pickup-order", Run = ItemCases.PickupOrder });
@@ -203,7 +229,6 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "floats.folded", Run = FloatCases.Folded });
             list.Add(new Case { Name = "floats.stored", Run = FloatCases.Stored });
             list.Add(new Case { Name = "floats.ints-stay", Run = FloatCases.IntsStay });
-            return list;
         }
 
         /// <summary>Runs every case on a fresh world, and returns a PASS or FAIL line for each, then DONE.</summary>

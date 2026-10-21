@@ -1928,7 +1928,6 @@ namespace Moonwell.Objects
                 {
                     Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
                     AcquisitionRange = 500f;
-                    Agility = 14;
                     AgilityPerLevel = 1.2f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2010,7 +2009,6 @@ namespace Moonwell.Objects
                     Hotkey = "C";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroCryptLord.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-cryptlord.blp";
-                    Intelligence = 14;
                     IntelligencePerLevel = 1.6f;
                     IsABuilding = false;
                     LumberBountyAwardedBase = 0;
@@ -2067,11 +2065,13 @@ namespace Moonwell.Objects
                     Speed = 290;
                     SpeedMaximum = 0;
                     SpeedMinimum = 0;
+                    StartingAgility = 14;
+                    StartingIntelligence = 14;
+                    StartingStrength = 26;
                     StockInitialAfterStartDelay = 1;
                     StockMaximum = 3;
                     StockReplenishInterval = 30;
                     StockStartDelay = 0;
-                    Strength = 26;
                     StrengthPerLevel = 3.2f;
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
@@ -2104,7 +2104,6 @@ namespace Moonwell.Objects
                 {
                     Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
                     AcquisitionRange = 500f;
-                    Agility = 12;
                     AgilityPerLevel = 1.5f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2185,7 +2184,6 @@ namespace Moonwell.Objects
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
                     Hotkey = "D";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-deathknight.blp";
-                    Intelligence = 17;
                     IntelligencePerLevel = 1.8f;
                     IsABuilding = false;
                     LumberBountyAwardedBase = 0;
@@ -2241,11 +2239,13 @@ namespace Moonwell.Objects
                     Speed = 320;
                     SpeedMaximum = 0;
                     SpeedMinimum = 0;
+                    StartingAgility = 12;
+                    StartingIntelligence = 17;
+                    StartingStrength = 23;
                     StockInitialAfterStartDelay = 1;
                     StockMaximum = 3;
                     StockReplenishInterval = 30;
                     StockStartDelay = 0;
-                    Strength = 23;
                     StrengthPerLevel = 2.7f;
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
@@ -2548,7 +2548,6 @@ namespace Moonwell.Objects
                 {
                     Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
                     AcquisitionRange = 500f;
-                    Agility = 16;
                     AgilityPerLevel = 1f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2630,7 +2629,6 @@ namespace Moonwell.Objects
                     Hotkey = "E";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroDreadLord.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-dreadlord.blp";
-                    Intelligence = 18;
                     IntelligencePerLevel = 2.5f;
                     IsABuilding = false;
                     LumberBountyAwardedBase = 0;
@@ -2687,11 +2685,13 @@ namespace Moonwell.Objects
                     Speed = 300;
                     SpeedMaximum = 0;
                     SpeedMinimum = 0;
+                    StartingAgility = 16;
+                    StartingIntelligence = 18;
+                    StartingStrength = 20;
                     StockInitialAfterStartDelay = 1;
                     StockMaximum = 3;
                     StockReplenishInterval = 30;
                     StockStartDelay = 0;
-                    Strength = 20;
                     StrengthPerLevel = 2.5f;
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
@@ -3604,7 +3604,6 @@ namespace Moonwell.Objects
                 {
                     Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
                     AcquisitionRange = 600f;
-                    Agility = 14;
                     AgilityPerLevel = 1f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -3688,7 +3687,6 @@ namespace Moonwell.Objects
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
                     Hotkey = "L";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-lich.blp";
-                    Intelligence = 20;
                     IntelligencePerLevel = 3.4f;
                     IsABuilding = false;
                     LumberBountyAwardedBase = 0;
@@ -3745,11 +3743,13 @@ namespace Moonwell.Objects
                     Speed = 290;
                     SpeedMaximum = 0;
                     SpeedMinimum = 0;
+                    StartingAgility = 14;
+                    StartingIntelligence = 20;
+                    StartingStrength = 15;
                     StockInitialAfterStartDelay = 1;
                     StockMaximum = 3;
                     StockReplenishInterval = 30;
                     StockStartDelay = 0;
-                    Strength = 15;
                     StrengthPerLevel = 2f;
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
