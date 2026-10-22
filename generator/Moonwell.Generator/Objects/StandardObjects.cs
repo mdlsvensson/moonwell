@@ -252,11 +252,16 @@ public static class StandardObjects
     /// <summary>
     /// The keys of one object's merged rows, looked up as spelled and then without regard to case. The skin files key some
     /// values by graphics mode (<c>modelScale:sd</c>, <c>modelScale:de</c>, <c>modelScale:hd</c>; the modes of 3.0.0's patch
-    /// notes: Classic, Definitive Edition and Reforged): a key's Definitive Edition value wins over the key itself, as the
-    /// game reads it (a footman's scale is 0.8, a peasant's 0.85 beside its <c>modelScale=1</c>; seen on 3.0.1).
+    /// notes: Classic, Definitive Edition and Reforged). The standard value is the Definitive Edition graphics' value: a
+    /// key's <c>:de</c> value wins over the key itself. That is what the game gave in Definitive Edition graphics on 3.0.1
+    /// (game-facts: a footman's scale 0.8, a paladin's 0.935, a peasant's 0.85 beside its <c>modelScale=1</c>); in the
+    /// other modes the game reads that mode's values. A key with no <c>:de</c> value reads the key itself, and one with only
+    /// <c>:sd</c> and <c>:hd</c> values has none.
     /// </summary>
     private sealed class Row
     {
+        // A blank :de value is read as the value, so the key has none: the export's only one, Aent's Casterart:de, leaves
+        // Entangle Gold Mine without its caster art. Not checked in the game.
         private const string GameMode = ":de";
 
         private readonly ObjectRows _rows;
