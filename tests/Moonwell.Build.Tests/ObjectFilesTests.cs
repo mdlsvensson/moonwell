@@ -256,8 +256,10 @@ namespace Moonwell.Build.Tests
         {
             var staged = StageFixtureObjects(out var ids, out _);
 
-            Assert.Equal(IdOf(ids["Objects.Claws"]), Assert.Single(ReadItems(staged, "war3map.w3t").NewItems).NewId);
-            Assert.Equal(900, Assert.Single(Assert.Single(ReadItems(staged, "war3map.w3t").NewItems).Modifications, one => one.Id == IdOf("igol")).Value);
+            var claws = Assert.Single(ReadItems(staged, "war3map.w3t").NewItems, one => one.NewId == IdOf(ids["Objects.Claws"]));
+            Assert.Equal(900, Assert.Single(claws.Modifications, one => one.Id == IdOf("igol")).Value);
+            var flask = Assert.Single(ReadItems(staged, "war3map.w3t").NewItems, one => one.NewId == IdOf(ids["Objects.Flask"]));
+            Assert.Equal(3, Assert.Single(flask.Modifications, one => one.Id == IdOf("iuse")).Value);
             Assert.Equal(IdOf(ids["Objects.Gate"]), Assert.Single(ReadDestructables(staged, "war3map.w3b").NewDestructables).NewId);
             Assert.Equal("Gate", Assert.Single(Assert.Single(ReadDestructables(staged, "war3mapSkin.w3b").NewDestructables).Modifications, one => one.Id == IdOf("bnam")).Value);
             Assert.Equal(IdOf(ids["Objects.Rock"]), Assert.Single(ReadDoodads(staged, "war3map.w3d").NewDoodads).NewId);
