@@ -2709,7 +2709,7 @@ namespace Moonwell.Objects
                 EquipmentType = global::Moonwell.Objects.EquipmentType.None;
                 GoldCost = 550;
                 HitPoints = 75;
-                Icon = "ReplaceableTextures\\CommandButtons\\BTNAzureDragon.blp";
+                Icon = "ReplaceableTextures\\CommandButtons\\BTNAzureDrake.blp";
                 IgnoreCooldown = false;
                 IncludeAsRandomChoice = true;
                 Invulnerable = false;
@@ -8607,7 +8607,7 @@ namespace Moonwell.Objects
                 EquipmentType = global::Moonwell.Objects.EquipmentType.None;
                 GoldCost = 700;
                 HitPoints = 75;
-                Icon = "ReplaceableTextures\\CommandButtons\\BTNpurpleDragonSpawn.blp";
+                Icon = "ReplaceableTextures\\CommandButtons\\BTNDragonSpawnOverseer.blp";
                 IgnoreCooldown = false;
                 IncludeAsRandomChoice = true;
                 Invulnerable = false;
@@ -30937,8 +30937,8 @@ namespace Moonwell.Objects
                 StockStartDelay = 0;
                 Tag = global::Moonwell.Objects.ItemTag.Undefined;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
-                TintingColor1Red = 100;
-                TintingColor2Green = 100;
+                TintingColor1Red = 255;
+                TintingColor2Green = 255;
                 TintingColor3Blue = 255;
                 Tooltip = "Purchase Thunder Phoenix Egg";
                 TooltipExtended = "A rare egg of a Thunder Phoenix.";

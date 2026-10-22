@@ -53,6 +53,17 @@ public class StandardObjectsTests
             File.WriteAllText(path, text.Substring(0, at) + replace + text.Substring(at + find.Length));
         }
 
+        /// <summary>Replaces the footman's <c>modelScale</c> lines (the file has :de, :hd and :sd ones) with these lines.</summary>
+        public void SetFootmanScales(params string[] lines)
+        {
+            var path = Path.Combine(_folder, "units/unitskin.txt");
+            var text = File.ReadAllText(path);
+            var start = text.IndexOf("modelScale", text.IndexOf("[hfoo]", StringComparison.Ordinal), StringComparison.Ordinal);
+            var end = text.IndexOf("legacyModelScale", start, StringComparison.Ordinal);
+            Assert.True(start >= 0 && end > start, "the footman has no modelScale lines before legacyModelScale");
+            File.WriteAllText(path, text.Substring(0, start) + string.Join("\r\n", lines) + "\r\n" + text.Substring(end));
+        }
+
         public void Write(string relative, string text)
         {
             var path = Path.Combine(_folder, relative);
@@ -119,6 +130,41 @@ public class StandardObjectsTests
         copy.Replace("units/unitskin.txt", "[hfoo]", "modelScale:de=0.8", "modelScale=1\nmodelScale:de=0.85");
 
         Assert.Equal("0.85", Find(Of(copy.Tables(), Kind.Unit), "hfoo").Values["usca"]);
+    }
+
+    [Fact]
+    public void a_value_with_no_definitive_edition_one_is_the_reforged_one_not_the_classic_one()
+    {
+        // The game, in Definitive Edition graphics, scales an Assassin (hd 1.2, sd 1.3) to 1.2 and a Guardian Golem
+        // (hd 1.0, sd 1.5) to 1.0: with no :de value it reads :hd, never :sd (game-facts, seen on 3.0.1).
+        using var copy = new Copy();
+        copy.SetFootmanScales("modelScale:hd=1.2", "modelScale:sd=1.3");
+        Assert.Equal("1.2", Find(Of(copy.Tables(), Kind.Unit), "hfoo").Values["usca"]);
+
+        copy.SetFootmanScales("modelScale:hd=1.0", "modelScale:sd=1.5");
+        Assert.Equal("1.0", Find(Of(copy.Tables(), Kind.Unit), "hfoo").Values["usca"]);
+    }
+
+    [Fact]
+    public void a_value_of_the_reforged_graphics_wins_over_the_plain_key_and_loses_to_the_definitive_edition_one()
+    {
+        // Plain 1 beside :hd 0.9 gives 0.9; with a :de 0.85 as well, 0.85.
+        using var copy = new Copy();
+        copy.SetFootmanScales("modelScale=1", "modelScale:hd=0.9", "modelScale:sd=1.3");
+        Assert.Equal("0.9", Find(Of(copy.Tables(), Kind.Unit), "hfoo").Values["usca"]);
+
+        copy.SetFootmanScales("modelScale=1", "modelScale:de=0.85", "modelScale:hd=0.9", "modelScale:sd=1.3");
+        Assert.Equal("0.85", Find(Of(copy.Tables(), Kind.Unit), "hfoo").Values["usca"]);
+    }
+
+    [Fact]
+    public void a_blank_reforged_value_with_no_definitive_edition_one_is_no_value()
+    {
+        // As with a blank :de value: the key has none, not the plain key's or the classic one.
+        using var copy = new Copy();
+        copy.SetFootmanScales("modelScale=1", "modelScale:hd=", "modelScale:sd=1.3");
+
+        Assert.False(Find(Of(copy.Tables(), Kind.Unit), "hfoo").Values.ContainsKey("usca"));
     }
 
     [Fact]

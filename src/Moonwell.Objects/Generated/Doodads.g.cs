@@ -89,7 +89,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.9f;
-                Model = "Doodads\\Cityscape\\Structures\\Cathedral\\Cathedral";
+                Model = "Doodads\\Cityscape\\Structures\\CityAlonsusChapel\\CityAlonsusChapel";
                 Name = "WESTRING_DOOD_YOSB";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "none";
@@ -189,7 +189,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Village\\Structures\\VillageBuilding\\VillageBuilding1.mdl";
+                Model = "Doodads\\LordaeronFall\\Structures\\AndrohalClockTower\\AndrohalClockTower";
                 Name = "WESTRING_DOOD_ACT0";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\8x8Default.tga";
@@ -239,7 +239,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Village\\Structures\\VillageBuilding\\VillageBuilding1.mdl";
+                Model = "Doodads\\LordaeronFall\\Structures\\AndrohalClockTower_Destroyed\\AndrohalClockTower_Destroyed";
                 Name = "WESTRING_DOOD_ACTD";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\8x8Default.tga";
@@ -1238,7 +1238,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Cityscape\\Structures\\Archway1\\Archway1";
+                Model = "Doodads\\Cityscape\\Structures\\ArchwayEntrance1\\ArchwayEntrance1";
                 Name = "WESTRING_DOOD_YSA2";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\CityArch.tga";
@@ -1288,7 +1288,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Cityscape\\Structures\\Archway45\\Archway45";
+                Model = "Doodads\\Cityscape\\Structures\\ArchwayEntrance45\\ArchwayEntrance45";
                 Name = "WESTRING_DOOD_YSA3";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\CityArch45.tga";
@@ -1738,7 +1738,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Ruins\\Structures\\RuinsArchway0_\\RuinsArchway0_2.mdl";
+                Model = "Doodads\\RuinTomb\\Structures\\Archway_Standard\\Archway_Standard";
                 Name = "WESTRING_DOOD_ASD0";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\28x6Default.tga";
@@ -1794,7 +1794,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityArch.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 1.4f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -1994,7 +1994,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityArch.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 1.45f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -3144,7 +3144,7 @@ namespace Moonwell.Objects
                 PathingTexture = "none";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 1.75f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -3690,7 +3690,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Village\\Structures\\VillageBuilding\\VillageBuilding1.mdl";
+                Model = "Doodads\\LordaeronFall\\Structures\\BrillClockTower\\BrillClockTower";
                 Name = "WESTRING_DOOD_BCT0";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\8x8Default.tga";
@@ -4196,7 +4196,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\2x2Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.8f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -4246,7 +4246,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\2x2Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -4396,7 +4396,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\4x4Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.75f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -4871,13 +4871,13 @@ namespace Moonwell.Objects
                 IsADecalHD = false;
                 IsWaterHD = false;
                 LoopingSound = "CathedralLoop";
-                MaximumScale = 1.3f;
+                MaximumScale = 0.9f;
                 MinimapColor1Red = 0;
                 MinimapColor2Green = 0;
                 MinimapColor3Blue = 0;
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
-                MinimumScale = 1.1f;
+                MinimumScale = 0.9f;
                 Model = "Doodads\\Cityscape\\Structures\\Cathedral\\Cathedral";
                 Name = "WESTRING_DOOD_YSCA";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
@@ -4921,13 +4921,13 @@ namespace Moonwell.Objects
                 IgnoreModelClicks = false;
                 IsADecalHD = false;
                 IsWaterHD = false;
-                MaximumScale = 1.3f;
+                MaximumScale = 0.9f;
                 MinimapColor1Red = 0;
                 MinimapColor2Green = 0;
                 MinimapColor3Blue = 0;
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
-                MinimumScale = 1.1f;
+                MinimumScale = 0.9f;
                 Model = "Doodads\\Cityscape\\Structures\\CathedralRuined\\CathedralRuined";
                 Name = "WESTRING_DOOD_YSCR";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
@@ -4984,7 +4984,7 @@ namespace Moonwell.Objects
                 PathingTexture = "none";
                 PlaceableOnCliffs = false;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 1.1f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -5084,7 +5084,7 @@ namespace Moonwell.Objects
                 PathingTexture = "none";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 1.1f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -6034,7 +6034,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding0-2.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -6084,7 +6084,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding0-2.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -6134,7 +6134,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding0-2.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -6184,7 +6184,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding6-8.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -6234,7 +6234,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding6-8.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -6284,7 +6284,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding6-8.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -6334,7 +6334,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding3-5.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -6384,7 +6384,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding3-5.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -6434,7 +6434,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding3-5.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -6534,7 +6534,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuildingLarge_135.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -6584,7 +6584,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuildingLarge_45.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -6634,7 +6634,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuildingLarge_90.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -6684,7 +6684,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuildingLarge_135.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -6734,7 +6734,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuildingLarge_45.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -6884,7 +6884,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuildingLarge_0.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -6928,7 +6928,7 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 1f;
-                Model = "Buildings\\Other\\CityBuildingSmall90_0\\CityBuildingSmall90_0";
+                Model = "Doodads\\Cityscape\\Structures\\CityBuildingRow_0\\CityBuildingRow_0";
                 Name = "WESTRING_DOOD_YSBR";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "none";
@@ -6978,7 +6978,7 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 1f;
-                Model = "Buildings\\Other\\CityBuildingSmall0_0\\CityBuildingSmall0_0";
+                Model = "Doodads\\Cityscape\\Structures\\CityBuildingRow_1\\CityBuildingRow_1";
                 Name = "WESTRING_DOOD_YSB1";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "none";
@@ -7028,7 +7028,7 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 1f;
-                Model = "Doodads\\Village\\Structures\\VillageBuilding\\VillageBuilding1.mdl";
+                Model = "Doodads\\Cityscape\\Structures\\CityBuildingRow_2\\CityBuildingRow_2";
                 Name = "WESTRING_DOOD_YSB2";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "none";
@@ -7084,7 +7084,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding0-2.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -7134,7 +7134,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding0-2.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -7184,7 +7184,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding0-2.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -7234,7 +7234,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding6-8.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -7284,7 +7284,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding6-8.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -7334,7 +7334,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding6-8.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -7384,7 +7384,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding3-5.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -7434,7 +7434,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding3-5.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -7484,7 +7484,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding3-5.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -7534,7 +7534,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding9-11.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -7584,7 +7584,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding9-11.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -7634,7 +7634,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding9-11.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -7684,7 +7684,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding9-11.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -7734,7 +7734,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding9-11.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -7784,7 +7784,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\CityBuilding9-11.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.9f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -7828,7 +7828,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.9f;
-                Model = "Doodads\\Village\\Structures\\VillageBuilding\\VillageBuilding2.mdl";
+                Model = "Doodads\\Cityscape\\Structures\\CityMainTower\\CityMainTower";
                 Name = "WESTRING_DOOD_YOMB";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "none";
@@ -8734,7 +8734,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\18x12Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 1.15f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -8784,7 +8784,7 @@ namespace Moonwell.Objects
                 PathingTexture = "none";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 1.1f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -8878,7 +8878,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\LordaeronSummer\\Props\\SittingCorpse\\SittingCorpse";
+                Model = "Doodads\\RuinTomb\\Props\\CorpseofGulDan\\CorpseofGulDan";
                 Name = "WESTRING_DOOD_CGD0";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.NoOcclusion;
                 PathingTexture = "PathTextures\\4x4Default.tga";
@@ -9236,7 +9236,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\8x8Default.tga";
                 PlaceableOnCliffs = false;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 1.5f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -10330,7 +10330,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Ruins\\Structures\\RuinsArchway0_\\RuinsArchway0_2.mdl";
+                Model = "Doodads\\RuinTomb\\Structures\\ExteriorGate\\ExteriorGate";
                 Name = "WESTRING_DOOD_EG00";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "none";
@@ -10380,7 +10380,7 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Ruins\\Structures\\RuinsArchway45_\\RuinsArchway45_";
+                Model = "Doodads\\RuinTomb\\Structures\\ExteriorMainTower\\ExteriorMainTower";
                 Name = "WESTRING_DOOD_EMT0";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\24x24Unflyable.tga";
@@ -10430,7 +10430,7 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Ruins\\Terrain\\RuinsWall0\\RuinsWall0";
+                Model = "Doodads\\RuinTomb\\Structures\\ExteriorTower\\ExteriorTower";
                 Name = "WESTRING_DOOD_ET00";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "none";
@@ -10480,7 +10480,7 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Ruins\\Terrain\\RuinsWall0\\RuinsWall0";
+                Model = "Doodads\\RuinTomb\\Structures\\ExteriorWall\\ExteriorWall";
                 Name = "WESTRING_DOOD_EW00";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "none";
@@ -10695,7 +10695,7 @@ namespace Moonwell.Objects
                 TintingColor2Green = Levels(255, 255, 255, 255, 255, 255, 255, 255, 255, 255);
                 TintingColor3Blue = Levels(255, 255, 255, 255, 255, 255, 255, 255, 255, 255);
                 UseClickHelper = false;
-                Variations = 1;
+                Variations = 3;
                 VisibilityRadius = 50f;
                 Walkable = false;
             }
@@ -10745,7 +10745,7 @@ namespace Moonwell.Objects
                 TintingColor2Green = Levels(255, 255, 255, 255, 255, 255, 255, 255, 255, 255);
                 TintingColor3Blue = Levels(255, 255, 255, 255, 255, 255, 255, 255, 255, 255);
                 UseClickHelper = false;
-                Variations = 1;
+                Variations = 3;
                 VisibilityRadius = 50f;
                 Walkable = false;
             }
@@ -12088,7 +12088,7 @@ namespace Moonwell.Objects
                 PathingTexture = "none";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 1.2f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -14308,7 +14308,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Cityscape\\Structures\\Cathedral\\Cathedral";
+                Model = "Doodads\\LordaeronFall\\Structures\\HearthglenAbbey\\HearthglenAbbey";
                 Name = "WESTRING_DOOD_HA00";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\24x32Default.tga";
@@ -14358,7 +14358,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Cityscape\\Props\\Banner_Long\\Banner_Long";
+                Model = "Doodads\\Silvermoon\\Prop\\HighElfCrestHangingBanners\\HighElfCrestHangingBanners";
                 Name = "WESTRING_DOOD_HECH";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\4x4Default.tga";
@@ -14408,7 +14408,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Cityscape\\Props\\Banner_Long\\Banner_Long";
+                Model = "Doodads\\Silvermoon\\Prop\\HighElfCrestStandingBanners\\HighElfCrestStandingBanners";
                 Name = "WESTRING_DOOD_HECS";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\4x4Default.tga";
@@ -14464,7 +14464,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\2x2Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 1.2f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -14764,7 +14764,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\4x4Default.tga";
                 PlaceableOnCliffs = false;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.65f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -14964,7 +14964,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\4x4Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.65f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -15014,7 +15014,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\4x4Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.6f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -15408,7 +15408,7 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.9f;
-                Model = "Doodads\\Cityscape\\Props\\City_Statue\\City_Statue";
+                Model = "Doodads\\Cityscape\\Props\\StatueKingTerenas\\StatueKingTerenas";
                 Name = "WESTRING_DOOD_YOSS";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\4x4Default.tga";
@@ -17206,7 +17206,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.9f;
-                Model = "Doodads\\Dungeon\\Props\\TreasurePile\\TreasurePile1.mdl";
+                Model = "Doodads\\Cityscape\\Props\\MarketItemBaubles\\MarketItemBaubles";
                 Name = "WESTRING_DOOD_YOM2";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "none";
@@ -17256,7 +17256,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.9f;
-                Model = "Doodads\\Dungeon\\Props\\JunkPile\\JunkPile0.mdl";
+                Model = "Doodads\\Cityscape\\Props\\MarketItemBaublesAlt\\MarketItemBaublesAlt";
                 Name = "WESTRING_DOOD_YOM3";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "none";
@@ -17306,7 +17306,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.9f;
-                Model = "Doodads\\Dungeon\\Props\\JunkPile\\JunkPile0.mdl";
+                Model = "Doodads\\Cityscape\\Props\\MarketItemProduce\\MarketItemProduce";
                 Name = "WESTRING_DOOD_YOM4";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "none";
@@ -17356,7 +17356,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.9f;
-                Model = "Doodads\\Dungeon\\Props\\JunkPile\\JunkPile1.mdl";
+                Model = "Doodads\\Cityscape\\Props\\MarketItemProduceAlt\\MarketItemProduceAlt";
                 Name = "WESTRING_DOOD_YOM5";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "none";
@@ -17406,7 +17406,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.9f;
-                Model = "Doodads\\Dungeon\\Props\\JunkPile\\JunkPile1.mdl";
+                Model = "Doodads\\Cityscape\\Props\\MarketItemTextiles\\MarketItemTextiles";
                 Name = "WESTRING_DOOD_YOM6";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "none";
@@ -17456,7 +17456,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.9f;
-                Model = "Doodads\\Dungeon\\Props\\TreasurePile\\TreasurePile1.mdl";
+                Model = "Doodads\\Cityscape\\Props\\MarketItemTextilesAlt\\MarketItemTextilesAlt";
                 Name = "WESTRING_DOOD_YOM7";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "none";
@@ -17506,7 +17506,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.9f;
-                Model = "Doodads\\Dungeon\\Props\\TreasurePile\\TreasurePile1.mdl";
+                Model = "Doodads\\Cityscape\\Props\\MarketStallLarge\\MarketStallLarge";
                 Name = "WESTRING_DOOD_YOMS";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "none";
@@ -17556,7 +17556,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.9f;
-                Model = "Doodads\\LordaeronSummer\\Props\\Trash1\\Trash1";
+                Model = "Doodads\\Cityscape\\Props\\MarketStallSmall\\MarketStallSmall";
                 Name = "WESTRING_DOOD_YOM1";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "none";
@@ -18112,7 +18112,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\2x2Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.5f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -18162,7 +18162,7 @@ namespace Moonwell.Objects
                 PathingTexture = "none";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.65f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -18212,7 +18212,7 @@ namespace Moonwell.Objects
                 PathingTexture = "none";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.65f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -20812,7 +20812,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\4x4Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.8f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -21707,7 +21707,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Village\\Structures\\VillageBuilding\\VillageBuilding1.mdl";
+                Model = "Doodads\\LordaeronFall\\Structures\\PyrewoodVillageClockTower_Destroyed\\PyrewoodVillageClockTower_Destroyed";
                 Name = "WESTRING_DOOD_PVCT";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\8x8Default.tga";
@@ -22557,7 +22557,7 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Barrens\\Rocks\\Barrens_Spires\\Barrens_Spires";
+                Model = "Doodads\\Barrens\\Rocks\\Barrens_Spires_CIN\\Barrens_Spires_CIN";
                 Name = "WESTRING_DOOD_BRRC";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\LargeRockSpire.tga";
@@ -23363,7 +23363,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\8x8Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.75f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -26068,7 +26068,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\8x8Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 0.9f;
+                Scale = 1.45f;
                 SelectionSize = 288f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -27006,7 +27006,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\8x8Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.8f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -27056,7 +27056,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\8x8Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.75f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -29907,7 +29907,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\4x4Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 1.1f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -30351,7 +30351,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Dungeon\\Props\\AzsharaStatue\\AzsharaStatue";
+                Model = "Doodads\\RuinTomb\\Props\\StatueofAzshara\\StatueofAzshara";
                 Name = "WESTRING_DOOD_SA02";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\12x12Default.tga";
@@ -30688,7 +30688,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Village\\Structures\\VillageBuilding\\VillageBuilding1.mdl";
+                Model = "Doodads\\LordaeronFall\\Structures\\StrahnbradClockTower\\StrahnbradClockTower";
                 Name = "WESTRING_DOOD_SCT0";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\8x8Default.tga";
@@ -30738,7 +30738,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Barrens\\Rocks\\Barrens_Spires\\Barrens_Spires";
+                Model = "Doodads\\LordaeronFall\\Structures\\StrahnbradLargeTree\\StrahnbradLargeTree";
                 Name = "WESTRING_DOOD_SLT0";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\16x16Default.tga";
@@ -31796,7 +31796,7 @@ namespace Moonwell.Objects
                 PathingTexture = "none";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 0.95f;
+                Scale = 1.35f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -32456,7 +32456,7 @@ namespace Moonwell.Objects
                 TintingColor2Green = Levels(255, 255, 255, 255, 255, 255, 255, 255, 255, 255);
                 TintingColor3Blue = Levels(255, 255, 255, 255, 255, 255, 255, 255, 255, 255);
                 UseClickHelper = false;
-                Variations = 1;
+                Variations = 3;
                 VisibilityRadius = 50f;
                 Walkable = false;
             }
@@ -32507,7 +32507,7 @@ namespace Moonwell.Objects
                 TintingColor2Green = Levels(255, 255, 255, 255, 255, 255, 255, 255, 255, 255);
                 TintingColor3Blue = Levels(255, 255, 255, 255, 255, 255, 255, 255, 255, 255);
                 UseClickHelper = false;
-                Variations = 1;
+                Variations = 3;
                 VisibilityRadius = 50f;
                 Walkable = false;
             }
@@ -33136,7 +33136,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Cityscape\\Plants\\CityBush\\CityBush";
+                Model = "Doodads\\Terrain\\CityscapeTreePlanter\\CityscapeTreePlanter";
                 Name = "WESTRING_DOOD_YPTP";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.NoOcclusion;
                 PathingTexture = "PathTextures\\2x2Default.tga";
@@ -33151,7 +33151,7 @@ namespace Moonwell.Objects
                 TintingColor2Green = Levels(255, 255, 255, 255, 255, 255, 255, 255, 255, 255);
                 TintingColor3Blue = Levels(255, 255, 255, 255, 255, 255, 255, 255, 255, 255);
                 UseClickHelper = false;
-                Variations = 1;
+                Variations = 3;
                 VisibilityRadius = 50f;
                 Walkable = false;
             }
@@ -33236,13 +33236,13 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Ruins\\Plants\\Ruins_Flower\\Ruins_Flower";
+                Model = "Doodads\\Silvermoon\\Prop\\Tulips\\Tulips";
                 Name = "WESTRING_DOOD_ZPf0";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.NoOcclusion;
                 PathingTexture = "none";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 1.2f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -35201,7 +35201,7 @@ namespace Moonwell.Objects
                 TintingColor2Green = Levels(255, 255, 255, 255, 255, 255, 255, 255, 255, 255);
                 TintingColor3Blue = Levels(255, 255, 255, 255, 255, 255, 255, 255, 255, 255);
                 UseClickHelper = false;
-                Variations = 2;
+                Variations = 1;
                 VisibilityRadius = 50f;
                 Walkable = false;
             }
@@ -35788,7 +35788,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\2x2Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.95f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -35838,7 +35838,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\2x2Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.7f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -35888,7 +35888,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\2x2Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.95f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;
@@ -35938,7 +35938,7 @@ namespace Moonwell.Objects
                 PathingTexture = "PathTextures\\2x2Default.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
-                Scale = 1f;
+                Scale = 0.7f;
                 SelectionSize = 0f;
                 ShowInFogOfWar = true;
                 TeamColor = global::Moonwell.Objects.TeamColor.NeutralHostile;

@@ -30,6 +30,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 405f;
+                    AnimationWalkSpeed = 405f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.65f;
@@ -154,6 +156,7 @@ namespace Moonwell.Objects
                     RequirementsTier3.Add("TALT");
                     RequirementsTiersUsed = 3;
                     Requires.Add("TALT");
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -212,6 +215,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 405f;
+                    AnimationWalkSpeed = 405f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.65f;
@@ -336,6 +341,7 @@ namespace Moonwell.Objects
                     RequirementsTier3.Add("TALT");
                     RequirementsTiersUsed = 3;
                     Requires.Add("TALT");
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -394,6 +400,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 290f;
+                    AnimationWalkSpeed = 290f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.65f;
@@ -502,7 +510,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 180f;
                     ProjectileLaunchZSwimming = 0f;
                     ProperNames = "Razzil Naypolm,Niffy Gurglebeaker,Ezzel Darkbrewer,Lapis Concocter,Savvy Foulmixer,Fictious Warpotion";
                     ProperNamesUsed = 6;
@@ -577,6 +585,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 405f;
+                    AnimationWalkSpeed = 405f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.65f;
@@ -758,6 +768,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -852,7 +864,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 70f;
                     ProjectileLaunchY = 200f;
-                    ProjectileLaunchZ = 200f;
+                    ProjectileLaunchZ = 70f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -864,6 +876,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 3.8f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -912,6 +925,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 5;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -1007,6 +1022,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.6f;
                     ShadowImageCenterX = 90f;
                     ShadowImageCenterY = 90f;
                     ShadowImageHeight = 200f;
@@ -1055,6 +1071,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 5;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -1151,6 +1169,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.3f;
                     ShadowImageCenterX = 70f;
                     ShadowImageCenterY = 70f;
                     ShadowImageHeight = 180f;
@@ -1198,6 +1217,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -1276,7 +1297,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 65f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -1287,6 +1308,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.92f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -1339,6 +1361,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Stone;
                     Attack1AnimationBackswingPoint = 0.47f;
@@ -1436,6 +1460,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.8f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -1484,6 +1509,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -1555,6 +1582,7 @@ namespace Moonwell.Objects
                     MaxLife = 450;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\BanditSpearThrower\\BanditSpearThrower";
                     ModelFileExtraVersions = 0;
                     Name = "Assassin";
                     NormalSkin = "Ashm,ACvs";
@@ -1563,21 +1591,24 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\BanditSpearThrower\\BanditSpearThrower_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 80f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
                     RepairGoldCost = 260;
                     RepairLumberCost = 30;
                     RepairTime = 40;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.2f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -1626,6 +1657,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -1714,6 +1747,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -1766,6 +1800,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -1856,9 +1892,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 425;
                     RepairLumberCost = 100;
                     RepairTime = 70;
+                    Scale = 1.15f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.8f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -1906,6 +1944,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Stone;
                     Attack1AnimationBackswingPoint = 0.47f;
@@ -2002,6 +2042,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.8f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -2050,6 +2091,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Stone;
                     Attack1AnimationBackswingPoint = 0.47f;
@@ -2147,6 +2190,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.8f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -2195,6 +2239,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.56f;
                     AnimationCastPoint = 0.47f;
+                    AnimationRunSpeed = 240f;
+                    AnimationWalkSpeed = 240f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -2270,6 +2316,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GolemStatue\\GolemStatue_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -2287,6 +2334,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.9f;
                     ShadowImageCenterX = 90f;
                     ShadowImageCenterY = 90f;
                     ShadowImageHeight = 200f;
@@ -2333,6 +2381,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.67f;
@@ -2423,6 +2473,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 140f;
@@ -2471,6 +2522,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -2648,6 +2701,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 4;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.77f;
@@ -2740,7 +2795,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 140f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -2800,6 +2855,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 4;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -2895,6 +2952,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.2f;
                     ShadowImageCenterX = 70f;
                     ShadowImageCenterY = 70f;
                     ShadowImageHeight = 180f;
@@ -2943,6 +3001,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 1f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 6;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -3042,7 +3102,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 120f;
-                    ProjectileLaunchZ = -30f;
+                    ProjectileLaunchZ = 0f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -3100,6 +3160,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.47f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -3194,7 +3256,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 90f;
-                    ProjectileLaunchZ = -20f;
+                    ProjectileLaunchZ = 10f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -3252,6 +3314,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 1f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -3346,7 +3410,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 60f;
-                    ProjectileLaunchZ = -20f;
+                    ProjectileLaunchZ = -15f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -3481,11 +3545,11 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 30f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 25f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -3545,6 +3609,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 2.4f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.85f;
@@ -3691,8 +3757,11 @@ namespace Moonwell.Objects
                     Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.CleavingAttack>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
+                    AnimationBlendTimeSeconds = 0.2f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -3784,9 +3853,11 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.15f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.35f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -3835,6 +3906,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 1f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 6;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -3921,6 +3994,7 @@ namespace Moonwell.Objects
                     MaxLife = 2200;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "Units\\creeps\\AzureDragon\\AzureDragon";
                     ModelFileExtraVersions = 0;
                     Name = "Blue Dragon";
                     NormalSkin = "Advc,ACdv,Afrb,ACmi";
@@ -3929,12 +4003,13 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\creeps\\AzureDragon\\AzureDragon_portrait";
                     Priority = 2;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 120f;
-                    ProjectileLaunchZ = -20f;
+                    ProjectileLaunchZ = 0f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -3993,6 +4068,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.47f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -4088,7 +4165,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 60f;
-                    ProjectileLaunchZ = -10f;
+                    ProjectileLaunchZ = 10f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -4147,6 +4224,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.67f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 279f;
+                    AnimationWalkSpeed = 124f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -4248,6 +4327,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.1f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -4296,6 +4376,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 356f;
+                    AnimationWalkSpeed = 124f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -4391,6 +4473,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -4439,6 +4522,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 310f;
+                    AnimationWalkSpeed = 124f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -4537,6 +4622,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.85f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -4585,6 +4671,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.67f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 279f;
+                    AnimationWalkSpeed = 124f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -4687,6 +4775,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.7f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -4735,6 +4824,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 310f;
+                    AnimationWalkSpeed = 124f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -4829,6 +4920,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.45f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -4877,6 +4969,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 1f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -4972,7 +5066,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 100f;
-                    ProjectileLaunchZ = -20f;
+                    ProjectileLaunchZ = 25f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -5033,6 +5127,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 290f;
+                    AnimationWalkSpeed = 290f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.65f;
@@ -5213,6 +5309,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -5303,9 +5401,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 150;
                     RepairLumberCost = 10;
                     RepairTime = 25;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.15f;
                     ShadowImageCenterX = 45f;
                     ShadowImageCenterY = 45f;
                     ShadowImageHeight = 100f;
@@ -5354,6 +5454,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 1f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 6;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -5454,7 +5556,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 160f;
-                    ProjectileLaunchZ = -50f;
+                    ProjectileLaunchZ = 0f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -5513,6 +5615,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.47f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -5608,7 +5712,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 60f;
-                    ProjectileLaunchZ = -20f;
+                    ProjectileLaunchZ = -40f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -5667,6 +5771,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 1f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -5762,7 +5868,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 120f;
-                    ProjectileLaunchZ = -30f;
+                    ProjectileLaunchZ = -25f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -5915,6 +6021,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.2f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 160f;
@@ -5963,6 +6070,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -6038,6 +6147,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\BurningArcher\\BurningArcher";
                     ModelFileExtraVersions = 0;
                     Name = "Burning Archer";
                     NormalSkin = "ACsa";
@@ -6046,21 +6156,24 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\BurningArcher\\BurningArcher_portrait";
                     Priority = 2;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = -11f;
                     ProjectileLaunchY = 74f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 120f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
                     RepairGoldCost = 225;
                     RepairLumberCost = 25;
                     RepairTime = 20;
+                    Scale = 1.15f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.4f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 120f;
@@ -6192,9 +6305,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 95;
                     RepairLumberCost = 5;
                     RepairTime = 25;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.8f;
                     ShadowImageCenterX = 100f;
                     ShadowImageCenterY = 100f;
                     ShadowImageHeight = 240f;
@@ -6240,6 +6355,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -6324,7 +6441,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 100f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -6336,6 +6453,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.4f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 120f;
@@ -6383,6 +6501,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -6475,6 +6595,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.45f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 120f;
@@ -6523,6 +6644,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -6611,7 +6734,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 150f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -6623,6 +6746,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.4f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -6671,6 +6795,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 4;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -6766,6 +6892,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2f;
                     ShadowImageCenterX = 80f;
                     ShadowImageCenterY = 80f;
                     ShadowImageHeight = 160f;
@@ -6813,6 +6940,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -6908,6 +7037,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.4f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -6942,13 +7072,13 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Centaur Sorcerer (ncks).</summary>
+            /// <summary>Centaur Sorceress (ncks).</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncks")]
-            public class CentaurSorcerer : global::Moonwell.Objects.StandardUnit
+            public class CentaurSorceress : global::Moonwell.Objects.StandardUnit
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public CentaurSorcerer()
+                public CentaurSorceress()
                 {
                     Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.BloodlustACbl, global::Moonwell.Objects.Creeps.Abilities.AbolishMagicACdm>();
                     AcquisitionRange = 600f;
@@ -6956,6 +7086,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -7031,7 +7163,7 @@ namespace Moonwell.Objects
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\creeps\\CentaurKhan\\CentaurKhan";
                     ModelFileExtraVersions = 0;
-                    Name = "Centaur Sorcerer";
+                    Name = "Centaur Sorceress";
                     NormalSkin = "ACbl,ACdm";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -7044,7 +7176,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 100f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -7080,7 +7212,7 @@ namespace Moonwell.Objects
                     TintingColor1Red = 205;
                     TintingColor2Green = 190;
                     TintingColor3Blue = 255;
-                    Tooltip = "Hire Centaur Sorcerer";
+                    Tooltip = "Hire Centaur Sorceress";
                     TooltipExtended = "Medium ranged unit that hurls fiery missiles. Casts Abolish Magic and Bloodlust. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
                     TurnRate = 0.5f;
@@ -7104,6 +7236,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -7170,6 +7304,7 @@ namespace Moonwell.Objects
                     MaxLife = 240;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\creeps\\CorruptedEnt\\CorruptedEnt";
                     ModelFileExtraVersions = 0;
                     Name = "Corrupted Treant";
                     OccluderHeight = 0f;
@@ -7177,6 +7312,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\creeps\\CorruptedEnt\\CorruptedEnt_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -7194,6 +7330,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.75f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -7240,6 +7377,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Stone;
                     Attack1AnimationBackswingPoint = 0.47f;
@@ -7329,9 +7468,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 40;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.8f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -7379,6 +7520,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.44f;
@@ -7467,9 +7610,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 120;
                     RepairLumberCost = 0;
                     RepairTime = 18;
+                    Scale = 1.15f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.45f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 120f;
@@ -7514,6 +7659,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -7590,6 +7737,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\other\\DalaranReject\\DalaranReject_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -7602,9 +7750,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 85;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.95f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -7653,6 +7803,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -7911,7 +8063,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 35f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -7926,6 +8078,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.25f;
                     ShadowImageCenterX = 45f;
                     ShadowImageCenterY = 45f;
                     ShadowImageHeight = 100f;
@@ -8058,7 +8211,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 65f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -8069,6 +8222,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -8204,20 +8358,22 @@ namespace Moonwell.Objects
                     PointValue = 100;
                     PortraitModelFile = "units\\creeps\\DarkTrollShadowPriest\\DarkTrollShadowPriest_portrait";
                     Priority = 7;
-                    ProjectileImpactZ = 80f;
+                    ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 160f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
                     RepairGoldCost = 255;
                     RepairLumberCost = 30;
                     RepairTime = 40;
+                    Scale = 1.3f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.75f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -8352,7 +8508,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 6;
-                    ProjectileImpactZ = 80f;
+                    ProjectileImpactZ = 45f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -8363,9 +8519,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 175;
                     RepairLumberCost = 10;
                     RepairTime = 25;
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 45f;
                     ShadowImageCenterY = 45f;
                     ShadowImageHeight = 100f;
@@ -8414,6 +8572,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.3f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -8504,9 +8664,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 215;
                     RepairLumberCost = 20;
                     RepairTime = 30;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.25f;
                     ShadowImageCenterX = 45f;
                     ShadowImageCenterY = 45f;
                     ShadowImageHeight = 100f;
@@ -8555,6 +8717,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -8639,7 +8803,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 100f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -8650,6 +8814,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2f;
                     ShadowImageCenterX = 70f;
                     ShadowImageCenterY = 70f;
                     ShadowImageHeight = 180f;
@@ -8698,6 +8863,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 2.4f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 4;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.85f;
@@ -8797,6 +8964,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.25f;
                     ShadowImageCenterX = 75f;
                     ShadowImageCenterY = 75f;
                     ShadowImageHeight = 190f;
@@ -8845,6 +9013,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 5;
                     ArmorType = global::Moonwell.Objects.ArmorType.Ethereal;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -8941,6 +9111,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.5f;
                     ShadowImageCenterX = 80f;
                     ShadowImageCenterY = 80f;
                     ShadowImageHeight = 190f;
@@ -8990,6 +9161,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.47f;
@@ -9078,7 +9251,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 80f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -9089,6 +9262,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.4f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -9137,6 +9311,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Ethereal;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -9209,6 +9385,7 @@ namespace Moonwell.Objects
                     MaxMana = 600;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\RevenantOfTheWaves\\RevenantOfTheWaves";
                     ModelFileExtraVersions = 0;
                     Name = "Deeplord Revenant";
                     NormalSkin = "ACcv,ACf2";
@@ -9217,6 +9394,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\RevenantOfTheWaves\\RevenantOfTheWaves_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -9233,6 +9411,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.7f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -9282,6 +9461,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.56f;
                     AnimationCastPoint = 0.47f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Stone;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -9389,9 +9570,11 @@ namespace Moonwell.Objects
                     RepairLumberCost = 80;
                     RepairTime = 60;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.05f;
                     ShadowImageCenterX = 95f;
                     ShadowImageCenterY = 95f;
                     ShadowImageHeight = 230f;
@@ -9437,6 +9620,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -9532,6 +9717,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3.55f;
                     ShadowImageCenterX = 70f;
                     ShadowImageCenterY = 70f;
                     ShadowImageHeight = 180f;
@@ -9579,6 +9765,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -9668,6 +9856,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 120;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -9720,6 +9909,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -9815,6 +10006,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 140f;
@@ -9863,6 +10055,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -9961,6 +10155,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.4f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -10009,6 +10204,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.67f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.58f;
@@ -10158,6 +10355,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -10300,6 +10499,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.67f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.58f;
@@ -10390,7 +10591,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 65f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -10401,6 +10602,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.8f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 120f;
@@ -10449,6 +10651,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -10542,6 +10746,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.05f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -10590,6 +10795,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.67f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.58f;
@@ -10680,7 +10887,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 70f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -10691,6 +10898,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.25f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 120f;
@@ -10738,6 +10946,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -10831,6 +11041,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.1f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -10879,6 +11090,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 4;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -10982,6 +11195,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 5f;
                     ShadowImageCenterX = 120f;
                     ShadowImageCenterY = 120f;
                     ShadowImageHeight = 280f;
@@ -11030,6 +11244,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 5;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -11166,6 +11382,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 5;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -11302,6 +11520,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -11395,7 +11615,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 60f;
                     ProjectileLaunchY = 150f;
-                    ProjectileLaunchZ = 150f;
+                    ProjectileLaunchZ = 120f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -11407,6 +11627,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 4f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -11454,6 +11675,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -11546,6 +11769,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.9f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -11594,6 +11818,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -11688,6 +11914,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.3f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -11736,6 +11963,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.3f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Ethereal;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -11835,6 +12064,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.65f;
                     ShadowImageCenterX = 100f;
                     ShadowImageCenterY = 100f;
                     ShadowImageHeight = 200f;
@@ -11883,6 +12113,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -11976,6 +12208,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.8f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -12024,6 +12257,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -12113,9 +12348,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 215;
                     RepairLumberCost = 20;
                     RepairTime = 30;
+                    Scale = 1.37f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.25f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -12164,6 +12401,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 220f;
+                    AnimationWalkSpeed = 220f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.77f;
@@ -12253,7 +12492,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 100f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -12313,6 +12552,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -12409,6 +12650,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.2f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -12456,6 +12698,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -12547,6 +12791,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 160f;
@@ -12594,6 +12839,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.6f;
@@ -12687,7 +12934,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 60f;
-                    ProjectileLaunchZ = 160f;
+                    ProjectileLaunchZ = 120f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -12699,6 +12946,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.75f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -12746,6 +12994,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.6f;
@@ -12840,7 +13090,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 40f;
-                    ProjectileLaunchZ = 140f;
+                    ProjectileLaunchZ = 100f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -12852,6 +13102,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.65f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -12899,6 +13150,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.6f;
@@ -12991,7 +13244,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 75f;
-                    ProjectileLaunchZ = 190f;
+                    ProjectileLaunchZ = 140f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -13003,6 +13256,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.7f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -13050,6 +13304,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -13168,6 +13424,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -13216,6 +13473,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -13334,6 +13593,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.9f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -13382,6 +13642,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -13479,6 +13741,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -13526,6 +13789,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.47f;
@@ -13620,6 +13885,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.2f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 120f;
@@ -13667,6 +13933,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -13746,7 +14014,7 @@ namespace Moonwell.Objects
                     PointValue = 100;
                     PortraitModelFile = "units\\creeps\\FelstalkerPurple\\FelstalkerPurple_portrait";
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 30f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -13761,6 +14029,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.95f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -13809,6 +14078,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 4;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -13889,7 +14160,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 100f;
+                    ProjectileImpactZ = 50f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -13904,6 +14175,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -13948,8 +14220,11 @@ namespace Moonwell.Objects
                 {
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
+                    AnimationBlendTimeSeconds = 0.2f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -14036,9 +14311,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 170;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.1f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -14087,6 +14364,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -14223,6 +14502,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -14359,6 +14640,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Ethereal;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -14453,6 +14736,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.65f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -14504,6 +14788,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.4f;
                     AnimationCastPoint = 0.67f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.54f;
@@ -14759,11 +15045,11 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 25f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 25f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -14917,6 +15203,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.3f;
                     ShadowImageCenterX = 45f;
                     ShadowImageCenterY = 45f;
                     ShadowImageHeight = 100f;
@@ -15051,7 +15338,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 65f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -15062,6 +15349,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -15201,7 +15489,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 65f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -15212,6 +15500,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.75f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -15363,6 +15652,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 45f;
                     ShadowImageCenterY = 45f;
                     ShadowImageHeight = 100f;
@@ -15507,6 +15797,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.3f;
                     ShadowImageCenterX = 45f;
                     ShadowImageCenterY = 45f;
                     ShadowImageHeight = 100f;
@@ -15555,6 +15846,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -15639,7 +15932,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 100f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -15650,6 +15943,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2f;
                     ShadowImageCenterX = 70f;
                     ShadowImageCenterY = 70f;
                     ShadowImageHeight = 180f;
@@ -15802,6 +16096,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 250;
                     RepairTime = 80;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -15850,6 +16145,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 1.25f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 290f;
+                    AnimationWalkSpeed = 290f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.567f;
@@ -15970,6 +16267,7 @@ namespace Moonwell.Objects
                     RequirementsTier3.Add("TALT");
                     RequirementsTiersUsed = 3;
                     Requires.Add("TALT");
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -16027,6 +16325,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Ethereal;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -16125,6 +16425,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.7f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -16173,6 +16474,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -16263,6 +16566,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.5f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 140f;
@@ -16310,6 +16614,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -16403,6 +16709,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.4f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -16450,6 +16757,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 5;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -16544,6 +16853,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.9f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -16592,6 +16902,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -16693,6 +17005,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.85f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 160f;
@@ -16741,6 +17054,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -16842,6 +17157,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -16890,6 +17206,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -16988,6 +17306,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.6f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -17036,6 +17355,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 4;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -17134,6 +17455,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.3f;
                     ShadowImageCenterX = 70f;
                     ShadowImageCenterY = 70f;
                     ShadowImageHeight = 180f;
@@ -17182,6 +17504,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 4;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -17277,6 +17601,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 4.05f;
                     ShadowImageCenterX = 75f;
                     ShadowImageCenterY = 75f;
                     ShadowImageHeight = 210f;
@@ -17325,6 +17650,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.83f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Ethereal;
                     Attack1AnimationBackswingPoint = 0.51f;
@@ -17411,16 +17738,18 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 100f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
                     RepairGoldCost = 215;
                     RepairLumberCost = 20;
                     RepairTime = 30;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 120f;
@@ -17469,6 +17798,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -17561,6 +17892,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.95f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 140f;
@@ -17608,6 +17940,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.67f;
@@ -17702,6 +18036,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 3.4f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 160f;
@@ -17750,6 +18085,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 4;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -17832,7 +18169,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 100f;
+                    ProjectileImpactZ = 70f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 40f;
@@ -17848,6 +18185,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 3.5f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 170f;
@@ -17895,6 +18233,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 4;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.44f;
@@ -17982,9 +18322,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 165;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.9f;
                     ShadowImageCenterX = 70f;
                     ShadowImageCenterY = 70f;
                     ShadowImageHeight = 160f;
@@ -18176,6 +18518,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -18268,6 +18612,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.8f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 140f;
@@ -18318,6 +18663,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.53f;
+                    AnimationRunSpeed = 290f;
+                    AnimationWalkSpeed = 290f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.65f;
@@ -18481,6 +18828,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -18558,6 +18907,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Gnoll\\Gnoll_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -18570,9 +18920,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.1f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -18621,6 +18973,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -18707,7 +19061,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = -20f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 40f;
+                    ProjectileLaunchZ = 55f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -18718,6 +19072,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.4f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 160f;
@@ -18765,6 +19120,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -18859,6 +19216,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.3f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -18907,6 +19265,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -18985,6 +19345,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GnollOverseer\\GnollOverseer_portrait";
                     Priority = 2;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -19001,6 +19362,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.4f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -19048,6 +19410,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -19127,6 +19491,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GnollArcher\\GnollArcher_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -19143,6 +19508,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.1f;
                     ShadowImageCenterX = 45f;
                     ShadowImageCenterY = 45f;
                     ShadowImageHeight = 100f;
@@ -19191,6 +19557,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 1.23f;
                     AnimationCastPoint = 0.6f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -19275,6 +19643,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GnollWarden\\GnollWarden_portrait";
                     Priority = 5;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -19291,6 +19660,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.4f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -19339,6 +19709,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -19419,6 +19791,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GnollOverseer\\GnollOverseer_portrait";
                     Priority = 2;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -19431,9 +19804,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 305;
                     RepairLumberCost = 35;
                     RepairTime = 50;
+                    Scale = 1.15f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.75f;
                     ShadowImageCenterX = 95f;
                     ShadowImageCenterY = 95f;
                     ShadowImageHeight = 230f;
@@ -19480,6 +19855,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.56f;
                     AnimationCastPoint = 0.47f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 5;
                     ArmorType = global::Moonwell.Objects.ArmorType.Stone;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -19573,11 +19950,11 @@ namespace Moonwell.Objects
                     PointValue = 100;
                     PortraitModelFile = "units\\creeps\\RockGolem\\RockGolem_portrait";
                     Priority = 8;
-                    ProjectileImpactZ = 100f;
+                    ProjectileImpactZ = 150f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 60f;
-                    ProjectileLaunchZ = 220f;
+                    ProjectileLaunchZ = 180f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -19589,6 +19966,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.8f;
                     ShadowImageCenterX = 95f;
                     ShadowImageCenterY = 95f;
                     ShadowImageHeight = 230f;
@@ -19636,6 +20014,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.3f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Ethereal;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -19735,9 +20115,11 @@ namespace Moonwell.Objects
                     RepairLumberCost = 45;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 80f;
                     ShadowImageCenterY = 80f;
                     ShadowImageHeight = 160f;
@@ -19786,6 +20168,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 1f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 6;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -19882,11 +20266,11 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 2;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 0f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 120f;
-                    ProjectileLaunchZ = -30f;
+                    ProjectileLaunchZ = -10f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -19944,6 +20328,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 1f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -20096,6 +20482,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 1f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -20186,11 +20574,11 @@ namespace Moonwell.Objects
                     PointValue = 100;
                     PortraitModelFile = "Units\\Creeps\\GreenDrake\\GreenDrake_portrait";
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 10f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 120f;
-                    ProjectileLaunchZ = -20f;
+                    ProjectileLaunchZ = -30f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -20249,6 +20637,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.56f;
                     AnimationCastPoint = 0.47f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Stone;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -20356,6 +20746,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 150;
                     RepairTime = 90;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -20405,6 +20796,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -20497,13 +20890,14 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 0f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
                     RepairGoldCost = 365;
                     RepairLumberCost = 80;
                     RepairTime = 60;
+                    Scale = 0.85f;
                     ScaleProjectiles = false;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -20554,6 +20948,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -20639,7 +21035,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 0f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -20696,6 +21092,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -20779,7 +21177,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 0f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -20837,6 +21235,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -20925,7 +21325,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 0f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -20984,6 +21384,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -21074,13 +21476,14 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 0f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
                     RepairGoldCost = 240;
                     RepairLumberCost = 30;
                     RepairTime = 30;
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -21132,6 +21535,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.47f;
@@ -21220,7 +21625,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 100f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -21231,6 +21636,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.2f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 160f;
@@ -21280,6 +21686,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -21376,6 +21784,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 3.15f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -21424,6 +21833,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -21509,7 +21920,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 30f;
                     ProjectileLaunchY = 30f;
-                    ProjectileLaunchZ = 100f;
+                    ProjectileLaunchZ = 70f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -21521,6 +21932,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 2.1f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -21569,6 +21981,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 4;
                     ArmorType = global::Moonwell.Objects.ArmorType.Ethereal;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -21664,6 +22078,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.2f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 160f;
@@ -21723,7 +22138,7 @@ namespace Moonwell.Objects
                     Attack1DamageSpillRadius = 0f;
                     Attack1MaximumNumberOfTargets = 1;
                     Attack1ProjectileArc = 0.15f;
-                    Attack1ProjectileArt = "Abilities\\Weapons\\Axe\\AxeMissile.mdl";
+                    Attack1ProjectileArt = "Abilities\\Weapons\\Axe_IceTroll\\Axe_IceTroll.mdl";
                     Attack1ProjectileSpeed = 1200;
                     Attack1RangeMotionBuffer = 250f;
                     Attack1ShowUI = true;
@@ -21806,6 +22221,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.25f;
                     ShadowImageCenterX = 45f;
                     ShadowImageCenterY = 45f;
                     ShadowImageHeight = 100f;
@@ -21853,6 +22269,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -21862,7 +22280,7 @@ namespace Moonwell.Objects
                     Attack1DamageSpillRadius = 0f;
                     Attack1MaximumNumberOfTargets = 1;
                     Attack1ProjectileArc = 0.15f;
-                    Attack1ProjectileArt = "Abilities\\Weapons\\Axe\\AxeMissile.mdl";
+                    Attack1ProjectileArt = "Abilities\\Weapons\\Axe_IceTroll\\Axe_IceTroll.mdl";
                     Attack1ProjectileSpeed = 1200;
                     Attack1RangeMotionBuffer = 250f;
                     Attack1ShowUI = true;
@@ -21938,7 +22356,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 100f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -21949,6 +22367,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -21997,6 +22416,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -22070,6 +22491,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\creeps\\IceTrollShadowPriest\\IceTrollShadowPriest";
                     ModelFileExtraVersions = 0;
                     Name = "Ice Troll High Priest";
                     NormalSkin = "Anh2,ACf2,ACd2";
@@ -22078,12 +22500,13 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\creeps\\IceTrollShadowPriest\\IceTrollShadowPriest_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 65f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -22094,6 +22517,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.65f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -22243,6 +22667,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.85f;
                     ShadowImageCenterX = 45f;
                     ShadowImageCenterY = 45f;
                     ShadowImageHeight = 100f;
@@ -22302,7 +22727,7 @@ namespace Moonwell.Objects
                     Attack1DamageSpillRadius = 0f;
                     Attack1MaximumNumberOfTargets = 1;
                     Attack1ProjectileArc = 0.15f;
-                    Attack1ProjectileArt = "Abilities\\Weapons\\Axe\\AxeMissile.mdl";
+                    Attack1ProjectileArt = "Abilities\\Weapons\\Axe_IceTroll\\Axe_IceTroll.mdl";
                     Attack1ProjectileSpeed = 1200;
                     Attack1RangeMotionBuffer = 250f;
                     Attack1ShowUI = true;
@@ -22390,6 +22815,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.25f;
                     ShadowImageCenterX = 45f;
                     ShadowImageCenterY = 45f;
                     ShadowImageHeight = 100f;
@@ -22438,6 +22864,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -22447,7 +22875,7 @@ namespace Moonwell.Objects
                     Attack1DamageSpillRadius = 0f;
                     Attack1MaximumNumberOfTargets = 1;
                     Attack1ProjectileArc = 0.15f;
-                    Attack1ProjectileArt = "Abilities\\Weapons\\Axe\\AxeMissile.mdl";
+                    Attack1ProjectileArt = "Abilities\\Weapons\\Axe_IceTroll\\Axe_IceTroll.mdl";
                     Attack1ProjectileSpeed = 1200;
                     Attack1RangeMotionBuffer = 250f;
                     Attack1ShowUI = true;
@@ -22517,11 +22945,11 @@ namespace Moonwell.Objects
                     PointValue = 100;
                     PortraitModelFile = "units\\creeps\\IceTroll\\IceTroll_portrait";
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 100f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -22532,6 +22960,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.75f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -22579,6 +23008,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -22669,9 +23100,11 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -22719,6 +23152,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.8f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 180f;
+                    AnimationWalkSpeed = 180f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.8f;
@@ -22734,7 +23169,7 @@ namespace Moonwell.Objects
                     Attack1DamageSpillRadius = 0f;
                     Attack1MaximumNumberOfTargets = 1;
                     Attack1ProjectileArc = 0.08f;
-                    Attack1ProjectileArt = "Abilities\\Weapons\\RedDragonBreath\\RedDragonMissile.mdl";
+                    Attack1ProjectileArt = "Abilities\\Weapons\\InfernalMachineMissile\\InfernalMachineMissile.mdl";
                     Attack1ProjectileSpeed = 700;
                     Attack1RangeMotionBuffer = 250f;
                     Attack1ShowUI = true;
@@ -22806,7 +23241,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = -30f;
-                    ProjectileLaunchZ = 80f;
+                    ProjectileLaunchZ = 100f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 30f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -22814,6 +23249,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 50;
                     RepairTime = 36;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.6f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -22866,6 +23302,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.8f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 180f;
+                    AnimationWalkSpeed = 180f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.8f;
@@ -22881,7 +23319,7 @@ namespace Moonwell.Objects
                     Attack1DamageSpillRadius = 0f;
                     Attack1MaximumNumberOfTargets = 1;
                     Attack1ProjectileArc = 0.08f;
-                    Attack1ProjectileArt = "Abilities\\Weapons\\RedDragonBreath\\RedDragonMissile.mdl";
+                    Attack1ProjectileArt = "Abilities\\Weapons\\InfernalMachineMissile\\InfernalMachineMissile.mdl";
                     Attack1ProjectileSpeed = 700;
                     Attack1RangeMotionBuffer = 250f;
                     Attack1ShowUI = true;
@@ -22957,7 +23395,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 30f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 160f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 30f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -22965,9 +23403,11 @@ namespace Moonwell.Objects
                     RepairLumberCost = 50;
                     RepairTime = 36;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3.65f;
                     ShadowImageCenterX = 110f;
                     ShadowImageCenterY = 110f;
                     ShadowImageHeight = 280f;
@@ -23016,6 +23456,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.8f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 180f;
+                    AnimationWalkSpeed = 180f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.8f;
@@ -23031,7 +23473,7 @@ namespace Moonwell.Objects
                     Attack1DamageSpillRadius = 0f;
                     Attack1MaximumNumberOfTargets = 1;
                     Attack1ProjectileArc = 0.08f;
-                    Attack1ProjectileArt = "Abilities\\Weapons\\RedDragonBreath\\RedDragonMissile.mdl";
+                    Attack1ProjectileArt = "Abilities\\Weapons\\InfernalMachineMissile\\InfernalMachineMissile.mdl";
                     Attack1ProjectileSpeed = 700;
                     Attack1RangeMotionBuffer = 250f;
                     Attack1ShowUI = true;
@@ -23116,6 +23558,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 50;
                     RepairTime = 36;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -23167,6 +23610,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -23258,6 +23703,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.6f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -23305,6 +23751,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.6f;
@@ -23396,6 +23844,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.1f;
                     ShadowImageCenterX = 45f;
                     ShadowImageCenterY = 45f;
                     ShadowImageHeight = 100f;
@@ -23444,6 +23893,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.6f;
@@ -23534,7 +23985,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 50f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -23545,6 +23996,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.2f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -23593,6 +24045,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.6f;
@@ -23685,6 +24139,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.15f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -23733,6 +24188,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.6f;
@@ -23827,6 +24284,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.1f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -23874,6 +24332,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.3f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Ethereal;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -23964,6 +24424,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.65f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -24016,6 +24477,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 296f;
+                    AnimationWalkSpeed = 81f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -24104,11 +24567,11 @@ namespace Moonwell.Objects
                     PointValue = 100;
                     PortraitModelFile = "units\\creeps\\ThunderLizard\\ThunderLizard_portrait";
                     Priority = 1;
-                    ProjectileImpactZ = 100f;
+                    ProjectileImpactZ = 40f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 100f;
-                    ProjectileLaunchZ = 20f;
+                    ProjectileLaunchZ = 6f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -24120,6 +24583,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3f;
                     ShadowImageCenterX = 90f;
                     ShadowImageCenterY = 90f;
                     ShadowImageHeight = 200f;
@@ -24168,6 +24632,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Ethereal;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -24252,7 +24718,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 90f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -24263,6 +24729,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.05f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -24312,6 +24779,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.84f;
                     AnimationCastPoint = 0.66f;
+                    AnimationRunSpeed = 554f;
+                    AnimationWalkSpeed = 40f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.84f;
@@ -24410,7 +24879,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = -100f;
                     ProjectileLaunchY = 40f;
-                    ProjectileLaunchZ = 360f;
+                    ProjectileLaunchZ = 200f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -24418,9 +24887,11 @@ namespace Moonwell.Objects
                     RepairLumberCost = 200;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3.25f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -24469,6 +24940,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.84f;
                     AnimationCastPoint = 0.66f;
+                    AnimationRunSpeed = 554f;
+                    AnimationWalkSpeed = 40f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.84f;
@@ -24567,7 +25040,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = -80f;
                     ProjectileLaunchY = 35f;
-                    ProjectileLaunchZ = 300f;
+                    ProjectileLaunchZ = 200f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -24579,6 +25052,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3.75f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -24627,6 +25101,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.84f;
                     AnimationCastPoint = 0.66f;
+                    AnimationRunSpeed = 554f;
+                    AnimationWalkSpeed = 40f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.84f;
@@ -24722,6 +25198,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -24770,6 +25247,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.2f;
                     AnimationCastPoint = 0.6f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -24852,11 +25331,11 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 6;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 110f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 110f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -24867,6 +25346,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.3f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 140f;
@@ -24915,6 +25395,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 6;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.47f;
@@ -25017,6 +25499,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.2f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -25064,6 +25547,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 6;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -25158,6 +25643,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.85f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -25205,6 +25691,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 6;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.6f;
@@ -25298,6 +25786,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.6f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -25345,6 +25834,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 6;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -25440,6 +25931,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -25488,6 +25980,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 6;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -25582,6 +26076,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -25630,6 +26125,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 6;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -25731,6 +26228,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.7f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -25778,6 +26276,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -25867,6 +26367,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -25976,6 +26477,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = false;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\MonsterLure\\MonsterLure_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -26037,6 +26539,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.56f;
                     AnimationCastPoint = 0.47f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 5;
                     ArmorType = global::Moonwell.Objects.ArmorType.Stone;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -26194,6 +26698,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.56f;
                     AnimationCastPoint = 0.47f;
+                    AnimationRunSpeed = 240f;
+                    AnimationWalkSpeed = 240f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Stone;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -26294,6 +26800,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.4f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 120f;
@@ -26341,6 +26848,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -26437,9 +26946,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 195;
                     RepairLumberCost = 10;
                     RepairTime = 20;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 1.4f;
                     ShadowImageCenterX = 35f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 100f;
@@ -26487,6 +26998,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.6f;
@@ -26576,9 +27089,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 1.4f;
                     ShadowImageCenterX = 35f;
                     ShadowImageCenterY = 35f;
                     ShadowImageHeight = 90f;
@@ -26627,6 +27142,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.45f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -26717,9 +27234,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 2.05f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 170f;
@@ -26768,6 +27287,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -26864,9 +27385,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 2.2f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 170f;
@@ -26915,6 +27438,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -27013,9 +27538,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 265;
                     RepairLumberCost = 30;
                     RepairTime = 20;
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 1.65f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -27063,6 +27590,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -27151,9 +27680,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 1.6f;
                     ShadowImageCenterX = 40f;
                     ShadowImageCenterY = 40f;
                     ShadowImageHeight = 120f;
@@ -27202,6 +27733,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.45f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -27296,6 +27829,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.6f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -27344,6 +27878,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.45f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -27436,6 +27972,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.4f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -27484,6 +28021,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.45f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -27578,6 +28117,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.95f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -27626,6 +28166,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -27717,6 +28259,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -27765,6 +28308,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -27857,6 +28402,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.1f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -27907,6 +28453,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.4f;
                     AnimationCastPoint = 0.67f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.54f;
@@ -28023,6 +28571,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 500;
                     RepairLumberCost = 100;
                     RepairTime = 50;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -28076,6 +28625,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -28151,7 +28702,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 120f;
+                    ProjectileImpactZ = 50f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -28166,6 +28717,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.25f;
                     ShadowImageCenterX = 45f;
                     ShadowImageCenterY = 45f;
                     ShadowImageHeight = 100f;
@@ -28214,6 +28766,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.36f;
@@ -28312,6 +28866,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.6f;
                     ShadowImageCenterX = 80f;
                     ShadowImageCenterY = 80f;
                     ShadowImageHeight = 190f;
@@ -28360,6 +28915,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.36f;
@@ -28459,6 +29016,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.4f;
                     ShadowImageCenterX = 80f;
                     ShadowImageCenterY = 80f;
                     ShadowImageHeight = 190f;
@@ -28507,6 +29065,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -28599,6 +29159,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.4f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -28646,6 +29207,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -28726,11 +29289,11 @@ namespace Moonwell.Objects
                     PointValue = 100;
                     PortraitModelFile = "units\\creeps\\Nerubian\\Nerubian_portrait";
                     Priority = 1;
-                    ProjectileImpactZ = 160f;
+                    ProjectileImpactZ = 80f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 100f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -28742,6 +29305,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.2f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 160f;
@@ -28790,6 +29354,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.36f;
@@ -28892,6 +29458,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.7f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 160f;
@@ -28940,6 +29507,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 1f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 6;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -29045,7 +29614,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 80f;
-                    ProjectileLaunchZ = 5f;
+                    ProjectileLaunchZ = 0f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -29103,6 +29672,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -29199,7 +29770,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = -30f;
-                    ProjectileLaunchZ = 30f;
+                    ProjectileLaunchZ = 50f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -29256,6 +29827,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -29351,7 +29924,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 80f;
-                    ProjectileLaunchZ = 5f;
+                    ProjectileLaunchZ = 35f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -29410,6 +29983,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.56f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -29482,6 +30057,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\OgreLord\\OgreLord";
                     ModelFileExtraVersions = 0;
                     Name = "Ogre Lord";
                     NormalSkin = "ACav,ACsh";
@@ -29490,6 +30066,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\OgreLord\\OgreLord_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -29507,6 +30084,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.15f;
                     ShadowImageCenterX = 80f;
                     ShadowImageCenterY = 80f;
                     ShadowImageHeight = 190f;
@@ -29555,6 +30133,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.56f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -29654,6 +30234,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.7f;
                     ShadowImageCenterX = 80f;
                     ShadowImageCenterY = 80f;
                     ShadowImageHeight = 190f;
@@ -29701,6 +30282,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.673f;
                     AnimationCastPoint = 0.527f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -29796,6 +30379,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.7f;
                     ShadowImageCenterX = 80f;
                     ShadowImageCenterY = 80f;
                     ShadowImageHeight = 190f;
@@ -29843,6 +30427,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.56f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -29937,6 +30523,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.4f;
                     ShadowImageCenterX = 80f;
                     ShadowImageCenterY = 80f;
                     ShadowImageHeight = 190f;
@@ -29985,6 +30572,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -30076,9 +30665,11 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1.25f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3.3f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -30127,6 +30718,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Stone;
                     Attack1AnimationBackswingPoint = 0.47f;
@@ -30221,6 +30814,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.8f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -30451,6 +31045,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -30547,6 +31143,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3.25f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -30594,6 +31191,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -30687,6 +31286,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.45f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -30732,6 +31332,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.67f;
@@ -30825,6 +31427,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 2.9f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -30872,6 +31475,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -30965,6 +31570,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -31012,6 +31618,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 5;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -31106,6 +31714,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -31154,6 +31763,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -31243,7 +31854,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 160f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -31255,6 +31866,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.9f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 160f;
@@ -31303,6 +31915,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -31406,6 +32020,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -31454,6 +32069,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -31552,6 +32169,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.2f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -31600,6 +32218,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 4;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -31698,6 +32318,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2f;
                     ShadowImageCenterX = 70f;
                     ShadowImageCenterY = 70f;
                     ShadowImageHeight = 180f;
@@ -31745,6 +32366,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -31836,6 +32459,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.75f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -31884,6 +32508,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.2f;
                     AnimationCastPoint = 0.6f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -31968,11 +32594,11 @@ namespace Moonwell.Objects
                     PointValue = 100;
                     PortraitModelFile = "units\\demon\\DemonessBlue\\DemonessBlue_portrait";
                     Priority = 6;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 110f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 110f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -31983,6 +32609,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.35f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 140f;
@@ -32030,6 +32657,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -32123,6 +32752,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.25f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -32171,6 +32801,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -32265,6 +32897,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.45f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -32313,6 +32946,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.67f;
@@ -32405,6 +33040,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3.3f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 140f;
@@ -32450,6 +33086,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -32541,6 +33179,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.4f;
                     ShadowImageCenterX = 40f;
                     ShadowImageCenterY = 40f;
                     ShadowImageHeight = 80f;
@@ -32588,6 +33227,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -32644,6 +33285,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRazormaneChief.blp";
                     IsABuilding = false;
                     Level = 7;
                     LumberBountyAwardedBase = 0;
@@ -32667,11 +33309,11 @@ namespace Moonwell.Objects
                     PointValue = 100;
                     PortraitModelFile = "units\\creeps\\RazorMane\\RazorMane_portrait";
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 90f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 120f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -32682,6 +33324,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -32730,6 +33373,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -32828,6 +33473,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.3f;
                     ShadowImageCenterX = 40f;
                     ShadowImageCenterY = 40f;
                     ShadowImageHeight = 80f;
@@ -32875,6 +33521,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -32966,6 +33614,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.15f;
                     ShadowImageCenterX = 40f;
                     ShadowImageCenterY = 40f;
                     ShadowImageHeight = 80f;
@@ -33013,6 +33662,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 1f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 6;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -33113,7 +33764,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 120f;
-                    ProjectileLaunchZ = -30f;
+                    ProjectileLaunchZ = 0f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -33170,6 +33821,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -33264,7 +33917,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 40f;
-                    ProjectileLaunchZ = -30f;
+                    ProjectileLaunchZ = -10f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -33322,6 +33975,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.47f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -33416,7 +34071,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 30f;
-                    ProjectileLaunchZ = -20f;
+                    ProjectileLaunchZ = 0f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -33474,6 +34129,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 1f;
+                    AnimationRunSpeed = 220f;
+                    AnimationWalkSpeed = 220f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -33556,7 +34213,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 60f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 80f;
+                    ProjectileLaunchZ = 50f;
                     ProjectileLaunchZSwimming = 80f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -33616,6 +34273,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 2.4f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.85f;
@@ -33715,6 +34374,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2f;
                     ShadowImageCenterX = 75f;
                     ShadowImageCenterY = 75f;
                     ShadowImageHeight = 190f;
@@ -33763,6 +34423,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Ethereal;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -33860,6 +34522,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -33908,6 +34571,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Ethereal;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -34001,6 +34666,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.2f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -34049,6 +34715,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Ethereal;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -34142,6 +34810,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.6f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -34191,6 +34860,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.56f;
                     AnimationCastPoint = 0.47f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 4;
                     ArmorType = global::Moonwell.Objects.ArmorType.Stone;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -34282,6 +34953,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\RockGolem\\RockGolem_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -34299,6 +34971,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.6f;
                     ShadowImageCenterX = 95f;
                     ShadowImageCenterY = 95f;
                     ShadowImageHeight = 230f;
@@ -34346,6 +35019,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -34435,9 +35110,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 150;
                     RepairLumberCost = 0;
                     RepairTime = 30;
+                    Scale = 1.15f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.15f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -34486,6 +35163,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 2.4f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.85f;
@@ -34570,11 +35249,11 @@ namespace Moonwell.Objects
                     PointValue = 100;
                     PortraitModelFile = "units\\creeps\\BanditMage\\BanditMage_portrait";
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 85f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 25f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 66f;
+                    ProjectileLaunchZ = 95f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -34586,6 +35265,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.9f;
                     ShadowImageCenterX = 75f;
                     ShadowImageCenterY = 75f;
                     ShadowImageHeight = 190f;
@@ -34634,6 +35314,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 367f;
+                    AnimationWalkSpeed = 111f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -34734,9 +35416,11 @@ namespace Moonwell.Objects
                     RepairLumberCost = 50;
                     RepairTime = 50;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3.1f;
                     ShadowImageCenterX = 120f;
                     ShadowImageCenterY = 120f;
                     ShadowImageHeight = 240f;
@@ -34784,6 +35468,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 296f;
+                    AnimationWalkSpeed = 58f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -34884,6 +35570,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.1f;
                     ShadowImageCenterX = 90f;
                     ShadowImageCenterY = 90f;
                     ShadowImageHeight = 200f;
@@ -34931,6 +35618,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 367f;
+                    AnimationWalkSpeed = 111f;
                     Armor = 6;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -35022,7 +35711,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 140f;
-                    ProjectileLaunchZ = 20f;
+                    ProjectileLaunchZ = 30f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -35034,6 +35723,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3.6f;
                     ShadowImageCenterX = 120f;
                     ShadowImageCenterY = 120f;
                     ShadowImageHeight = 280f;
@@ -35082,6 +35772,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 296f;
+                    AnimationWalkSpeed = 81f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -35182,9 +35874,11 @@ namespace Moonwell.Objects
                     RepairLumberCost = 100;
                     RepairTime = 70;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3.1f;
                     ShadowImageCenterX = 120f;
                     ShadowImageCenterY = 120f;
                     ShadowImageHeight = 240f;
@@ -35233,6 +35927,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -35317,6 +36013,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.25f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -35364,6 +36061,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -35439,7 +36138,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 100f;
+                    ProjectileImpactZ = 40f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -35454,6 +36153,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -35502,6 +36202,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -35597,6 +36299,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.2f;
                     ShadowImageCenterX = 70f;
                     ShadowImageCenterY = 70f;
                     ShadowImageHeight = 180f;
@@ -35644,6 +36347,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 1.2f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -35718,6 +36423,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Satyr\\Satyr_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -35734,6 +36440,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.1f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 120f;
@@ -35782,6 +36489,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 1.2f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 4;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -35879,6 +36588,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.35f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 160f;
@@ -35927,6 +36637,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -36029,6 +36741,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.25f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -36057,6 +36770,7 @@ namespace Moonwell.Objects
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitSoundSet = "FemaleSatyre";
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
                 }
@@ -36076,6 +36790,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 1.2f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -36175,6 +36891,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.4f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -36223,6 +36940,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -36304,8 +37023,9 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\SatyrTrickster\\SatyrTrickster_portrait";
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 80f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -36316,9 +37036,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.15f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 120f;
@@ -36367,6 +37089,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 220f;
+                    AnimationWalkSpeed = 220f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.47f;
@@ -36461,6 +37185,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 1.85f;
                     ShadowImageCenterX = 80f;
                     ShadowImageCenterY = 80f;
                     ShadowImageHeight = 200f;
@@ -36604,6 +37329,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 2.75f;
                     ShadowImageCenterX = 75f;
                     ShadowImageCenterY = 75f;
                     ShadowImageHeight = 190f;
@@ -36752,6 +37478,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 2.75f;
                     ShadowImageCenterX = 75f;
                     ShadowImageCenterY = 75f;
                     ShadowImageHeight = 190f;
@@ -36800,6 +37527,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.75f;
                     AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Stone;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -36894,6 +37623,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 3.25f;
                     ShadowImageCenterX = 75f;
                     ShadowImageCenterY = 75f;
                     ShadowImageHeight = 190f;
@@ -36942,6 +37672,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 4;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -37021,7 +37753,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 100f;
+                    ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -37037,6 +37769,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 2.4f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -37085,6 +37818,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -37181,6 +37916,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 1.7f;
                     ShadowImageCenterX = 45f;
                     ShadowImageCenterY = 45f;
                     ShadowImageHeight = 120f;
@@ -37231,6 +37967,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.4f;
                     AnimationCastPoint = 0.67f;
+                    AnimationRunSpeed = 290f;
+                    AnimationWalkSpeed = 290f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.54f;
@@ -37411,6 +38149,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.4f;
                     AnimationCastPoint = 0.67f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.54f;
@@ -37525,6 +38265,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 500;
                     RepairLumberCost = 100;
                     RepairTime = 50;
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -37579,6 +38320,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 240f;
+                    AnimationWalkSpeed = 240f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.6f;
@@ -37656,6 +38399,7 @@ namespace Moonwell.Objects
                     MaxLife = 600;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\IronGolem\\IronGolem";
                     ModelFileExtraVersions = 0;
                     Name = "Shredder";
                     NormalSkin = "Ahr3";
@@ -37664,6 +38408,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\IronGolem\\IronGolem_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -37677,6 +38422,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 100;
                     RepairTime = 50;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -37729,6 +38475,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.56f;
                     AnimationCastPoint = 0.47f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 5;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -37822,6 +38570,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.9f;
                     ShadowImageCenterX = 120f;
                     ShadowImageCenterY = 120f;
                     ShadowImageHeight = 260f;
@@ -37869,6 +38618,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -37956,7 +38707,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = -11f;
                     ProjectileLaunchY = 74f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 105f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -37967,6 +38718,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.25f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 120f;
@@ -38014,6 +38766,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.44f;
@@ -38106,6 +38860,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 120f;
@@ -38154,6 +38909,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.6f;
                     AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.6f;
@@ -38236,11 +38993,11 @@ namespace Moonwell.Objects
                     PointValue = 100;
                     PortraitModelFile = "units\\creeps\\SkeletonOrc\\SkeletonOrc_portrait";
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 20f;
                     ProjectileLaunchY = 50f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 120f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -38251,6 +39008,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.65f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 120f;
@@ -38298,6 +39056,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.44f;
@@ -38391,6 +39151,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.6f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 120f;
@@ -38438,6 +39199,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -38578,6 +39341,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -38659,7 +39424,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = -11f;
                     ProjectileLaunchY = 74f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 100f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -38718,6 +39483,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.44f;
@@ -38804,9 +39571,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 18;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.3f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 120f;
@@ -38854,6 +39623,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.44f;
@@ -38940,6 +39711,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 18;
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -38992,6 +39764,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -39082,7 +39856,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 50f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -39093,6 +39867,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.1f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -39141,6 +39916,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -39220,8 +39997,9 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\SludgeMonster\\SludgeMonster_portrait";
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 30f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -39232,9 +40010,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.6f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.15f;
                     ShadowImageCenterX = 40f;
                     ShadowImageCenterY = 40f;
                     ShadowImageHeight = 100f;
@@ -39283,6 +40063,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -39430,6 +40212,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -39523,9 +40307,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 305;
                     RepairLumberCost = 35;
                     RepairTime = 50;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.2f;
                     ShadowImageCenterX = 95f;
                     ShadowImageCenterY = 95f;
                     ShadowImageHeight = 230f;
@@ -39648,11 +40434,11 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 20f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 20f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -39711,6 +40497,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 106f;
+                    AnimationWalkSpeed = 64f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -39805,6 +40593,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.75f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -39852,6 +40641,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 106f;
+                    AnimationWalkSpeed = 64f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -39946,6 +40737,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.25f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -39993,6 +40785,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 106f;
+                    AnimationWalkSpeed = 64f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -40070,6 +40864,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\SpiderCrabCreep\\SpiderCrabCreep_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -40086,6 +40881,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.1f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -40133,6 +40929,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -40208,11 +41006,11 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 30f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 25f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -40224,6 +41022,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.3f;
                     ShadowImageCenterX = 45f;
                     ShadowImageCenterY = 45f;
                     ShadowImageHeight = 120f;
@@ -40272,6 +41071,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.67f;
@@ -40364,6 +41165,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3.55f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 140f;
@@ -40409,6 +41211,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -40495,9 +41299,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.95f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 140f;
@@ -40689,6 +41495,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.77f;
@@ -40831,6 +41639,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.77f;
@@ -40973,6 +41783,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 296f;
+                    AnimationWalkSpeed = 81f;
                     Armor = 5;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -41065,7 +41877,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 150f;
-                    ProjectileLaunchZ = 20f;
+                    ProjectileLaunchZ = 30f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -41077,6 +41889,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 4.2f;
                     ShadowImageCenterX = 120f;
                     ShadowImageCenterY = 120f;
                     ShadowImageHeight = 280f;
@@ -41124,6 +41937,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -41220,6 +42035,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.2f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 120f;
@@ -41268,6 +42084,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -41417,6 +42235,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.47f;
@@ -41507,7 +42327,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 70f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -41518,6 +42338,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.45f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 120f;
@@ -41566,6 +42387,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -41665,6 +42488,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.75f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 120f;
@@ -41712,6 +42536,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.2f;
                     AnimationCastPoint = 0.6f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -41787,7 +42613,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 6;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 70f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -41798,9 +42624,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 225;
                     RepairLumberCost = 40;
                     RepairTime = 28;
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.15f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 140f;
@@ -41848,6 +42676,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 6;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.6f;
@@ -41937,9 +42767,11 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.6f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -41987,6 +42819,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 0f;
+                    AnimationWalkSpeed = 0f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -42059,6 +42893,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\ForgottenOne\\ForgottenOneTent_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -42075,6 +42910,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1f;
                     ShadowImageCenterX = 35f;
                     ShadowImageCenterY = 35f;
                     ShadowImageHeight = 90f;
@@ -42120,6 +42956,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 228f;
+                    AnimationWalkSpeed = 81f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.56f;
@@ -42213,7 +43051,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 120f;
-                    ProjectileLaunchZ = 20f;
+                    ProjectileLaunchZ = 15f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -42225,6 +43063,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3.5f;
                     ShadowImageCenterX = 120f;
                     ShadowImageCenterY = 120f;
                     ShadowImageHeight = 240f;
@@ -42272,6 +43111,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -42362,6 +43203,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 140f;
@@ -42412,6 +43254,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.53f;
+                    AnimationRunSpeed = 290f;
+                    AnimationWalkSpeed = 290f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.65f;
@@ -42537,6 +43381,7 @@ namespace Moonwell.Objects
                     RequirementsTier3.Add("TALT");
                     RequirementsTiersUsed = 3;
                     Requires.Add("TALT");
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -42596,6 +43441,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.53f;
+                    AnimationRunSpeed = 290f;
+                    AnimationWalkSpeed = 290f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.65f;
@@ -42774,6 +43621,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1DamageLossFactor = 0f;
@@ -42829,6 +43678,7 @@ namespace Moonwell.Objects
                     MaxLife = 900;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
+                    Model = "Units\\Creeps\\HumanTransportShip\\HumanTransportShip";
                     ModelFileExtraVersions = 0;
                     Name = "Transport Ship";
                     NormalSkin = "Sch5,Slo3,Sdro";
@@ -42837,6 +43687,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\HumanTransportShip\\HumanTransportShip_portrait";
                     Priority = 2;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -42850,6 +43701,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 50;
                     RepairTime = 30;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -42901,6 +43753,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 4;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -42995,6 +43849,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.8f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -43042,6 +43897,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -43184,6 +44041,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.67f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -43335,6 +44194,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.67f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -43344,7 +44205,7 @@ namespace Moonwell.Objects
                     Attack1DamageSpillRadius = 0f;
                     Attack1MaximumNumberOfTargets = 1;
                     Attack1ProjectileArc = 0.15f;
-                    Attack1ProjectileArt = "abilities\\weapons\\TuskarSpear\\TuskarSpear.mdl";
+                    Attack1ProjectileArt = "abilities\\weapons\\TuskarSorcererMissile\\TuskarSorcererMissile.mdl";
                     Attack1ProjectileSpeed = 1200;
                     Attack1RangeMotionBuffer = 250f;
                     Attack1ShowUI = true;
@@ -43435,6 +44296,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.75f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -43482,6 +44344,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -43625,6 +44489,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -43634,7 +44500,7 @@ namespace Moonwell.Objects
                     Attack1DamageSpillRadius = 0f;
                     Attack1MaximumNumberOfTargets = 1;
                     Attack1ProjectileArc = 0.15f;
-                    Attack1ProjectileArt = "abilities\\weapons\\TuskarSpear\\TuskarSpear.mdl";
+                    Attack1ProjectileArt = "abilities\\weapons\\TuskarSpear\\TuskarTrapperSpear.mdl";
                     Attack1ProjectileSpeed = 1200;
                     Attack1RangeMotionBuffer = 250f;
                     Attack1ShowUI = true;
@@ -43710,7 +44576,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 105f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -43769,6 +44635,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -43910,6 +44778,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -44004,6 +44874,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.35f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -44052,6 +44923,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -44150,6 +45023,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.7f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -44198,6 +45072,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -44266,6 +45142,7 @@ namespace Moonwell.Objects
                     MaxLife = 475;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\Unbroken\\Unbroken";
                     ModelFileExtraVersions = 0;
                     Name = "Unbroken Rager";
                     NormalSkin = "ACen";
@@ -44339,6 +45216,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.2f;
                     AnimationCastPoint = 0.6f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -44419,11 +45298,11 @@ namespace Moonwell.Objects
                     PointValue = 100;
                     PortraitModelFile = "units\\demon\\Demoness\\Demoness_portrait";
                     Priority = 6;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 90f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 90f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -44434,6 +45313,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.3f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 140f;
@@ -44482,6 +45362,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.2f;
                     AnimationCastPoint = 0.6f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.64f;
@@ -44565,11 +45447,11 @@ namespace Moonwell.Objects
                     PointValue = 100;
                     PortraitModelFile = "units\\demon\\DemonessBlue\\DemonessBlue_portrait";
                     Priority = 6;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 110f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 110f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -44629,6 +45511,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.3f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Ethereal;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -44731,6 +45615,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.35f;
                     ShadowImageCenterX = 60f;
                     ShadowImageCenterY = 60f;
                     ShadowImageHeight = 130f;
@@ -44779,6 +45664,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.56f;
                     AnimationCastPoint = 0.47f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 4;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -44872,6 +45759,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.9f;
                     ShadowImageCenterX = 95f;
                     ShadowImageCenterY = 95f;
                     ShadowImageHeight = 230f;
@@ -44918,6 +45806,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Stone;
                     Attack1AnimationBackswingPoint = 0.47f;
@@ -45012,6 +45902,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.4f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -45059,6 +45950,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.6f;
@@ -45149,9 +46042,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 1.25f;
                     ShadowImageCenterX = 35f;
                     ShadowImageCenterY = 35f;
                     ShadowImageHeight = 90f;
@@ -45200,6 +46095,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -45298,9 +46195,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 320;
                     RepairLumberCost = 50;
                     RepairTime = 20;
+                    Scale = 0.6f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -45348,6 +46247,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.55f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -45438,9 +46339,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 40f;
                     ShadowImageCenterY = 40f;
                     ShadowImageHeight = 120f;
@@ -45488,6 +46391,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -45579,6 +46484,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -45627,6 +46533,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.75f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -45722,6 +46630,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.6f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -45768,6 +46677,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -45861,6 +46772,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.75f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -45909,6 +46821,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.83f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Ethereal;
                     Attack1AnimationBackswingPoint = 0.51f;
@@ -45997,7 +46911,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 120f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
@@ -46008,6 +46922,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.85f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 120f;
@@ -46055,6 +46970,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Wood;
                     Attack1DamageLossFactor = 0f;
@@ -46139,6 +47056,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 60;
                     RepairTime = 30;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;

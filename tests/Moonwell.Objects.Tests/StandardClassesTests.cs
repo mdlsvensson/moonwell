@@ -278,6 +278,14 @@ namespace Moonwell.Objects.Tests
         }
 
         [Fact]
+        public void a_standard_units_scale_with_no_definitive_edition_one_is_the_reforged_one()
+        {
+            // The game reads :hd when a unit has no :de value (game-facts, seen on 3.0.1): an Assassin's 1.2 (sd 1.3), a Guardian Golem's 1.0 (sd 1.5).
+            Assert.Equal(1.2f, new Moonwell.Objects.Creeps.Units.Assassin().Scale);
+            Assert.Equal(1.0f, new Moonwell.Objects.Creeps.Units.GuardianGolem().Scale);
+        }
+
+        [Fact]
         public void a_standard_class_and_a_class_that_sets_nothing_declare_nothing()
         {
             Assert.Empty(DeclaredOf(new Moonwell.Objects.Human.Units.Paladin()));
