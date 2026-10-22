@@ -119,6 +119,58 @@ namespace Moonwell.Testing
             Expect.Equal("o=", "o=" + boxedNull, "a boxed null int? joined");
         }
 
+        /// <summary>
+        /// An int made a float? or double? in a string gives the text a float made from the int gives (Lua writes a whole float
+        /// as 4.0, C18), not the float's text with 0.0 added to it.
+        /// </summary>
+        public static void NullableFromInt(FakeWorld world)
+        {
+            int count = 4;
+            Expect.Equal("x" + (float)count, "x" + (float?)count, "an int cast to a float?");
+            Expect.Equal("[" + (double)count + "]", $"[{(double?)count}]", "an int cast to a double?, interpolated");
+            Expect.Equal("[4.0]", $"[{(float?)count:F1}]", "an int cast to a float?, interpolated with a format");
+        }
+
+        /// <summary>A char? joined to a string gives the character, not its code, and "" when null.</summary>
+        public static void NullableChar(FakeWorld world)
+        {
+            char? letter = Letter();
+            char? none = NoLetter();
+            Expect.Equal("c=A", "c=" + letter, "a char? 'A'");
+            Expect.Equal("c=", "c=" + none, "a null char?");
+            Expect.Equal("[A|]", $"[{letter}|{none}]", "a char?, interpolated");
+            Expect.Equal("[A|]", $"[{letter:X}|{none:X}]", "a char? with a format, which a char leaves out");
+            var text = "s=";
+            text += letter;
+            Expect.Equal("s=A", text, "+= a char?");
+        }
+
+        /// <summary>A nullable struct in a string gives its ToString, and "" when null; a format reaches an IFormattable.</summary>
+        public static void NullableStruct(FakeWorld world)
+        {
+            Spot? spot = new Spot(2);
+            Spot? none = NoSpot();
+            Expect.Equal("p=spot 2", "p=" + spot, "a Spot?");
+            Expect.Equal("p=", "p=" + none, "a null Spot?");
+            Expect.Equal("[spot 2|]", $"[{spot}|{none}]", "a Spot?, interpolated");
+            Expect.Equal("[spot 2 as Q|]", $"[{spot:Q}|{none:Q}]", "a Spot? with a format");
+        }
+
+        private static char? Letter()
+        {
+            return 'A';
+        }
+
+        private static char? NoLetter()
+        {
+            return null;
+        }
+
+        private static Spot? NoSpot()
+        {
+            return null;
+        }
+
         private static int? Three()
         {
             return 3;
@@ -152,6 +204,28 @@ namespace Moonwell.Testing
         private static Bag? NoBag()
         {
             return null;
+        }
+
+        // A struct that formats itself, as C# formats it in an interpolation (with no format as its ToString, which is how
+        // CSharp.lua writes a hole without one).
+        private struct Spot : System.IFormattable
+        {
+            public int Value;
+
+            public Spot(int value)
+            {
+                Value = value;
+            }
+
+            public override string ToString()
+            {
+                return "spot " + Value;
+            }
+
+            public string ToString(string? format, System.IFormatProvider? formatProvider)
+            {
+                return string.IsNullOrEmpty(format) ? ToString() : "spot " + Value + " as " + format;
+            }
         }
 
         private sealed class Bag

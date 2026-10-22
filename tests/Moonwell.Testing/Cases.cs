@@ -289,6 +289,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "text.conditional-access-concat", Run = TextCases.ConditionalAccessConcat });
             list.Add(new Case { Name = "text.nullable-interpolation", Run = TextCases.NullableInterpolation });
             list.Add(new Case { Name = "text.nullable-operands", Run = TextCases.NullableOperands });
+            list.Add(new Case { Name = "text.nullable-from-int", Run = TextCases.NullableFromInt });
+            list.Add(new Case { Name = "text.nullable-char", Run = TextCases.NullableChar });
+            list.Add(new Case { Name = "text.nullable-struct", Run = TextCases.NullableStruct });
             list.Add(new Case { Name = "text.nullable-to-string", Run = TextCases.NullableToString });
             list.Add(new Case { Name = "text.plain", Run = TextCases.Plain });
         }

@@ -326,4 +326,24 @@ namespace Moonwell.Build
     /// </param>
     /// <param name="Change">How the check names the change, or empty when it is part of another; null names it by its text.</param>
     internal readonly record struct FloatEdit(TextSpan Span, string Text, int Order = 0, string? Change = null);
+
+    /// <summary>
+    /// The orders of brackets written around an expression: at one place, the brackets that close come first, inner before outer,
+    /// then what is written in by order 0 (a left-out argument), then the brackets that open, outer before inner. Of two passes'
+    /// brackets around the same expression, the outer pass's go outside.
+    /// </summary>
+    internal static class Brackets
+    {
+        /// <summary>The order of a bracket that opens before an expression of <paramref name="length"/> characters.</summary>
+        internal static int Open(int length, bool outer = false)
+        {
+            return int.MinValue + (2 * length) + (outer ? 1 : 0);
+        }
+
+        /// <summary>The order of a bracket that closes after an expression of <paramref name="length"/> characters.</summary>
+        internal static int Close(int length, bool outer = false)
+        {
+            return int.MaxValue - (2 * length) - (outer ? 1 : 0);
+        }
+    }
 }

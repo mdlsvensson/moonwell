@@ -11,10 +11,14 @@ namespace Moonwell.Build
     /// concatenation, after <c>+=</c> on a string, or in an interpolation hole with no width, as <c>n:ToString()</c>, a method of
     /// the Lua value, and a number or a boolean has methods only where CSharp.lua's core gives them through the debug library,
     /// which the game does not have; nil never has. <c>"n=" + n</c> becomes <c>"n=" + n.ToString()</c>, which CSharp.lua writes
-    /// as <c>System.toString(n)</c>, and which C# defines as the same text: the value's, or <c>""</c> for null. A hole with a
-    /// format and no width, <c>{n:F1}</c>, becomes <c>{n?.ToString("F1")}</c> (null gives <c>""</c> in the hole), or
-    /// <c>{n.ToString()}</c> for a type with no <c>ToString(string)</c>, whose format C# leaves out. A nullable enum is left: CSharp.lua
-    /// writes it with <c>System.EnumToString</c>, which gives <c>""</c> for nil.
+    /// as <c>System.toString(n)</c>, and which C# defines as the same text: the value's, or <c>""</c> for null. A <c>char?</c>
+    /// becomes <c>c?.ToString()</c>, which CSharp.lua writes with <c>System.Char.ToString</c>: a char is a number in Lua, which
+    /// <c>System.toString</c> would give as its code. A hole with a format and no width, <c>{n:F1}</c>, becomes
+    /// <c>{n?.ToString("F1")}</c> for an <c>IFormattable</c> (null gives <c>""</c> in the hole), or <c>{n.ToString()}</c> for
+    /// any other type, whose format C# leaves out, and for a struct that implements <c>IFormattable</c> only explicitly, which
+    /// CSharp.lua does not reach through the interface either (its <c>ToString()</c> is called). A nullable enum
+    /// is left: CSharp.lua writes it with <c>System.EnumToString</c>, which gives <c>""</c> for nil. The brackets go outside
+    /// those of <see cref="RunTimeFloats"/> around the same value (<c>"x" + (float?)count</c>).
     /// </summary>
     internal static class NullableText
     {
@@ -50,17 +54,18 @@ namespace Moonwell.Build
             return type?.SpecialType == SpecialType.System_String && (method == null || method.ContainingType.SpecialType == SpecialType.System_String);
         }
 
-        // n joined to a string becomes n.ToString().
+        // n joined to a string becomes n.ToString(), c?.ToString() for a char.
         private static void Joined(IOperation operand, HashSet<TextSpan> done, List<FloatEdit> edits)
         {
             var value = Unconverted(operand);
             if (IsNullableValue(value.Type) && value.Syntax is ExpressionSyntax expression && done.Add(expression.Span))
             {
-                Wrap(expression, ".ToString()", edits);
+                Wrap(expression, Plain(value.Type!), edits);
             }
         }
 
-        // {n} becomes {n.ToString()}; {n:F1} becomes {n?.ToString("F1")}, or {n.ToString()} where the type has no ToString(string).
+        // {n} becomes {n.ToString()}; {n:F1} becomes {n?.ToString("F1")} for an IFormattable, {n.ToString()} for another type; a
+        // char's {c} or {c:X} becomes {c?.ToString()}.
         private static void Interpolated(IInterpolationOperation hole, HashSet<TextSpan> done, List<FloatEdit> edits)
         {
             var value = Unconverted(hole.Expression);
@@ -72,16 +77,28 @@ namespace Moonwell.Build
 
             if (syntax.FormatClause is not { } format)
             {
-                Wrap(expression, ".ToString()", edits);
+                Wrap(expression, Plain(value.Type!), edits);
                 return;
             }
 
-            var inner = ((INamedTypeSymbol)value.Type!).TypeArguments[0];
-            var call = HasFormattedToString(inner)
-                ? "?.ToString(" + SymbolDisplay.FormatLiteral(format.FormatStringToken.ValueText, quote: true) + ")"
-                : ".ToString()";
-            Wrap(expression, call, edits);
+            var inner = Inner(value.Type!);
+            var literal = SymbolDisplay.FormatLiteral(format.FormatStringToken.ValueText, quote: true);
+            var arguments = inner.SpecialType != SpecialType.System_Char && IsFormattable(inner) ? FormattedToString(inner) : null;
+            Wrap(expression, arguments == null ? Plain(value.Type!) : "?.ToString(" + literal + arguments + ")", edits);
+
             edits.Add(new FloatEdit(format.Span, string.Empty, 0, string.Empty));
+        }
+
+        // The call that gives a nullable value's text as C# joins it: n.ToString(), or c?.ToString() for a char, whose
+        // Nullable<char>.ToString() CSharp.lua writes as System.toString, which gives the char's code.
+        private static string Plain(ITypeSymbol type)
+        {
+            return Inner(type).SpecialType == SpecialType.System_Char ? "?.ToString()" : ".ToString()";
+        }
+
+        private static ITypeSymbol Inner(ITypeSymbol nullable)
+        {
+            return ((INamedTypeSymbol)nullable).TypeArguments[0];
         }
 
         // The value under the conversions C# makes implicitly (to object, for a concatenation).
@@ -102,28 +119,49 @@ namespace Moonwell.Build
                 && nullable.TypeArguments[0].TypeKind != TypeKind.Enum;
         }
 
-        private static bool HasFormattedToString(ITypeSymbol type)
+        // Whether C# passes a hole's format to the type: whether it implements IFormattable.
+        private static bool IsFormattable(ITypeSymbol type)
         {
-            return type.GetMembers("ToString").OfType<IMethodSymbol>().Any(method =>
-                !method.IsStatic && method.DeclaredAccessibility == Accessibility.Public && method.Parameters.Length == 1
-                && method.Parameters[0].Type.SpecialType == SpecialType.System_String);
+            return type.AllInterfaces.Any(face => IsSystem(face, "IFormattable"));
         }
 
-        // The call after the expression, with brackets around it where the call would bind to a part of it ((n + 1), a?.Count).
-        private static void Wrap(ExpressionSyntax expression, string call, List<FloatEdit> edits)
+        private static bool IsSystem(ITypeSymbol type, string name)
         {
-            var bare = IsWhole(expression);
-            var open = bare ? string.Empty : "(";
-            var close = (bare ? string.Empty : ")") + call;
-            // As RunTimeFloats: at one place, the brackets that close come first, inner before outer, then the brackets that open,
-            // outer before inner.
-            var length = expression.Span.Length;
-            if (!bare)
+            return type.Name == name && type.ContainingNamespace is { Name: "System", ContainingNamespace.IsGlobalNamespace: true };
+        }
+
+        // The arguments after the format of a public ToString the type has for it: "" for ToString(string), ", null" for
+        // ToString(string, IFormatProvider); null when it has neither (IFormattable implemented explicitly).
+        private static string? FormattedToString(ITypeSymbol type)
+        {
+            var methods = type.GetMembers("ToString").OfType<IMethodSymbol>()
+                .Where(method => !method.IsStatic && method.DeclaredAccessibility == Accessibility.Public
+                    && method.Parameters.Length > 0 && method.Parameters[0].Type.SpecialType == SpecialType.System_String)
+                .ToList();
+            if (methods.Any(method => method.Parameters.Length == 1))
             {
-                edits.Add(new FloatEdit(new TextSpan(expression.SpanStart, 0), open, int.MinValue + length, string.Empty));
+                return string.Empty;
             }
 
-            edits.Add(new FloatEdit(new TextSpan(expression.Span.End, 0), close, int.MaxValue - length, expression + " -> " + open + expression + close));
+            return methods.Any(method => method.Parameters.Length == 2 && IsSystem(method.Parameters[1].Type, "IFormatProvider"))
+                ? ", null"
+                : null;
+        }
+
+        // The call after the expression, with brackets around it where the call would bind to a part of it ((n + 1), a?.Count);
+        // outside the brackets RunTimeFloats writes around the same expression.
+        private static void Wrap(ExpressionSyntax expression, string call, List<FloatEdit> edits)
+        {
+            var whole = IsWhole(expression);
+            var open = whole ? string.Empty : "(";
+            var close = (whole ? string.Empty : ")") + call;
+            var length = expression.Span.Length;
+            if (!whole)
+            {
+                edits.Add(new FloatEdit(new TextSpan(expression.SpanStart, 0), open, Brackets.Open(length, outer: true), string.Empty));
+            }
+
+            edits.Add(new FloatEdit(new TextSpan(expression.Span.End, 0), close, Brackets.Close(length, outer: true), expression + " -> " + open + expression + close));
         }
 
         // An expression a member access after it reads whole.
