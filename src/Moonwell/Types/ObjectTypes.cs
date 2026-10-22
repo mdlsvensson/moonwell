@@ -39,6 +39,9 @@ namespace Moonwell
         /// <summary>The classes and type ids whose default object is being made, so that one read while its constructor runs fails rather than making it again; made on first use.</summary>
         private static HashSet<object>? making;
 
+        /// <summary>While Registering runs its register step, the registrations' listens, which run their classes' constructors once every maker is registered; null otherwise, when a registration listens at once.</summary>
+        private static List<Action>? waiting;
+
         /// <summary>Registers a unit type with its id and the function that makes its object, and listens for the events its class needs.</summary>
         public static void Unit<T>(int id, Func<T> make)
             where T : Moonwell.Unit
@@ -50,7 +53,7 @@ namespace Moonwell
 
             ids[typeof(T)] = id;
             makers[id] = make;
-            Events.Need(Hooks.MaskOf(make(), Moonwell.Unit.UnitHooks));
+            Listen(() => Events.Need(Hooks.MaskOf(make(), Moonwell.Unit.UnitHooks)));
         }
 
         /// <summary>Registers an item type with its id and the function that makes its object, and listens for the events its class needs.</summary>
@@ -64,7 +67,7 @@ namespace Moonwell
 
             ids[typeof(T)] = id;
             itemMakers[id] = make;
-            Events.Need(Hooks.MaskOf(make(), Moonwell.Item.ItemHooks));
+            Listen(() => Events.Need(Hooks.MaskOf(make(), Moonwell.Item.ItemHooks)));
         }
 
         /// <summary>Registers a destructable type with its id and the function that makes its object, and listens for the events its class needs.</summary>
@@ -78,7 +81,7 @@ namespace Moonwell
 
             ids[typeof(T)] = id;
             destructableMakers[id] = make;
-            Events.Need(Hooks.MaskOf(make(), Moonwell.Destructable.DestructableHooks));
+            Listen(() => Events.Need(Hooks.MaskOf(make(), Moonwell.Destructable.DestructableHooks)));
         }
 
         /// <summary>Registers an ability type with its id and the function that makes its object, and listens for the events its class needs.</summary>
@@ -92,7 +95,44 @@ namespace Moonwell
 
             ids[typeof(T)] = id;
             abilityMakers[id] = make;
-            Events.Need(Hooks.MaskOf(make(), Moonwell.Ability.AbilityHooks));
+            Listen(() => Events.Need(Hooks.MaskOf(make(), Moonwell.Ability.AbilityHooks)));
+        }
+
+        /// <summary>
+        /// Runs a register step, then the constructors its registrations run to find the events their classes need: every maker is
+        /// registered before any constructor runs, so that a constructor that reads the default object of a class registered after
+        /// its own (<c>Unit.Default&lt;Lancer&gt;()</c>) gets that class's, made by its maker. Runtime.Install runs the map's registry with it.
+        /// </summary>
+        internal static void Registering(Action register)
+        {
+            var listens = new List<Action>();
+            waiting = listens;
+            try
+            {
+                register();
+            }
+            finally
+            {
+                waiting = null;
+            }
+
+            for (var i = 0; i < listens.Count; i++)
+            {
+                listens[i]();
+            }
+        }
+
+        /// <summary>Runs a registration's listen, which makes an object of its class: at once, or once the register step Registering runs has registered every maker.</summary>
+        private static void Listen(Action listen)
+        {
+            if (waiting != null)
+            {
+                waiting.Add(listen);
+            }
+            else
+            {
+                listen();
+            }
         }
 
         /// <summary>Registers a class with its object id and no maker, for kinds such as doodads, upgrades and buffs; throws when the class is registered twice.</summary>
@@ -396,6 +436,7 @@ namespace Moonwell
             itemDefaults = null;
             classDefaults = null;
             making = null;
+            waiting = null;
         }
 
         /// <summary>The character code at an index of a string.</summary>

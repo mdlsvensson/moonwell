@@ -291,6 +291,18 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_constructor_reads_the_default_of_a_class_registered_after_it_in_lua()
+        {
+            using var lua = compiled.Start();
+
+            // Recruiter is registered before Veteran, and its constructor reads Veteran's default object.
+            var errors = compiled.Run().Errors;
+            Assert.True(errors.Count == 0, string.Join(" | ", errors));
+            Assert.True(Truth(lua, "return System.is(Moonwell.Widget.Default(Objects.Veteran), Objects.Veteran)"));
+            Assert.Equal("255", Query(lua, "return tostring(MoonwellObjectValues['Objects.Recruiter']['ugol'])"));
+        }
+
+        [Fact]
         public void every_list_call_runs_in_lua()
         {
             using var lua = compiled.Start();

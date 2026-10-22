@@ -200,6 +200,25 @@ namespace Objects
         }
     }
 
+    // Reads the default object of a class the registry registers after it (by name): its constructor runs again in the game.
+    [Moonwell.Objects.ObjectId("h004")]
+    public class Recruiter : Moonwell.Objects.Human.Units.Footman
+    {
+        public Recruiter()
+        {
+            GoldCost = Moonwell.Unit.Default<Veteran>().GoldCost + 5;
+        }
+    }
+
+    [Moonwell.Objects.ObjectId("h005")]
+    public class Veteran : Moonwell.Objects.Human.Units.Knight
+    {
+        public Veteran()
+        {
+            GoldCost = 250;
+        }
+    }
+
     [Moonwell.Objects.Replaces]
     public class StrongFootman : Moonwell.Objects.Human.Units.Footman
     {

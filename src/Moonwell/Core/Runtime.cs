@@ -60,10 +60,10 @@ namespace Moonwell
             Start(() => Install(map, register));
         }
 
-        /// <summary>Runs the register step, then adds the map's starting components to the game, in list order; Start runs it as the setup.</summary>
+        /// <summary>Runs the register step, with every maker registered before any class's constructor runs (ObjectTypes.Registering), then adds the map's starting components to the game, in list order; Start runs it as the setup.</summary>
         internal static void Install(Map map, Action register)
         {
-            register();
+            ObjectTypes.Registering(register);
             var components = map.StartComponents;
             for (var i = 0; i < components.Count; i++)
             {
