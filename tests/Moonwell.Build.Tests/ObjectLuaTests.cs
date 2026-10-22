@@ -76,8 +76,9 @@ namespace Moonwell.Build.Tests
             Assert.Contains($"[{ObjectLua.FourCC("H001")}] = {{ [\"uhpm\"] = 1300, [\"umpi\"] = 255, [\"unam\"] = \"Arthas\" }}", values);
             Assert.Contains($"[{ObjectLua.FourCC("hfoo")}] = {{ [\"uhpm\"] = 600, [\"umpi\"] = 0, [\"unam\"] = \"Footman\" }}", values);
             Assert.Contains($"[{ObjectLua.FourCC("Hamg")}] = {{ [\"uhpm\"] = 450, [\"umpi\"] = 285, [\"unam\"] = \"Archmage\" }}", values);
-            // No item field is read.
-            Assert.DoesNotContain($"[{ObjectLua.FourCC("ratf")}] =", values);
+            // Flask reads its default's charges, the one item field read: every item type has it, the map's Flask its own.
+            Assert.Contains($"[{ObjectLua.FourCC("ratf")}] = {{ [\"iuse\"] = 0 }}", values);
+            Assert.Contains($"[{ObjectLua.FourCC("I002")}] = {{ [\"iuse\"] = 3 }}", values);
             Assert.DoesNotContain("umpm", values);
         }
 
@@ -277,6 +278,41 @@ namespace Moonwell.Build.Tests
             // Tuned's constructor runs Firebolt's (Levels and PerLevel), then Set by level and Set of a whole field.
             // The damage is a float, so Lua prints it with its point (C18); the count is an int.
             Assert.Equal("100.0 250.0 300.0 3", Query(lua, "local t = Objects.Tuned(); local d = t:getDamage(); return d:get(1) .. ' ' .. d:get(2) .. ' ' .. d:get(3) .. ' ' .. d:getCount()"));
+        }
+
+        [Fact]
+        public void one_value_for_every_level_runs_in_lua()
+        {
+            using var lua = compiled.Start();
+
+            // Steady's constructor puts ManaCost = 60 and Duration = 30f: Levels' implicit conversion, whose value the setter drops.
+            var errors = compiled.Run().Errors;
+            Assert.True(errors.Count == 0, string.Join(" | ", errors));
+            Assert.True(Truth(lua, "return System.is(Moonwell.ObjectTypes.AbilityMaker(Moonwell.ObjectTypes.FourCC('A007'))(), Objects.Steady)"));
+        }
+
+        [Fact]
+        public void a_constructor_reads_the_default_of_a_class_registered_after_it_in_lua()
+        {
+            using var lua = compiled.Start();
+
+            // Recruiter is registered before Veteran, and its constructor reads Veteran's default object.
+            var errors = compiled.Run().Errors;
+            Assert.True(errors.Count == 0, string.Join(" | ", errors));
+            Assert.True(Truth(lua, "return System.is(Moonwell.Widget.Default(Objects.Veteran), Objects.Veteran)"));
+            Assert.Equal("255", Query(lua, "return tostring(MoonwellObjectValues['Objects.Recruiter']['ugol'])"));
+        }
+
+        [Fact]
+        public void a_class_reads_its_default_in_its_own_methods_in_lua()
+        {
+            using var lua = compiled.Start();
+
+            // Sentinel's OnDeath and Flask's OnPickedUp read Default bare and through this (Flask's through base too): the class's
+            // one default object. An int read bare and made a float (Sentinel's gold, Flask's charges, kept and passed to a float)
+            // gets both its receiver and its conversion.
+            Assert.Equal("500.0 500.0 same 135.0", Query(lua, "local s = Moonwell.ObjectTypes.UnitMaker(Moonwell.ObjectTypes.FourCC('h006'))(); s:OnDeath(nil); return Objects.Sentinel.Read"));
+            Assert.Equal("3 3 same 3.0 1.5", Query(lua, "local f = Moonwell.ObjectTypes.ItemMaker(Moonwell.ObjectTypes.FourCC('I002'))(); f:OnPickedUp(nil); return Objects.Flask.Read"));
         }
 
         [Fact]
@@ -635,6 +671,7 @@ namespace Moonwell.Build.Tests
             lua.DoString("Moonwell = {}");
             lua.DoString(definitions);
             Assert.Equal("table", Query(lua, "return type(Moonwell.Objects.Levels_1(1))"));
+            Assert.Equal("nil", Query(lua, "return type(Moonwell.Objects.Levels_1(1).op_Implicit(60))"));
             Assert.Equal("table", Query(lua, "return type(Moonwell.Objects.ObjectList_1(1))"));
             Assert.Equal("table", Query(lua, "return type(Moonwell.Objects.ObjectRef_1(1))"));
         }

@@ -65,5 +65,91 @@ namespace Moonwell.Build.Tests
                 Directory.Delete(folder, true);
             }
         }
+
+        [Fact]
+        public void the_check_names_nullable_values_joined_to_strings()
+        {
+            var folder = Path.Combine(Path.GetTempPath(), "moonwell-package-floats-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(folder);
+            try
+            {
+                var file = Path.Combine(folder, "Joined.cs");
+                File.WriteAllText(file, string.Join("\n", new[]
+                {
+                    "public enum Kind { A }",
+                    "public class Bag { public int Count; }",
+                    "public class Joined",
+                    "{",
+                    "    public static string Of(int? n, float? f, bool? b, Bag? bag, Kind? k, int i, string s, char? c)",
+                    "    {",
+                    "        s += n;",
+                    "        s = \"n=\" + n + (n + 1) + bag?.Count;",
+                    "        s = $\"{n}|{f:F1}|{b:G}|{n,3}|{k}|{i}\";",
+                    "        s = \"x\" + (float?)i + $\"{(double?)i}|{(float?)i:F1}|{c}|{c:X}\" + c;",
+                    "        return s + k + i + n.ToString();",
+                    "    }",
+                    "}",
+                }));
+
+                var (changes, errors) = FloatLiterals.Check(new[] { file }, Array.Empty<string>());
+
+                Assert.Empty(errors);
+                Assert.Equal(
+                    new[]
+                    {
+                        file + "(7): n -> n.ToString()",
+                        file + "(8): n -> n.ToString()",
+                        file + "(8): n + 1 -> (n + 1).ToString()",
+                        file + "(8): bag?.Count -> (bag?.Count).ToString()",
+                        file + "(9): n -> n.ToString()",
+                        file + "(9): f -> f?.ToString(\"F1\")",
+                        file + "(9): b -> b.ToString()",
+                        file + "(10): (float?)i -> ((float?)i + 0.0f)",
+                        file + "(10): (float?)i -> ((float?)i).ToString()",
+                        file + "(10): (double?)i -> ((double?)i + 0.0)",
+                        file + "(10): (double?)i -> ((double?)i).ToString()",
+                        file + "(10): (float?)i -> ((float?)i + 0.0f)",
+                        file + "(10): (float?)i -> ((float?)i)?.ToString(\"F1\")",
+                        file + "(10): c -> c?.ToString()",
+                        file + "(10): c -> c?.ToString()",
+                        file + "(10): c -> c?.ToString()",
+                    },
+                    changes);
+            }
+            finally
+            {
+                Directory.Delete(folder, true);
+            }
+        }
+
+        [Fact]
+        public void the_rewrite_writes_the_text_of_a_nullable_float_made_from_an_int_outside_the_float()
+        {
+            var folder = Path.Combine(Path.GetTempPath(), "moonwell-package-floats-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(folder);
+            try
+            {
+                var file = Path.Combine(folder, "Made.cs");
+                File.WriteAllText(file, string.Join("\n", new[]
+                {
+                    "public class Made",
+                    "{",
+                    "    public static string Of(int i) { return \"x\" + (float?)i + $\"{(double?)i}|{(float?)i:F1}\"; }",
+                    "}",
+                }));
+
+                var errors = FloatLiterals.Rewrite(folder, new[] { "Made.cs" }, "Made", Array.Empty<string>(), Array.Empty<string>());
+
+                Assert.Empty(errors);
+                Assert.Equal(
+                    "    public static string Of(int i) { return \"x\" + (((float?)i + 0.0f)).ToString() + "
+                        + "$\"{(((double?)i + 0.0)).ToString()}|{(((float?)i + 0.0f))?.ToString(\"F1\")}\"; }",
+                    File.ReadAllLines(file)[2]);
+            }
+            finally
+            {
+                Directory.Delete(folder, true);
+            }
+        }
     }
 }

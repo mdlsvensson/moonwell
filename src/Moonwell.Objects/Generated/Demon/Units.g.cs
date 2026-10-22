@@ -117,6 +117,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\demon\\DoomGuard\\DoomGuard";
                     ModelFileExtraVersions = 0;
                     Name = "Doom Guard";
                     NameEditorSuffix = "(Summoned)";
@@ -126,6 +127,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\demon\\DoomGuard\\DoomGuard_portrait";
                     Priority = 8;
                     ProjectileImpactZ = 90f;
                     ProjectileImpactZSwimming = 0f;
@@ -302,6 +304,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 120;
                     RepairTime = 70;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.68f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -444,6 +447,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 50;
                     RepairTime = 50;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.65f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -583,6 +587,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 120;
                     RepairTime = 80;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1.25f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -605,6 +610,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "C,O,K";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 190;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Infernal";
                     TooltipExtended = "Heavy melee unit cloaked in demonic flames that damage nearby enemy ground units. Immune to magic. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;

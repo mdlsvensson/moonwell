@@ -91,6 +91,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 2f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNQuillBeast.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -100,6 +101,7 @@ namespace Moonwell.Objects
                     MaxLife = 700;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\QuillBeast\\QuillBeast";
                     ModelFileExtraVersions = 0;
                     Name = "Berserk Quilbeast";
                     NameEditorSuffix = "(Level 4)";
@@ -109,6 +111,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\QuillBeast\\QuillBeast_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -122,6 +125,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.15f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -456,6 +460,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDragonRoost.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -573,6 +578,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -687,6 +693,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -802,6 +809,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -1469,6 +1477,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 2f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSkeletonWarrior.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -1478,6 +1487,7 @@ namespace Moonwell.Objects
                     MaxLife = 290;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\undead\\Skeleton\\Skeleton";
                     ModelFileExtraVersions = 0;
                     Name = "Dark Minion";
                     OccluderHeight = 0f;
@@ -1485,6 +1495,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\undead\\Skeleton\\Skeleton_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -1497,6 +1508,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 18;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -1520,6 +1532,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 200;
+                    TintingColor2Green = 200;
+                    TintingColor3Blue = 200;
                     Tooltip = "Summon Dark Minion";
                     TransportedSize = 1;
                     TurnRate = 0.5f;
@@ -1603,6 +1618,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNQuillBeast.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -1612,6 +1628,7 @@ namespace Moonwell.Objects
                     MaxLife = 515;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\QuillBeast\\QuillBeast";
                     ModelFileExtraVersions = 0;
                     Name = "Dire Quilbeast";
                     NameEditorSuffix = "(Level 2)";
@@ -1621,6 +1638,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\QuillBeast\\QuillBeast_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -1634,6 +1652,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -1961,6 +1980,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDranaiHut.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -2209,6 +2229,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -2324,6 +2345,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -2559,6 +2581,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFountainOfLife.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -2592,6 +2615,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -2675,6 +2699,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -2790,6 +2815,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -2904,6 +2930,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -3018,6 +3045,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -3168,6 +3196,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -3532,6 +3561,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 60;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -3761,6 +3791,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 2f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSkeletonWarrior.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -3770,6 +3801,7 @@ namespace Moonwell.Objects
                     MaxLife = 405;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\undead\\Skeleton\\Skeleton";
                     ModelFileExtraVersions = 0;
                     Name = "Greater Dark Minion";
                     OccluderHeight = 0f;
@@ -3777,6 +3809,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\undead\\Skeleton\\Skeleton_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -3789,6 +3822,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 18;
+                    Scale = 1.4f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -3812,6 +3846,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 150;
+                    TintingColor2Green = 150;
+                    TintingColor3Blue = 150;
                     Tooltip = "Summon Dark Minion";
                     TransportedSize = 1;
                     TurnRate = 0.5f;
@@ -4003,6 +4040,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -4011,6 +4049,7 @@ namespace Moonwell.Objects
                     MaxLife = 125;
                     MaximumPitchAngleDegrees = 7f;
                     MaximumRollAngleDegrees = 7f;
+                    Model = "buildings\\other\\HarpyNest\\HarpyNest";
                     ModelFileExtraVersions = 0;
                     Name = "Harpy Nest";
                     NameEditorSuffix = "2";
@@ -4022,6 +4061,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\other\\HarpyNest\\HarpyNest_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -4117,6 +4157,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -4263,6 +4304,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 22;
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -4357,6 +4399,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -4472,6 +4515,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -5191,6 +5235,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -5320,6 +5365,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = false;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Critters\\Shoveler\\Shoveler_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -5355,6 +5401,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 165;
                     Tooltip = "Train Kobold Shoveler";
                     TooltipExtended = "Vice President of Blizzard, Frank pearce. Powerful programmer, good at cutting through the chaff and getting tasks done. |n|n|cffffcc00Attacks bugs.|r";
                     TransportedSize = 1;
@@ -5474,6 +5523,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 1;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -5586,6 +5636,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNLavaSpawn.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -5595,6 +5646,7 @@ namespace Moonwell.Objects
                     MaxLife = 550;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\LavaSpawn\\LavaSpawn";
                     ModelFileExtraVersions = 0;
                     Name = "Lava Spawn";
                     NameEditorSuffix = "(Level 2)";
@@ -5603,6 +5655,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 2;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\LavaSpawn\\LavaSpawn_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 70f;
                     ProjectileImpactZSwimming = 0f;
@@ -5616,6 +5669,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 1;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -5728,6 +5782,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNLavaSpawn.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -5737,6 +5792,7 @@ namespace Moonwell.Objects
                     MaxLife = 700;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\LavaSpawn\\LavaSpawn";
                     ModelFileExtraVersions = 0;
                     Name = "Lava Spawn";
                     NameEditorSuffix = "(Level 3)";
@@ -5745,6 +5801,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 2;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\LavaSpawn\\LavaSpawn_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 80f;
                     ProjectileImpactZSwimming = 0f;
@@ -5758,6 +5815,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 1;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.4f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -5861,6 +5919,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 2f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSkeletonWarrior.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -5870,6 +5929,7 @@ namespace Moonwell.Objects
                     MaxLife = 215;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\undead\\Skeleton\\Skeleton";
                     ModelFileExtraVersions = 0;
                     Name = "Lesser Dark Minion";
                     OccluderHeight = 0f;
@@ -5877,6 +5937,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\undead\\Skeleton\\Skeleton_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -5912,6 +5973,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 230;
+                    TintingColor2Green = 230;
+                    TintingColor3Blue = 230;
                     Tooltip = "Summon Dark Minion";
                     TransportedSize = 1;
                     TurnRate = 0.5f;
@@ -6138,6 +6202,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6258,6 +6323,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6378,6 +6444,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6498,6 +6565,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6618,6 +6686,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6738,6 +6807,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6858,6 +6928,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6978,6 +7049,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -7098,6 +7170,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -7218,6 +7291,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -7338,6 +7412,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -7458,6 +7533,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -7578,6 +7654,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -7698,6 +7775,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -7818,6 +7896,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -7938,6 +8017,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -8031,6 +8111,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 2f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGrizzlyBear.blp";
                     IsABuilding = false;
                     Level = 7;
                     LumberBountyAwardedBase = 0;
@@ -8040,6 +8121,7 @@ namespace Moonwell.Objects
                     MaxLife = 2250;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\GrizzlyBear\\GrizzlyBear";
                     ModelFileExtraVersions = 0;
                     Name = "Misha";
                     NameEditorSuffix = "(Level 4)";
@@ -8049,6 +8131,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GrizzlyBear\\GrizzlyBear_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -8062,6 +8145,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1.3f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -8165,6 +8249,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGrizzlyBear.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -8174,6 +8259,7 @@ namespace Moonwell.Objects
                     MaxLife = 1800;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\GrizzlyBear\\GrizzlyBear";
                     ModelFileExtraVersions = 0;
                     Name = "Misha";
                     NameEditorSuffix = "(Level 3)";
@@ -8183,6 +8269,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GrizzlyBear\\GrizzlyBear_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -8196,6 +8283,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1.15f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -8299,6 +8387,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGrizzlyBear.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -8308,6 +8397,7 @@ namespace Moonwell.Objects
                     MaxLife = 900;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\GrizzlyBear\\GrizzlyBear";
                     ModelFileExtraVersions = 0;
                     Name = "Misha";
                     NameEditorSuffix = "(Level 1)";
@@ -8317,6 +8407,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GrizzlyBear\\GrizzlyBear_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -8330,6 +8421,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -8433,6 +8525,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGrizzlyBear.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -8442,6 +8535,7 @@ namespace Moonwell.Objects
                     MaxLife = 1200;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\GrizzlyBear\\GrizzlyBear";
                     ModelFileExtraVersions = 0;
                     Name = "Misha";
                     NameEditorSuffix = "(Level 2)";
@@ -8451,6 +8545,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GrizzlyBear\\GrizzlyBear_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -8464,6 +8559,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -8558,6 +8654,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -8566,6 +8663,7 @@ namespace Moonwell.Objects
                     MaxLife = 125;
                     MaximumPitchAngleDegrees = 7f;
                     MaximumRollAngleDegrees = 7f;
+                    Model = "buildings\\other\\MurlocHut0\\MurlocHut0";
                     ModelFileExtraVersions = 0;
                     Name = "Mur'gul Hut";
                     NameEditorSuffix = "0";
@@ -8577,6 +8675,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\other\\MurlocHut0\\MurlocHut0_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -8673,6 +8772,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -8681,6 +8781,7 @@ namespace Moonwell.Objects
                     MaxLife = 125;
                     MaximumPitchAngleDegrees = 7f;
                     MaximumRollAngleDegrees = 7f;
+                    Model = "buildings\\other\\MurlocHut1\\MurlocHut1";
                     ModelFileExtraVersions = 0;
                     Name = "Mur'gul Hut";
                     NameEditorSuffix = "1";
@@ -8692,6 +8793,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\other\\MurlocHut1\\MurlocHut1_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -8789,6 +8891,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -8797,6 +8900,7 @@ namespace Moonwell.Objects
                     MaxLife = 125;
                     MaximumPitchAngleDegrees = 7f;
                     MaximumRollAngleDegrees = 7f;
+                    Model = "buildings\\other\\MurlocHut1\\MurlocHut1";
                     ModelFileExtraVersions = 0;
                     Name = "Murloc Hut";
                     NameEditorSuffix = "2";
@@ -8808,6 +8912,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\other\\MurlocHut1\\MurlocHut1_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -8903,6 +9008,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -9018,6 +9124,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -9252,6 +9359,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBlackDragonRoost.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -9260,6 +9368,7 @@ namespace Moonwell.Objects
                     MaxLife = 150000;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
+                    Model = "buildings\\other\\DragonBuildingBlack\\DragonBuildingBlack";
                     ModelFileExtraVersions = 0;
                     Name = "Nether Dragon Roost";
                     NeutralBuildingShowsMinimapIcon = true;
@@ -9272,6 +9381,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\other\\DragonBuildingBlack\\DragonBuildingBlack_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -9372,6 +9482,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
                     Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPocketFactory.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -9381,6 +9492,7 @@ namespace Moonwell.Objects
                     MaxLife = 450;
                     MaximumPitchAngleDegrees = 15f;
                     MaximumRollAngleDegrees = 15f;
+                    Model = "Units\\Creeps\\HeroTinkerFactory\\HeroTinkerFactory";
                     ModelFileExtraVersions = 0;
                     Name = "Pocket Factory";
                     NameEditorSuffix = "(Level 2)";
@@ -9390,6 +9502,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\HeroTinkerFactory\\HeroTinkerFactory_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -9417,6 +9530,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Structure;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 225;
+                    TintingColor2Green = 225;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Pocket Factory";
                     TooltipExtended = "Factory unit for spawning Clockwerk Goblins via the Pocket Factory ability.";
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -9490,6 +9606,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
                     Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPocketFactory.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -9499,6 +9616,7 @@ namespace Moonwell.Objects
                     MaxLife = 600;
                     MaximumPitchAngleDegrees = 15f;
                     MaximumRollAngleDegrees = 15f;
+                    Model = "Units\\Creeps\\HeroTinkerFactory\\HeroTinkerFactory";
                     ModelFileExtraVersions = 0;
                     Name = "Pocket Factory";
                     NameEditorSuffix = "(Level 3)";
@@ -9508,6 +9626,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\HeroTinkerFactory\\HeroTinkerFactory_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -9535,6 +9654,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Structure;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 225;
+                    TintingColor2Green = 225;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Pocket Factory";
                     TooltipExtended = "Factory unit for spawning Clockwerk Goblins via the Pocket Factory ability.";
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -9655,6 +9777,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Structure;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 225;
+                    TintingColor2Green = 225;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Pocket Factory";
                     TooltipExtended = "Factory unit for spawning Clockwerk Goblins via the Pocket Factory ability.";
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -9765,6 +9890,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -9878,6 +10004,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNQuillBeast.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -9887,6 +10014,7 @@ namespace Moonwell.Objects
                     MaxLife = 600;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\QuillBeast\\QuillBeast";
                     ModelFileExtraVersions = 0;
                     Name = "Raging Quilbeast";
                     NameEditorSuffix = "(Level 3)";
@@ -9896,6 +10024,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\QuillBeast\\QuillBeast_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -9909,6 +10038,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -10005,6 +10135,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDragonRoost.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -10013,6 +10144,7 @@ namespace Moonwell.Objects
                     MaxLife = 150000;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
+                    Model = "buildings\\other\\DragonBuilding\\DragonBuilding";
                     ModelFileExtraVersions = 0;
                     Name = "Red Dragon Roost";
                     NeutralBuildingShowsMinimapIcon = true;
@@ -10025,6 +10157,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\other\\DragonBuilding\\DragonBuilding_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -10416,6 +10549,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWarEagle.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -10425,6 +10559,7 @@ namespace Moonwell.Objects
                     MaxLife = 650;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "units\\creeps\\WarEagle\\WarEagle";
                     ModelFileExtraVersions = 0;
                     Name = "Spirit Hawk";
                     NameEditorSuffix = "(Level 3)";
@@ -10434,6 +10569,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\WarEagle\\WarEagle_portrait";
                     Priority = 3;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -10446,6 +10582,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 22;
+                    Scale = 1.3f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -10656,6 +10793,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTaurenHut.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -10806,6 +10944,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -10891,6 +11030,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -11005,6 +11145,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -11121,6 +11262,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -11129,6 +11271,7 @@ namespace Moonwell.Objects
                     MaxLife = 75;
                     MaximumPitchAngleDegrees = 7f;
                     MaximumRollAngleDegrees = 7f;
+                    Model = "buildings\\other\\Tent2\\Tent2";
                     ModelFileExtraVersions = 0;
                     Name = "Tent";
                     NameEditorSuffix = "3";
@@ -11140,6 +11283,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\other\\Tent2\\Tent2_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -11253,6 +11397,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWarEagle.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -11262,6 +11407,7 @@ namespace Moonwell.Objects
                     MaxLife = 450;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "units\\creeps\\WarEagle\\WarEagle";
                     ModelFileExtraVersions = 0;
                     Name = "Thunder Hawk";
                     NameEditorSuffix = "(Level 2)";
@@ -11271,6 +11417,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\WarEagle\\WarEagle_portrait";
                     Priority = 3;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -11283,6 +11430,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 22;
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -11529,6 +11677,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 50;
                     RepairLumberCost = 0;
                     RepairTime = 3;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;

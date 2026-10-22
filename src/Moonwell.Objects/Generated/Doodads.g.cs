@@ -12232,6 +12232,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
+                Model = "Doodads\\Cityscape\\Props\\ForsakenStandingBanners\\ForsakenStandingBanners";
                 Name = "WESTRING_DOOD_FSSB";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\4x4Default.tga";
@@ -16654,6 +16655,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
+                Model = "Doodads\\Cityscape\\Props\\LordaeronStandingBanners\\LordaeronStandingBanners";
                 Name = "WESTRING_DOOD_LRSB";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\4x4Default.tga";
@@ -26660,6 +26662,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
+                Model = "Doodads\\Cityscape\\Props\\ScarletCrusadeStandingBanners\\ScarletCrusadeStandingBanners";
                 Name = "WESTRING_DOOD_SCSB";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\4x4Default.tga";
@@ -27347,6 +27350,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
+                Model = "Doodads\\Cityscape\\Props\\SilverHandStandingBanners\\SilverHandStandingBanners";
                 Name = "WESTRING_DOOD_SHSB";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\4x4Default.tga";
@@ -31536,6 +31540,7 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.8f;
+                Model = "Doodads\\Cityscape\\Props\\TeamColorStandingBanners\\TeamColorStandingBanners";
                 Name = "WESTRING_DOOD_TCSB";
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType2.Auto;
                 PathingTexture = "PathTextures\\4x4Default.tga";

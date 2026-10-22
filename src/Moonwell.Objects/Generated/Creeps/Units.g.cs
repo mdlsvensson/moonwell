@@ -106,6 +106,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "X";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroAlchemist.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-alchemist.blp";
                     Intelligence = 18;
                     IntelligencePerLevel = 2f;
@@ -287,6 +288,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "X";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroAlchemist.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-alchemist.blp";
                     Intelligence = 18;
                     IntelligencePerLevel = 2f;
@@ -516,6 +518,7 @@ namespace Moonwell.Objects
                     RequirementsTier3.Add("TALT");
                     RequirementsTiersUsed = 3;
                     Requires.Add("TALT");
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -650,6 +653,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "X";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroAlchemist.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-alchemist.blp";
                     Intelligence = 18;
                     IntelligencePerLevel = 2f;
@@ -697,6 +701,7 @@ namespace Moonwell.Objects
                     RequirementsTier3.Add("TALT");
                     RequirementsTiersUsed = 3;
                     Requires.Add("TALT");
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -819,6 +824,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGreenHydra.blp";
                     IsABuilding = false;
                     Level = 10;
                     LumberBountyAwardedBase = 0;
@@ -831,6 +837,7 @@ namespace Moonwell.Objects
                     MaxMana = 600;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\Hydra\\Hydra";
                     ModelFileExtraVersions = 0;
                     Name = "Ancient Hydra";
                     NormalSkin = "Aspo,Awrh,ACdv,Advc,Aspy";
@@ -839,6 +846,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\Hydra\\Hydra_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -852,6 +860,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 200;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -959,6 +968,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSasquatch.blp";
                     IsABuilding = false;
                     Level = 9;
                     LumberBountyAwardedBase = 0;
@@ -971,6 +981,7 @@ namespace Moonwell.Objects
                     MaxMana = 600;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Sasquatch\\Sasquatch";
                     ModelFileExtraVersions = 0;
                     Name = "Ancient Sasquatch";
                     NormalSkin = "ACtc,ACfr,ACrn";
@@ -979,6 +990,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Sasquatch\\Sasquatch_portrait";
                     Priority = 8;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -991,6 +1003,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 545;
                     RepairLumberCost = 150;
                     RepairTime = 90;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -1014,6 +1027,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "V,Q";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 215;
+                    TintingColor3Blue = 215;
                     Tooltip = "Summon Ancient Sasquatch";
                     TooltipExtended = "Heavy melee unit that can Slam opponents. Can cast Force of Nature. Also has Reincarnation. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -1095,6 +1111,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWendigo.blp";
                     IsABuilding = false;
                     Level = 9;
                     LumberBountyAwardedBase = 0;
@@ -1107,6 +1124,7 @@ namespace Moonwell.Objects
                     MaxMana = 600;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Wendigo\\Wendigo";
                     ModelFileExtraVersions = 0;
                     Name = "Ancient Wendigo";
                     NormalSkin = "Awrs,ACbh,ACrn";
@@ -1115,6 +1133,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Wendigo\\Wendigo_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -1128,6 +1147,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 150;
                     RepairTime = 90;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -1237,6 +1257,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBanditMage.blp";
                     IsABuilding = false;
                     Level = 1;
                     LumberBountyAwardedBase = 0;
@@ -1379,6 +1400,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNArachnathid.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -1388,6 +1410,7 @@ namespace Moonwell.Objects
                     MaxLife = 450;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
+                    Model = "Units\\Creeps\\Archnathid\\Archnathid";
                     ModelFileExtraVersions = 0;
                     Name = "Arachnathid Earth-borer";
                     NormalSkin = "ACvs,ACss";
@@ -1396,6 +1419,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\Archnathid\\Archnathid_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -1408,6 +1432,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 150;
                     RepairLumberCost = 10;
                     RepairTime = 25;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -1573,6 +1598,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Y,X,V,Q,J";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 200;
+                    TintingColor3Blue = 225;
                     Tooltip = "Hire Assassin";
                     TooltipExtended = "Medium ranged unit that fires envenomed bolts and can Shadowmeld. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -1710,6 +1738,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Y,X,V,Q,J";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 225;
+                    TintingColor3Blue = 180;
                     Tooltip = "Hire Bandit";
                     TooltipExtended = "Light melee unit with Shadowmeld. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -1967,6 +1998,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 95;
                     RepairLumberCost = 5;
                     RepairTime = 25;
+                    Scale = 0.6f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -1990,6 +2022,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I";
+                    TintingColor1Red = 200;
+                    TintingColor2Green = 200;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Barbed Arachnathid";
                     TooltipExtended = "Light ranged unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -2108,6 +2143,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 95;
                     RepairLumberCost = 5;
                     RepairTime = 25;
+                    Scale = 0.65f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -2131,6 +2167,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I";
+                    TintingColor1Red = 220;
+                    TintingColor2Green = 220;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Barbed Arachnathid";
                     TooltipExtended = "Light ranged unit that has the Burrow ability. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -2244,6 +2283,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 10;
                     RepairTime = 25;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -2266,6 +2306,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "D,G";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 200;
                     Tooltip = "Summon Battle Golem";
                     TooltipExtended = "Heavy melee unit. Immune to spells. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -2376,6 +2419,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -2547,6 +2591,7 @@ namespace Moonwell.Objects
                     RequirementsTier3.Add("TALT");
                     RequirementsTiersUsed = 3;
                     Requires.Add("TALT");
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -2667,6 +2712,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSummonWaterElemental.blp";
                     IsABuilding = false;
                     Level = 8;
                     LumberBountyAwardedBase = 0;
@@ -2679,6 +2725,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\human\\WaterElemental\\WaterElemental";
                     ModelFileExtraVersions = 0;
                     Name = "Berserk Elemental";
                     NormalSkin = "ACmi,ACfn";
@@ -2687,6 +2734,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\human\\WaterElemental\\WaterElemental_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -2700,6 +2748,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 120;
                     RepairTime = 80;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -2723,6 +2772,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "X,J";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 50;
+                    TintingColor3Blue = 190;
                     Tooltip = "Summon Berserk Elemental";
                     TooltipExtended = "Heavy melee unit that can cast Frost Nova. Immune to spells. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -2804,6 +2856,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNOwlBear.blp";
                     IsABuilding = false;
                     Level = 8;
                     LumberBountyAwardedBase = 0;
@@ -2816,6 +2869,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Owlbear\\Owlbear";
                     ModelFileExtraVersions = 0;
                     Name = "Berserk Wildkin";
                     NormalSkin = "ACbh,Awrs";
@@ -2824,6 +2878,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Owlbear\\Owlbear_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -2836,6 +2891,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 480;
                     RepairLumberCost = 120;
                     RepairTime = 80;
+                    Scale = 1.4f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -2994,6 +3050,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 200;
                     RepairTime = 100;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -3017,6 +3074,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "F";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Black Dragon";
                     TooltipExtended = "Heavy ranged flying unit that can Devour opponents and is immune to magic. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.1f;
@@ -3111,6 +3171,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBlackDragon.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -3141,6 +3202,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 20;
                     RepairTime = 30;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.4f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -3164,6 +3226,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "F";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Black Dragon Whelp";
                     TooltipExtended = "Tiny ranged flying unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.1f;
@@ -3257,6 +3322,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "K";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBlackDragon.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -3266,6 +3332,7 @@ namespace Moonwell.Objects
                     MaxLife = 950;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "Units\\Creeps\\BlackDrake\\BlackDrake";
                     ModelFileExtraVersions = 0;
                     Name = "Black Drake";
                     OccluderHeight = 0f;
@@ -3273,6 +3340,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\BlackDrake\\BlackDrake_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -3286,6 +3354,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 80;
                     RepairTime = 60;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -3309,6 +3378,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "F";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 220;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Black Drake";
                     TooltipExtended = "Small ranged flying unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.1f;
@@ -3332,6 +3404,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 90f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -3418,9 +3492,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.1f;
                     ShadowImageCenterX = 40f;
                     ShadowImageCenterY = 40f;
                     ShadowImageHeight = 80f;
@@ -3544,6 +3620,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\BanditMage\\BanditMage";
                     ModelFileExtraVersions = 0;
                     Name = "Blood Wizard";
                     NormalSkin = "ACbl";
@@ -3552,6 +3629,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\BanditMage\\BanditMage_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -3590,6 +3668,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Y,X,V,Q,J";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 75;
+                    TintingColor3Blue = 75;
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -3670,6 +3751,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFelGuard.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -3679,6 +3761,7 @@ namespace Moonwell.Objects
                     MaxLife = 450;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\demon\\Felgaurd\\Felgaurd";
                     ModelFileExtraVersions = 0;
                     Name = "Bloodfiend";
                     NormalSkin = "ACce";
@@ -3687,6 +3770,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\demon\\Felgaurd\\Felgaurd_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -3858,6 +3942,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 200;
                     RepairTime = 100;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -3881,6 +3966,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "N,W,I,N";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 210;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Blue Dragon";
                     TooltipExtended = "Heavy ranged flying unit that deals cold damage and slows enemy units. Can Devour opponents and is immune to magic. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.1f;
@@ -3976,6 +4064,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAzureDragon.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -4007,6 +4096,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 20;
                     RepairTime = 30;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.4f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -4030,6 +4120,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "N,W,I,N";
+                    TintingColor1Red = 190;
+                    TintingColor2Green = 190;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Blue Dragon Whelp";
                     TooltipExtended = "Tiny ranged flying unit that deals cold damage and slows enemy units. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.1f;
@@ -4151,6 +4244,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 10;
                     RepairTime = 25;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -4174,6 +4268,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I";
+                    TintingColor1Red = 220;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 220;
                     Tooltip = "Hire Blue Dragonspawn Apprentice";
                     TooltipExtended = "Light ranged unit with Evasion and Rejuvenation. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -4290,6 +4387,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -4313,6 +4411,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I";
+                    TintingColor1Red = 210;
+                    TintingColor2Green = 220;
+                    TintingColor3Blue = 220;
                     Tooltip = "Hire Blue Dragonspawn Meddler";
                     TooltipExtended = "Light melee unit with Evasion. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -4396,6 +4497,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNpurpleDragonSpawn.blp";
                     IsABuilding = false;
                     Level = 8;
                     LumberBountyAwardedBase = 0;
@@ -4408,6 +4510,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\DragonSpawnBlue\\DragonSpawnBlue";
                     ModelFileExtraVersions = 0;
                     Name = "Blue Dragonspawn Overseer";
                     NormalSkin = "ACev,ACav,ACbf";
@@ -4416,6 +4519,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\DragonSpawnBlue\\DragonSpawnBlue_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -4429,6 +4533,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 120;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -4542,6 +4647,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGreenDragonSpawn.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -4554,6 +4660,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\DragonSpawnGreen\\DragonSpawnGreen";
                     ModelFileExtraVersions = 0;
                     Name = "Blue Dragonspawn Sorcerer";
                     NormalSkin = "ACfn,ACev";
@@ -4562,6 +4669,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\DragonSpawnGreen\\DragonSpawnGreen_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -4575,6 +4683,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 80;
                     RepairTime = 25;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.25f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -4684,6 +4793,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBlueDragonSpawn.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -4715,6 +4825,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -4738,6 +4849,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 235;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Blue Dragonspawn Warrior";
                     TooltipExtended = "Heavy melee unit with Evasion. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -4833,6 +4947,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "K";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAzureDragon.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -4842,6 +4957,7 @@ namespace Moonwell.Objects
                     MaxLife = 950;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "units\\creeps\\AzureDragon\\AzureDragon";
                     ModelFileExtraVersions = 0;
                     Name = "Blue Drake";
                     NormalSkin = "Afrb";
@@ -4850,6 +4966,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\AzureDragon\\AzureDragon_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 40f;
                     ProjectileImpactZSwimming = 0f;
@@ -4863,6 +4980,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 80;
                     RepairTime = 60;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -4886,6 +5004,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "N,W,I,N";
+                    TintingColor1Red = 190;
+                    TintingColor2Green = 215;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Blue Drake";
                     TooltipExtended = "Small ranged flying unit that deals cold damage and slows enemy units. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.1f;
@@ -5035,6 +5156,7 @@ namespace Moonwell.Objects
                     RequirementsTier3.Add("TALT");
                     RequirementsTiersUsed = 3;
                     Requires.Add("TALT");
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -5149,6 +5271,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBanditSpearThrower.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -5158,6 +5281,7 @@ namespace Moonwell.Objects
                     MaxLife = 300;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\BanditSpearThrower\\BanditSpearThrower";
                     ModelFileExtraVersions = 0;
                     Name = "Brigand";
                     NormalSkin = "Ashm";
@@ -5166,6 +5290,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\BanditSpearThrower\\BanditSpearThrower_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -5201,6 +5326,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Y,X,V,Q,J";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 225;
+                    TintingColor3Blue = 190;
                     Tooltip = "Hire Brigand";
                     TooltipExtended = "Light ranged unit with Shadowmeld. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -5334,6 +5462,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 200;
                     RepairTime = 100;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -5357,6 +5486,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Bronze Dragon";
                     TooltipExtended = "Heavy ranged flying unit that can Devour opponents and is immune to magic. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.1f;
@@ -5452,6 +5584,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBronzeDragon.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -5483,6 +5616,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 20;
                     RepairTime = 30;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.4f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -5506,6 +5640,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 210;
+                    TintingColor3Blue = 120;
                     Tooltip = "Summon Bronze Dragon Whelp";
                     TooltipExtended = "Tiny ranged flying unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.1f;
@@ -5600,6 +5737,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "K";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBronzeDragon.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -5609,6 +5747,7 @@ namespace Moonwell.Objects
                     MaxLife = 950;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "Units\\Creeps\\BronzeDrake\\BronzeDrake";
                     ModelFileExtraVersions = 0;
                     Name = "Bronze Drake";
                     NormalSkin = "Alit";
@@ -5617,6 +5756,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\BronzeDrake\\BronzeDrake_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -5630,6 +5770,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 80;
                     RepairTime = 60;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -5680,6 +5821,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 90f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -5736,6 +5879,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSpiderBlue.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -5745,6 +5889,7 @@ namespace Moonwell.Objects
                     MaxLife = 750;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
+                    Model = "units\\creeps\\SpiderBlue\\SpiderBlue";
                     ModelFileExtraVersions = 0;
                     Name = "Brood Mother";
                     NormalSkin = "ACvs,ACen,Aspd";
@@ -5753,6 +5898,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\SpiderBlue\\SpiderBlue_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -5765,6 +5911,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 365;
                     RepairLumberCost = 80;
                     RepairTime = 60;
+                    Scale = 1.25f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -5788,6 +5935,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A,C";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 180;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Brood Mother";
                     TooltipExtended = "Heavy melee unit that poisons opponents and carries its young into battle. Can cast Ensnare. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -5875,6 +6025,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSkeletonArcher.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -5929,6 +6080,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "D";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 100;
+                    TintingColor3Blue = 150;
                     Tooltip = "Hire Burning Archer";
                     TooltipExtended = "Light ranged unit that shoots Searing Arrows. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -6059,6 +6213,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I";
+                    TintingColor1Red = 200;
+                    TintingColor2Green = 200;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Barbed Arachnathid";
                     TooltipExtended = "Light ranged unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -6175,6 +6332,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 10;
                     RepairTime = 25;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6198,11 +6356,15 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 210;
+                    TintingColor3Blue = 230;
                     Tooltip = "Hire Centaur Archer";
                     TooltipExtended = "Light ranged unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitSoundSet = "CentaurArcher";
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
                 }
@@ -6309,6 +6471,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 10;
                     RepairTime = 25;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6420,6 +6583,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCentaurArcher.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -6432,6 +6596,7 @@ namespace Moonwell.Objects
                     MaxMana = 200;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\CentaurArcher\\CentaurArcher";
                     ModelFileExtraVersions = 0;
                     Name = "Centaur Impaler";
                     NormalSkin = "ACsa";
@@ -6440,6 +6605,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\CentaurArcher\\CentaurArcher_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -6453,6 +6619,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6476,11 +6643,15 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 190;
+                    TintingColor3Blue = 205;
                     Tooltip = "Hire Centaur Impaler";
                     TooltipExtended = "Medium ranged unit with Searing Arrows. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitSoundSet = "CentaurArcher";
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
                 }
@@ -6591,6 +6762,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 120;
                     RepairTime = 80;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.3f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6700,6 +6872,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "O";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNcentaur.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -6709,6 +6882,7 @@ namespace Moonwell.Objects
                     MaxLife = 550;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Centaur\\Centaur";
                     ModelFileExtraVersions = 0;
                     Name = "Centaur Outrunner";
                     OccluderHeight = 0f;
@@ -6716,6 +6890,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Centaur\\Centaur_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -6729,6 +6904,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6752,6 +6928,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 220;
                     Tooltip = "Hire Centaur Outrunner";
                     TooltipExtended = "Medium melee attacker wielding a large axe. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -6837,6 +7016,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCentaurKhan.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -6849,6 +7029,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\CentaurKhan\\CentaurKhan";
                     ModelFileExtraVersions = 0;
                     Name = "Centaur Sorcerer";
                     NormalSkin = "ACbl,ACdm";
@@ -6857,6 +7038,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\CentaurKhan\\CentaurKhan_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -6870,6 +7052,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 50;
                     RepairTime = 50;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6894,11 +7077,15 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B";
+                    TintingColor1Red = 205;
+                    TintingColor2Green = 190;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Centaur Sorcerer";
                     TooltipExtended = "Medium ranged unit that hurls fiery missiles. Casts Abolish Magic and Bloodlust. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitSoundSet = "Centaur";
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
                 }
@@ -7003,6 +7190,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.65f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -7025,6 +7213,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "C";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 190;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Corrupted Treant";
                     TooltipExtended = "Light melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -7161,6 +7352,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I";
+                    TintingColor1Red = 200;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 200;
                     Tooltip = "Hire Crystal Arachnathid";
                     TooltipExtended = "Light melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -7431,6 +7625,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "J";
+                    TintingColor1Red = 200;
+                    TintingColor2Green = 150;
+                    TintingColor3Blue = 255;
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -7577,6 +7774,7 @@ namespace Moonwell.Objects
                     RequirementsTier3.Add("TALT");
                     RequirementsTiersUsed = 3;
                     Requires.Add("TALT");
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -7724,6 +7922,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 150;
                     RepairLumberCost = 10;
                     RepairTime = 25;
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -7747,6 +7946,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A";
+                    TintingColor1Red = 175;
+                    TintingColor2Green = 210;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Dark Troll";
                     TooltipExtended = "Light ranged unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -7832,6 +8034,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDarkTrollTrapper.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -7841,6 +8044,7 @@ namespace Moonwell.Objects
                     MaxLife = 450;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\DarkTrollTrapper\\DarkTrollTrapper";
                     ModelFileExtraVersions = 0;
                     Name = "Dark Troll Berserker";
                     OccluderHeight = 0f;
@@ -7848,6 +8052,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\DarkTroll\\DarkTroll_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 80f;
                     ProjectileImpactZSwimming = 0f;
@@ -7860,6 +8065,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 245;
                     RepairLumberCost = 30;
                     RepairTime = 40;
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -7883,6 +8089,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A";
+                    TintingColor1Red = 210;
+                    TintingColor2Green = 230;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Dark Troll Berserker";
                     TooltipExtended = "Rabid axe-thrower. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -7971,6 +8180,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "H";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDarkTrollShadowPriest.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -7983,6 +8193,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\DarkTrollShadowPriest\\DarkTrollShadowPriest";
                     ModelFileExtraVersions = 0;
                     Name = "Dark Troll High Priest";
                     NormalSkin = "Anh2,ACsl";
@@ -7991,6 +8202,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\DarkTrollShadowPriest\\DarkTrollShadowPriest_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 80f;
                     ProjectileImpactZSwimming = 0f;
@@ -8026,6 +8238,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A";
+                    TintingColor1Red = 230;
+                    TintingColor2Green = 187;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Dark Troll High Priest";
                     TooltipExtended = "High Priest of healing magic. Hurls fiery missiles. Can cast Sleep. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -8312,6 +8527,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A";
+                    TintingColor1Red = 170;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 170;
                     Tooltip = "Hire Dark Troll Trapper";
                     TooltipExtended = "Light ranged unit that can Ensnare opponents. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -8396,6 +8614,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDarkTrollTrapper.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -8405,6 +8624,7 @@ namespace Moonwell.Objects
                     MaxLife = 750;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\DarkTrollTrapper\\DarkTrollTrapper";
                     ModelFileExtraVersions = 0;
                     Name = "Dark Troll Warlord";
                     NormalSkin = "ACat";
@@ -8413,6 +8633,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\DarkTrollTrapper\\DarkTrollTrapper_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -8425,6 +8646,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 365;
                     RepairLumberCost = 80;
                     RepairTime = 60;
+                    Scale = 1.25f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -8448,6 +8670,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 227;
+                    TintingColor3Blue = 182;
                     Tooltip = "Hire Dark Troll Warlord";
                     TooltipExtended = "Heavy ranged unit with Trueshot Aura. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -8533,6 +8758,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBanditMage.blp";
                     IsABuilding = false;
                     Level = 8;
                     LumberBountyAwardedBase = 0;
@@ -8567,6 +8793,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 120;
                     RepairTime = 80;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -8675,6 +8902,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRevenant.blp";
                     IsABuilding = false;
                     Level = 9;
                     LumberBountyAwardedBase = 0;
@@ -8687,6 +8915,7 @@ namespace Moonwell.Objects
                     MaxMana = 600;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Revenant\\Revenant";
                     ModelFileExtraVersions = 0;
                     Name = "Death Revenant";
                     NormalSkin = "ACrd,ACdc,ACad";
@@ -8695,6 +8924,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Revenant\\Revenant_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -8707,6 +8937,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 545;
                     RepairLumberCost = 150;
                     RepairTime = 90;
+                    Scale = 1.4f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -8819,6 +9050,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAcolyte.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -8831,6 +9063,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
+                    Model = "units\\undead\\Acolyte\\Acolyte";
                     ModelFileExtraVersions = 0;
                     Name = "Deceiver";
                     NormalSkin = "ACcs";
@@ -8839,6 +9072,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\undead\\Acolyte\\Acolyte_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -8851,6 +9085,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 215;
                     RepairLumberCost = 20;
                     RepairTime = 30;
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -8874,6 +9109,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Y";
+                    TintingColor1Red = 210;
+                    TintingColor2Green = 190;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Deceiver";
                     TooltipExtended = "Light ranged unit that hurls Demon fire. Can cast Curse. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -8991,6 +9229,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 745;
                     RepairLumberCost = 200;
                     RepairTime = 40;
+                    Scale = 1.45f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -9014,6 +9253,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 160;
+                    TintingColor2Green = 180;
+                    TintingColor3Blue = 180;
                     Tooltip = "Hire Deeplord Revenant";
                     TooltipExtended = "Heavy melee unit with Crushing Wave and Frost Armor. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -9111,6 +9353,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRockGolem.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -9123,6 +9366,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\RockGolem\\RockGolem";
                     ModelFileExtraVersions = 0;
                     Name = "Defender Golem";
                     NormalSkin = "ACmi,ACtb";
@@ -9131,6 +9375,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\RockGolem\\RockGolem_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -9166,6 +9411,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,F,W,V,Q,Y,X,D,J";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 150;
+                    TintingColor3Blue = 255;
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -9245,6 +9493,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTimberWolf.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -9257,6 +9506,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\WhiteWolf\\WhiteWolf";
                     ModelFileExtraVersions = 0;
                     Name = "Dire Frost Wolf";
                     NormalSkin = "ACct,ACro";
@@ -9265,6 +9515,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\WhiteWolf\\WhiteWolf_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -9277,6 +9528,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 365;
                     RepairLumberCost = 80;
                     RepairTime = 60;
+                    Scale = 1.4f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -9300,6 +9552,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "N";
+                    TintingColor1Red = 190;
+                    TintingColor2Green = 175;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Dire Frost Wolf";
                     TooltipExtended = "Medium melee unit with Critical Strike. Can cast Roar. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -9534,6 +9789,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\TimberWolf\\TimberWolf";
                     ModelFileExtraVersions = 0;
                     Name = "Dire Wolf";
                     NormalSkin = "ACct,ACro";
@@ -9542,6 +9798,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\TimberWolf\\TimberWolf_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -9554,6 +9811,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 365;
                     RepairLumberCost = 80;
                     RepairTime = 60;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -9577,6 +9835,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A";
+                    TintingColor1Red = 190;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Dire Wolf";
                     TooltipExtended = "Medium melee unit with Critical Strike. Can cast Roar. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -9661,6 +9922,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "S";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDranai.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -9673,6 +9935,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\other\\DranaiWhite\\DranaiWhite";
                     ModelFileExtraVersions = 0;
                     Name = "Draenei Darkslayer";
                     NormalSkin = "ACim";
@@ -9681,6 +9944,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\other\\DranaiWhite\\DranaiWhite_portrait";
                     Priority = 6;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -9693,6 +9957,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 260;
                     RepairLumberCost = 40;
                     RepairTime = 20;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -9841,6 +10106,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 195;
                     RepairLumberCost = 10;
                     RepairTime = 28;
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -9865,6 +10131,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "O,K";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 195;
                     Tooltip = "Hire Draenei Disciple";
                     TooltipExtended = "Light ranged unit that casts Heal. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -9957,6 +10226,7 @@ namespace Moonwell.Objects
                     MaxLife = 240;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\other\\Dranai\\Dranai";
                     ModelFileExtraVersions = 0;
                     Name = "Draenei Guardian";
                     OccluderHeight = 0f;
@@ -9964,6 +10234,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\other\\Dranai\\Dranai_portrait";
                     Priority = 6;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -9976,6 +10247,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 85;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -10000,6 +10272,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "O,K";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 190;
+                    TintingColor3Blue = 190;
                     Tooltip = "Hire Draenei Guardian";
                     TooltipExtended = "Light melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -10087,6 +10362,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDranaiMage.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -10099,6 +10375,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\other\\DranaiMage\\DranaiMage";
                     ModelFileExtraVersions = 0;
                     Name = "Draenei Harbinger";
                     NormalSkin = "Ache,ACbb";
@@ -10107,6 +10384,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\other\\DranaiMage\\DranaiMage_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -10119,6 +10397,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 165;
                     RepairLumberCost = 20;
                     RepairTime = 28;
+                    Scale = 1.5f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -10142,6 +10421,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "O,K";
+                    TintingColor1Red = 205;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Draenei Harbinger";
                     TooltipExtended = "Medium ranged unit with Bloodlust and Cast Ray of Disruption. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -10225,6 +10507,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDranai.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -10255,6 +10538,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 135;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -10278,6 +10562,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "O,K";
+                    TintingColor1Red = 205;
+                    TintingColor2Green = 205;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Draenei Protector";
                     TooltipExtended = "Light melee unit with Ensnare. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -10365,6 +10652,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDranaiMage.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -10377,6 +10665,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\other\\DranaiMage\\DranaiMage";
                     ModelFileExtraVersions = 0;
                     Name = "Draenei Seer";
                     NormalSkin = "ACsw,ACba,AChv";
@@ -10385,6 +10674,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\other\\DranaiMage\\DranaiMage_portrait";
                     Priority = 8;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -10397,6 +10687,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 210;
                     RepairLumberCost = 30;
                     RepairTime = 28;
+                    Scale = 1.35f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -10420,6 +10711,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "O,K";
+                    TintingColor1Red = 200;
+                    TintingColor2Green = 160;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Draenei Seer";
                     TooltipExtended = "Heavy ranged unit with Brilliance Aura. Can cast Slow and Healing Wave. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -10502,6 +10796,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDranai.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -10511,6 +10806,7 @@ namespace Moonwell.Objects
                     MaxLife = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\other\\Dranai\\Dranai";
                     ModelFileExtraVersions = 0;
                     Name = "Draenei Watcher";
                     OccluderHeight = 0f;
@@ -10518,6 +10814,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\other\\Dranai\\Dranai_portrait";
                     Priority = 6;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -10530,6 +10827,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 135;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -10680,6 +10978,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 200;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -10819,6 +11118,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -10932,6 +11232,7 @@ namespace Moonwell.Objects
                     MaxLife = 2250;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\EarthPandarenBrewmaster\\EarthPandarenBrewmaster";
                     ModelFileExtraVersions = 0;
                     Name = "Earth";
                     NormalSkin = "ACmi,ACpv,ANta,ACrk";
@@ -10940,6 +11241,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\EarthPandarenBrewmaster\\EarthPandarenBrewmaster_portrait";
                     Priority = 6;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -10952,6 +11254,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 40;
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -11064,6 +11367,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 15f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGreenHydra.blp";
                     IsABuilding = false;
                     Level = 7;
                     LumberBountyAwardedBase = 0;
@@ -11076,6 +11380,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\Hydra\\Hydra";
                     ModelFileExtraVersions = 0;
                     Name = "Elder Hydra";
                     NormalSkin = "ACff";
@@ -11084,6 +11389,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\Hydra\\Hydra_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 80f;
                     ProjectileImpactZSwimming = 0f;
@@ -11097,6 +11403,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -11120,6 +11427,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 210;
+                    TintingColor2Green = 180;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Elder Hydra";
                     TooltipExtended = "Heavy ranged amphibious unit with Faerie Fire. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -11200,6 +11510,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNJungleBeast.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -11209,6 +11520,7 @@ namespace Moonwell.Objects
                     MaxLife = 900;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\JungleBeast\\JungleBeast";
                     ModelFileExtraVersions = 0;
                     Name = "Elder Jungle Stalker";
                     OccluderHeight = 0f;
@@ -11216,6 +11528,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\JungleBeast\\JungleBeast_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -11229,6 +11542,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -11370,6 +11684,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 365;
                     RepairLumberCost = 80;
                     RepairTime = 60;
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -11393,6 +11708,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "V,Q";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 205;
+                    TintingColor3Blue = 205;
                     Tooltip = "Summon Elder Sasquatch";
                     TooltipExtended = "Heavy melee unit that can Bash opponents. Can cast Force of Nature. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -11477,6 +11795,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNVoidWalker.blp";
                     IsABuilding = false;
                     Level = 9;
                     LumberBountyAwardedBase = 0;
@@ -11489,6 +11808,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\VoidWalker\\VoidWalker";
                     ModelFileExtraVersions = 0;
                     Name = "Elder Voidwalker";
                     NormalSkin = "ACfl,ACde";
@@ -11497,6 +11817,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 2;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\VoidWalker\\VoidWalker_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -11510,6 +11831,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 150;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1.35f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -11533,6 +11855,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "O,K";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 125;
+                    TintingColor3Blue = 125;
                     Tooltip = "Hire Elder Voidwalker";
                     TooltipExtended = "Heavy ranged unit that can cast Devour Magic and Forked Lightning. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -11614,6 +11939,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWendigo.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -11623,6 +11949,7 @@ namespace Moonwell.Objects
                     MaxLife = 950;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Wendigo\\Wendigo";
                     ModelFileExtraVersions = 0;
                     Name = "Elder Wendigo";
                     NormalSkin = "ACbh";
@@ -11631,6 +11958,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Wendigo\\Wendigo_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -11644,6 +11972,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 80;
                     RepairTime = 60;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -11667,6 +11996,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "N";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 225;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Elder Wendigo";
                     TooltipExtended = "Heavy melee unit that can Bash opponents. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -11749,6 +12081,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBandit.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -11758,6 +12091,7 @@ namespace Moonwell.Objects
                     MaxLife = 600;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Bandit\\Bandit";
                     ModelFileExtraVersions = 0;
                     Name = "Enforcer";
                     NormalSkin = "ACev";
@@ -11766,6 +12100,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Bandit\\Bandit_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -11893,6 +12228,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSummonWaterElemental.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -11902,6 +12238,7 @@ namespace Moonwell.Objects
                     MaxLife = 550;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\human\\WaterElemental\\WaterElemental";
                     ModelFileExtraVersions = 0;
                     Name = "Enraged Elemental";
                     NormalSkin = "ACmi";
@@ -11910,6 +12247,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\human\\WaterElemental\\WaterElemental_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -11923,6 +12261,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -11946,6 +12285,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "X,J";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 150;
+                    TintingColor3Blue = 205;
                     Tooltip = "Summon Enraged Elemental";
                     TooltipExtended = "Medium melee unit. Immune to spells. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -12027,6 +12369,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNJungleBeast.blp";
                     IsABuilding = false;
                     Level = 9;
                     LumberBountyAwardedBase = 0;
@@ -12039,6 +12382,7 @@ namespace Moonwell.Objects
                     MaxMana = 600;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\JungleBeast\\JungleBeast";
                     ModelFileExtraVersions = 0;
                     Name = "Enraged Jungle Stalker";
                     NormalSkin = "ACtc";
@@ -12047,6 +12391,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\JungleBeast\\JungleBeast_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -12060,6 +12405,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 150;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -12166,6 +12512,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNOwlBear.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -12175,6 +12522,7 @@ namespace Moonwell.Objects
                     MaxLife = 950;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Owlbear\\Owlbear";
                     ModelFileExtraVersions = 0;
                     Name = "Enraged Wildkin";
                     OccluderHeight = 0f;
@@ -12182,6 +12530,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Owlbear\\Owlbear_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -12194,6 +12543,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 365;
                     RepairLumberCost = 80;
                     RepairTime = 60;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -12217,6 +12567,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B,D,G";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 160;
+                    TintingColor3Blue = 160;
                     Tooltip = "Summon Enraged Wildkin";
                     TransportedSize = 1;
                     TurnRate = 0.5f;
@@ -12342,6 +12695,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -12458,6 +12812,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNEredarWarlockPurple.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -12470,6 +12825,7 @@ namespace Moonwell.Objects
                     MaxMana = 200;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\demon\\EredarWarlock\\EredarWarlock";
                     ModelFileExtraVersions = 0;
                     Name = "Eredar Sorcerer";
                     NormalSkin = "ACdm,ACsl";
@@ -12478,6 +12834,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\demon\\EredarWarlock\\EredarWarlock_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -12491,6 +12848,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -12606,6 +12964,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNEredarWarlockPurple.blp";
                     IsABuilding = false;
                     Level = 9;
                     LumberBountyAwardedBase = 0;
@@ -12640,6 +12999,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 150;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -12769,6 +13129,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFacelessOne.blp";
                     IsABuilding = false;
                     Level = 10;
                     LumberBountyAwardedBase = 0;
@@ -12781,6 +13142,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\FacelessOne\\FacelessOne";
                     ModelFileExtraVersions = 0;
                     Name = "Faceless One Deathbringer";
                     NormalSkin = "ACad,ACsi";
@@ -12789,6 +13151,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\FacelessOne\\FacelessOne_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 180f;
                     ProjectileImpactZSwimming = 0f;
@@ -12801,6 +13164,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 745;
                     RepairLumberCost = 200;
                     RepairTime = 40;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -12931,6 +13295,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFacelessOne.blp";
                     IsABuilding = false;
                     Level = 8;
                     LumberBountyAwardedBase = 0;
@@ -12943,6 +13308,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\FacelessOne\\FacelessOne";
                     ModelFileExtraVersions = 0;
                     Name = "Faceless One Terror";
                     NormalSkin = "ACsl,ACmf";
@@ -12951,6 +13317,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\FacelessOne\\FacelessOne_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 160f;
                     ProjectileImpactZSwimming = 0f;
@@ -12963,6 +13330,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 480;
                     RepairLumberCost = 120;
                     RepairTime = 40;
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -12986,6 +13354,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 220;
+                    TintingColor3Blue = 205;
                     Tooltip = "Hire Faceless One Terror";
                     TooltipExtended = "Heavy ranged unit that hurls bolts of lightning. Can cast Sleep and Mana Shield. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -13104,6 +13475,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 255;
                     RepairLumberCost = 30;
                     RepairTime = 40;
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -13127,6 +13499,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I";
+                    TintingColor1Red = 220;
+                    TintingColor2Green = 220;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Faceless One Trickster";
                     TooltipExtended = "Heavy melee unit with Purge and Curse. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -13210,6 +13585,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAcolyte.blp";
                     IsABuilding = false;
                     Level = 1;
                     LumberBountyAwardedBase = 0;
@@ -13219,6 +13595,7 @@ namespace Moonwell.Objects
                     MaxLife = 240;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
+                    Model = "units\\undead\\Acolyte\\Acolyte";
                     ModelFileExtraVersions = 0;
                     Name = "Fallen Priest";
                     OccluderHeight = 0f;
@@ -13226,6 +13603,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\undead\\Acolyte\\Acolyte_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -13238,6 +13616,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -13261,6 +13640,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Y";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 187;
+                    TintingColor3Blue = 187;
                     Tooltip = "Hire Fallen Priest";
                     TooltipExtended = "Light ranged unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -13354,6 +13736,7 @@ namespace Moonwell.Objects
                     MaxLife = 390;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\FelstalkerPurple\\FelstalkerPurple";
                     ModelFileExtraVersions = 0;
                     Name = "Fel Beast";
                     OccluderHeight = 0f;
@@ -13361,6 +13744,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\FelstalkerPurple\\FelstalkerPurple_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -13373,6 +13757,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 155;
                     RepairLumberCost = 0;
                     RepairTime = 50;
+                    Scale = 0.5f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -13396,6 +13781,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "C,O,K";
+                    TintingColor1Red = 240;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 240;
                     Tooltip = "Summon Fel Beast";
                     TooltipExtended = "Light melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -13478,6 +13866,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPurpleFelhound.blp";
                     IsABuilding = false;
                     Level = 7;
                     LumberBountyAwardedBase = 0;
@@ -13511,6 +13900,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 320;
                     RepairLumberCost = 50;
                     RepairTime = 50;
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -13669,6 +14059,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "O,K";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 230;
+                    TintingColor3Blue = 230;
                     Tooltip = "Hire Felguard";
                     TooltipExtended = "Light melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -13782,6 +14175,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -13895,6 +14289,7 @@ namespace Moonwell.Objects
                     MaxLife = 1350;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\FirePandarenBrewmaster\\FirePandarenBrewmaster";
                     ModelFileExtraVersions = 0;
                     Name = "Fire";
                     NormalSkin = "Apig,ACrk";
@@ -13903,6 +14298,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\FirePandarenBrewmaster\\FirePandarenBrewmaster_portrait";
                     Priority = 4;
                     ProjectileImpactZ = 90f;
                     ProjectileImpactZSwimming = 0f;
@@ -13915,6 +14311,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 40;
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -14018,6 +14415,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRevenant.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -14051,6 +14449,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 215;
                     RepairLumberCost = 20;
                     RepairTime = 30;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -14074,6 +14473,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "D";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 180;
+                    TintingColor3Blue = 180;
                     Tooltip = "Summon Fire Revenant";
                     TooltipExtended = "Light melee unit with Immolation. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -14224,6 +14626,7 @@ namespace Moonwell.Objects
                     RequirementsTier3.Add("TALT");
                     RequirementsTiersUsed = 3;
                     Requires.Add("TALT");
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -14279,6 +14682,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 90f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -14365,9 +14770,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.6f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.5f;
                     ShadowImageCenterX = 40f;
                     ShadowImageCenterY = 40f;
                     ShadowImageHeight = 80f;
@@ -14506,6 +14913,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 150;
                     RepairLumberCost = 10;
                     RepairTime = 25;
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -14529,6 +14937,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,F,V,Q";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 220;
+                    TintingColor3Blue = 140;
                     Tooltip = "Hire Forest Troll";
                     TooltipExtended = "Axe-throwing Troll. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -14616,6 +15027,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNForestTroll.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -14625,6 +15037,7 @@ namespace Moonwell.Objects
                     MaxLife = 450;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\ForestTroll\\ForestTroll";
                     ModelFileExtraVersions = 0;
                     Name = "Forest Troll Berserker";
                     OccluderHeight = 0f;
@@ -14632,6 +15045,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\ForestTroll\\ForestTroll_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 80f;
                     ProjectileImpactZSwimming = 0f;
@@ -14644,6 +15058,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 245;
                     RepairLumberCost = 30;
                     RepairTime = 40;
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -14667,6 +15082,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,F,V,Q";
+                    TintingColor1Red = 215;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 225;
                     Tooltip = "Hire Forest Troll Berserker";
                     TooltipExtended = "Rabid axe-thrower. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -14755,6 +15173,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "H";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNForestTrollShadowPriest.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -14767,6 +15186,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\ForestTrollShadowPriest\\ForestTrollShadowPriest";
                     ModelFileExtraVersions = 0;
                     Name = "Forest Troll High Priest";
                     NormalSkin = "Anh2,ACif,ACd2";
@@ -14775,6 +15195,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\ForestTrollShadowPriest\\ForestTrollShadowPriest_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 80f;
                     ProjectileImpactZSwimming = 0f;
@@ -14787,6 +15208,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 305;
                     RepairLumberCost = 40;
                     RepairTime = 40;
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -14810,6 +15232,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,F,V,Q";
+                    TintingColor1Red = 215;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 215;
                     Tooltip = "Hire Forest Troll High Priest";
                     TooltipExtended = "High Priest of healing magic. Hurls fiery missiles. Can cast Abolish Magic and Inner Fire. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -14934,6 +15359,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 195;
                     RepairLumberCost = 10;
                     RepairTime = 25;
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -14957,6 +15383,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,F,V,Q";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 220;
+                    TintingColor3Blue = 140;
                     Tooltip = "Hire Forest Troll Shadow Priest";
                     TooltipExtended = "Shadow Priest of healing magic. Hurls fiery missiles. Can cast Abolish Magic. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -15074,6 +15503,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 215;
                     RepairLumberCost = 20;
                     RepairTime = 30;
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -15184,6 +15614,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNForestTroll.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -15193,6 +15624,7 @@ namespace Moonwell.Objects
                     MaxLife = 750;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\ForestTrollTrapper\\ForestTrollTrapper";
                     ModelFileExtraVersions = 0;
                     Name = "Forest Troll Warlord";
                     NormalSkin = "ACat";
@@ -15201,6 +15633,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\ForestTrollTrapper\\ForestTrollTrapper_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -15213,6 +15646,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 365;
                     RepairLumberCost = 80;
                     RepairTime = 60;
+                    Scale = 1.15f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -15652,6 +16086,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRevenant.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -15664,6 +16099,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Revenant\\Revenant";
                     ModelFileExtraVersions = 0;
                     Name = "Frost Revenant";
                     NormalSkin = "ACbz";
@@ -15672,6 +16108,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Revenant\\Revenant_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -15684,6 +16121,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 255;
                     RepairLumberCost = 30;
                     RepairTime = 40;
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -15707,6 +16145,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "N,G";
+                    TintingColor1Red = 220;
+                    TintingColor2Green = 190;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Frost Revenant";
                     TooltipExtended = "Medium melee unit that can cast Blizzard. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -15788,6 +16229,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTimberWolf.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -15817,6 +16259,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 150;
                     RepairLumberCost = 10;
                     RepairTime = 25;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -15956,6 +16399,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -16064,6 +16508,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFurbolg.blp";
                     IsABuilding = false;
                     Level = 7;
                     LumberBountyAwardedBase = 0;
@@ -16073,6 +16518,7 @@ namespace Moonwell.Objects
                     MaxLife = 950;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Furbolg\\Furbolg";
                     ModelFileExtraVersions = 0;
                     Name = "Furbolg Champion";
                     OccluderHeight = 0f;
@@ -16080,6 +16526,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Furbolg\\Furbolg_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -16093,6 +16540,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 100;
                     RepairTime = 70;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -16116,6 +16564,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A,C";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 190;
+                    TintingColor3Blue = 205;
                     Tooltip = "Hire Furbolg Champion";
                     TooltipExtended = "Heavy melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -16202,6 +16653,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFurbolgShaman.blp";
                     IsABuilding = false;
                     Level = 7;
                     LumberBountyAwardedBase = 0;
@@ -16214,6 +16666,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\FurbolgShaman\\FurbolgShaman";
                     ModelFileExtraVersions = 0;
                     Name = "Furbolg Elder Shaman";
                     NormalSkin = "ACr2,ACls";
@@ -16222,6 +16675,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\FurbolgShaman\\FurbolgShaman_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -16235,6 +16689,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 100;
                     RepairTime = 70;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -16258,6 +16713,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A,C";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 205;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Furbolg Elder Shaman";
                     TooltipExtended = "Heavy ranged unit that hurls bolts of lightning. Can cast Rejuvenation and Lightning Shield. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -16380,6 +16838,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.6f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -16525,6 +16984,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 80;
                     RepairTime = 60;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -16647,6 +17107,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\FurbolgElder\\FurbolgElder";
                     ModelFileExtraVersions = 0;
                     Name = "Furbolg Ursa Warrior";
                     NormalSkin = "Awrs,ACac";
@@ -16655,6 +17116,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\FurbolgElder\\FurbolgElder_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -16668,6 +17130,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 120;
                     RepairTime = 80;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -16778,6 +17241,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSeaTurtleGreen.blp";
                     IsABuilding = false;
                     Level = 7;
                     LumberBountyAwardedBase = 0;
@@ -16809,6 +17273,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.725f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -16975,6 +17440,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "N,D,G";
+                    TintingColor1Red = 190;
+                    TintingColor2Green = 205;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Ghost";
                     TooltipExtended = "Light ranged unit that can cast Possession. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -17057,6 +17525,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTimberWolf.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -17066,6 +17535,7 @@ namespace Moonwell.Objects
                     MaxLife = 550;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\WhiteWolf\\WhiteWolf";
                     ModelFileExtraVersions = 0;
                     Name = "Giant Frost Wolf";
                     NormalSkin = "ACct";
@@ -17074,6 +17544,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\WhiteWolf\\WhiteWolf_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -17086,6 +17557,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 255;
                     RepairLumberCost = 30;
                     RepairTime = 40;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -17109,6 +17581,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "N";
+                    TintingColor1Red = 205;
+                    TintingColor2Green = 190;
+                    TintingColor3Blue = 195;
                     Tooltip = "Summon Giant Frost Wolf";
                     TooltipExtended = "Medium melee unit with Critical Strike |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -17191,6 +17666,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFrostBear.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -17200,6 +17676,7 @@ namespace Moonwell.Objects
                     MaxLife = 900;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\PolarBear\\PolarBear";
                     ModelFileExtraVersions = 0;
                     Name = "Giant Polar Bear";
                     OccluderHeight = 0f;
@@ -17207,6 +17684,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\PolarBear\\PolarBear_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 90f;
                     ProjectileImpactZSwimming = 0f;
@@ -17220,6 +17698,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 80;
                     RepairTime = 60;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -17243,6 +17722,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I,N";
+                    TintingColor1Red = 190;
+                    TintingColor2Green = 225;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Giant Polar Bear";
                     TooltipExtended = "Heavy melee amphibious unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -17330,6 +17812,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSeaTurtleGreen.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -17361,6 +17844,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 35;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.575f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -17384,6 +17868,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 225;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Giant Sea Turtle";
                     TooltipExtended = "Medium ranged amphibious unit whose spiked shell harms enemy melee attackers. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -17464,6 +17951,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSkeletonWarrior.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -17473,6 +17961,7 @@ namespace Moonwell.Objects
                     MaxLife = 380;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\undead\\Skeleton\\Skeleton";
                     ModelFileExtraVersions = 0;
                     Name = "Giant Skeleton Warrior";
                     OccluderHeight = 0f;
@@ -17480,6 +17969,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\undead\\Skeleton\\Skeleton_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -17514,6 +18004,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "D,G";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 150;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Giant Skeleton Warrior";
                     TooltipExtended = "Large melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -17540,6 +18033,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 90f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -17596,6 +18091,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSpider.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -17605,6 +18101,7 @@ namespace Moonwell.Objects
                     MaxLife = 500;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
+                    Model = "units\\creeps\\Spider\\Spider";
                     ModelFileExtraVersions = 0;
                     Name = "Giant Spider";
                     NormalSkin = "ACvs,ACen";
@@ -17613,6 +18110,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Spider\\Spider_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -17625,9 +18123,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 255;
                     RepairLumberCost = 30;
                     RepairTime = 40;
+                    Scale = 1.25f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 0.95f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -17732,6 +18232,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTimberWolf.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -17741,6 +18242,7 @@ namespace Moonwell.Objects
                     MaxLife = 550;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\TimberWolf\\TimberWolf";
                     ModelFileExtraVersions = 0;
                     Name = "Giant Wolf";
                     NormalSkin = "ACct";
@@ -17749,6 +18251,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\TimberWolf\\TimberWolf_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -17761,6 +18264,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 215;
                     RepairLumberCost = 0;
                     RepairTime = 40;
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -17784,6 +18288,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A";
+                    TintingColor1Red = 210;
+                    TintingColor2Green = 200;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Giant Wolf";
                     TooltipExtended = "Medium melee unit with Critical Strike. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -18175,6 +18682,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "S";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGnollArcher.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -18184,6 +18692,7 @@ namespace Moonwell.Objects
                     MaxLife = 320;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\GnollArcher\\GnollArcher";
                     ModelFileExtraVersions = 0;
                     Name = "Gnoll Assassin";
                     NormalSkin = "ACvs";
@@ -18192,6 +18701,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GnollArcher\\GnollArcher_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -18204,6 +18714,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 215;
                     RepairLumberCost = 20;
                     RepairTime = 30;
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -18227,6 +18738,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,F,W";
+                    TintingColor1Red = 160;
+                    TintingColor2Green = 160;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Gnoll Assassin";
                     TooltipExtended = "Light ranged unit that fires envenomed bolts. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -18310,6 +18824,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGnoll.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -18319,6 +18834,7 @@ namespace Moonwell.Objects
                     MaxLife = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Gnoll\\Gnoll";
                     ModelFileExtraVersions = 0;
                     Name = "Gnoll Brute";
                     OccluderHeight = 0f;
@@ -18326,6 +18842,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Gnoll\\Gnoll_portrait";
                     Priority = 2;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -18338,6 +18855,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 140;
                     RepairLumberCost = 0;
                     RepairTime = 30;
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -18361,6 +18879,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,F,W";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 180;
+                    TintingColor3Blue = 180;
                     Tooltip = "Hire Gnoll Brute";
                     TooltipExtended = "Light melee unit to bolster your forces. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -18476,6 +18997,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 305;
                     RepairLumberCost = 35;
                     RepairTime = 50;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -18617,6 +19139,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.65f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -18764,6 +19287,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 180;
                     RepairLumberCost = 20;
                     RepairTime = 30;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -18930,6 +19454,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,F,W";
+                    TintingColor1Red = 100;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -19022,6 +19549,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRockGolem.blp";
                     IsABuilding = false;
                     Level = 9;
                     LumberBountyAwardedBase = 0;
@@ -19034,6 +19562,7 @@ namespace Moonwell.Objects
                     MaxMana = 600;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\RockGolem\\RockGolem";
                     ModelFileExtraVersions = 0;
                     Name = "Granite Golem";
                     NormalSkin = "ACmi,ACtb,ACtc";
@@ -19042,6 +19571,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\RockGolem\\RockGolem_portrait";
                     Priority = 8;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -19055,6 +19585,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 150;
                     RepairTime = 90;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1.5f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -19077,6 +19608,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,F,W,V,Q,Y,X,D,J";
+                    TintingColor1Red = 190;
+                    TintingColor2Green = 160;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Granite Golem";
                     TooltipExtended = "Heavy melee unit that can Slam opponents and hurl boulders. Immune to spells. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -19165,6 +19699,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "V";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNVoidWalker.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -19177,6 +19712,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\VoidWalker\\VoidWalker";
                     ModelFileExtraVersions = 0;
                     Name = "Greater Voidwalker";
                     NormalSkin = "ACf2,ACcl";
@@ -19185,6 +19721,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 2;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\VoidWalker\\VoidWalker_portrait";
                     Priority = 4;
                     ProjectileImpactZ = 90f;
                     ProjectileImpactZSwimming = 0f;
@@ -19221,6 +19758,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "O,K";
+                    TintingColor1Red = 80;
+                    TintingColor2Green = 80;
+                    TintingColor3Blue = 80;
                     Tooltip = "Hire Greater Voidwalker";
                     TooltipExtended = "Heavy ranged unit that casts Chain Lightning and Frost Armor. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -19354,6 +19894,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 200;
                     RepairTime = 100;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -19377,6 +19918,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A,C";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 210;
+                    TintingColor3Blue = 180;
                     Tooltip = "Summon Green Dragon";
                     TooltipExtended = "Heavy ranged flying unit that can Devour opponents and is immune to magic. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.1f;
@@ -19471,6 +20015,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGreenDragon.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -19501,6 +20046,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 20;
                     RepairTime = 30;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.4f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -19524,6 +20070,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A,C";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 230;
+                    TintingColor3Blue = 100;
                     Tooltip = "Summon Green Dragon Whelp";
                     TooltipExtended = "Tiny ranged flying unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.5f;
@@ -19617,6 +20166,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "K";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGreenDragon.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -19626,6 +20176,7 @@ namespace Moonwell.Objects
                     MaxLife = 950;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "Units\\Creeps\\GreenDrake\\GreenDrake";
                     ModelFileExtraVersions = 0;
                     Name = "Green Drake";
                     OccluderHeight = 0f;
@@ -19633,6 +20184,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\GreenDrake\\GreenDrake_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -19646,6 +20198,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 80;
                     RepairTime = 60;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -19669,6 +20222,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A,C";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Green Drake";
                     TooltipExtended = "Small ranged flying unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.1f;
@@ -19764,6 +20320,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRockGolem.blp";
                     IsABuilding = false;
                     Level = 9;
                     LumberBountyAwardedBase = 0;
@@ -19776,6 +20333,7 @@ namespace Moonwell.Objects
                     MaxMana = 600;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\RockGolem\\RockGolem";
                     ModelFileExtraVersions = 0;
                     Name = "Guardian Golem";
                     NormalSkin = "ACmi,ACtb,ACtc";
@@ -19784,6 +20342,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\RockGolem\\RockGolem_portrait";
                     Priority = 8;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -19820,6 +20379,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,F,W,V,Q,Y,X,D,J";
+                    TintingColor1Red = 150;
+                    TintingColor2Green = 100;
+                    TintingColor3Blue = 255;
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -20053,6 +20615,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHarpy.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -20062,6 +20625,7 @@ namespace Moonwell.Objects
                     MaxLife = 340;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "units\\creeps\\Harpy\\Harpy";
                     ModelFileExtraVersions = 0;
                     Name = "Harpy Rogue";
                     OccluderHeight = 0f;
@@ -20069,6 +20633,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Harpy\\Harpy_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 30f;
                     ProjectileImpactZSwimming = 0f;
@@ -20081,6 +20646,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 215;
                     RepairLumberCost = 20;
                     RepairTime = 30;
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -20104,6 +20670,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 205;
                     Tooltip = "Hire Harpy Rogue";
                     TooltipExtended = "Light flying ranged unit that hurls pin-feathers. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.5f;
@@ -20217,6 +20786,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 150;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -20240,6 +20810,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 140;
+                    TintingColor3Blue = 120;
                     Tooltip = "Hire Harpy Scout";
                     TooltipExtended = "Light flying ranged unit that hurls pin-feathers. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.5f;
@@ -20324,6 +20897,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHarpyWitch.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -20336,6 +20910,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "units\\creeps\\HarpyWitch\\HarpyWitch";
                     ModelFileExtraVersions = 0;
                     Name = "Harpy Storm-hag";
                     NormalSkin = "ACcs,ACsl";
@@ -20344,6 +20919,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\HarpyWitch\\HarpyWitch_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 30f;
                     ProjectileImpactZSwimming = 0f;
@@ -20356,6 +20932,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 320;
                     RepairLumberCost = 50;
                     RepairTime = 50;
+                    Scale = 1.1f;
                     ScaleProjectiles = false;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -20380,6 +20957,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B";
+                    TintingColor1Red = 150;
+                    TintingColor2Green = 200;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Harpy Storm-hag";
                     TooltipExtended = "Medium flying ranged unit that hurls bolts of lightning. Can Curse opponents and cast Sleep. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.5f;
@@ -20612,6 +21192,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAcolyte.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -20624,6 +21205,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
+                    Model = "units\\undead\\Acolyte\\Acolyte";
                     ModelFileExtraVersions = 0;
                     Name = "Heretic";
                     NormalSkin = "ACrd,ACca";
@@ -20632,6 +21214,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\undead\\Acolyte\\Acolyte_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -20644,6 +21227,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 320;
                     RepairLumberCost = 50;
                     RepairTime = 50;
+                    Scale = 1.3f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -20667,6 +21251,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Y";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 210;
                     Tooltip = "Hire Heretic";
                     TooltipExtended = "Medium ranged unit that hurls Demon fire. Can cast Raise Dead and Carrion Swarm. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -20753,6 +21340,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 10f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGreenHydra.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -20784,6 +21372,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.55f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -20905,6 +21494,7 @@ namespace Moonwell.Objects
                     MaxLife = 350;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\Hydra\\Hydra";
                     ModelFileExtraVersions = 0;
                     Name = "Hydra Hatchling";
                     NormalSkin = "Aspo";
@@ -20913,6 +21503,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\Hydra\\Hydra_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 50f;
                     ProjectileImpactZSwimming = 0f;
@@ -20926,6 +21517,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.45f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -20949,6 +21541,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 190;
                     Tooltip = "Hire Hydra Hatchling";
                     TooltipExtended = "Medium ranged amphibious unit with Slow Poison. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -21030,6 +21625,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRevenant.blp";
                     IsABuilding = false;
                     Level = 8;
                     LumberBountyAwardedBase = 0;
@@ -21042,6 +21638,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Revenant\\Revenant";
                     ModelFileExtraVersions = 0;
                     Name = "Ice Revenant";
                     NormalSkin = "ACvp,ACfn";
@@ -21050,6 +21647,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Revenant\\Revenant_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -21062,6 +21660,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 480;
                     RepairLumberCost = 120;
                     RepairTime = 80;
+                    Scale = 1.4f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -21085,6 +21684,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "N,G";
+                    TintingColor1Red = 200;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Ice Revenant";
                     TooltipExtended = "Heavy melee unit with Vampiric Aura. Can cast Frost Nova. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -21200,6 +21802,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 150;
                     RepairLumberCost = 10;
                     RepairTime = 25;
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -21223,6 +21826,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "W,N,I";
+                    TintingColor1Red = 225;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Ice Troll";
                     TooltipExtended = "Light ranged unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -21318,6 +21924,7 @@ namespace Moonwell.Objects
                     MaxLife = 450;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\IceTroll\\IceTroll";
                     ModelFileExtraVersions = 0;
                     Name = "Ice Troll Berserker";
                     OccluderHeight = 0f;
@@ -21325,6 +21932,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\IceTroll\\IceTroll_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -21337,6 +21945,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 245;
                     RepairLumberCost = 30;
                     RepairTime = 40;
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -21360,6 +21969,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "W,N,I";
+                    TintingColor1Red = 225;
+                    TintingColor2Green = 190;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Ice Troll Berserker";
                     TooltipExtended = "Medium ranged unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -21478,6 +22090,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 255;
                     RepairLumberCost = 30;
                     RepairTime = 40;
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -21501,6 +22114,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "W,N,I";
+                    TintingColor1Red = 225;
+                    TintingColor2Green = 220;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Ice Troll High Priest";
                     TooltipExtended = "High Priest of healing magic. Can cast Abolish Magic and Frost Armor. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -21601,6 +22217,7 @@ namespace Moonwell.Objects
                     MaxMana = 200;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\IceTrollShadowPriest\\IceTrollShadowPriest";
                     ModelFileExtraVersions = 0;
                     Name = "Ice Troll Priest";
                     NormalSkin = "Anh1";
@@ -21609,6 +22226,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\IceTrollShadowPriest\\IceTrollShadowPriest_portrait";
                     Priority = 6;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -21621,6 +22239,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 175;
                     RepairLumberCost = 10;
                     RepairTime = 25;
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -21644,6 +22263,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "W,N,I";
+                    TintingColor1Red = 220;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Ice Troll Priest";
                     TooltipExtended = "Priest of healing magic. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -21732,6 +22354,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNICeTroll.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -21741,6 +22364,7 @@ namespace Moonwell.Objects
                     MaxLife = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\IceTroll\\IceTroll";
                     ModelFileExtraVersions = 0;
                     Name = "Ice Troll Trapper";
                     NormalSkin = "ACen";
@@ -21749,6 +22373,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\IceTroll\\IceTroll_portrait";
                     Priority = 5;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -21761,6 +22386,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 200;
                     RepairLumberCost = 20;
                     RepairTime = 30;
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -21784,6 +22410,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "W,N,I";
+                    TintingColor1Red = 230;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 220;
                     Tooltip = "Hire Ice Troll Trapper";
                     TooltipExtended = "Medium ranged unit that can Ensnare opponents. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -21867,6 +22496,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNICeTroll.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -21876,6 +22506,7 @@ namespace Moonwell.Objects
                     MaxLife = 750;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\IceTroll\\IceTroll";
                     ModelFileExtraVersions = 0;
                     Name = "Ice Troll Warlord";
                     NormalSkin = "ACat";
@@ -21884,6 +22515,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\IceTroll\\IceTroll_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -21896,6 +22528,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 365;
                     RepairLumberCost = 80;
                     RepairTime = 60;
+                    Scale = 1.15f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -22004,6 +22637,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMammoth.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -22013,6 +22647,7 @@ namespace Moonwell.Objects
                     MaxLife = 925;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\Mammoth\\Mammoth";
                     ModelFileExtraVersions = 0;
                     Name = "Icetusk Mammoth";
                     OccluderHeight = 0f;
@@ -22020,6 +22655,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\Mammoth\\Mammoth_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -22056,6 +22692,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 165;
+                    TintingColor3Blue = 100;
                     Tooltip = "Hire Icetusk Mammoth";
                     TooltipExtended = "Heavy melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -22441,6 +23080,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNInfernalCannon.blp";
                     IsABuilding = false;
                     Level = 8;
                     LumberBountyAwardedBase = 0;
@@ -22453,6 +23093,7 @@ namespace Moonwell.Objects
                     MaxMana = 350;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
+                    Model = "units\\creeps\\InfernalCannonCannon\\InfernalCannonCannon";
                     ModelFileExtraVersions = 0;
                     Name = "Infernal Machine";
                     NormalSkin = "ACbc";
@@ -22461,6 +23102,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\InfernalCannonCannon\\InfernalCannonCannon_portrait";
                     Priority = 2;
                     ProjectileImpactZ = 90f;
                     ProjectileImpactZSwimming = 0f;
@@ -22497,6 +23139,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "O,K";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 200;
+                    TintingColor3Blue = 200;
                     Tooltip = "Hire Infernal Machine";
                     TooltipExtended = "Heavy ranged unit that hurls fiery missiles. Can cast Breath of Fire. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 2;
@@ -22609,6 +23254,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 20;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -22746,6 +23392,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 90;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -22769,6 +23416,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "D,Y,X,V,Q,G,J";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 210;
                     Tooltip = "Hire Kobold";
                     TooltipExtended = "Light melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -22891,6 +23541,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 215;
                     RepairLumberCost = 30;
                     RepairTime = 30;
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -22998,6 +23649,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNKobold.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -23007,6 +23659,7 @@ namespace Moonwell.Objects
                     MaxLife = 650;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Kobold\\Kobold";
                     ModelFileExtraVersions = 0;
                     Name = "Kobold Taskmaster";
                     NormalSkin = "ACac,ACbh";
@@ -23015,6 +23668,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Kobold\\Kobold_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -23027,6 +23681,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 320;
                     RepairLumberCost = 50;
                     RepairTime = 50;
+                    Scale = 1.3f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -23136,6 +23791,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNKobold.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -23145,6 +23801,7 @@ namespace Moonwell.Objects
                     MaxLife = 325;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Kobold\\Kobold";
                     ModelFileExtraVersions = 0;
                     Name = "Kobold Tunneler";
                     NormalSkin = "ACbh";
@@ -23153,6 +23810,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Kobold\\Kobold_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -23165,6 +23823,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 150;
                     RepairLumberCost = 0;
                     RepairTime = 30;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -23188,6 +23847,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "D,Y,X,V,Q,G,J";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 205;
+                    TintingColor3Blue = 218;
                     Tooltip = "Hire Kobold Tunneler";
                     TooltipExtended = "Light melee unit that can Bash opponents. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -23271,6 +23933,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNVoidWalker.blp";
                     IsABuilding = false;
                     Level = 1;
                     LumberBountyAwardedBase = 0;
@@ -23280,6 +23943,7 @@ namespace Moonwell.Objects
                     MaxLife = 240;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\VoidWalker\\VoidWalker";
                     ModelFileExtraVersions = 0;
                     Name = "Lesser Voidwalker";
                     OccluderHeight = 0f;
@@ -23287,6 +23951,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 2;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\VoidWalker\\VoidWalker_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -23415,6 +24080,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNThunderLizard.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -23427,6 +24093,7 @@ namespace Moonwell.Objects
                     MaxMana = 200;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\ThunderLizard\\ThunderLizard";
                     ModelFileExtraVersions = 0;
                     Name = "Lightning Lizard";
                     NormalSkin = "Alit,ACpu";
@@ -23435,6 +24102,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\ThunderLizard\\ThunderLizard_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -23448,6 +24116,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 10;
                     RepairTime = 25;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -23471,6 +24140,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B,A,C,G";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 180;
                     Tooltip = "Summon Lightning Lizard";
                     TooltipExtended = "Light ranged unit that hurls bolts of lightning. Can cast Purge. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -23552,6 +24224,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRevenant.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -23564,6 +24237,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Revenant\\Revenant";
                     ModelFileExtraVersions = 0;
                     Name = "Lightning Revenant";
                     NormalSkin = "ACpu,ACcl";
@@ -23572,6 +24246,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Revenant\\Revenant_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -23584,6 +24259,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 365;
                     RepairLumberCost = 80;
                     RepairTime = 60;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -23607,6 +24283,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "D";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 150;
                     Tooltip = "Summon Lightning Revenant";
                     TooltipExtended = "Heavy melee unit that can cast Chain Lightning and Purge. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -23896,6 +24575,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -24038,6 +24718,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 15;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.6f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -24148,6 +24829,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBlueDemoness.blp";
                     IsABuilding = false;
                     Level = 8;
                     LumberBountyAwardedBase = 0;
@@ -24181,6 +24863,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 480;
                     RepairLumberCost = 120;
                     RepairTime = 28;
+                    Scale = 1.3f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -24294,6 +24977,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNLobstrokkGreen.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -24306,6 +24990,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
+                    Model = "Units\\Creeps\\Lobstrokkblue\\Lobstrokkblue";
                     ModelFileExtraVersions = 0;
                     Name = "Makrura Deepseer";
                     NormalSkin = "Aenw,Aslp";
@@ -24314,6 +24999,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\Lobstrokkblue\\Lobstrokkblue_portrait";
                     Priority = 8;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -24327,6 +25013,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 100;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -24350,6 +25037,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 250;
+                    TintingColor2Green = 250;
+                    TintingColor3Blue = 200;
                     Tooltip = "Hire Makrura Deepseer";
                     TooltipExtended = "Medium ranged unit that can cast Entangling Roots and summon Prawns. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -24432,6 +25122,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNLobstrokkRed.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -24441,6 +25132,7 @@ namespace Moonwell.Objects
                     MaxLife = 210;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
+                    Model = "Units\\Creeps\\Lobstrokkred\\Lobstrokkred";
                     ModelFileExtraVersions = 0;
                     Name = "Makrura Pooldweller";
                     OccluderHeight = 0f;
@@ -24448,6 +25140,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\Lobstrokkred\\Lobstrokkred_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -24461,6 +25154,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -24484,6 +25178,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 185;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 225;
                     Tooltip = "Hire Makrura Pooldweller";
                     TooltipExtended = "Light melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -24597,6 +25294,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -24706,6 +25404,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNLobstrokkRed.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -24715,6 +25414,7 @@ namespace Moonwell.Objects
                     MaxLife = 620;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
+                    Model = "Units\\Creeps\\Lobstrokkred\\Lobstrokkred";
                     ModelFileExtraVersions = 0;
                     Name = "Makrura Snapper";
                     OccluderHeight = 0f;
@@ -24722,6 +25422,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\Lobstrokkred\\Lobstrokkred_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -24735,6 +25436,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -24758,6 +25460,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 205;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 190;
                     Tooltip = "Hire Makrura Snapper";
                     TooltipExtended = "Heavy melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -24873,6 +25578,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -25021,6 +25727,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -25044,6 +25751,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 230;
                     Tooltip = "Hire Makrura Tidecaller";
                     TooltipExtended = "Light ranged unit with Heal and Frost Armor. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -25398,6 +26108,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRockGolem.blp";
                     IsABuilding = false;
                     Level = 9;
                     LumberBountyAwardedBase = 0;
@@ -25410,6 +26121,7 @@ namespace Moonwell.Objects
                     MaxMana = 600;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\RockGolem\\RockGolem";
                     ModelFileExtraVersions = 0;
                     Name = "Moss Covered Granite Golem";
                     NormalSkin = "ACmi,ACtb,ACtc";
@@ -25418,6 +26130,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\RockGolem\\RockGolem_portrait";
                     Priority = 8;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -25431,6 +26144,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 150;
                     RepairTime = 90;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1.5f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -25454,6 +26168,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,F,W,V,Q,Y,X,D,J";
+                    TintingColor1Red = 110;
+                    TintingColor2Green = 225;
+                    TintingColor3Blue = 110;
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -25537,6 +26254,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "U";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRockGolem.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -25549,6 +26267,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\RockGolem\\RockGolem";
                     ModelFileExtraVersions = 0;
                     Name = "Mud Golem";
                     NormalSkin = "ACmi,ACsw";
@@ -25557,6 +26276,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\RockGolem\\RockGolem_portrait";
                     Priority = 4;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -25570,6 +26290,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 10;
                     RepairTime = 25;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.65f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -25592,6 +26313,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,F,W,V,Q,Y,X,D,J";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 170;
                     Tooltip = "Summon Mud Golem";
                     TooltipExtended = "Light melee unit that can Slow opponents. Immune to spells. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -25821,6 +26545,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMurgulTideWarrior.blp";
                     IsABuilding = false;
                     Level = 1;
                     LumberBountyAwardedBase = 0;
@@ -25830,6 +26555,7 @@ namespace Moonwell.Objects
                     MaxLife = 240;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\MurgulTideWarrior\\MurgulTideWarrior";
                     ModelFileExtraVersions = 0;
                     Name = "Mur'gul Cliffrunner";
                     OccluderHeight = 0f;
@@ -25837,6 +26563,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\MurgulTideWarrior\\MurgulTideWarrior_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -25872,6 +26599,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 128;
                     Tooltip = "Hire Mur'gul Cliffrunner";
                     TooltipExtended = "Light melee amphibious unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -25955,6 +26685,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMurgulBloodGill.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -25964,6 +26695,7 @@ namespace Moonwell.Objects
                     MaxLife = 1000;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\MurgulReaver\\MurgulReaver";
                     ModelFileExtraVersions = 0;
                     Name = "Mur'gul Marauder";
                     NormalSkin = "ACac";
@@ -25972,6 +26704,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\MurgulReaver\\MurgulReaver_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -26245,6 +26978,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "G";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMurgulShadowCaster.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -26257,6 +26991,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\MurgulShadowCaster\\MurgulShadowCaster";
                     ModelFileExtraVersions = 0;
                     Name = "Mur'gul Snarecaster";
                     NormalSkin = "ACsw,ACdm";
@@ -26265,6 +27000,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\MurgulShadowCaster\\MurgulShadowCaster_portrait";
                     Priority = 6;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -26300,6 +27036,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 192;
+                    TintingColor2Green = 192;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Mur'gul Snarecaster";
                     TooltipExtended = "Medium ranged amphibious unit with Abolish Magic and Slow. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -26553,6 +27292,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 140;
                     RepairLumberCost = 0;
                     RepairTime = 30;
+                    Scale = 1.3f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -26661,6 +27401,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "H";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMurloc.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -26691,6 +27432,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 150;
                     RepairLumberCost = 10;
                     RepairTime = 25;
+                    Scale = 1.15f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -26832,6 +27574,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 365;
                     RepairLumberCost = 80;
                     RepairTime = 60;
+                    Scale = 1.5f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -26970,6 +27713,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 215;
                     RepairLumberCost = 20;
                     RepairTime = 30;
+                    Scale = 1.4f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -26993,6 +27737,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,F,W,V,Q,Y,X,B,N,A,J";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 227;
+                    TintingColor3Blue = 227;
                     Tooltip = "Hire Murloc Nightcrawler";
                     TooltipExtended = "Light melee unit that poisons opponents. Can also Shadowmeld. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -27074,6 +27821,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMurlocMutant.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -27083,6 +27831,7 @@ namespace Moonwell.Objects
                     MaxLife = 180;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\MurlocMutant\\MurlocMutant";
                     ModelFileExtraVersions = global::Moonwell.Objects.VersionFlags.TheFrozenThrone | global::Moonwell.Objects.VersionFlags.Unlisted4;
                     Name = "Murloc Plaguebearer";
                     NormalSkin = "Aap3";
@@ -27091,6 +27840,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\MurlocMutant\\MurlocMutant_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -27127,6 +27877,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "C";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 120;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Murloc Plaguebearer";
                     TooltipExtended = "Light melee unit that diseases opponents. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -27230,6 +27983,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "S";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMurlocNightCrawler.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-lich.blp";
                     Intelligence = 19;
                     IntelligencePerLevel = 3.2f;
@@ -27245,6 +27999,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\MurlocNightcrawler\\MurlocNightcrawler";
                     ModelFileExtraVersions = 0;
                     Name = "Murloc Sorcerer";
                     NormalSkin = "AInv";
@@ -27253,6 +28008,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\MurlocNightcrawler\\MurlocNightcrawler_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.INT;
                     Priority = 9;
                     ProjectileImpactZ = 120f;
@@ -27406,6 +28162,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -27429,6 +28186,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,F,W,V,Q,Y,X,B,N,A,J";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Murloc Tiderunner";
                     TooltipExtended = "Light melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -27548,6 +28308,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 100;
                     RepairTime = 70;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -27658,6 +28419,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNnerubianSpiderLord.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -27670,6 +28432,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
+                    Model = "units\\creeps\\NerubianQueen\\NerubianQueen";
                     ModelFileExtraVersions = 0;
                     Name = "Nerubian Seer";
                     NormalSkin = "ACrd,ACdm,Aspa";
@@ -27678,6 +28441,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\NerubianQueen\\NerubianQueen_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -27691,6 +28455,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 50;
                     RepairTime = 50;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.5f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -27714,6 +28479,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I,N";
+                    TintingColor1Red = 195;
+                    TintingColor2Green = 225;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Nerubian Seer";
                     TooltipExtended = "Heavy melee unit that can cast Abolish Magic and Raise Dead. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -27827,6 +28595,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 50;
                     RepairTime = 50;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.6f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -27850,6 +28619,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I,N";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 190;
                     Tooltip = "Summon Nerubian Spider Lord";
                     TooltipExtended = "Heavy melee unit that carries its young into battle. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -27933,6 +28705,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNNerubian.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -27942,6 +28715,7 @@ namespace Moonwell.Objects
                     MaxLife = 400;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
+                    Model = "units\\creeps\\Nerubian\\Nerubian";
                     ModelFileExtraVersions = 0;
                     Name = "Nerubian Warrior";
                     NormalSkin = "Assp";
@@ -27950,6 +28724,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Nerubian\\Nerubian_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 160f;
                     ProjectileImpactZSwimming = 0f;
@@ -27963,6 +28738,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 30;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.45f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -27986,6 +28762,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I,N";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 180;
                     Tooltip = "Summon Nerubian Warrior";
                     TooltipExtended = "Light melee unit that carries its young into battle. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -28073,6 +28852,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "N";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNNerubianQueen.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -28085,6 +28865,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
+                    Model = "units\\creeps\\NerubianSpiderLord\\NerubianSpiderLord";
                     ModelFileExtraVersions = 0;
                     Name = "Nerubian Webspinner";
                     NormalSkin = "ACwb,ACrd,Aspa";
@@ -28093,6 +28874,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\NerubianSpiderLord\\NerubianSpiderLord_portrait";
                     Priority = 3;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -28106,6 +28888,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 35;
                     RepairTime = 30;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.4f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -28129,6 +28912,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I,N";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 180;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Nerubian Webspinner";
                     TooltipExtended = "Light ranged unit that can cast Web and Raise Dead. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -28244,6 +29030,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "Units\\creeps\\NetherDrake\\NetherDrake";
                     ModelFileExtraVersions = 0;
                     Name = "Nether Dragon";
                     NormalSkin = "ACmi,ACcr";
@@ -28252,6 +29039,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\creeps\\NetherDrake\\NetherDrake_portrait";
                     Priority = 2;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -28265,6 +29053,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 200;
                     RepairTime = 100;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -28288,6 +29077,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "O,K";
+                    TintingColor1Red = 100;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 100;
                     Tooltip = "Summon Nether Dragon";
                     TooltipExtended = "Heavy ranged flying unit that can cast Cripple and is immune to magic. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.1f;
@@ -28383,6 +29175,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "H";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNNetherDragon.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -28392,6 +29185,7 @@ namespace Moonwell.Objects
                     MaxLife = 340;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "Units\\creeps\\NetherDrake\\NetherDrake";
                     ModelFileExtraVersions = 0;
                     Name = "Nether Dragon Hatchling";
                     OccluderHeight = 0f;
@@ -28399,6 +29193,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\creeps\\NetherDragonHatchling\\NetherDragonHatchling_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 0f;
                     ProjectileImpactZSwimming = 0f;
@@ -28412,6 +29207,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 20;
                     RepairTime = 30;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.4f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -28435,6 +29231,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "O,K";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Nether Dragon Hatchling";
                     TooltipExtended = "Tiny ranged flying unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.1f;
@@ -28528,6 +29327,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "K";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNNetherDragon.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -28537,6 +29337,7 @@ namespace Moonwell.Objects
                     MaxLife = 950;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "Units\\creeps\\NetherDrake\\NetherDrake";
                     ModelFileExtraVersions = 0;
                     Name = "Nether Drake";
                     OccluderHeight = 0f;
@@ -28544,6 +29345,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\creeps\\NetherDrake\\NetherDrake_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -28557,6 +29359,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 80;
                     RepairTime = 60;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.65f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -28700,6 +29503,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 100;
                     RepairTime = 70;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -28846,6 +29650,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 50;
                     RepairTime = 50;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.15f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -28955,6 +29760,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "M";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNOgre.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -28964,6 +29770,7 @@ namespace Moonwell.Objects
                     MaxLife = 850;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Ogre\\Ogre";
                     ModelFileExtraVersions = 0;
                     Name = "Ogre Mauler";
                     OccluderHeight = 0f;
@@ -28971,6 +29778,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Ogre\\Ogre_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -28984,6 +29792,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 50;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.25f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -29007,6 +29816,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,F,W";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 207;
+                    TintingColor3Blue = 207;
                     Tooltip = "Hire Ogre Mauler";
                     TooltipExtended = "Large brutal warrior of the Ogre Legion. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -29121,6 +29933,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 30;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -29404,6 +30217,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 255;
                     RepairLumberCost = 30;
                     RepairTime = 40;
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -29579,6 +30393,7 @@ namespace Moonwell.Objects
                     RequirementsTier3.Add("TALT");
                     RequirementsTiersUsed = 3;
                     Requires.Add("TALT");
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -29692,6 +30507,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCorruptedEnt.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -29704,6 +30520,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\CorruptedEnt\\CorruptedEnt";
                     ModelFileExtraVersions = 0;
                     Name = "Plague Treant";
                     NormalSkin = "Aenr,Aap3";
@@ -29712,6 +30529,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\CorruptedEnt\\CorruptedEnt_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -29725,6 +30543,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 50;
                     RepairTime = 50;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -29747,6 +30566,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "C";
+                    TintingColor1Red = 160;
+                    TintingColor2Green = 220;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Plague Treant";
                     TooltipExtended = "Medium melee unit that diseases opponents. Can cast Entangling Roots. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -29828,6 +30650,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCorruptedEnt.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -29837,6 +30660,7 @@ namespace Moonwell.Objects
                     MaxLife = 350;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\CorruptedEnt\\CorruptedEnt";
                     ModelFileExtraVersions = 0;
                     Name = "Poison Treant";
                     NormalSkin = "Aenr,ACvs";
@@ -29845,6 +30669,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\CorruptedEnt\\CorruptedEnt_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -29858,6 +30683,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 20;
                     RepairTime = 30;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -29880,6 +30706,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "C";
+                    TintingColor1Red = 210;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 120;
                     Tooltip = "Summon Poison Treant";
                     TooltipExtended = "Light melee unit that poisons opponents. Can cast Entangling Roots. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -29992,6 +30821,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -30131,6 +30961,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.6f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -30239,6 +31070,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPolarFurbolg.blp";
                     IsABuilding = false;
                     Level = 7;
                     LumberBountyAwardedBase = 0;
@@ -30248,6 +31080,7 @@ namespace Moonwell.Objects
                     MaxLife = 950;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\PolarFurbolg\\PolarFurbolg";
                     ModelFileExtraVersions = 0;
                     Name = "Polar Furbolg Champion";
                     OccluderHeight = 0f;
@@ -30255,6 +31088,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\PolarFurbolg\\PolarFurbolg_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -30268,6 +31102,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 100;
                     RepairTime = 70;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -30291,6 +31126,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I,N";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 190;
+                    TintingColor3Blue = 205;
                     Tooltip = "Hire Polar Furbolg Champion";
                     TooltipExtended = "Heavy melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -30377,6 +31215,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPolarFurbolgShaman.blp";
                     IsABuilding = false;
                     Level = 8;
                     LumberBountyAwardedBase = 0;
@@ -30389,6 +31228,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\PolarFurbolgTracker\\PolarFurbolgTracker";
                     ModelFileExtraVersions = 0;
                     Name = "Polar Furbolg Elder Shaman";
                     NormalSkin = "AChv,ACfn";
@@ -30397,6 +31237,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\PolarFurbolgTracker\\PolarFurbolgTracker_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -30410,6 +31251,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 120;
                     RepairTime = 70;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -30433,6 +31275,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I,N";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 205;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Polar Furbolg Elder Shaman";
                     TooltipExtended = "Heavy ranged unit with Frost Nova and Healing Wave. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -30534,6 +31379,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\PolarFurbolgTracker\\PolarFurbolgTracker";
                     ModelFileExtraVersions = 0;
                     Name = "Polar Furbolg Shaman";
                     NormalSkin = "ACf2,ACdm";
@@ -30542,6 +31388,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\PolarFurbolgTracker\\PolarFurbolgTracker_portrait";
                     Priority = 5;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -30555,6 +31402,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.55f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -30700,6 +31548,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 80;
                     RepairTime = 60;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.6f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -30822,6 +31671,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\PolarFurbolg\\PolarFurbolg";
                     ModelFileExtraVersions = 0;
                     Name = "Polar Furbolg Ursa Warrior";
                     NormalSkin = "Awrs,ACac";
@@ -30830,6 +31680,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\PolarFurbolg\\PolarFurbolg_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -30843,6 +31694,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 120;
                     RepairTime = 80;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -30980,6 +31832,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.65f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -31091,6 +31944,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBlueDemoness.blp";
                     IsABuilding = false;
                     Level = 10;
                     LumberBountyAwardedBase = 0;
@@ -31103,6 +31957,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\demon\\DemonessBlue\\DemonessBlue";
                     ModelFileExtraVersions = 0;
                     Name = "Queen of Suffering";
                     NormalSkin = "ACdc,ACua,ACch";
@@ -31111,6 +31966,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\demon\\DemonessBlue\\DemonessBlue_portrait";
                     Priority = 6;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -31123,6 +31979,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 225;
                     RepairLumberCost = 40;
                     RepairTime = 28;
+                    Scale = 1.35f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -31231,6 +32088,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRazorback.blp";
                     IsABuilding = false;
                     Level = 1;
                     LumberBountyAwardedBase = 0;
@@ -31240,6 +32098,7 @@ namespace Moonwell.Objects
                     MaxLife = 240;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Bristleback\\Bristleback";
                     ModelFileExtraVersions = 0;
                     Name = "Quillboar";
                     OccluderHeight = 0f;
@@ -31247,6 +32106,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Bristleback\\Bristleback_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -31259,6 +32119,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -31282,6 +32143,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 170;
+                    TintingColor3Blue = 200;
                     Tooltip = "Hire Quillboar";
                     TooltipExtended = "Light ranged unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -31365,6 +32229,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRazorback.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -31374,6 +32239,7 @@ namespace Moonwell.Objects
                     MaxLife = 375;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Bristleback\\Bristleback";
                     ModelFileExtraVersions = 0;
                     Name = "Quillboar Hunter";
                     NormalSkin = "ACev";
@@ -31382,6 +32248,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Bristleback\\Bristleback_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -31394,6 +32261,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 215;
                     RepairLumberCost = 20;
                     RepairTime = 30;
+                    Scale = 1.3f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -31417,6 +32285,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 200;
+                    TintingColor3Blue = 215;
                     Tooltip = "Hire Quillboar Hunter";
                     TooltipExtended = "Medium ranged unit with Evasion. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -31496,6 +32367,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGrizzlyBear.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -31505,6 +32377,7 @@ namespace Moonwell.Objects
                     MaxLife = 900;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\GrizzlyBear\\GrizzlyBear";
                     ModelFileExtraVersions = 0;
                     Name = "Raging Bear";
                     NameEditorSuffix = "(Level 2)";
@@ -31514,6 +32387,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GrizzlyBear\\GrizzlyBear_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -31527,6 +32401,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -31631,6 +32506,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRazorback.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -31640,6 +32516,7 @@ namespace Moonwell.Objects
                     MaxLife = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\RazorMane\\RazorMane";
                     ModelFileExtraVersions = 0;
                     Name = "Razormane Brute";
                     OccluderHeight = 0f;
@@ -31647,6 +32524,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\RazorMane\\RazorMane_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -31659,6 +32537,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 215;
                     RepairLumberCost = 20;
                     RepairTime = 30;
+                    Scale = 1.4f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -31777,6 +32656,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\RazorMane\\RazorMane";
                     ModelFileExtraVersions = 0;
                     Name = "Razormane Chieftain";
                     NormalSkin = "ACah,ACtb";
@@ -31785,6 +32665,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\RazorMane\\RazorMane_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -31797,6 +32678,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 425;
                     RepairLumberCost = 100;
                     RepairTime = 70;
+                    Scale = 1.6f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -31820,6 +32702,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Razormane Chieftain";
                     TooltipExtended = "Heavy melee unit with Thorns Aura. Can hurl boulders at enemies. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -31904,6 +32789,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "M";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRazorManeChief.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -31916,6 +32802,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\RazorMane\\RazorMane";
                     ModelFileExtraVersions = 0;
                     Name = "Razormane Medicine Man";
                     NormalSkin = "AChw,ACs9";
@@ -31924,6 +32811,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\RazorMane\\RazorMane_portrait";
                     Priority = 8;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -31936,6 +32824,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 350;
                     RepairLumberCost = 60;
                     RepairTime = 50;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -31959,6 +32848,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 205;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Razormane Medicine Man";
                     TooltipExtended = "Medium melee unit that can cast Healing Ward and Feral Spirit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -32049,6 +32941,7 @@ namespace Moonwell.Objects
                     MaxLife = 240;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\RazorMane\\RazorMane";
                     ModelFileExtraVersions = 0;
                     Name = "Razormane Scout";
                     OccluderHeight = 0f;
@@ -32056,6 +32949,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\RazorMane\\RazorMane_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -32068,6 +32962,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -32091,6 +32986,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 190;
                     Tooltip = "Hire Razormane Scout";
                     TransportedSize = 1;
                     TurnRate = 0.5f;
@@ -32223,6 +33121,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 200;
                     RepairTime = 100;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -32342,6 +33241,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRedDragon.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -32372,6 +33272,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 20;
                     RepairTime = 30;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.45f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -32395,6 +33296,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,V,Q";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Red Dragon Whelp";
                     TooltipExtended = "Tiny ranged flying unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.5f;
@@ -32488,6 +33392,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "K";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRedDragon.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -32497,6 +33402,7 @@ namespace Moonwell.Objects
                     MaxLife = 950;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "Units\\Creeps\\RedDrake\\RedDrake";
                     ModelFileExtraVersions = 0;
                     Name = "Red Drake";
                     OccluderHeight = 0f;
@@ -32504,6 +33410,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\RedDragon\\RedDragon_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 0f;
                     ProjectileImpactZSwimming = 0f;
@@ -32517,6 +33424,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 80;
                     RepairTime = 60;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -32540,6 +33448,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,V,Q";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 180;
+                    TintingColor3Blue = 200;
                     Tooltip = "Summon Red Drake";
                     TooltipExtended = "Small ranged flying unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.1f;
@@ -32621,6 +33532,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSeaElemental.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -32630,6 +33542,7 @@ namespace Moonwell.Objects
                     MaxLife = 300;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\SeaElemental\\SeaElemental";
                     ModelFileExtraVersions = 0;
                     Name = "Reef Elemental";
                     OccluderHeight = 0f;
@@ -32637,6 +33550,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 2;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\SeaElemental\\SeaElemental_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 60f;
@@ -32650,6 +33564,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 1;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -32760,6 +33675,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBanditMage.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -32772,6 +33688,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\BanditMage\\BanditMage";
                     ModelFileExtraVersions = 0;
                     Name = "Renegade Wizard";
                     NormalSkin = "ACpu,ACls";
@@ -32780,6 +33697,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\BanditMage\\BanditMage_portrait";
                     Priority = 6;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -32793,6 +33711,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 50;
                     RepairTime = 50;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -32816,6 +33735,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Y,X,V,Q,J";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 230;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Renegade Wizard";
                     TooltipExtended = "Medium ranged unit that can cast Purge and Lightning Shield. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -32899,6 +33821,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRevenant.blp";
                     IsABuilding = false;
                     Level = 8;
                     LumberBountyAwardedBase = 0;
@@ -32911,6 +33834,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\RevenantOfTheWaves\\RevenantOfTheWaves";
                     ModelFileExtraVersions = 0;
                     Name = "Revenant of the Depths";
                     NormalSkin = "ACwe";
@@ -32919,6 +33843,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\RevenantOfTheWaves\\RevenantOfTheWaves_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -32931,6 +33856,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 425;
                     RepairLumberCost = 100;
                     RepairTime = 40;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -33040,6 +33966,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRevenant.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -33049,6 +33976,7 @@ namespace Moonwell.Objects
                     MaxLife = 900;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\RevenantOfTheWaves\\RevenantOfTheWaves";
                     ModelFileExtraVersions = 0;
                     Name = "Revenant of the Seas";
                     OccluderHeight = 0f;
@@ -33056,6 +33984,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\RevenantOfTheWaves\\RevenantOfTheWaves_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -33068,6 +33997,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 255;
                     RepairLumberCost = 30;
                     RepairTime = 40;
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -33091,6 +34021,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 100;
+                    TintingColor2Green = 130;
+                    TintingColor3Blue = 130;
                     Tooltip = "Hire Revenant of the Seas";
                     TooltipExtended = "Heavy melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -33174,6 +34107,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRevenant.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -33183,6 +34117,7 @@ namespace Moonwell.Objects
                     MaxLife = 375;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\RevenantOfTheWaves\\RevenantOfTheWaves";
                     ModelFileExtraVersions = 0;
                     Name = "Revenant of the Tides";
                     OccluderHeight = 0f;
@@ -33190,6 +34125,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\RevenantOfTheWaves\\RevenantOfTheWaves_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -33202,6 +34138,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 255;
                     RepairLumberCost = 30;
                     RepairTime = 40;
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -33225,6 +34162,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 220;
+                    TintingColor3Blue = 190;
                     Tooltip = "Hire Revenant of the Tides";
                     TooltipExtended = "Light melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -33355,6 +34295,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 80;
                     RepairTime = 60;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -33462,6 +34403,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBandit.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -33471,6 +34413,7 @@ namespace Moonwell.Objects
                     MaxLife = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Bandit\\Bandit";
                     ModelFileExtraVersions = 0;
                     Name = "Rogue";
                     NormalSkin = "Ashm";
@@ -33479,6 +34422,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Bandit\\Bandit_portrait";
                     Priority = 2;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -33514,6 +34458,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Y,X,V,Q,J";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 200;
+                    TintingColor3Blue = 225;
                     Tooltip = "Hire Rogue";
                     TooltipExtended = "Light melee unit with Shadowmeld. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -33599,6 +34546,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBanditMage.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -33611,6 +34559,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\BanditMage\\BanditMage";
                     ModelFileExtraVersions = 0;
                     Name = "Rogue Wizard";
                     NormalSkin = "ACf2";
@@ -33619,6 +34568,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\BanditMage\\BanditMage_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -33632,6 +34582,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 20;
                     RepairTime = 30;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -33655,6 +34606,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Y,X,V,Q,J";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 212;
                     Tooltip = "Hire Rogue Wizard";
                     TooltipExtended = "Light ranged unit that can cast Frost Armor. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -33757,6 +34711,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\ThunderLizardSalamander\\ThunderLizardSalamander";
                     ModelFileExtraVersions = 0;
                     Name = "Salamander";
                     NormalSkin = "ACim,ACfb";
@@ -33765,6 +34720,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\ThunderLizardSalamander\\ThunderLizardSalamander_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -33801,6 +34757,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "D";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 190;
+                    TintingColor3Blue = 220;
                     Tooltip = "Summon Salamander";
                     TooltipExtended = "Medium ranged unit that hurls fiery missiles. Can cast Immolation and Firebolt. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -33889,6 +34848,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNThunderLizardSalamander.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -33898,6 +34858,7 @@ namespace Moonwell.Objects
                     MaxLife = 400;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\ThunderLizardSalamander\\ThunderLizardSalamander";
                     ModelFileExtraVersions = 0;
                     Name = "Salamander Hatchling";
                     OccluderHeight = 0f;
@@ -33905,6 +34866,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\ThunderLizardSalamander\\ThunderLizardSalamander_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -33918,6 +34880,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 20;
                     RepairTime = 30;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.6f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -33941,6 +34904,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "D";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 190;
                     Tooltip = "Summon Salamander Hatchling";
                     TransportedSize = 1;
                     TurnRate = 0.5f;
@@ -34029,6 +34995,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 2f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNThunderLizardSalamander.blp";
                     IsABuilding = false;
                     Level = 10;
                     LumberBountyAwardedBase = 0;
@@ -34063,6 +35030,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 200;
                     RepairTime = 100;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1.25f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -34237,6 +35205,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "D";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 200;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Salamander Vizier";
                     TooltipExtended = "Heavy ranged unit that hurls fiery missiles. Can cast Abolish Magic, Mana Burn, and Bloodlust. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -34342,6 +35313,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 215;
                     RepairLumberCost = 100;
                     RepairTime = 25;
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -34478,6 +35450,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 320;
                     RepairLumberCost = 50;
                     RepairTime = 50;
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -34585,6 +35558,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSasquatch.blp";
                     IsABuilding = false;
                     Level = 7;
                     LumberBountyAwardedBase = 0;
@@ -34597,6 +35571,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Sasquatch\\Sasquatch";
                     ModelFileExtraVersions = 0;
                     Name = "Sasquatch Oracle";
                     NormalSkin = "ACrj,ACro";
@@ -34605,6 +35580,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Sasquatch\\Sasquatch_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -34617,6 +35593,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 425;
                     RepairLumberCost = 100;
                     RepairTime = 70;
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -34640,6 +35617,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "V,Q";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 205;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Sasquatch Oracle";
                     TooltipExtended = "Heavy melee unit with Roar. Can also cast Rejuvenation. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -34750,6 +35730,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -34858,6 +35839,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSatyr.blp";
                     IsABuilding = false;
                     Level = 8;
                     LumberBountyAwardedBase = 0;
@@ -34870,6 +35852,7 @@ namespace Moonwell.Objects
                     MaxMana = 500;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Satyr\\Satyr";
                     ModelFileExtraVersions = 0;
                     Name = "Satyr Hellcaller";
                     NormalSkin = "ACbl,ACua,ACad";
@@ -34878,6 +35861,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Satyr\\Satyr_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -34891,6 +35875,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 120;
                     RepairTime = 80;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -34914,6 +35899,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A,C";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 140;
                     Tooltip = "Hire Satyr Hellcaller";
                     TooltipExtended = "Heavy melee unit with Unholy Aura. Can cast Bloodlust and Animate Dead. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -35002,6 +35990,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "S";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSatyrTrickster.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -35014,6 +36003,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\SatyrTrickster\\SatyrTrickster";
                     ModelFileExtraVersions = 0;
                     Name = "Satyr Shadowdancer";
                     NormalSkin = "ACcs,Ashm";
@@ -35022,6 +36012,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\SatyrTrickster\\SatyrTrickster_portrait";
                     Priority = 4;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -35034,6 +36025,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 190;
                     RepairLumberCost = 20;
                     RepairTime = 30;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -35057,6 +36049,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A,C";
+                    TintingColor1Red = 220;
+                    TintingColor2Green = 230;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Satyr Shadowdancer";
                     TooltipExtended = "Light ranged unit with Shadowmeld. Can cast Curse. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -35141,6 +36136,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "S";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSatyr.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -35153,6 +36149,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Satyr\\Satyr";
                     ModelFileExtraVersions = 0;
                     Name = "Satyr Soulstealer";
                     NormalSkin = "Ambd,ACrd";
@@ -35161,6 +36158,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Satyr\\Satyr_portrait";
                     Priority = 8;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -35173,6 +36171,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 320;
                     RepairLumberCost = 50;
                     RepairTime = 50;
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -35196,6 +36195,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A,C";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 195;
+                    TintingColor3Blue = 205;
                     Tooltip = "Hire Satyr Soulstealer";
                     TooltipExtended = "Medium melee unit that can cast Mana Burn and Raise Dead. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -35337,6 +36339,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A,C";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 120;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Satyr Trickster";
                     TooltipExtended = "Light ranged unit that hurls bolts of hellfire. Can cast Purge. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -35452,6 +36457,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 1;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -35474,6 +36480,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 180;
+                    TintingColor2Green = 210;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Sea Elemental";
                     TooltipExtended = "Medium ranged unit that can Bash opponents. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -35591,6 +36600,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 85;
                     RepairTime = 45;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -35702,6 +36712,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSeaGiant.blp";
                     IsABuilding = false;
                     Level = 8;
                     LumberBountyAwardedBase = 0;
@@ -35714,6 +36725,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\SeaGiant\\SeaGiant";
                     ModelFileExtraVersions = 0;
                     Name = "Sea Giant Behemoth";
                     NormalSkin = "ACpv,Awrs,ACtb";
@@ -35722,6 +36734,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\SeaGiant\\SeaGiant_portrait";
                     Priority = 2;
                     ProjectileImpactZ = 200f;
                     ProjectileImpactZSwimming = 0f;
@@ -35735,6 +36748,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 85;
                     RepairTime = 45;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -35876,6 +36890,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 85;
                     RepairTime = 45;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -36018,6 +37033,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.475f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -36041,6 +37057,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 225;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 225;
                     Tooltip = "Hire Sea Turtle";
                     TooltipExtended = "Light melee amphibious unit whose spiked shell harms enemy melee attackers. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -36127,6 +37146,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSeaTurtleGreen.blp";
                     IsABuilding = false;
                     Level = 1;
                     LumberBountyAwardedBase = 0;
@@ -36157,6 +37177,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.3f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -36180,6 +37201,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 224;
+                    TintingColor2Green = 225;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Sea Turtle Hatchling";
                     TooltipExtended = "Light ranged amphibious unit whose spiked shell harms enemy melee attackers. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -36328,6 +37352,7 @@ namespace Moonwell.Objects
                     RequirementsTier3.Add("TALT");
                     RequirementsTiersUsed = 3;
                     Requires.Add("TALT");
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -36621,6 +37646,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
                     Hotkey = "G";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNJunkGolem.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -36759,6 +37785,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNArmorGolem.blp";
                     IsABuilding = false;
                     Level = 9;
                     LumberBountyAwardedBase = 0;
@@ -36768,6 +37795,7 @@ namespace Moonwell.Objects
                     MaxLife = 1900;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\GolemStatue\\GolemStatue";
                     ModelFileExtraVersions = 0;
                     Name = "Siege Golem";
                     NormalSkin = "ACmi";
@@ -36776,6 +37804,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GolemStatue\\GolemStatue_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -36789,6 +37818,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 150;
                     RepairTime = 90;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1.5f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -36811,6 +37841,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "D,G";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 187;
+                    TintingColor3Blue = 217;
                     Tooltip = "Summon Siege Golem";
                     TooltipExtended = "Heavy melee unit. Immune to spells. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -36895,6 +37928,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "K";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSkeletonArcher.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -36907,6 +37941,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\SkeletonArcher\\SkeletonArcher";
                     ModelFileExtraVersions = 0;
                     Name = "Skeletal Marksman";
                     NormalSkin = "ACcw";
@@ -36915,6 +37950,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\SkeletonArcher\\SkeletonArcher_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 90f;
                     ProjectileImpactZSwimming = 0f;
@@ -36927,6 +37963,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 215;
                     RepairLumberCost = 20;
                     RepairTime = 20;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -36949,6 +37986,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "N,G";
+                    TintingColor1Red = 180;
+                    TintingColor2Green = 205;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Skeletal Marksman";
                     TooltipExtended = "Light ranged unit that shoots Cold Arrows. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -37062,6 +38102,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 90;
                     RepairLumberCost = 0;
                     RepairTime = 18;
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -37184,6 +38225,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\SkeletonOrc\\SkeletonOrc";
                     ModelFileExtraVersions = 0;
                     Name = "Skeletal Orc Champion";
                     NormalSkin = "ACdc";
@@ -37192,6 +38234,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\SkeletonOrc\\SkeletonOrc_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -37204,6 +38247,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 90;
                     RepairLumberCost = 0;
                     RepairTime = 18;
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -37226,6 +38270,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 220;
+                    TintingColor2Green = 220;
+                    TintingColor3Blue = 250;
                     Tooltip = "Summon Skeletal Orc Champion";
                     TooltipExtended = "Heavy melee unit with Death Coil. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -37319,6 +38366,7 @@ namespace Moonwell.Objects
                     MaxLife = 850;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\SkeletonOrc\\SkeletonOrc";
                     ModelFileExtraVersions = 0;
                     Name = "Skeletal Orc Grunt";
                     OccluderHeight = 0f;
@@ -37326,6 +38374,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\SkeletonOrc\\SkeletonOrc_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -37338,6 +38387,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 300;
                     RepairLumberCost = 0;
                     RepairTime = 18;
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -37360,6 +38410,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 205;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 205;
                     Tooltip = "Summon Skeletal Orc Grunt";
                     TooltipExtended = "Heavy melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -38001,6 +39054,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSludgeCreature.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -38013,6 +39067,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
+                    Model = "units\\creeps\\SludgeMonster\\SludgeMonster";
                     ModelFileExtraVersions = 0;
                     Name = "Sludge Flinger";
                     NormalSkin = "ACsw";
@@ -38021,6 +39076,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\SludgeMonster\\SludgeMonster_portrait";
                     Priority = 4;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -38033,6 +39089,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 255;
                     RepairLumberCost = 30;
                     RepairTime = 30;
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -38056,6 +39113,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "C,D,G";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 200;
+                    TintingColor3Blue = 220;
                     Tooltip = "Summon Sludge Flinger";
                     TooltipExtended = "Light ranged unit that can Slow opponents. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -38282,6 +39342,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSludgeCreature.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -38294,6 +39355,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
+                    Model = "units\\creeps\\SludgeMonster\\SludgeMonster";
                     ModelFileExtraVersions = 0;
                     Name = "Sludge Monstrosity";
                     NormalSkin = "ACsw";
@@ -38302,6 +39364,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\SludgeMonster\\SludgeMonster_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -38314,6 +39377,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 320;
                     RepairLumberCost = 50;
                     RepairTime = 50;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -38424,6 +39488,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGnollKing.blp";
                     IsABuilding = false;
                     Level = 11;
                     LumberBountyAwardedBase = 0;
@@ -38436,6 +39501,7 @@ namespace Moonwell.Objects
                     MaxMana = 350;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\GnollOverseer\\GnollOverseer";
                     ModelFileExtraVersions = 0;
                     Name = "Snarlmane the Bloodgorger";
                     NormalSkin = "ACbl,Ansk,Awrs,ACac";
@@ -38444,6 +39510,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GnollOverseer\\GnollOverseer_portrait";
                     Priority = 2;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -38479,6 +39546,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "L,F,W";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 100;
+                    TintingColor3Blue = 100;
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -38501,6 +39571,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 90f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -38587,6 +39659,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.3f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -38611,6 +39684,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A,C";
+                    TintingColor1Red = 220;
+                    TintingColor2Green = 200;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Spider";
                     TooltipExtended = "Light melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -38694,6 +39770,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSpiderCrab.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -38703,6 +39780,7 @@ namespace Moonwell.Objects
                     MaxLife = 850;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
+                    Model = "units\\creeps\\SpiderCrabCreep\\SpiderCrabCreep";
                     ModelFileExtraVersions = 0;
                     Name = "Spider Crab Behemoth";
                     OccluderHeight = 0f;
@@ -38710,6 +39788,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\SpiderCrabCreep\\SpiderCrabCreep_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -38722,6 +39801,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 300;
                     RepairLumberCost = 0;
                     RepairTime = 50;
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -38745,6 +39825,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 210;
+                    TintingColor3Blue = 190;
                     Tooltip = "Hire Spider Crab";
                     TooltipExtended = "Heavy melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -38828,6 +39911,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSpiderCrab.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -38837,6 +39921,7 @@ namespace Moonwell.Objects
                     MaxLife = 400;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
+                    Model = "units\\creeps\\SpiderCrabCreep\\SpiderCrabCreep";
                     ModelFileExtraVersions = 0;
                     Name = "Spider Crab Limbripper";
                     OccluderHeight = 0f;
@@ -38844,6 +39929,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\SpiderCrabCreep\\SpiderCrabCreep_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -38856,6 +39942,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 150;
                     RepairLumberCost = 0;
                     RepairTime = 30;
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -38879,6 +39966,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 200;
                     Tooltip = "Hire Spider Crab";
                     TooltipExtended = "Light melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -38992,6 +40082,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.6f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -39015,6 +40106,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 180;
+                    TintingColor2Green = 195;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Spider Crab Shorecrawler";
                     TooltipExtended = "Light melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -39126,6 +40220,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.42f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -39149,6 +40244,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I,N";
+                    TintingColor1Red = 180;
+                    TintingColor2Green = 225;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Spiderling";
                     TooltipExtended = "Light melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -39228,6 +40326,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGrizzlyBear.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -39237,6 +40336,7 @@ namespace Moonwell.Objects
                     MaxLife = 1200;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\GrizzlyBear\\GrizzlyBear";
                     ModelFileExtraVersions = 0;
                     Name = "Spirit Bear";
                     NameEditorSuffix = "(Level 3)";
@@ -39246,6 +40346,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GrizzlyBear\\GrizzlyBear_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -39259,6 +40360,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.15f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -39363,6 +40465,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRazorback.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -39440,6 +40543,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 90f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -39531,9 +40636,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 235;
                     RepairLumberCost = 30;
                     RepairTime = 30;
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 0.75f;
                     ShadowImageCenterX = 45f;
                     ShadowImageCenterY = 45f;
                     ShadowImageHeight = 120f;
@@ -39554,6 +40661,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "A,C";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 180;
                     Tooltip = "Summon Spitting Spider";
                     TooltipExtended = "Light ranged unit that spits poison at opponents. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -39673,6 +40783,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -39792,6 +40903,7 @@ namespace Moonwell.Objects
                     MaxMana = 750;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\StormPandarenBrewmaster\\StormPandarenBrewmaster";
                     ModelFileExtraVersions = 0;
                     Name = "Storm";
                     NormalSkin = "Adsm,ACcy,ACrk,ANwk";
@@ -39800,6 +40912,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\StormPandarenBrewmaster\\StormPandarenBrewmaster_portrait";
                     Priority = 8;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -39812,6 +40925,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 40;
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -39923,6 +41037,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNThunderLizard.blp";
                     IsABuilding = false;
                     Level = 9;
                     LumberBountyAwardedBase = 0;
@@ -39935,6 +41050,7 @@ namespace Moonwell.Objects
                     MaxMana = 600;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\ThunderLizard\\ThunderLizard";
                     ModelFileExtraVersions = 0;
                     Name = "Storm Wyrm";
                     NormalSkin = "Alit,ACls,ACcl,Advc,ACdv";
@@ -39943,6 +41059,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\ThunderLizard\\ThunderLizard_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 140f;
                     ProjectileImpactZSwimming = 0f;
@@ -39956,6 +41073,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 150;
                     RepairTime = 90;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1.25f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -40067,6 +41185,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNOrcWarlock.blp";
                     IsABuilding = false;
                     Level = 1;
                     LumberBountyAwardedBase = 0;
@@ -40076,6 +41195,7 @@ namespace Moonwell.Objects
                     MaxLife = 240;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\OrcWarlock\\OrcWarlock";
                     ModelFileExtraVersions = 0;
                     Name = "Stormreaver Apprentice";
                     OccluderHeight = 0f;
@@ -40083,6 +41203,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\OrcWarlock\\OrcWarlock_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -40095,6 +41216,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 105;
                     RepairLumberCost = 5;
                     RepairTime = 30;
+                    Scale = 0.375f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -40118,6 +41240,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 205;
+                    TintingColor3Blue = 190;
                     Tooltip = "Hire Stormreaver Apprentice";
                     TooltipExtended = "Light ranged unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -40204,6 +41329,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNOrcWarlock.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -40216,6 +41342,7 @@ namespace Moonwell.Objects
                     MaxMana = 200;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\OrcWarlock\\OrcWarlock";
                     ModelFileExtraVersions = 0;
                     Name = "Stormreaver Hermit";
                     NormalSkin = "ACpu";
@@ -40224,6 +41351,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\OrcWarlock\\OrcWarlock_portrait";
                     Priority = 8;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -40236,6 +41364,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 190;
                     RepairLumberCost = 20;
                     RepairTime = 30;
+                    Scale = 0.425f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -40350,6 +41479,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNOrcWarlock.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -40362,6 +41492,7 @@ namespace Moonwell.Objects
                     MaxMana = 350;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\OrcWarlock\\OrcWarlock";
                     ModelFileExtraVersions = 0;
                     Name = "Stormreaver Necrolyte";
                     NormalSkin = "ACbl,ACcl";
@@ -40370,6 +41501,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\OrcWarlock\\OrcWarlock_portrait";
                     Priority = 8;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -40382,6 +41514,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 180;
                     RepairLumberCost = 20;
                     RepairTime = 30;
+                    Scale = 0.525f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -40405,6 +41538,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 190;
+                    TintingColor2Green = 220;
+                    TintingColor3Blue = 200;
                     Tooltip = "Hire Stormreaver Necrolyte";
                     TooltipExtended = "Heavy ranged unit with Bloodlust and Chain Lightning. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -40525,6 +41661,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 545;
                     RepairLumberCost = 150;
                     RepairTime = 30;
+                    Scale = 0.65f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -41084,6 +42221,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 150;
                     RepairTime = 60;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -41220,6 +42358,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 150;
                     RepairLumberCost = 10;
                     RepairTime = 25;
+                    Scale = 0.77f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -41349,6 +42488,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "Z";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroTinker.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-tinker.blp";
                     Intelligence = 20;
                     IntelligencePerLevel = 2.6f;
@@ -41579,6 +42719,7 @@ namespace Moonwell.Objects
                     RequirementsTier3.Add("TALT");
                     RequirementsTiersUsed = 3;
                     Requires.Add("TALT");
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -41828,6 +42969,7 @@ namespace Moonwell.Objects
                     MaxLife = 950;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\tuskar\\tuskar";
                     ModelFileExtraVersions = 0;
                     Name = "Tuskarr Chieftain";
                     NormalSkin = "ACac";
@@ -41836,6 +42978,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\tuskar\\tuskar_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -41848,6 +42991,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 425;
                     RepairLumberCost = 100;
                     RepairTime = 70;
+                    Scale = 1.4f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -41966,6 +43110,7 @@ namespace Moonwell.Objects
                     MaxLife = 250;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\tuskar\\tuskar";
                     ModelFileExtraVersions = 0;
                     Name = "Tuskarr Fighter";
                     OccluderHeight = 0f;
@@ -41973,6 +43118,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\tuskar\\tuskar_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -41985,6 +43131,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 170;
                     RepairLumberCost = 0;
                     RepairTime = 40;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -42009,6 +43156,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 230;
+                    TintingColor3Blue = 230;
                     Tooltip = "Hire Tuskarr Fighter";
                     TooltipExtended = "Light melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -42097,6 +43247,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTuskaarBrown.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -42109,6 +43260,7 @@ namespace Moonwell.Objects
                     MaxMana = 200;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\tuskar\\tuskar";
                     ModelFileExtraVersions = 0;
                     Name = "Tuskarr Healer";
                     NormalSkin = "ACdm,Anh1";
@@ -42117,6 +43269,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\tuskar\\tuskar_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -42129,6 +43282,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 215;
                     RepairLumberCost = 10;
                     RepairTime = 25;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -42153,6 +43307,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 225;
+                    TintingColor3Blue = 175;
                     Tooltip = "Hire Tuskarr Healer";
                     TooltipExtended = "Light ranged unit with Heal and Abolish Magic. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -42239,6 +43396,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTuskaarBrown.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -42251,6 +43409,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\tuskarRanged\\tuskarRanged";
                     ModelFileExtraVersions = 0;
                     Name = "Tuskarr Sorcerer";
                     NormalSkin = "ACif";
@@ -42259,6 +43418,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\tuskarRanged\\tuskarRanged_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -42271,6 +43431,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 195;
                     RepairLumberCost = 10;
                     RepairTime = 25;
+                    Scale = 1.15f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -42294,6 +43455,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 225;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Tuskarr Sorcerer";
                     TooltipExtended = "Medium ranged unit with Inner Fire. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -42388,6 +43552,7 @@ namespace Moonwell.Objects
                     MaxLife = 300;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\tuskarRanged\\tuskarRanged";
                     ModelFileExtraVersions = 0;
                     Name = "Tuskarr Spearman";
                     OccluderHeight = 0f;
@@ -42407,6 +43572,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 150;
                     RepairLumberCost = 10;
                     RepairTime = 20;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -42519,6 +43685,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTuskaarGold.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -42528,6 +43695,7 @@ namespace Moonwell.Objects
                     MaxLife = 475;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\tuskarRanged\\tuskarRanged";
                     ModelFileExtraVersions = 0;
                     Name = "Tuskarr Trapper";
                     NormalSkin = "ACen";
@@ -42536,6 +43704,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\tuskarRanged\\tuskarRanged_portrait";
                     Priority = 5;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -42548,6 +43717,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 280;
                     RepairLumberCost = 40;
                     RepairTime = 30;
+                    Scale = 1.3f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -42572,6 +43742,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 225;
+                    TintingColor3Blue = 175;
                     Tooltip = "Hire Tuskarr Trapper";
                     TooltipExtended = "Medium ranged unit with Ensnare. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -42654,6 +43827,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTuskaarBrown.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -42663,6 +43837,7 @@ namespace Moonwell.Objects
                     MaxLife = 475;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\tuskar\\tuskar";
                     ModelFileExtraVersions = 0;
                     Name = "Tuskarr Warrior";
                     OccluderHeight = 0f;
@@ -42670,6 +43845,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\tuskar\\tuskar_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -42682,6 +43858,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 255;
                     RepairLumberCost = 30;
                     RepairTime = 40;
+                    Scale = 1.3f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -42706,6 +43883,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 225;
+                    TintingColor3Blue = 175;
                     Tooltip = "Hire Tuskarr Warrior";
                     TooltipExtended = "Medium melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -42798,6 +43978,7 @@ namespace Moonwell.Objects
                     MaxLife = 250;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\Unbroken\\Unbroken";
                     ModelFileExtraVersions = 0;
                     Name = "Unbroken Darkhunter";
                     OccluderHeight = 0f;
@@ -42805,6 +43986,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\Unbroken\\Unbroken_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -42818,6 +44000,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 10;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -42927,6 +44110,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNUnbroken.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -42939,6 +44123,7 @@ namespace Moonwell.Objects
                     MaxMana = 200;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\Unbroken\\Unbroken";
                     ModelFileExtraVersions = 0;
                     Name = "Unbroken Darkweaver";
                     NormalSkin = "ACuf";
@@ -42947,6 +44132,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\Unbroken\\Unbroken_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -42960,6 +44146,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 50;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -42983,6 +44170,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "I";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 190;
+                    TintingColor3Blue = 190;
                     Tooltip = "Hire Unbroken Darkweaver";
                     TooltipExtended = "Medium melee unit with Unholy Frenzy. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -43066,6 +44256,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNUnbroken.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -43096,6 +44287,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -43207,6 +44399,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDemoness.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -43216,6 +44409,7 @@ namespace Moonwell.Objects
                     MaxLife = 750;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\demon\\Demoness\\Demoness";
                     ModelFileExtraVersions = 0;
                     Name = "Vile Temptress";
                     OccluderHeight = 0f;
@@ -43223,6 +44417,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\demon\\Demoness\\Demoness_portrait";
                     Priority = 6;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -43235,6 +44430,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 225;
                     RepairLumberCost = 40;
                     RepairTime = 28;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -43358,6 +44554,7 @@ namespace Moonwell.Objects
                     MaxMana = 200;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\demon\\DemonessBlue\\DemonessBlue";
                     ModelFileExtraVersions = 0;
                     Name = "Vile Tormentor";
                     NormalSkin = "ACsi";
@@ -43366,6 +44563,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\demon\\DemonessBlue\\DemonessBlue_portrait";
                     Priority = 6;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -43378,6 +44576,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 225;
                     RepairLumberCost = 40;
                     RepairTime = 28;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -43402,6 +44601,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "O,K";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 175;
+                    TintingColor3Blue = 210;
                     Tooltip = "Hire Vile Tormentor";
                     TooltipExtended = "Medium melee unit that can cast Silence. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -43525,6 +44727,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 20;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -43548,6 +44751,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "O,K";
+                    TintingColor1Red = 125;
+                    TintingColor2Green = 125;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Voidwalker";
                     TooltipExtended = "Light ranged unit with Cold Arrows. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -43629,6 +44835,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNArmorGolem.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -43638,6 +44845,7 @@ namespace Moonwell.Objects
                     MaxLife = 1000;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\GolemStatue\\GolemStatue";
                     ModelFileExtraVersions = 0;
                     Name = "War Golem";
                     NormalSkin = "ACmi";
@@ -43646,6 +44854,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GolemStatue\\GolemStatue_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -43659,6 +44868,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 80;
                     RepairTime = 60;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 1.3f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -43767,6 +44977,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNArachnathidGreen.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -43776,6 +44987,7 @@ namespace Moonwell.Objects
                     MaxLife = 375;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
+                    Model = "Units\\Creeps\\ArchnathidGreen\\ArchnathidGreen";
                     ModelFileExtraVersions = 0;
                     Name = "Warrior Arachnathid";
                     OccluderHeight = 0f;
@@ -43783,6 +44995,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\ArchnathidGreen\\ArchnathidGreen_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -43795,6 +45008,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 215;
                     RepairLumberCost = 20;
                     RepairTime = 40;
+                    Scale = 0.725f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -43903,6 +45117,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMurgulTideWarrior.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -43912,6 +45127,7 @@ namespace Moonwell.Objects
                     MaxLife = 240;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\MurgulTideWarrior\\MurgulTideWarrior";
                     ModelFileExtraVersions = 0;
                     Name = "Watery Minion";
                     NameEditorSuffix = "(Level 1)";
@@ -43920,6 +45136,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\MurgulTideWarrior\\MurgulTideWarrior_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -43955,6 +45172,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 128;
                     Tooltip = "Summon Watery Minion";
                     TooltipExtended = "Light melee amphibious unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -44042,6 +45262,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMurgulShadowCaster.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -44054,6 +45275,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\MurgulShadowCaster\\MurgulShadowCaster";
                     ModelFileExtraVersions = 0;
                     Name = "Watery Minion";
                     NameEditorSuffix = "(Level 3)";
@@ -44063,6 +45285,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\MurgulShadowCaster\\MurgulShadowCaster_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -44098,6 +45321,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "Z";
+                    TintingColor1Red = 192;
+                    TintingColor2Green = 192;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Watery Minion";
                     TooltipExtended = "Medium ranged amphibious unit with Abolish Magic and Slow. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -44180,6 +45406,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMurgulTideWarrior.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -44189,6 +45416,7 @@ namespace Moonwell.Objects
                     MaxLife = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\MurgulTideWarrior\\MurgulTideWarrior";
                     ModelFileExtraVersions = 0;
                     Name = "Watery Minion";
                     NameEditorSuffix = "(Level 2)";
@@ -44197,6 +45425,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\MurgulTideWarrior\\MurgulTideWarrior_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -44346,6 +45575,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 40;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -44453,6 +45683,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWendigo.blp";
                     IsABuilding = false;
                     Level = 7;
                     LumberBountyAwardedBase = 0;
@@ -44487,6 +45718,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 100;
                     RepairTime = 70;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -44510,6 +45742,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "N";
+                    TintingColor1Red = 175;
+                    TintingColor2Green = 205;
+                    TintingColor3Blue = 255;
                     Tooltip = "Summon Wendigo Shaman";
                     TooltipExtended = "Heavy melee unit that can cast Roar and Rejuvenation. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -44622,6 +45857,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 195;
                     RepairLumberCost = 0;
                     RepairTime = 40;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -44645,6 +45881,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B,D,G";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 170;
                     Tooltip = "Summon Wildkin";
                     TooltipExtended = "Medium melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -44730,6 +45969,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGhost.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -44742,6 +45982,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
+                    Model = "units\\creeps\\BansheeGhost\\BansheeGhost";
                     ModelFileExtraVersions = 0;
                     Name = "Wraith";
                     NormalSkin = "ACps,ACcs";
@@ -44750,6 +45991,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 2;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\BansheeGhost\\BansheeGhost_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -44762,6 +46004,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 365;
                     RepairLumberCost = 80;
                     RepairTime = 60;
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;

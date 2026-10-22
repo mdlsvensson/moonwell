@@ -759,7 +759,6 @@ namespace Moonwell.Objects
                     ButtonPositionNormalX = 1;
                     ButtonPositionNormalY = 2;
                     CastTime = Levels(3f);
-                    Caster = "Abilities\\Spells\\NightElf\\EntangleMine\\Roots.mdl";
                     CasterAttachmentPoint1 = "origin";
                     CheckDependencies = true;
                     Cooldown = Levels(0f);

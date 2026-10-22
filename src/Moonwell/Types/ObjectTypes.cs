@@ -39,6 +39,9 @@ namespace Moonwell
         /// <summary>The classes and type ids whose default object is being made, so that one read while its constructor runs fails rather than making it again; made on first use.</summary>
         private static HashSet<object>? making;
 
+        /// <summary>While Registering runs its register step, the registrations' listens, which run their classes' constructors once every maker is registered; null otherwise, when a registration listens at once.</summary>
+        private static List<Action>? waiting;
+
         /// <summary>Registers a unit type with its id and the function that makes its object, and listens for the events its class needs.</summary>
         public static void Unit<T>(int id, Func<T> make)
             where T : Moonwell.Unit
@@ -50,7 +53,7 @@ namespace Moonwell
 
             ids[typeof(T)] = id;
             makers[id] = make;
-            Events.Need(Hooks.MaskOf(make(), Moonwell.Unit.UnitHooks));
+            Listen(() => Events.Need(Hooks.MaskOf(make(), Moonwell.Unit.UnitHooks)));
         }
 
         /// <summary>Registers an item type with its id and the function that makes its object, and listens for the events its class needs.</summary>
@@ -64,7 +67,7 @@ namespace Moonwell
 
             ids[typeof(T)] = id;
             itemMakers[id] = make;
-            Events.Need(Hooks.MaskOf(make(), Moonwell.Item.ItemHooks));
+            Listen(() => Events.Need(Hooks.MaskOf(make(), Moonwell.Item.ItemHooks)));
         }
 
         /// <summary>Registers a destructable type with its id and the function that makes its object, and listens for the events its class needs.</summary>
@@ -78,7 +81,7 @@ namespace Moonwell
 
             ids[typeof(T)] = id;
             destructableMakers[id] = make;
-            Events.Need(Hooks.MaskOf(make(), Moonwell.Destructable.DestructableHooks));
+            Listen(() => Events.Need(Hooks.MaskOf(make(), Moonwell.Destructable.DestructableHooks)));
         }
 
         /// <summary>Registers an ability type with its id and the function that makes its object, and listens for the events its class needs.</summary>
@@ -92,7 +95,44 @@ namespace Moonwell
 
             ids[typeof(T)] = id;
             abilityMakers[id] = make;
-            Events.Need(Hooks.MaskOf(make(), Moonwell.Ability.AbilityHooks));
+            Listen(() => Events.Need(Hooks.MaskOf(make(), Moonwell.Ability.AbilityHooks)));
+        }
+
+        /// <summary>
+        /// Runs a register step, then the constructors its registrations run to find the events their classes need: every maker is
+        /// registered before any constructor runs, so that a constructor that reads the default object of a class registered after
+        /// its own (<c>Unit.Default&lt;Lancer&gt;()</c>) gets that class's, made by its maker. Runtime.Install runs the map's registry with it.
+        /// </summary>
+        internal static void Registering(Action register)
+        {
+            var listens = new List<Action>();
+            waiting = listens;
+            try
+            {
+                register();
+            }
+            finally
+            {
+                waiting = null;
+            }
+
+            for (var i = 0; i < listens.Count; i++)
+            {
+                listens[i]();
+            }
+        }
+
+        /// <summary>Runs a registration's listen, which makes an object of its class: at once, or once the register step Registering runs has registered every maker.</summary>
+        private static void Listen(Action listen)
+        {
+            if (waiting != null)
+            {
+                waiting.Add(listen);
+            }
+            else
+            {
+                listen();
+            }
         }
 
         /// <summary>Registers a class with its object id and no maker, for kinds such as doodads, upgrades and buffs; throws when the class is registered twice.</summary>
@@ -152,7 +192,7 @@ namespace Moonwell
 
             if (ids.TryGetValue(kind, out var id))
             {
-                return unitKind ? DefaultUnit(id, false) : DefaultItem(id);
+                return unitKind ? DefaultUnit(id, false, kind) : DefaultItem(id, kind);
             }
 
             if (classDefaults != null && classDefaults.TryGetValue(kind, out var known))
@@ -168,7 +208,7 @@ namespace Moonwell
         {
             if (typeId != 0)
             {
-                return DefaultUnit(typeId, unit is Hero);
+                return DefaultUnit(typeId, unit is Hero, null);
             }
 
             return (Unit)ClassDefault(unit);
@@ -179,7 +219,7 @@ namespace Moonwell
         {
             if (typeId != 0)
             {
-                return DefaultItem(typeId);
+                return DefaultItem(typeId, null);
             }
 
             return (Item)ClassDefault(item);
@@ -248,6 +288,21 @@ namespace Moonwell
             }
         }
 
+        /// <summary>The class a type id's default object is made as before its maker is registered: the most derived of the class asked for and the classes registered with the id that inherit it, so that a class that replaces a standard one, whose maker is the id's, is made rather than the standard one.</summary>
+        private static Type ClassOfId(int typeId, Type asked)
+        {
+            var chosen = asked;
+            foreach (var registered in ids)
+            {
+                if (registered.Value == typeId && registered.Key != chosen && chosen.IsAssignableFrom(registered.Key))
+                {
+                    chosen = registered.Key;
+                }
+            }
+
+            return chosen;
+        }
+
         /// <summary>The name of the class Make makes a default of: the class itself, or the one registered with the type id.</summary>
         private static string ClassNameOf(object key)
         {
@@ -267,8 +322,8 @@ namespace Moonwell
             return key.ToString()!;
         }
 
-        /// <summary>The default object of a unit type, made once: by the class registered for the type, else as a Hero for a hero type and a Unit for any other (as KnownUnits.TakeIn makes a unit), with the type id, no handle, and gone. </summary>
-        private static Unit DefaultUnit(int typeId, bool hero)
+        /// <summary>The default object of a unit type, made once: by the class registered for the type, else, when a class registered with the id asks before its maker is registered (a setup of the map's own; Registering registers every maker first), as that class with its own constructor (ClassOfId), else as a Hero for a hero type and a Unit for any other (as KnownUnits.TakeIn makes a unit), with the type id, no handle, and gone. </summary>
+        private static Unit DefaultUnit(int typeId, bool hero, Type? asked)
         {
             if (unitDefaults == null)
             {
@@ -281,15 +336,17 @@ namespace Moonwell
             }
 
             var maker = UnitMaker(typeId);
-            var made = maker != null ? Make(typeId, maker) : KnownUnits.Plain(hero);
+            var made = maker != null ? Make(typeId, maker)
+                : asked != null ? Make(typeId, () => (Unit)Another(ClassOfId(typeId, asked)))
+                : KnownUnits.Plain(hero);
             made.TypeId = typeId;
             made.IsGone = true;
             unitDefaults[typeId] = made;
             return made;
         }
 
-        /// <summary>The default object of an item type, made once: by the class registered for the type, else as an Item, with the type id, no handle, and gone. </summary>
-        private static Item DefaultItem(int typeId)
+        /// <summary>The default object of an item type, made once: by the class registered for the type, else as the class that asks before its maker is registered (as DefaultUnit), else as an Item, with the type id, no handle, and gone. </summary>
+        private static Item DefaultItem(int typeId, Type? asked)
         {
             if (itemDefaults == null)
             {
@@ -302,7 +359,9 @@ namespace Moonwell
             }
 
             var maker = ItemMaker(typeId);
-            var made = maker != null ? Make(typeId, maker) : new Item();
+            var made = maker != null ? Make(typeId, maker)
+                : asked != null ? Make(typeId, () => (Item)Another(ClassOfId(typeId, asked)))
+                : new Item();
             made.TypeId = typeId;
             made.IsGone = true;
             itemDefaults[typeId] = made;
@@ -396,6 +455,7 @@ namespace Moonwell
             itemDefaults = null;
             classDefaults = null;
             making = null;
+            waiting = null;
         }
 
         /// <summary>The character code at an index of a string.</summary>

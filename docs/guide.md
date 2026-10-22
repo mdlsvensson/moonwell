@@ -313,9 +313,11 @@ game with it. Both make a development build: it checks the values Moonwell recei
 `--release` makes the release build. `moonwell run --game <exe>` names the game when it is not in its usual place.
 
 The build also rejects what CSharp.lua cannot compile: collection expressions, `[1, 2]` (write `new List<int> { 1, 2 }`),
-and `using static Moonwell.Natives` (write `Natives.X`). It does not catch a `Dictionary` keyed by a map's own class
-that has a static field with a value: the map can stop while it loads, with nothing on the screen. Key by the handle,
-or set the field on first use. Moonwell's classes, `Unit` and the rest, are safe keys.
+and `using static Moonwell.Natives` (write `Natives.X`). `c ? n : x` whose first branch can be null or false in the
+game (an `int?`, a `bool?`) is error MW0016: the game gives `x` there, so write an `if`. The build does not catch a
+`Dictionary` keyed by a map's own class that has a static field with a value: the map can stop while it loads, with
+nothing on the screen. Key by the handle, or set the field on first use. Moonwell's classes, `Unit` and the rest, are
+safe keys.
 
 A whole-number `float` stays a float in the game, and prints as `50.0` where C# prints `50`; so does an `int` made a
 float (`(float)count`) and a `float` field without an initializer. An `int?` made a `float?` (`float? f = maybe;`),

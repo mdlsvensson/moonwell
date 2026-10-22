@@ -165,6 +165,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "defaults.live-actions-do-nothing", Run = UnitCases.DefaultLiveActionsDoNothing });
             list.Add(new Case { Name = "defaults.remove-does-nothing", Run = UnitCases.DefaultRemoveDoesNothing });
             list.Add(new Case { Name = "defaults.read-in-its-constructor", Run = UnitCases.DefaultReadInItsConstructor });
+            list.Add(new Case { Name = "defaults.class-registered-later", Run = UnitCases.DefaultOfClassRegisteredLater });
+            list.Add(new Case { Name = "defaults.class-without-its-maker-yet", Run = UnitCases.DefaultOfClassWithoutItsMakerYet });
             list.Add(new Case { Name = "defaults.unregistered-from-object", Run = UnitCases.DefaultOfUnregisteredFromObject });
             list.Add(new Case { Name = "defaults.unknown-type-name-empty", Run = UnitCases.DefaultNameOfUnknownTypeIsEmpty });
             list.Add(new Case { Name = "units.inventory", Run = ItemCases.Inventory });
@@ -283,6 +285,15 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "floats.converted", Run = FloatCases.Converted });
             list.Add(new Case { Name = "floats.bare", Run = FloatCases.Bare });
             list.Add(new Case { Name = "floats.ints-stay", Run = FloatCases.IntsStay });
+            list.Add(new Case { Name = "text.nullable-concat", Run = TextCases.NullableConcat });
+            list.Add(new Case { Name = "text.conditional-access-concat", Run = TextCases.ConditionalAccessConcat });
+            list.Add(new Case { Name = "text.nullable-interpolation", Run = TextCases.NullableInterpolation });
+            list.Add(new Case { Name = "text.nullable-operands", Run = TextCases.NullableOperands });
+            list.Add(new Case { Name = "text.nullable-from-int", Run = TextCases.NullableFromInt });
+            list.Add(new Case { Name = "text.nullable-char", Run = TextCases.NullableChar });
+            list.Add(new Case { Name = "text.nullable-struct", Run = TextCases.NullableStruct });
+            list.Add(new Case { Name = "text.nullable-to-string", Run = TextCases.NullableToString });
+            list.Add(new Case { Name = "text.plain", Run = TextCases.Plain });
         }
 
         /// <summary>Runs every case on a fresh world, and returns a PASS or FAIL line for each, then DONE.</summary>

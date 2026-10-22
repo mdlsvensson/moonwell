@@ -1126,6 +1126,67 @@ namespace Moonwell.Testing
             ExpectReadWhileMade("ReadsDefault", () => new ReadsDefault(), "Default in the constructor, asked again");
         }
 
+        /// <summary>A unit whose constructor reads the default object of a class registered after it, as Drillmaster's reads Lancer's.</summary>
+        private sealed class ReadsLaterDefault : Unit
+        {
+            /// <summary>The default object the last constructor read.</summary>
+            public static Unit? Seen;
+
+            /// <summary>Reads RegisteredLater's default object.</summary>
+            public ReadsLaterDefault()
+            {
+                Seen = Unit.Default<RegisteredLater>();
+            }
+        }
+
+        /// <summary>A unit class registered after ReadsLaterDefault.</summary>
+        private sealed class RegisteredLater : Unit
+        {
+        }
+
+        /// <summary>A constructor that reads the default object of a class registered after its own, as the build's registry runs them, gets the one default of that class: its maker's object, with its type id, whatever the order.</summary>
+        public static void DefaultOfClassRegisteredLater(FakeWorld world)
+        {
+            var first = ObjectTypes.FourCC("h0ra");
+            var later = ObjectTypes.FourCC("h0rb");
+            ReadsLaterDefault.Seen = null;
+
+            // As the build's registry: every id first, then the makers in the order of the classes' names.
+            Runtime.Install(new TestMap(), () =>
+            {
+                ObjectTypes.Id<ReadsLaterDefault>(first);
+                ObjectTypes.Id<RegisteredLater>(later);
+                ObjectTypes.Unit(first, () => new ReadsLaterDefault());
+                ObjectTypes.Unit(later, () => new RegisteredLater());
+            });
+
+            var seen = ReadsLaterDefault.Seen;
+            Expect.True(seen is RegisteredLater, "the default read is a RegisteredLater");
+            Expect.Same(seen, Unit.Default<RegisteredLater>(), "the class's default");
+            Expect.Same(seen, Unit.Of(world.NewUnit(later))!.Default, "the default of a unit of the type");
+            Expect.Equal(later, seen!.TypeId, "the default's type id");
+        }
+
+        /// <summary>A setup of its own (not the build's registry, which Runtime.Install runs) that registers a class whose constructor reads the default object of a class whose id is registered and whose maker is not yet: that class's own object, kept as its type's one default.</summary>
+        public static void DefaultOfClassWithoutItsMakerYet(FakeWorld world)
+        {
+            var first = ObjectTypes.FourCC("h0rc");
+            var later = ObjectTypes.FourCC("h0rd");
+            ReadsLaterDefault.Seen = null;
+
+            ObjectTypes.Id<ReadsLaterDefault>(first);
+            ObjectTypes.Id<RegisteredLater>(later);
+            ObjectTypes.Unit(first, () => new ReadsLaterDefault());
+            ObjectTypes.Unit(later, () => new RegisteredLater());
+
+            var seen = ReadsLaterDefault.Seen;
+            Expect.True(seen is RegisteredLater, "the default read is a RegisteredLater");
+            Expect.Same(seen, Unit.Default<RegisteredLater>(), "the class's default");
+            Expect.Same(seen, Unit.Of(world.NewUnit(later))!.Default, "the default of a unit of the type");
+            Expect.Equal(later, seen!.TypeId, "the default's type id");
+            Expect.True(seen.IsGone, "the default is gone");
+        }
+
         /// <summary>A unit class that is never registered, whose default is first asked for from an object of it.</summary>
         private sealed class AskedFromObject : Unit
         {

@@ -53,7 +53,7 @@ namespace Moonwell.Build
 
         // The trees of operations of a file: member bodies and initializers, and a primary constructor's, which is its class's
         // while its members have their own.
-        private static IEnumerable<IOperation> Roots(SyntaxNode node, SemanticModel model)
+        internal static IEnumerable<IOperation> Roots(SyntaxNode node, SemanticModel model)
         {
             if (model.GetOperation(node) is { Parent: null } root)
             {
@@ -175,11 +175,9 @@ namespace Moonwell.Build
             var zero = FloatOf(conversion) == SpecialType.System_Single ? "0.0f" : "0.0";
             var open = bracketed ? "((" : "(";
             var close = (bracketed ? ")" : string.Empty) + " + " + zero + ")";
-            // At one place, the brackets that close come first, inner before outer, then a left-out argument (order 0), then
-            // the brackets that open, outer before inner.
             var length = target.Span.Length;
-            edits.Add(new FloatEdit(new TextSpan(target.SpanStart, 0), open, int.MinValue + length, string.Empty));
-            edits.Add(new FloatEdit(new TextSpan(target.Span.End, 0), close, int.MaxValue - length, target + " -> " + open + target + close));
+            edits.Add(new FloatEdit(new TextSpan(target.SpanStart, 0), open, Brackets.Open(length), string.Empty));
+            edits.Add(new FloatEdit(new TextSpan(target.Span.End, 0), close, Brackets.Close(length), target + " -> " + open + target + close));
         }
 
         // An expression that stays whole before + 0.0f.

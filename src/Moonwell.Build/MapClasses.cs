@@ -22,16 +22,17 @@ namespace Moonwell.Build
                 inner = inner.InnerException!;
             }
 
-            var place = FirstLineInProject(new StackTrace(inner, true), project);
+            var frame = FirstFrameInProject(new StackTrace(inner, true), project);
             if (inner.GetType().FullName == FieldRuleExceptionName)
             {
                 // A value its field does not allow: the message names the class and the property. A formula of levels is
                 // checked after the constructor, so its line is where the formula was put.
                 var putAt = (StackTrace?)inner.GetType().GetProperty("PutAt")!.GetValue(inner);
-                place ??= putAt == null ? null : FirstLineInProject(putAt, project);
-                return new BuildException((place == null ? string.Empty : place + ": ") + inner.Message);
+                frame ??= putAt == null ? null : FirstFrameInProject(putAt, project);
+                return new BuildException((frame == null ? string.Empty : LineOf(frame, project) + ": ") + RuleMessage(inner, frame));
             }
 
+            var place = frame == null ? null : LineOf(frame, project);
             var prefix = place == null ? string.Empty : place + ": ";
             if (inner is BadImageFormatException || IsLiveMemberWithoutGame(inner))
             {
@@ -56,18 +57,55 @@ namespace Moonwell.Build
 
         internal static string? FirstLineInProject(StackTrace trace, MapProject project)
         {
+            var frame = FirstFrameInProject(trace, project);
+            return frame == null ? null : LineOf(frame, project);
+        }
+
+        private static StackFrame? FirstFrameInProject(StackTrace trace, MapProject project)
+        {
             var root = project.Folder + Path.DirectorySeparatorChar;
             foreach (var frame in trace.GetFrames())
             {
                 var file = frame.GetFileName();
                 if (file != null && file.StartsWith(root, StringComparison.OrdinalIgnoreCase))
                 {
-                    // The error format names the file with '/' on every system: Heroes/Arthas.cs:12.
-                    return $"{Path.GetRelativePath(project.Folder, file).Replace('\\', '/')}:{frame.GetFileLineNumber()}";
+                    return frame;
                 }
             }
 
             return null;
+        }
+
+        // The error format names the file with '/' on every system: Heroes/Arthas.cs:12.
+        private static string LineOf(StackFrame frame, MapProject project)
+        {
+            return $"{Path.GetRelativePath(project.Folder, frame.GetFileName()!).Replace('\\', '/')}:{frame.GetFileLineNumber()}";
+        }
+
+        // A rule's message names the class whose object was made (Drillmaster.MaxLife); when its line is in a declared class's
+        // own code, such as the constructor of the base it inherits (Sentry), it names that class instead, as the line does.
+        private static string RuleMessage(Exception rule, StackFrame? frame)
+        {
+            var property = (string)rule.GetType().GetProperty("Property")!.GetValue(rule)!;
+            var type = frame?.GetMethod()?.DeclaringType;
+            while (type is { IsNested: true } && type.Name.StartsWith('<'))
+            {
+                // A class the compiler made for a lambda or an iterator, inside the class whose code it is.
+                type = type.DeclaringType;
+            }
+
+            if (type == null || Declarations.KindBaseOf(type) == null || !rule.Message.StartsWith(property, StringComparison.Ordinal))
+            {
+                return rule.Message;
+            }
+
+            var name = type.Name;
+            for (var outer = type.DeclaringType; outer != null; outer = outer.DeclaringType)
+            {
+                name = outer.Name + "." + name;
+            }
+
+            return name + property.Substring(property.LastIndexOf('.')) + rule.Message.Substring(property.Length);
         }
     }
 }

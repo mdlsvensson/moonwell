@@ -22,7 +22,9 @@ namespace Moonwell.Build
         private const string ObjectsNamespace = "Moonwell.Objects";
 
         // The generic types whose names the ignored files' preambles evaluate when the script loads.
-        private static readonly string[] Generics = { "Levels_1", "ObjectList_1", "ObjectRef_1" };
+        private static readonly string[] Generics = { LevelsGeneric, "ObjectList_1", "ObjectRef_1" };
+
+        private const string LevelsGeneric = "Levels_1";
 
         private static readonly Regex Getter = new Regex("\\bget[A-Za-z_][A-Za-z0-9_]*", RegexOptions.CultureInvariant);
 
@@ -172,14 +174,18 @@ namespace Moonwell.Build
                 text.Append(space).Append(" = ").Append(space).Append(" or {}\n");
             }
 
-            text.Append("local function generic() return {} end\n");
-            foreach (var generic in Generics)
-            {
-                text.Append(ObjectsNamespace).Append('.').Append(generic).Append(" = generic\n");
-            }
-
             text.Append("local function nothing() end\n");
             text.Append("local function none() return nil end\n");
+
+            // Levels has the implicit conversion of one value for every level (ManaCost = 60), which a constructor runs again in
+            // the game: it gives nil, as the methods that make levels do, since the setters do nothing.
+            text.Append("local function generic() return {} end\n");
+            text.Append("local function levels() return { op_Implicit = none } end\n");
+            foreach (var generic in Generics)
+            {
+                text.Append(ObjectsNamespace).Append('.').Append(generic).Append(generic == LevelsGeneric ? " = levels\n" : " = generic\n");
+            }
+
             foreach (var group in used.Where(one => one.InObjects).GroupBy(one => NamespaceOf(one.FullName)).OrderBy(group => group.Key, StringComparer.Ordinal))
             {
                 text.Append("System.namespace(\"").Append(group.Key).Append("\", function (namespace)\n");

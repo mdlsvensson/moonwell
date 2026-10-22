@@ -263,8 +263,8 @@ namespace Moonwell.Build.Tests
                 new[]
                 {
                     "Objects.Arthas", "Objects.Burn", "Objects.Claws", "Objects.DarkArthas", "Objects.Drilled", "Objects.Duelist",
-                    "Objects.Elemental", "Objects.Firebolt", "Objects.Forge", "Objects.Gate", "Objects.Mage", "Objects.Portal",
-                    "Objects.Rock", "Objects.StrongFootman", "Objects.Tuned", "Objects.Zap",
+                    "Objects.Elemental", "Objects.Firebolt", "Objects.Flask", "Objects.Forge", "Objects.Gate", "Objects.Mage", "Objects.Portal",
+                    "Objects.Recruiter", "Objects.Rock", "Objects.Sentinel", "Objects.Steady", "Objects.StrongFootman", "Objects.Tuned", "Objects.Veteran", "Objects.Zap",
                 },
                 names);
         }
@@ -523,6 +523,14 @@ namespace Moonwell.Build.Tests
             AssertFails(
                 "OutOfRange",
                 "Objects.cs:13: Giant.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it");
+        }
+
+        [Fact]
+        public void a_value_out_of_range_put_in_a_bases_constructor_names_the_base()
+        {
+            AssertFails(
+                "OutOfRangeInBase",
+                "Objects.cs:14: Sentry.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it");
         }
 
         [Fact]

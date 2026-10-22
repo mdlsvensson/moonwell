@@ -101,6 +101,27 @@ public class StandardObjectsTests
     }
 
     [Fact]
+    public void a_value_of_the_definitive_edition_graphics_is_the_games()
+    {
+        // The skin files key a value of each graphics mode (modelScale:sd, :de, :hd); the game, in Definitive Edition
+        // graphics, scales a footman to 0.8 and a paladin to 0.935 (game-facts, seen on 3.0.1).
+        var units = Of(Kind.Unit);
+
+        Assert.Equal("0.8", Find(units, "hfoo").Values["usca"]);
+        Assert.Equal("0.935", Find(units, "Hpal").Values["usca"]);
+    }
+
+    [Fact]
+    public void a_value_of_the_definitive_edition_graphics_wins_over_the_plain_key()
+    {
+        // The peasant has modelScale=1 and modelScale:de=0.85, and the game scales it to 0.85.
+        using var copy = new Copy();
+        copy.Replace("units/unitskin.txt", "[hfoo]", "modelScale:de=0.8", "modelScale=1\nmodelScale:de=0.85");
+
+        Assert.Equal("0.85", Find(Of(copy.Tables(), Kind.Unit), "hfoo").Values["usca"]);
+    }
+
+    [Fact]
     public void objects_are_ordered_by_id()
     {
         var ids = Of(Kind.Unit).Select(o => o.Id).ToList();

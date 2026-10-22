@@ -239,6 +239,7 @@ namespace Moonwell.Objects
                     RepairTime = 70;
                     Requires.Set<global::Moonwell.Objects.Human.Units.Keep>();
                     ResearchesAvailable.Set<global::Moonwell.Objects.Human.Upgrades.PriestAdeptTraining, global::Moonwell.Objects.Human.Upgrades.SorceressAdeptTraining, global::Moonwell.Objects.Human.Upgrades.MagicSentry, global::Moonwell.Objects.Human.Upgrades.ControlMagic>();
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -673,6 +674,7 @@ namespace Moonwell.Objects
                     RequirementsTier2.Set<global::Moonwell.Objects.Human.Units.Keep>();
                     RequirementsTier3.Set<global::Moonwell.Objects.Human.Units.Castle>();
                     RequirementsTiersUsed = 3;
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -1101,6 +1103,7 @@ namespace Moonwell.Objects
                     RequirementsTier2.Set<global::Moonwell.Objects.Human.Units.Keep>();
                     RequirementsTier3.Set<global::Moonwell.Objects.Human.Units.Castle>();
                     RequirementsTiersUsed = 3;
+                    Scale = 1.03f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -1665,6 +1668,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDragonHawk.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -1677,6 +1681,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "units\\human\\BloodElfDragonHawk\\BloodElfDragonHawk";
                     ModelFileExtraVersions = 0;
                     Name = "Dragonhawk Rider";
                     NormalSkin = "Aclf,Amls,Ahan";
@@ -1685,6 +1690,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\human\\BloodElfDragonHawk\\BloodElfDragonHawk_portrait";
                     Priority = 4;
                     ProjectileImpactZ = 20f;
                     ProjectileImpactZSwimming = 0f;
@@ -1698,6 +1704,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 28;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.55f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -2135,6 +2142,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 13;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -2276,6 +2284,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 135;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -2412,6 +2421,7 @@ namespace Moonwell.Objects
                     RequiredAnimationNamesAttachments = "medium";
                     Requires.Set<global::Moonwell.Objects.Human.Units.Keep, global::Moonwell.Objects.Human.Units.LumberMill>();
                     ResearchesAvailable.Set<global::Moonwell.Objects.Human.Upgrades.StormHammers, global::Moonwell.Objects.Human.Upgrades.Cloud>();
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -2558,6 +2568,7 @@ namespace Moonwell.Objects
                     RepairTime = 45;
                     RequiredAnimationNamesAttachments = "medium";
                     Requires.Set<global::Moonwell.Objects.Human.Units.Castle>();
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -2961,6 +2972,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroArchMage.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-archmage.blp";
                     Intelligence = 19;
                     IntelligencePerLevel = 3.2f;
@@ -2978,6 +2990,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\human\\HeroArchMage\\HeroArchMage";
                     ModelFileExtraVersions = 0;
                     Movement = "HumanHeroArchMageMovement";
                     Name = "High Elf Archmage";
@@ -2987,6 +3000,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\human\\HeroArchMage\\HeroArchMage_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.INT;
                     Priority = 9;
                     ProjectileImpactZ = 60f;
@@ -3152,6 +3166,7 @@ namespace Moonwell.Objects
                     RepairTime = 45;
                     RequiredAnimationNamesAttachments = "medium";
                     Requires.Set<global::Moonwell.Objects.Human.Units.Castle, global::Moonwell.Objects.Human.Units.Blacksmith>();
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -3418,6 +3433,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 75;
                     RepairLumberCost = 0;
                     RepairTime = 15;
+                    Scale = 0.825f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -3578,6 +3594,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 70;
                     RepairTime = 32;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -3749,6 +3766,7 @@ namespace Moonwell.Objects
                     RequirementsTier2.Set<global::Moonwell.Objects.Human.Units.Keep>();
                     RequirementsTier3.Set<global::Moonwell.Objects.Human.Units.Castle>();
                     RequirementsTiersUsed = 3;
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -4078,6 +4096,7 @@ namespace Moonwell.Objects
                     RequirementsTier2.Set<global::Moonwell.Objects.Human.Units.Keep>();
                     RequirementsTier3.Set<global::Moonwell.Objects.Human.Units.Castle>();
                     RequirementsTiersUsed = 3;
+                    Scale = 0.935f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -4238,7 +4257,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 75;
                     RepairLumberCost = 0;
                     RepairTime = 15;
-                    Scale = 1f;
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -4359,6 +4378,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = -25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMarkOfFire.blp";
                     IsABuilding = false;
                     Level = 0;
                     LumberBountyAwardedBase = 0;
@@ -4390,6 +4410,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 45;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -4511,6 +4532,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 45;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -4655,6 +4677,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 135;
                     RepairLumberCost = 10;
                     RepairTime = 28;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -4800,6 +4823,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 26;
                     Requires.Set<global::Moonwell.Objects.Human.Units.Blacksmith>();
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -4924,6 +4948,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNElfVillager.blp";
                     IsABuilding = false;
                     Level = 1;
                     LumberBountyAwardedBase = 0;
@@ -4933,6 +4958,7 @@ namespace Moonwell.Objects
                     MaxLife = 150;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\critters\\HighElfPeasant\\HighElfPeasant";
                     ModelFileExtraVersions = 0;
                     Name = "Runner";
                     NameEditorSuffix = "High Elf";
@@ -4942,6 +4968,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\critters\\HighElfPeasant\\HighElfPeasant_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -5239,6 +5266,7 @@ namespace Moonwell.Objects
                     RepairTime = 55;
                     RequiredAnimationNamesAttachments = "large";
                     Requires.Set<global::Moonwell.Objects.Human.Units.Castle>();
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -5405,6 +5433,7 @@ namespace Moonwell.Objects
                     RequiredAnimationNames = "alternate";
                     RequiredAnimationNamesAttachments = "large";
                     Requires.Set<global::Moonwell.Objects.Human.Units.Castle>();
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -5556,6 +5585,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 155;
                     RepairLumberCost = 20;
                     RepairTime = 30;
+                    Scale = 1.11f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -5707,6 +5737,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 30;
                     RepairTime = 28;
                     Requires.Set<global::Moonwell.Objects.Human.Units.ArcaneVault, global::Moonwell.Objects.Human.Units.Keep>();
+                    Scale = 1.15f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6129,6 +6160,7 @@ namespace Moonwell.Objects
                     MaxLife = 700;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
+                    Model = "units\\human\\WarWagon\\WarWagon";
                     ModelFileExtraVersions = 0;
                     Movement = "HumanSteamTankMovement";
                     Name = "War Wagon";
@@ -6138,6 +6170,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\human\\WarWagon\\WarWagon_portrait";
                     Priority = 3;
                     ProjectileImpactZ = 80f;
                     ProjectileImpactZSwimming = 0f;
@@ -6265,6 +6298,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSummonWaterElemental.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -6296,6 +6330,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 1;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.7f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6407,6 +6442,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSummonWaterElemental.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -6416,6 +6452,7 @@ namespace Moonwell.Objects
                     MaxLife = 625;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\human\\WaterElemental\\WaterElemental";
                     ModelFileExtraVersions = 0;
                     Name = "Water Elemental";
                     NameEditorSuffix = "(Level 2)";
@@ -6424,6 +6461,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 2;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\human\\WaterElemental\\WaterElemental_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -6437,6 +6475,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 1;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6460,6 +6499,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 192;
+                    TintingColor3Blue = 255;
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -6545,6 +6587,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSummonWaterElemental.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -6554,6 +6597,7 @@ namespace Moonwell.Objects
                     MaxLife = 825;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\human\\WaterElemental\\WaterElemental";
                     ModelFileExtraVersions = 0;
                     Name = "Water Elemental";
                     NameEditorSuffix = "(Level 3)";
@@ -6562,6 +6606,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 2;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\human\\WaterElemental\\WaterElemental_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -6575,6 +6620,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 1;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6598,6 +6644,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 192;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;

@@ -101,7 +101,12 @@ internal static class LuaScript
         output = new List<string>();
         using var lua = new NLua.Lua();
         lua.RegisterFunction("print", null, typeof(LuaScript).GetMethod(nameof(Print)));
-        lua.DoString("setmetatable(_G, { __index = function(_, name) return function() return nil end end })");
+        // The game's Lua has no debug library, and CSharp.lua's core takes other paths without it (numbers, booleans and nil get
+        // no methods or operators, C21): the script runs without it here too. Each native is a function that gives nil, and main
+        // adds GetCameraMargin's to a number, which only the debug library's nil allowed.
+        lua.DoString("debug = nil");
+        lua.DoString("GetCameraMargin = function() return 0.0 end");
+        lua.DoString("setmetatable(_G, { __index = function(_, name) if name ~= 'debug' then return function() return nil end end end })");
         lua.DoString(script);
         lua.DoString("main()");
         return output;

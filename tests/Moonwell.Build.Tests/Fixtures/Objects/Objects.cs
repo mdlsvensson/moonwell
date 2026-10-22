@@ -189,6 +189,79 @@ namespace Objects
         }
     }
 
+    // One value for every level, through Levels' implicit conversion: the constructor runs again in the game when it is registered.
+    [Moonwell.Objects.ObjectId("A007")]
+    public class Steady : Moonwell.Objects.Human.Abilities.StormBolt
+    {
+        public Steady()
+        {
+            ManaCost = 60;
+            Duration = 30f;
+        }
+    }
+
+    // Reads the default object of a class the registry registers after it (by name): its constructor runs again in the game.
+    [Moonwell.Objects.ObjectId("h004")]
+    public class Recruiter : Moonwell.Objects.Human.Units.Footman
+    {
+        public Recruiter()
+        {
+            GoldCost = Moonwell.Unit.Default<Veteran>().GoldCost + 5;
+        }
+    }
+
+    [Moonwell.Objects.ObjectId("h005")]
+    public class Veteran : Moonwell.Objects.Human.Units.Knight
+    {
+        public Veteran()
+        {
+            GoldCost = 250;
+        }
+    }
+
+    // Reads its type's default object in its own reaction: bare, through this, and (the item) through base.
+    [Moonwell.Objects.ObjectId("h006")]
+    public class Sentinel : Moonwell.Objects.Human.Units.Footman
+    {
+        public static string? Read;
+
+        public Sentinel()
+        {
+            MaxLife = 500;
+        }
+
+        public override void OnDeath(Moonwell.Unit? killerUnit)
+        {
+            var same = Default == Moonwell.Unit.Default<Sentinel>() && this.Default == Default;
+            // An int read bare and made a float: the build writes both the receiver and the conversion.
+            float gold = Default.GoldCost;
+            Read = Default.MaxLife + " " + this.Default.MaxLife + " " + (same ? "same" : "other") + " " + gold;
+        }
+    }
+
+    [Moonwell.Objects.ObjectId("I002")]
+    public class Flask : Items.PotionOfHealing
+    {
+        public static string? Read;
+
+        public Flask()
+        {
+            Charges = 3;
+        }
+
+        public override void OnPickedUp(Moonwell.Unit carrierUnit)
+        {
+            var same = Default == Moonwell.Item.Default<Flask>() && this.Default == Default && base.Default == Default;
+            float charges = Default.Charges;
+            Read = Default.Charges + " " + this.Default.Charges + " " + (same ? "same" : "other") + " " + charges + " " + Half(Default.Charges);
+        }
+
+        private static float Half(float value)
+        {
+            return value / 2f;
+        }
+    }
+
     [Moonwell.Objects.Replaces]
     public class StrongFootman : Moonwell.Objects.Human.Units.Footman
     {
