@@ -46,5 +46,31 @@ namespace Moonwell.Testing
             Expect.True(found.IsGone, "the vanished destructable is gone");
             Expect.Equal(0, world.RemovedDestructables.Count, "the destructables the game was asked to remove");
         }
+
+        /// <summary>A destructable killed and then removed runs no death reaction from the removal: the game fires the death event again inside RemoveDestructable.</summary>
+        public static void RemoveAfterDeath(FakeWorld world)
+        {
+            world.DeathOnRemove = true;
+            ObjectTypes.Destructable(ObjectTypes.FourCC("B001"), () => new TestGate());
+            var handle = world.NewDestructable(ObjectTypes.FourCC("B001"));
+            var gate = Destructable.Of(handle)!;
+            TestLog.Lines.Clear();
+            Inbound.DestructableDied(handle);
+            gate.Remove();
+            ExpectLog(new string[] { "gate died", "part died" }, "the log");
+        }
+
+        /// <summary>A living destructable that is removed reacts to no death, even when the game fires one inside RemoveDestructable.</summary>
+        public static void RemoveLiving(FakeWorld world)
+        {
+            world.DeathOnRemove = true;
+            ObjectTypes.Destructable(ObjectTypes.FourCC("B001"), () => new TestGate());
+            var handle = world.NewDestructable(ObjectTypes.FourCC("B001"));
+            var gate = Destructable.Of(handle)!;
+            TestLog.Lines.Clear();
+            gate.Remove();
+            ExpectLog(new string[0], "the log");
+            Expect.True(gate.HasEnded, "the removed destructable has ended");
+        }
     }
 }

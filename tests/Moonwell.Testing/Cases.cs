@@ -221,6 +221,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "items.shared-without-handle", Run = ItemCases.SharedWithoutHandle });
             list.Add(new Case { Name = "destructables.watch", Run = DestructableCases.Watch });
             list.Add(new Case { Name = "destructables.sweep", Run = DestructableCases.SweepDetectsRemoval });
+            list.Add(new Case { Name = "destructables.remove-after-death", Run = DestructableCases.RemoveAfterDeath });
+            list.Add(new Case { Name = "destructables.remove-living", Run = DestructableCases.RemoveLiving });
+            list.Add(new Case { Name = "components.ended-in-onremoved", Run = EndedCases.ReadInOnRemoved });
             list.Add(new Case { Name = "damage.order", Run = DamageCases.Order });
             list.Add(new Case { Name = "damage.change-amount", Run = DamageCases.ChangeAmount });
             list.Add(new Case { Name = "damage.unknown-units", Run = DamageCases.UnknownUnits });
