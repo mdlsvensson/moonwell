@@ -526,6 +526,14 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_value_out_of_range_put_in_a_bases_constructor_names_the_base()
+        {
+            AssertFails(
+                "OutOfRangeInBase",
+                "Objects.cs:14: Sentry.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it");
+        }
+
+        [Fact]
         public void a_value_out_of_range_set_by_id_names_the_line_of_the_set_with_forward_slashes()
         {
             AssertFails(
