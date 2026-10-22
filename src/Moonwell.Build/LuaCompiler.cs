@@ -36,7 +36,7 @@ namespace Moonwell.Build
         /// <param name="standard">The standard data.</param>
         /// <param name="set">The tables values are read from (<see cref="GameData.ValueSet"/>): null for the base tables.</param>
         /// <returns>The script, also set on <paramref name="map"/>.</returns>
-        /// <exception cref="BuildException">Common.j and Blizzard.j are missing, the C# does not compile to Lua, or a declared list names a class with no id.</exception>
+        /// <exception cref="BuildException">Common.j and Blizzard.j are missing, the C# does not compile to Lua, a declared list names a class with no id, or an object file cannot be read.</exception>
         public static string Compile(
             MapProject project,
             War3Net.Build.Map map,
@@ -56,7 +56,9 @@ namespace Moonwell.Build
             }
 
             script = ObjectLua.AddToInit(script, declarations.Used);
-            script = ObjectLua.Values(script, declarations.Used, declarations.Objects, named, standard, set);
+            // A standard class reads its type as World Editor changed it, and a type's default object any type World Editor makes.
+            var mapTypes = MapTypes.Read(project.MapFolder, map.TriggerStrings, standard);
+            script = ObjectLua.Values(script, declarations, named, standard, set, mapTypes);
             script = LineTable.Apply(script, files);
             map.Script = script;
             return script;

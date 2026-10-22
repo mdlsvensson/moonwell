@@ -27,6 +27,18 @@ namespace Moonwell
         /// <summary>The hidden ability that carries each registered buff class on its unit, keyed by the class; a lookup only.</summary>
         private static Dictionary<object, int> carriers = new Dictionary<object, int>();
 
+        /// <summary>The default object of each unit type, keyed by its id; made on first use.</summary>
+        private static Dictionary<int, Unit>? unitDefaults;
+
+        /// <summary>The default object of each item type, keyed by its id; made on first use.</summary>
+        private static Dictionary<int, Item>? itemDefaults;
+
+        /// <summary>The default object of each unit or item class that is not registered, keyed by the class; made on first use.</summary>
+        private static Dictionary<Type, Widget>? classDefaults;
+
+        /// <summary>The classes and type ids whose default object is being made, so that one read while its constructor runs fails rather than making it again; made on first use.</summary>
+        private static HashSet<object>? making;
+
         /// <summary>Registers a unit type with its id and the function that makes its object, and listens for the events its class needs.</summary>
         public static void Unit<T>(int id, Func<T> make)
             where T : Moonwell.Unit
@@ -121,6 +133,182 @@ namespace Moonwell
             return id;
         }
 
+        /// <summary>The object id the class of an object is registered with; 0 when it is not registered.</summary>
+        internal static int IdOfClass(object obj)
+        {
+            return ids.TryGetValue(Names.TypeOf(obj), out var id) ? id : 0;
+        }
+
+        /// <summary>The default object of a class: the one of the type it is registered with, else one of its own, made with its constructor without parameters.</summary>
+        internal static Widget DefaultOf<T>()
+            where T : Widget, new()
+        {
+            var kind = typeof(T);
+            var unitKind = typeof(Unit).IsAssignableFrom(kind);
+            if (!unitKind && !typeof(Item).IsAssignableFrom(kind))
+            {
+                throw new MoonwellException(kind.Name + " has no default object: only units and items have one");
+            }
+
+            if (ids.TryGetValue(kind, out var id))
+            {
+                return unitKind ? DefaultUnit(id, false) : DefaultItem(id);
+            }
+
+            if (classDefaults != null && classDefaults.TryGetValue(kind, out var known))
+            {
+                return known;
+            }
+
+            return KeepClassDefault(kind, Make(kind, () => Another(kind)));
+        }
+
+        /// <summary>The default object of a unit's type: the one of its type id, or of its class when the class has no id and is not registered (see ClassDefault).</summary>
+        internal static Unit DefaultOf(Unit unit, int typeId)
+        {
+            if (typeId != 0)
+            {
+                return DefaultUnit(typeId, unit is Hero);
+            }
+
+            return (Unit)ClassDefault(unit);
+        }
+
+        /// <summary>The default object of an item's type: the one of its type id, or of its class when the class has no id and is not registered.</summary>
+        internal static Item DefaultOf(Item item, int typeId)
+        {
+            if (typeId != 0)
+            {
+                return DefaultItem(typeId);
+            }
+
+            return (Item)ClassDefault(item);
+        }
+
+        /// <summary>The default object of the class of an object with no type, made once with the class's constructor, as DefaultOf makes it: the same whichever is asked first.</summary>
+        private static Widget ClassDefault(Widget widget)
+        {
+            var kind = Names.TypeOf(widget);
+            if (classDefaults != null && classDefaults.TryGetValue(kind, out var known))
+            {
+                return known;
+            }
+
+            return KeepClassDefault(kind, Make(kind, () => Another(kind)));
+        }
+
+        /// <summary>Keeps a class's default object, gone, and gives it.</summary>
+        private static Widget KeepClassDefault(Type kind, Widget made)
+        {
+            if (classDefaults == null)
+            {
+                classDefaults = new Dictionary<Type, Widget>();
+            }
+
+            made.IsGone = true;
+            classDefaults[kind] = made;
+            return made;
+        }
+
+        /// <summary>A new object of a unit or item class, made with its constructor without parameters; an exception the constructor throws comes out as it is (new T() wraps it on .NET). In Lua a type's table holds the class at [1], which makes an object when called.</summary>
+        /// @CSharpLua.Template = "{0}[1]()"
+        private static Widget Another(Type kind)
+        {
+            return Construct(kind);
+        }
+
+        /// <summary>Another on .NET; CSharp.lua does not compile it.</summary>
+        /// @CSharpLua.Ignore
+        private static Widget Construct(Type kind)
+        {
+            return (Widget)Activator.CreateInstance(kind, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.DoNotWrapExceptions, null, null, null)!;
+        }
+
+        /// <summary>Makes the default object of a class or a registered type id (the key) with a function; throws, naming the class, when it is already being made: its constructor read it, so making it again would never end.</summary>
+        private static T Make<T>(object key, Func<T> make)
+            where T : Widget
+        {
+            if (making == null)
+            {
+                making = new HashSet<object>();
+            }
+
+            if (!making.Add(key))
+            {
+                throw new MoonwellException(ClassNameOf(key) + "'s default object is read while its constructor runs; read the field itself");
+            }
+
+            try
+            {
+                return make();
+            }
+            finally
+            {
+                making.Remove(key);
+            }
+        }
+
+        /// <summary>The name of the class Make makes a default of: the class itself, or the one registered with the type id.</summary>
+        private static string ClassNameOf(object key)
+        {
+            if (key is Type kind)
+            {
+                return kind.Name;
+            }
+
+            foreach (var registered in ids)
+            {
+                if (registered.Value == (int)key)
+                {
+                    return registered.Key.Name;
+                }
+            }
+
+            return key.ToString()!;
+        }
+
+        /// <summary>The default object of a unit type, made once: by the class registered for the type, else as a Hero for a hero type and a Unit for any other (as KnownUnits.TakeIn makes a unit), with the type id, no handle, and gone. </summary>
+        private static Unit DefaultUnit(int typeId, bool hero)
+        {
+            if (unitDefaults == null)
+            {
+                unitDefaults = new Dictionary<int, Unit>();
+            }
+
+            if (unitDefaults.TryGetValue(typeId, out var known))
+            {
+                return known;
+            }
+
+            var maker = UnitMaker(typeId);
+            var made = maker != null ? Make(typeId, maker) : KnownUnits.Plain(hero);
+            made.TypeId = typeId;
+            made.IsGone = true;
+            unitDefaults[typeId] = made;
+            return made;
+        }
+
+        /// <summary>The default object of an item type, made once: by the class registered for the type, else as an Item, with the type id, no handle, and gone. </summary>
+        private static Item DefaultItem(int typeId)
+        {
+            if (itemDefaults == null)
+            {
+                itemDefaults = new Dictionary<int, Item>();
+            }
+
+            if (itemDefaults.TryGetValue(typeId, out var known))
+            {
+                return known;
+            }
+
+            var maker = ItemMaker(typeId);
+            var made = maker != null ? Make(typeId, maker) : new Item();
+            made.TypeId = typeId;
+            made.IsGone = true;
+            itemDefaults[typeId] = made;
+            return made;
+        }
+
         /// <summary>The object id made from four characters, the first one the highest byte.</summary>
         [LocalSafe]
         public static int FourCC(string code)
@@ -204,6 +392,10 @@ namespace Moonwell
             ids = new Dictionary<Type, int>();
             buffIds = new Dictionary<object, int>();
             carriers = new Dictionary<object, int>();
+            unitDefaults = null;
+            itemDefaults = null;
+            classDefaults = null;
+            making = null;
         }
 
         /// <summary>The character code at an index of a string.</summary>

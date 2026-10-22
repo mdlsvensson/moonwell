@@ -7,12 +7,12 @@ namespace BeyondLimits
     {
     }
 
-    [BeyondLimits(nameof(HitPoints))]
+    [BeyondLimits(nameof(MaxLife))]
     public class Giant : Moonwell.Objects.Human.Units.Footman
     {
         public Giant()
         {
-            HitPoints = 600000;
+            MaxLife = 600000;
         }
     }
 }

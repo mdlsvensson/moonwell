@@ -148,6 +148,7 @@ public class ObjectsWriterTests
                 "Values/destructable.json",
                 "Values/doodad.json",
                 "Values/item.json",
+                "Values/misc.json",
                 "Values/unit.json",
                 "Values/upgrade.json",
             },
@@ -257,15 +258,14 @@ public class ObjectsWriterTests
         var unit = MiniFiles.Value["Kinds/StandardUnit.g.cs"];
 
         Assert.Contains(
-            "        [global::Moonwell.Objects.Field(\"uhpm\", Label = \"Hit Points Maximum (Base)\")]\n"
-            + "        [global::Moonwell.Objects.Limits(1, 500000)]\n"
-            + "        public int HitPoints\n"
+            "        [global::Moonwell.Objects.Field(\"ugol\", Label = \"Gold Cost\")]\n"
+            + "        [global::Moonwell.Objects.Limits(0, 100000)]\n"
+            + "        public int GoldCost\n"
             + "        {\n"
-            + "            get { return Fields.Get<int>(this, \"uhpm\"); }\n"
-            + "            protected set { Fields.Put(\"uhpm\", value); }\n"
+            + "            get { return Fields.Get<int>(this, \"ugol\"); }\n"
+            + "            protected set { Fields.Put(\"ugol\", value); }\n"
             + "        }\n",
             unit);
-        Assert.Contains("public string Name\n", unit);
         Assert.Contains(
             "public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> Abilities\n"
             + "        {\n"
@@ -283,11 +283,6 @@ public class ObjectsWriterTests
         var unit = MiniFiles.Value["Kinds/StandardUnit.g.cs"];
         var hero = MiniFiles.Value["Kinds/StandardHero.g.cs"];
 
-        Assert.Contains(
-            "        [global::Moonwell.Objects.Field(\"unam\", Label = \"Name\")]\n"
-            + "        [global::Moonwell.Objects.Required]\n"
-            + "        public string Name\n",
-            unit);
         Assert.Contains(
             "        [global::Moonwell.Objects.Field(\"unsf\", Label = \"Name - Editor Suffix\")]\n"
             + "        [global::Moonwell.Objects.MaxLength(50)]\n"
@@ -389,9 +384,91 @@ public class ObjectsWriterTests
 
         Assert.DoesNotContain("\"ustr\"", unit);
         Assert.DoesNotContain("Strength", unit);
-        Assert.Contains("public int StartingStrength\n", hero);
-        Assert.Contains("public int HitPoints\n", hero);
+        Assert.Contains("[\"ustr\"] = typeof(int),", hero);
+        Assert.Contains("[global::Moonwell.Objects.SharedField(\"ustr\", \"Strength\", Label = \"Starting Strength\", Min = 1, Max = 100, HasLimits = true)]\n", hero);
         Assert.Contains("public abstract class StandardHero : global::Moonwell.Hero\n", hero);
+    }
+
+    [Fact]
+    public void a_shared_field_has_no_property_and_its_rules_are_on_the_kind_base()
+    {
+        var unit = MiniFiles.Value["Kinds/StandardUnit.g.cs"];
+        var hero = MiniFiles.Value["Kinds/StandardHero.g.cs"];
+        var item = MiniFiles.Value["Kinds/StandardItem.g.cs"];
+
+        Assert.Contains(
+            "    /// @CSharpLua.Ignore\n"
+            + "    [global::Moonwell.Objects.SharedField(\"uhpm\", \"MaxLife\", Label = \"Hit Points Maximum (Base)\", Min = 1, Max = 500000, HasLimits = true)]\n",
+            unit);
+        Assert.Contains("    [global::Moonwell.Objects.SharedField(\"unam\", \"Name\", Label = \"Name\", Required = true)]\n", unit);
+        Assert.Contains("    [global::Moonwell.Objects.SharedField(\"umpm\", \"MaxMana\", Label = \"Mana Maximum\", Min = 0, Max = 100000, HasLimits = true)]\n", unit);
+        Assert.Contains("    [global::Moonwell.Objects.SharedField(\"iuse\", \"Charges\", Label = \"Number of Charges\", Min = 0, Max = 1000, HasLimits = true)]\n", item);
+        foreach (var old in new[] { "HitPoints", "ManaPoints", "UnitLevel", "ScalingValue", "Height", "Name" })
+        {
+            Assert.DoesNotContain(" " + old + "\n        {", unit);
+            Assert.DoesNotContain(" " + old + "\n        {", hero);
+        }
+
+        foreach (var old in new[] { "StartingStrength", "StartingAgility", "StartingIntelligence" })
+        {
+            Assert.DoesNotContain(old, hero);
+        }
+
+        Assert.DoesNotContain("NumberOfCharges", item);
+        Assert.DoesNotContain("Objects.Field(\"uhpm\"", unit);
+        Assert.Contains("[\"uhpm\"] = typeof(int),", unit);
+        Assert.Contains("[\"unam\"] = typeof(string),", unit);
+        Assert.Contains("[\"iuse\"] = typeof(int),", item);
+        // An item's name is no live value: it keeps its property.
+        Assert.Contains("[global::Moonwell.Objects.Field(\"unam\", Label = \"Name\")]\n        [global::Moonwell.Objects.Required]\n        public string Name\n", item);
+    }
+
+    [Fact]
+    public void every_shared_field_with_a_range_says_it_has_limits()
+    {
+        var shared = MiniFiles.Value.Where(f => f.Key.StartsWith("Kinds/", StringComparison.Ordinal))
+            .SelectMany(f => f.Value.Split('\n'))
+            .Where(line => line.Contains("SharedField(", StringComparison.Ordinal))
+            .ToList();
+
+        Assert.True(shared.Count >= 10, shared.Count + " shared fields");
+        foreach (var line in shared)
+        {
+            Assert.Equal(line.Contains("Min =", StringComparison.Ordinal) || line.Contains("Max =", StringComparison.Ordinal), line.Contains("HasLimits = true", StringComparison.Ordinal));
+        }
+    }
+
+    [Fact]
+    public void a_kind_with_shared_fields_reads_and_declares_them_through_its_fields()
+    {
+        var unit = MiniFiles.Value["Kinds/StandardUnit.g.cs"];
+        var item = MiniFiles.Value["Kinds/StandardItem.g.cs"];
+
+        foreach (var (source, name) in new[] { (unit, "StandardUnit"), (item, "StandardItem") })
+        {
+            Assert.Contains($"        public new global::Moonwell.Objects.{name} Default => (global::Moonwell.Objects.{name})base.Default;\n", source);
+            Assert.Contains("        protected override T DeclaredValue<T>(string field)\n        {\n            return Fields.Get<T>(this, field);\n        }\n", source);
+            Assert.Contains(
+                "        protected override void Declare(string field, object value)\n        {\n"
+                + "            Fields.Put(field, global::Moonwell.Objects.FieldChecks.Declared(fieldTypes, field, value));\n        }\n",
+                source);
+        }
+
+        Assert.DoesNotContain("Default", MiniFiles.Value["Kinds/StandardAbility.g.cs"]);
+        Assert.DoesNotContain("Declare", MiniFiles.Value["Kinds/StandardDestructable.g.cs"].Replace("Declared", "", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void a_hero_reads_its_life_and_mana_as_totals_and_declares_no_level()
+    {
+        var hero = MiniFiles.Value["Kinds/StandardHero.g.cs"];
+
+        Assert.Contains("        public new global::Moonwell.Objects.StandardHero Default => (global::Moonwell.Objects.StandardHero)base.Default;\n", hero);
+        Assert.Contains("\n        internal global::System.Collections.Generic.IReadOnlyDictionary<string, object?> Totals => Fields.Totals;", hero);
+        Assert.Contains("return global::Moonwell.Objects.HeroTotals.Read<T>(Fields, this, field);", hero);
+        Assert.Contains("throw new global::System.InvalidOperationException(\"a hero starts at level 1; its level is not declared\");", hero);
+        Assert.Contains("Fields.PutTotal(field, global::Moonwell.Objects.FieldChecks.Declared(fieldTypes, field, value));", hero);
+        Assert.DoesNotContain("Totals", MiniFiles.Value["Kinds/StandardUnit.g.cs"]);
     }
 
     [Fact]
@@ -477,12 +554,12 @@ public class ObjectsWriterTests
     [Fact]
     public void two_fields_of_one_name_in_a_class_are_an_error()
     {
-        var one = new Field(Kind.Unit, "uhpm", "Life", FieldType.Int, null, false, 0, false, Array.Empty<string>(), "HP");
-        var two = one with { Id = "uhpr" };
+        var one = new Field(Kind.Unit, "uhpr", "Life", FieldType.Int, null, false, 0, false, Array.Empty<string>(), "HP");
+        var two = one with { Id = "umpr" };
 
         var error = Assert.Throws<InvalidOperationException>(() => ObjectsWriter.Kind(Kind.Unit, new[] { one, two }, false));
 
-        Assert.Equal("StandardUnit: fields uhpm and uhpr are both named Life", error.Message);
+        Assert.Equal("StandardUnit: fields uhpr and umpr are both named Life", error.Message);
     }
 
     [Fact]
@@ -583,6 +660,21 @@ public class ObjectsWriterTests
         var keys = JsonDocument.Parse("{" + lines[2 + fields.Count].TrimEnd(',') + "}")
             .RootElement.GetProperty("Hpal").GetProperty("values").EnumerateObject().Select(p => p.Name).ToList();
         Assert.Equal(keys.OrderBy(k => k, StringComparer.Ordinal), keys);
+    }
+
+    [Fact]
+    public void misc_constants_are_exported_per_set()
+    {
+        using var document = JsonDocument.Parse(MiniFiles.Value["Values/misc.json"]);
+
+        // The fixture holds the base and two of the three balance sets; each has its own miscgame.txt.
+        Assert.Equal(new[] { "base", "custom_v0", "melee_v0" }, document.RootElement.EnumerateObject().Select(p => p.Name));
+        foreach (var set in document.RootElement.EnumerateObject())
+        {
+            Assert.Equal(new[] { "IntManaBonus", "StrHitPointBonus" }, set.Value.EnumerateObject().Select(p => p.Name));
+            Assert.Equal("25", set.Value.GetProperty("StrHitPointBonus").GetString());
+            Assert.Equal("15", set.Value.GetProperty("IntManaBonus").GetString());
+        }
     }
 
     [Fact]

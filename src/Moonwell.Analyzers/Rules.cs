@@ -25,7 +25,7 @@ public static class Rules
     public static readonly DiagnosticDescriptor LocalOutside = new(
         "MW0002",
         "Machine-local value outside Local.For",
-        "'{0}' gives a different answer on each machine; use it only inside Local.For or a [MachineLocal] method",
+        "'{0}' gives a different answer on each machine; use it only inside Local.For or a [MachineLocal] method{1}",
         Category,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
@@ -135,10 +135,19 @@ public static class Rules
         ObjectsCategory,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "The build runs the constructor of a class that inherits a standard unit, hero or item to read its fields, before there is a game. A live value or action of Unit, Hero or Item there (Mana, Scale, Strength, Charges, Kill, Add) fails the build with only an exception's message. Each live value a declared field shares a name with has the field named apart: ManaPoints for Mana and MaxMana, HitPoints for Life and MaxLife, ScalingValue for Scale, UnitLevel for Level, Height for FlyHeight, StartingStrength, StartingAgility and StartingIntelligence, and NumberOfCharges for Charges; a component goes to Components.Add(...). Code in a lambda or a local function is left alone, since it may run later in the game.");
+        description: "The build runs the constructor of a class that inherits a standard unit, hero or item to read its fields, before there is a game. A live value or action of Unit, Hero or Item there (Life, X, Kill, Add) fails the build with only an exception's message. The live values a declared field shares (MaxLife, MaxMana, Mana, Level, Scale, FlyHeight, Name; a hero's Strength, Agility and Intelligence; an item's Charges) are the class's declared values there, except a hero's Level (and Set(\"ulev\", ...)): a hero starts at level 1, so its level is not declared. A unit starts with full life, so Life has no declared value: set MaxLife. A component goes to Components.Add(...). The class's own default object (Default, or Unit.Default<T>() of the class) is what the constructor is making: read the field itself. Code in a lambda or a local function is left alone, since it may run later in the game.");
+
+    public static readonly DiagnosticDescriptor LevelOutsideConstructor = new(
+        "MW0015",
+        "A unit's level set outside its declared class's constructor",
+        "a unit's level is set only in its declared class's constructor",
+        ObjectsCategory,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "The game has no setter for a unit's level, so Level is a unit's declared value: it is set in the constructor of the class that declares the unit (and in a lambda or local function there), and only read anywhere else. A hero's level is set with SetLevel; a hero's constructor does not declare it. The build rejects the same set.");
 
     /// <summary>The rules for the constructor of a declared object class.</summary>
-    public static ImmutableArray<DiagnosticDescriptor> Declared { get; } = ImmutableArray.Create(LiveInDeclaration);
+    public static ImmutableArray<DiagnosticDescriptor> Declared { get; } = ImmutableArray.Create(LiveInDeclaration, LevelOutsideConstructor);
 
     public static readonly DiagnosticDescriptor NoId = new(
         "MW0013",

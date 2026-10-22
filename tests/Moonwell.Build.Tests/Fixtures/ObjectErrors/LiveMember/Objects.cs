@@ -10,7 +10,7 @@ namespace LiveMember
     {
         public Caster()
         {
-            Mana = 300;
+            Life = 300;
         }
     }
 }

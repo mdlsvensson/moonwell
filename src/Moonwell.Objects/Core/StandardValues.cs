@@ -10,6 +10,16 @@ namespace Moonwell.Objects
         /// <summary>Gives the game's value as text for a standard id, a field id and a level (0 when the field has none); null when it has none. The build sets it.</summary>
         public static Func<string, string, int, string?>? Read { get; set; }
 
+#if !MOONWELL_LUA
+        /// <summary>
+        /// Gives what a point of a hero's attribute adds, by the map's gameplay constants: most life for each point of strength,
+        /// and most and starting mana for each point of intelligence. A hero's MaxLife, MaxMana and Mana read the total, its
+        /// base field plus these (<see cref="HeroTotals"/>). The build sets it; with none, both are 0 and a hero's totals are its
+        /// base fields.
+        /// </summary>
+        public static Func<(float LifePerStrength, float ManaPerIntelligence)>? HeroBonus { get; set; }
+#endif
+
         /// <summary>
         /// Turns the text of a value into its type; null gives the default of the type. A text that is not a number of its type
         /// reads as the build's Lua side reads it: a decimal truncated for an <c>int</c>, else 0. A choice's text gives its enum's

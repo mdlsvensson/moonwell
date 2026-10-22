@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Moonwell
 {
@@ -42,6 +43,33 @@ namespace Moonwell
         /// <summary>The type id of the unit, as the game read it when the unit was taken in.</summary>
         [LocalSafe]
         public int TypeId { get; internal set; }
+
+        /// <summary>The default object of the unit's type, as Unreal's class default object: the values its class declares (a type no class of the map's declares, its values as World Editor made them, standard where World Editor left them), the same whatever this unit's are now and once it is gone. One per type, shared by its units, with no handle; it is gone, so its live actions do nothing.</summary>
+        [LocalSafe]
+        public Unit Default => ObjectTypes.DefaultOf(this, DeclaredTypeId);
+
+        /// <summary>The id of the type whose declared values the unit reads: its type id, else, while its constructor runs, the id its class is registered with, else 0.</summary>
+        internal int DeclaredTypeId => TypeId != 0 ? TypeId : ObjectTypes.IdOfClass(this);
+
+        /// <summary>The value the unit's type declares for a field, which a shared member reads when the unit has no handle (in its constructor, and on a default object). Here, the value the build wrote for the map; the standard classes read their own declared values on .NET.</summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected virtual T DeclaredValue<T>(string field)
+        {
+            // The build has no world; the classes it reads override this.
+            if (Runtime.World == null)
+            {
+                return default(T)!;
+            }
+
+            var value = Runtime.World.TypeValue(DeclaredTypeId, field);
+            return value == null ? default(T)! : (T)value;
+        }
+
+        /// <summary>Declares the value of a field for the unit's class, which a shared member does when it is set with no handle. Here, nothing: in the game the values are the build's; the standard classes keep them on .NET.</summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected virtual void Declare(string field, object value)
+        {
+        }
 
         /// <summary>The game's player that owned the unit when it was last read; kept for when the game no longer gives it.</summary>
         internal player owner = null!;
@@ -109,6 +137,9 @@ namespace Moonwell
         /// <summary>The inventory size last read.</summary>
         private int lastInventorySize;
 
+        /// <summary>The name last set.</summary>
+        private string lastName = "";
+
         /// <summary>Whether the unit can show a fly height: it flies, or FlyHeight has done the Amrf trick on it.</summary>
         private bool flyReady;
 
@@ -155,12 +186,17 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The most life the unit can have, a whole number (BlzSetUnitMaxHP; SetUnitState does not change it). The life stays unless the new most is below it, and then falls to it. Once the game has removed the unit, the last value read or set, and setting does nothing.</summary>
+        /// <summary>The most life the unit can have, a whole number (BlzSetUnitMaxHP; SetUnitState does not change it). The life stays unless the new most is below it, and then falls to it. Once the game has removed the unit, the last value read or set, and setting does nothing. In a declared class's constructor, the most life every unit of the class starts with (uhpm); on a default object, its type's.</summary>
         [LocalSafe]
         public float MaxLife
         {
             get
             {
+                if (Handle == null)
+                {
+                    return DeclaredValue<int>("uhpm") + 0.0f;
+                }
+
                 if (IsGone)
                 {
                     return lastMaxLife;
@@ -182,6 +218,12 @@ namespace Moonwell
 
             set
             {
+                if (Handle == null)
+                {
+                    Declare("uhpm", (int)value);
+                    return;
+                }
+
                 if (!IsGone)
                 {
                     // The game keeps the whole number, and lowers the life to it.
@@ -196,12 +238,17 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The unit's mana; a value above the most mana is clamped to it, and a unit without mana reads 0 and ignores a set. Once the game has removed the unit, the last mana read or set, and setting does nothing.</summary>
+        /// <summary>The unit's mana; a value above the most mana is clamped to it, and a unit without mana reads 0 and ignores a set. Once the game has removed the unit, the last mana read or set, and setting does nothing. In a declared class's constructor, the mana every unit of the class starts with (umpi); on a default object, its type's.</summary>
         [LocalSafe]
         public float Mana
         {
             get
             {
+                if (Handle == null)
+                {
+                    return DeclaredValue<int>("umpi") + 0.0f;
+                }
+
                 if (IsGone)
                 {
                     return lastMana;
@@ -223,6 +270,12 @@ namespace Moonwell
 
             set
             {
+                if (Handle == null)
+                {
+                    Declare("umpi", (int)value);
+                    return;
+                }
+
                 if (!IsGone)
                 {
                     // The game clamps to the most mana (0 for a unit without mana), so that is what a removed unit gives back.
@@ -238,12 +291,17 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The most mana the unit can have, a whole number (BlzSetUnitMaxMana; SetUnitState does not change it). The mana stays unless the new most is below it, and then falls to it. Once the game has removed the unit, the last value read or set, and setting does nothing.</summary>
+        /// <summary>The most mana the unit can have, a whole number (BlzSetUnitMaxMana; SetUnitState does not change it). The mana stays unless the new most is below it, and then falls to it. Once the game has removed the unit, the last value read or set, and setting does nothing. In a declared class's constructor, the most mana every unit of the class starts with (umpm); on a default object, its type's.</summary>
         [LocalSafe]
         public float MaxMana
         {
             get
             {
+                if (Handle == null)
+                {
+                    return DeclaredValue<int>("umpm") + 0.0f;
+                }
+
                 if (IsGone)
                 {
                     return lastMaxMana;
@@ -265,6 +323,12 @@ namespace Moonwell
 
             set
             {
+                if (Handle == null)
+                {
+                    Declare("umpm", (int)value);
+                    return;
+                }
+
                 if (!IsGone)
                 {
                     // The game keeps the whole number, and lowers the mana to it.
@@ -393,12 +457,17 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The unit's level; a hero's hero level. Once the game has removed the unit, the last level read.</summary>
+        /// <summary>The unit's level; a hero's hero level. Once the game has removed the unit, the last level read. The game has no setter: a set in a declared class's constructor is the level every unit of the class has (ulev), and one on a unit in the game does nothing (the build rejects it). A hero's level is not declared: it starts at 1, which a hero with no handle reads. On a default object, its type's.</summary>
         [LocalSafe]
         public int Level
         {
             get
             {
+                if (Handle == null)
+                {
+                    return this is Hero ? 1 : DeclaredValue<int>("ulev");
+                }
+
                 if (IsGone)
                 {
                     return lastLevel;
@@ -416,6 +485,55 @@ namespace Moonwell
                 }
 
                 return now;
+            }
+
+            set
+            {
+                if (Handle == null)
+                {
+                    Declare("ulev", value);
+                }
+            }
+        }
+
+        /// <summary>The unit's name (GetUnitName): a hero's is its type's name, not its proper name (seen 10-21). The game gives it in each player's language, so it is read only inside Local.For. Setting it (BlzSetUnitName) renames this unit only, the same on every machine. Once the game has removed the unit, the last name set (a read keeps nothing, as it differs by machine), and setting does nothing. In a declared class's constructor, the name of the class's type (unam), the same on every machine; on a default object, its type's, empty for a type the build's table does not hold.</summary>
+        public string Name
+        {
+            [MachineLocal]
+            get
+            {
+                if (Handle == null)
+                {
+                    return DeclaredValue<string>("unam") ?? string.Empty;
+                }
+
+                if (IsGone)
+                {
+                    return lastName;
+                }
+
+                var now = Runtime.World.UnitNameOf(Handle);
+                if (string.IsNullOrEmpty(now) && RemovedByGame())
+                {
+                    return lastName;
+                }
+
+                return now;
+            }
+
+            set
+            {
+                if (Handle == null)
+                {
+                    Declare("unam", value);
+                    return;
+                }
+
+                if (!IsGone)
+                {
+                    lastName = value;
+                    Runtime.World.RenameUnit(Handle, value);
+                }
             }
         }
 
@@ -471,12 +589,17 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The size of the unit's model as a factor of its normal size, set on all three axes (SetUnitScale). Until it is set, it reads the scale of the unit's type (0.8 for a footman), which is not 1. Once the game has removed the unit, the last value read or set, and setting does nothing.</summary>
+        /// <summary>The size of the unit's model as a factor of its normal size, set on all three axes (SetUnitScale). Until it is set, it reads the scale of the unit's type (0.8 for a footman), which is not 1. Once the game has removed the unit, the last value read or set, and setting does nothing. In a declared class's constructor, the scale every unit of the class starts with (usca); on a default object, its type's.</summary>
         [LocalSafe]
         public float Scale
         {
             get
             {
+                if (Handle == null)
+                {
+                    return DeclaredValue<float>("usca");
+                }
+
                 if (IsGone || scaleKnown)
                 {
                     return lastScale;
@@ -499,6 +622,12 @@ namespace Moonwell
 
             set
             {
+                if (Handle == null)
+                {
+                    Declare("usca", value);
+                    return;
+                }
+
                 if (!IsGone)
                 {
                     lastScale = value;
@@ -517,12 +646,17 @@ namespace Moonwell
             }
         }
 
-        /// <summary>How high the unit flies above the ground, set at once (SetUnitFlyHeight with a rate of 0). A unit that does not fly only shows the height once Amrf has been added to it and removed (seen 10-21), so the first set on such a unit does that; reading gives the height set either way. Once the game has removed the unit, the last value read or set, and setting does nothing.</summary>
+        /// <summary>How high the unit flies above the ground, set at once (SetUnitFlyHeight with a rate of 0). A unit that does not fly only shows the height once Amrf has been added to it and removed (seen 10-21), so the first set on such a unit does that; reading gives the height set either way. Once the game has removed the unit, the last value read or set, and setting does nothing. In a declared class's constructor, the height every unit of the class flies at (umvh); on a default object, its type's.</summary>
         [LocalSafe]
         public float FlyHeight
         {
             get
             {
+                if (Handle == null)
+                {
+                    return DeclaredValue<float>("umvh");
+                }
+
                 if (IsGone)
                 {
                     return lastFlyHeight;
@@ -544,6 +678,12 @@ namespace Moonwell
 
             set
             {
+                if (Handle == null)
+                {
+                    Declare("umvh", value);
+                    return;
+                }
+
                 if (!IsGone)
                 {
                     lastFlyHeight = value;
@@ -780,8 +920,14 @@ namespace Moonwell
             return null;
         }
 
-        /// <summary>Removes the unit from the game: it ends, which runs its OnLeave.</summary>
-        public void Remove() => End();
+        /// <summary>Removes the unit from the game: it ends, which runs its OnLeave. Does nothing on a default object, which is not in the game.</summary>
+        public void Remove()
+        {
+            if (Handle != null)
+            {
+                End();
+            }
+        }
 
         /// <summary>Runs once, when the unit comes into the game, after its starting components are added.</summary>
         protected virtual void OnCreated()

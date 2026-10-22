@@ -403,6 +403,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemRecall>();
                 Description = "Can be used to teleport units to the user.";
@@ -421,7 +422,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Amulet of Recall";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -510,6 +510,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemSkeletonSummon>();
                 Description = "Summons a Furbolg.";
@@ -527,7 +528,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Amulet of the Wild";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 136;
                 Scale = 1f;
@@ -828,6 +828,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemReincarnation>();
                 Description = "Allows reincarnation upon death.";
@@ -846,7 +847,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Ankh of Reincarnation";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 142;
                 Scale = 1f;
@@ -884,6 +884,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set("Aami");
                 Description = "Renders Hero immune to magic.";
@@ -902,7 +903,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Anti-magic Potion";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 56;
                 Requires.Set<global::Moonwell.Objects.NightElf.Units.TreeOfEternity>();
@@ -1045,6 +1045,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporaryAreaArmorBonusAIdb>();
                 Description = "Restores hit points, mana and increases armor to nearby units.";
@@ -1063,7 +1064,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Arcane Scroll";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -2701,6 +2701,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemSkeletonSummon>();
                 Description = "Summons a Blue Drake.";
@@ -2718,7 +2719,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Blue Drake Egg";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 77;
                 Scale = 1f;
@@ -2970,6 +2970,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemSkeletonSummon>();
                 Description = "Summons skeletons.";
@@ -2987,7 +2988,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Book of the Dead";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 55;
                 Scale = 1f;
@@ -3825,6 +3825,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.BundleOfLumber>();
                 Description = "Gives lumber to player.";
@@ -3842,7 +3843,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdl";
                 Name = "Bundle of Lumber";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -4039,6 +4039,7 @@ namespace Moonwell.Objects
                 CanBeDropped = false;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = false;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 Description = "|cffffff00Quest Item|r|nA ghoul captured in a net. At times calm, at other times quite agitated.";
                 DroppedWhenCarrierDies = false;
@@ -4055,7 +4056,6 @@ namespace Moonwell.Objects
                 MaxStacks = 10;
                 Model = "Objects/Inventoryitems/GhoulInBagItem/GhoulInBagItem.mdl";
                 Name = "|cffffff00Captured Ghoul|r";
-                NumberOfCharges = 1;
                 Perishable = false;
                 Priority = 0;
                 Scale = 1f;
@@ -4575,6 +4575,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ClarityPotion>();
                 Description = "Regenerates mana over time.";
@@ -4593,7 +4594,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Clarity Potion";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 67;
                 Requires.Set<global::Moonwell.Objects.NightElf.Units.TreeOfEternity>();
@@ -5160,6 +5160,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemConsecratedMixture>();
                 Description = "|cff82cdfcConsumable Item|r|nPermanently increases All Stats when used.";
@@ -5177,7 +5178,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "|cff7c2abbConsecrated Mixture|r";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 1;
                 Scale = 1f;
@@ -5643,6 +5643,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 3;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemAreaDetection>();
                 Description = "Permits the viewing of distant areas.";
@@ -5661,7 +5662,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Crystal Ball";
-                NumberOfCharges = 3;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -6506,6 +6506,7 @@ namespace Moonwell.Objects
                 CanBeDropped = false;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = false;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 Description = "|cffffff00Quest Item|r|nA fresh sample of a darkhound's cursed blood.";
                 DroppedWhenCarrierDies = false;
@@ -6522,7 +6523,6 @@ namespace Moonwell.Objects
                 MaxStacks = 10;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "|cffffff00Darkhound Blood|r";
-                NumberOfCharges = 1;
                 Perishable = false;
                 Priority = 0;
                 Scale = 1f;
@@ -6990,6 +6990,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemSkeletonSummon>();
                 Description = "Summons a Doom Guard.";
@@ -7007,7 +7008,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Demonic Figurine";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 139;
                 Scale = 1f;
@@ -7686,6 +7686,7 @@ namespace Moonwell.Objects
                 CanBeDropped = false;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = false;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 Description = "|cffffff00Quest Item|r|nA simple key that can open multiple locks. Also a sign of lax security measures.";
                 DroppedWhenCarrierDies = false;
@@ -7702,7 +7703,6 @@ namespace Moonwell.Objects
                 MaxStacks = 10;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "|cffffff00Dungeon Key|r";
-                NumberOfCharges = 1;
                 Perishable = false;
                 Priority = 0;
                 Scale = 1f;
@@ -7740,6 +7740,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 2;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.DustOfAppearance>();
                 Description = "Reveals invisible units.";
@@ -7758,7 +7759,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Dust of Appearance";
-                NumberOfCharges = 2;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -8012,6 +8012,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemElixirOfCunnning>();
                 Description = "|cff82cdfcConsumable Item|r|nPermanently increases Agility and Intelligence when used.";
@@ -8029,7 +8030,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "|cff40da00Elixir of Cunning|r";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 1;
                 Scale = 1f;
@@ -8067,6 +8067,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemElixirOfGreaterIntelligence>();
                 Description = "|cff82cdfcConsumable Item|r|nPermanently increases Intelligence when used.";
@@ -8084,7 +8085,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "|cff6295E3Elixir of Greater Intelligence|r";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 1;
                 Scale = 1f;
@@ -8122,6 +8122,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemElixirOfLesserIntelligence>();
                 Description = "|cff82cdfcConsumable Item|r|nPermanently increases Intelligence when used.";
@@ -8139,7 +8140,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "|cff40da00Elixir of Lesser Intelligence|r";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 1;
                 Scale = 1f;
@@ -8177,6 +8177,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemElixirOfTheMonsterHunter>();
                 Description = "|cff82cdfcConsumable Item|r|nPermanently increases Strength and Agility when used.";
@@ -8194,7 +8195,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "|cff40da00Elixir of the Monster Hunter|r";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 1;
                 Scale = 1f;
@@ -8437,6 +8437,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 5;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set("AIrg");
                 Description = "Regenerates health and mana.";
@@ -8455,7 +8456,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Enchanted Vial";
-                NumberOfCharges = 5;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -8599,6 +8599,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemSkeletonSummon>();
                 Description = "Summons a Blue Dragonspawn Overseer.";
@@ -8616,7 +8617,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Engraved Scale";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 141;
                 Scale = 1f;
@@ -8761,6 +8761,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 CooldownGroup.Set("AIhe");
                 Description = "Restores lost hit points.";
@@ -8778,7 +8779,6 @@ namespace Moonwell.Objects
                 MaxStacks = 5;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Essence of Undeath";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -8919,6 +8919,7 @@ namespace Moonwell.Objects
                 CanBeDropped = false;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = false;
+                Charges = 3;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 Description = "|cffffff00Quest Item|r|nA heavy barrel loaded with gunpowder.";
                 DroppedWhenCarrierDies = false;
@@ -8935,7 +8936,6 @@ namespace Moonwell.Objects
                 MaxStacks = 99;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "|cffffff00Explosive Barrel|r";
-                NumberOfCharges = 3;
                 Perishable = false;
                 Priority = 0;
                 Scale = 1f;
@@ -9132,6 +9132,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 3;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.FlareGun>();
                 Description = "Reveals an area on the map.";
@@ -9150,7 +9151,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Flare Gun";
-                NumberOfCharges = 3;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -10992,6 +10992,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 3;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemGlixsBomb>();
                 Description = "Glix's personal explosive recipe! Deals more damage to structures.";
@@ -11010,7 +11011,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Glix's Special";
-                NumberOfCharges = 3;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -11637,6 +11637,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set("AIgl");
                 Description = "Improves building armor and hit points.";
@@ -11655,7 +11656,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\Glyph\\Glyph.mdl";
                 Name = "Glyph of Fortification";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -11691,6 +11691,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemRevealEntireMap>();
                 Description = "Reveals the entire map.";
@@ -11709,7 +11710,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\Glyph\\Glyph.mdl";
                 Name = "Glyph of Omniscience";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -11795,6 +11795,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set("AIgl");
                 Description = "Improves night vision.";
@@ -11813,7 +11814,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\Glyph\\Glyph.mdl";
                 Name = "Glyph of Ultravision";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -11957,6 +11957,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 3;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemPlaceGoblinLandMine>();
                 Description = "Explosive mines.";
@@ -11975,7 +11976,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Goblin Land Mines";
-                NumberOfCharges = 3;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -12064,6 +12064,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ChestOfGold>();
                 Description = "Gives gold to player.";
@@ -12081,7 +12082,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\PotofGold\\PotofGold.mdl";
                 Name = "Gold Coins";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -12279,6 +12279,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set("AIrg");
                 Description = "Regenerates health and mana.";
@@ -12297,7 +12298,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Greater Replenishment Potion";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 119;
                 Scale = 1f;
@@ -12333,6 +12333,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set("AIrg");
                 Description = "Regenerates the health and mana of nearby units.";
@@ -12351,7 +12352,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Greater Scroll of Replenishment";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 130;
                 Scale = 1f;
@@ -12441,6 +12441,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 10;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set("AImi");
                 Description = "|cff87ceebUnique Consumable|r|nPermanently increases hit points.";
@@ -12459,7 +12460,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Grimoire of Souls";
-                NumberOfCharges = 10;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -12983,6 +12983,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 3;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set("AIrg");
                 Description = "Regenerates lost hit points over time.";
@@ -13001,7 +13002,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Healing Salve";
-                NumberOfCharges = 3;
                 Perishable = true;
                 Priority = 82;
                 Scale = 1f;
@@ -13037,6 +13037,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 2;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Orc.Abilities.HealingWard>();
                 Description = "Conjures a Healing Ward.";
@@ -13054,7 +13055,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Healing Wards";
-                NumberOfCharges = 2;
                 Perishable = true;
                 Priority = 85;
                 Scale = 1f;
@@ -13090,6 +13090,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set("AIhe");
                 Description = "Provides faster regeneration, and can be consumed for hit points.";
@@ -13107,7 +13108,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Health Stone";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 122;
                 Scale = 1f;
@@ -14477,6 +14477,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemSkeletonSummon>();
                 Description = "Summons an Ice Revenant.";
@@ -14494,7 +14495,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Ice Shard";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 135;
                 Scale = 1f;
@@ -14584,6 +14584,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemSkeletonSummon>();
                 Description = "Summons a Furbolg Tracker.";
@@ -14601,7 +14602,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Idol of the Wild";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 84;
                 Scale = 1f;
@@ -14797,6 +14797,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Artifact;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemSkeletonSummon>();
                 Description = "Brings down an Infernal Demon.";
@@ -14814,7 +14815,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Inferno Stone";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 146;
                 Scale = 1f;
@@ -15066,6 +15066,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.BuildTinyCastle>();
                 Description = "Creates a Scout Tower.";
@@ -15084,7 +15085,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Ivory Tower";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Requires.Set<global::Moonwell.Objects.Human.Units.Keep>();
@@ -16232,6 +16232,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ClarityPotion>();
                 Description = "Regenerates mana over time.";
@@ -16250,7 +16251,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Lesser Clarity Potion";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 57;
                 Scale = 1f;
@@ -16448,6 +16448,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set("AIrg");
                 Description = "Regenerates health and mana.";
@@ -16466,7 +16467,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Lesser Replenishment Potion";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 72;
                 Scale = 1f;
@@ -16502,6 +16502,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set("AIrg");
                 Description = "Regenerates the health and mana of nearby units.";
@@ -16520,7 +16521,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Lesser Scroll of Replenishment";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 129;
                 Scale = 1f;
@@ -17137,6 +17137,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set("AIma");
                 Description = "Provides faster mana regeneration, and can be consumed for mana.";
@@ -17154,7 +17155,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Mana Stone";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 90;
                 Scale = 1f;
@@ -17297,6 +17297,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set("AImi");
                 Description = "Permanent +50 hit points.";
@@ -17314,7 +17315,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\tome\\tome.mdl";
                 Name = "Manual of Health";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -17618,6 +17618,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.MechanicalCritter>();
                 Description = "Creates a mechanical critter.";
@@ -17636,7 +17637,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Mechanical Critter";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -17777,6 +17777,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set("AIrg");
                 Description = "Regenerates health and mana.";
@@ -17795,7 +17796,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Minor Replenishment Potion";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 31;
                 Scale = 1f;
@@ -17990,6 +17990,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.MonsterLure>();
                 Description = "Draws nearby creeps to ward.";
@@ -18008,7 +18009,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Monster Lure";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -18146,6 +18146,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ChangeTimeOfDay>();
                 Description = "Makes it night time.";
@@ -18164,7 +18165,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Moonstone";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 1;
                 Scale = 1f;
@@ -20665,6 +20665,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporaryInvulnerabilityAIvu>();
                 Description = "Turns Hero invulnerable.";
@@ -20684,7 +20685,6 @@ namespace Moonwell.Objects
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Potion of Divinity";
                 NameEditorSuffix = "(Invulnerability)";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 125;
                 Scale = 1f;
@@ -20720,6 +20720,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Human.Abilities.DivineShield>();
                 Description = "Turns Hero invulnerable.";
@@ -20739,7 +20740,6 @@ namespace Moonwell.Objects
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Potion of Divinity";
                 NameEditorSuffix = "(Divine Shield)";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -20775,6 +20775,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set("AIhe");
                 Description = "Restores lost hit points.";
@@ -20793,7 +20794,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Potion of Greater Healing";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 121;
                 Scale = 1f;
@@ -20829,6 +20829,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set("AIvi");
                 Description = "Renders Hero temporarily invisible.";
@@ -20847,7 +20848,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Potion of Greater Invisibility";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 36;
                 Scale = 1f;
@@ -20883,6 +20883,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set("AIma");
                 Description = "Restores lost mana.";
@@ -20901,7 +20902,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Potion of Greater Mana";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 68;
                 Scale = 1f;
@@ -20939,6 +20939,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set("AIhe");
                 Description = "Restores lost hit points.";
@@ -20957,7 +20958,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Potion of Healing";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 74;
                 Requires.Add("TWN2");
@@ -20994,6 +20994,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set("AIvi");
                 Description = "Renders Hero temporarily invisible.";
@@ -21012,7 +21013,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Potion of Invisibility";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 33;
                 Scale = 1f;
@@ -21048,6 +21048,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporaryInvulnerabilityAIvu>();
                 Description = "Renders Hero temporarily invulnerable.";
@@ -21066,7 +21067,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Potion of Invulnerability";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 102;
                 Scale = 1f;
@@ -21104,6 +21104,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporaryInvulnerabilityAIvu>();
                 Description = "Renders Hero temporarily invulnerable.";
@@ -21122,7 +21123,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Potion of Lesser Invulnerability";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 40;
                 Scale = 1f;
@@ -21160,6 +21160,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set("AIma");
                 Description = "Restores lost mana.";
@@ -21178,7 +21179,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Potion of Mana";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 66;
                 Requires.Add("TWN2");
@@ -21215,6 +21215,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemRevealEntireMap>();
                 Description = "Reveals the entire map.";
@@ -21233,7 +21234,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Potion of Omniscience";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -21269,6 +21269,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemHealManaRegain>();
                 Description = "Restores lost hit points and mana.";
@@ -21287,7 +21288,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Potion of Restoration";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 132;
                 Scale = 1f;
@@ -21323,6 +21323,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporarySpeedBonus>();
                 Description = "Provides Hero with a temporary speed increase.";
@@ -21341,7 +21342,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Potion of Speed";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 7;
                 Scale = 1f;
@@ -21379,6 +21379,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 CooldownGroup.Set("AIhe");
                 Description = "Restores lost hit points.";
@@ -21396,7 +21397,6 @@ namespace Moonwell.Objects
                 MaxStacks = 5;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Potion of Ultimate Healing";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -21434,6 +21434,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 CooldownGroup.Set("AIma");
                 Description = "Restores lost mana.";
@@ -21451,7 +21452,6 @@ namespace Moonwell.Objects
                 MaxStacks = 5;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Potion of Ultimate Mana";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -21861,6 +21861,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemSkeletonSummon>();
                 Description = "Summons a Red Drake.";
@@ -21879,7 +21880,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Red Drake Egg";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -21915,6 +21915,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set("AIrg");
                 Description = "Regenerates health and mana.";
@@ -21933,7 +21934,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Replenishment Potion";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 75;
                 Scale = 1f;
@@ -23477,6 +23477,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.RitualDaggerAIg2>();
                 Description = "Sacrifices a unit to regenerate the health of nearby units.";
@@ -23495,7 +23496,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Ritual Dagger";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 86;
                 Scale = 1f;
@@ -23746,6 +23746,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 4;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.RaiseDeadItem>();
                 Description = "Creates two Skeleton Warriors from a corpse.";
@@ -23764,7 +23765,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Rod of Necromancy";
-                NumberOfCharges = 4;
                 Perishable = true;
                 Priority = 86;
                 Scale = 1f;
@@ -23854,6 +23854,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.PowerupDispel>();
                 Description = "Dispels magic in the surrounding area.";
@@ -23872,7 +23873,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\runicobject\\runicobject.mdl";
                 Name = "Rune of Dispel Magic";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -23962,6 +23962,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemAreaHealing>();
                 Description = "Restores hit points to nearby units.";
@@ -23980,7 +23981,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\runicobject\\runicobject.mdl";
                 Name = "Rune of Greater Healing";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -24016,6 +24016,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemAreaManaRegain>();
                 Description = "Restores mana to nearby units.";
@@ -24034,7 +24035,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\runicobject\\runicobject.mdl";
                 Name = "Rune of Greater Mana";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -24070,6 +24070,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemResurrection>();
                 Description = "Resurrects your dead to fight again.";
@@ -24087,7 +24088,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\runicobject\\runicobject.mdl";
                 Name = "Rune of Greater Resurrection";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -24123,6 +24123,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemAreaHealing>();
                 Description = "Restores hit points to nearby units.";
@@ -24141,7 +24142,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\runicobject\\runicobject.mdl";
                 Name = "Rune of Healing";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -24177,6 +24177,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemAreaHealing>();
                 Description = "Restores hit points to nearby units.";
@@ -24195,7 +24196,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\runicobject\\runicobject.mdl";
                 Name = "Rune of Lesser Healing";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -24231,6 +24231,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemResurrection>();
                 Description = "Resurrects your dead to fight again.";
@@ -24248,7 +24249,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\runicobject\\runicobject.mdl";
                 Name = "Rune of Lesser Resurrection";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -24284,6 +24284,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemAreaManaRegain>();
                 Description = "Restores mana to nearby units.";
@@ -24302,7 +24303,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\runicobject\\runicobject.mdl";
                 Name = "Rune of Mana";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -24338,6 +24338,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.Rebirth>();
                 Description = "Makes a monster yours.";
@@ -24356,7 +24357,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\runicobject\\runicobject.mdl";
                 Name = "Rune of Rebirth";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -24392,6 +24392,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemAreaHealManaRegain>();
                 Description = "Restores hit points and mana to nearby units.";
@@ -24410,7 +24411,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\runicobject\\runicobject.mdl";
                 Name = "Rune of Restoration";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -24446,6 +24446,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.SpellShield>();
                 Description = "Gives nearby units a shield that blocks an enemy spell.";
@@ -24464,7 +24465,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\runicobject\\runicobject.mdl";
                 Name = "Rune of Shielding";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -24500,6 +24500,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporarySpeedBonus>();
                 Description = "Increases movement speed of units.";
@@ -24518,7 +24519,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\runicobject\\runicobject.mdl";
                 Name = "Rune of Speed";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -24554,6 +24554,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.SpiritLink>();
                 Description = "Links units together to distribute damage.";
@@ -24571,7 +24572,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\runicobject\\runicobject.mdl";
                 Name = "Rune of Spirit Link";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -24607,6 +24607,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.RuneOfTheWatcher>();
                 Description = "Creates an invulnerable Sentry Ward here.";
@@ -24625,7 +24626,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\runicobject\\runicobject.mdl";
                 Name = "Rune of the Watcher";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -24983,6 +24983,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.BlightPlacement>();
                 Description = "Creates Blight at a target location.";
@@ -25001,7 +25002,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Sacrificial Skull";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -25199,6 +25199,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemTransmute>();
                 Description = "Turns non-Hero units into gold.";
@@ -25216,7 +25217,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Scepter of Avarice";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 134;
                 Scale = 1f;
@@ -25359,6 +25359,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemCommand>();
                 Description = "Allows mind control of non-Hero units.";
@@ -25377,7 +25378,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Scepter of Mastery";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 143;
                 Scale = 1f;
@@ -25413,6 +25413,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 5;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Creeps.Abilities.WateryMinion>();
                 Description = "|cff87ceebUnique Consumable|r|nSummons murlocs.";
@@ -25431,7 +25432,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Scepter of the Sea";
-                NumberOfCharges = 5;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -25519,6 +25519,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemAnimateDead>();
                 Description = "Animates the dead to fight for you.";
@@ -25536,7 +25537,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Scroll of Animate Dead";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -25574,6 +25574,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemAreaHealing>();
                 Description = "Restores hit points to nearby units.";
@@ -25592,7 +25593,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Scroll of Healing";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 73;
                 Requires.Set<global::Moonwell.Objects.Undead.Units.BlackCitadel>();
@@ -25629,6 +25629,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemAreaManaRegain>();
                 Description = "Restores mana to nearby units.";
@@ -25647,7 +25648,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Scroll of Mana";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 65;
                 Scale = 1f;
@@ -25683,6 +25683,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporaryAreaArmorBonus>();
                 Description = "Temporarily increases the armor of nearby units.";
@@ -25701,7 +25702,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Scroll of Protection";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 103;
                 Scale = 1f;
@@ -25739,6 +25739,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ScrollOfRegeneration>();
                 Description = "Regenerates the health of nearby units.";
@@ -25757,7 +25758,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Scroll of Regeneration";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 70;
                 Scale = 1f;
@@ -25793,6 +25793,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemAreaHealManaRegain>();
                 Description = "Restores hit points and mana to nearby units.";
@@ -25811,7 +25812,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Scroll of Restoration";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 144;
                 Scale = 1f;
@@ -25847,6 +25847,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemResurrection>();
                 Description = "Resurrects your dead to fight again.";
@@ -25864,7 +25865,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Scroll of Resurrection";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -25902,6 +25902,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporarySpeedBonus>();
                 Description = "Increases movement speed of units.";
@@ -25920,7 +25921,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Scroll of Speed";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 34;
                 Scale = 1f;
@@ -25956,6 +25956,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.NightElf.Abilities.RoarAroa>();
                 Description = "Boosts friendly unit combat damage.";
@@ -25973,7 +25974,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Scroll of the Beast";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 63;
                 Scale = 1f;
@@ -26009,6 +26009,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemAnimateDead>();
                 Description = "Animates nearby corpses.";
@@ -26027,7 +26028,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Scroll of the Unholy Legion";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -26065,6 +26065,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemTownPortal>();
                 Description = "Transports troops to friendly town hall.";
@@ -26083,7 +26084,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Scroll of Town Portal";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 123;
                 Requires.Add("TWN2");
@@ -26334,6 +26334,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = false;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 Description = "Unlocks a secret level!";
                 DroppedWhenCarrierDies = false;
@@ -26350,7 +26351,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\QuestionMark\\QuestionMark.mdl";
                 Name = "Secret Level Powerup";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -26490,6 +26490,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 2;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Orc.Abilities.SentryWard>();
                 Description = "Conjures a Sentry Ward.";
@@ -26507,7 +26508,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Sentry Wards";
-                NumberOfCharges = 2;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -27713,6 +27713,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 6;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set("AIhe");
                 Description = "Restores lost hit points.";
@@ -27731,7 +27732,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Shimmerglaze Roast";
-                NumberOfCharges = 6;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -28560,6 +28560,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = false;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemSoulTheft>();
                 Description = "Allows the theft of a Hero's soul.";
@@ -28578,7 +28579,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Soul Gem";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 137;
                 Scale = 1f;
@@ -28935,6 +28935,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 4;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemWeb>();
                 Description = "Webs a target air unit.";
@@ -28953,7 +28954,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Spider Silk Broach";
-                NumberOfCharges = 4;
                 Perishable = true;
                 Priority = 81;
                 Scale = 1f;
@@ -28989,6 +28989,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemSkeletonSummon>();
                 Description = "Summons a Fel Stalker.";
@@ -29006,7 +29007,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Spiked Collar";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 83;
                 Scale = 1f;
@@ -29746,6 +29746,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemSkeletonSummon>();
                 Description = "Summons a Rock Golem.";
@@ -29763,7 +29764,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Stone Token";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 140;
                 Scale = 1f;
@@ -30386,6 +30386,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 3;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemSkeletonSummon>();
                 Description = "Summons Furbolgs.";
@@ -30403,7 +30404,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Talisman of the Wild";
-                NumberOfCharges = 3;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -31174,6 +31174,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.BuildTinyAltarOfKings>();
                 Description = "Creates a Altar of Kings.";
@@ -31192,7 +31193,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Tiny Altar of Kings";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -31228,6 +31228,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.BuildTinyCastle>();
                 Description = "Creates a Barracks.";
@@ -31246,7 +31247,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Tiny Barracks";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -31282,6 +31282,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.BuildTinyCastle>();
                 Description = "Creates a Blacksmith.";
@@ -31300,7 +31301,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Tiny Blacksmith";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -31336,6 +31336,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.BuildTinyCastle>();
                 Description = "Creates a Castle.";
@@ -31354,7 +31355,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Tiny Castle";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Requires.Set<global::Moonwell.Objects.Human.Units.Castle>();
@@ -31391,6 +31391,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.BuildTinyCastle>();
                 Description = "Creates a Farm.";
@@ -31409,7 +31410,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Tiny Farm";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -31447,6 +31447,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.BuildTinyCastle>();
                 Description = "Creates a Great Hall.";
@@ -31465,7 +31466,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Tiny Great Hall";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Requires.Set<global::Moonwell.Objects.Orc.Units.Fortress>();
@@ -31502,6 +31502,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.BuildTinyCastle>();
                 Description = "Creates a Lumber Mill.";
@@ -31520,7 +31521,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Tiny Lumber Mill";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -31558,6 +31558,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemAgilityGain>();
                 Description = "|cff82cdfcConsumable Item|r|nPermanently increases Agility.";
@@ -31575,7 +31576,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\tomeGreen\\tomeGreen.mdl";
                 Name = "|cff40da00Tome of Agility|r";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -31611,6 +31611,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemAgilityGainAIgm>();
                 Description = "Permanently increases Agility.";
@@ -31628,7 +31629,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\tomeGreen\\tomeGreen.mdl";
                 Name = "Tome of Agility +2";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -31664,6 +31664,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemAgilityGain>();
                 Description = "Permanently increases Agility.";
@@ -31682,7 +31683,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\tomeGreen\\tomeGreen.mdl";
                 Name = "Tome of Agility";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -31772,6 +31772,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemExperienceGainAIem>();
                 Description = "Gives bonus experience points.";
@@ -31790,7 +31791,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\tomeBrown\\tomeBrown.mdl";
                 Name = "Tome of Experience";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -31826,6 +31826,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemExperienceGain>();
                 Description = "Gives bonus experience points.";
@@ -31843,7 +31844,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\tomeBrown\\tomeBrown.mdl";
                 Name = "Tome of Greater Experience";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -31881,6 +31881,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemIntelligenceGain>();
                 Description = "|cff82cdfcConsumable Item|r|nPermanently increases Intelligence.";
@@ -31898,7 +31899,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\tomeGreen\\tomeBlue.mdl";
                 Name = "|cff40da00Tome of Intelligence|r";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -31934,6 +31934,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemIntelligenceGainAItm>();
                 Description = "Permanently increases Intelligence.";
@@ -31951,7 +31952,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\tomeBlue\\tomeBlue.mdl";
                 Name = "Tome of Intelligence +2";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -31987,6 +31987,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemIntelligenceGain>();
                 Description = "Permanently increases Intelligence.";
@@ -32005,7 +32006,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\tomeBlue\\tomeBlue.mdl";
                 Name = "Tome of Intelligence";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -32041,6 +32041,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemIntAgiStrGain>();
                 Description = "Permanently increases Strength, Agility and Intelligence.";
@@ -32058,7 +32059,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\tome\\tome.mdl";
                 Name = "Tome of Knowledge";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -32094,6 +32094,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Artifact;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemLevelGain>();
                 Description = "Gives the Hero an experience level.";
@@ -32112,7 +32113,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\tomeBrown\\tomeBrown.mdl";
                 Name = "Tome of Power";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -32150,6 +32150,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.TomeOfRetraining>();
                 Description = "Unlearns a Hero's skills.";
@@ -32168,7 +32169,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Tome of Retraining";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -32259,6 +32259,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemStrengthGainAIsm>();
                 Description = "|cff82cdfcConsumable Item|r|nPermanently increases Strength.";
@@ -32276,7 +32277,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\tomeGreen\\tomeRed.mdl";
                 Name = "|cff40da00Tome of Strength|r";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -32312,6 +32312,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemStrengthGain>();
                 Description = "Permanently increases Strength.";
@@ -32329,7 +32330,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\tomeRed\\tomeRed.mdl";
                 Name = "Tome of Strength +2";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -32365,6 +32365,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemStrengthGainAIsm>();
                 Description = "Permanently increases Strength.";
@@ -32383,7 +32384,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\tomeRed\\tomeRed.mdl";
                 Name = "Tome of Strength";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -32419,6 +32419,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.GrantTalentPoint>();
                 Description = "Grants 1 Talent Point.";
@@ -32437,7 +32438,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\tomeBrown\\tomeBrown.mdl";
                 Name = "Tome of Talent";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 200;
                 Scale = 1f;
@@ -32895,6 +32895,7 @@ namespace Moonwell.Objects
                 CanBeDropped = false;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = false;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 Description = "|cffffff00Quest Item|r|nA heavy iron wheel designed to fit onto a matching stem. It looks surprisingly ornate for something so utilitarian.";
                 DroppedWhenCarrierDies = false;
@@ -32911,7 +32912,6 @@ namespace Moonwell.Objects
                 MaxStacks = 10;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "|cffffff00Valve Wheel|r";
-                NumberOfCharges = 1;
                 Perishable = false;
                 Priority = 0;
                 Scale = 1f;
@@ -33001,6 +33001,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.VampiricPotion>();
                 Description = "Damage bonus and life-stealing attack.";
@@ -33019,7 +33020,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Vampiric Potion";
-                NumberOfCharges = 1;
                 Perishable = true;
                 Priority = 39;
                 Scale = 1f;
@@ -33368,6 +33368,7 @@ namespace Moonwell.Objects
                 CanBeDropped = false;
                 CanBeSoldByMerchants = false;
                 CanBeSoldToMerchants = false;
+                Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
                 Description = "|cffffff00Quest Item|r|nCovered in muck, slime and murloc blood.";
                 DroppedWhenCarrierDies = false;
@@ -33384,7 +33385,6 @@ namespace Moonwell.Objects
                 MaxStacks = 10;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "|cffffff00Vile Fin Scale|r";
-                NumberOfCharges = 1;
                 Perishable = false;
                 Priority = 0;
                 Scale = 1f;
@@ -33522,6 +33522,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 2;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemIllusions>();
                 Description = "Creates a phantom double.";
@@ -33540,7 +33541,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Wand of Illusion";
-                NumberOfCharges = 2;
                 Perishable = true;
                 Priority = 14;
                 Scale = 1f;
@@ -33576,6 +33576,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 2;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.LightningShield>();
                 Description = "Casts Lightning Shield.";
@@ -33593,7 +33594,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Wand of Lightning Shield";
-                NumberOfCharges = 2;
                 Perishable = true;
                 Priority = 8;
                 Scale = 1f;
@@ -33629,6 +33629,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 2;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.Steal>();
                 Description = "Steals mana.";
@@ -33647,7 +33648,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Wand of Mana Stealing";
-                NumberOfCharges = 2;
                 Perishable = true;
                 Priority = 69;
                 Scale = 1f;
@@ -33685,6 +33685,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 3;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemPurgeAIpw>();
                 Description = "Dispels magic on a single target.";
@@ -33703,7 +33704,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Wand of Negation";
-                NumberOfCharges = 3;
                 Perishable = true;
                 Priority = 110;
                 Requires.Set<global::Moonwell.Objects.Undead.Units.HallsOfTheDead>();
@@ -33740,6 +33740,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 4;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemChainDispel>();
                 Description = "Dispels magical effects in a chain.";
@@ -33758,7 +33759,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Wand of Neutralization";
-                NumberOfCharges = 4;
                 Perishable = true;
                 Priority = 111;
                 Scale = 1f;
@@ -33794,6 +33794,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 2;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.WandOfShadowsight>();
                 Description = "Grants vision of a target unit.";
@@ -33812,7 +33813,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Wand of Shadowsight";
-                NumberOfCharges = 2;
                 Perishable = true;
                 Priority = 0;
                 Scale = 1f;
@@ -33956,6 +33956,7 @@ namespace Moonwell.Objects
                 CanBeDropped = true;
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
+                Charges = 2;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
                 CooldownGroup.Set<global::Moonwell.Objects.NightElf.Abilities.Cyclone>();
                 Description = "Casts Cyclone.";
@@ -33973,7 +33974,6 @@ namespace Moonwell.Objects
                 MaxStacks = 0;
                 Model = "Objects\\InventoryItems\\TreasureChest\\treasurechest.mdl";
                 Name = "Wand of the Wind";
-                NumberOfCharges = 2;
                 Perishable = true;
                 Priority = 30;
                 Scale = 1f;

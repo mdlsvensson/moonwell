@@ -19,6 +19,13 @@ namespace Moonwell
             return type;
         }
 
+        // In Lua the System type of an object is its class's, the one typeof gives for the class; GetType is not there.
+        /// @CSharpLua.Template = "System.typeof(getmetatable({0}))"
+        internal static Type TypeOf(object obj)
+        {
+            return obj.GetType();
+        }
+
         // In Lua the class name is the name of the class's System type.
         /// @CSharpLua.Template = "System.typeof(getmetatable({0})):getName()"
         internal static string NameOf(object obj)

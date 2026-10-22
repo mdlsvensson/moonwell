@@ -343,6 +343,37 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_units_level_set_in_a_map_without_objects_fails_the_build()
+        {
+            // The build reads no declarations of a map without Moonwell.Objects, but the game has no setter of a unit's level.
+            var copy = folders.TemporaryCopyOfSample();
+            File.Delete(Path.Combine(copy, "Objects.cs"));
+            File.Delete(Path.Combine(copy, "ids.json"));
+            var project = Path.Combine(copy, "Sample.csproj");
+            File.WriteAllText(project, Regex.Replace(File.ReadAllText(project), @"[ \t]*<ProjectReference [^>]*Moonwell\.Objects\.csproj"" />\r?\n", string.Empty));
+            // MW0015 reports the same set while compiling; the pragma leaves it to the build's own check.
+            File.WriteAllText(Path.Combine(copy, "Drill.cs"), """
+                #pragma warning disable MW0015
+                using Moonwell;
+
+                namespace Sample
+                {
+                    public sealed class Drill : GameComponent
+                    {
+                        public override void OnUnitDied(Unit dying, Unit? killer)
+                        {
+                            dying.Level = 2;
+                        }
+                    }
+                }
+                """);
+
+            var error = Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), new StringWriter()));
+
+            Assert.Equal("Sample.Drill.OnUnitDied sets Level; a unit's level is set only in its declared class's constructor", error.Message);
+        }
+
+        [Fact]
         public void a_class_nested_in_the_map_and_a_using_static_of_a_group_build()
         {
             var copy = folders.TemporaryCopyOfSample();
@@ -381,12 +412,12 @@ namespace Moonwell.Build.Tests
                 namespace Sample
                 {
                     [Moonwell.Objects.ObjectId("H001")]
-                    [Moonwell.Objects.BeyondLimits(nameof(HitPoints))]
+                    [Moonwell.Objects.BeyondLimits(nameof(MaxLife))]
                     public sealed class Arthas : Moonwell.Objects.Human.Units.Paladin
                     {
                         public Arthas()
                         {
-                            HitPoints = 600000;
+                            MaxLife = 600000;
                             DeathType = Moonwell.Objects.DeathType.CanRaiseDoesNotDecay;
                         }
                     }
@@ -401,6 +432,61 @@ namespace Moonwell.Build.Tests
             Assert.DoesNotContain("public enum Targets", stubs);
             var script = File.ReadAllText(Path.Combine(copy, "build", "Sample", "war3map.lua"));
             Assert.Contains("\"Sample.Arthas\"", script);
+        }
+
+        [Fact]
+        public void a_heros_total_becomes_its_base_in_the_object_file()
+        {
+            // The Paladin has 22 strength and 17 intelligence: 550 life and 255 mana of his start come from them (25 and 15 a
+            // point). Mana is what he starts with, his field plus his intelligence's share (seen on 3.0.1, 10-21).
+            var copy = folders.TemporaryCopyOfSample();
+            File.WriteAllText(Path.Combine(copy, "Objects.cs"), """
+                namespace Sample
+                {
+                    [Moonwell.Objects.ObjectId("H001")]
+                    public sealed class Arthas : Moonwell.Objects.Human.Units.Paladin
+                    {
+                        public Arthas()
+                        {
+                            MaxLife = 800;
+                            MaxMana = 400;
+                            Mana = 300;
+                        }
+                    }
+                }
+                """);
+
+            MapBuild.Run(copy, new BuildOptions(), new StringWriter());
+
+            var arthas = Assert.Single(ReadUnits(copy).NewUnits);
+            Assert.Equal(250, Assert.Single(arthas.Modifications, one => one.Id == IdOf("uhpm")).Value);
+            Assert.Equal(145, Assert.Single(arthas.Modifications, one => one.Id == IdOf("umpm")).Value);
+            Assert.Equal(45, Assert.Single(arthas.Modifications, one => one.Id == IdOf("umpi")).Value);
+        }
+
+        [Fact]
+        public void a_float_on_an_int_field_is_truncated()
+        {
+            // MaxLife is a float, as the game gives it; the field is a whole number, and the setter drops the fraction.
+            var copy = folders.TemporaryCopyOfSample();
+            File.WriteAllText(Path.Combine(copy, "Objects.cs"), """
+                namespace Sample
+                {
+                    [Moonwell.Objects.ObjectId("h001")]
+                    public sealed class Sturdy : Moonwell.Objects.Human.Units.Footman
+                    {
+                        public Sturdy()
+                        {
+                            MaxLife = 800.7f;
+                        }
+                    }
+                }
+                """);
+
+            MapBuild.Run(copy, new BuildOptions(), new StringWriter());
+
+            var sturdy = Assert.Single(ReadUnits(copy).NewUnits);
+            Assert.Equal(800, Assert.Single(sturdy.Modifications, one => one.Id == IdOf("uhpm")).Value);
         }
 
         [Theory]
@@ -501,9 +587,9 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
-        public void a_live_member_in_a_declared_class_constructor_is_an_error_naming_the_declared_field()
+        public void a_live_member_in_a_declared_class_constructor_is_an_error_saying_what_to_set()
         {
-            // Mana is the unit's mana in the game; the build runs the constructor with no game, so the declared field is ManaPoints.
+            // Life has no field: a unit starts with full life, and the build runs the constructor with no game.
             var copy = folders.TemporaryCopyOfSample();
             File.WriteAllText(Path.Combine(copy, "Objects.cs"), """
                 namespace Sample
@@ -513,7 +599,7 @@ namespace Moonwell.Build.Tests
                     {
                         public Caster()
                         {
-                            Mana = 300;
+                            Life = 300;
                         }
                     }
                 }
@@ -522,7 +608,7 @@ namespace Moonwell.Build.Tests
 
             Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), log));
 
-            Assert.Contains("error MW0012: 'Mana' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is ManaPoints", log.ToString());
+            Assert.Contains("error MW0012: 'Life' is the unit's value in the game: a unit starts with full life; set MaxLife", log.ToString());
         }
 
         [Fact]
@@ -660,7 +746,7 @@ namespace Moonwell.Build.Tests
             var first = stubs.IndexOf("protected void Set(string field, object value)", StringComparison.Ordinal);
             var second = stubs.IndexOf("protected void Set(string field, int level, object value)", StringComparison.Ordinal);
             Assert.True(first >= 0 && second > first, stubs);
-            Assert.DoesNotContain("HitPoints", stubs);
+            Assert.DoesNotContain("GoldCost", stubs);
             var script = File.ReadAllText(Path.Combine(copy, "build", "Sample", "war3map.lua"));
             Assert.Contains("Set = nothing", script);
             Assert.Contains("Set1 = nothing", script);
@@ -669,7 +755,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void a_name_the_assembly_does_not_reference_is_an_error_that_says_why()
         {
-            // nameof leaves no reference in the assembly, so the stubs lack HitPoints and CSharp.lua cannot compile the map.
+            // nameof leaves no reference in the assembly, so the stubs lack GoldCost and CSharp.lua cannot compile the map.
             var copy = folders.TemporaryCopyOfSample();
             File.AppendAllText(Path.Combine(copy, "Objects.cs"), """
 
@@ -677,14 +763,14 @@ namespace Moonwell.Build.Tests
                 {
                     public static class Names
                     {
-                        public static readonly string Life = nameof(Moonwell.Objects.Human.Units.Paladin.HitPoints);
+                        public static readonly string Life = nameof(Moonwell.Objects.Human.Units.Paladin.GoldCost);
                     }
                 }
                 """);
 
             var error = Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), new StringWriter()));
 
-            Assert.Contains("HitPoints", error.Message);
+            Assert.Contains("GoldCost", error.Message);
             Assert.Contains("only the members of Moonwell.Objects that the map's assembly references", error.Message);
         }
 
@@ -756,6 +842,13 @@ namespace Moonwell.Build.Tests
             var after = before.Replace(text, with, StringComparison.Ordinal);
             Assert.NotEqual(before, after);
             File.WriteAllText(path, after);
+        }
+
+        // The staged unit file of a built copy of the Sample.
+        private static War3Net.Build.Object.UnitObjectData ReadUnits(string copy)
+        {
+            using var reader = new BinaryReader(File.OpenRead(Path.Combine(copy, "build", "Sample", "war3map.w3u")), Encoding.UTF8);
+            return reader.ReadUnitObjectData();
         }
 
         private static Dictionary<string, string> ReadIds(string path)

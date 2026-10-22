@@ -6,21 +6,15 @@ public class ConstructorTests
     [Fact]
     public void a_live_member_in_a_declared_class_constructor_is_an_error()
     {
+        // The live members a declared field shares (Mana, MaxLife, Strength, Charges) are the class's declared values there.
         Assert.Equal(new[]
         {
-            "MW0012: Mana",
-            "MW0012: MaxMana",
             "MW0012: Life",
-            "MW0012: MaxLife",
-            "MW0012: Scale",
             "MW0012: Kill",
             "MW0012: X",
             "MW0012: Facing",
-            "MW0012: Strength",
-            "MW0012: Agility",
-            "MW0012: Intelligence",
+            "MW0012: Level",
             "MW0012: Revive",
-            "MW0012: Charges",
             "MW0012: Remove",
         }, MapCode.CheckFile("""
             using Moonwell;
@@ -51,6 +45,7 @@ public class ConstructorTests
                     {
                         Agility = stats;
                         Intelligence += stats;
+                        Level = 2;
                         Revive(0.0f, 0.0f);
                     }
                 }
@@ -68,24 +63,15 @@ public class ConstructorTests
     }
 
     [Fact]
-    public void the_message_names_the_declared_field()
+    public void the_message_says_what_to_set_instead()
     {
         Assert.Equal(
             new[]
             {
-                "'Mana' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is ManaPoints",
-                "'MaxMana' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is ManaPoints",
-                "'Life' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is HitPoints",
-                "'MaxLife' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is HitPoints",
-                "'Scale' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is ScalingValue",
-                "'Level' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is UnitLevel",
-                "'FlyHeight' is the unit's value in the game, which a declared class's constructor cannot reach; the declared field is Height",
+                "'Life' is the unit's value in the game: a unit starts with full life; set MaxLife",
                 "'Add' starts a component in the game, which a declared class's constructor cannot do; use Components.Add(...)",
                 "'Kill' calls the game, which a declared class's constructor cannot do; game work starts from a reaction or the game's start",
-                "'Strength' is the hero's value in the game, which a declared class's constructor cannot reach; the declared field is StartingStrength",
-                "'Agility' is the hero's value in the game, which a declared class's constructor cannot reach; the declared field is StartingAgility",
-                "'Intelligence' is the hero's value in the game, which a declared class's constructor cannot reach; the declared field is StartingIntelligence",
-                "'Charges' is the item's value in the game, which a declared class's constructor cannot reach; the declared field is NumberOfCharges",
+                "'Level' is the hero's level in the game: a hero starts at level 1; its level is not declared",
             },
             MapCode.MessagesOfFile("""
                 using Moonwell;
@@ -101,13 +87,7 @@ public class ConstructorTests
                     {
                         public Mage()
                         {
-                            Mana = 300;
-                            MaxMana = 300;
                             Life = 10.0f;
-                            MaxLife = 10.0f;
-                            Scale = 1.2f;
-                            var level = Level;
-                            FlyHeight = 100.0f;
                             Add(new Counter());
                             Kill();
                         }
@@ -117,17 +97,7 @@ public class ConstructorTests
                     {
                         public Champion()
                         {
-                            Strength = 22;
-                            Agility = 1;
-                            Intelligence = 2;
-                        }
-                    }
-
-                    public class Potion : Items.ClawsOfAttack15
-                    {
-                        public Potion()
-                        {
-                            Charges = 3;
+                            var level = Level;
                         }
                     }
                 }
@@ -135,7 +105,66 @@ public class ConstructorTests
     }
 
     [Fact]
-    public void declared_fields_components_later_code_and_classes_the_game_makes_are_accepted()
+    public void a_classs_own_default_object_in_its_constructor_is_an_error()
+    {
+        // The default object is what the constructor is making: the build cannot make it while it runs.
+        var source = """
+            using System;
+            using Moonwell;
+            using Moonwell.Objects;
+
+            namespace Map
+            {
+                public class Mage : Human.Units.Footman
+                {
+                    public Mage()
+                    {
+                        Tooltip = "Has " + Default.MaxLife;
+                        var life = this.Default.MaxLife + base.Default.MaxMana;
+                        var same = Unit.Default<Mage>().MaxLife;
+                        var footman = Unit.Default<Human.Units.Footman>().MaxLife;
+                        Func<float> later = () => Default.MaxLife + Unit.Default<Mage>().MaxLife;
+                    }
+                }
+
+                public class Champion : Human.Units.Paladin
+                {
+                    public Champion()
+                    {
+                        var name = Default.Name;
+                        var mana = Hero.Default<Champion>().MaxMana + Unit.Default<Champion>().MaxMana;
+                        var other = Unit.Default<Mage>().MaxLife;
+                    }
+                }
+
+                public class Potion : Items.ClawsOfAttack15
+                {
+                    public Potion()
+                    {
+                        Charges = Default.Charges + Item.Default<Potion>().Charges;
+                    }
+                }
+            }
+            """;
+
+        Assert.Equal(new[]
+        {
+            "MW0012: Default",
+            "MW0012: Default",
+            "MW0012: Default",
+            "MW0012: Unit.Default<Mage>()",
+            "MW0012: Default",
+            "MW0012: Hero.Default<Champion>()",
+            "MW0012: Unit.Default<Champion>()",
+            "MW0012: Default",
+            "MW0012: Item.Default<Potion>()",
+        }, MapCode.CheckFile(source));
+        Assert.Equal("'Default' reads the class's default object: a class's default object is what its constructor is making; read the field itself", MapCode.MessagesOfFile(source)[0]);
+        Assert.Equal("'Unit.Default<Mage>()' reads the class's default object: a class's default object is what its constructor is making; read the field itself", MapCode.MessagesOfFile(source)[3]);
+    }
+
+    [Fact]
+    public void declared_and_shared_fields_components_later_code_and_classes_the_game_makes_are_accepted()
     {
         Assert.Empty(MapCode.CheckFile("""
             using System;
@@ -154,9 +183,14 @@ public class ConstructorTests
 
                     public Mage()
                     {
-                        ManaPoints = 300;
-                        HitPoints = HitPoints + 200;
-                        ScalingValue = 1.2f;
+                        Name = "Mage";
+                        MaxMana = 300;
+                        Mana = MaxMana;
+                        MaxLife = MaxLife + 200;
+                        this.Scale = 1.2f;
+                        base.FlyHeight = 50.0f;
+                        Level = 2;
+                        GoldCost = 100;
                         Components.Add(new Counter());
                         mana = () => Mana;
                         var named = nameof(Mana);
@@ -170,7 +204,7 @@ public class ConstructorTests
 
                     public Mage(Mage other)
                     {
-                        ManaPoints = (int)other.Mana;
+                        MaxMana = other.MaxMana;
                     }
 
                     protected override void OnCreated()
@@ -184,7 +218,10 @@ public class ConstructorTests
                 {
                     public Champion()
                     {
-                        StartingStrength = 22;
+                        Strength = 22;
+                        Agility = Strength;
+                        Intelligence += 2;
+                        MaxLife = 800;
                     }
                 }
 
@@ -192,7 +229,7 @@ public class ConstructorTests
                 {
                     public Potion()
                     {
-                        NumberOfCharges = 3;
+                        Charges = 3;
                     }
                 }
 
@@ -202,6 +239,117 @@ public class ConstructorTests
                     public Walker()
                     {
                         var life = Life;
+                    }
+                }
+            }
+            """));
+    }
+
+    [Fact]
+    public void a_heros_level_set_by_its_field_is_the_same_error()
+    {
+        Assert.Equal(
+            new[]
+            {
+                "'Set(\"ulev\")' is the hero's level in the game: a hero starts at level 1; its level is not declared",
+            },
+            MapCode.MessagesOfFile("""
+                using Moonwell;
+                using Moonwell.Objects;
+
+                namespace Map
+                {
+                    public class Champion : Human.Units.Paladin
+                    {
+                        public Champion()
+                        {
+                            Set("ulev", 5);
+                            Set("uhpm", 900);
+                        }
+                    }
+
+                    public class Mage : Human.Units.Footman
+                    {
+                        public Mage()
+                        {
+                            Set("ulev", 5);
+                        }
+                    }
+                }
+                """));
+    }
+
+    [Fact]
+    public void a_units_level_set_in_a_component_is_mw0015()
+    {
+        var source = """
+            using Moonwell;
+            using Moonwell.Objects;
+
+            namespace Map
+            {
+                public sealed class Promote : UnitComponent
+                {
+                    protected override void OnAdded()
+                    {
+                        Unit.Level = 3;
+                        Unit.Level++;
+                        var read = Unit.Level;
+                    }
+                }
+
+                public class Walker : Unit
+                {
+                    public Walker()
+                    {
+                        Level = 2;
+                    }
+                }
+            }
+            """;
+
+        Assert.Equal(new[] { "MW0015: Unit.Level", "MW0015: Unit.Level", "MW0015: Level" }, MapCode.CheckFile(source));
+        Assert.Equal("a unit's level is set only in its declared class's constructor", MapCode.MessagesOfFile(source)[0]);
+    }
+
+    [Fact]
+    public void a_units_level_set_in_a_declared_class_constructor_and_its_lambdas_is_accepted()
+    {
+        Assert.Empty(MapCode.CheckFile("""
+            using System;
+            using Moonwell;
+            using Moonwell.Objects;
+
+            namespace Map
+            {
+                public abstract class Veteran : Human.Units.Footman
+                {
+                    protected Veteran()
+                    {
+                        Level = 3;
+                    }
+                }
+
+                public class Elite<T> : Human.Units.Footman
+                {
+                    public Elite()
+                    {
+                        this.Level = 4;
+                    }
+                }
+
+                public class Captain : Veteran
+                {
+                    public Captain()
+                    {
+                        base.Level = 5;
+                        Action later = () => Level = 6;
+                        Wrap();
+
+                        void Wrap()
+                        {
+                            Level = 7;
+                        }
                     }
                 }
             }

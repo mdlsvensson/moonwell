@@ -10,7 +10,7 @@ namespace GameCall
     {
         public Lucky()
         {
-            HitPoints = Natives.GetRandomInt(1, 2);
+            MaxLife = Natives.GetRandomInt(1, 2);
         }
     }
 }

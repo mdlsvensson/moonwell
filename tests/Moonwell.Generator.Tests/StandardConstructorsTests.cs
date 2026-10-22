@@ -35,7 +35,10 @@ public class StandardConstructorsTests
 
     private static readonly IReadOnlyList<Field> UnitFields = new[]
     {
-        Plain("uhpm", "HitPoints", FieldType.Int),
+        Plain("uhpm", "MaxLife", FieldType.Int),
+        Plain("umpm", "MaxMana", FieldType.Int),
+        Plain("ulev", "Level", FieldType.Int),
+        Plain("ustr", "Strength", FieldType.Int) with { HeroOnly = true },
         Plain("ua1c", "AttackCooldown", FieldType.Float),
         Plain("unam", "Name", FieldType.String),
         Plain("udro", "Dropped", FieldType.Bool),
@@ -116,7 +119,11 @@ public class StandardConstructorsTests
         var paladin = Class(MiniFiles.Value["Human/Units.g.cs"], "Paladin");
 
         Assert.Contains("                public Paladin()\n                {\n", paladin);
-        Assert.Contains("                    HitPoints = 100;\n", paladin);
+        // A hero's life and mana are set by id as base values, which its MaxLife and MaxMana read as totals.
+        Assert.Contains("                    Set(\"uhpm\", 100);\n", paladin);
+        Assert.DoesNotContain("MaxLife = ", paladin);
+        Assert.DoesNotContain("MaxMana = ", paladin);
+        Assert.Contains("                    Strength = 22;\n", paladin);
         Assert.Contains("                    AttackCooldown = 2f;\n", paladin);
         Assert.Contains("                    AgilityPerLevel = 1.5f;\n", paladin);
         Assert.Contains("                    ManaRegen = 0.01f;\n", paladin);
@@ -171,7 +178,19 @@ public class StandardConstructorsTests
     {
         var lines = UnitLines(new Dictionary<string, string> { ["uhpm"] = "420", ["unam"] = "Knight", ["ua1c"] = "1.5" });
 
-        Assert.Equal(new[] { "AttackCooldown = 1.5f;", "HitPoints = 420;", "Name = \"Knight\";" }, lines);
+        Assert.Equal(new[] { "AttackCooldown = 1.5f;", "MaxLife = 420;", "Name = \"Knight\";" }, lines);
+    }
+
+    [Fact]
+    public void a_shared_field_is_set_by_its_live_name_and_a_heros_life_mana_and_level_by_id()
+    {
+        var values = new Dictionary<string, string> { ["uhpm"] = "420", ["umpm"] = "200", ["ulev"] = "5", ["ustr"] = "22", ["unam"] = "Knight" };
+
+        var unit = UnitLines(values.Where(p => p.Key != "ustr").ToDictionary(p => p.Key, p => p.Value));
+        var hero = Constructors().Lines(Object(Kind.Unit, "Hkni", values), Array.Empty<Field>());
+
+        Assert.Equal(new[] { "Level = 5;", "MaxLife = 420;", "MaxMana = 200;", "Name = \"Knight\";" }, unit);
+        Assert.Equal(new[] { "Set(\"ulev\", 5);", "Set(\"uhpm\", 420);", "Set(\"umpm\", 200);", "Name = \"Knight\";", "Strength = 22;" }, hero);
     }
 
     [Fact]
@@ -192,7 +211,7 @@ public class StandardConstructorsTests
                 "AttackCooldown = 1E-05f;",
                 "AttackType = global::Moonwell.AttackType.Hero;",
                 "Dropped = true;",
-                "HitPoints = -7;",
+                "MaxLife = -7;",
                 "TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies;",
             },
             lines);
@@ -203,7 +222,7 @@ public class StandardConstructorsTests
     {
         var lines = UnitLines(new Dictionary<string, string> { ["uhpm"] = "12.75", ["ua1c"] = "fast", ["udro"] = "0" });
 
-        Assert.Equal(new[] { "AttackCooldown = 0f;", "Dropped = false;", "HitPoints = 12;" }, lines);
+        Assert.Equal(new[] { "AttackCooldown = 0f;", "Dropped = false;", "MaxLife = 12;" }, lines);
     }
 
     [Fact]

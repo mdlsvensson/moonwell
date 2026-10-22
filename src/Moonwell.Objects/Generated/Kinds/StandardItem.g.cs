@@ -8,6 +8,7 @@ namespace Moonwell.Objects
 {
     /// <summary>The fields of an item, which every standard item class has.</summary>
     /// @CSharpLua.Ignore
+    [global::Moonwell.Objects.SharedField("iuse", "Charges", Label = "Number of Charges", Min = 0, Max = 1000, HasLimits = true)]
     public abstract class StandardItem : global::Moonwell.Item
     {
         private static readonly global::System.Collections.Generic.Dictionary<string, global::System.Type> fieldTypes =
@@ -70,6 +71,21 @@ namespace Moonwell.Objects
 
         /// <summary>The values put on this object so far, by field id; the build reads them.</summary>
         internal global::System.Collections.Generic.IReadOnlyDictionary<string, object?> Declared => Fields.Values;
+
+        /// <summary>The default object of the type, as the runtime class gives it, with every field of the kind.</summary>
+        public new global::Moonwell.Objects.StandardItem Default => (global::Moonwell.Objects.StandardItem)base.Default;
+
+        /// <summary>A shared field's declared value, which its live member reads with no handle.</summary>
+        protected override T DeclaredValue<T>(string field)
+        {
+            return Fields.Get<T>(this, field);
+        }
+
+        /// <summary>Puts a shared field's value, which its live member does when set with no handle.</summary>
+        protected override void Declare(string field, object value)
+        {
+            Fields.Put(field, global::Moonwell.Objects.FieldChecks.Declared(fieldTypes, field, value));
+        }
 
         /// <summary>The field <c>iabi</c>.</summary>
         [global::Moonwell.Objects.Field("iabi", Label = "Abilities")]
@@ -390,15 +406,6 @@ namespace Moonwell.Objects
         {
             get { return Fields.Get<bool>(this, "iusa"); }
             protected set { Fields.Put("iusa", value); }
-        }
-
-        /// <summary>The field <c>iuse</c>.</summary>
-        [global::Moonwell.Objects.Field("iuse", Label = "Number of Charges")]
-        [global::Moonwell.Objects.Limits(0, 1000)]
-        public int NumberOfCharges
-        {
-            get { return Fields.Get<int>(this, "iuse"); }
-            protected set { Fields.Put("iuse", value); }
         }
 
         /// <summary>The field <c>ubpx</c>.</summary>

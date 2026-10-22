@@ -239,6 +239,20 @@ public sealed class ExportTables
         return present;
     }
 
+    /// <summary>
+    /// The gameplay constants of the <c>[Misc]</c> section of <c>units/miscgame.txt</c> (<c>StrHitPointBonus</c>,
+    /// <c>IntManaBonus</c>), by key as the file spells them. <paramref name="set"/> is null for the base file, else
+    /// <c>melee_v0</c>, <c>custom_v0</c> or <c>custom_v1</c>, whose own file replaces the base's when it has one.
+    /// </summary>
+    public IReadOnlyDictionary<string, string> Misc(string? set)
+    {
+        const string path = "units/miscgame.txt";
+        var sections = ReadSections(Require(path, set), out _);
+        return sections.TryGetValue("Misc", out var misc)
+            ? misc
+            : throw new FormatException($"{path} has no [Misc] section");
+    }
+
     /// <summary>The English label for a <c>WESTRING_</c> key (looked up without regard to case, as the game does), or the key itself when the export has none.</summary>
     public string Label(string key)
     {

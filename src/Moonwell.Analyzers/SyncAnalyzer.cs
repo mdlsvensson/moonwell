@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
@@ -127,10 +128,91 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
                     context.ReportDiagnostic(Diagnostic.Create(Rules.StateInLocal, location, finding.Message(Name(member))));
                 }
             }
-            else if (Has(member, machineLocal))
+            else if (IsMachineLocal(member, write) && !DeclaredName(operation, member, write) && !InNameOf(operation))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rules.LocalOutside, location, Name(member)));
+                // 0.2.2's Name read the declared name outside the constructor too; the message says where it is now.
+                var declared = member is IPropertySymbol { Name: "Name" } && IsRuntime(member) && member.ContainingType.Name == "Unit" ? "; the declared name is Default.Name" : string.Empty;
+                context.ReportDiagnostic(Diagnostic.Create(Rules.LocalOutside, location, Name(member), declared));
             }
+        }
+
+        /// <summary>
+        /// Whether a read of a unit's name (not a hero's proper name, which has no declared value) is the declared one, the same on every machine: in a declared class's
+        /// constructor on the object itself, or on a default object (<c>….Default</c> or <c>Unit.Default&lt;T&gt;()</c>).
+        /// A copy of a default object in a variable is not known to be one.
+        /// </summary>
+        private bool DeclaredName(IOperation operation, ISymbol member, bool write)
+        {
+            if (write || member is not IPropertySymbol { Name: "Name" } property || !IsRuntime(property)
+                || operation is not IPropertyReferenceOperation { Instance: { } instance })
+            {
+                return false;
+            }
+
+            if (instance is IInstanceReferenceOperation)
+            {
+                return InDeclaredConstructor(operation);
+            }
+
+            return instance switch
+            {
+                IPropertyReferenceOperation { Property: { Name: "Default", IsStatic: false } defaults } => IsRuntimeObject(defaults.ContainingType),
+                IInvocationOperation { TargetMethod: { Name: "Default", IsGenericMethod: true } method } => IsRuntime(method),
+                _ => false,
+            };
+        }
+
+        // nameof(Name) names the member without reading it.
+        private static bool InNameOf(IOperation operation)
+        {
+            for (var node = operation.Syntax.Parent; node != null && node is not StatementSyntax and not MemberDeclarationSyntax; node = node.Parent)
+            {
+                if (node is InvocationExpressionSyntax { Expression: IdentifierNameSyntax { Identifier.ValueText: "nameof" } } invocation
+                    && operation.SemanticModel!.GetSymbolInfo(invocation).Symbol == null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // A unit or item class of Moonwell or of Moonwell.Objects, whose Default is the one of the runtime's Unit or Item.
+        private bool IsRuntimeObject(INamedTypeSymbol? type)
+        {
+            for (; type != null; type = type.BaseType)
+            {
+                if (IsRuntime(type))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsRuntime(ISymbol member) =>
+            runtime != null && SymbolEqualityComparer.Default.Equals(member.ContainingAssembly, runtime);
+
+        /// <summary>Whether an operation is in the body of an instance constructor of a declared class, and not in a lambda or local function there, which may run later.</summary>
+        private static bool InDeclaredConstructor(IOperation operation)
+        {
+            for (var node = operation.Syntax; node != null; node = node.Parent)
+            {
+                switch (node)
+                {
+                    case AnonymousFunctionExpressionSyntax or LocalFunctionStatementSyntax:
+                        return false;
+                    case ConstructorDeclarationSyntax constructor:
+                        return !constructor.Modifiers.Any(SyntaxKind.StaticKeyword)
+                            && operation.SemanticModel!.GetDeclaredSymbol(constructor)?.ContainingType is { } type
+                            && DeclaredAnalyzer.IsDeclared(type);
+                    case MemberDeclarationSyntax:
+                        return false;
+                }
+            }
+
+            return false;
         }
 
         public void Loop(OperationAnalysisContext context)
@@ -255,7 +337,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
                 || (damage != null && SymbolEqualityComparer.Default.Equals(member.ContainingAssembly, damage)))
             {
                 // Making a Moonwell object changes nothing in the game until it is added or started.
-                if (member is IMethodSymbol { MethodKind: MethodKind.Constructor } || IsLocalSafe(member, write) || Has(member, machineLocal))
+                if (member is IMethodSymbol { MethodKind: MethodKind.Constructor } || IsLocalSafe(member, write) || IsMachineLocal(member, write))
                 {
                     return null;
                 }
@@ -264,7 +346,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             }
 
             if (!SymbolEqualityComparer.Default.Equals(member.ContainingAssembly, compilation.Assembly)
-                || Has(member, syncUnchecked) || Has(member, machineLocal))
+                || Has(member, syncUnchecked) || IsMachineLocal(member, write))
             {
                 return null;
             }
@@ -419,6 +501,10 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
 
             return false;
         }
+
+        /// <summary>Whether a member is local to one machine: marked [MachineLocal] itself, or a property whose getter is, for a read only.</summary>
+        private bool IsMachineLocal(ISymbol member, bool write) =>
+            Has(member, machineLocal) || (!write && member is IPropertySymbol property && Has(property.GetMethod, machineLocal, false));
 
         /// <summary>Whether a symbol carries an attribute; an accessor also takes its property's.</summary>
         private static bool Has(ISymbol? symbol, INamedTypeSymbol? attribute, bool withProperty = true)

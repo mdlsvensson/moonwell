@@ -14,7 +14,7 @@ namespace Objects
         public Arthas()
         {
             Name = "Arthas";
-            HitPoints = HitPoints * 2;
+            MaxLife = MaxLife * 2;
             GoldCost = GoldCost * 2;
             Abilities.Add<Firebolt>();
             HeroAbilities.Remove<Moonwell.Objects.Human.Abilities.DevotionAura>();
@@ -194,7 +194,7 @@ namespace Objects
     {
         public StrongFootman()
         {
-            HitPoints = 600;
+            MaxLife = 600;
         }
     }
 }

@@ -52,13 +52,39 @@ namespace Moonwell.Build
             return false;
         }
 
+        /// <summary>
+        /// Checks the setters a map without <c>Moonwell.Objects</c> calls: a unit's Level has no live setter, and such a map has no
+        /// class whose constructor may set it (<see cref="Read"/> checks a map that uses the library).
+        /// </summary>
+        /// <param name="assemblyPath">The map's built assembly.</param>
+        /// <exception cref="BuildException">A method sets a unit's Level.</exception>
+        public static void CheckSetters(string assemblyPath)
+        {
+            var context = new MapLoadContext(Path.GetDirectoryName(Path.GetFullPath(assemblyPath))!);
+            try
+            {
+                CheckSettersIn(context, assemblyPath);
+            }
+            finally
+            {
+                context.Unload();
+            }
+        }
+
+        // Kept apart from CheckSetters so that nothing of the loaded assembly is on its frame when the context unloads.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void CheckSettersIn(MapLoadContext context, string assemblyPath)
+        {
+            SetterScan.Check(context.Open(assemblyPath));
+        }
+
         /// <summary>Loads the built assembly, constructs every declared object class and collects what each changed from its standard object.</summary>
         /// <param name="assemblyPath">The map's built assembly; <c>Moonwell.Objects.dll</c> is beside it.</param>
         /// <param name="project">The map project; lines in messages are relative to its folder.</param>
         /// <param name="standard">The standard values.</param>
         /// <param name="set">The tables that fields a class leaves unset read (<see cref="GameData.ValueSet"/>): null for the base tables, else <c>melee_v0</c>, <c>custom_v0</c> or <c>custom_v1</c>.</param>
-        /// <returns>The declared objects, ordered by class name, the ids of the standard classes their lists and references name, and the classes the map's Lua uses; all empty when the map does not use <c>Moonwell.Objects</c>.</returns>
-        /// <exception cref="BuildException">A constructor calls the game or throws, a declared field is set outside a constructor, or <c>[Replaces]</c> is misused.</exception>
+        /// <returns>The declared objects, ordered by class name, the ids of the standard classes their lists and references name, the classes the map's Lua uses, the hero bonuses and the fields read of a type's default object; all empty when the map does not use <c>Moonwell.Objects</c>.</returns>
+        /// <exception cref="BuildException">A constructor calls the game or throws, a declared field or a unit's level is set outside a constructor, a hero's total or level is not one it can start with, or <c>[Replaces]</c> is misused.</exception>
         public static DeclarationSet Read(string assemblyPath, MapProject project, StandardData standard, string? set)
         {
             if (!File.Exists(assemblyPath))
@@ -82,13 +108,13 @@ namespace Moonwell.Build
         private static DeclarationSet ReadIn(MapLoadContext context, string assemblyPath, MapProject project, StandardData standard, string? set)
         {
             var map = context.Open(assemblyPath);
+            SetterScan.Check(map);
             if (!map.GetReferencedAssemblies().Any(name => name.Name == ObjectsAssemblyName))
             {
-                return new DeclarationSet(Array.Empty<DeclaredObject>(), new Dictionary<string, string>(), Array.Empty<UsedClass>(), string.Empty);
+                return new DeclarationSet(Array.Empty<DeclaredObject>(), new Dictionary<string, string>(), Array.Empty<UsedClass>(), string.Empty, new HeroBonus(0f, 0f), new Dictionary<string, IReadOnlyList<string>>());
             }
 
             var objects = context.LoadFromAssemblyName(new AssemblyName(ObjectsAssemblyName));
-            SetterScan.Check(map);
             var used = ObjectLua.UsedClasses(project, map, objects, assemblyPath, out var support);
 
             var classNames = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -109,11 +135,17 @@ namespace Moonwell.Build
                 .ToList();
             CheckReplaces(candidates);
 
-            var values = objects.GetType("Moonwell.Objects.StandardValues", true)!.GetProperty("Read", BindingFlags.Public | BindingFlags.Static)!;
+            // A hero's MaxLife, MaxMana and Mana read in a constructor are its totals, by the map's gameplay constants. The data of a map
+            // with no objects has none, and reads them as its base fields.
+            var bonus = ReferenceEquals(standard, StandardData.Empty) ? new HeroBonus(0f, 0f) : MapMisc.Read(project.MapFolder, standard.Misc(set));
+            var standardValues = objects.GetType("Moonwell.Objects.StandardValues", true)!;
+            var values = standardValues.GetProperty("Read", BindingFlags.Public | BindingFlags.Static)!;
+            var heroBonus = standardValues.GetProperty("HeroBonus", BindingFlags.Public | BindingFlags.Static)!;
             values.SetValue(null, (Func<string, string, int, string?>)((id, field, level) => standard.Value(id, field, level, set)));
+            heroBonus.SetValue(null, (Func<(float LifePerStrength, float ManaPerIntelligence)>)(() => (bonus.LifePerStrength, bonus.ManaPerIntelligence)));
             try
             {
-                var comparer = new ChangedFields(standard, set, project, classNames);
+                var comparer = new ChangedFields(standard, set, project, classNames, bonus);
                 var declared = new List<DeclaredObject>();
                 foreach (var type in candidates)
                 {
@@ -132,11 +164,12 @@ namespace Moonwell.Build
                     }
                 }
 
-                return new DeclarationSet(declared, named, used, support);
+                return new DeclarationSet(declared, named, used, support, bonus, ObjectLua.TypeFields(objects, assemblyPath));
             }
             finally
             {
                 values.SetValue(null, null);
+                heroBonus.SetValue(null, null);
             }
         }
 
@@ -168,8 +201,20 @@ namespace Moonwell.Build
             }
 
             var put = (IReadOnlyDictionary<string, object?>)kindBase.GetProperty("Declared", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(instance)!;
+            if (kind == "hero")
+            {
+                put = comparer.WithBases(type, root, put, Internal<IReadOnlyDictionary<string, object?>>(kindBase, instance, "Totals"), TotalsPutAt(kindBase, instance));
+            }
+
             var references = new SortedSet<string>(StringComparer.Ordinal);
             var changed = comparer.Compute(name, kind, root, put, references);
+
+            // The game starts a hero at level 1; its ulev is the standard hero's (World Editor's Level), which only its Set reaches.
+            if (kind == "hero" && changed.ContainsKey("ulev"))
+            {
+                throw new BuildException($"{name} changes ulev: a hero starts at level 1; its level is not declared");
+            }
+
             return new DeclaredObject(
                 name,
                 kind,
@@ -179,6 +224,19 @@ namespace Moonwell.Build
                 CarrierIdOf(type),
                 changed,
                 references.ToList());
+        }
+
+        // An internal property of a kind base, read as the build reads Declared.
+        private static T Internal<T>(Type kindBase, object instance, string property)
+        {
+            return (T)kindBase.GetProperty(property, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(instance)!;
+        }
+
+        // Where each of a hero's totals was put: Declared's TotalsPutAt, reached through the kind base's Fields.
+        private static IReadOnlyDictionary<string, object?> TotalsPutAt(Type kindBase, object instance)
+        {
+            var fields = Internal<object>(kindBase, instance, "Fields");
+            return (IReadOnlyDictionary<string, object?>)fields.GetType().GetProperty("TotalsPutAt", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(fields)!;
         }
 
         // A class that is constructed: not abstract or open generic, not a standard class, and its base chain reaches a kind base.

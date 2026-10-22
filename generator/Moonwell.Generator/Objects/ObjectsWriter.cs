@@ -8,7 +8,8 @@ namespace Moonwell.Generator.Objects;
 /// <remarks>
 /// <para>
 /// A kind base (<c>StandardUnit</c>, <c>StandardHero</c>, <c>StandardItem</c>, ...) carries a property for each field
-/// of its kind that every object of the kind can have; a standard class has a constructor that sets the object's values
+/// of its kind that every object of the kind can have, except a shared field (<see cref="SharedFields"/>), whose live
+/// member reads and puts it; a standard class has a constructor that sets the object's values
 /// (<see cref="StandardConstructors"/>) and, for an ability, a property for each of its own fields.
 /// Every type name in the source is spelled in full (<c>global::Moonwell.Unit</c>), so that a class named like a
 /// namespace part cannot shadow it.
@@ -39,6 +40,13 @@ public static class ObjectsWriter
     /// (<paramref name="hero"/>) has every unit field. An ability's own fields (those with a <c>Specific</c> list) are
     /// properties of its standard class, not of <c>StandardAbility</c>, but <c>Set</c> knows their types too.
     /// </summary>
+    /// <remarks>
+    /// A shared field has no property: the kind base carries a <c>[SharedField]</c> with its rules, and overrides the runtime
+    /// class's hooks so that its live member reads and puts the declared value while the object has no handle. Its
+    /// <c>Default</c> is the runtime class's, typed as the kind base so that every field of the default object can be read.
+    /// <c>StandardHero</c> reads most life, most mana and starting mana as the totals the hero starts with
+    /// (<c>HeroTotals</c>), keeps a total put on them apart from the base fields (<c>Totals</c>), and declares no level.
+    /// </remarks>
     public static string Kind(ObjectKind kind, IReadOnlyList<Field> fields, bool hero)
     {
         if (hero && kind != ObjectKind.Unit)
@@ -49,6 +57,7 @@ public static class ObjectsWriter
         var name = KindBase(kind, hero);
         var held = new List<Field>();
         var common = new List<Field>();
+        var shared = new List<Field>();
         foreach (var field in fields)
         {
             if (field.HeroOnly && !hero)
@@ -57,7 +66,11 @@ public static class ObjectsWriter
             }
 
             held.Add(field);
-            if (field.Specific.Count == 0)
+            if (SharedFields.MemberOf(kind, field.Id) != null)
+            {
+                shared.Add(field);
+            }
+            else if (field.Specific.Count == 0)
             {
                 common.Add(field);
             }
@@ -68,6 +81,11 @@ public static class ObjectsWriter
         text.Append("namespace Moonwell.Objects\n{\n");
         text.Append($"    /// <summary>The fields of {Describe(kind, hero)}, which every standard {Noun(kind, hero)} class has.</summary>\n");
         text.Append($"    {Ignore}\n");
+        foreach (var field in shared)
+        {
+            text.Append($"    {SharedFieldAttribute(field, SharedFields.MemberOf(kind, field.Id)!)}\n");
+        }
+
         text.Append($"    public abstract class {name} : {Runtime}.{(hero ? "Hero" : kind.ToString())}\n    {{\n");
         text.Append("        private static readonly global::System.Collections.Generic.Dictionary<string, global::System.Type> fieldTypes =\n");
         text.Append("            new global::System.Collections.Generic.Dictionary<string, global::System.Type>\n            {\n");
@@ -82,6 +100,11 @@ public static class ObjectsWriter
         text.Append($"        protected {Root}.Declared Fields => declared ??= new {Root}.Declared(this);\n\n");
         text.Append("        /// <summary>The values put on this object so far, by field id; the build reads them.</summary>\n");
         text.Append("        internal global::System.Collections.Generic.IReadOnlyDictionary<string, object?> Declared => Fields.Values;\n");
+        if (SharedFields.Of(kind).Count > 0)
+        {
+            AppendSharedMembers(text, name, hero);
+        }
+
         foreach (var field in common)
         {
             text.Append('\n');
@@ -212,6 +235,83 @@ public static class ObjectsWriter
 
         text.Append("}\n");
         return text.ToString();
+    }
+
+    /// <summary>
+    /// The members of a kind base whose kind has shared fields: <c>Default</c> typed as the kind base, the hooks a shared
+    /// member reads and puts its declared value through, and for <c>StandardHero</c> the totals of its life and mana.
+    /// </summary>
+    private static void AppendSharedMembers(StringBuilder text, string name, bool hero)
+    {
+        var declared = $"{Root}.FieldChecks.Declared(fieldTypes, field, value)";
+        if (hero)
+        {
+            text.Append("\n        /// <summary>The totals of most life, most mana and starting mana the hero's class put by their live names, by field id; the build reads them.</summary>\n");
+            text.Append("        internal global::System.Collections.Generic.IReadOnlyDictionary<string, object?> Totals => Fields.Totals;\n");
+        }
+
+        text.Append("\n        /// <summary>The default object of the type, as the runtime class gives it, with every field of the kind.</summary>\n");
+        text.Append($"        public new {Root}.{name} Default => ({Root}.{name})base.Default;\n\n");
+        if (hero)
+        {
+            text.Append("        /// <summary>A shared field's declared value, which its live member reads with no handle: most life, most mana and starting mana as the totals the hero starts with.</summary>\n");
+            text.Append("        protected override T DeclaredValue<T>(string field)\n        {\n");
+            text.Append($"            return {Root}.HeroTotals.Read<T>(Fields, this, field);\n        }}\n\n");
+            text.Append("        /// <summary>Puts a shared field's value, which its live member does when set with no handle: most life, most mana and starting mana as totals; a hero's level is not declared.</summary>\n");
+            text.Append("        protected override void Declare(string field, object value)\n        {\n");
+            text.Append("            if (field == \"ulev\")\n            {\n");
+            text.Append("                throw new global::System.InvalidOperationException(\"a hero starts at level 1; its level is not declared\");\n            }\n\n");
+            text.Append($"            if ({Root}.HeroTotals.Holds(field))\n            {{\n");
+            text.Append($"                Fields.PutTotal(field, {declared});\n                return;\n            }}\n\n");
+            text.Append($"            Fields.Put(field, {declared});\n        }}\n");
+            return;
+        }
+
+        text.Append("        /// <summary>A shared field's declared value, which its live member reads with no handle.</summary>\n");
+        text.Append("        protected override T DeclaredValue<T>(string field)\n        {\n");
+        text.Append("            return Fields.Get<T>(this, field);\n        }\n\n");
+        text.Append("        /// <summary>Puts a shared field's value, which its live member does when set with no handle.</summary>\n");
+        text.Append("        protected override void Declare(string field, object value)\n        {\n");
+        text.Append($"            Fields.Put(field, {declared});\n        }}\n");
+    }
+
+    /// <summary>
+    /// The <c>[SharedField]</c> of a shared field, with the rules a property of it would carry (<see cref="RuleAttributes"/>):
+    /// its label, its range with <c>HasLimits</c>, <c>NonNegative</c> and <c>Required</c>.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The field has a rule or a type <c>[SharedField]</c> cannot carry.</exception>
+    private static string SharedFieldAttribute(Field field, string member)
+    {
+        var rules = field.Rules;
+        if (rules.MaxLength.HasValue || rules.MaxEntries.HasValue || field.PerLevel || field.Type == FieldType.Choice)
+        {
+            throw new InvalidOperationException($"shared field {field.Id} has a rule or a type [SharedField] cannot carry");
+        }
+
+        var text = new StringBuilder($"[{Root}.SharedField({Literal(field.Id)}, {Literal(member)}");
+        if (rules.Label != null)
+        {
+            text.Append($", Label = {Literal(rules.Label)}");
+        }
+
+        if (IsLimited(field))
+        {
+            text.Append(rules.Min.HasValue ? $", Min = {Number(rules.Min.Value)}" : "");
+            text.Append(rules.Max.HasValue ? $", Max = {Number(rules.Max.Value)}" : "");
+            text.Append(", HasLimits = true");
+        }
+
+        if (IsNumber(field) && rules.NoNegative)
+        {
+            text.Append(", NonNegative = true");
+        }
+
+        if (rules.Required)
+        {
+            text.Append(", Required = true");
+        }
+
+        return text.Append(")]").ToString();
     }
 
     // "The standard objects of the group Human.", "The standard units of the group Human.", "The standard items."
@@ -382,6 +482,25 @@ public static class ObjectsWriter
         return text.ToString();
     }
 
+    /// <summary>
+    /// The JSON of the gameplay constants: an object of the data sets (<c>base</c>, <c>custom_v0</c>), one per line, each
+    /// the constants by key. Sets and keys are in ordinal order.
+    /// </summary>
+    public static string Misc(IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> sets)
+    {
+        var text = new StringBuilder("{\n");
+        var ordered = sets.Keys.OrderBy(k => k, StringComparer.Ordinal).ToList();
+        for (var i = 0; i < ordered.Count; i++)
+        {
+            text.Append(Json(ordered[i])).Append(':');
+            AppendMap(text, sets[ordered[i]]);
+            text.Append(i + 1 < ordered.Count ? ",\n" : "\n");
+        }
+
+        text.Append("}\n");
+        return text.ToString();
+    }
+
     /// <summary>The name of a field type in the values JSON.</summary>
     public static string TypeName(FieldType type)
     {
@@ -430,14 +549,12 @@ public static class ObjectsWriter
     {
         var rules = field.Rules;
         var attributes = new List<string>();
-        var limited = rules.Min.HasValue || rules.Max.HasValue;
-        var number = field.Type == FieldType.Int || field.Type == FieldType.Float || (field.Type == FieldType.String && limited);
-        if (number && limited)
+        if (IsLimited(field))
         {
             attributes.Add(LimitsAttribute(rules.Min, rules.Max));
         }
 
-        if (number && rules.NoNegative)
+        if (IsNumber(field) && rules.NoNegative)
         {
             attributes.Add($"[{Root}.NonNegative]");
         }
@@ -460,12 +577,31 @@ public static class ObjectsWriter
         return attributes;
     }
 
+    // A number field, or a number list held as text that has limits: the fields [Limits] and [NonNegative] apply to.
+    private static bool IsNumber(Field field)
+    {
+        var limited = field.Rules.Min.HasValue || field.Rules.Max.HasValue;
+        return field.Type == FieldType.Int || field.Type == FieldType.Float || (field.Type == FieldType.String && limited);
+    }
+
+    // A number field with a minVal or a maxVal.
+    private static bool IsLimited(Field field)
+    {
+        return IsNumber(field) && (field.Rules.Min.HasValue || field.Rules.Max.HasValue);
+    }
+
     /// <summary>The <c>[Limits]</c> attribute of a range; a missing end is an infinity (<c>double.NegativeInfinity</c>).</summary>
     public static string LimitsAttribute(double? min, double? max)
     {
-        var low = min.HasValue ? min.Value.ToString("R", CultureInfo.InvariantCulture) : "double.NegativeInfinity";
-        var high = max.HasValue ? max.Value.ToString("R", CultureInfo.InvariantCulture) : "double.PositiveInfinity";
+        var low = min.HasValue ? Number(min.Value) : "double.NegativeInfinity";
+        var high = max.HasValue ? Number(max.Value) : "double.PositiveInfinity";
         return $"[{Root}.Limits({low}, {high})]";
+    }
+
+    // A limit as C# reads the same double back.
+    private static string Number(double value)
+    {
+        return value.ToString("R", CultureInfo.InvariantCulture);
     }
 
     /// <summary>The type of a field's value: the object type for a list or a reference, the enum for a choice, else <c>int</c>, <c>float</c>, <c>bool</c> or <c>string</c>.</summary>

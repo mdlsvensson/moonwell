@@ -7,6 +7,12 @@ public static class GeneratedObjects
 {
     private const string RootNamespace = "Moonwell.Objects.";
 
+    /// <summary>The file of the gameplay constants the build reads, which is also the end of its embedded resource name.</summary>
+    private const string MiscFile = "Values/misc.json";
+
+    // The keys of miscgame.txt's [Misc] section the build reads: a hero's life per point of strength and mana per point of intelligence.
+    private static readonly string[] MiscKeys = { "StrHitPointBonus", "IntManaBonus" };
+
     /// <summary>The file name of a kind's values (<c>unit.json</c>), which is also the end of its embedded resource name.</summary>
     public static string ValuesFile(Kind kind)
     {
@@ -16,7 +22,7 @@ public static class GeneratedObjects
     /// <summary>
     /// The files, by path under <c>Generated/</c> with <c>/</c> separators: the enums of the choice types
     /// (<c>Choices.g.cs</c>), the eight kind bases (<c>Kinds/</c>), one file for each namespace (<c>Units/Human.g.cs</c>,
-    /// <c>Items.g.cs</c>) and a values file for each kind (<c>Values/unit.json</c>, heroes included).
+    /// <c>Items.g.cs</c>) and a values file for each kind (<c>Values/unit.json</c>, heroes included) and the gameplay constants (<c>Values/misc.json</c>).
     /// </summary>
     /// <param name="tables">The export.</param>
     /// <param name="runtime">The runtime classes' members, whose names no field takes; null for none.</param>
@@ -69,6 +75,8 @@ public static class GeneratedObjects
             }
         }
 
+        files[MiscFile] = ObjectsWriter.Misc(MiscConstants(tables));
+
         var names = ClassNames.Assign(everything);
         var byNamespace = new SortedDictionary<string, List<(StandardObject, ClassName)>>(StringComparer.Ordinal);
         foreach (var obj in everything)
@@ -89,6 +97,27 @@ public static class GeneratedObjects
         }
 
         return files;
+    }
+
+    /// <summary>The constants of <see cref="MiscKeys"/> in the base file and in each balance set the export holds, by set (<c>base</c> for the base).</summary>
+    private static Dictionary<string, IReadOnlyDictionary<string, string>> MiscConstants(ExportTables tables)
+    {
+        var sets = new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.Ordinal);
+        foreach (var set in new string?[] { null }.Concat(tables.Sets))
+        {
+            var misc = tables.Misc(set);
+            var constants = new Dictionary<string, string>(StringComparer.Ordinal);
+            foreach (var key in MiscKeys)
+            {
+                constants[key] = misc.TryGetValue(key, out var value)
+                    ? value
+                    : throw new InvalidOperationException($"miscgame.txt of {set ?? "base"} has no {key}");
+            }
+
+            sets[set ?? "base"] = constants;
+        }
+
+        return sets;
     }
 
     /// <summary>

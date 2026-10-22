@@ -31,6 +31,20 @@ namespace Moonwell.Objects
             return value;
         }
 
+        /// <summary>
+        /// The value a shared member declares, in the type its field holds: a float put into an int field truncated, as the live
+        /// setters do; anything else as it is, its rules checked when it is put.
+        /// </summary>
+        internal static object Declared(IReadOnlyDictionary<string, Type> held, string field, object value)
+        {
+            if (value is float number && held.TryGetValue(field, out var type) && type == typeof(int))
+            {
+                return (int)number;
+            }
+
+            return value;
+        }
+
         /// <summary>Gives <paramref name="value"/> when <paramref name="target"/> has <paramref name="field"/> and it is of the type one level of the field holds; else throws naming the field.</summary>
         internal static object LevelValue(string owner, IReadOnlyDictionary<string, Type> held, object target, string field, int level, object? value)
         {
@@ -73,7 +87,7 @@ namespace Moonwell.Objects
             return type;
         }
 
-        /// <summary>The ids of the fields that the standard classes in <paramref name="type"/>'s base chain have as properties.</summary>
+        /// <summary>The ids of the fields that the standard classes in <paramref name="type"/>'s base chain have as properties, and of its shared fields.</summary>
         private static HashSet<string> PropertyFieldsOf(Type type)
         {
             lock (propertyFields)
@@ -90,6 +104,14 @@ namespace Moonwell.Objects
         private static HashSet<string> ReadPropertyFields(Type type)
         {
             var ids = new HashSet<string>(StringComparer.Ordinal);
+#if !MOONWELL_LUA
+            // A shared field has no property: its id is on the attribute of a class in the chain.
+            foreach (SharedFieldAttribute shared in type.GetCustomAttributes(typeof(SharedFieldAttribute), true))
+            {
+                ids.Add(shared.Id);
+            }
+#endif
+
             for (var parent = type; parent != null; parent = parent.BaseType)
             {
                 if (parent.Assembly != typeof(FieldChecks).Assembly)

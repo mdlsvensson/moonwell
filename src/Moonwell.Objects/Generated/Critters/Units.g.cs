@@ -57,6 +57,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 240f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -69,11 +70,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 240f;
                     HeightMinimum = 90f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNAlbatross.blp";
                     IsABuilding = false;
@@ -81,6 +80,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\critters\\Albatross\\Albatross";
@@ -182,6 +182,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -194,11 +195,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNCritterChicken.blp";
                     IsABuilding = false;
@@ -206,6 +205,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\critters\\EasterChicken\\EasterChicken";
@@ -308,6 +308,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -320,11 +321,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNSpinyCrab.blp";
                     IsABuilding = false;
@@ -332,6 +331,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\critters\\SpiderCrab\\SpiderCrab";
@@ -430,6 +430,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 0;
                     GoldBountyAwardedBase = 0;
@@ -442,11 +443,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNWolf.blp";
                     IsABuilding = false;
@@ -454,6 +453,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\BrownWolf\\BrownWolf";
@@ -477,8 +477,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 1f;
                     ScaleProjectiles = true;
-                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     ShadowImageCenterX = 35f;
@@ -554,6 +554,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -566,11 +567,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNDuneWorm.blp";
                     IsABuilding = false;
@@ -578,6 +577,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\critters\\DuneWorm\\DuneWorm";
@@ -676,6 +676,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -688,11 +689,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNFelBoar.blp";
                     IsABuilding = false;
@@ -700,6 +699,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Felboar\\Felboar";
@@ -796,6 +796,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 240f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -808,17 +809,16 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 240f;
                     HeightMinimum = 90f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     IsABuilding = false;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\critters\\FlyingSheep\\FlyingSheep";
@@ -920,6 +920,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -932,11 +933,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNHex.blp";
                     IsABuilding = false;
@@ -944,6 +943,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\critters\\Frog\\Frog";
@@ -1044,6 +1044,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 0;
                     GoldBountyAwardedBase = 0;
@@ -1056,17 +1057,16 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     IsABuilding = false;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     ModelFileExtraVersions = 0;
@@ -1163,6 +1163,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -1175,11 +1176,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNHermitCrab.blp";
                     IsABuilding = false;
@@ -1187,6 +1186,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\critters\\HermitCrab\\HermitCrab";
@@ -1285,6 +1285,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -1297,11 +1298,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNPenguin.blp";
                     IsABuilding = false;
@@ -1309,6 +1308,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Penguin\\Penguin";
@@ -1407,6 +1407,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -1419,11 +1420,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNPenguin.blp";
                     IsABuilding = false;
@@ -1431,6 +1430,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Penguin\\Penguin";
@@ -1531,6 +1531,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -1543,11 +1544,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNPig.blp";
                     IsABuilding = false;
@@ -1555,6 +1554,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Pig\\Pig";
@@ -1657,6 +1657,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -1669,11 +1670,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNCritterRabbit.blp";
                     IsABuilding = false;
@@ -1681,6 +1680,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\critters\\EasterRabbit\\EasterRabbit";
@@ -1704,8 +1704,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 1f;
                     ScaleProjectiles = true;
-                    ScalingValue = 1f;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 0.9f;
@@ -1784,6 +1784,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -1796,11 +1797,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNRacoon.blp";
                     IsABuilding = false;
@@ -1808,6 +1807,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\critters\\Raccoon\\Raccoon";
@@ -1909,6 +1909,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -1921,11 +1922,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNYouDirtyRat!.blp";
                     IsABuilding = false;
@@ -1933,6 +1932,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Rat\\Rat";
@@ -2031,6 +2031,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -2043,11 +2044,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNSeal.blp";
                     IsABuilding = false;
@@ -2055,6 +2054,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Seal\\Seal";
@@ -2153,6 +2153,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -2165,11 +2166,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNSheep.blp";
                     IsABuilding = false;
@@ -2177,6 +2176,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Sheep\\Sheep";
@@ -2277,6 +2277,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -2289,11 +2290,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNSheep.blp";
                     IsABuilding = false;
@@ -2301,6 +2300,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Sheep\\Sheep";
@@ -2400,6 +2400,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -2412,11 +2413,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNSheep.blp";
                     IsABuilding = false;
@@ -2424,6 +2423,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\Sheep\\Sheep";
@@ -2527,6 +2527,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -2539,11 +2540,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNSkink.blp";
                     IsABuilding = false;
@@ -2551,6 +2550,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 60f;
                     MaximumRollAngleDegrees = 60f;
                     Model = "units\\critters\\Skink\\Skink";
@@ -2651,6 +2651,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 240f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -2663,11 +2664,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 240f;
                     HeightMinimum = 90f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNSnowOwl.blp";
                     IsABuilding = false;
@@ -2675,6 +2674,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\critters\\SnowOwl\\SnowOwl";
@@ -2772,6 +2772,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -2784,11 +2785,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 0f;
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNStag.blp";
                     IsABuilding = false;
@@ -2796,6 +2795,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
                     Model = "units\\critters\\BlackStagMale\\BlackStagMale";
@@ -2892,6 +2892,7 @@ namespace Moonwell.Objects
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = false;
                     ElevationSampleRadius = 20f;
+                    FlyHeight = 240f;
                     FogOfWarSampleRadius = 0f;
                     FormationRank = 4;
                     GoldBountyAwardedBase = 0;
@@ -2904,11 +2905,9 @@ namespace Moonwell.Objects
                     GroupSeparationPriority = 0;
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
-                    Height = 240f;
                     HeightMinimum = 90f;
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
-                    HitPoints = 15;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNVulture.blp";
                     IsABuilding = false;
@@ -2916,6 +2915,7 @@ namespace Moonwell.Objects
                     LumberBountyAwardedNumberOfDice = 0;
                     LumberBountyAwardedSidesPerDie = 0;
                     LumberCost = 0;
+                    MaxLife = 15;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
                     Model = "units\\critters\\Vulture\\Vulture";
@@ -2939,8 +2939,8 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 1f;
                     ScaleProjectiles = true;
-                    ScalingValue = 1f;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 1f;

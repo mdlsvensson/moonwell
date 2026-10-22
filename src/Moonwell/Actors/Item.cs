@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Moonwell
 {
@@ -37,6 +38,33 @@ namespace Moonwell
         [LocalSafe]
         public int TypeId { get; internal set; }
 
+        /// <summary>The default object of the item's type, as Unreal's class default object: the values its class declares (a type no class of the map's declares, its values as World Editor made them, standard where World Editor left them), the same whatever this item's are now and once it is gone. One per type, shared by its items, with no handle; it is gone, so its live actions do nothing.</summary>
+        [LocalSafe]
+        public Item Default => ObjectTypes.DefaultOf(this, DeclaredTypeId);
+
+        /// <summary>The id of the type whose declared values the item reads: its type id, else, while its constructor runs, the id its class is registered with, else 0.</summary>
+        internal int DeclaredTypeId => TypeId != 0 ? TypeId : ObjectTypes.IdOfClass(this);
+
+        /// <summary>The value the item's type declares for a field, which a shared member reads when the item has no handle (in its constructor, and on a default object). Here, the value the build wrote for the map; the standard classes read their own declared values on .NET.</summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected virtual T DeclaredValue<T>(string field)
+        {
+            // The build has no world; the classes it reads override this.
+            if (Runtime.World == null)
+            {
+                return default(T)!;
+            }
+
+            var value = Runtime.World.TypeValue(DeclaredTypeId, field);
+            return value == null ? default(T)! : (T)value;
+        }
+
+        /// <summary>Declares the value of a field for the item's class, which a shared member does when it is set with no handle. Here, nothing: in the game the values are the build's; the standard classes keep them on .NET.</summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected virtual void Declare(string field, object value)
+        {
+        }
+
         /// <summary>The charges last read or set.</summary>
         private int lastCharges;
 
@@ -58,12 +86,17 @@ namespace Moonwell
             return Runtime.World.ItemTypeId(Handle) == 0;
         }
 
-        /// <summary>The item's charges (what the type gives: a healing potion 1, Claws of Attack 0). Any value is taken at once; 0 does not remove the item, it stays where it is, on the ground or in an inventory, and a carried potion of 0 charges can still be used. Once the game has removed the item, the last value read or set, and setting does nothing.</summary>
+        /// <summary>The item's charges (what the type gives: a healing potion 1, Claws of Attack 0). Any value is taken at once; 0 does not remove the item, it stays where it is, on the ground or in an inventory, and a carried potion of 0 charges can still be used. Once the game has removed the item, the last value read or set, and setting does nothing. In a declared class's constructor, the charges every item of the class starts with (iuse); on a default object, its type's.</summary>
         [LocalSafe]
         public int Charges
         {
             get
             {
+                if (Handle == null)
+                {
+                    return DeclaredValue<int>("iuse");
+                }
+
                 if (IsGone)
                 {
                     return lastCharges;
@@ -85,6 +118,12 @@ namespace Moonwell
 
             set
             {
+                if (Handle == null)
+                {
+                    Declare("iuse", value);
+                    return;
+                }
+
                 if (!IsGone)
                 {
                     lastCharges = value;
@@ -255,8 +294,14 @@ namespace Moonwell
         public T Add<T>(T component)
             where T : ItemComponent => AddComponent(component);
 
-        /// <summary>Removes the item from the game: it ends, which runs its OnLeave.</summary>
-        public void Remove() => End();
+        /// <summary>Removes the item from the game: it ends, which runs its OnLeave. Does nothing on a default object, which is not in the game.</summary>
+        public void Remove()
+        {
+            if (Handle != null)
+            {
+                End();
+            }
+        }
 
         /// <summary>Runs once, when the item comes into the game, after its starting components are added.</summary>
         protected virtual void OnCreated()

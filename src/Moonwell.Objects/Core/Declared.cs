@@ -37,6 +37,11 @@ namespace Moonwell.Objects
 
         private readonly Dictionary<string, object?> values = new Dictionary<string, object?>();
         private readonly Dictionary<string, object?> standard = new Dictionary<string, object?>();
+        private readonly Dictionary<string, object?> totals = new Dictionary<string, object?>();
+
+        // Where each total was put (a System.Diagnostics.StackTrace), for the build's error of a base out of its field's limits.
+        private readonly Dictionary<string, object?> totalsPutAt = new Dictionary<string, object?>();
+
         private readonly object? owner;
 
         // The puts still to come from the standard class's constructors: 0 when they are done, -1 while the standard class
@@ -72,6 +77,32 @@ namespace Moonwell.Objects
         public IReadOnlyDictionary<string, object?> Values
         {
             get { return values; }
+        }
+
+        /// <summary>
+        /// A hero's life and mana put as the totals it starts with (<c>MaxLife = 800</c>), by field id: kept apart from
+        /// <see cref="Values"/>, which hold base fields, for the build to turn into base fields by the hero's attributes. They
+        /// are not checked here: the base field the build makes of them is.
+        /// </summary>
+        internal IReadOnlyDictionary<string, object?> Totals
+        {
+            get { return totals; }
+        }
+
+        /// <summary>Where each of <see cref="Totals"/> was put, a <c>System.Diagnostics.StackTrace</c> from the put's caller: the line the build names when the base field it makes of the total is out of the field's limits.</summary>
+        internal IReadOnlyDictionary<string, object?> TotalsPutAt
+        {
+            get { return totalsPutAt; }
+        }
+
+        /// <summary>Puts a hero's total of a field (see <see cref="Totals"/>).</summary>
+        internal void PutTotal(string field, object? value)
+        {
+            totals[field] = value;
+#if !MOONWELL_LUA
+            // Skip this frame: the put site is the kind base's Declare, the live member's setter and the class's constructor above it.
+            totalsPutAt[field] = new System.Diagnostics.StackTrace(1, true);
+#endif
         }
 
         /// <summary>Gives the value put on a field, else the standard object's value of the field.</summary>

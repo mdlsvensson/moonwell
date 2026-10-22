@@ -8,12 +8,130 @@ namespace Moonwell.Objects.Tests
     {
     }
 
-    /// <summary>A Footman of a map's own that sets its hit points.</summary>
+    /// <summary>A Footman of a map's own that sets its most life.</summary>
     public class Sentinel : Moonwell.Objects.Human.Units.Footman
     {
         public Sentinel()
         {
-            HitPoints = 900;
+            MaxLife = 900;
+        }
+    }
+
+    /// <summary>A Paladin of a map's own that sets its life, then its strength.</summary>
+    public class LifeThenStrength : Moonwell.Objects.Human.Units.Paladin
+    {
+        public LifeThenStrength()
+        {
+            MaxLife = 800;
+            Strength = 30;
+        }
+    }
+
+    /// <summary>A Paladin of a map's own that sets its strength, then its life.</summary>
+    public class StrengthThenLife : Moonwell.Objects.Human.Units.Paladin
+    {
+        public StrengthThenLife()
+        {
+            Strength = 30;
+            MaxLife = 800;
+        }
+    }
+
+    /// <summary>A Paladin of a map's own that adds to the life it starts with.</summary>
+    public class Stalwart : Moonwell.Objects.Human.Units.Paladin
+    {
+        public Stalwart()
+        {
+            MaxLife += 200;
+        }
+    }
+
+    /// <summary>A Paladin of a map's own that sets its strength and intelligence alone.</summary>
+    public class Scholarly : Moonwell.Objects.Human.Units.Paladin
+    {
+        public Scholarly()
+        {
+            Strength = 30;
+            Intelligence = 20;
+        }
+    }
+
+    /// <summary>A Paladin of a map's own that lowers its most mana below what it starts with.</summary>
+    public class Drained : Moonwell.Objects.Human.Units.Paladin
+    {
+        public Drained()
+        {
+            MaxMana = 100;
+        }
+    }
+
+    /// <summary>A Paladin of a map's own that starts with more mana than its most.</summary>
+    public class Overfull : Moonwell.Objects.Human.Units.Paladin
+    {
+        public Overfull()
+        {
+            Mana = 1000;
+            MaxMana = 300;
+        }
+    }
+
+    /// <summary>A Paladin of a map's own that reads its own default object in its constructor, which MW0012 rejects.</summary>
+    public class ReadsOwnDefault : Moonwell.Objects.Human.Units.Paladin
+    {
+        public ReadsOwnDefault()
+        {
+            Tooltip = "Has " + Default.MaxLife;
+        }
+    }
+
+    /// <summary>A Paladin of a map's own that reads its class's default object in its constructor, which MW0012 rejects.</summary>
+    public class ReadsOwnClassDefault : Moonwell.Objects.Human.Units.Paladin
+    {
+        public ReadsOwnClassDefault()
+        {
+            Tooltip = "Has " + Moonwell.Unit.Default<ReadsOwnClassDefault>().MaxLife;
+        }
+    }
+
+    /// <summary>A Footman of a map's own whose default is first asked for from an object of it.</summary>
+    public class Lookout : Moonwell.Objects.Human.Units.Footman
+    {
+        public Lookout()
+        {
+            MaxLife = 300;
+        }
+    }
+
+    /// <summary>A Paladin of a map's own that sets its level, which a hero does not declare.</summary>
+    public class Veteran : Moonwell.Objects.Human.Units.Paladin
+    {
+        public Veteran()
+        {
+            Level = 3;
+        }
+    }
+
+    /// <summary>A Footman of a map's own that sets its shared fields by their live names.</summary>
+    public class Commander : Moonwell.Objects.Human.Units.Footman
+    {
+        public Commander()
+        {
+            Name = "Commander";
+            MaxMana = 300.9f;
+            Mana = 100;
+            Level = 4;
+            Scale = 1.25f;
+            FlyHeight = 50f;
+            Tooltip = Name + " leads";
+        }
+    }
+
+    /// <summary>A Potion of Healing of a map's own with more charges.</summary>
+    public class BigPotion : Moonwell.Objects.Items.PotionOfHealing
+    {
+        public BigPotion()
+        {
+            Charges = 3;
         }
     }
 
@@ -81,11 +199,13 @@ namespace Moonwell.Objects.Tests
         public StandardClassesTests()
         {
             StandardValues.Read = null;
+            StandardValues.HeroBonus = null;
         }
 
         public void Dispose()
         {
             StandardValues.Read = null;
+            StandardValues.HeroBonus = null;
         }
 
         private static Dictionary<string, JsonElement> ReadValues()
@@ -128,8 +248,9 @@ namespace Moonwell.Objects.Tests
         {
             var paladin = new Moonwell.Objects.Human.Units.Paladin();
 
-            Assert.Equal(int.Parse(Base("Hpal", "uhpm")), paladin.HitPoints);
-            Assert.Equal(100, paladin.HitPoints);
+            // With no build, a hero's bonus of each attribute is 0: its life is its base.
+            Assert.Equal(int.Parse(Base("Hpal", "uhpm")), paladin.MaxLife);
+            Assert.Equal(100, paladin.MaxLife);
             Assert.Equal("Paladin", paladin.Name);
             Assert.Equal(AttackType.Hero, paladin.AttackType);
             Assert.Equal(
@@ -150,9 +271,128 @@ namespace Moonwell.Objects.Tests
         {
             var sentinel = new Sentinel();
 
-            Assert.Equal(900, sentinel.HitPoints);
+            Assert.Equal(900, sentinel.MaxLife);
             Assert.Equal(new[] { "uhpm" }, DeclaredOf(sentinel).Keys);
             Assert.Equal(900, DeclaredOf(sentinel)["uhpm"]);
+        }
+
+        [Fact]
+        public void a_shared_field_set_by_its_live_name_is_declared_and_read_back_in_its_fields_type()
+        {
+            var commander = new Commander();
+
+            Assert.Equal("Commander", commander.Name);
+            Assert.Equal(300f, commander.MaxMana);
+            Assert.Equal(100f, commander.Mana);
+            Assert.Equal(4, commander.Level);
+            Assert.Equal(1.25f, commander.Scale);
+            Assert.Equal(50f, commander.FlyHeight);
+            Assert.Equal("Commander leads", commander.Tooltip);
+            Assert.Equal(new[] { "ulev", "umpi", "umpm", "umvh", "unam", "usca", "utip" }, DeclaredOf(commander).Keys.OrderBy(k => k, StringComparer.Ordinal));
+            // A float put into an int field is truncated, as the live setter does.
+            Assert.Equal(300, DeclaredOf(commander)["umpm"]);
+            Assert.Equal(3, new BigPotion().Charges);
+            Assert.Equal(3, DeclaredOf(new BigPotion())["iuse"]);
+        }
+
+        [Fact]
+        public void a_heros_life_reads_the_total()
+        {
+            StandardValues.HeroBonus = () => (25f, 15f);
+
+            Assert.Equal(100 + (22 * 25), new Moonwell.Objects.Human.Units.Paladin().MaxLife);
+            Assert.Equal(100 + (30 * 25), new Scholarly().MaxLife);
+            Assert.Equal(0 + (20 * 15), new Scholarly().MaxMana);
+            Assert.Empty(new Scholarly().Totals);
+        }
+
+        [Fact]
+        public void a_heros_life_set_is_the_total_whatever_the_order()
+        {
+            StandardValues.HeroBonus = () => (25f, 15f);
+
+            foreach (var hero in new Moonwell.Objects.StandardHero[] { new LifeThenStrength(), new StrengthThenLife() })
+            {
+                Assert.Equal(800, hero.Totals["uhpm"]);
+                Assert.Equal(800, hero.MaxLife);
+                Assert.Equal(30, hero.Strength);
+                Assert.False(hero.Declared.ContainsKey("uhpm"));
+            }
+        }
+
+        [Fact]
+        public void life_plus_200_on_a_hero_adds_200_to_the_total()
+        {
+            StandardValues.HeroBonus = () => (25f, 15f);
+
+            var stalwart = new Stalwart();
+
+            Assert.Equal(100 + (22 * 25) + 200, stalwart.Totals["uhpm"]);
+            Assert.Equal(850, stalwart.MaxLife);
+            Assert.Empty(stalwart.Declared);
+        }
+
+        [Fact]
+        public void a_heros_mana_starts_with_its_intelligence_up_to_its_most()
+        {
+            StandardValues.HeroBonus = () => (25f, 15f);
+
+            // The Paladin's base mana is 0 and its starting mana 100: 17 intelligence add 255 to each, and it starts full.
+            var paladin = new Moonwell.Objects.Human.Units.Paladin();
+            Assert.Equal(255, paladin.MaxMana);
+            Assert.Equal(255, paladin.Mana);
+            Assert.Equal(100, new Drained().Mana);
+            Assert.Equal(100, new Drained().Totals["umpm"]);
+        }
+
+        [Fact]
+        public void a_heros_mana_put_above_its_most_reads_its_most()
+        {
+            StandardValues.HeroBonus = () => (25f, 15f);
+
+            Assert.Equal(300, new Overfull().Mana);
+            Assert.Equal(300, new Overfull().MaxMana);
+        }
+
+        [Fact]
+        public void a_classs_own_default_object_read_in_its_constructor_throws_with_what_to_read()
+        {
+            var error = Assert.Throws<MoonwellException>(() => new ReadsOwnDefault());
+            var byClass = Assert.Throws<MoonwellException>(() => Moonwell.Unit.Default<ReadsOwnClassDefault>());
+
+            Assert.Equal("ReadsOwnDefault's default object is read while its constructor runs; read the field itself", error.Message);
+            Assert.Equal("ReadsOwnClassDefault's default object is read while its constructor runs; read the field itself", byClass.Message);
+        }
+
+        [Fact]
+        public void a_classs_default_object_asked_first_from_an_object_is_the_classs()
+        {
+            var first = new Lookout().Default;
+
+            Assert.IsType<Lookout>(first);
+            Assert.Equal(300f, first.MaxLife);
+            Assert.Same(first, Moonwell.Unit.Default<Lookout>());
+        }
+
+        [Fact]
+        public void a_heros_level_in_its_constructor_throws()
+        {
+            var error = Assert.Throws<InvalidOperationException>(() => new Veteran());
+
+            Assert.Equal("a hero starts at level 1; its level is not declared", error.Message);
+            // Its standard class sets its unit level by id, and the hero reads level 1.
+            Assert.Equal(1, new Moonwell.Objects.Human.Units.Paladin().Level);
+        }
+
+        [Fact]
+        public void a_declared_class_reaches_every_field_of_its_default_object()
+        {
+            var squire = Moonwell.Unit.Default<Squire>();
+
+            Assert.Same(squire, squire.Default);
+            Assert.Equal("Paladin", squire.Default.Name);
+            Assert.Equal(squire.GoldCost, squire.Default.GoldCost);
+            Assert.True(squire.Default.IsGone);
         }
 
         [Fact]
@@ -160,7 +400,7 @@ namespace Moonwell.Objects.Tests
         {
             var error = Assert.Throws<FieldRuleException>(() => new Giant());
 
-            Assert.Equal("Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it", error.Message);
+            Assert.Equal("Giant.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it", error.Message);
         }
 
         [Fact]
@@ -192,7 +432,7 @@ namespace Moonwell.Objects.Tests
         [Fact]
         public void a_standard_class_that_cannot_be_made_by_itself_is_an_error_that_names_it()
         {
-            var error = Assert.Throws<InvalidOperationException>(() => new FromUnmade().HitPoints);
+            var error = Assert.Throws<InvalidOperationException>(() => new FromUnmade().MaxLife);
 
             Assert.StartsWith("Moonwell.Objects.Tests.Unmade, a standard class, could not be made by itself to count the values its constructor sets: ", error.Message);
         }
@@ -208,7 +448,7 @@ namespace Moonwell.Objects.Tests
             var parse = typeof(StandardValues).GetMethod("Parse", BindingFlags.Static | BindingFlags.NonPublic)!;
             var rulesType = typeof(RuleChecks).GetNestedType("Rules", BindingFlags.NonPublic)!;
             var check = typeof(RuleChecks).GetMethod("Check", BindingFlags.Static | BindingFlags.NonPublic)!;
-            var rulesOf = new Dictionary<PropertyInfo, object>();
+            var rulesOf = new Dictionary<object, object>();
             var broken = new List<string>();
             var checkedValues = 0;
             foreach (var type in Objects.GetTypes().Where(type => type.GetCustomAttribute<StandardAttribute>(false) != null))
@@ -226,25 +466,43 @@ namespace Moonwell.Objects.Tests
                     }
                 }
 
+                var shared = SharedFieldsOf(type);
                 foreach (var (key, text) in AllValues.Value[id])
                 {
                     var colon = key.IndexOf(':');
-                    var (property, field) = properties[colon < 0 ? key : key.Substring(0, colon)];
+                    var fieldId = colon < 0 ? key : key.Substring(0, colon);
                     int? level = colon < 0 ? null : int.Parse(key.Substring(colon + 1));
-                    var generic = property.PropertyType.IsGenericType ? property.PropertyType.GetGenericTypeDefinition() : null;
-                    if (generic == typeof(ObjectList<>) || generic == typeof(ObjectRef<>))
+                    object? rules;
+                    Type element;
+                    if (shared.TryGetValue(fieldId, out var one))
                     {
-                        // A list's only rule is its count, which [BeyondLimits] lifts.
-                        continue;
+                        // A shared field's rules are on its kind base's [SharedField], as a class that lifts its member has them.
+                        if (!rulesOf.TryGetValue(one.Shared, out rules))
+                        {
+                            rulesOf[one.Shared] = rules = Activator.CreateInstance(rulesType, "Lifted", one.Shared, true)!;
+                        }
+
+                        element = one.Held;
+                    }
+                    else
+                    {
+                        var (property, field) = properties[fieldId];
+                        var generic = property.PropertyType.IsGenericType ? property.PropertyType.GetGenericTypeDefinition() : null;
+                        if (generic == typeof(ObjectList<>) || generic == typeof(ObjectRef<>))
+                        {
+                            // A list's only rule is its count, which [BeyondLimits] lifts.
+                            continue;
+                        }
+
+                        if (!rulesOf.TryGetValue(property, out rules))
+                        {
+                            // The rules as a class that lifts the property has them (lifted: true).
+                            rulesOf[property] = rules = Activator.CreateInstance(rulesType, "Lifted", property, field, true)!;
+                        }
+
+                        element = generic == typeof(Levels<>) ? property.PropertyType.GetGenericArguments()[0] : property.PropertyType;
                     }
 
-                    if (!rulesOf.TryGetValue(property, out var rules))
-                    {
-                        // The rules as a class that lifts the property has them (lifted: true).
-                        rulesOf[property] = rules = Activator.CreateInstance(rulesType, "Lifted", property, field, true)!;
-                    }
-
-                    var element = generic == typeof(Levels<>) ? property.PropertyType.GetGenericArguments()[0] : property.PropertyType;
                     var value = parse.MakeGenericMethod(element).Invoke(null, new object?[] { text });
                     try
                     {
@@ -261,6 +519,39 @@ namespace Moonwell.Objects.Tests
 
             Assert.True(broken.Count == 0, broken.Count + " standard values break a rule [BeyondLimits] does not lift:\n" + string.Join("\n", broken.Take(40)));
             Assert.True(checkedValues > 100000, checkedValues + " values");
+        }
+
+        // The declared values of an object of a generated class, its kind base's protected Fields.
+        private static Declared FieldsOf(object made)
+        {
+            for (var type = made.GetType(); type != null; type = type.BaseType)
+            {
+                var property = type.GetProperty("Fields", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+                if (property != null)
+                {
+                    return (Declared)property.GetValue(made)!;
+                }
+            }
+
+            throw new InvalidOperationException(made.GetType() + " has no Fields");
+        }
+
+        // The shared fields of a standard class by id:the [SharedField] of its kind base and the type its table says the field holds.
+        private static Dictionary<string, (SharedFieldAttribute Shared, Type Held)> SharedFieldsOf(Type type)
+        {
+            var held = (IReadOnlyDictionary<string, Type>?)null;
+            for (var chain = type; chain != null && held == null; chain = chain.BaseType)
+            {
+                held = (IReadOnlyDictionary<string, Type>?)chain.GetField("fieldTypes", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)?.GetValue(null);
+            }
+
+            var shared = new Dictionary<string, (SharedFieldAttribute, Type)>(StringComparer.Ordinal);
+            foreach (var attribute in type.GetCustomAttributes<SharedFieldAttribute>(true))
+            {
+                shared[attribute.Id] = (attribute, held![attribute.Id]);
+            }
+
+            return shared;
         }
 
         // Every value of every standard object, under the base tables and each balance set (a set's empty text is no value), by id.
@@ -305,7 +596,7 @@ namespace Moonwell.Objects.Tests
             Assert.Equal(270, new Squire().Speed);
             Assert.Equal(270, new Moonwell.Objects.Human.Units.Paladin().Speed);
             // The set has no value for the Paladin's hit points: the base tables' value is not used either.
-            Assert.Equal(0, new Squire().HitPoints);
+            Assert.Equal(0, new Squire().MaxLife);
             Assert.Equal(new object[] { typeof(Moonwell.Objects.Human.Abilities.Defend) }, new Sentinel().Abilities.Entries);
             Assert.Equal(new object[] { typeof(Moonwell.Objects.Human.Abilities.Defend) }, new Sentinel().Abilities.Standard);
             Assert.Empty(DeclaredOf(new Squire()));
@@ -356,15 +647,26 @@ namespace Moonwell.Objects.Tests
                     }
                 }
 
+                var shared = SharedFieldsOf(type);
                 foreach (var value in Values.Value[id].EnumerateObject())
                 {
                     var colon = value.Name.IndexOf(':');
                     var field = colon < 0 ? value.Name : value.Name.Substring(0, colon);
                     var level = colon < 0 ? 0 : int.Parse(value.Name.Substring(colon + 1));
                     var text = value.Value.GetString()!;
+                    var where = $"{type.FullName} ({id}) {value.Name}";
+                    if (shared.TryGetValue(field, out var sharedField))
+                    {
+                        // A shared field has no property: its base value is in the declared values (a hero's live member reads a total).
+                        var stored = typeof(Declared).GetMethod("Get")!.MakeGenericMethod(sharedField.Held).Invoke(FieldsOf(made), new[] { made, field });
+                        var expectedShared = parse.MakeGenericMethod(sharedField.Held).Invoke(null, new object?[] { text });
+                        Assert.True(Equals(expectedShared, stored), $"{where}: {stored}, not {expectedShared}");
+                        checkedValues++;
+                        continue;
+                    }
+
                     var property = properties[field];
                     var read = property.GetValue(made);
-                    var where = $"{type.FullName} ({id}) {value.Name}";
                     var generic = property.PropertyType.IsGenericType ? property.PropertyType.GetGenericTypeDefinition() : null;
                     if (generic == typeof(ObjectList<>))
                     {
@@ -410,7 +712,7 @@ namespace Moonwell.Objects.Tests
         }
     }
 
-    /// <summary>The tests that set <see cref="StandardValues.Read"/>, a static, run one after another.</summary>
+    /// <summary>The tests that set <see cref="StandardValues.Read"/> or <see cref="StandardValues.HeroBonus"/>, statics, or read a hero's totals, run one after another.</summary>
     [CollectionDefinition(Name)]
     public class StandardValuesCollection
     {

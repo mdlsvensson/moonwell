@@ -65,7 +65,7 @@ public sealed class Champion : Human.Units.Paladin
     public Champion()
     {
         Name = "Champion";
-        HitPoints = HitPoints + 200;
+        MaxLife = MaxLife + 200;
         HeroAbilities.Replace<Human.Abilities.HolyLight, Smite>();
         Components.Add(new KillCounter());
     }
@@ -86,18 +86,34 @@ public sealed class Champion : Human.Units.Paladin
 - `AttackType` and `DefenseType` are core Moonwell's (`Moonwell.AttackType`), shared with the damage package, and keep
   their names in the game. A file writes them with `using Moonwell;`; a name of the old `Moonwell.Objects.AttackType`
   is error MW0011.
-- A declared field that a `Unit`, `Hero` or `Item` also has as a live value is named apart: `ManaPoints` (the unit's
-  `Mana` in the game), `UnitLevel` (`Level`), `ScalingValue` (`Scale`; a doodad keeps `Scale`), `StartingStrength`,
-  `StartingAgility` and `StartingIntelligence` (`Strength`, ...) and, on an item, `NumberOfCharges` (`Charges`). Six
-  ability fields are named apart as well: `Inferno.InfernalDuration`, `Taunt.PreferHostiles` and `PreferFriendlies`,
-  `WindWalk.BackstabDamage` and `Backstab`, `HealingModifier.HealingPercent`.
+- A field that a `Unit`, `Hero` or `Item` also has as a live value has one name for both. In the constructor it sets
+  what every object of the class starts with; anywhere else it is this object (`MaxLife += 10` in `OnKill`). The
+  names are `MaxLife`, `MaxMana`, `Mana` (what it starts with), `Scale`, `FlyHeight` and `Name` on a unit and hero,
+  `Level` on a unit that is not a hero, `Strength`, `Agility` and `Intelligence` on a hero, and `Charges` on an item.
+  They were `HitPoints`, `ManaPoints`, `ManaInitialAmount`, `ScalingValue`, `Height`, `UnitLevel`,
+  `StartingStrength`, `StartingAgility`, `StartingIntelligence` and `NumberOfCharges`, which are gone. Outside the
+  constructor the old names read the declared value; write `Default.MaxLife` (`Default.Name`) for that. An item's `Level`,
+  `Scale` and `HitPoints`, a doodad's `Scale` and a destructable's `HitPoints` keep their names, and six ability fields are
+  named apart: `Inferno.InfernalDuration`, `Taunt.PreferHostiles` and `PreferFriendlies`, `WindWalk.BackstabDamage` and
+  `Backstab`, `HealingModifier.HealingPercent`.
+- A field with no live value (`Model`, `Tooltip`, `GoldCost`) keeps World Editor's name, is set only in the constructor,
+  and reads the declared value anywhere.
+- A hero's `MaxLife`, `MaxMana` and `Mana` in its constructor are the totals it starts with: `MaxLife = 800` starts a
+  Paladin at 800 life. The build takes off what its starting strength and intelligence give (25 life per strength and
+  15 mana per intelligence, or the map's own in `war3mapMisc.txt`) and writes the rest as the base field. A total the
+  attributes alone pass fails the build with its line: `Champion.MaxLife is 400; its 30 strength already give 750
+  (751 at least)`. A hero class that sets `Strength` but not `MaxLife` keeps its base, so its life follows the strength.
+  A hero starts at level 1: `Level = ...` or `Set("ulev", ...)` in a hero's constructor is error MW0012; use `SetLevel`
+  in the game. A unit's `Level` is set only in its declared class's constructor, since the game has no setter: anywhere
+  else it is error MW0015, and a build error too.
 - A list takes `Set<A, B, C>()` (the whole list, in order), `Replace<Old, New>()` (in the old one's place), `Add<T>()`
   and `Remove<T>()`.
 - The tooltips are World Editor's four: `Tooltip` (Tooltip - Normal), `TooltipExtended` (Tooltip - Normal - Extended),
   `TooltipLearn` (Tooltip - Learn) and `TooltipLearnExtended` (Tooltip - Learn - Extended).
 - A field with no name of its own is set by its id: `Set("Htb1", 2, 250f)`.
-- A constructor may compute, but must not call the game: the build fails at such a line. A live value or action of the
-  unit, hero or item there (`Mana = 300`, `Kill()`) is error MW0012, which names the declared field to set instead.
+- A constructor may compute, but must not call the game: the build fails at such a line. A live member with no declared
+  field there (`Life = 300`, `Kill()`, `X`) is error MW0012, which says what to set instead where there is one: a unit
+  starts with full life, so set `MaxLife`.
 - A class with no `[ObjectId]` is error MW0013, and the build names a free id to use. A buff also names its carrier,
   the hidden ability that shows its icon: `[ObjectId("B001", Carrier = "A002")]`, or `[ObjectId(Carrier = "A002")]`
   with `[Replaces]`. An id is four characters, and only a hero's starts with an upper-case letter (MW0014).
@@ -109,10 +125,10 @@ Each value a class sets is checked against World Editor's limits. One outside th
 a constant is marked in the editor as error MW0009:
 
 ```
-Heroes/Giant.cs:12: Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it
+Heroes/Giant.cs:12: Giant.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it
 ```
 
-`[BeyondLimits(nameof(HitPoints))]` on the class goes past a range on purpose. It lifts ranges, lengths and counts
+`[BeyondLimits(nameof(MaxLife))]` on the class goes past a range on purpose. It lifts ranges, lengths and counts
 only: an empty name, a negative on a field the game never lets go below 0, and a choice that is none of the enum's
 values still fail. The values a standard class has are the game's, and are never checked.
 
@@ -120,6 +136,27 @@ To see a standard object's values, go to its class: Go to Definition on `Paladin
 `Moonwell.Objects` embeds in its library, in an editor that navigates to embedded sources (the editors on Microsoft's C#
 language server do). Its constructor sets each value of the base tables, World Editor's
 Default. A map on another data set plays that set's values for the fields it leaves unset.
+
+### The default object and the name
+
+`Default` is the class's declared values as an object, which never changes when the unit does. Every unit, hero and
+item has it, a plain standard unit too: `unit.Default.MaxMana` is 300 whatever this Champion's is now. From the class
+alone it is `Unit.Default<Champion>().MaxMana`: `Unit.Default<T>()` takes a unit class (`Hero.Default<T>()` works too),
+`Item.Default<T>()` an item class. On a declared class `Default` is typed as its kind base (`StandardUnit`,
+`StandardHero` or `StandardItem`), so it holds every field of it (`Default.Model`, `Default.GoldCost`); the class's own
+members come through `Unit.Default<T>()`. Its live actions do nothing. In the class's own constructor the default
+object is what the constructor is making, so `Default` and `Unit.Default<T>()` of the class there are error MW0012:
+read the field itself (`MaxLife`, not `Default.MaxLife`).
+
+`Default` of a type made or changed in World Editor reads its values as World Editor made them; a class of the map with
+its id wins over them.
+
+`unit.Name` reads the game's name, which is in each player's language, so reading it is error MW0002 outside
+`Local.For`; setting it is fine anywhere outside `Local.For`. Reading `Name` in a declared class's constructor, and on
+`Default`, is allowed, and the same on every machine. A local copy of a default (`var d = unit.Default; d.Name`) is
+still MW0002, a false alarm: write `unit.Default.Name`. A hero's `Name` is its type's ("Paladin"). `Hero.ProperName`
+("Arius the Seeker") has no declared value: it is read inside `Local.For` only, set anywhere outside it, and empty on a
+default.
 
 ## Components and reactions
 
@@ -168,9 +205,10 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 | `Life`, `MaxLife`, `Mana`, `MaxMana` | read and set; a `Life` under 0.405 kills, above the most it clamps; the most are whole numbers |
 | `X`, `Y` | read; `MoveTo(x, y)` through the game's pathing, `PlaceAt(x, y)` with none, not even the map's edge |
 | `Facing` | read and set (the unit turns, so a read at once gives the old one); `FaceNow(degrees)` turns at once, a walking unit turns back |
-| `Level` | read; a hero's hero level |
+| `Level` | read; a hero's hero level; a unit's level is set only in its declared class's constructor |
 | `IsAlive`, `Kill()` | whether it lives; kills it, with `OnDeath` run |
 | `IsPaused`, `Scale`, `FlyHeight` | read and set; a paused unit takes no orders but still animates; `Scale` reads its type's scale until set; `FlyHeight` also lifts a ground unit |
+| `Name` | read inside `Local.For` only (each player's language), set anywhere outside it |
 | `Tint(red, green, blue, alpha)` | colours the model, each value clamped to 0-255 |
 | `Order(order)`, `OrderAt(order, x, y)`, `OrderOn(order, target)`, `Stop()` | orders by the game's order string (`"move"`, `"attack"`) |
 | `InventorySize`, `ItemIn(slot)`, `Give(item)`, `Drop(item)` | the inventory; `Give` and `Drop` run the pick-up and drop reactions inside the call; `Give` answers false, with no reaction, for a full inventory; giving an item the unit holds runs a drop and then a pick-up |
@@ -182,6 +220,7 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 | `Strength`, `Agility`, `Intelligence` | the base, read and set |
 | `StrengthWithBonus`, `AgilityWithBonus`, `IntelligenceWithBonus` | with items and auras, read |
 | `SkillPoints` | read and set |
+| `ProperName` | read inside `Local.For` only, set anywhere outside it |
 
 | Item | |
 |---|---|

@@ -240,6 +240,18 @@ namespace Moonwell.Testing
         /// <summary>The tech limits set, keyed by slot, then by type id.</summary>
         private readonly Dictionary<int, Dictionary<int, int>> techMaxes = new Dictionary<int, Dictionary<int, int>>();
 
+        /// <summary>The declared values of each type, keyed by type id, then by field id, as the build's table gives them.</summary>
+        private readonly Dictionary<int, Dictionary<string, object>> typeValues = new Dictionary<int, Dictionary<string, object>>();
+
+        /// <summary>The name of each unit, "" until set.</summary>
+        private readonly Dictionary<unit, string> unitNames = new Dictionary<unit, string>();
+
+        /// <summary>The proper name of each hero, "" until set.</summary>
+        private readonly Dictionary<unit, string> properNames = new Dictionary<unit, string>();
+
+        /// <summary>Whether a call on a unit or an item throws, for a case that checks the runtime makes none.</summary>
+        public bool CallsThrow;
+
         /// <summary>Makes a fresh world for one case and makes it the runtime's world; as the runtime does at its start, it listens for pick-ups and drops.</summary>
         public static FakeWorld Install()
         {
@@ -345,6 +357,29 @@ namespace Moonwell.Testing
         {
             startXs[slot] = x;
             startYs[slot] = y;
+        }
+
+        /// <summary>Sets a declared value of a type, as the build's table holds it.</summary>
+        public void SetTypeValue(int typeId, string field, object value)
+        {
+            if (!typeValues.TryGetValue(typeId, out var values))
+            {
+                values = new Dictionary<string, object>();
+                typeValues[typeId] = values;
+            }
+
+            values[field] = value;
+        }
+
+        /// <summary>A declared value of a type; null when none was set.</summary>
+        public object? TypeValue(int typeId, string field)
+        {
+            if (typeValues.TryGetValue(typeId, out var values) && values.TryGetValue(field, out var value))
+            {
+                return value;
+            }
+
+            return null;
         }
 
         /// <summary>Moves time forward by the seconds, calling Runtime.Wake at each wake request on the way.</summary>
@@ -593,6 +628,7 @@ namespace Moonwell.Testing
         /// <summary>The type id of a unit; 0 once it is removed or vanished.</summary>
         public int UnitTypeId(unit unit)
         {
+            Refuse();
             if (unitTypes.TryGetValue(unit, out var typeId))
             {
                 return typeId;
@@ -604,6 +640,7 @@ namespace Moonwell.Testing
         /// <summary>The type id of an item; 0 once it is removed or vanished.</summary>
         public int ItemTypeId(item item)
         {
+            Refuse();
             if (itemTypes.TryGetValue(item, out var typeId))
             {
                 return typeId;
@@ -669,12 +706,14 @@ namespace Moonwell.Testing
         /// <summary>Whether a unit was made as a hero.</summary>
         public bool IsHero(unit unit)
         {
+            Refuse();
             return heroes.TryGetValue(unit, out var hero) && hero;
         }
 
         /// <summary>The player owning a unit; null for a vanished unit, slot 0 for a unit the world did not make.</summary>
         public player OwnerOf(unit unit)
         {
+            Refuse();
             if (ownerless.Contains(unit))
             {
                 return null!;
@@ -842,6 +881,15 @@ namespace Moonwell.Testing
 
         /// <summary>The id of Crow Form (Amrf), whose adding and removing lets a ground unit show a fly height.</summary>
         public static readonly int CrowForm = ObjectTypes.FourCC("Amrf");
+
+        /// <summary>Throws when CallsThrow is set: the runtime called the game about a unit or an item.</summary>
+        private void Refuse()
+        {
+            if (CallsThrow)
+            {
+                throw new ExpectationFailed("the runtime called the game about a unit or an item");
+            }
+        }
 
         /// <summary>Counts a call on an item the world has removed.</summary>
         private void NoteGoneItem(item item)
@@ -1379,6 +1427,36 @@ namespace Moonwell.Testing
             NoteGone(unit);
             ScaleCalls++;
             scales[unit] = scale;
+        }
+
+        /// <summary>The name of a unit; "" until set.</summary>
+        public string UnitNameOf(unit unit)
+        {
+            NoteGone(unit);
+            return !vanishedUnits.Contains(unit) && unitNames.TryGetValue(unit, out var name) ? name : "";
+        }
+
+        /// <summary>Sets the name of a unit, and records a "rename".</summary>
+        public void RenameUnit(unit unit, string name)
+        {
+            NoteGone(unit);
+            UnitCalls.Add("rename");
+            unitNames[unit] = name;
+        }
+
+        /// <summary>The proper name of a hero; "" until set.</summary>
+        public string ProperNameOf(unit hero)
+        {
+            NoteGone(hero);
+            return !vanishedUnits.Contains(hero) && properNames.TryGetValue(hero, out var name) ? name : "";
+        }
+
+        /// <summary>Sets the proper name of a hero, and records a "proper-name".</summary>
+        public void SetProperName(unit hero, string name)
+        {
+            NoteGone(hero);
+            HeroCalls.Add("proper-name " + name);
+            properNames[hero] = name;
         }
 
         /// <summary>Keeps the four values a unit was tinted with.</summary>

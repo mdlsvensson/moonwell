@@ -24,6 +24,11 @@ namespace Moonwell.Generator.Objects;
 /// 1, which its property reads. Both id forms are internal to Moonwell.Objects: a map names classes.
 /// </para>
 /// <para>
+/// A shared field (<see cref="SharedFields"/>) is set by its live name (<c>MaxMana = 300;</c>), which puts it while the
+/// object has no handle, except a hero's most life, most mana, starting mana and level: <c>Set("uhpm", 100);</c>, since
+/// the hero's live members read and put the totals it starts with, and its level is not declared.
+/// </para>
+/// <para>
 /// What a standard class sets is not declared by a map: Moonwell.Objects keeps it apart, never checks it and never
 /// writes it as a change, and the build reads the map's data set for a field the map leaves unset.
 /// </para>
@@ -121,7 +126,7 @@ public sealed class StandardConstructors
                 // A flags choice of no flags is 0, which C# converts to any enum; in Levels(...) or Set the cast stays, as it gives the type.
                 var value = field.Type == FieldType.Choice && field.Choice!.Flags && ChoiceNumber(field.Choice, text) == 0
                     && !field.Choice.Members.Any(member => member.Value == 0) ? "0" : Value(field, text);
-                lines.Add($"{field.Name} = {value};");
+                lines.Add(obj.IsHero && SharedFields.HeroSetsById(field.Id) ? $"Set({Text(field.Id)}, {value});" : $"{field.Name} = {value};");
             }
 
             return;

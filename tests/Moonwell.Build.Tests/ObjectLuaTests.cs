@@ -1,7 +1,11 @@
 using System.Globalization;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text;
 using System.Text.RegularExpressions;
+using War3Net.Build.Extensions;
+using War3Net.Build.Object;
+using War3Net.Build.Script;
 using Xunit;
 
 namespace Moonwell.Build.Tests
@@ -19,13 +23,216 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void declared_value_reads_in_lua()
         {
-            var paladin = int.Parse(compiled.Standard.Value("Hpal", "uhpm", 0, null)!, CultureInfo.InvariantCulture);
+            var paladin = int.Parse(compiled.Standard.Value("Hpal", "ugol", 0, null)!, CultureInfo.InvariantCulture);
 
             var run = compiled.Run();
 
             Assert.Empty(run.Errors);
-            // Damage is a float, so Lua prints it with its point (C18).
-            Assert.Contains($"objects: {2 * paladin} 200.0", run.Lines);
+            // Damage is a float, so Lua prints it with its point (C18); so is a unit's MaxLife, Arthas's doubled total.
+            Assert.Contains($"objects: {2 * paladin} 200.0 1300.0", run.Lines);
+        }
+
+        [Fact]
+        public void declared_shared_value_reads_in_lua()
+        {
+            using var lua = compiled.Start();
+
+            // The Paladin's total life is 100 + 22 * 25, which Arthas doubles; his mana starts full at 0 + 17 * 15. The values are
+            // the totals the build wrote, read through the kind base's hooks with no handle.
+            Assert.Equal("1300.0 255.0 1300.0 Arthas", Query(lua, "return Objects.Report.Shared()"));
+            Assert.Equal("1300.0 Arthas", Query(lua, "local a = Objects.Arthas(); return tostring(a:getMaxLife()) .. ' ' .. a:getName()"));
+            Assert.Equal("1300.0 Dark Arthas", Query(lua, "local a = Objects.DarkArthas(); return tostring(a:getMaxLife()) .. ' ' .. a:getName()"));
+            Assert.Equal("600.0", Query(lua, "return tostring(Objects.StrongFootman():getMaxLife())"));
+            Assert.Contains("[\"uhpm\"] = 1300", Regex.Match(CompiledObjects.ValuesOf(compiled.Script), "\\[\"Objects\\.Arthas\"\\] = \\{[^\\n]*").Value);
+        }
+
+        [Fact]
+        public void the_default_object_is_the_same_object_from_a_unit_and_from_its_class()
+        {
+            using var lua = compiled.Start();
+
+            Assert.True(Truth(lua, "return Objects.Report.SameDefault()"));
+            Assert.True(Truth(lua, "return System.is(Moonwell.Widget.Default(Objects.Arthas), Objects.Arthas)"));
+        }
+
+        [Fact]
+        public void shared_members_in_a_constructor_call_no_native_in_lua()
+        {
+            using var lua = compiled.Start();
+
+            // Every global the game would give is logged from here: a native called with no handle would show.
+            lua.DoString("natives = {}; setmetatable(_G, { __index = function(_, name) return function() natives[#natives + 1] = name; return nil end end })");
+            lua.DoString("for _, id in ipairs({ 'H001', 'H002', 'hfoo' }) do Moonwell.ObjectTypes.UnitMaker(Moonwell.ObjectTypes.FourCC(id))() end");
+
+            Assert.Equal(string.Empty, Query(lua, "return table.concat(natives, ',')"));
+        }
+
+        [Fact]
+        public void type_values_are_written_when_the_map_reads_default()
+        {
+            // Report reads Default, MaxLife, Mana and Name: every unit and hero type has those fields, a hero its totals, and a map's class its own values.
+            var values = compiled.Script.Substring(compiled.Script.LastIndexOf("MoonwellTypeValues = {", StringComparison.Ordinal));
+
+            Assert.Contains($"[{ObjectLua.FourCC("H001")}] = {{ [\"uhpm\"] = 1300, [\"umpi\"] = 255, [\"unam\"] = \"Arthas\" }}", values);
+            Assert.Contains($"[{ObjectLua.FourCC("hfoo")}] = {{ [\"uhpm\"] = 600, [\"umpi\"] = 0, [\"unam\"] = \"Footman\" }}", values);
+            Assert.Contains($"[{ObjectLua.FourCC("Hamg")}] = {{ [\"uhpm\"] = 450, [\"umpi\"] = 285, [\"unam\"] = \"Archmage\" }}", values);
+            // No item field is read.
+            Assert.DoesNotContain($"[{ObjectLua.FourCC("ratf")}] =", values);
+            Assert.DoesNotContain("umpm", values);
+        }
+
+        [Fact]
+        public void a_plain_footmans_default_reads_its_standard_value()
+        {
+            using var lua = compiled.Start();
+
+            // The Objects map's StrongFootman replaces the footman; the knight and the archmage have no class of the map's. A unit
+            // the game made has its type id and a plain class; its default object has neither handle nor class of the map's.
+            Assert.Equal("885.0 Knight", Query(lua, "local u = Moonwell.Unit(); u.TypeId = Moonwell.ObjectTypes.FourCC('hkni'); return Objects.Report.DefaultOf(u)"));
+            Assert.Equal("450.0 Archmage", Query(lua, "local h = Moonwell.Hero(); h.TypeId = Moonwell.ObjectTypes.FourCC('Hamg'); return Objects.Report.DefaultOf(h)"));
+            Assert.Equal("600.0 Footman", Query(lua, "local u = Moonwell.Unit(); u.TypeId = Moonwell.ObjectTypes.FourCC('hfoo'); return Objects.Report.DefaultOf(u)"));
+        }
+
+        [Fact]
+        public void type_values_read_the_types_the_map_makes_or_changes_in_world_editor()
+        {
+            // World Editor changed the knight and made a recruit (a footman with a name only) and a hero on the paladin; it also
+            // has H001 and hfoo, which the map's Arthas and StrongFootman declare. The skin file holds the names.
+            using var folders = new TestFolders();
+            var map = folders.TemporaryFolderOutsideRepository();
+            var main = new UnitObjectData(ObjectDataFormatVersion.v3);
+            main.BaseUnits.Add(WorldEditorObject("hkni", string.Empty, Mod("uhpm", 500)));
+            main.BaseUnits.Add(WorldEditorObject("hfoo", string.Empty, Mod("uhpm", 1)));
+            main.NewUnits.Add(WorldEditorObject("hfoo", "h00R"));
+            main.NewUnits.Add(WorldEditorObject("Hpal", "H00A", Mod("uhpm", 200), Mod("umpi", 1000)));
+            main.NewUnits.Add(WorldEditorObject("Hpal", "H001", Mod("uhpm", 1)));
+            var skin = new UnitObjectData(ObjectDataFormatVersion.v3);
+            skin.BaseUnits.Add(WorldEditorObject("hkni", string.Empty, Mod("unam", "Edited Knight")));
+            skin.NewUnits.Add(WorldEditorObject("hfoo", "h00R", Mod("unam", "Recruit")));
+            skin.NewUnits.Add(WorldEditorObject("Hpal", "H001", Mod("unam", "Old name")));
+            WriteUnits(Path.Combine(map, "war3map.w3u"), main);
+            WriteUnits(Path.Combine(map, "war3mapSkin.w3u"), skin);
+
+            var values = TypeValuesOf(ObjectLua.Values(compiled.Script, compiled.Declarations, NamedIds(), compiled.Standard, null, MapTypes.Read(map, null, compiled.Standard)));
+
+            Assert.Contains($"[{ObjectLua.FourCC("hkni")}] = {{ [\"uhpm\"] = 500, [\"umpi\"] = 0, [\"unam\"] = \"Edited Knight\" }}", values);
+            // A new type reads its base's standard values where it changes none: the standard footman's, not StrongFootman's.
+            Assert.Contains($"[{ObjectLua.FourCC("h00R")}] = {{ [\"uhpm\"] = 420, [\"umpi\"] = 0, [\"unam\"] = \"Recruit\" }}", values);
+            // The hero's life is its total, 200 + 22 * 25; its mana starts at most at its most mana, 0 + 17 * 15.
+            Assert.Contains($"[{ObjectLua.FourCC("H00A")}] = {{ [\"uhpm\"] = 750, [\"umpi\"] = 255, [\"unam\"] = \"Paladin\" }}", values);
+            // The map's classes win over World Editor's objects of their ids.
+            Assert.Contains($"[{ObjectLua.FourCC("H001")}] = {{ [\"uhpm\"] = 1300, [\"umpi\"] = 255, [\"unam\"] = \"Arthas\" }}", values);
+            Assert.Contains($"[{ObjectLua.FourCC("hfoo")}] = {{ [\"uhpm\"] = 600, [\"umpi\"] = 0, [\"unam\"] = \"Footman\" }}", values);
+            Assert.Contains($"[{ObjectLua.FourCC("hpea")}] = {{ [\"uhpm\"] = 240, [\"umpi\"] = 0, [\"unam\"] = \"Peasant\" }}", values);
+        }
+
+        [Fact]
+        public void type_values_read_world_editor_items_and_reals()
+        {
+            // Fields of a kind the Objects map does not read: an item's charges, a unit's scale (a real in the object file).
+            using var folders = new TestFolders();
+            var map = folders.TemporaryFolderOutsideRepository();
+            var units = new UnitObjectData(ObjectDataFormatVersion.v3);
+            units.NewUnits.Add(WorldEditorObject("hkni", "h00S"));
+            var unitSkin = new UnitObjectData(ObjectDataFormatVersion.v3);
+            unitSkin.NewUnits.Add(WorldEditorObject("hkni", "h00S", new SimpleObjectDataModification { Id = IdOf("usca"), Type = ObjectDataType.Real, Value = 2f }));
+            var items = new ItemObjectData(ObjectDataFormatVersion.v3);
+            items.BaseItems.Add(WorldEditorObject("ratf", string.Empty, Mod("iuse", 3)));
+            items.NewItems.Add(WorldEditorObject("ratf", "I000"));
+            WriteUnits(Path.Combine(map, "war3map.w3u"), units);
+            WriteUnits(Path.Combine(map, "war3mapSkin.w3u"), unitSkin);
+            using (var stream = File.Create(Path.Combine(map, "war3map.w3t")))
+            using (var writer = new BinaryWriter(stream, Encoding.UTF8))
+            {
+                writer.Write(items);
+            }
+
+            var fields = new Dictionary<string, IReadOnlyList<string>>(StringComparer.Ordinal) { ["unit"] = new[] { "usca" }, ["item"] = new[] { "iuse" } };
+            var declarations = compiled.Declarations with { TypeFields = fields };
+
+            var values = TypeValuesOf(ObjectLua.Values(compiled.Script, declarations, NamedIds(), compiled.Standard, null, MapTypes.Read(map, null, compiled.Standard)));
+
+            Assert.Contains($"[{ObjectLua.FourCC("h00S")}] = {{ [\"usca\"] = 2.0 }}", values);
+            Assert.Contains($"[{ObjectLua.FourCC("ratf")}] = {{ [\"iuse\"] = 3 }}", values);
+            Assert.Contains($"[{ObjectLua.FourCC("I000")}] = {{ [\"iuse\"] = 0 }}", values);
+        }
+
+        [Fact]
+        public void type_values_read_world_editors_own_save_with_its_trigger_strings()
+        {
+            // World Editor keeps the new peasant's name in war3map.wts, as TRIGSTR_012.
+            var fixture = TestFolders.Fixture("WorldEditorObjects");
+            TriggerStrings strings;
+            using (var reader = new StreamReader(Path.Combine(fixture, "war3map.wts")))
+            {
+                strings = reader.ReadTriggerStrings();
+            }
+
+            var types = MapTypes.Read(fixture, strings, compiled.Standard);
+
+            var values = TypeValuesOf(ObjectLua.Values(compiled.Script, compiled.Declarations, NamedIds(), compiled.Standard, null, types));
+            Assert.Contains($"[{ObjectLua.FourCC("h000")}] = {{ [\"uhpm\"] = 240, [\"umpi\"] = 0, [\"unam\"] = \"Unit\" }}", values);
+            var item = Assert.Single(types, one => one.Id == "I000");
+            Assert.Equal(("item", "ratf", (object?)"Item"), (item.Kind, item.Root, item.Changed["unam"]));
+        }
+
+        [Fact]
+        public void a_trigger_string_reference_to_no_string_stays_as_it_is()
+        {
+            using var folders = new TestFolders();
+            var map = folders.TemporaryFolderOutsideRepository();
+            var skin = new UnitObjectData(ObjectDataFormatVersion.v3);
+            skin.NewUnits.Add(WorldEditorObject("hfoo", "h00R", Mod("unam", "TRIGSTR_999")));
+            WriteUnits(Path.Combine(map, "war3mapSkin.w3u"), skin);
+            var strings = new TriggerStrings();
+            strings.Strings.Add(new TriggerString { Key = 12, Value = "Unit" });
+
+            var recruit = Assert.Single(MapTypes.Read(map, strings, compiled.Standard));
+
+            Assert.Equal("TRIGSTR_999", recruit.Changed["unam"]);
+        }
+
+        [Fact]
+        public void a_standard_class_reads_its_type_as_world_editor_changed_it()
+        {
+            // The map's code names Rifleman, and Paladin and Footman as bases of its classes; World Editor changed all three types.
+            using var folders = new TestFolders();
+            var map = folders.TemporaryFolderOutsideRepository();
+            var main = new UnitObjectData(ObjectDataFormatVersion.v3);
+            main.BaseUnits.Add(WorldEditorObject("hrif", string.Empty, Mod("uhpm", 777)));
+            main.BaseUnits.Add(WorldEditorObject("Hpal", string.Empty, Mod("uhpm", 300)));
+            main.BaseUnits.Add(WorldEditorObject("hfoo", string.Empty, Mod("uhpm", 1)));
+            var skin = new UnitObjectData(ObjectDataFormatVersion.v3);
+            skin.BaseUnits.Add(WorldEditorObject("hrif", string.Empty, Mod("unam", "Edited Rifleman")));
+            WriteUnits(Path.Combine(map, "war3map.w3u"), main);
+            WriteUnits(Path.Combine(map, "war3mapSkin.w3u"), skin);
+
+            var values = CompiledObjects.ValuesOf(ObjectLua.Values(compiled.Script, compiled.Declarations, NamedIds(), compiled.Standard, null, MapTypes.Read(map, null, compiled.Standard)));
+
+            string Of(string name) => Regex.Match(values, "\\[\"" + Regex.Escape(name) + "\"\\] = \\{[^\\n]*").Value;
+            Assert.Contains("[\"uhpm\"] = 777", Of("Moonwell.Objects.Human.Units.Rifleman"));
+            Assert.Contains("[\"unam\"] = \"Edited Rifleman\"", Of("Moonwell.Objects.Human.Units.Rifleman"));
+            // The hero's total: 300 + 22 * 25.
+            Assert.Contains("[\"uhpm\"] = 850", Of("Moonwell.Objects.Human.Units.Paladin"));
+            // A class based on the paladin has the standard paladin's values, which Arthas doubles: (100 + 22 * 25) * 2.
+            Assert.Contains("[\"uhpm\"] = 1300", Of("Objects.Arthas"));
+            // StrongFootman replaces the footman, so World Editor's change to it is not in the map.
+            Assert.Contains("[\"uhpm\"] = 420", Of("Moonwell.Objects.Human.Units.Footman"));
+        }
+
+        [Fact]
+        public void a_map_that_does_not_read_default_writes_no_type_values()
+        {
+            using var folders = new TestFolders();
+            var map = folders.TemporaryFolderOutsideRepository();
+            var main = new UnitObjectData(ObjectDataFormatVersion.v3);
+            main.NewUnits.Add(WorldEditorObject("hfoo", "h00R", Mod("uhpm", 500)));
+            WriteUnits(Path.Combine(map, "war3map.w3u"), main);
+            var declarations = compiled.Declarations with { TypeFields = new Dictionary<string, IReadOnlyList<string>>(StringComparer.Ordinal) };
+
+            var script = ObjectLua.Values(compiled.Script, declarations, NamedIds(), compiled.Standard, null, MapTypes.Read(map, null, compiled.Standard));
+
+            Assert.DoesNotContain("MoonwellTypeValues = {", CompiledObjects.ValuesOf(script));
         }
 
         [Fact]
@@ -50,16 +257,16 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void setter_does_nothing_in_lua()
         {
-            var paladin = int.Parse(compiled.Standard.Value("Hpal", "uhpm", 0, null)!, CultureInfo.InvariantCulture);
+            var paladin = int.Parse(compiled.Standard.Value("Hpal", "ugol", 0, null)!, CultureInfo.InvariantCulture);
             using var lua = compiled.Start();
 
-            // Arthas's constructor runs HitPoints = HitPoints * 2: the value read is the declared one, and stays it.
+            // Arthas's constructor runs GoldCost = GoldCost * 2: the value read is the declared one, and stays it.
             Assert.Equal(
                 (2 * paladin).ToString(CultureInfo.InvariantCulture),
-                Query(lua, "local a = Objects.Arthas(); return tostring(a:getHitPoints())"));
+                Query(lua, "local a = Objects.Arthas(); return tostring(a:getGoldCost())"));
             Assert.Equal(
                 (2 * paladin).ToString(CultureInfo.InvariantCulture),
-                Query(lua, "local a = Objects.Arthas(); a:setHitPoints(5); return tostring(MoonwellObjectValues['Objects.Arthas']['uhpm'])"));
+                Query(lua, "local a = Objects.Arthas(); a:setGoldCost(5); return tostring(MoonwellObjectValues['Objects.Arthas']['ugol'])"));
         }
 
         [Fact]
@@ -105,20 +312,20 @@ namespace Moonwell.Build.Tests
             // A class with no entry of its own reads the entry of the nearest base that has one; a nested class's name has a +.
             lua.DoString("System.define('Test.Outer+Inner', { base = { Objects.Arthas } })");
             Assert.Equal(
-                Query(lua, "return tostring(MoonwellObjectValues['Objects.Arthas']['uhpm'])"),
-                Query(lua, "return tostring(Test.Outer.Inner():getHitPoints())"));
+                Query(lua, "return tostring(MoonwellObjectValues['Objects.Arthas']['ugol'])"),
+                Query(lua, "return tostring(Test.Outer.Inner():getGoldCost())"));
         }
 
         [Fact]
         public void stubs_have_only_the_members_the_map_references()
         {
-            // Arthas's constructor reads and sets HitPoints; no code names AnimationWalkSpeed.
+            // Arthas's constructor reads and sets GoldCost; no code names AnimationWalkSpeed.
             var hero = compiled.Declarations.Used.Single(one => one.FullName == "Moonwell.Objects.StandardHero");
-            Assert.Contains(hero.Fields, field => field.Property == "HitPoints");
+            Assert.Contains(hero.Fields, field => field.Property == "GoldCost");
             Assert.DoesNotContain(hero.Fields, field => field.Property == "AnimationWalkSpeed");
 
             Assert.Contains("    public abstract class StandardHero : global::Moonwell.Hero\n", compiled.Stubs);
-            Assert.Contains("        public int HitPoints\n        {\n            get { return default; }\n            protected set { }\n        }\n", compiled.Stubs);
+            Assert.Contains("        public int GoldCost\n        {\n            get { return default; }\n            protected set { }\n        }\n", compiled.Stubs);
             Assert.Contains(
                 "namespace Moonwell.Objects\n{\n"
                 + "    /// @CSharpLua.Ignore\n    public static partial class Human\n    {\n"
@@ -215,7 +422,9 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void unused_standard_class_absent()
         {
-            Assert.DoesNotContain("Archmage", compiled.Script);
+            // The table by type id has every type's name.
+            var types = compiled.Script.LastIndexOf("MoonwellTypeValues = {", StringComparison.Ordinal);
+            Assert.DoesNotContain("Archmage", compiled.Script.Substring(0, types));
             Assert.DoesNotContain("Archmage", compiled.Registry);
         }
 
@@ -252,7 +461,7 @@ namespace Moonwell.Build.Tests
             var values = CompiledObjects.ValuesOf(release ? compiled.ReleaseScript : compiled.Script);
             var arthas = Regex.Match(values, "\\[\"Objects\\.Arthas\"\\] = \\{[^\\n]*").Value;
 
-            Assert.Contains("[\"uhpm\"] = ", arthas);
+            Assert.Contains("[\"ugol\"] = ", arthas);
             // No code reads Arthas's AI placement radius.
             Assert.DoesNotContain("[\"uabr\"]", values);
         }
@@ -269,9 +478,9 @@ namespace Moonwell.Build.Tests
 
             var script = compiled.Script + "\nlocal text = \"local endOfMoonwellObjects = true\"\n";
 
-            var values = CompiledObjects.ValuesOf(ObjectLua.Values(script, compiled.Declarations.Used, compiled.Declarations.Objects, ids, compiled.Standard, null));
+            var values = CompiledObjects.ValuesOf(ObjectLua.Values(script, compiled.Declarations, ids, compiled.Standard, null, Array.Empty<MapType>()));
 
-            Assert.Contains("[\"uhpm\"] = ", values);
+            Assert.Contains("[\"ugol\"] = ", values);
         }
 
         [Theory]
@@ -428,6 +637,51 @@ namespace Moonwell.Build.Tests
             Assert.Equal("table", Query(lua, "return type(Moonwell.Objects.Levels_1(1))"));
             Assert.Equal("table", Query(lua, "return type(Moonwell.Objects.ObjectList_1(1))"));
             Assert.Equal("table", Query(lua, "return type(Moonwell.Objects.ObjectRef_1(1))"));
+        }
+
+        // The ids the build gives Values: the standard classes' and the declared classes'.
+        private Dictionary<string, string> NamedIds()
+        {
+            var ids = new Dictionary<string, string>(compiled.Declarations.StandardClassIds, StringComparer.Ordinal);
+            foreach (var entry in compiled.Ids)
+            {
+                ids[entry.Key] = entry.Value;
+            }
+
+            return ids;
+        }
+
+        // The table of the types' values appended to a script.
+        private static string TypeValuesOf(string script)
+        {
+            var at = script.LastIndexOf("MoonwellTypeValues = {", StringComparison.Ordinal);
+            Assert.True(at >= 0, "the script has no table of the types' values");
+            return script.Substring(at);
+        }
+
+        private static SimpleObjectModification WorldEditorObject(string oldId, string newId, params SimpleObjectDataModification[] modifications)
+        {
+            var one = new SimpleObjectModification { OldId = IdOf(oldId), NewId = newId.Length == 0 ? 0 : IdOf(newId) };
+            one.Unk.Add(0);
+            one.Modifications.AddRange(modifications);
+            return one;
+        }
+
+        private static SimpleObjectDataModification Mod(string field, object value)
+        {
+            return new SimpleObjectDataModification { Id = IdOf(field), Type = value is int ? ObjectDataType.Int : ObjectDataType.String, Value = value };
+        }
+
+        private static int IdOf(string text)
+        {
+            return BitConverter.ToInt32(Encoding.ASCII.GetBytes(text));
+        }
+
+        private static void WriteUnits(string path, UnitObjectData data)
+        {
+            using var stream = File.Create(path);
+            using var writer = new BinaryWriter(stream, Encoding.UTF8);
+            writer.Write(data);
         }
 
         private static bool Truth(NLua.Lua lua, string chunk)

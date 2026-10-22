@@ -36,18 +36,18 @@ public class FieldRulesTests
 
     private static string Archmage(string statements, string attribute = "") => Class("Mage", "Moonwell.Objects.Human.Units.Archmage", statements, attribute);
 
-    private const string HitPointsText = "Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it";
+    private const string MaxLifeText = "Giant.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it";
 
     [Fact]
     public void a_constant_out_of_range_in_an_assignment_gives_the_build_text()
     {
-        Assert.Equal(new[] { HitPointsText }, Messages(Footman("HitPoints = 600000;")));
+        Assert.Equal(new[] { MaxLifeText }, Messages(Footman("MaxLife = 600000;")));
     }
 
     [Fact]
     public void the_diagnostic_is_mw0009_on_the_value()
     {
-        Assert.Equal(new[] { "MW0009: 600000" }, Found(Footman("HitPoints = 600000;")));
+        Assert.Equal(new[] { "MW0009: 600000" }, Found(Footman("MaxLife = 600000;")));
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public class FieldRulesTests
     [Fact]
     public void a_constant_out_of_range_in_set_by_id_is_rejected()
     {
-        Assert.Equal(new[] { HitPointsText }, Messages(Footman("""Set("uhpm", 600000);""")));
+        Assert.Equal(new[] { MaxLifeText }, Messages(Footman("""Set("uhpm", 600000);""")));
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class FieldRulesTests
     {
         Assert.Empty(Found(
             Bolt("Cooldown = Levels(0f, 3600f); Set(\"acdn\", 2, 1f);")
-            + Class("Big", "Moonwell.Objects.Human.Units.Footman", "HitPoints = 500000; Set(\"uhpm\", 1);")));
+            + Class("Big", "Moonwell.Objects.Human.Units.Footman", "MaxLife = 500000; Set(\"uhpm\", 1);")));
     }
 
     [Fact]
@@ -140,9 +140,9 @@ public class FieldRulesTests
 
                 public Sized(int hp, string name)
                 {
-                    HitPoints = hp;
-                    HitPoints = Hit();
-                    HitPoints = hp * 600000;
+                    MaxLife = hp;
+                    MaxLife = Hit();
+                    MaxLife = hp * 600000;
                     Name = name;
                     Set("uhpm", Hit());
                     Set("uhpm", hp);
@@ -161,8 +161,8 @@ public class FieldRulesTests
 
                 public Sized()
                 {
-                    HitPoints = Big;
-                    HitPoints = 2 * Big;
+                    MaxLife = Big;
+                    MaxLife = 2 * Big;
                 }
             }
             """));
@@ -187,14 +187,14 @@ public class FieldRulesTests
     [Fact]
     public void a_property_named_in_beyond_limits_gives_nothing()
     {
-        Assert.Empty(Found(Footman("HitPoints = 600000; Set(\"uhpm\", 700000);", "[BeyondLimits(nameof(HitPoints))]")));
+        Assert.Empty(Found(Footman("MaxLife = 600000; Set(\"uhpm\", 700000);", "[BeyondLimits(nameof(MaxLife))]")));
     }
 
     [Fact]
     public void beyond_limits_is_inherited_from_a_base_class()
     {
         Assert.Empty(Found("""
-            [BeyondLimits(nameof(HitPoints))]
+            [BeyondLimits(nameof(MaxLife))]
             public abstract class Colossus : Moonwell.Objects.Human.Units.Footman
             {
             }
@@ -203,7 +203,7 @@ public class FieldRulesTests
             {
                 public Giant()
                 {
-                    HitPoints = 600000;
+                    MaxLife = 600000;
                 }
             }
             """));
@@ -214,15 +214,15 @@ public class FieldRulesTests
     {
         Assert.Equal(
             new[] { "Giant.Armor is 5000; Defense Base (udef) allows 0 to 1000; [BeyondLimits] goes past it" },
-            Messages(Footman("HitPoints = 600000; Armor = 5000;", "[BeyondLimits(nameof(HitPoints))]")));
+            Messages(Footman("MaxLife = 600000; Armor = 5000;", "[BeyondLimits(nameof(MaxLife))]")));
     }
 
     [Fact]
     public void beyond_limits_with_several_attributes_and_names_lifts_all()
     {
         Assert.Empty(Found(Footman(
-            "HitPoints = 600000; Armor = 5000; Speed = 900;",
-            "[BeyondLimits(nameof(HitPoints), nameof(Armor))]\n[BeyondLimits(nameof(Speed))]")));
+            "MaxLife = 600000; Armor = 5000; Speed = 900;",
+            "[BeyondLimits(nameof(MaxLife), nameof(Armor))]\n[BeyondLimits(nameof(Speed))]")));
     }
 
     [Fact]
@@ -246,9 +246,9 @@ public class FieldRulesTests
     {
         // uhpm's minimum is 1 and the game does not force it: a negative is past the range, like 600000.
         Assert.Equal(
-            new[] { "Giant.HitPoints is -5; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it" },
-            Messages(Footman("HitPoints = -5;")));
-        Assert.Empty(Found(Footman("HitPoints = -5;", "[BeyondLimits(nameof(HitPoints))]")));
+            new[] { "Giant.MaxLife is -5; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it" },
+            Messages(Footman("MaxLife = -5;")));
+        Assert.Empty(Found(Footman("MaxLife = -5;", "[BeyondLimits(nameof(MaxLife))]")));
     }
 
     [Fact]
@@ -334,7 +334,7 @@ public class FieldRulesTests
     public void a_class_nested_in_another_is_named_with_its_outer_class()
     {
         Assert.Equal(
-            new[] { "Heroes.Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it" },
+            new[] { "Heroes.Giant.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it" },
             Messages("""
                 public static class Heroes
                 {
@@ -342,7 +342,7 @@ public class FieldRulesTests
                     {
                         public Giant()
                         {
-                            HitPoints = 600000;
+                            MaxLife = 600000;
                         }
                     }
                 }
@@ -353,17 +353,17 @@ public class FieldRulesTests
     public void the_class_that_holds_the_assignment_is_named_and_lifted()
     {
         Assert.Equal(
-            new[] { "Base.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it" },
+            new[] { "Base.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it" },
             Messages("""
                 public abstract class Base : Moonwell.Objects.Human.Units.Footman
                 {
                     protected Base()
                     {
-                        HitPoints = 600000;
+                        MaxLife = 600000;
                     }
                 }
 
-                [BeyondLimits(nameof(HitPoints))]
+                [BeyondLimits(nameof(MaxLife))]
                 public class Derived : Base
                 {
                 }
@@ -373,20 +373,81 @@ public class FieldRulesTests
     [Fact]
     public void an_assignment_in_a_lambda_or_a_method_is_checked_too()
     {
-        Assert.Equal(new[] { "MW0009: 600000", "MW0009: 700000" }, Found("""
+        Assert.Equal(new[] { "MW0009: 5000", "MW0009: 6000" }, Found("""
             public class Giant : Moonwell.Objects.Human.Units.Footman
             {
                 public Giant()
                 {
-                    Action a = () => HitPoints = 600000;
+                    Action a = () => Armor = 5000;
                 }
 
                 private void Grow()
                 {
-                    HitPoints = 700000;
+                    Armor = 6000;
                 }
             }
             """));
+    }
+
+    [Fact]
+    public void a_shared_member_is_checked_only_where_it_declares_its_field()
+    {
+        // Outside the constructor, in a lambda, or on another unit, MaxLife is the live value, which takes any number.
+        Assert.Empty(Found("""
+            public class Giant : Moonwell.Objects.Human.Units.Footman
+            {
+                public Giant(Giant other)
+                {
+                    Action a = () => MaxLife = 600000;
+                    other.MaxLife = 600000;
+                }
+
+                private void Grow()
+                {
+                    MaxLife = 700000;
+                }
+            }
+            """));
+    }
+
+    [Fact]
+    public void a_shared_member_is_named_by_its_member_and_carries_its_fields_rules()
+    {
+        Assert.Equal(
+            new[]
+            {
+                "Giant.MaxMana is 200000; Mana Maximum (umpm) allows 0 to 100000; [BeyondLimits] goes past it",
+                "Giant.Scale is -1; Scaling Value (usca) allows 0.1 to 10",
+                "Giant.Level is 101; Level (ulev) allows 1 to 100; [BeyondLimits] goes past it",
+                "Giant.FlyHeight is 2000; Height (umvh) allows -1000 to 1000; [BeyondLimits] goes past it",
+                "Potion.Charges is 1001; Number of Charges (iuse) allows 0 to 1000; [BeyondLimits] goes past it",
+                "Champion.Strength is 0; Starting Strength (ustr) allows 1 to 100; [BeyondLimits] goes past it",
+            },
+            Messages(
+                Footman("MaxMana = 200000; Scale = -1f; Level = 101; FlyHeight = 2000f; Mana = 100;")
+                + Class("Potion", "Moonwell.Objects.Items.ClawsOfAttack15", "Charges = 1001;")
+                + Class("Champion", "Moonwell.Objects.Human.Units.Paladin", "Strength = 0; Agility = 50;")));
+    }
+
+    [Fact]
+    public void a_float_put_into_a_whole_number_field_is_truncated_first_as_the_build_does()
+    {
+        Assert.Equal(
+            new[] { "Giant.MaxLife is 0; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it" },
+            Messages(Footman("MaxLife = 0.5f; MaxLife = 1.5f;")));
+    }
+
+    [Fact]
+    public void a_heros_life_and_mana_by_their_live_names_are_totals_the_build_checks_but_set_by_id_are_checked()
+    {
+        Assert.Equal(
+            new[] { "Champion.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it" },
+            Messages(Class("Champion", "Moonwell.Objects.Human.Units.Paladin", """
+                MaxLife = 600000;
+                MaxMana = 200000;
+                Mana = 200000;
+                Set("uhpm", 600000);
+                """)));
     }
 
     [Fact]
@@ -395,7 +456,7 @@ public class FieldRulesTests
         Assert.Equal(
             new[] { "[BeyondLimits] on Giant names 'Hitpoints', which is no field property of Giant or its base classes" },
             Messages("""
-                [BeyondLimits(nameof(HitPoints), "Hitpoints")]
+                [BeyondLimits(nameof(MaxLife), "Hitpoints")]
                 public class Giant : Moonwell.Objects.Human.Units.Footman
                 {
                 }
@@ -406,7 +467,7 @@ public class FieldRulesTests
     public void a_beyond_limits_name_that_is_a_base_class_property_is_accepted()
     {
         Assert.Empty(Found("""
-            [BeyondLimits("HitPoints", nameof(Name))]
+            [BeyondLimits("GoldCost", nameof(MaxLife), nameof(Name))]
             public class Giant : Moonwell.Objects.Human.Units.Footman
             {
             }
@@ -417,7 +478,7 @@ public class FieldRulesTests
     public void a_beyond_limits_diagnostic_points_at_the_name()
     {
         Assert.Equal(new[] { "MW0009: \"Hitpoints\"" }, Found("""
-            [BeyondLimits(nameof(HitPoints), "Hitpoints")]
+            [BeyondLimits(nameof(MaxLife), "Hitpoints")]
             public class Giant : Moonwell.Objects.Human.Units.Footman
             {
             }

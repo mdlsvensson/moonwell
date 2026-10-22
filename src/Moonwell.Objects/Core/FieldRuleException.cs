@@ -8,14 +8,14 @@ namespace Moonwell.Objects
     /// <summary>
     /// A value a declared class put that World Editor does not allow. The message is
     /// <c>{Property}[ at level {Level}] is {Value}; {Label} ({FieldId}) allows {Allowed}</c>, with the label and its
-    /// parentheses left out when the field has no label: <c>Arthas.HitPoints is 600000; Hit Points Maximum (Base) (uhpm)
+    /// parentheses left out when the field has no label: <c>Arthas.MaxLife is 600000; Hit Points Maximum (Base) (uhpm)
     /// allows 1 to 500000; [BeyondLimits] goes past it</c>. The build puts the file and line before it.
     /// </summary>
     /// @CSharpLua.Ignore
     public sealed class FieldRuleException : Exception
     {
         /// <summary>Makes the error of one value.</summary>
-        /// <param name="property">The class and the property, as a modder writes them: <c>Arthas.HitPoints</c>.</param>
+        /// <param name="property">The class and the property, as a modder writes them: <c>Arthas.MaxLife</c>.</param>
         /// <param name="fieldId">The field id: <c>uhpm</c>.</param>
         /// <param name="label">The field's World Editor label; empty when it has none.</param>
         /// <param name="value">The value as the message shows it: <c>600000</c>, <c>"text"</c>, <c>13 entries</c>.</param>
@@ -32,7 +32,7 @@ namespace Moonwell.Objects
             Level = level;
         }
 
-        /// <summary>The class and the property: <c>Arthas.HitPoints</c>.</summary>
+        /// <summary>The class and the property: <c>Arthas.MaxLife</c>.</summary>
         public string Property { get; }
 
         /// <summary>The field id: <c>uhpm</c>.</summary>

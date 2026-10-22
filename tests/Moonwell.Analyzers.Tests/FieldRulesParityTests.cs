@@ -56,11 +56,16 @@ public class FieldRulesParityTests
         var names = string.Join(",", Enumerable.Range(1, 33).Select(i => "N" + i));
 
         // base, attribute, statement; whether the build and the analyzer both allow it is part of the case.
-        yield return new object[] { "range", Footman, "", "HitPoints = 600000;" };
-        yield return new object[] { "range, lower end", Footman, "", "HitPoints = 0;" };
-        yield return new object[] { "range, lifted", Footman, "[BeyondLimits(nameof(HitPoints))]", "HitPoints = 600000;" };
-        yield return new object[] { "range, at the end", Footman, "", "HitPoints = 500000;" };
-        yield return new object[] { "range, another property lifted", Footman, "[BeyondLimits(nameof(Speed))]", "HitPoints = 600000;" };
+        yield return new object[] { "range", Footman, "", "MaxLife = 600000;" };
+        yield return new object[] { "range, lower end", Footman, "", "MaxLife = 0;" };
+        yield return new object[] { "range, lifted", Footman, "[BeyondLimits(nameof(MaxLife))]", "MaxLife = 600000;" };
+        yield return new object[] { "range, at the end", Footman, "", "MaxLife = 500000;" };
+        yield return new object[] { "range, another property lifted", Footman, "[BeyondLimits(nameof(Speed))]", "MaxLife = 600000;" };
+        yield return new object[] { "range, a float truncated", Footman, "", "MaxLife = 0.5f;" };
+        yield return new object[] { "range of a declared field", Footman, "", "GoldCost = 200000;" };
+        yield return new object[] { "range, a shared float field", Footman, "", "FlyHeight = 2000f;" };
+        yield return new object[] { "range, a hero's attribute", "Moonwell.Objects.Human.Units.Paladin", "", "Strength = 0;" };
+        yield return new object[] { "range, an item's charges", "Moonwell.Objects.Items.ClawsOfAttack15", "", "Charges = 1001;" };
         yield return new object[] { "range of a field without a label", "Probe", "", "Unlabelled = 5;" };
         yield return new object[] { "range of a field without a label, in range", "Probe", "", "Unlabelled = 3;" };
         yield return new object[] { "or more", "Probe", "", "AtLeast = 0;" };
@@ -68,8 +73,9 @@ public class FieldRulesParityTests
         yield return new object[] { "at most", StormBolt, "", "RequirementsLevels = \"1,200\";" };
         yield return new object[] { "at most, lifted", StormBolt, "[BeyondLimits(nameof(RequirementsLevels))]", "RequirementsLevels = \"1,200\";" };
         yield return new object[] { "at most, in range", StormBolt, "", "RequirementsLevels = \"-5,100\";" };
-        yield return new object[] { "negative", Footman, "", "HitPoints = -5;" };
-        yield return new object[] { "negative, lifted", Footman, "[BeyondLimits(nameof(HitPoints))]", "HitPoints = -5;" };
+        yield return new object[] { "negative", Footman, "", "MaxLife = -5;" };
+        yield return new object[] { "negative, lifted", Footman, "[BeyondLimits(nameof(MaxLife))]", "MaxLife = -5;" };
+        yield return new object[] { "negative the game forbids, shared", Footman, "[BeyondLimits(nameof(Scale))]", "Scale = -1f;" };
         yield return new object[] { "negative the game forbids", Footman, "", "CollisionSize = -5f;" };
         yield return new object[] { "negative the game forbids, lifted", Footman, "[BeyondLimits(nameof(CollisionSize))]", "CollisionSize = -5f;" };
         yield return new object[] { "negative a standard object holds, lifted", Footman, "[BeyondLimits(nameof(ButtonPositionY))]", "ButtonPositionY = -11;" };

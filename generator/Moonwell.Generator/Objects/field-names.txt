@@ -1,7 +1,4 @@
-unit unam Name
-unit uhpm HitPoints
 unit uhpr HitPointRegen
-unit umpm ManaPoints
 unit umpr ManaRegen
 unit udef Armor
 unit umvs Speed
@@ -12,12 +9,10 @@ unit ulum LumberCost
 unit ufoo Food
 unit ufma FoodProduced
 unit ubld BuildTime
-unit ulev UnitLevel
 unit uabi Abilities
 unit uhab HeroAbilities
 unit ureq Requires
 unit umdl Model
-unit usca ScalingValue
 unit uico Icon
 unit utip Tooltip
 unit utub TooltipExtended
@@ -28,9 +23,6 @@ unit ua1d DamageDice
 unit ua1s DamageSides
 unit ua1c AttackCooldown
 unit ua1r AttackRange
-unit ustr StartingStrength
-unit uagi StartingAgility
-unit uint StartingIntelligence
 unit ustp StrengthPerLevel
 unit uagp AgilityPerLevel
 unit uinp IntelligencePerLevel
@@ -53,7 +45,6 @@ item utub TooltipExtended
 item ides Description
 item uhot Hotkey
 item ureq Requires
-item iuse NumberOfCharges
 destructable bnam Name
 destructable bhps HitPoints
 destructable bfil Model

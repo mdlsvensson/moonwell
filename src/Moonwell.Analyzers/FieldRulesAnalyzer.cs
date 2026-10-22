@@ -17,7 +17,10 @@ namespace Moonwell.Analyzers;
 /// left to the build.
 /// </summary>
 /// <remarks>
-/// The rules are read from the attributes of the property the field belongs to. A <c>[BeyondLimits]</c> on the class that
+/// The rules are read from the attributes of the property the field belongs to; a shared field, which has no property,
+/// has them on its kind base's <c>[SharedField]</c>, and is checked where it is declared: set by id, or by its live member
+/// on the object itself in its class's constructor (elsewhere that member is the live value). A hero's most life, most
+/// mana and starting mana set by their live members are the totals it starts with, whose base fields the build checks. A <c>[BeyondLimits]</c> on the class that
 /// holds the assignment, or on one of its base classes, lifts a range, a length or a number of entries but never a negative
 /// where none is allowed, an empty required name or a choice that is no member (the build names the class that is being
 /// constructed instead; the analyzer only sees the class that holds the assignment). The analyzer also reports a
@@ -53,17 +56,48 @@ public sealed class FieldRulesAnalyzer : DiagnosticAnalyzer
         public bool Required;
         public int? MaxLength;
         public int? MaxEntries;
+
+        // A whole-number field that its live member puts as a float: the build truncates the value first.
+        public bool Whole;
     }
+
+    // The fields whose live member is a float, which their setter truncates.
+    private static readonly HashSet<string> WholeFields = new() { "uhpm", "umpm", "umpi" };
+
+    // The fields a hero's live member puts as a total or not at all, which the build checks as base fields.
+    private static readonly HashSet<string> HeroTotals = new() { "uhpm", "umpm", "umpi", "ulev" };
 
     private static void Assignment(OperationAnalysisContext context)
     {
         var assignment = (ISimpleAssignmentOperation)context.Operation;
         if (assignment.Target is IPropertyReferenceOperation reference
             && EnclosingType(context.ContainingSymbol) is { } holder
-            && ReadField(reference.Property, holder) is { } field)
+            && (ReadField(reference.Property, holder) ?? SharedAssignment(context, reference, holder)) is { } field)
         {
             Value(context, field, null, assignment.Value);
         }
+    }
+
+    /// <summary>The shared field a live member declares: set on the object itself in its class's constructor; null anywhere else, and for a hero's total.</summary>
+    private static Field? SharedAssignment(OperationAnalysisContext context, IPropertyReferenceOperation reference, INamedTypeSymbol holder)
+    {
+        if (context.ContainingSymbol is not IMethodSymbol { MethodKind: MethodKind.Constructor, IsStatic: false }
+            || reference.Instance is not IInstanceReferenceOperation
+            || reference.Property.ContainingType?.ContainingNamespace is not { Name: "Moonwell", ContainingNamespace.IsGlobalNamespace: true }
+            || InLambda(reference)
+            || SharedFieldOf(holder, null, reference.Property.Name) is not { } shared)
+        {
+            return null;
+        }
+
+        var field = ReadShared(shared, holder);
+        if (HeroTotals.Contains(field.Id) && IsHero(holder))
+        {
+            return null;
+        }
+
+        field.Whole = WholeFields.Contains(field.Id);
+        return field;
     }
 
     private static void Call(OperationAnalysisContext context)
@@ -96,7 +130,11 @@ public sealed class FieldRulesAnalyzer : DiagnosticAnalyzer
 
         var holder = EnclosingType(context.ContainingSymbol);
         var property = holder == null ? null : PropertyOf(holder, id);
-        if (holder != null && property != null && ReadField(property, holder) is { } field)
+        var field = holder == null ? null
+            : property != null ? ReadField(property, holder)
+            : SharedFieldOf(holder, id, null) is { } shared ? ReadShared(shared, holder)
+            : null;
+        if (field != null)
         {
             Value(context, field, level, call.Arguments[call.Arguments.Length - 1].Value);
         }
@@ -183,6 +221,9 @@ public sealed class FieldRulesAnalyzer : DiagnosticAnalyzer
         {
             case int whole:
                 return Number(field, whole, false, whole.ToString(CultureInfo.InvariantCulture), string.Empty);
+            case float real when field.Whole:
+                var truncated = (int)real;
+                return Number(field, truncated, false, truncated.ToString(CultureInfo.InvariantCulture), string.Empty);
             case float real:
                 return Number(field, real, true, real.ToString("R", CultureInfo.InvariantCulture), string.Empty);
             case string text:
@@ -348,6 +389,100 @@ public sealed class FieldRulesAnalyzer : DiagnosticAnalyzer
         return result;
     }
 
+    // Code in a lambda or a local function may run later in the game, where a shared member is the live value.
+    private static bool InLambda(IOperation operation)
+    {
+        for (var parent = operation.Parent; parent != null; parent = parent.Parent)
+        {
+            if (parent is IAnonymousFunctionOperation or ILocalFunctionOperation)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>The rules of a shared field as the class that holds the put has them, from its <c>[SharedField]</c>.</summary>
+    private static Field ReadShared(AttributeData shared, INamedTypeSymbol holder)
+    {
+        var member = (string)shared.ConstructorArguments[1].Value!;
+        var result = new Field
+        {
+            Property = ClassName(holder) + "." + member,
+            Id = (string)shared.ConstructorArguments[0].Value!,
+            Lifted = BeyondLimitsOf(holder).Contains(member),
+        };
+        var min = double.NegativeInfinity;
+        var max = double.PositiveInfinity;
+        foreach (var named in shared.NamedArguments)
+        {
+            switch (named.Key)
+            {
+                case "Label" when named.Value.Value is string label:
+                    result.Label = label;
+                    break;
+                case "Min" when named.Value.Value != null:
+                    min = Convert.ToDouble(named.Value.Value, CultureInfo.InvariantCulture);
+                    break;
+                case "Max" when named.Value.Value != null:
+                    max = Convert.ToDouble(named.Value.Value, CultureInfo.InvariantCulture);
+                    break;
+                case "HasLimits" when named.Value.Value is bool limited:
+                    result.HasLimits = limited;
+                    break;
+                case "NonNegative" when named.Value.Value is bool nonNegative:
+                    result.NonNegative = nonNegative;
+                    break;
+                case "Required" when named.Value.Value is bool required:
+                    result.Required = required;
+                    break;
+            }
+        }
+
+        // As the build: the range is read only when the attribute says the field has one.
+        if (result.HasLimits)
+        {
+            result.Min = min;
+            result.Max = max;
+        }
+
+        return result;
+    }
+
+    /// <summary>The <c>[SharedField]</c> on the class or its bases with this id, or for this live member; null when none is.</summary>
+    private static AttributeData? SharedFieldOf(INamedTypeSymbol type, string? id, string? member)
+    {
+        for (var parent = type; parent != null; parent = parent.BaseType)
+        {
+            foreach (var attribute in parent.GetAttributes())
+            {
+                if (IsObjects(attribute.AttributeClass, "SharedFieldAttribute") && attribute.ConstructorArguments.Length == 2
+                    && attribute.ConstructorArguments[0].Value is string sharedId && attribute.ConstructorArguments[1].Value is string sharedMember
+                    && (id == null || sharedId == id) && (member == null || sharedMember == member))
+                {
+                    return attribute;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // A class that inherits Moonwell's Hero.
+    private static bool IsHero(INamedTypeSymbol type)
+    {
+        for (var parent = (INamedTypeSymbol?)type; parent != null; parent = parent.BaseType)
+        {
+            if (parent.Name == "Hero" && parent.ContainingNamespace is { Name: "Moonwell", ContainingNamespace.IsGlobalNamespace: true })
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static AttributeData? FieldAttributeOf(IPropertySymbol property)
     {
         foreach (var attribute in property.GetAttributes())
@@ -408,7 +543,7 @@ public sealed class FieldRulesAnalyzer : DiagnosticAnalyzer
             ? attribute.ConstructorArguments[0].Values
             : ImmutableArray<TypedConstant>.Empty;
 
-    /// <summary>Reports a <c>[BeyondLimits]</c> name that is no field property of the class or its bases.</summary>
+    /// <summary>Reports a <c>[BeyondLimits]</c> name that is no field property or shared member of the class or its bases.</summary>
     private static void Declaration(SymbolAnalysisContext context)
     {
         var type = (INamedTypeSymbol)context.Symbol;
@@ -436,6 +571,11 @@ public sealed class FieldRulesAnalyzer : DiagnosticAnalyzer
 
     private static bool IsFieldProperty(INamedTypeSymbol type, string name)
     {
+        if (SharedFieldOf(type, null, name) != null)
+        {
+            return true;
+        }
+
         for (var parent = type; parent != null; parent = parent.BaseType)
         {
             foreach (var property in parent.GetMembers(name).OfType<IPropertySymbol>())

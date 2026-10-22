@@ -24,7 +24,7 @@ namespace Moonwell.Build
         // The attributes of Moonwell.Objects whose files are inside #if !MOONWELL_LUA: a map may name them, so CSharp.lua gets stubs.
         private static readonly HashSet<string> RuleAttributes = new HashSet<string>(StringComparer.Ordinal)
         {
-            "BeyondLimitsAttribute", "LimitsAttribute", "MaxEntriesAttribute", "MaxLengthAttribute", "NonNegativeAttribute", "RequiredAttribute",
+            "BeyondLimitsAttribute", "LimitsAttribute", "MaxEntriesAttribute", "MaxLengthAttribute", "NonNegativeAttribute", "RequiredAttribute", "SharedFieldAttribute",
         };
 
         private const BindingFlags DeclaredMembers =
@@ -278,8 +278,16 @@ namespace Moonwell.Build
             var setter = property.GetSetMethod(true);
             var first = (getter ?? setter)!;
             var access = Access(first);
-            text.Append("        ").Append(access).Append(first.IsStatic ? " static " : " ").Append(TypeName(property.PropertyType)).Append(' ')
-                .Append(property.Name).Append("\n        {\n");
+            if (property.Name == "Default" && Hides(property))
+            {
+                // A kind base's Default, typed as the kind base, is the default object the core's Default gives. CSharp.lua renames
+                // the core's getters of Default for this one (getDefault1, getDefault2, in an order of its own), so the call reads
+                // it by the class instead: Widget.Default<T>() of the object's class, the same object.
+                text.Append("        /// @CSharpLua.Get = \"Moonwell.Widget.Default(getmetatable({this}))\"\n");
+            }
+
+            text.Append("        ").Append(access).Append(first.IsStatic ? " static " : " ").Append(Hides(property) ? "new " : string.Empty)
+                .Append(TypeName(property.PropertyType)).Append(' ').Append(property.Name).Append("\n        {\n");
             if (getter != null)
             {
                 text.Append("            ").Append(Access(getter) == access ? string.Empty : Access(getter) + " ").Append("get { return default; }\n");
@@ -293,9 +301,24 @@ namespace Moonwell.Build
             text.Append("        }\n");
         }
 
+        // A property that hides one of its base's, as a kind base's Default typed as the kind base: written with new, as declared.
+        private static bool Hides(PropertyInfo property)
+        {
+            var accessor = (property.GetGetMethod(true) ?? property.GetSetMethod(true))!;
+            var inherited = property.DeclaringType!.BaseType?.GetProperties(DeclaredMembers & ~BindingFlags.DeclaredOnly) ?? Array.Empty<PropertyInfo>();
+            return !IsOverride(accessor) && inherited.Any(one => one.Name == property.Name);
+        }
+
+        // An override keeps its base method's name in Lua, so the core's calls reach the objects' library's function.
+        private static bool IsOverride(MethodInfo method)
+        {
+            return method.IsVirtual && method.GetBaseDefinition().DeclaringType != method.DeclaringType;
+        }
+
         private static void WriteMethod(StringBuilder text, MethodInfo method)
         {
-            text.Append("        ").Append(Access(method)).Append(method.IsStatic ? " static " : " ").Append(TypeName(method.ReturnType)).Append(' ').Append(method.Name);
+            text.Append("        ").Append(Access(method)).Append(method.IsStatic ? " static " : " ").Append(IsOverride(method) ? "override " : string.Empty)
+                .Append(TypeName(method.ReturnType)).Append(' ').Append(method.Name);
             if (method.IsGenericMethodDefinition)
             {
                 text.Append('<').Append(string.Join(", ", method.GetGenericArguments().Select(argument => argument.Name))).Append('>');

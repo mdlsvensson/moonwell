@@ -1,6 +1,8 @@
 namespace Moonwell.Objects.Tests
 {
     /// <summary>A kind base written by hand, in the pattern the generated kind bases follow.</summary>
+    [SharedField("uhpm", "MaxLife")]
+    [SharedField("umpm", "MaxMana", Label = "Mana Maximum", Min = 0, Max = 100000, HasLimits = true)]
     public class TestUnitBase : Moonwell.Unit
     {
         private Declared? declared;
@@ -8,12 +10,16 @@ namespace Moonwell.Objects.Tests
         /// <summary>The declared values of this object, created on first use.</summary>
         protected Declared Fields => declared ??= new Declared(this);
 
-        /// <summary>The hit points.</summary>
-        [Field("uhpm")]
-        public int HitPoints
+        /// <summary>A shared field's declared value, which MaxLife and MaxMana read without a handle.</summary>
+        protected override T DeclaredValue<T>(string field)
         {
-            get { return Fields.Get<int>(this, "uhpm"); }
-            protected set { Fields.Put("uhpm", value); }
+            return Fields.Get<T>(this, field);
+        }
+
+        /// <summary>Puts a shared field's value, which MaxLife and MaxMana do when set without a handle.</summary>
+        protected override void Declare(string field, object value)
+        {
+            Fields.Put(field, value);
         }
 
         /// <summary>The damage of each attack level.</summary>

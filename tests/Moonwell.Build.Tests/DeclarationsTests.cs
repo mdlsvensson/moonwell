@@ -33,7 +33,9 @@ namespace Moonwell.Build.Tests
             Assert.Null(arthas.CarrierId);
             Assert.Equal(new[] { "uabi", "ugol", "uhab", "uhpm", "unam" }, arthas.Changed.Keys);
             Assert.Equal("Arthas", arthas.Changed["unam"]);
-            Assert.Equal(2 * BaseInt("Hpal", "uhpm"), arthas.Changed["uhpm"]);
+            // MaxLife = MaxLife * 2 doubles the Paladin's total, its base and its strength's life; the base field is the total less what its strength gives.
+            var strength = BaseInt("Hpal", "ustr") * 25;
+            Assert.Equal((2 * (BaseInt("Hpal", "uhpm") + strength)) - strength, arthas.Changed["uhpm"]);
             Assert.Equal(2 * BaseInt("Hpal", "ugol"), arthas.Changed["ugol"]);
             Assert.Equal(
                 new[] { "Moonwell.Objects.Other.Abilities.Inventory", "Objects.Firebolt" },
@@ -129,7 +131,8 @@ namespace Moonwell.Build.Tests
             var arthas = Find(built.Read("melee_v0").Objects, "Objects.Arthas");
 
             Assert.Equal(1000, arthas.Changed["ugol"]);
-            Assert.Equal(200, arthas.Changed["uhpm"]);
+            // The Paladin's base life (100) and strength (22) are the same in melee_v0: his total is 650, doubled 1300, less 550.
+            Assert.Equal(750, arthas.Changed["uhpm"]);
         }
 
         [Theory]
@@ -410,11 +413,25 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void the_hero_bonuses_are_the_gameplay_constants_of_each_set()
+        {
+            var standard = built.Standard;
+
+            foreach (var set in new[] { null, "melee_v0", "custom_v0", "custom_v1" })
+            {
+                Assert.Equal(new HeroBonus(25f, 15f), standard.Misc(set));
+            }
+
+            Assert.Throws<BuildException>(() => standard.Misc("custom_v9"));
+            Assert.Throws<BuildException>(() => StandardData.Empty.Misc(null));
+        }
+
+        [Fact]
         public void setter_outside_ctor()
         {
             AssertFails(
                 "SetOutsideCtor",
-                "SetOutsideCtor.Reset.Heal sets HitPoints; declared fields are set only in the constructor");
+                "SetOutsideCtor.Reset.Heal sets GoldCost; declared fields are set only in the constructor");
         }
 
         [Fact]
@@ -494,7 +511,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void a_live_member_of_the_unit_names_line_as_a_game_call()
         {
-            // Mana is the unit's mana in the game, whose setter reaches for the game that is not there yet (MW0012 turned off).
+            // Life is the unit's life in the game, with no field to declare: its setter reaches for the game that is not there yet (MW0012 turned off).
             AssertFails(
                 "LiveMember",
                 "Objects.cs:13: LiveMember.Caster calls the game while it is declared; game work starts from a reaction or the game's start");
@@ -505,7 +522,7 @@ namespace Moonwell.Build.Tests
         {
             AssertFails(
                 "OutOfRange",
-                "Objects.cs:13: Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it");
+                "Objects.cs:13: Giant.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it");
         }
 
         [Fact]
@@ -513,7 +530,7 @@ namespace Moonwell.Build.Tests
         {
             AssertFails(
                 "OutOfRangeById",
-                "Heroes/Objects.cs:13: Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it");
+                "Heroes/Objects.cs:13: Giant.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it");
         }
 
         [Fact]
@@ -529,6 +546,76 @@ namespace Moonwell.Build.Tests
         public void an_empty_name_names_the_line()
         {
             AssertFails("EmptyRequired", "Objects.cs:13: Nobody.Name is \"\"; Name (unam) allows any text that is not empty");
+        }
+
+        [Fact]
+        public void a_heros_total_below_what_strength_gives_fails_with_its_line()
+        {
+            // The strength set after the life counts: 30 points give 750 life, so a total of 400 would need a base of -350.
+            AssertFails("HeroBelowAttributes", "Objects.cs:13: Champion.MaxLife is 400; its 30 strength already give 750 (751 at least)");
+        }
+
+        [Fact]
+        public void a_heros_total_above_the_fields_limits_fails_with_its_line()
+        {
+            AssertFails("HeroAboveLimits", "Objects.cs:13: Champion.MaxLife is 600000; its 22 strength give 550 (500550 at most)");
+        }
+
+        [Fact]
+        public void a_heros_mana_below_what_intelligence_gives_fails_with_its_line()
+        {
+            // The Paladin's 17 intelligence give 255 mana, which a starting mana of 200 cannot be.
+            AssertFails("HeroManaBelowAttributes", "Objects.cs:13: Sage.Mana is 200; its 17 intelligence already give 255 (255 at least)");
+        }
+
+        [Fact]
+        public void a_maps_gameplay_constants_count_in_a_heros_total_and_its_base()
+        {
+            // 10 life a point of strength: the Paladin's total is 100 + 22 * 10, the Champion's 420, and his 30 strength give 300 of it.
+            var project = MapProject.Find(Path.Combine(TestFolders.Fixture("ObjectErrors"), "HeroMapConstants"));
+            var assembly = DotnetBuild.Run(project, false, TextWriter.Null);
+
+            var declared = Declarations.Read(assembly, project, built.Standard, null);
+
+            Assert.Equal(120, Find(declared.Objects, "HeroMapConstants.Champion").Changed["uhpm"]);
+            Assert.Equal(new HeroBonus(10f, 15f), declared.Bonus);
+        }
+
+        [Fact]
+        public void a_heros_level_set_by_id_is_an_error()
+        {
+            AssertFails("HeroLevel", "HeroLevel.Veteran changes ulev: a hero starts at level 1; its level is not declared");
+        }
+
+        [Fact]
+        public void a_units_level_set_outside_its_constructor_is_an_error()
+        {
+            AssertFails("LevelOutsideCtor", "LevelOutsideCtor.Veteran.Promote sets Level; a unit's level is set only in its declared class's constructor");
+        }
+
+        [Fact]
+        public void a_units_level_set_in_the_constructor_of_a_class_that_declares_nothing_is_an_error()
+        {
+            // The map has no class of Moonwell.Objects, so its assembly does not reference the library.
+            AssertFails("LevelInOtherCtor", "LevelInOtherCtor.Drill's constructor sets Level; a unit's level is set only in its declared class's constructor");
+        }
+
+        [Fact]
+        public void a_units_level_set_in_the_constructor_of_an_abstract_or_generic_base_is_declared()
+        {
+            var project = MapProject.Find(Path.Combine(TestFolders.Fixture("ObjectErrors"), "LevelInAbstractBase"));
+            var assembly = DotnetBuild.Run(project, false, TextWriter.Null);
+
+            var declared = Declarations.Read(assembly, project, built.Standard, null);
+
+            Assert.Equal(3, Find(declared.Objects, "LevelInAbstractBase.Veteran").Changed["ulev"]);
+            Assert.Equal(4, Find(declared.Objects, "LevelInAbstractBase.Sergeant").Changed["ulev"]);
+        }
+
+        [Fact]
+        public void a_units_level_set_in_a_class_of_its_own_inside_a_declared_class_is_an_error()
+        {
+            AssertFails("LevelInNestedHelper", "LevelInNestedHelper.Veteran.Promoter's constructor sets Level; a unit's level is set only in its declared class's constructor");
         }
 
         [Fact]
@@ -561,7 +648,7 @@ namespace Moonwell.Build.Tests
 
             Assert.Equal("dotnet build failed", error.Message);
             Assert.Contains(
-                "error MW0009: Giant.HitPoints is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it",
+                "error MW0009: Giant.MaxLife is 600000; Hit Points Maximum (Base) (uhpm) allows 1 to 500000; [BeyondLimits] goes past it",
                 log.ToString());
         }
 
