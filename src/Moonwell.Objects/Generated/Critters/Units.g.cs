@@ -27,6 +27,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 100f;
+                    AnimationWalkSpeed = 100f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -93,7 +95,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 0f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -104,6 +106,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -218,7 +221,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 20f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -229,6 +232,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -344,7 +348,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 15f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -355,6 +359,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -402,6 +407,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 190f;
+                    AnimationWalkSpeed = 190f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -466,7 +473,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 30f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -481,6 +488,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.15f;
                     ShadowImageCenterX = 35f;
                     ShadowImageCenterY = 35f;
                     ShadowImageHeight = 70f;
@@ -524,6 +532,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 100f;
+                    AnimationWalkSpeed = 100f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -590,7 +600,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 30f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -601,6 +611,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 1.25f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -646,6 +657,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 100f;
+                    AnimationWalkSpeed = 100f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -712,7 +725,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 30f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -723,9 +736,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1f;
                     ShadowImageCenterX = 35f;
                     ShadowImageCenterY = 35f;
                     ShadowImageHeight = 70f;
@@ -768,6 +783,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 100f;
+                    AnimationWalkSpeed = 100f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -832,7 +849,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 0f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -844,6 +861,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -957,7 +975,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 20f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -968,6 +986,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -1015,6 +1034,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 190f;
+                    AnimationWalkSpeed = 190f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -1093,6 +1114,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 1.4f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -1206,7 +1228,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 25f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -1217,6 +1239,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -1264,6 +1287,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 100f;
+                    AnimationWalkSpeed = 100f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -1328,7 +1353,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 20f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -1339,6 +1364,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -1386,6 +1412,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 100f;
+                    AnimationWalkSpeed = 100f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -1451,7 +1479,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 0f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -1463,6 +1491,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 1;
                     RequiredAnimationNames = "swim";
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -1510,6 +1539,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 100f;
+                    AnimationWalkSpeed = 100f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -1574,7 +1605,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 120f;
+                    ProjectileImpactZ = 30f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -1585,6 +1616,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -1699,8 +1731,9 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\critters\\EasterRabbit\\EasterRabbit_portrait";
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 20f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -1827,7 +1860,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 20f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -1838,6 +1871,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -1952,7 +1986,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 15f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 10f;
                     ProjectileLaunchY = -48f;
@@ -1963,6 +1997,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -2010,6 +2045,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 100f;
+                    AnimationWalkSpeed = 100f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -2073,8 +2110,9 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\critters\\Seal\\Seal_portrait";
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 15f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -2085,6 +2123,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -2132,6 +2171,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 100f;
+                    AnimationWalkSpeed = 100f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -2197,7 +2238,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 25f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -2209,6 +2250,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -2256,6 +2298,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 100f;
+                    AnimationWalkSpeed = 100f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -2320,7 +2364,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 25f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -2332,6 +2376,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -2379,6 +2424,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 100f;
+                    AnimationWalkSpeed = 100f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -2444,7 +2491,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 0f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -2457,6 +2504,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 1;
                     RequiredAnimationNames = "swim";
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = true;
@@ -2504,6 +2552,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 200f;
+                    AnimationWalkSpeed = 200f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -2570,7 +2620,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 15f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -2581,6 +2631,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 0.85f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -2628,6 +2679,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 100f;
+                    AnimationWalkSpeed = 100f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -2694,7 +2747,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 10f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -2705,6 +2758,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 230f;
                     SelectionCircleOnWater = false;
@@ -2751,6 +2805,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 190f;
+                    AnimationWalkSpeed = 190f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -2814,8 +2870,9 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\critters\\BlackStagMale\\BlackStagMale_portrait";
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 35f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -2826,9 +2883,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 1.2f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -2871,6 +2930,8 @@ namespace Moonwell.Objects
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 100f;
+                    AnimationWalkSpeed = 100f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1DamageLossFactor = 0f;
@@ -2935,7 +2996,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 0f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;

@@ -98,6 +98,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\human\\AltarofKings\\AltarofKings_portrait";
                     Priority = 5;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -225,6 +226,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\human\\ArcaneSanctum\\ArcaneSanctum_portrait";
                     Priority = 5;
                     ProjectileImpactZ = 160f;
                     ProjectileImpactZSwimming = 0f;
@@ -368,6 +370,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\human\\HumanTower\\HumanTower_portrait";
                     Priority = 2;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -494,6 +497,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\human\\ArcaneVault\\ArcaneVault_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -551,6 +555,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 2.4f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.85f;
@@ -661,7 +667,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 15f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 66f;
+                    ProjectileLaunchZ = 100f;
                     ProjectileLaunchZSwimming = 0f;
                     ProperNames = "Tenn Flamecaster,Nilas Arcanister,Andromath,Shal Lightbinder,Aran Spellweaver,Manath Magesinger,Landazar,Doril Magefont,Peril Spellbinder,Conjurus Rex,Fordred Aran,Dalar Dawnweaver,Kelen the Seeker";
                     ProperNamesUsed = 13;
@@ -801,6 +807,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\human\\HumanBarracks\\HumanBarracks_portrait";
                     Priority = 9;
                     ProjectileImpactZ = 160f;
                     ProjectileImpactZSwimming = 0f;
@@ -926,6 +933,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\human\\Blacksmith\\Blacksmith_portrait";
                     Priority = 4;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -984,6 +992,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 1f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 300f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.85f;
@@ -1087,11 +1097,11 @@ namespace Moonwell.Objects
                     PointValue = 100;
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.INT;
                     Priority = 9;
-                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZ = 90f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 15f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 66f;
+                    ProjectileLaunchZ = 100f;
                     ProjectileLaunchZSwimming = 0f;
                     ProperNames = "Eldin Sunstrider,Tanin Hawkwing,Lorn Bloodseeker,Aldos Firestar,Gilaras Drakeson,Hale Magefire,Kath'ranis Remar,Tyoril Sunchaser,Sylvos Windrunner,Tenris Mirkblood,Marakanis Starfury,Geldor Earthfire,Halendor Burnkin,Kelen the Destroyer";
                     ProperNamesUsed = 9;
@@ -1261,6 +1271,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\human\\HumanTower\\HumanTower_portrait";
                     Priority = 3;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -1391,6 +1402,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\human\\TownHall\\TownHall_portrait";
                     Priority = 8;
                     ProjectileImpactZ = 160f;
                     ProjectileImpactZSwimming = 0f;
@@ -1451,6 +1463,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 0f;
+                    AnimationWalkSpeed = 0f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -1543,6 +1557,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Other\\DiabloCar\\DiabloCar_portrait";
                     Priority = 3;
                     ProjectileImpactZ = 80f;
                     ProjectileImpactZSwimming = 0f;
@@ -1606,6 +1621,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 1.03f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.633f;
@@ -1696,7 +1713,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = -17f;
-                    ProjectileLaunchZ = 33f;
+                    ProjectileLaunchZ = 20f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Human;
@@ -1757,6 +1774,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 0f;
+                    AnimationWalkSpeed = 0f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -1849,6 +1868,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Other\\DwarfCar\\DwarfCar_portrait";
                     Priority = 3;
                     ProjectileImpactZ = 80f;
                     ProjectileImpactZSwimming = 0f;
@@ -1866,6 +1886,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3f;
                     ShadowImageCenterX = 120f;
                     ShadowImageCenterY = 120f;
                     ShadowImageHeight = 240f;
@@ -1980,6 +2001,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\human\\Farm\\Farm_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -2034,6 +2056,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 400f;
+                    AnimationWalkSpeed = 400f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.97f;
@@ -2195,6 +2219,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -2406,6 +2432,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\human\\GryphonAviary\\GryphonAviary_portrait";
                     Priority = 5;
                     ProjectileImpactZ = 160f;
                     ProjectileImpactZSwimming = 0f;
@@ -2425,6 +2452,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 4.1f;
                     ShadowTextureBuilding = "ShadowGryphonAviary";
                     SightRadiusNight = 600;
                     SightRange = 900;
@@ -2463,6 +2491,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.87f;
@@ -2559,7 +2589,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 12f;
                     ProjectileLaunchY = -17f;
-                    ProjectileLaunchZ = 33f;
+                    ProjectileLaunchZ = 60f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Human;
@@ -2706,6 +2736,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\human\\HumanTower\\HumanTower_portrait";
                     Priority = 2;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -2836,6 +2867,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\human\\TownHall\\TownHall_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 160f;
                     ProjectileImpactZSwimming = 0f;
@@ -2897,6 +2929,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 2.4f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.85f;
@@ -3007,7 +3041,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 15f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 66f;
+                    ProjectileLaunchZ = 80f;
                     ProjectileLaunchZSwimming = 0f;
                     ProperNames = "Kelen the Seeker";
                     ProperNamesUsed = 13;
@@ -3020,6 +3054,7 @@ namespace Moonwell.Objects
                     RequirementsTier2.Set<global::Moonwell.Objects.Human.Units.Keep>();
                     RequirementsTier3.Set<global::Moonwell.Objects.Human.Units.Castle>();
                     RequirementsTiersUsed = 3;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -3072,6 +3107,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 5;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.44f;
@@ -3288,6 +3325,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\human\\HumanLumbermill\\HumanLumbermill_portrait";
                     Priority = 4;
                     ProjectileImpactZ = 160f;
                     ProjectileImpactZSwimming = 0f;
@@ -3343,6 +3381,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.44f;
@@ -3485,6 +3525,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.9f;
                     AnimationCastPoint = 1.1f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 1.1f;
@@ -3586,7 +3628,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 30f;
                     ProjectileLaunchY = 25f;
-                    ProjectileLaunchZ = 0f;
+                    ProjectileLaunchZ = 60f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Human;
@@ -3650,6 +3692,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 290f;
+                    AnimationWalkSpeed = 290f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.65f;
@@ -3754,7 +3798,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 90f;
                     ProjectileLaunchZSwimming = 0f;
                     ProperNames = "Bor Stonebreaker,Munin Ironcliff,Thorgas Broadaxe,Kelv Sternhammer,Grim Thunderbrew,Buri Frostbeard,Huginn Ironcliff,Thordin Rockbeard,Bandis Forgefire,Gar Doomforge,Beazel Bludstone,Modi Stonesmith,Aggronor the Mighty";
                     ProperNamesUsed = 13;
@@ -3824,6 +3868,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 0f;
+                    AnimationWalkSpeed = 0f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -3916,6 +3962,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Other\\Orccar\\Orccar_portrait";
                     Priority = 3;
                     ProjectileImpactZ = 80f;
                     ProjectileImpactZSwimming = 0f;
@@ -3933,6 +3980,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3.5f;
                     ShadowImageCenterX = 120f;
                     ShadowImageCenterY = 120f;
                     ShadowImageHeight = 300f;
@@ -3980,6 +4028,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 1.67f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 290f;
+                    AnimationWalkSpeed = 290f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.567f;
@@ -4153,6 +4203,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 190f;
+                    AnimationWalkSpeed = 190f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.567f;
@@ -4312,6 +4364,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.5f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.633f;
@@ -4402,7 +4456,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 20f;
+                    ProjectileLaunchZ = 50f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 61f;
                     Race = global::Moonwell.Objects.UnitRace.Human;
@@ -4579,6 +4633,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.67f;
                     AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.58f;
@@ -4644,6 +4700,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "P";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPriestV1.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -4670,7 +4727,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 90f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Human;
@@ -4731,6 +4788,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -4877,6 +4936,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 120f;
+                    AnimationWalkSpeed = 120f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.567f;
@@ -5104,6 +5165,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\human\\HumanTower\\HumanTower_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -5159,6 +5221,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 220f;
+                    AnimationWalkSpeed = 220f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -5320,6 +5384,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 220f;
+                    AnimationWalkSpeed = 220f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -5487,6 +5553,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 1.08f;
                     AnimationCastPoint = 0.45f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.78f;
@@ -5552,6 +5620,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "S";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSorceressV1.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -5578,7 +5647,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 85f;
+                    ProjectileLaunchZ = 80f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Human;
@@ -5729,7 +5798,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 40f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Human;
@@ -5865,6 +5934,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\human\\TownHall\\TownHall_portrait";
                     Priority = 6;
                     ProjectileImpactZ = 160f;
                     ProjectileImpactZSwimming = 0f;
@@ -5924,6 +5994,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 0f;
+                    AnimationWalkSpeed = 0f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -6016,6 +6088,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Other\\UndeadCar\\UndeadCar_portrait";
                     Priority = 3;
                     ProjectileImpactZ = 80f;
                     ProjectileImpactZSwimming = 0f;
@@ -6033,6 +6106,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.75f;
                     ShadowImageCenterX = 120f;
                     ShadowImageCenterY = 120f;
                     ShadowImageHeight = 240f;
@@ -6078,6 +6152,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 220f;
+                    AnimationWalkSpeed = 220f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Metal;
                     Attack1AnimationBackswingPoint = 0.5f;
@@ -6236,6 +6312,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 220f;
+                    AnimationWalkSpeed = 220f;
                     Armor = 0;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.77f;
@@ -6322,7 +6400,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 105f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Human;
@@ -6380,6 +6458,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 220f;
+                    AnimationWalkSpeed = 220f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.77f;
@@ -6467,7 +6547,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 125f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Human;
@@ -6525,6 +6605,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 220f;
+                    AnimationWalkSpeed = 220f;
                     Armor = 2;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.77f;
@@ -6612,7 +6694,7 @@ namespace Moonwell.Objects
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZ = 145f;
                     ProjectileLaunchZSwimming = 0f;
                     PropulsionWindowDegrees = 60f;
                     Race = global::Moonwell.Objects.UnitRace.Human;
@@ -6741,6 +6823,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\human\\Workshop\\Workshop_portrait";
                     Priority = 5;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;

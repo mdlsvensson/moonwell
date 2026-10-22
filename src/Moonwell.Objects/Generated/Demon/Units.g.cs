@@ -28,6 +28,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Stone;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -141,9 +143,11 @@ namespace Moonwell.Objects
                     RepairLumberCost = 120;
                     RepairTime = 70;
                     RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.5f;
                     ShadowImageCenterX = 90f;
                     ShadowImageCenterY = 90f;
                     ShadowImageHeight = 180f;
@@ -192,6 +196,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Stone;
                     Attack1AnimationBackswingPoint = 0.7f;
@@ -291,6 +297,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\demon\\DoomGuard\\DoomGuard_portrait";
                     Priority = 8;
                     ProjectileImpactZ = 90f;
                     ProjectileImpactZSwimming = 0f;
@@ -308,6 +315,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.4f;
                     ShadowImageCenterX = 90f;
                     ShadowImageCenterY = 90f;
                     ShadowImageHeight = 180f;
@@ -356,6 +364,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 350f;
+                    AnimationWalkSpeed = 350f;
                     Armor = 3;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -435,7 +445,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PointValue = 100;
                     Priority = 1;
-                    ProjectileImpactZ = 100f;
+                    ProjectileImpactZ = 55f;
                     ProjectileImpactZSwimming = 0f;
                     ProjectileLaunchX = 0f;
                     ProjectileLaunchY = 0f;
@@ -451,6 +461,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 2.7f;
                     ShadowImageCenterX = 50f;
                     ShadowImageCenterY = 50f;
                     ShadowImageHeight = 140f;
@@ -499,6 +510,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.3f;
+                    AnimationRunSpeed = 320f;
+                    AnimationWalkSpeed = 320f;
                     Armor = 6;
                     ArmorType = global::Moonwell.Objects.ArmorType.Stone;
                     Attack1AnimationBackswingPoint = 0.74f;
@@ -591,6 +604,7 @@ namespace Moonwell.Objects
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 3.2f;
                     ShadowImageCenterX = 100f;
                     ShadowImageCenterY = 100f;
                     ShadowImageHeight = 200f;

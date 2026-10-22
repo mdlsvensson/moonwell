@@ -791,7 +791,7 @@ namespace Moonwell.Objects
                     Duration = Levels(180f);
                     HeroAbility = false;
                     HeroDuration = Levels(0f);
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAzureDragon.blp";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAzureDrake.blp";
                     ItemAbility = true;
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
@@ -886,7 +886,7 @@ namespace Moonwell.Objects
                     Duration = Levels(180f);
                     HeroAbility = false;
                     HeroDuration = Levels(0f);
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNpurpleDragonSpawn.blp";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDragonSpawnOverseer.blp";
                     ItemAbility = true;
                     LevelCount = 1;
                     LevelSkipRequirement = 0;

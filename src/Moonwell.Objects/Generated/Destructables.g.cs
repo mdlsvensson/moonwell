@@ -57,7 +57,7 @@ namespace Moonwell.Objects
                 ReplaceableTextureFile = "ReplaceableTextures\\AshenvaleTree\\AshenCanopyTree";
                 ReplaceableTextureID = 32;
                 SelectableInGame = false;
-                SelectionSizeEditor = 0f;
+                SelectionSizeEditor = 340f;
                 SelectionSizeGame = 256f;
                 Shadow = "BuildingShadowSmall";
                 ShowDeadVersionInPalette = true;
@@ -104,7 +104,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
                 Model = "Doodads\\Terrain\\AshenTree\\AshenTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 5;
                 Name = "WESTRING_DEST_ASHENVALE_TREE_WALL";
                 OcclusionHeight = 230f;
@@ -166,7 +166,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1.1f;
                 Model = "Buildings\\Other\\BarrelsUnit0\\BarrelsUnit0";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Buildings\\Other\\BarrelsUnit0\\BarrelsUnit0";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\BarrelsUnit_Portrait\\BarrelsUnit0_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_BARREL";
                 OcclusionHeight = 0f;
@@ -226,7 +226,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1.1f;
                 Model = "Buildings\\Other\\BarrelsUnit\\BarrelsUnit";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Buildings\\Other\\BarrelsUnit\\BarrelsUnit";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\BarrelsUnit_Portrait\\BarrelsUnit_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_BARREL";
                 OcclusionHeight = 0f;
@@ -286,7 +286,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1.1f;
                 Model = "Buildings\\Other\\BarrelsUnit1\\BarrelsUnit1";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Buildings\\Other\\BarrelsUnit1\\BarrelsUnit1";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\BarrelsUnit_Portrait\\BarrelsUnit1_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_BARREL";
                 OcclusionHeight = 0f;
@@ -346,7 +346,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1.1f;
                 Model = "Units\\Other\\TNTBarrel\\TNTBarrel";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Units\\Other\\TNTBarrel\\TNTBarrel";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\TNTBarrel_Portrait\\TNTBarrel_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_BARREL_EXPLOSIVES";
                 OcclusionHeight = 0f;
@@ -404,9 +404,9 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Ashenvale\\Plants\\AshenCanopyTree\\AshenCanopyTree";
+                Model = "Doodads\\Barrens\\Plants\\BarrensCanopyTree\\BarrensCanopyTree";
                 ModelFileHasLightweightModel = false;
-                ModelFileVariations = 3;
+                ModelFileVariations = 0;
                 Name = "WESTRING_DOOD_BTTC";
                 OcclusionHeight = 300f;
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -419,7 +419,7 @@ namespace Moonwell.Objects
                 ReplaceableTextureFile = "ReplaceableTextures\\BarrensTree\\BarrensTree";
                 ReplaceableTextureID = 32;
                 SelectableInGame = false;
-                SelectionSizeEditor = 0f;
+                SelectionSizeEditor = 460f;
                 SelectionSizeGame = 256f;
                 Shadow = "BuildingShadowSmall";
                 ShowDeadVersionInPalette = true;
@@ -466,7 +466,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
                 Model = "Doodads\\Terrain\\BarrensTree\\BarrensTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 10;
                 Name = "WESTRING_DEST_BARRENS_TREE_WALL";
                 OcclusionHeight = 230f;
@@ -527,7 +527,7 @@ namespace Moonwell.Objects
                 MinimumScale = 0.8f;
                 Model = "Doodads\\LordaeronSummer\\Terrain\\Barricade\\Barricade";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\LordaeronSummer\\Terrain\\Barricade\\Barricade0";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Barricade_Portrait\\Barricade_Portrait";
                 ModelFileVariations = 2;
                 Name = "WESTRING_DOOD_LOBA";
                 OcclusionHeight = 0f;
@@ -586,7 +586,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.65f;
                 Model = "Doodads\\Terrain\\OutlandMushroomTree\\OutlandMushroomTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 10;
                 Name = "WESTRING_DEST_BLACK_CITADEL_TREE_WALL";
                 OcclusionHeight = 230f;
@@ -658,7 +658,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -719,7 +719,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -769,7 +769,7 @@ namespace Moonwell.Objects
                 MinimumScale = 0.8f;
                 Model = "Doodads\\LordaeronSummer\\Props\\Cage\\Cage";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\LordaeronSummer\\Props\\Cage\\Cage";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Cage_Portrait\\Cage_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_CAGE";
                 OcclusionHeight = 0f;
@@ -952,7 +952,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
                 Model = "Doodads\\Terrain\\CityscapeTree\\CityscapeTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 2;
                 Name = "WESTRING_DEST_CITYSCAPE_FALL_TREE_WALL";
                 OcclusionHeight = 300f;
@@ -1013,7 +1013,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
                 Model = "Doodads\\Terrain\\CityscapeTree\\CityscapeTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 2;
                 Name = "WESTRING_DEST_CITYSCAPE_RUINED_TREE_WALL";
                 OcclusionHeight = 300f;
@@ -1074,7 +1074,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
                 Model = "Doodads\\Terrain\\CityscapeTree\\CityscapeTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 2;
                 Name = "WESTRING_DEST_CITYSCAPE_SNOWY_TREE_WALL";
                 OcclusionHeight = 300f;
@@ -1135,7 +1135,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
                 Model = "Doodads\\Terrain\\CityscapeTree\\CityscapeTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 2;
                 Name = "WESTRING_DEST_CITYSCAPE_SUMMER_TREE_WALL";
                 OcclusionHeight = 300f;
@@ -1196,7 +1196,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
                 Model = "Doodads\\Terrain\\CityscapeTree\\CityscapeTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 2;
                 Name = "WESTRING_DEST_CITYSCAPE_WINTER_TREE_WALL";
                 OcclusionHeight = 300f;
@@ -1258,7 +1258,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\Dungeon\\Terrain\\CaveGate\\CaveGate";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\CaveGate_Portrait\\CaveGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_DTC1";
                 OcclusionHeight = 0f;
@@ -1319,7 +1319,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\Dungeon\\Terrain\\CaveGate2\\CaveGate2";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\CaveGate_Portrait\\CaveGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_DTC2";
                 OcclusionHeight = 0f;
@@ -1380,7 +1380,7 @@ namespace Moonwell.Objects
                 MinimumScale = 0.8f;
                 Model = "Doodads\\LordaeronSummer\\Terrain\\Crates\\Crates";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Buildings\\Other\\CratesUnit\\CratesUnit";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\CratesUnit_Portrait\\CratesUnit_Portrait";
                 ModelFileVariations = 2;
                 Name = "WESTRING_DOOD_LOCS";
                 OcclusionHeight = 0f;
@@ -1497,7 +1497,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
                 Model = "Doodads\\Terrain\\LordaeronTree\\LordaeronTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 10;
                 Name = "WESTRING_DEST_DALARAN_RUINS_TREE_WALL";
                 OcclusionHeight = 230f;
@@ -2536,7 +2536,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\SilvermoonBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectionSizeEditor = 0f;
                 Shadow = "none";
@@ -2585,7 +2585,7 @@ namespace Moonwell.Objects
                 MinimumScale = 0.9f;
                 Model = "Doodads\\LordaeronSummer\\Terrain\\ElfGate\\ElfGate";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\ElfGate_Portrait\\ElfGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_ELVEN_GATE_HORIZONTAL";
                 OcclusionHeight = 400f;
@@ -2646,7 +2646,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\LordaeronSummer\\Terrain\\ElfGate45\\ElfGate45";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\ElfGate_Portrait\\ElfGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_ELVEN_GATE_DIAGONAL_1";
                 OcclusionHeight = 400f;
@@ -2707,7 +2707,7 @@ namespace Moonwell.Objects
                 MinimumScale = 0.9f;
                 Model = "Doodads\\LordaeronSummer\\Terrain\\ElfGate\\ElfGate";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\ElfGate_Portrait\\ElfGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_ELVEN_GATE_VERTICAL";
                 OcclusionHeight = 400f;
@@ -2768,7 +2768,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\LordaeronSummer\\Terrain\\ElfGate45\\ElfGate45";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\ElfGate_Portrait\\ElfGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_ELVEN_GATE_DIAGONAL_2";
                 OcclusionHeight = 400f;
@@ -2840,7 +2840,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge1.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -2902,7 +2902,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge1.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -2964,7 +2964,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge1.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -3026,7 +3026,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge1.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -3076,7 +3076,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
                 Model = "Doodads\\Terrain\\LordaeronTree\\LordaeronTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 10;
                 Name = "WESTRING_DEST_FALL_TREE_WALL";
                 OcclusionHeight = 230f;
@@ -3151,7 +3151,7 @@ namespace Moonwell.Objects
                 ReplaceableTextureFile = "ReplaceableTextures\\AshenvaleTree\\FelwoodTree";
                 ReplaceableTextureID = 32;
                 SelectableInGame = false;
-                SelectionSizeEditor = 0f;
+                SelectionSizeEditor = 385f;
                 SelectionSizeGame = 256f;
                 Shadow = "BuildingShadowSmall";
                 ShowDeadVersionInPalette = true;
@@ -3198,7 +3198,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
                 Model = "Doodads\\Terrain\\AshenTree\\AshenTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 5;
                 Name = "WESTRING_DEST_FELWOOD_TREE_WALL";
                 OcclusionHeight = 230f;
@@ -3747,7 +3747,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\Icecrown\\Terrain\\IceCrownThroneGate\\IceCrownThroneGate";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\IceCrownThroneGate_Portrait\\IceCrownThroneGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_FROZEN_THRONE_GATE";
                 OcclusionHeight = 400f;
@@ -3799,13 +3799,13 @@ namespace Moonwell.Objects
                 HiddenInGame = false;
                 HitPoints = 500f;
                 IsWalkable = false;
-                MaximumScale = 0.9f;
+                MaximumScale = 1f;
                 MinimapColor1Red = 0;
                 MinimapColor2Green = 0;
                 MinimapColor3Blue = 0;
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
-                MinimumScale = 0.9f;
+                MinimumScale = 1f;
                 Model = "Doodads\\LordaeronSummer\\Terrain\\Gate\\Gate";
                 ModelFileHasLightweightModel = false;
                 ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
@@ -3921,13 +3921,13 @@ namespace Moonwell.Objects
                 HiddenInGame = false;
                 HitPoints = 500f;
                 IsWalkable = false;
-                MaximumScale = 0.9f;
+                MaximumScale = 1f;
                 MinimapColor1Red = 0;
                 MinimapColor2Green = 0;
                 MinimapColor3Blue = 0;
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
-                MinimumScale = 0.9f;
+                MinimumScale = 1f;
                 Model = "Doodads\\LordaeronSummer\\Terrain\\Gate\\Gate";
                 ModelFileHasLightweightModel = false;
                 ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
@@ -4650,7 +4650,7 @@ namespace Moonwell.Objects
                 MinimumScale = 0.9f;
                 Model = "Doodads\\Icecrown\\Terrain\\IceGate\\IceGate";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\IceGate_Portrait\\IceGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_ICE_GATE_HORIZONTAL";
                 OcclusionHeight = 400f;
@@ -4711,7 +4711,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\Icecrown\\Terrain\\IceGate45\\IceGate45";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\IceGate_Portrait\\IceGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_ICE_GATE_DIAGONAL_1";
                 OcclusionHeight = 400f;
@@ -4772,7 +4772,7 @@ namespace Moonwell.Objects
                 MinimumScale = 0.9f;
                 Model = "Doodads\\Icecrown\\Terrain\\IceGate\\IceGate";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\IceGate_Portrait\\IceGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_ICE_GATE_VERTICAL";
                 OcclusionHeight = 400f;
@@ -4833,7 +4833,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\Icecrown\\Terrain\\IceGate45\\IceGate45";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\IceGate_Portrait\\IceGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_ICE_GATE_DIAGONAL_2";
                 OcclusionHeight = 400f;
@@ -4892,9 +4892,9 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Ashenvale\\Plants\\AshenCanopyTree\\AshenCanopyTree";
+                Model = "Doodads\\Icecrown\\Plants\\IcecrownCanopyTree\\IcecrownCanopyTree";
                 ModelFileHasLightweightModel = false;
-                ModelFileVariations = 3;
+                ModelFileVariations = 0;
                 Name = "WESTRING_DOOD_ITTC";
                 OcclusionHeight = 300f;
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -4907,7 +4907,7 @@ namespace Moonwell.Objects
                 ReplaceableTextureFile = "ReplaceableTextures\\AshenvaleTree\\Ice_Tree";
                 ReplaceableTextureID = 32;
                 SelectableInGame = false;
-                SelectionSizeEditor = 0f;
+                SelectionSizeEditor = 260f;
                 SelectionSizeGame = 256f;
                 Shadow = "BuildingShadowSmall";
                 ShowDeadVersionInPalette = true;
@@ -4951,7 +4951,7 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 1f;
-                Model = "Doodads\\Cityscape\\Terrain\\CityEnteranceGate\\CityEnteranceGate";
+                Model = "Doodads\\Icecrown\\Terrain\\IcecrownCitadelEntrance\\IcecrownCitadelEntrance";
                 ModelFileHasLightweightModel = false;
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_ICECROWN_CITADEL_ENTRANCE";
@@ -4962,8 +4962,6 @@ namespace Moonwell.Objects
                 RepairGoldCost = 0;
                 RepairLumberCost = 0;
                 RepairTime = 0;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
-                ReplaceableTextureID = 11;
                 SelectionSizeEditor = 0f;
                 Shadow = "ShadowGate1";
                 ShowDeadVersionInPalette = true;
@@ -5305,7 +5303,7 @@ namespace Moonwell.Objects
                 MinimumScale = 0.9f;
                 Model = "Doodads\\Icecrown\\Terrain\\IceCrownGate\\IceCrownGate";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\IceCrownGate_Portrait\\IceCrownGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_ICECROWN_GATE_HORIZONTAL";
                 OcclusionHeight = 400f;
@@ -5366,7 +5364,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\Icecrown\\Terrain\\IceCrownGate45\\IceCrownGate45";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\IceCrownGate_Portrait\\IceCrownGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_ICECROWN_GATE_DIAGONAL_1";
                 OcclusionHeight = 400f;
@@ -5427,7 +5425,7 @@ namespace Moonwell.Objects
                 MinimumScale = 0.9f;
                 Model = "Doodads\\Icecrown\\Terrain\\IceCrownGate\\IceCrownGate";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\IceCrownGate_Portrait\\IceCrownGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_ICECROWN_GATE_VERTICAL";
                 OcclusionHeight = 400f;
@@ -5488,7 +5486,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\Icecrown\\Terrain\\IceCrownGate45\\IceCrownGate45";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\IceCrownGate_Portrait\\IceCrownGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_ICECROWN_GATE_DIAGONAL_2";
                 OcclusionHeight = 400f;
@@ -5549,7 +5547,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\Icecrown\\Structures\\Igloo\\Igloo";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Icecrown\\Structures\\Igloo\\Igloo";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Igloo_Portrait\\Igloo_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DOOD_ISIG";
                 OcclusionHeight = 230f;
@@ -5725,7 +5723,7 @@ namespace Moonwell.Objects
                 MinimumScale = 0.9f;
                 Model = "Doodads\\LordaeronSummer\\Terrain\\IronGate\\IronGate";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\IronGate_Portrait\\IronGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_IRON_GATE_HORIZONTAL";
                 OcclusionHeight = 400f;
@@ -5786,7 +5784,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\LordaeronSummer\\Terrain\\IronGate45\\IronGate45";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\IronGate_Portrait\\IronGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_IRON_GATE_DIAGONAL_1";
                 OcclusionHeight = 400f;
@@ -5847,7 +5845,7 @@ namespace Moonwell.Objects
                 MinimumScale = 0.9f;
                 Model = "Doodads\\LordaeronSummer\\Terrain\\IronGate\\IronGate";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\IronGate_Portrait\\IronGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_IRON_GATE_VERTICAL";
                 OcclusionHeight = 400f;
@@ -5908,7 +5906,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\LordaeronSummer\\Terrain\\IronGate45\\IronGate45";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\IronGate_Portrait\\IronGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_IRON_GATE_DIAGONAL_2";
                 OcclusionHeight = 400f;
@@ -6154,7 +6152,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\WoodenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -6216,7 +6214,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\WoodenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -6266,7 +6264,7 @@ namespace Moonwell.Objects
                 MinimumScale = 0.9f;
                 Model = "Doodads\\Cinematic\\DungeonLever\\DungeonLever";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Cinematic\\DungeonLever\\DungeonLever";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\DungeonLever_Portrait\\DungeonLever_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_LEVER";
                 OcclusionHeight = 0f;
@@ -6439,7 +6437,7 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 1f;
-                Model = "Doodads\\BlackCitadel\\Props\\BlackCitadelStatue\\BlackCitadelStatue";
+                Model = "Doodads\\LordaeronFall\\Terrain\\LionStatue\\LionStatue";
                 ModelFileHasLightweightModel = false;
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_LION_STATUE";
@@ -6496,7 +6494,7 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 1f;
-                Model = "Doodads\\BlackCitadel\\Props\\BlackCitadelStatue\\BlackCitadelStatue";
+                Model = "Doodads\\LordaeronFall\\Terrain\\LionStatue_Destroyed\\LionStatue_Destroyed";
                 ModelFileHasLightweightModel = false;
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_LION_STATUE_DESTROYED";
@@ -6567,7 +6565,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\ElvenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -6629,7 +6627,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\ElvenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -6691,7 +6689,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\ElvenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -6753,7 +6751,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\ElvenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -6815,7 +6813,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge0.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -6877,7 +6875,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge0.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -6939,7 +6937,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge0.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -7001,7 +6999,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge0.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -7063,7 +7061,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge1.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -7125,7 +7123,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge1.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -7187,7 +7185,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge1.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -7249,7 +7247,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge1.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -7803,7 +7801,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\RicketyWoodBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -7865,7 +7863,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\RicketyWoodBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -7927,7 +7925,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\RicketyWoodBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -7989,7 +7987,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\RicketyWoodBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -8051,7 +8049,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -8113,7 +8111,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -8175,7 +8173,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -8237,7 +8235,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -8299,7 +8297,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -8361,7 +8359,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -8423,7 +8421,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -8485,7 +8483,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -8547,7 +8545,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StratholmeBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -8609,7 +8607,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StratholmeBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -8671,7 +8669,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StratholmeBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -8733,7 +8731,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StratholmeBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -9039,7 +9037,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\WoodenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -9101,7 +9099,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\WoodenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -9163,7 +9161,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\WoodenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -9225,7 +9223,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\WoodenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -9380,7 +9378,7 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 1f;
-                Model = "Doodads\\Dalaran\\Terrain\\DalaranVioletCitadel\\DalaranVioletCitadel";
+                Model = "Doodads\\LordaeronFall\\Terrain\\LordaeronCityMainBuilding\\LordaeronCityMainBuilding";
                 ModelFileHasLightweightModel = false;
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_LORDAERON_CITY_MAIN_BUILDING";
@@ -9488,7 +9486,7 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 1f;
-                Model = "Doodads\\Cityscape\\Terrain\\CityEnteranceGate\\CityEnteranceGate";
+                Model = "Doodads\\LordaeronFall\\Terrain\\LordaeronCityMainGate\\LordaeronCityMainGate";
                 ModelFileHasLightweightModel = false;
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_LORDAERON_CITY_MAIN_GATE";
@@ -9499,8 +9497,6 @@ namespace Moonwell.Objects
                 RepairGoldCost = 0;
                 RepairLumberCost = 0;
                 RepairTime = 0;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
-                ReplaceableTextureID = 11;
                 SelectionSizeEditor = 0f;
                 Shadow = "ShadowGate1";
                 ShowDeadVersionInPalette = true;
@@ -9658,7 +9654,7 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 1f;
-                Model = "Doodads\\Cityscape\\Terrain\\CityEnteranceGate\\CityEnteranceGate";
+                Model = "Doodads\\LordaeronFall\\Terrain\\LordaeronCityMainGate_Destroyed\\LordaeronCityMainGate_Destroyed";
                 ModelFileHasLightweightModel = false;
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_LORDAERON_CITY_MAIN_GATE_DESTROYED";
@@ -9669,8 +9665,6 @@ namespace Moonwell.Objects
                 RepairGoldCost = 0;
                 RepairLumberCost = 0;
                 RepairTime = 0;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
-                ReplaceableTextureID = 11;
                 SelectionSizeEditor = 0f;
                 Shadow = "ShadowGate1";
                 ShowDeadVersionInPalette = true;
@@ -9884,13 +9878,13 @@ namespace Moonwell.Objects
                 HiddenInGame = false;
                 HitPoints = 250f;
                 IsWalkable = false;
-                MaximumScale = 0.85f;
+                MaximumScale = 1.05f;
                 MinimapColor1Red = 0;
                 MinimapColor2Green = 0;
                 MinimapColor3Blue = 0;
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
-                MinimumScale = 0.85f;
+                MinimumScale = 1.05f;
                 Model = "Doodads\\Terrain\\DalaranMagicalPenWall\\DalaranMagicalPenWall";
                 ModelFileHasLightweightModel = false;
                 ModelFilePortrait = "Doodads\\Terrain\\Portraits\\DalaranMagicalPen_portrait\\DalaranMagicalPen_portrait";
@@ -10074,7 +10068,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\Cinematic\\SargerasGate\\SargerasGate";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\SargerasGate_Portrait\\SargerasGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_SARGERAS_GATE";
                 OcclusionHeight = 400f;
@@ -10135,7 +10129,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\Cinematic\\SargerasGate\\SargerasGate";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\SargerasGate_Portrait\\SargerasGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_SARGERAS_GATE";
                 OcclusionHeight = 400f;
@@ -10194,9 +10188,9 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Ashenvale\\Plants\\AshenCanopyTree\\AshenCanopyTree";
+                Model = "Doodads\\Northrend\\Plants\\NorthrendCanopyTree\\NorthrendCanopyTree";
                 ModelFileHasLightweightModel = false;
-                ModelFileVariations = 3;
+                ModelFileVariations = 0;
                 Name = "WESTRING_DOOD_NTTC";
                 OcclusionHeight = 300f;
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -10209,7 +10203,7 @@ namespace Moonwell.Objects
                 ReplaceableTextureFile = "ReplaceableTextures\\NorthrendTree\\NorthTree";
                 ReplaceableTextureID = 32;
                 SelectableInGame = false;
-                SelectionSizeEditor = 0f;
+                SelectionSizeEditor = 310f;
                 SelectionSizeGame = 256f;
                 Shadow = "BuildingShadowSmall";
                 ShowDeadVersionInPalette = true;
@@ -10256,7 +10250,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
                 Model = "Doodads\\Terrain\\NorthrendTree\\NorthrendTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 10;
                 Name = "WESTRING_DEST_ICY_TREE_WALL";
                 OcclusionHeight = 230f;
@@ -10267,6 +10261,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 0;
                 RepairLumberCost = 0;
                 RepairTime = 0;
+                ReplaceableTextureFile = "ReplaceableTextures\\NorthrendTreeIcy\\NorthTreeIcy";
                 ReplaceableTextureID = 34;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -10316,7 +10311,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
                 Model = "Doodads\\Terrain\\NorthrendTree\\NorthrendTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 10;
                 Name = "WESTRING_DEST_NORTHREND_TREE_WALL";
                 OcclusionHeight = 230f;
@@ -10385,8 +10380,6 @@ namespace Moonwell.Objects
                 RepairGoldCost = 0;
                 RepairLumberCost = 0;
                 RepairTime = 0;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
-                ReplaceableTextureID = 11;
                 SelectionSizeEditor = 0f;
                 Shadow = "ShadowGate1";
                 ShowDeadVersionInPalette = true;
@@ -10430,7 +10423,7 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 1f;
-                Model = "Doodads\\Dalaran\\Terrain\\DalaranVioletCitadel\\DalaranVioletCitadel";
+                Model = "Doodads\\Barrens\\Terrain\\OrgrimmarTower_Completed\\OrgrimmarTower_Completed";
                 ModelFileHasLightweightModel = false;
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_ORGRIMMAR_TOWER_COMPLETED";
@@ -10484,7 +10477,7 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 1f;
-                Model = "Doodads\\Dalaran\\Terrain\\DalaranVioletCitadel\\DalaranVioletCitadel";
+                Model = "Doodads\\Barrens\\Terrain\\OrgrimmarTower_UnderConstruction\\OrgrimmarTower_UnderConstruction";
                 ModelFileHasLightweightModel = false;
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_ORGRIMMAR_TOWER_UNDERCONSTRUCTION";
@@ -10651,7 +10644,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.65f;
                 Model = "Doodads\\Terrain\\OutlandMushroomTree\\OutlandMushroomTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 10;
                 Name = "WESTRING_DEST_OUTLAND_TREE_WALL";
                 OcclusionHeight = 230f;
@@ -11421,7 +11414,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\Cinematic\\RessurectionStoneSW\\RessurectionStoneSW";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Cinematic\\RessurectionStoneSW\\RessurectionStoneSW";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\RessurectionStoneSW_Portrait\\RessurectionStoneSW_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_RES_STONE";
                 OcclusionHeight = 0f;
@@ -11481,7 +11474,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\Cinematic\\RessurectionStoneSE\\RessurectionStoneSE";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Cinematic\\RessurectionStoneSE\\RessurectionStoneSE";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\RessurectionStoneSE_Portrait\\RessurectionStoneSE_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_RES_STONE";
                 OcclusionHeight = 0f;
@@ -11778,9 +11771,9 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.9f;
-                Model = "Doodads\\Ruins\\Terrain\\RuinsRoundDoor\\RuinsRoundDoor";
+                Model = "Doodads\\Icecrown\\Terrain\\IceCrownRoundDoor\\IceCrownRoundDoor";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\RuinsRoundDoor_Portrait\\RuinsRoundDoor_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\IceCrownRoundDoor_Portrait\\IceCrownRoundDoor_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_ICECROWN_ROUND_DOOR_HORIZONTAL_1";
                 OcclusionHeight = 400f;
@@ -11841,9 +11834,9 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.9f;
-                Model = "Doodads\\Ruins\\Terrain\\RuinsRoundDoor\\RuinsRoundDoor";
+                Model = "Doodads\\Icecrown\\Terrain\\IceCrownRoundDoor\\IceCrownRoundDoor";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\RuinsRoundDoor_Portrait\\RuinsRoundDoor_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\IceCrownRoundDoor_Portrait\\IceCrownRoundDoor_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_RUINS_ROUND_DOOR_VERTICAL_1";
                 OcclusionHeight = 400f;
@@ -11904,9 +11897,9 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.9f;
-                Model = "Doodads\\Ruins\\Terrain\\RuinsRoundDoor\\RuinsRoundDoor";
+                Model = "Doodads\\Icecrown\\Terrain\\IceCrownRoundDoor\\IceCrownRoundDoor";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\RuinsRoundDoor_Portrait\\RuinsRoundDoor_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\IceCrownRoundDoor_Portrait\\IceCrownRoundDoor_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_RUINS_ROUND_DOOR_HORIZONTAL_2";
                 OcclusionHeight = 400f;
@@ -11967,9 +11960,9 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 0.9f;
-                Model = "Doodads\\Ruins\\Terrain\\RuinsRoundDoor\\RuinsRoundDoor";
+                Model = "Doodads\\Icecrown\\Terrain\\IceCrownRoundDoor\\IceCrownRoundDoor";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\RuinsRoundDoor_Portrait\\RuinsRoundDoor_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\IceCrownRoundDoor_Portrait\\IceCrownRoundDoor_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_RUINS_ROUND_DOOR_VERTICAL_2";
                 OcclusionHeight = 400f;
@@ -12536,7 +12529,7 @@ namespace Moonwell.Objects
                 MinimumScale = 0.9f;
                 Model = "Doodads\\Ruins\\Terrain\\RuinsGate\\RuinsGate";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\RuinsGate_Portrait\\RuinsGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_RUINS_GATE_HORIZONTAL";
                 OcclusionHeight = 400f;
@@ -12597,7 +12590,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\Ruins\\Terrain\\RuinsGate45\\RuinsGate45";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\RuinsGate_Portrait\\RuinsGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_RUINS_GATE_DIAGONAL_1";
                 OcclusionHeight = 400f;
@@ -12658,7 +12651,7 @@ namespace Moonwell.Objects
                 MinimumScale = 0.9f;
                 Model = "Doodads\\Ruins\\Terrain\\RuinsGate\\RuinsGate";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\RuinsGate_Portrait\\RuinsGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_RUINS_GATE_VERTICAL";
                 OcclusionHeight = 400f;
@@ -12719,7 +12712,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\Ruins\\Terrain\\RuinsGate45\\RuinsGate45";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\Gate_Portrait\\Gate_Portrait";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\RuinsGate_Portrait\\RuinsGate_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_RUINS_GATE_DIAGONAL_2";
                 OcclusionHeight = 400f;
@@ -12778,9 +12771,9 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Ashenvale\\Plants\\AshenCanopyTree\\AshenCanopyTree";
+                Model = "Doodads\\Ruins\\Plants\\RuinsCanopyTree\\RuinsCanopyTree";
                 ModelFileHasLightweightModel = false;
-                ModelFileVariations = 3;
+                ModelFileVariations = 0;
                 Name = "WESTRING_DOOD_ZTTC";
                 OcclusionHeight = 300f;
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -12793,7 +12786,7 @@ namespace Moonwell.Objects
                 ReplaceableTextureFile = "ReplaceableTextures\\RuinsTree\\RuinsTree";
                 ReplaceableTextureID = 32;
                 SelectableInGame = false;
-                SelectionSizeEditor = 0f;
+                SelectionSizeEditor = 430f;
                 SelectionSizeGame = 256f;
                 Shadow = "BuildingShadowSmall";
                 ShowDeadVersionInPalette = true;
@@ -12898,7 +12891,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.65f;
                 Model = "Doodads\\Terrain\\RuinsTree\\RuinsTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 10;
                 Name = "WESTRING_DEST_RUINS_TREE_WALL";
                 OcclusionHeight = 230f;
@@ -12958,8 +12951,8 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Terrain\\NorthrendTree\\NorthrendTree";
-                ModelFileHasLightweightModel = true;
+                Model = "Doodads\\Terrain\\ScorchedTree\\ScorchedTree";
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 10;
                 Name = "WESTRING_DEST_SCORCHED_TREE_WALL";
                 OcclusionHeight = 300f;
@@ -12970,6 +12963,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 0;
                 RepairLumberCost = 0;
                 RepairTime = 0;
+                ReplaceableTextureFile = "ReplaceableTextures\\ScorchedTree\\ScorchedTree";
                 ReplaceableTextureID = 34;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -13020,7 +13014,7 @@ namespace Moonwell.Objects
                 MinimumScale = 1f;
                 Model = "Doodads\\Cinematic\\ShimmeringPortal\\ShimmeringPortal";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "Doodads\\Cinematic\\ShimmeringPortal\\ShimmeringPortal";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\ShimmeringPortal_Portrait\\ShimmeringPortal_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DOOD_OZSP";
                 OcclusionHeight = 0f;
@@ -13148,7 +13142,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\ElvenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -13210,7 +13204,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\ElvenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -13272,7 +13266,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\ElvenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -13334,7 +13328,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\ElvenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -13396,7 +13390,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge0.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -13458,7 +13452,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge0.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -13520,7 +13514,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge0.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -13582,7 +13576,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge0.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -13644,7 +13638,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge1.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -13706,7 +13700,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge1.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -13768,7 +13762,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge1.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -13830,7 +13824,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge1.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -14384,7 +14378,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\RicketyWoodBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -14446,7 +14440,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\RicketyWoodBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -14508,7 +14502,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\RicketyWoodBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -14570,7 +14564,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\RicketyWoodBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -14632,7 +14626,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -14694,7 +14688,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -14756,7 +14750,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -14818,7 +14812,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -14880,7 +14874,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -14942,7 +14936,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -15004,7 +14998,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -15066,7 +15060,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -15128,7 +15122,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StratholmeBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -15190,7 +15184,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StratholmeBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -15252,7 +15246,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StratholmeBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -15314,7 +15308,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StratholmeBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -15376,7 +15370,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\WoodenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -15438,7 +15432,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\WoodenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -15500,7 +15494,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\WoodenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -15562,7 +15556,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\WoodenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -15611,8 +15605,8 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
-                Model = "Doodads\\Terrain\\LordaeronTree\\LordaeronTree";
-                ModelFileHasLightweightModel = true;
+                Model = "Doodads\\Terrain\\SilvermoonTree\\SilvermoonTree";
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 10;
                 Name = "WESTRING_DEST_SILVER_MOON_TREE";
                 OcclusionHeight = 300f;
@@ -15623,6 +15617,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 0;
                 RepairLumberCost = 0;
                 RepairTime = 0;
+                ReplaceableTextureFile = "ReplaceableTextures\\SilvermoonTree\\SilverMoonTree";
                 ReplaceableTextureID = 31;
                 SelectionSizeEditor = 0f;
                 SelectionSizeGame = 128f;
@@ -15671,7 +15666,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
                 Model = "Doodads\\Terrain\\LordaeronTree\\LordaeronTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 10;
                 Name = "WESTRING_DEST_SNOWY_TREE_WALL";
                 OcclusionHeight = 230f;
@@ -15742,8 +15737,6 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\IceBridge.blp";
-                ReplaceableTextureID = 11;
                 SelectionSizeEditor = 0f;
                 Shadow = "none";
                 ShowDeadVersionInPalette = false;
@@ -17490,7 +17483,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
                 Model = "Doodads\\Terrain\\LordaeronTree\\LordaeronTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 10;
                 Name = "WESTRING_DEST_SUMMER_TREE_WALL";
                 OcclusionHeight = 230f;
@@ -17543,16 +17536,16 @@ namespace Moonwell.Objects
                 HiddenInGame = false;
                 HitPoints = 50f;
                 IsWalkable = false;
-                MaximumScale = 1f;
+                MaximumScale = 0.9f;
                 MinimapColor1Red = 0;
                 MinimapColor2Green = 0;
                 MinimapColor3Blue = 0;
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
-                MinimumScale = 1f;
+                MinimumScale = 0.9f;
                 Model = "doodads\\underground\\terrain\\SupportBeam\\SupportBeam";
                 ModelFileHasLightweightModel = false;
-                ModelFilePortrait = "doodads\\underground\\terrain\\SupportBeam\\SupportBeam";
+                ModelFilePortrait = "Doodads\\Terrain\\Portraits\\SupportBeam_Portrait\\SupportBeam_Portrait";
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_SUPPORT_COLUMN";
                 OcclusionHeight = 0f;
@@ -17623,7 +17616,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\LordaeronTree\\LordaeronWinterTree";
+                ReplaceableTextureFile = "ReplaceableTextures\\Treebridge\\LW_BridgesRamps_TreeBridge.blp";
                 ReplaceableTextureID = 31;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -17685,7 +17678,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\AshenvaleTree\\AshenTree";
+                ReplaceableTextureFile = "ReplaceableTextures\\Treebridge\\AV_BridgesRamps_TreeBridge.blp";
                 ReplaceableTextureID = 31;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -17747,7 +17740,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\LordaeronTree\\LordaeronSummerTree";
+                ReplaceableTextureFile = "ReplaceableTextures\\Treebridge\\LS_BridgesRamps_TreeBridge.blp";
                 ReplaceableTextureID = 31;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -17809,7 +17802,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\LordaeronTree\\LordaeronSummerTree";
+                ReplaceableTextureFile = "ReplaceableTextures\\Treebridge\\LS_BridgesRamps_TreeBridge.blp";
                 ReplaceableTextureID = 31;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -17871,7 +17864,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\LordaeronTree\\LordaeronFallTree";
+                ReplaceableTextureFile = "ReplaceableTextures\\Treebridge\\LF_BridgesRamps_TreeBridge.blp";
                 ReplaceableTextureID = 31;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -17933,7 +17926,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\LordaeronTree\\LordaeronFallTree";
+                ReplaceableTextureFile = "ReplaceableTextures\\Treebridge\\LF_BridgesRamps_TreeBridge.blp";
                 ReplaceableTextureID = 31;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -17995,7 +17988,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\LordaeronTree\\LordaeronWinterTree";
+                ReplaceableTextureFile = "ReplaceableTextures\\Treebridge\\LW_BridgesRamps_TreeBridge.blp";
                 ReplaceableTextureID = 31;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -18057,7 +18050,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\AshenvaleTree\\AshenTree";
+                ReplaceableTextureFile = "ReplaceableTextures\\Treebridge\\AV_BridgesRamps_TreeBridge.blp";
                 ReplaceableTextureID = 31;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -18118,6 +18111,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 0;
                 RepairLumberCost = 0;
                 RepairTime = 0;
+                ReplaceableTextureFile = "ReplaceableTextures\\Mushroom\\G_MushroomTree";
                 ReplaceableTextureID = 35;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -18167,7 +18161,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
                 Model = "Doodads\\Terrain\\LordaeronTree\\LordaeronTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 10;
                 Name = "WESTRING_DEST_VILLAGE_TREE_WALL";
                 OcclusionHeight = 230f;
@@ -18284,7 +18278,7 @@ namespace Moonwell.Objects
                 MinimapShow = true;
                 MinimapUseCustomColor = false;
                 MinimumScale = 1f;
-                Model = "Doodads\\LordaeronSummer\\Terrain\\BridgeRampSmall135\\BridgeRampSmall135";
+                Model = "Doodads\\Terrain\\CliffDoodad\\WayGateRamp\\WayGateRamp";
                 ModelFileHasLightweightModel = false;
                 ModelFileVariations = 1;
                 Name = "WESTRING_DEST_WAYGATE_RAMP";
@@ -18414,7 +18408,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\ElvenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -18476,7 +18470,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\ElvenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -18538,7 +18532,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\ElvenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -18600,7 +18594,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\ElvenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -18662,7 +18656,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge0.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -18724,7 +18718,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge0.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -18786,7 +18780,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge0.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -18848,7 +18842,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge0.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -18910,7 +18904,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge1.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -18972,7 +18966,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge1.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -19034,7 +19028,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge1.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -19096,7 +19090,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\NaturalBridge1.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -19650,7 +19644,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\RicketyWoodBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -19712,7 +19706,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\RicketyWoodBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -19774,7 +19768,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\RicketyWoodBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -19836,7 +19830,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\RicketyWoodBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -19898,7 +19892,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -19960,7 +19954,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -20022,7 +20016,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -20084,7 +20078,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -20146,7 +20140,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -20208,7 +20202,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -20270,7 +20264,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -20332,7 +20326,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff0.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StoneBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -20456,7 +20450,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StratholmeBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -20518,7 +20512,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StratholmeBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -20580,7 +20574,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\StratholmeBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -20642,7 +20636,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\WoodenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -20704,7 +20698,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\WoodenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -20766,7 +20760,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\WoodenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -20828,7 +20822,7 @@ namespace Moonwell.Objects
                 RepairGoldCost = 200;
                 RepairLumberCost = 100;
                 RepairTime = 120;
-                ReplaceableTextureFile = "ReplaceableTextures\\Cliff\\Cliff1.blp";
+                ReplaceableTextureFile = "ReplaceableTextures\\Bridges\\WoodenBridge.blp";
                 ReplaceableTextureID = 11;
                 SelectableInGame = false;
                 SelectionSizeEditor = 0f;
@@ -20878,7 +20872,7 @@ namespace Moonwell.Objects
                 MinimapUseCustomColor = true;
                 MinimumScale = 0.8f;
                 Model = "Doodads\\Terrain\\LordaeronTree\\LordaeronTree";
-                ModelFileHasLightweightModel = true;
+                ModelFileHasLightweightModel = false;
                 ModelFileVariations = 10;
                 Name = "WESTRING_DEST_WINTER_TREE_WALL";
                 OcclusionHeight = 230f;

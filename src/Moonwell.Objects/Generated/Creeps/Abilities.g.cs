@@ -5849,7 +5849,7 @@ namespace Moonwell.Objects
                     HeroAbility = true;
                     HeroDuration = Levels(0f, 0f, 0f);
                     Hotkey = "E";
-                    Icon = "ReplaceableTextures\\CommandButtons\\PASBTNEngineeringUpgrade.blp";
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNEngineeringUpgrade.blp";
                     IconResearch = "ReplaceableTextures\\CommandButtons\\BTNEngineeringUpgrade.blp";
                     ItemAbility = false;
                     LearnHotkey = "E";
@@ -16753,8 +16753,8 @@ namespace Moonwell.Objects
                     HeroAbility = true;
                     HeroDuration = Levels(0f, 0f, 0f, 0f);
                     Hotkey = "I";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGrizzlyBear.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNGrizzlyBear.blp";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMisha.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNMisha.blp";
                     ItemAbility = false;
                     LearnHotkey = "I";
                     LevelCount = 4;
