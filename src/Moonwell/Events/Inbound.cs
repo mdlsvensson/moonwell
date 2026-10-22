@@ -74,11 +74,11 @@ namespace Moonwell
             UnitItemDropped(by, dropped);
         }
 
-        /// <summary>A destructable dies: its type's OnDeath, then its components' OnDeath.</summary>
+        /// <summary>A destructable dies: its type's OnDeath, then its components' OnDeath; one that is ending reacts to none, since the game fires the death event inside RemoveDestructable.</summary>
         internal static void DestructableDied(destructable d)
         {
             var dead = Destructable.Of(d);
-            if (dead == null)
+            if (dead == null || dead.ending)
             {
                 return;
             }

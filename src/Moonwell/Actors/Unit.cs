@@ -934,7 +934,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the unit leaves the game, before its components end.</summary>
+        /// <summary>Runs when the unit leaves the game, before its components end; HasEnded is still false here.</summary>
         protected virtual void OnLeave()
         {
         }

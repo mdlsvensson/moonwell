@@ -179,7 +179,8 @@ public sealed class KillCounter : UnitComponent
 ```
 
 - A type lists the components its instances start with in its constructor. `unit.Add(new KillCounter())` adds one in the
-  game, and `unit.Remove<KillCounter>()` removes it (`End()` ends a component from inside).
+  game, and `unit.Remove<KillCounter>()` removes it (`End()` ends a component from inside). `HasEnded` is false inside
+  `OnRemoved`, `OnLeave` and `OnEnd`, and true once the removal or `End()` returns.
 - Reactions to the whole map (`OnGameStart`, `OnUnitCreated`, `OnUnitDied`, `OnUnitCast`, `OnLeave`) go on a game or
   player component. `OnUnitCreated` runs once for each unit, when it comes into the game; a unit's own is `OnCreated`.
 - A reaction's parameters say the role: `OnPickedUp(Unit carrierUnit)`, `OnUnitDied(Unit dyingUnit, Unit? killerUnit)`,

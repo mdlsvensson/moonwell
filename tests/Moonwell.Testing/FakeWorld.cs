@@ -57,6 +57,9 @@ namespace Moonwell.Testing
         /// <summary>The destructables the runtime removed.</summary>
         public List<destructable> RemovedDestructables = new List<destructable>();
 
+        /// <summary>Whether RemoveDestructable fires the death event of a watched destructable inside the call, as the game does (seen in a played map).</summary>
+        public bool DeathOnRemove;
+
         /// <summary>The ability calls, as "add 42", "hide 42" or "remove 42", with the ability id in decimal.</summary>
         public List<string> AbilityCalls = new List<string>();
 
@@ -700,6 +703,11 @@ namespace Moonwell.Testing
         public void DeleteDestructable(destructable destructable)
         {
             RemovedDestructables.Add(destructable);
+            if (DeathOnRemove && Watched.Contains(destructable))
+            {
+                Inbound.DestructableDied(destructable);
+            }
+
             destructableTypes[destructable] = 0;
         }
 
