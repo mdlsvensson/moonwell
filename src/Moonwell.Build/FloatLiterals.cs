@@ -14,8 +14,8 @@ namespace Moonwell.Build
     /// one. Each such constant becomes the one literal of its value (<c>16777216.0f</c>), which CSharp.lua copies as written; a
     /// whole-number default value a call leaves out, which CSharp.lua also writes by value, is written into the call, named.
     /// What is a float only at run time is rewritten too (<see cref="RunTimeFloats"/>), and so is a template property read with no
-    /// receiver CSharp.lua can fill the template with (<see cref="TemplateReceivers"/>): the rewrite is the one pass with the
-    /// semantic model of the copy CSharp.lua compiles.
+    /// receiver CSharp.lua can fill the template with (<see cref="TemplateReceivers"/>), and a nullable value joined to a string
+    /// (<see cref="NullableText"/>): the rewrite is the one pass with the semantic model of the copy CSharp.lua compiles.
     /// </summary>
     public static class FloatLiterals
     {
@@ -153,6 +153,7 @@ namespace Moonwell.Build
 
             RunTimeFloats.Edits(root, model, edits);
             TemplateReceivers.Edits(root, model, edits);
+            NullableText.Edits(root, model, edits);
             return edits;
         }
 

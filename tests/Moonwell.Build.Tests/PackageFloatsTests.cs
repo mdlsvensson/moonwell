@@ -65,5 +65,51 @@ namespace Moonwell.Build.Tests
                 Directory.Delete(folder, true);
             }
         }
+
+        [Fact]
+        public void the_check_names_nullable_values_joined_to_strings()
+        {
+            var folder = Path.Combine(Path.GetTempPath(), "moonwell-package-floats-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(folder);
+            try
+            {
+                var file = Path.Combine(folder, "Joined.cs");
+                File.WriteAllText(file, string.Join("\n", new[]
+                {
+                    "public enum Kind { A }",
+                    "public class Bag { public int Count; }",
+                    "public class Joined",
+                    "{",
+                    "    public static string Of(int? n, float? f, bool? b, Bag? bag, Kind? k, int i, string s)",
+                    "    {",
+                    "        s += n;",
+                    "        s = \"n=\" + n + (n + 1) + bag?.Count;",
+                    "        s = $\"{n}|{f:F1}|{b:G}|{n,3}|{k}|{i}\";",
+                    "        return s + k + i + n.ToString();",
+                    "    }",
+                    "}",
+                }));
+
+                var (changes, errors) = FloatLiterals.Check(new[] { file }, Array.Empty<string>());
+
+                Assert.Empty(errors);
+                Assert.Equal(
+                    new[]
+                    {
+                        file + "(7): n -> n.ToString()",
+                        file + "(8): n -> n.ToString()",
+                        file + "(8): n + 1 -> (n + 1).ToString()",
+                        file + "(8): bag?.Count -> (bag?.Count).ToString()",
+                        file + "(9): n -> n.ToString()",
+                        file + "(9): f -> f?.ToString(\"F1\")",
+                        file + "(9): b -> b.ToString()",
+                    },
+                    changes);
+            }
+            finally
+            {
+                Directory.Delete(folder, true);
+            }
+        }
     }
 }
