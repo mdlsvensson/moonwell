@@ -189,6 +189,17 @@ namespace Objects
         }
     }
 
+    // One value for every level, through Levels' implicit conversion: the constructor runs again in the game when it is registered.
+    [Moonwell.Objects.ObjectId("A007")]
+    public class Steady : Moonwell.Objects.Human.Abilities.StormBolt
+    {
+        public Steady()
+        {
+            ManaCost = 60;
+            Duration = 30f;
+        }
+    }
+
     [Moonwell.Objects.Replaces]
     public class StrongFootman : Moonwell.Objects.Human.Units.Footman
     {

@@ -280,6 +280,17 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void one_value_for_every_level_runs_in_lua()
+        {
+            using var lua = compiled.Start();
+
+            // Steady's constructor puts ManaCost = 60 and Duration = 30f: Levels' implicit conversion, whose value the setter drops.
+            var errors = compiled.Run().Errors;
+            Assert.True(errors.Count == 0, string.Join(" | ", errors));
+            Assert.True(Truth(lua, "return System.is(Moonwell.ObjectTypes.AbilityMaker(Moonwell.ObjectTypes.FourCC('A007'))(), Objects.Steady)"));
+        }
+
+        [Fact]
         public void every_list_call_runs_in_lua()
         {
             using var lua = compiled.Start();
@@ -635,6 +646,7 @@ namespace Moonwell.Build.Tests
             lua.DoString("Moonwell = {}");
             lua.DoString(definitions);
             Assert.Equal("table", Query(lua, "return type(Moonwell.Objects.Levels_1(1))"));
+            Assert.Equal("nil", Query(lua, "return type(Moonwell.Objects.Levels_1(1).op_Implicit(60))"));
             Assert.Equal("table", Query(lua, "return type(Moonwell.Objects.ObjectList_1(1))"));
             Assert.Equal("table", Query(lua, "return type(Moonwell.Objects.ObjectRef_1(1))"));
         }

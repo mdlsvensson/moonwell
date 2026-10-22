@@ -264,7 +264,7 @@ namespace Moonwell.Build.Tests
                 {
                     "Objects.Arthas", "Objects.Burn", "Objects.Claws", "Objects.DarkArthas", "Objects.Drilled", "Objects.Duelist",
                     "Objects.Elemental", "Objects.Firebolt", "Objects.Forge", "Objects.Gate", "Objects.Mage", "Objects.Portal",
-                    "Objects.Rock", "Objects.StrongFootman", "Objects.Tuned", "Objects.Zap",
+                    "Objects.Rock", "Objects.Steady", "Objects.StrongFootman", "Objects.Tuned", "Objects.Zap",
                 },
                 names);
         }
