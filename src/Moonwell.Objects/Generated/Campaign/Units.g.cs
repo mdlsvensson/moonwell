@@ -243,6 +243,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "L";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroPaladin.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-paladin.blp";
                     Intelligence = 17;
                     IntelligencePerLevel = 1.8f;
@@ -1386,6 +1387,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSpellBreaker.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-paladin.blp";
                     Intelligence = 17;
                     IntelligencePerLevel = 1.8f;
@@ -1401,6 +1403,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\human\\BloodElfSpellThief\\BloodElfSpellThief";
                     ModelFileExtraVersions = 0;
                     Name = "High King";
                     NormalSkin = "AInv";
@@ -1409,6 +1412,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\human\\BloodElfSpellThief\\BloodElfSpellThief_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.STR;
                     Priority = 9;
                     ProjectileImpactZ = 60f;
@@ -1427,6 +1431,7 @@ namespace Moonwell.Objects
                     RequirementsTier2.Set<global::Moonwell.Objects.Human.Units.Keep>();
                     RequirementsTier3.Set<global::Moonwell.Objects.Human.Units.Castle>();
                     RequirementsTiersUsed = 3;
+                    Scale = 1.1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -1556,6 +1561,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "A";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroArchMage.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-archmage.blp";
                     Intelligence = 19;
                     IntelligencePerLevel = 3.2f;
@@ -1573,6 +1579,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\human\\HeroArchMage\\HeroArchMage";
                     ModelFileExtraVersions = 0;
                     Movement = "HumanHeroArchMageMovement";
                     Name = "Archmage";
@@ -1582,6 +1589,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\human\\HeroArchMage\\HeroArchMage_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.INT;
                     Priority = 11;
                     ProjectileImpactZ = 60f;
@@ -1897,6 +1905,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 2f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
                     Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroCryptLord.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-cryptlord.blp";
                     Intelligence = 14;
                     IntelligencePerLevel = 1.6f;
@@ -2250,7 +2259,7 @@ namespace Moonwell.Objects
                     MaxMana = 350;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
-                    Model = "units\\forsaken\\HeroLeonid\\HeroLeonid";
+                    Model = "Units\\Forsaken\\Apothecary\\Apothecary";
                     ModelFileExtraVersions = 0;
                     Name = "Apothecary";
                     NormalSkin = "AInv";
@@ -2833,6 +2842,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "L";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNArthas.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-arthas.blp";
                     Intelligence = 17;
                     IntelligencePerLevel = 1.8f;
@@ -3167,6 +3177,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroDeathKnight.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-deathknight.blp";
                     Intelligence = 17;
                     IntelligencePerLevel = 1.8f;
@@ -3335,6 +3346,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
                     Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroDeathKnight.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-deathknight.blp";
                     Intelligence = 17;
                     IntelligencePerLevel = 1.8f;
@@ -3505,6 +3517,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Undead\\CultAssassin\\Cult_Assassin_Portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -3540,6 +3553,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     TransportedSize = 1;
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -3637,6 +3653,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
                     Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTichondrius.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-tichondrius.blp";
                     Intelligence = 18;
                     IntelligencePerLevel = 4.5f;
@@ -3652,6 +3669,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\undead\\Tichondrius\\Tichondrius";
                     ModelFileExtraVersions = 0;
                     Name = "Dreadlord";
                     NormalSkin = "AInv";
@@ -3660,6 +3678,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\undead\\Tichondrius\\Tichondrius_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.STR;
                     Priority = 10;
                     ProjectileImpactZ = 200f;
@@ -3702,6 +3721,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 200;
+                    TintingColor3Blue = 200;
                     TooltipAwaken = "Revive Dreadlord";
                     TooltipExtended = "Cunning Hero, adept at controlling combat. Can learn Carrion Swarm, Sleep, Vampiric Aura, and Inferno. |n|n|cffffcc00Attacks land units.|r";
                     TooltipRevive = "Revive Dreadlord";
@@ -4077,7 +4099,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
                     Hotkey = "D";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNthecaptain.blp";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRivendareUndead.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-RivendareUndead.blp";
                     Intelligence = 17;
                     IntelligencePerLevel = 1.8f;
@@ -4241,6 +4263,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
                     Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRivendare.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-RivendareUndead.blp";
                     Intelligence = 17;
                     IntelligencePerLevel = 1.8f;
@@ -4968,6 +4991,7 @@ namespace Moonwell.Objects
                     MaxLife = 220;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\critters\\HighElfPeasant\\HighElfPeasant";
                     ModelFileExtraVersions = 0;
                     Name = "Blood Elf Engineer";
                     NormalSkin = "Ahar,Ahrp";
@@ -4976,6 +5000,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\critters\\HighElfPeasant\\HighElfPeasant_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 45f;
                     ProjectileImpactZSwimming = 0f;
@@ -5104,6 +5129,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "L";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSpellBreaker.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -5513,6 +5539,7 @@ namespace Moonwell.Objects
                     MaxLife = 340;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Undead\\CultBruteDagger\\CultBruteDagger";
                     ModelFileExtraVersions = 0;
                     Name = "Brute";
                     OccluderHeight = 0f;
@@ -5520,6 +5547,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Undead\\CultBruteDagger\\CultBruteDagger_Portrait";
                     Priority = 5;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -5655,6 +5683,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroTaurenChieftain.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-taurenchieftain.blp";
                     Intelligence = 14;
                     IntelligencePerLevel = 1.3f;
@@ -5680,6 +5709,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\orc\\HeroTaurenChieftain\\HeroTaurenChieftainCIN_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.STR;
                     Priority = 11;
                     ProjectileImpactZ = 100f;
@@ -5823,6 +5853,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroTaurenChieftain.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-taurenchieftain.blp";
                     Intelligence = 14;
                     IntelligencePerLevel = 1.3f;
@@ -5847,6 +5878,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\orc\\HeroTaurenChieftain\\HeroTaurenChieftainCIN_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.STR;
                     Priority = 11;
                     ProjectileImpactZ = 100f;
@@ -5990,6 +6022,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroTaurenChieftain.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-taurenchieftain.blp";
                     Intelligence = 14;
                     IntelligencePerLevel = 1.3f;
@@ -6015,6 +6048,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\orc\\HeroTaurenChieftain\\HeroTaurenChieftainCIN_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.STR;
                     Priority = 11;
                     ProjectileImpactZ = 100f;
@@ -6296,6 +6330,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 3f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNKeeperOfTheGrove.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-keeperofthegrove.blp";
                     Intelligence = 18;
                     IntelligencePerLevel = 5f;
@@ -6311,6 +6346,7 @@ namespace Moonwell.Objects
                     Set("umpm", 55);
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\NightElf\\Cenarius\\Cenarius";
                     ModelFileExtraVersions = 0;
                     Name = "Demigod";
                     NormalSkin = "AInv,SCc1";
@@ -6319,6 +6355,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\NightElf\\Cenarius\\Cenarius_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.INT;
                     Priority = 12;
                     ProjectileImpactZ = 60f;
@@ -6361,6 +6398,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
                     TooltipAwaken = "Revive Cenarius";
                     TooltipRevive = "Revive Cenarius";
                     TransportedSize = 1;
@@ -6449,6 +6489,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBanditMage.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -6461,6 +6502,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\HumanMage\\HumanMage";
                     ModelFileExtraVersions = 0;
                     Name = "Chaplain";
                     NormalSkin = "Anh2,ACif,Adsm";
@@ -6469,6 +6511,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\HumanMage\\HumanMage_portrait";
                     Priority = 6;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -6610,6 +6653,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "N";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPandarenBrewmaster.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-pandarenbrewmaster.blp";
                     Intelligence = 15;
                     IntelligencePerLevel = 1.5f;
@@ -6625,6 +6669,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\PandarenBrewmaster\\PandarenBrewmaster";
                     ModelFileExtraVersions = 0;
                     Name = "Brewmaster";
                     NormalSkin = "AInv";
@@ -6633,6 +6678,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Creeps\\PandarenBrewmaster\\PandarenBrewmaster_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.STR;
                     Priority = 10;
                     ProjectileImpactZ = 60f;
@@ -6778,6 +6824,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -6898,6 +6945,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 0.8f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -8727,6 +8775,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericHumanBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -8842,6 +8891,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericHumanBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -8957,6 +9007,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericHumanBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -9072,6 +9123,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericHumanBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -9205,6 +9257,7 @@ namespace Moonwell.Objects
                     MaxLife = 600;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Human\\CityGuard\\CityGuard";
                     ModelFileExtraVersions = 0;
                     Name = "City Guard";
                     OccluderHeight = 0f;
@@ -9789,6 +9842,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 255;
                     RepairLumberCost = 70;
                     RepairTime = 70;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -10093,6 +10147,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 155;
                     RepairLumberCost = 40;
                     RepairTime = 50;
+                    Scale = 1f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -10205,6 +10260,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Night;
                     Hotkey = "U";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTreeOfAges.blp";
                     IsABuilding = true;
                     LoopingFadeInRate = 512;
                     LoopingFadeOutRate = 512;
@@ -10242,6 +10298,7 @@ namespace Moonwell.Objects
                     RepairTime = 60;
                     RequiredAnimationNames = "Upgrade,First";
                     RequiredAnimationNamesAttachments = "upgrade,first";
+                    Scale = 1.15f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -10364,6 +10421,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Night;
                     Hotkey = "U";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTreeOfEternity.blp";
                     IsABuilding = true;
                     LoopingFadeInRate = 512;
                     LoopingFadeOutRate = 512;
@@ -10729,6 +10787,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 150;
+                    TintingColor2Green = 150;
+                    TintingColor3Blue = 255;
                     Tooltip = "Train Couatl";
                     TooltipExtended = "Light flying unit that can learn Abolish Magic. |n|n|cffffcc00Attacks land and air units.|r";
                     TurnRate = 0.4f;
@@ -10972,6 +11033,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "L";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroPaladin.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-paladin.blp";
                     Intelligence = 17;
                     IntelligencePerLevel = 1.8f;
@@ -10987,6 +11049,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\human\\HeroPaladinBoss2\\HeroPaladinBoss2";
                     ModelFileExtraVersions = 0;
                     Name = "Paladin";
                     NormalSkin = "AInv";
@@ -10995,6 +11058,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\human\\HeroPaladinBoss2\\HeroPaladinBoss2_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.STR;
                     Priority = 10;
                     ProjectileImpactZ = 60f;
@@ -11264,6 +11328,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
                     Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroDreadlord.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-dreadlord.blp";
                     Intelligence = 18;
                     IntelligencePerLevel = 4.5f;
@@ -11279,6 +11344,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\undead\\HeroDreadLord\\HeroDreadLord";
                     ModelFileExtraVersions = 0;
                     Name = "Dreadlord";
                     NormalSkin = "AInv";
@@ -11287,6 +11353,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\undead\\HeroDreadLord\\HeroDreadLord_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.STR;
                     Priority = 10;
                     ProjectileImpactZ = 100f;
@@ -12072,6 +12139,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
                     Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroDreadlord.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-dreadlord.blp";
                     Intelligence = 18;
                     IntelligencePerLevel = 4.5f;
@@ -12087,6 +12155,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\undead\\HeroDreadLord\\HeroDreadLord";
                     ModelFileExtraVersions = 0;
                     Name = "Dreadlord";
                     NormalSkin = "AInv";
@@ -12095,6 +12164,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\undead\\HeroDreadLord\\HeroDreadLord_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.STR;
                     Priority = 10;
                     ProjectileImpactZ = 100f;
@@ -12439,6 +12509,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDranaiHut.blp";
                     IsABuilding = true;
                     LoopingFadeInRate = 512;
                     LoopingFadeOutRate = 512;
@@ -12449,6 +12520,7 @@ namespace Moonwell.Objects
                     MaxLife = 1250;
                     MaximumPitchAngleDegrees = 7f;
                     MaximumRollAngleDegrees = 7f;
+                    Model = "Buildings\\Other\\DraeneiBarracks\\DraeneiBarracks";
                     ModelFileExtraVersions = 0;
                     Name = "Draenei Barracks";
                     NeutralBuildingShowsMinimapIcon = false;
@@ -12459,6 +12531,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\other\\DraneiHut0\\DraneiHut0";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -12588,6 +12661,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
                     Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCatapult.blp";
                     IsABuilding = false;
                     Level = 2;
                     LoopingFadeInRate = 512;
@@ -12600,6 +12674,7 @@ namespace Moonwell.Objects
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 45f;
                     MinimumAttackRange = 250;
+                    Model = "units\\orc\\catapult\\catapult";
                     ModelFileExtraVersions = global::Moonwell.Objects.VersionFlags.TheFrozenThrone;
                     Movement = "OrcCatapultMovement";
                     Name = "Draenei Demolisher";
@@ -12609,6 +12684,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\orc\\catapult\\catapult_portrait";
                     Priority = 2;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -12722,6 +12798,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDranaiChiefHut.blp";
                     IsABuilding = true;
                     LoopingFadeInRate = 512;
                     LoopingFadeOutRate = 512;
@@ -12732,6 +12809,7 @@ namespace Moonwell.Objects
                     MaxLife = 1500;
                     MaximumPitchAngleDegrees = 7f;
                     MaximumRollAngleDegrees = 7f;
+                    Model = "buildings\\other\\ChieftainHut\\ChieftainHut";
                     ModelFileExtraVersions = 0;
                     Name = "Draenei Haven";
                     NeutralBuildingShowsMinimapIcon = false;
@@ -12743,6 +12821,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\other\\ChieftainHut\\ChieftainHut_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -12867,6 +12946,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDranai.blp";
                     IsABuilding = false;
                     Level = 1;
                     LumberBountyAwardedBase = 0;
@@ -12920,6 +13000,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "O,K";
+                    TintingColor1Red = 210;
+                    TintingColor2Green = 210;
+                    TintingColor3Blue = 255;
                     Tooltip = "Train Drainei Laborer";
                     TooltipExtended = "Basic worker unit. Can harvest gold and lumber, build structures, and Repair. |n|n|cffffcc00Attacks land units and trees.|r";
                     TransportedSize = 1;
@@ -13005,6 +13088,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDranai.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -13014,6 +13098,7 @@ namespace Moonwell.Objects
                     MaxLife = 465;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\other\\Dranai\\Dranai";
                     ModelFileExtraVersions = 0;
                     Name = "Draenei Stalker";
                     NormalSkin = "Apiv,ACev,ACen";
@@ -13022,6 +13107,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\other\\Dranai\\Dranai_portrait";
                     Priority = 6;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -13143,6 +13229,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDranai.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -13152,6 +13239,7 @@ namespace Moonwell.Objects
                     MaxLife = 900;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\other\\DranaiWhite\\DranaiWhite";
                     ModelFileExtraVersions = 0;
                     Name = "Draenei Vindicator";
                     OccluderHeight = 0f;
@@ -13159,6 +13247,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\other\\DranaiWhite\\DranaiWhite_portrait";
                     Priority = 6;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -13284,6 +13373,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDragonHawk.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -13554,6 +13644,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "T";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSeaTurtleRed.blp";
                     IsABuilding = false;
                     Level = 5;
                     LumberBountyAwardedBase = 0;
@@ -13757,6 +13848,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 220;
+                    TintingColor3Blue = 255;
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -13857,6 +13951,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "F";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroFarseer.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-farseer.blp";
                     Intelligence = 19;
                     IntelligencePerLevel = 3f;
@@ -13872,6 +13967,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\orc\\HeroFarSeer\\HeroFarSeer";
                     ModelFileExtraVersions = 0;
                     Name = "Far Seer";
                     NormalSkin = "AInv";
@@ -13880,6 +13976,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\orc\\HeroFarSeer\\HeroFarSeer_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.INT;
                     Priority = 9;
                     ProjectileImpactZ = 60f;
@@ -14011,6 +14108,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNElvenGuardTower.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -14143,6 +14241,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBanditMage.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -14155,6 +14254,7 @@ namespace Moonwell.Objects
                     MaxMana = 200;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\HumanMage\\HumanMage";
                     ModelFileExtraVersions = 0;
                     Name = "Emissary";
                     NormalSkin = "Ahea,Ainf,Adis";
@@ -14163,6 +14263,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\HumanMage\\HumanMage_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -14268,6 +14369,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNEnchantedGemstone.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -14515,6 +14617,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGoblinSapper.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -14524,6 +14627,7 @@ namespace Moonwell.Objects
                     MaxLife = 100;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\GoblinSapper\\GoblinSapper";
                     ModelFileExtraVersions = 0;
                     Name = "Engineer Gazlowe";
                     NormalSkin = "Asds";
@@ -14532,6 +14636,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GoblinSapper\\GoblinSapper_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -14657,6 +14762,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
                     Hotkey = "O";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTrollBurrow.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -14665,6 +14771,7 @@ namespace Moonwell.Objects
                     MaxLife = 600;
                     MaximumPitchAngleDegrees = 15f;
                     MaximumRollAngleDegrees = 15f;
+                    Model = "buildings\\orc\\TrollBurrow\\TrollBurrow";
                     ModelFileExtraVersions = 0;
                     Name = "Fel Burrow";
                     NormalSkin = "Abds,Aspi,Abun,Sbtl,Astd,Arbr,Aorb";
@@ -14676,6 +14783,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\orc\\TrollBurrow\\TrollBurrow_portrait";
                     Priority = 3;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -15965,6 +16073,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 28;
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -16516,6 +16625,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -16722,6 +16832,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFountainOfLife.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -17955,6 +18066,7 @@ namespace Moonwell.Objects
                     RepairLumberCost = 70;
                     RepairTime = 45;
                     RequiredAnimationNamesAttachments = "large";
+                    Scale = 0.95f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -18064,6 +18176,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGrunt.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -18073,6 +18186,7 @@ namespace Moonwell.Objects
                     MaxLife = 700;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\orc\\Grunt\\Grunt";
                     ModelFileExtraVersions = 0;
                     Name = "Gar'thok";
                     NormalSkin = "Asal,Aion";
@@ -18081,6 +18195,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\orc\\Grunt\\Grunt_portrait";
                     Priority = 3;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -18369,6 +18484,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSkeletonWarrior.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -18378,6 +18494,7 @@ namespace Moonwell.Objects
                     MaxLife = 800;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\undead\\Skeleton\\Skeleton";
                     ModelFileExtraVersions = 0;
                     Name = "Giant Skeleton Warrior";
                     OccluderHeight = 0f;
@@ -18385,6 +18502,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\undead\\Skeleton\\Skeleton_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -18419,6 +18537,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 150;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Giant Skeleton Warrior";
                     TooltipExtended = "Large melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -18509,6 +18630,7 @@ namespace Moonwell.Objects
                     MaxLife = 600;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\IronGolem\\IronGolem";
                     ModelFileExtraVersions = 0;
                     Name = "Goblin Blaster";
                     OccluderHeight = 0f;
@@ -18516,6 +18638,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\IronGolem\\IronGolem_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -18742,6 +18865,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericHumanBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -18866,6 +18990,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFelHound.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -18878,6 +19003,7 @@ namespace Moonwell.Objects
                     MaxMana = 150;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\FelstalkerPurple\\FelstalkerPurple";
                     ModelFileExtraVersions = 0;
                     Name = "Greater Spirit Beast";
                     NameEditorSuffix = "(Level 3)";
@@ -18887,6 +19013,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\FelstalkerPurple\\FelstalkerPurple_portrait";
                     Priority = 5;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -18922,6 +19049,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 220;
+                    TintingColor2Green = 220;
+                    TintingColor3Blue = 220;
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -19523,6 +19653,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "L";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroPaladin.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-paladin.blp";
                     Intelligence = 17;
                     IntelligencePerLevel = 1.8f;
@@ -19538,6 +19669,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\human\\HeroPaladinBoss\\HeroPaladinBoss";
                     ModelFileExtraVersions = 0;
                     Name = "Paladin";
                     NormalSkin = "AInv";
@@ -19546,6 +19678,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\human\\HeroPaladinBoss\\HeroPaladinBoss_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.STR;
                     Priority = 10;
                     ProjectileImpactZ = 60f;
@@ -19789,6 +19922,7 @@ namespace Moonwell.Objects
                     MaxLife = 15;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\critters\\HighElfPeasant\\HighElfPeasant";
                     ModelFileExtraVersions = 0;
                     Name = "High Elf";
                     NameEditorSuffix = "(Male)";
@@ -19797,6 +19931,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\critters\\HighElfPeasant\\HighElfPeasant_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -20020,6 +20155,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNElvenFarm.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -20134,6 +20270,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNElvenFarm.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -20248,6 +20385,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNElvenFarm.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -20362,6 +20500,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNElvenFarm.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -20476,6 +20615,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNElvenFarm.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -20590,6 +20730,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNElvenFarm.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -20704,6 +20845,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNElvenFarm.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -20818,6 +20960,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNElvenFarm.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -21176,6 +21319,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHornOfCenarius.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -21982,6 +22126,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "Y";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBanditMage.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -21994,6 +22139,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\BanditMage\\BanditMage";
                     ModelFileExtraVersions = 0;
                     Name = "Hydromancer";
                     NormalSkin = "ACsw,ACpy,ACc3";
@@ -22002,6 +22148,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\BanditMage\\BanditMage_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -22039,6 +22186,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 170;
                     Tooltip = "Train Hydromancer";
                     TooltipExtended = "Versatile spellcaster. Can cast Slow, Crushing Wave, and Polymorph. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -22408,6 +22558,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 425;
                     RepairLumberCost = 100;
                     RepairTime = 40;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -22579,6 +22730,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 425;
                     RepairLumberCost = 100;
                     RepairTime = 40;
+                    Scale = 1.25f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -23068,6 +23220,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Night;
                     Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroDemonHunter.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-demonhunter.blp";
                     Intelligence = 16;
                     IntelligencePerLevel = 2.1f;
@@ -23083,6 +23236,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\NightElf\\Illidan\\Illidan";
                     ModelFileExtraVersions = 0;
                     Name = "Demon Hunter";
                     NameEditorSuffix = "(Demon Form)";
@@ -23092,6 +23246,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\NightElf\\Illidan\\Illidan_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.AGI;
                     Priority = 12;
                     ProjectileImpactZ = 60f;
@@ -23238,6 +23393,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Night;
                     Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroDemonHunter.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-demonhunter.blp";
                     Intelligence = 16;
                     IntelligencePerLevel = 2.1f;
@@ -23253,6 +23409,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\NightElf\\Illidan\\Illidan";
                     ModelFileExtraVersions = 0;
                     Name = "Demon Hunter";
                     NormalSkin = "AInv,Ault";
@@ -23261,6 +23418,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\NightElf\\Illidan\\Illidan_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.AGI;
                     Priority = 12;
                     ProjectileImpactZ = 60f;
@@ -23412,6 +23570,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Night;
                     Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroDemonHunter.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-demonhunter.blp";
                     Intelligence = 16;
                     IntelligencePerLevel = 2.1f;
@@ -23427,6 +23586,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\NightElf\\Illidan\\Illidan";
                     ModelFileExtraVersions = 0;
                     Name = "Demon Hunter";
                     NameEditorSuffix = "(Morphed)";
@@ -23436,6 +23596,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\NightElf\\Illidan\\Illidan_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.AGI;
                     Priority = 12;
                     ProjectileImpactZ = 60f;
@@ -23553,6 +23714,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericHumanBuilding.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -23722,6 +23884,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 165;
                     RepairLumberCost = 0;
                     RepairTime = 18;
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -23978,6 +24141,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBandit.blp";
                     IsABuilding = false;
                     Level = 1;
                     LumberBountyAwardedBase = 0;
@@ -23987,6 +24151,7 @@ namespace Moonwell.Objects
                     MaxLife = 240;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Bandit\\Bandit";
                     ModelFileExtraVersions = 0;
                     Name = "Jailor Kassan";
                     OccluderHeight = 0f;
@@ -23994,6 +24159,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Bandit\\Bandit_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -24302,6 +24468,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSylvanusWindrunner.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-sylvanus.blp";
                     Intelligence = 15;
                     IntelligencePerLevel = 2.6f;
@@ -24317,6 +24484,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\SylvanusWindrunner\\SylvanusWindrunner";
                     ModelFileExtraVersions = 0;
                     Name = "Ranger";
                     NormalSkin = "AInv,Ault";
@@ -24325,6 +24493,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\SylvanusWindrunner\\SylvanusWindrunner_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.AGI;
                     Priority = 10;
                     ProjectileImpactZ = 60f;
@@ -24639,6 +24808,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
                     Hotkey = "L";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNLichVersion2.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-lich.blp";
                     Intelligence = 20;
                     IntelligencePerLevel = 3.4f;
@@ -24830,6 +25000,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 125;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 200;
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -24945,6 +25118,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\undead\\HeroLichCIN\\HeroLichCIN";
                     ModelFileExtraVersions = global::Moonwell.Objects.VersionFlags.TheFrozenThrone;
                     Name = "Lich";
                     NameEditorSuffix = "(Lich)";
@@ -24954,6 +25128,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\undead\\HeroLichCIN\\HeroLichCIN_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.INT;
                     Priority = 11;
                     ProjectileImpactZ = 60f;
@@ -25137,6 +25312,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 125;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 200;
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -25843,6 +26021,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "N";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNNagaSeaWitch.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-seawitch.blp";
                     Intelligence = 20;
                     IntelligencePerLevel = 3.4f;
@@ -26025,6 +26204,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\human\\CityGuardCaptain\\CityGuardCaptain";
                     ModelFileExtraVersions = 0;
                     Name = "Guard Captain";
                     NormalSkin = "AInv";
@@ -26190,6 +26370,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Undead\\UndeadLanden\\UndeadLanden";
                     ModelFileExtraVersions = 0;
                     Name = "Fallen Captain";
                     NameEditorSuffix = "(Evil)";
@@ -26470,6 +26651,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFelHound.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -26479,6 +26661,7 @@ namespace Moonwell.Objects
                     MaxLife = 200;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\FelstalkerPurple\\FelstalkerPurple";
                     ModelFileExtraVersions = 0;
                     Name = "Lesser Spirit Beast";
                     NameEditorSuffix = "(Level 1)";
@@ -26487,6 +26670,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\FelstalkerPurple\\FelstalkerPurple_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -26522,6 +26706,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 200;
+                    TintingColor3Blue = 200;
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -26588,6 +26775,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRevenant.blp";
                     IsABuilding = false;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -27060,6 +27248,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "L";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroPaladin.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-paladin.blp";
                     Intelligence = 17;
                     IntelligencePerLevel = 1.8f;
@@ -27456,6 +27645,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "L";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroPaladin.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-paladin.blp";
                     Intelligence = 17;
                     IntelligencePerLevel = 1.8f;
@@ -27471,6 +27661,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\human\\HeroPaladin\\HeroPaladin";
                     ModelFileExtraVersions = 0;
                     Name = "Paladin";
                     NormalSkin = "AInv";
@@ -27479,6 +27670,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\human\\HeroPaladin\\HeroPaladin_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.STR;
                     Priority = 10;
                     ProjectileImpactZ = 60f;
@@ -27623,6 +27815,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "P";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPitLord.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-pitlord.blp";
                     Intelligence = 16;
                     IntelligencePerLevel = 1.8f;
@@ -27638,6 +27831,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\demon\\HeroPitLord\\HeroPitLord";
                     ModelFileExtraVersions = 0;
                     Name = "Pit Lord";
                     NormalSkin = "AInv";
@@ -27646,6 +27840,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\demon\\HeroPitLord\\HeroPitLord_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.STR;
                     Priority = 9;
                     ProjectileImpactZ = 90f;
@@ -27960,6 +28155,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
                     Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroDreadlord.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-dreadlord.blp";
                     Intelligence = 18;
                     IntelligencePerLevel = 2.5f;
@@ -27975,6 +28171,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\undead\\HeroDreadLord\\HeroDreadLord";
                     ModelFileExtraVersions = 0;
                     Name = "Dreadlord";
                     NormalSkin = "AInv";
@@ -27983,6 +28180,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\undead\\HeroDreadLord\\HeroDreadLord_Portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.STR;
                     Priority = 10;
                     ProjectileImpactZ = 100f;
@@ -28300,6 +28498,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Night;
                     Hotkey = "K";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFurion.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-furion.blp";
                     Intelligence = 18;
                     IntelligencePerLevel = 2.7f;
@@ -28789,6 +28988,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "M";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRifleman.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -29070,6 +29270,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNChaosWarlord.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -29079,6 +29280,7 @@ namespace Moonwell.Objects
                     MaxLife = 340;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\demon\\ChaosWarlord\\ChaosWarlord";
                     ModelFileExtraVersions = 0;
                     Name = "Mathog";
                     OccluderHeight = 0f;
@@ -29086,6 +29288,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\demon\\ChaosWarlord\\ChaosWarlord_portrait";
                     Priority = 3;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -29209,6 +29412,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Night;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRavenForm.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -29492,6 +29696,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGrizzlyBear.blp";
                     IsABuilding = false;
                     Level = 4;
                     LumberBountyAwardedBase = 0;
@@ -29501,6 +29706,7 @@ namespace Moonwell.Objects
                     MaxLife = 475;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\GrizzlyBear\\GrizzlyBear";
                     ModelFileExtraVersions = 0;
                     Name = "Misha";
                     OccluderHeight = 0f;
@@ -29508,6 +29714,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GrizzlyBear\\GrizzlyBear_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -29642,6 +29849,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "M";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroMountainKing.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-mountainking.blp";
                     Intelligence = 15;
                     IntelligencePerLevel = 1.5f;
@@ -29794,6 +30002,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNMurgulTideWarrior.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -29847,6 +30056,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 200;
+                    TintingColor2Green = 170;
+                    TintingColor3Blue = 255;
                     Tooltip = "Train Mur'gul Reaver";
                     TooltipExtended = "Light melee amphibious unit.  |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -30531,6 +30743,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Night;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHuntress.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -30540,6 +30753,7 @@ namespace Moonwell.Objects
                     MaxLife = 700;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\nightelf\\Huntress\\Huntress";
                     ModelFileExtraVersions = 0;
                     Name = "Naisha";
                     NormalSkin = "Aesr,Ashm,Amgr";
@@ -30548,6 +30762,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\nightelf\\Huntress\\Huntress_portrait";
                     Priority = 3;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -30585,6 +30800,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 125;
+                    TintingColor3Blue = 255;
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
@@ -30666,6 +30884,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRaider.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -30675,6 +30894,7 @@ namespace Moonwell.Objects
                     MaxLife = 610;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\orc\\WolfRider\\WolfRider";
                     ModelFileExtraVersions = 0;
                     Name = "Nazgrel";
                     NormalSkin = "Aens,Asal,Aion";
@@ -30683,6 +30903,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\orc\\WolfRider\\WolfRider_portrait";
                     Priority = 6;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -30937,6 +31158,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNNightElfFishingVillage.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -31051,6 +31273,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNNightElfFishingVillage.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -31279,6 +31502,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNNightElfFishingVillage.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -31393,6 +31617,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNNightElfFishingVillage.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -31507,6 +31732,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNNightElfFishingVillage.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -31621,6 +31847,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNNightElfFishingVillage.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -31735,6 +31962,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNNightElfFishingVillage.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -32777,6 +33005,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGoblinShipyard.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -32785,6 +33014,7 @@ namespace Moonwell.Objects
                     MaxLife = 1200;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
+                    Model = "Buildings\\Orc\\OrcShipYard\\OrcShipYard";
                     ModelFileExtraVersions = 0;
                     Name = "Orc Shipyard";
                     NormalSkin = "Ane2,Abds";
@@ -32796,6 +33026,7 @@ namespace Moonwell.Objects
                     PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
                     PlacementRequiresWaterRadius = 384f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\other\\GoblinShipyard\\GoblinShipyard";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -33306,6 +33537,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRiderlessHorse.blp";
                     IsABuilding = false;
                     Level = 1;
                     LumberBountyAwardedBase = 0;
@@ -33579,6 +33811,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "P";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPitLord.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-pitlord.blp";
                     Intelligence = 20;
                     IntelligencePerLevel = 2f;
@@ -34110,6 +34343,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\forsaken\\Hero_Putress\\Hero_Putress_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.INT;
                     Priority = 9;
                     ProjectileImpactZ = 60f;
@@ -35643,6 +35877,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "S";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNShadowHunter.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-shadowhunter.blp";
                     Intelligence = 18;
                     IntelligencePerLevel = 2.5f;
@@ -35658,6 +35893,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\orc\\HeroShadowHunter\\HeroShadowHunter";
                     ModelFileExtraVersions = 0;
                     Name = "Shadow Hunter";
                     NormalSkin = "AInv";
@@ -35666,6 +35902,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\orc\\HeroShadowHunter\\HeroShadowHunter_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.AGI;
                     Priority = 11;
                     ProjectileImpactZ = 60f;
@@ -35802,6 +36039,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNThunderLizardVizier.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -35856,6 +36094,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "O,K";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 190;
+                    TintingColor3Blue = 255;
                     Tooltip = "Train Salamander";
                     TooltipExtended = "Heavy ranged unit that hurls bolts of lightning.|n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -36122,6 +36363,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "B";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroBlademaster.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-blademaster.blp";
                     Intelligence = 16;
                     IntelligencePerLevel = 2.25f;
@@ -36137,6 +36379,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Orc\\Samuro\\Samuro";
                     ModelFileExtraVersions = 0;
                     Name = "Blademaster";
                     NormalSkin = "AInv";
@@ -36145,6 +36388,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\orc\\HeroBladeMaster\\HeroBladeMaster_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.AGI;
                     Priority = 9;
                     ProjectileImpactZ = 60f;
@@ -36291,6 +36535,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 2f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFrostWyrm.blp";
                     IsABuilding = false;
                     Level = 6;
                     LumberBountyAwardedBase = 0;
@@ -36300,6 +36545,7 @@ namespace Moonwell.Objects
                     MaxLife = 1100;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "units\\undead\\FrostWyrm\\FrostWyrm";
                     ModelFileExtraVersions = 0;
                     Name = "Sapphiron";
                     NameEditorSuffix = "(undead)";
@@ -36308,6 +36554,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\undead\\FrostWyrm\\FrostWyrm_portrait";
                     Priority = 6;
                     ProjectileImpactZ = 0f;
                     ProjectileImpactZSwimming = 0f;
@@ -36443,6 +36690,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 2f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAzureDragon.blp";
                     IsABuilding = false;
                     Level = 10;
                     LumberBountyAwardedBase = 0;
@@ -36452,6 +36700,7 @@ namespace Moonwell.Objects
                     MaxLife = 1800;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "units\\creeps\\AzureDragon\\AzureDragon";
                     ModelFileExtraVersions = 0;
                     Name = "Sapphiron";
                     NameEditorSuffix = "(living)";
@@ -36460,6 +36709,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\AzureDragon\\AzureDragon_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -36496,6 +36746,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 200;
+                    TintingColor2Green = 180;
+                    TintingColor3Blue = 255;
                     TurnRate = 0.1f;
                     Type = global::Moonwell.Objects.MoveType.Fly;
                     UnitSoundSet = "AzureDragon";
@@ -36575,6 +36828,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBlackDragon.blp";
                     IsABuilding = false;
                     Level = 8;
                     LumberBountyAwardedBase = 0;
@@ -36584,6 +36838,7 @@ namespace Moonwell.Objects
                     MaxLife = 1250;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "units\\creeps\\BlackDragon\\BlackDragon";
                     ModelFileExtraVersions = 0;
                     Name = "Searinox";
                     OccluderHeight = 0f;
@@ -36591,6 +36846,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\BlackDragon\\BlackDragon_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 40f;
                     ProjectileImpactZSwimming = 0f;
@@ -36627,6 +36883,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Air;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 200;
+                    TintingColor3Blue = 200;
                     TurnRate = 0.1f;
                     Type = global::Moonwell.Objects.MoveType.Fly;
                     UnitSoundSet = "AzureDragon";
@@ -36695,6 +36954,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDranaiHut.blp";
                     IsABuilding = true;
                     LoopingFadeInRate = 512;
                     LoopingFadeOutRate = 512;
@@ -36705,6 +36965,7 @@ namespace Moonwell.Objects
                     MaxLife = 1150;
                     MaximumPitchAngleDegrees = 7f;
                     MaximumRollAngleDegrees = 7f;
+                    Model = "Buildings\\Other\\SeersDen\\SeersDen";
                     ModelFileExtraVersions = 0;
                     Name = "Seer's Den";
                     NeutralBuildingShowsMinimapIcon = false;
@@ -36715,6 +36976,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\other\\DraneiHut1\\DraneiHut1";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -36823,6 +37085,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHuntress.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -37476,6 +37739,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "L";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroPaladin.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-paladin.blp";
                     Intelligence = 17;
                     IntelligencePerLevel = 1.8f;
@@ -37961,6 +38225,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "K";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSkeletonArcher.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -37973,6 +38238,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\SkeletonArcher\\SkeletonArcher";
                     ModelFileExtraVersions = 0;
                     Name = "Skeletal Marksman";
                     OccluderHeight = 0f;
@@ -37980,6 +38246,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\SkeletonArcher\\SkeletonArcher_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 90f;
                     ProjectileImpactZSwimming = 0f;
@@ -37992,6 +38259,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 20;
+                    Scale = 1.2f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -38014,6 +38282,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 180;
+                    TintingColor2Green = 205;
+                    TintingColor3Blue = 255;
                     Tooltip = "Hire Skeletal Marksman";
                     TooltipExtended = "Light ranged unit. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -38123,6 +38394,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 18;
+                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -38362,6 +38634,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNElvenGuardTower.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -38548,6 +38821,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 120;
                     Tooltip = "Train Snap Dragon";
                     TooltipExtended = "Light ranged unit that has a poison attack which slows and damages enemy units. Has the Submerge ability, which allows this unit to hide in water. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -38757,6 +39033,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFelHound.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -38766,6 +39043,7 @@ namespace Moonwell.Objects
                     MaxLife = 300;
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\FelstalkerPurple\\FelstalkerPurple";
                     ModelFileExtraVersions = 0;
                     Name = "Spirit Beast";
                     NameEditorSuffix = "(Level 2)";
@@ -38775,6 +39053,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\FelstalkerPurple\\FelstalkerPurple_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -38959,6 +39238,8 @@ namespace Moonwell.Objects
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
                     AnimationCastPoint = 0.5f;
+                    AnimationRunSpeed = 300f;
+                    AnimationWalkSpeed = 90f;
                     Armor = 1;
                     ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
                     Attack1AnimationBackswingPoint = 0.3f;
@@ -39046,9 +39327,11 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 30;
+                    Scale = 0.75f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
+                    SelectionScale = 0.6f;
                     ShadowImageCenterX = 45f;
                     ShadowImageCenterY = 45f;
                     ShadowImageHeight = 120f;
@@ -39069,6 +39352,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 180;
                     Tooltip = "Summon Spitting Spider";
                     TooltipExtended = "Light ranged unit that spits poison at opponents. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -39151,6 +39437,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNOneHeadedOgre.blp";
                     IsABuilding = false;
                     Level = 7;
                     LumberBountyAwardedBase = 0;
@@ -39163,6 +39450,7 @@ namespace Moonwell.Objects
                     MaxMana = 400;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\OgreMagi\\OgreMagi";
                     ModelFileExtraVersions = 0;
                     Name = "Stonemaul Magi";
                     NormalSkin = "ACro";
@@ -39171,6 +39459,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 1;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\OgreMagi\\OgreMagi_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 100f;
                     ProjectileImpactZSwimming = 0f;
@@ -39207,6 +39496,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 225;
+                    TintingColor3Blue = 235;
                     Tooltip = "Hire Stonemaul Magi";
                     TooltipExtended = "Powerful spellcaster. Intelligent and decisive, these Ogre Magi support their warriors with arcane spells. Can cast Roar. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -39344,6 +39636,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 230;
+                    TintingColor3Blue = 210;
                     Tooltip = "Hire Stonemaul Ogre";
                     TooltipExtended = "Powerful warrior. Less intelligent than the two-headed variety, but great combat fodder. Can cast Ensnare. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -39479,6 +39774,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "B";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 235;
+                    TintingColor3Blue = 215;
                     Tooltip = "Hire Stonemaul Warchief";
                     TooltipExtended = "Lord of the Ogres. This powerfully built Ogre can crush lesser beasts with his bare hands. Has Taunt, Bash, and Endurance Aura. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -39878,6 +40176,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 120;
                     Tooltip = "Train Snap Dragon";
                     TooltipExtended = "Light ranged unit that has a poison attack which slows and damages enemy units. Has the Submerge ability, which allows this unit to hide in water. |n|n|cffffcc00Attacks land and air units.|r";
                     TransportedSize = 1;
@@ -40225,6 +40526,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "S";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTheCaptain.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -40234,6 +40536,7 @@ namespace Moonwell.Objects
                     MaxLife = 420;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\human\\TheCaptain\\TheCaptain";
                     ModelFileExtraVersions = 0;
                     Name = "Swordsman";
                     NormalSkin = "Adef";
@@ -40242,6 +40545,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\human\\TheCaptain\\TheCaptain_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -40278,6 +40582,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 180;
                     Tooltip = "Train Swordsman";
                     TooltipExtended = "Versatile foot soldier. Can learn the Defend ability. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -40380,6 +40687,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Night;
                     Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBansheeRanger.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-bansheeranger.blp";
                     Intelligence = 15;
                     IntelligencePerLevel = 2.6f;
@@ -40706,6 +41014,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGhost.blp";
                     IsABuilding = false;
                     Level = 3;
                     LumberBountyAwardedBase = 0;
@@ -40718,6 +41027,7 @@ namespace Moonwell.Objects
                     MaxMana = 300;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
+                    Model = "units\\creeps\\BansheeGhost\\BansheeGhost";
                     ModelFileExtraVersions = 0;
                     Name = "Sylvanas Windrunner";
                     NameEditorSuffix = "(Banshee)";
@@ -40727,6 +41037,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 2;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\BansheeGhost\\BansheeGhost_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -40763,6 +41074,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 120;
+                    TintingColor2Green = 150;
+                    TintingColor3Blue = 255;
                     TransportedSize = 1;
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Hover;
@@ -41129,6 +41443,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTheCaptain.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-thaloriendawnseeker.blp";
                     Intelligence = 16;
                     IntelligencePerLevel = 2.25f;
@@ -41144,6 +41459,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\human\\TheCaptain\\TheCaptain";
                     ModelFileExtraVersions = 0;
                     Name = "Master Swordsman";
                     NormalSkin = "AInv";
@@ -41152,6 +41468,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\human\\TheCaptain\\TheCaptain_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.AGI;
                     Priority = 9;
                     ProjectileImpactZ = 60f;
@@ -41279,6 +41596,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGreenDragon.blp";
                     IsABuilding = false;
                     Level = 8;
                     LumberBountyAwardedBase = 0;
@@ -41288,6 +41606,7 @@ namespace Moonwell.Objects
                     MaxLife = 800;
                     MaximumPitchAngleDegrees = 33f;
                     MaximumRollAngleDegrees = 25f;
+                    Model = "units\\creeps\\GreenDragon\\GreenDragon";
                     ModelFileExtraVersions = 0;
                     Name = "Tharifas";
                     OccluderHeight = 0f;
@@ -41295,6 +41614,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\GreenDragon\\GreenDragon_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -42339,6 +42659,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Night;
                     Hotkey = "P";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNPriestessOfTheMoon.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-priestessofthemoon.blp";
                     Intelligence = 15;
                     IntelligencePerLevel = 2.6f;
@@ -42354,6 +42675,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 45f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\nightelf\\HeroMoonPriestess\\HeroMoonPriestess";
                     ModelFileExtraVersions = 0;
                     Name = "Priestess of the Moon";
                     NormalSkin = "AInv,Ashm,Ault";
@@ -42362,6 +42684,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 4;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\nightelf\\HeroMoonPriestess\\HeroMoonPriestess_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.AGI;
                     Priority = 12;
                     ProjectileImpactZ = 60f;
@@ -43042,6 +43365,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "L";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroPaladin.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-paladin.blp";
                     Intelligence = 17;
                     IntelligencePerLevel = 1.8f;
@@ -43208,6 +43532,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 1f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Blight;
                     Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroDreadlord.blp";
                     IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-dreadlord.blp";
                     Intelligence = 18;
                     IntelligencePerLevel = 4.5f;
@@ -43223,6 +43548,7 @@ namespace Moonwell.Objects
                     Set("umpm", 0);
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Undead\\Varimathras\\Varimathras";
                     ModelFileExtraVersions = 0;
                     Name = "Dreadlord";
                     NormalSkin = "AInv";
@@ -43231,6 +43557,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "Units\\Undead\\Varimathras\\Varimathras_portrait";
                     PrimaryAttribute = global::Moonwell.Objects.AttributeType.STR;
                     Priority = 11;
                     ProjectileImpactZ = 100f;
@@ -43618,6 +43945,7 @@ namespace Moonwell.Objects
                     RepairGoldCost = 0;
                     RepairLumberCost = 0;
                     RepairTime = 1;
+                    Scale = 1.05f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -43729,6 +44057,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWitchDoctor.blp";
                     IsABuilding = false;
                     Level = 2;
                     LumberBountyAwardedBase = 0;
@@ -43741,6 +44070,7 @@ namespace Moonwell.Objects
                     MaxMana = 200;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\orc\\WitchDoctor\\WitchDoctor";
                     ModelFileExtraVersions = 0;
                     Name = "Vol'jin";
                     NormalSkin = "Aeye,Ahwd,Asta,Aion";
@@ -43749,6 +44079,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 5;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\orc\\WitchDoctor\\WitchDoctor_portrait";
                     Priority = 7;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -44361,6 +44692,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCage.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -44473,6 +44805,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCage.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -44481,6 +44814,7 @@ namespace Moonwell.Objects
                     MaxLife = 500;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
+                    Model = "buildings\\other\\WyvernCage\\WyvernCage";
                     ModelFileExtraVersions = 0;
                     Name = "Wind Rider Cage";
                     NameEditorSuffix = "(3)";
@@ -44492,6 +44826,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\other\\WyvernCage\\WyvernCage_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -44584,6 +44919,7 @@ namespace Moonwell.Objects
                     HeightMinimum = 0f;
                     HideMinimapDisplay = false;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCage.blp";
                     IsABuilding = true;
                     LumberBountyAwardedBase = 0;
                     LumberBountyAwardedNumberOfDice = 0;
@@ -44592,6 +44928,7 @@ namespace Moonwell.Objects
                     MaxLife = 500;
                     MaximumPitchAngleDegrees = 0f;
                     MaximumRollAngleDegrees = 0f;
+                    Model = "buildings\\other\\WyvernCage2\\WyvernCage2";
                     ModelFileExtraVersions = 0;
                     Name = "Wind Rider Cage";
                     NameEditorSuffix = "(4)";
@@ -44603,6 +44940,7 @@ namespace Moonwell.Objects
                     PlaceableInEditor = true;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
+                    PortraitModelFile = "buildings\\other\\WyvernCage2\\WyvernCage2_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 120f;
                     ProjectileImpactZSwimming = 0f;
@@ -44725,6 +45063,7 @@ namespace Moonwell.Objects
                     HitPointRegen = 0.25f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
                     Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNElfVillager.blp";
                     IsABuilding = false;
                     Level = 1;
                     LumberBountyAwardedBase = 0;
@@ -45000,6 +45339,7 @@ namespace Moonwell.Objects
                     HideMinimapDisplay = false;
                     HitPointRegen = 0.5f;
                     HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNZombie.blp";
                     IsABuilding = false;
                     Level = 1;
                     LumberBountyAwardedBase = 0;
@@ -45009,6 +45349,7 @@ namespace Moonwell.Objects
                     MaxLife = 240;
                     MaximumPitchAngleDegrees = 10f;
                     MaximumRollAngleDegrees = 10f;
+                    Model = "units\\creeps\\Zombie\\Zombie";
                     ModelFileExtraVersions = 0;
                     Name = "Zombie";
                     NameEditorSuffix = "Female";
@@ -45017,6 +45358,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PlaceableInEditor = true;
                     PointValue = 100;
+                    PortraitModelFile = "units\\creeps\\Zombie\\Zombie_portrait";
                     Priority = 1;
                     ProjectileImpactZ = 60f;
                     ProjectileImpactZSwimming = 0f;
@@ -45053,6 +45395,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 210;
+                    TintingColor3Blue = 210;
                     Tooltip = "Summon Zombie";
                     TooltipExtended = "Light melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;
@@ -45187,6 +45532,9 @@ namespace Moonwell.Objects
                     TargetedAs = global::Moonwell.Objects.Targets.Ground;
                     TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
                     Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 230;
+                    TintingColor3Blue = 230;
                     Tooltip = "Summon Zombie";
                     TooltipExtended = "Light melee unit. |n|n|cffffcc00Attacks land units.|r";
                     TransportedSize = 1;

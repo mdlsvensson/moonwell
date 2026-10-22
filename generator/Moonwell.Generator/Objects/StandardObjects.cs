@@ -249,9 +249,16 @@ public static class StandardObjects
         }
     }
 
-    /// <summary>The keys of one object's merged rows, looked up as spelled and then without regard to case.</summary>
+    /// <summary>
+    /// The keys of one object's merged rows, looked up as spelled and then without regard to case. The skin files key some
+    /// values by graphics mode (<c>modelScale:sd</c>, <c>modelScale:de</c>, <c>modelScale:hd</c>; the modes of 3.0.0's patch
+    /// notes: Classic, Definitive Edition and Reforged): a key's Definitive Edition value wins over the key itself, as the
+    /// game reads it (a footman's scale is 0.8, a peasant's 0.85 beside its <c>modelScale=1</c>; seen on 3.0.1).
+    /// </summary>
     private sealed class Row
     {
+        private const string GameMode = ":de";
+
         private readonly ObjectRows _rows;
         private Dictionary<string, string?>? _folded;
 
@@ -289,6 +296,11 @@ public static class StandardObjects
         }
 
         private string? Spelling(string key)
+        {
+            return Spelled(key + GameMode) ?? Spelled(key);
+        }
+
+        private string? Spelled(string key)
         {
             if (_rows.Values.ContainsKey(key))
             {
