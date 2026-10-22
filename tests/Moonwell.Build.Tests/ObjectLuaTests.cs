@@ -76,8 +76,9 @@ namespace Moonwell.Build.Tests
             Assert.Contains($"[{ObjectLua.FourCC("H001")}] = {{ [\"uhpm\"] = 1300, [\"umpi\"] = 255, [\"unam\"] = \"Arthas\" }}", values);
             Assert.Contains($"[{ObjectLua.FourCC("hfoo")}] = {{ [\"uhpm\"] = 600, [\"umpi\"] = 0, [\"unam\"] = \"Footman\" }}", values);
             Assert.Contains($"[{ObjectLua.FourCC("Hamg")}] = {{ [\"uhpm\"] = 450, [\"umpi\"] = 285, [\"unam\"] = \"Archmage\" }}", values);
-            // No item field is read.
-            Assert.DoesNotContain($"[{ObjectLua.FourCC("ratf")}] =", values);
+            // Flask reads its default's charges, the one item field read: every item type has it, the map's Flask its own.
+            Assert.Contains($"[{ObjectLua.FourCC("ratf")}] = {{ [\"iuse\"] = 0 }}", values);
+            Assert.Contains($"[{ObjectLua.FourCC("I002")}] = {{ [\"iuse\"] = 3 }}", values);
             Assert.DoesNotContain("umpm", values);
         }
 
@@ -300,6 +301,16 @@ namespace Moonwell.Build.Tests
             Assert.True(errors.Count == 0, string.Join(" | ", errors));
             Assert.True(Truth(lua, "return System.is(Moonwell.Widget.Default(Objects.Veteran), Objects.Veteran)"));
             Assert.Equal("255", Query(lua, "return tostring(MoonwellObjectValues['Objects.Recruiter']['ugol'])"));
+        }
+
+        [Fact]
+        public void a_class_reads_its_default_in_its_own_methods_in_lua()
+        {
+            using var lua = compiled.Start();
+
+            // Sentinel's OnDeath and Flask's OnPickedUp read Default bare and through this (Flask's through base too): the class's one default object.
+            Assert.Equal("500.0 500.0 same", Query(lua, "local s = Moonwell.ObjectTypes.UnitMaker(Moonwell.ObjectTypes.FourCC('h006'))(); s:OnDeath(nil); return Objects.Sentinel.Read"));
+            Assert.Equal("3 3 same", Query(lua, "local f = Moonwell.ObjectTypes.ItemMaker(Moonwell.ObjectTypes.FourCC('I002'))(); f:OnPickedUp(nil); return Objects.Flask.Read"));
         }
 
         [Fact]

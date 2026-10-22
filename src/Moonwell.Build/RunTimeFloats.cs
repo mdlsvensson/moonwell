@@ -53,7 +53,7 @@ namespace Moonwell.Build
 
         // The trees of operations of a file: member bodies and initializers, and a primary constructor's, which is its class's
         // while its members have their own.
-        private static IEnumerable<IOperation> Roots(SyntaxNode node, SemanticModel model)
+        internal static IEnumerable<IOperation> Roots(SyntaxNode node, SemanticModel model)
         {
             if (model.GetOperation(node) is { Parent: null } root)
             {

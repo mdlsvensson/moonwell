@@ -219,6 +219,41 @@ namespace Objects
         }
     }
 
+    // Reads its type's default object in its own reaction: bare, through this, and (the item) through base.
+    [Moonwell.Objects.ObjectId("h006")]
+    public class Sentinel : Moonwell.Objects.Human.Units.Footman
+    {
+        public static string? Read;
+
+        public Sentinel()
+        {
+            MaxLife = 500;
+        }
+
+        public override void OnDeath(Moonwell.Unit? killerUnit)
+        {
+            var same = Default == Moonwell.Unit.Default<Sentinel>() && this.Default == Default;
+            Read = Default.MaxLife + " " + this.Default.MaxLife + " " + (same ? "same" : "other");
+        }
+    }
+
+    [Moonwell.Objects.ObjectId("I002")]
+    public class Flask : Items.PotionOfHealing
+    {
+        public static string? Read;
+
+        public Flask()
+        {
+            Charges = 3;
+        }
+
+        public override void OnPickedUp(Moonwell.Unit carrierUnit)
+        {
+            var same = Default == Moonwell.Item.Default<Flask>() && this.Default == Default && base.Default == Default;
+            Read = Default.Charges + " " + this.Default.Charges + " " + (same ? "same" : "other");
+        }
+    }
+
     [Moonwell.Objects.Replaces]
     public class StrongFootman : Moonwell.Objects.Human.Units.Footman
     {
