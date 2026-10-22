@@ -308,9 +308,11 @@ namespace Moonwell.Build.Tests
         {
             using var lua = compiled.Start();
 
-            // Sentinel's OnDeath and Flask's OnPickedUp read Default bare and through this (Flask's through base too): the class's one default object.
-            Assert.Equal("500.0 500.0 same", Query(lua, "local s = Moonwell.ObjectTypes.UnitMaker(Moonwell.ObjectTypes.FourCC('h006'))(); s:OnDeath(nil); return Objects.Sentinel.Read"));
-            Assert.Equal("3 3 same", Query(lua, "local f = Moonwell.ObjectTypes.ItemMaker(Moonwell.ObjectTypes.FourCC('I002'))(); f:OnPickedUp(nil); return Objects.Flask.Read"));
+            // Sentinel's OnDeath and Flask's OnPickedUp read Default bare and through this (Flask's through base too): the class's
+            // one default object. An int read bare and made a float (Sentinel's gold, Flask's charges, kept and passed to a float)
+            // gets both its receiver and its conversion.
+            Assert.Equal("500.0 500.0 same 135.0", Query(lua, "local s = Moonwell.ObjectTypes.UnitMaker(Moonwell.ObjectTypes.FourCC('h006'))(); s:OnDeath(nil); return Objects.Sentinel.Read"));
+            Assert.Equal("3 3 same 3.0 1.5", Query(lua, "local f = Moonwell.ObjectTypes.ItemMaker(Moonwell.ObjectTypes.FourCC('I002'))(); f:OnPickedUp(nil); return Objects.Flask.Read"));
         }
 
         [Fact]

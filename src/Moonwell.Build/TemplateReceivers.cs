@@ -37,7 +37,9 @@ namespace Moonwell.Build
                     var name = reference.Property.Name;
                     if (instance.IsImplicit && reference.Syntax is IdentifierNameSyntax bare && done.Add(bare.SpanStart))
                     {
-                        edits.Add(new FloatEdit(new TextSpan(bare.SpanStart, 0), This + ".", 0, name + " -> " + This + "." + name));
+                        // The name is replaced, not written before: a bracket another edit opens at the same place (an int
+                        // made a float, RunTimeFloats) then goes before the receiver, as an insert goes before a replacement.
+                        edits.Add(new FloatEdit(bare.Span, This + "." + bare.Identifier.Text, 0, name + " -> " + This + "." + name));
                     }
                     else if (reference.Syntax is MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax or BaseExpressionSyntax } access
                         && (access.Expression is ThisExpressionSyntax || ReadsTheSame(access, reference.Property, model))

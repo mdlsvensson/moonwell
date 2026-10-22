@@ -233,7 +233,9 @@ namespace Objects
         public override void OnDeath(Moonwell.Unit? killerUnit)
         {
             var same = Default == Moonwell.Unit.Default<Sentinel>() && this.Default == Default;
-            Read = Default.MaxLife + " " + this.Default.MaxLife + " " + (same ? "same" : "other");
+            // An int read bare and made a float: the build writes both the receiver and the conversion.
+            float gold = Default.GoldCost;
+            Read = Default.MaxLife + " " + this.Default.MaxLife + " " + (same ? "same" : "other") + " " + gold;
         }
     }
 
@@ -250,7 +252,13 @@ namespace Objects
         public override void OnPickedUp(Moonwell.Unit carrierUnit)
         {
             var same = Default == Moonwell.Item.Default<Flask>() && this.Default == Default && base.Default == Default;
-            Read = Default.Charges + " " + this.Default.Charges + " " + (same ? "same" : "other");
+            float charges = Default.Charges;
+            Read = Default.Charges + " " + this.Default.Charges + " " + (same ? "same" : "other") + " " + charges + " " + Half(Default.Charges);
+        }
+
+        private static float Half(float value)
+        {
+            return value / 2f;
         }
     }
 
