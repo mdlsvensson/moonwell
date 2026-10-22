@@ -166,6 +166,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "defaults.remove-does-nothing", Run = UnitCases.DefaultRemoveDoesNothing });
             list.Add(new Case { Name = "defaults.read-in-its-constructor", Run = UnitCases.DefaultReadInItsConstructor });
             list.Add(new Case { Name = "defaults.class-registered-later", Run = UnitCases.DefaultOfClassRegisteredLater });
+            list.Add(new Case { Name = "defaults.class-without-its-maker-yet", Run = UnitCases.DefaultOfClassWithoutItsMakerYet });
             list.Add(new Case { Name = "defaults.unregistered-from-object", Run = UnitCases.DefaultOfUnregisteredFromObject });
             list.Add(new Case { Name = "defaults.unknown-type-name-empty", Run = UnitCases.DefaultNameOfUnknownTypeIsEmpty });
             list.Add(new Case { Name = "units.inventory", Run = ItemCases.Inventory });
