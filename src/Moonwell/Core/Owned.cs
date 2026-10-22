@@ -9,7 +9,7 @@ namespace Moonwell
         [LocalSafe]
         public Owner? Owner { get; internal set; }
 
-        /// <summary>Whether this object has ended.</summary>
+        /// <summary>Whether this object has ended: false inside its OnEnd, OnRemoved and OnLeave, true once its End or removal returns.</summary>
         [LocalSafe]
         public bool HasEnded { get; private set; }
 

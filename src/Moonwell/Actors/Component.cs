@@ -26,7 +26,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the component is removed or its actor ends, before it leaves its actor.</summary>
+        /// <summary>Runs when the component is removed or its actor ends, before it leaves its actor; HasEnded is still false here.</summary>
         protected virtual void OnRemoved()
         {
         }
