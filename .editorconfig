@@ -1,0 +1,20 @@
+root = true
+
+# Every editor (Rider, Visual Studio, VS Code, Gram) writes files the way the repository stores them.
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+
+[*.{csproj,props,targets,slnx,xml,json,yml,yaml}]
+indent_size = 2
+
+# The game's and World Editor's own files are kept exactly as they wrote them.
+[{**/map/**,**/*.w3mod/**,tests/Moonwell.Build.Tests/Fixtures/WorldEditorObjects/**}]
+charset = unset
+end_of_line = unset
+insert_final_newline = unset
+indent_style = unset
+indent_size = unset
