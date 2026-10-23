@@ -44,7 +44,7 @@ namespace Moonwell.Build
                 throw new BuildException("dotnet msbuild could not find the built assembly");
             }
 
-            return lines[lines.Length - 1];
+            return lines[^1];
         }
 
         /// <summary>
