@@ -12,6 +12,8 @@
     <PackageReference Include="Moonwell.Objects" Version="MOONWELL_VERSION" />
     <!-- For damage reactions in stages (before and after armor, lethal, landed), take the comment off the next line. -->
     <!-- <PackageReference Include="Moonwell.Damage" Version="MOONWELL_VERSION" /> -->
+    <!-- For vectors, angles, easing, polygons and raycasts, take the comment off the next line. -->
+    <!-- <PackageReference Include="Moonwell.Maths" Version="MOONWELL_VERSION" /> -->
   </ItemGroup>
 
 </Project>
