@@ -2,7 +2,7 @@ using Xunit;
 
 namespace Moonwell.Build.Tests
 {
-    /// <summary>The files the build reads as the map's code: the stage, the float rewrite and the stubs' look at the source agree.</summary>
+    /// <summary>The files the build reads as the map's code: the stage and the stubs' look at the source agree.</summary>
     public sealed class CompiledFilesTests : IDisposable
     {
         private readonly TestFolders folders = new TestFolders();
@@ -41,21 +41,6 @@ namespace Moonwell.Build.Tests
 
             Assert.DoesNotContain(marked.Files, file => file.StartsWith("bin/", StringComparison.Ordinal) || file.StartsWith("obj/", StringComparison.Ordinal));
             Assert.Contains("Objects.cs", marked.Files);
-        }
-
-        [Fact]
-        public void the_float_rewrite_does_not_read_a_file_under_bin_or_obj()
-        {
-            // Main.cs names a class that only a file under bin or obj declares: the rewrite cannot resolve it unless it reads those.
-            var folder = folders.TemporaryFolderOutsideRepository();
-            Write(folder, "Main.cs", "class Main { Same field; }");
-            Write(folder, "bin/Junk.cs", "class Same { }");
-            Write(folder, "obj/Junk.cs", "class Same { }");
-
-            Assert.NotEmpty(FloatLiterals.Rewrite(folder, new[] { "Main.cs" }, "Map", Array.Empty<string>(), Array.Empty<string>()));
-
-            Write(folder, "Sub/Junk.cs", "class Same { }");
-            Assert.Empty(FloatLiterals.Rewrite(folder, new[] { "Main.cs" }, "Map", Array.Empty<string>(), Array.Empty<string>()));
         }
 
         [Fact]

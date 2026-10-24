@@ -91,6 +91,37 @@ namespace Moonwell.Testing
             Expect.Equal("float", NumberType(bare.Auto), "a float auto-property without an initializer");
         }
 
+        /// <summary>
+        /// What Moonwell's own rewrite of the map's code did not reach: an int? made a float?, ints taken as floats in a foreach, a
+        /// struct's float field, a float array's items, Math.Floor and Math.Ceiling, and a whole float as text.
+        /// </summary>
+        public static void Beyond(FakeWorld world)
+        {
+            int? some = Some();
+            float? made = some;
+            Expect.Equal("float", NumberType(made ?? 0f), "an int? made a float?");
+            Expect.Equal(true, made == 4f, "its value");
+            double? madeDouble = some;
+            Expect.Equal("float", NumberType(madeDouble ?? 0d), "an int? made a double?");
+            foreach (float item in new[] { 3, 4 })
+            {
+                Expect.Equal("float", NumberType(item), "an int taken as a float in a foreach");
+            }
+
+            var spot = new FloatSpot();
+            Expect.Equal("float", NumberType(spot.X), "a struct's float field");
+            var items = new float[2];
+            Expect.Equal("float", NumberType(items[1]), "a float array's item");
+            Expect.Equal("float", NumberType((float)System.Math.Floor(2.5f)), "Math.Floor");
+            Expect.Equal("float", NumberType((float)System.Math.Ceiling(2.5f)), "Math.Ceiling");
+            Expect.Equal("float", NumberType(System.Math.Floor(2.5)), "Math.Floor of a double");
+            float defaulted = Defaulted();
+            Expect.Equal("float", NumberType(defaulted), "default(float?).GetValueOrDefault()");
+            Expect.Equal("4", 4f.ToString(), "a whole float's text");
+            Expect.Equal("x4", "x" + 4f, "a whole float joined to a string");
+            Expect.Equal("[4|2.5]", $"[{4f}|{2.5f}]", "whole and fractional floats interpolated");
+        }
+
         /// <summary>Ints stay integers.</summary>
         public static void IntsStay(FakeWorld world)
         {
@@ -128,6 +159,24 @@ namespace Moonwell.Testing
         {
             return "integer";
         }
+
+        private static int? Some()
+        {
+            return 4;
+        }
+
+        private static float Defaulted()
+        {
+            float? none = null;
+            return none.GetValueOrDefault();
+        }
+
+#pragma warning disable CS0649
+        private struct FloatSpot
+        {
+            public float X;
+        }
+#pragma warning restore CS0649
 
         private sealed class Holder
         {

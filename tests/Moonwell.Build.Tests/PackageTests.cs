@@ -374,15 +374,15 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
-        public void package_folder_elsewhere_is_reported()
+        public void package_without_source_is_reported()
         {
             var copy = folders.TemporaryCopyOfSample();
             WriteAssets(copy, "Moonwell/0.0.0-missing", "package");
 
             var error = Assert.Throws<BuildException>(() => PackageSources.Check(MapProject.Find(copy)));
 
-            var packages = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
-            Assert.Equal($"Moonwell 0.0.0-missing has no source in {packages}; CSharp.lua reads packages only from there (is NUGET_PACKAGES set?)", error.Message);
+            var packages = CSharpLua.PackageHelper.GetGlobalPackagesPath();
+            Assert.Equal($"Moonwell 0.0.0-missing has no source in {packages}, where CSharp.lua reads packages from", error.Message);
         }
 
         [Fact]

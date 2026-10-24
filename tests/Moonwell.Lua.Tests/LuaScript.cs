@@ -59,8 +59,8 @@ internal static class LuaScript
         return map.Script;
     }
 
-    // A copy of the project whose whole-number floats are written as the map build writes a map's (FloatLiterals), with its
-    // project references made absolute; the projects it references are compiled as they are, as a map's packages are.
+    // A copy of the project with its project references made absolute; the projects it references are compiled as they are,
+    // as a map's packages are.
     private static string Rewritten(string csproj, string folder)
     {
         var source = Path.GetDirectoryName(Path.GetFullPath(csproj));
@@ -86,15 +86,6 @@ internal static class LuaScript
             "(<ProjectReference Include=\")([^\"]+)\"",
             match => match.Groups[1].Value + Path.GetFullPath(Path.Combine(source, match.Groups[2].Value)) + "\"");
         File.WriteAllText(project, text);
-
-        var tested = Path.GetFileNameWithoutExtension(csproj);
-        var references = Directory.EnumerateFiles(AppContext.BaseDirectory, "Moonwell*.dll")
-            .Where(path => Path.GetFileNameWithoutExtension(path) is var name && name != tested && name != "Moonwell.Lua.Tests" && name != "Moonwell.Build");
-        var errors = FloatLiterals.Rewrite(folder, files, tested, references, Array.Empty<string>());
-        if (errors.Count > 0)
-        {
-            throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
-        }
 
         return project;
     }

@@ -319,11 +319,6 @@ The build also rejects `using static Moonwell.Natives` (write `Natives.X`), whic
 nothing on the screen. Key by the handle, or set the field on first use. Moonwell's classes, `Unit` and the rest, are
 safe keys.
 
-A whole-number `float` stays a float in the game, and prints as `50.0` where C# prints `50`; so does an `int` made a
-float (`(float)count`) and a `float` field without an initializer. An `int?` made a `float?` (`float? f = maybe;`),
-`foreach (float f in ints)`, a float array's items, and `Math.Floor` or `Math.Ceiling`, are integers in the game: add
-`+ 0.0f` where a product could pass 2^31.
-
 An error in a reaction shows on the screen with its C# file and line, and is written in full to
 `Documents\Warcraft III\CustomMapData\Moonwell\log.txt`. A release build leaves the message off the screen and keeps
 the file and line.

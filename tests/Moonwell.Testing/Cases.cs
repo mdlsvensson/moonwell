@@ -287,6 +287,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "floats.stored", Run = FloatCases.Stored });
             list.Add(new Case { Name = "floats.converted", Run = FloatCases.Converted });
             list.Add(new Case { Name = "floats.bare", Run = FloatCases.Bare });
+            list.Add(new Case { Name = "floats.beyond-the-rewrite", Run = FloatCases.Beyond });
             list.Add(new Case { Name = "floats.ints-stay", Run = FloatCases.IntsStay });
             list.Add(new Case { Name = "text.nullable-concat", Run = TextCases.NullableConcat });
             list.Add(new Case { Name = "text.conditional-access-concat", Run = TextCases.ConditionalAccessConcat });

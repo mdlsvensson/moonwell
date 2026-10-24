@@ -2,12 +2,12 @@ using System.Text.Json;
 
 namespace Moonwell.Build
 {
-    /// <summary>Checks that the Moonwell packages a map project uses carry their source where CSharp.lua looks for it.</summary>
+    /// <summary>Checks that the Moonwell packages a map project uses carry their source in the folder CSharp.lua reads packages from.</summary>
     public static class PackageSources
     {
         /// <summary>Checks every <c>Moonwell</c> and <c>Moonwell.*</c> package the project restored.</summary>
         /// <param name="project">The map project, whose <c>obj\project.assets.json</c> <c>dotnet build</c> has just written.</param>
-        /// <exception cref="BuildException">A package has no C# source in the default NuGet folder.</exception>
+        /// <exception cref="BuildException">A package has no C# source in the folder NuGet restores packages to.</exception>
         public static void Check(MapProject project)
         {
             var assets = Path.Combine(project.Folder, "obj", "project.assets.json");
@@ -16,7 +16,7 @@ namespace Moonwell.Build
                 return;
             }
 
-            var defaultFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
+            var defaultFolder = CSharpLua.PackageHelper.GetGlobalPackagesPath();
             using var stream = File.OpenRead(assets);
             using var document = JsonDocument.Parse(stream);
             if (!document.RootElement.TryGetProperty("libraries", out var libraries) || libraries.ValueKind != JsonValueKind.Object)
@@ -44,7 +44,7 @@ namespace Moonwell.Build
                 var source = Path.Combine(defaultFolder, id.ToLowerInvariant(), version.ToLowerInvariant(), "contentFiles", "cs");
                 if (!Directory.Exists(source))
                 {
-                    throw new BuildException($"{id} {version} has no source in {defaultFolder}; CSharp.lua reads packages only from there (is NUGET_PACKAGES set?)");
+                    throw new BuildException($"{id} {version} has no source in {defaultFolder}, where CSharp.lua reads packages from");
                 }
             }
         }

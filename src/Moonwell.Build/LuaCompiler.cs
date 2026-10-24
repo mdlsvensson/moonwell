@@ -89,7 +89,6 @@ namespace Moonwell.Build
             var symbols = release ? new[] { "MOONWELL_LUA" } : new[] { "DEBUG", "MOONWELL_LUA" };
             var marked = MarkedProject.Stage(project, symbols);
             files = marked.Files;
-            var unread = FloatLiterals.Rewrite(marked.Folder, marked.Files, Path.GetFileNameWithoutExtension(targetPath), CompiledFiles.LibrariesBeside(targetPath), symbols);
             var compiler = new Compiler(marked.ProjectFile, project.GeneratedFolder, string.Empty, null!, null!, "*", "-define:" + string.Join(";", symbols), false, null!, string.Empty)
             {
                 IsExportMetadata = false,
@@ -125,13 +124,6 @@ namespace Moonwell.Build
                 }
 
                 throw new BuildException(string.Join(Environment.NewLine, errors));
-            }
-
-            // CSharp.lua's own errors come first; one only the float rewrite saw means a name it could not resolve kept its integers.
-            if (unread.Count > 0)
-            {
-                var lines = unread.Select(marked.Unstage).Prepend("the build could not resolve these names to write whole-number floats for Lua (C18):");
-                throw new BuildException(string.Join(Environment.NewLine, lines));
             }
 
             var script = ScriptLibraries.Trim(map.Script ?? throw new BuildException("CSharp.lua wrote no script"));

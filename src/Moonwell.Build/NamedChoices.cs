@@ -37,7 +37,7 @@ namespace Moonwell.Build
 
             foreach (var symbols in symbolSets)
             {
-                foreach (var (tree, model) in FloatLiterals.Models(sources, sources, Path.GetFileNameWithoutExtension(assembly), libraries, symbols))
+                foreach (var (tree, model) in SourceModels.Of(sources, sources, Path.GetFileNameWithoutExtension(assembly), libraries, symbols))
                 {
                     foreach (var name in tree.GetRoot().DescendantNodes().OfType<IdentifierNameSyntax>())
                     {
