@@ -77,6 +77,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "maths.lua.shared-not-copied", Run = LuaShapeCases.SharedNotCopied });
             list.Add(new Case { Name = "maths.lua.out-pair", Run = LuaShapeCases.OutPair });
             list.Add(new Case { Name = "maths.lua.number-types", Run = LuaShapeCases.NumberTypes });
+            list.Add(new Case { Name = "maths.lua.miss-makes-nothing", Run = MissCases.MissMakesNothing });
+            list.Add(new Case { Name = "maths.raycast.ray-values", Run = MissCases.RayValues });
         }
 
         /// <summary>Adds the first cases: the harness, collections, errors, ownership, timers, hooks, actors and objects (Lua allows 200 locals in a function, and each case made here is one).</summary>

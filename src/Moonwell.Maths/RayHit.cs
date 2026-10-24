@@ -1,7 +1,9 @@
+using System;
+
 namespace Moonwell
 {
     /// <summary>Where a raycast hit: the point, the surface's normal there, and how far along the segment.</summary>
-    public readonly struct RayHit
+    public readonly struct RayHit : IEquatable<RayHit>
     {
         /// <summary>The point hit.</summary>
         public readonly Vector2 Point;
@@ -19,6 +21,48 @@ namespace Moonwell
             Point = point;
             Normal = normal;
             Fraction = fraction;
+        }
+
+        /// <summary>Whether the point, normal and fraction are exactly equal.</summary>
+        [LocalSafe]
+        public static bool operator ==(RayHit a, RayHit b)
+        {
+            return a.Point == b.Point && a.Normal == b.Normal && a.Fraction == b.Fraction;
+        }
+
+        /// <summary>Whether the point, normal or fraction differs.</summary>
+        [LocalSafe]
+        public static bool operator !=(RayHit a, RayHit b)
+        {
+            return a.Point != b.Point || a.Normal != b.Normal || a.Fraction != b.Fraction;
+        }
+
+        /// <summary>Whether the point, normal and fraction are exactly equal.</summary>
+        [LocalSafe]
+        public bool Equals(RayHit other)
+        {
+            return Point == other.Point && Normal == other.Normal && Fraction == other.Fraction;
+        }
+
+        /// <summary>Whether the object is a RayHit with the same point, normal and fraction.</summary>
+        [LocalSafe]
+        public override bool Equals(object? obj)
+        {
+            return obj is RayHit other && Equals(other);
+        }
+
+        /// <summary>A hash of the point, normal and fraction.</summary>
+        [LocalSafe]
+        public override int GetHashCode()
+        {
+            return Point.GetHashCode() ^ (Normal.GetHashCode() * 397) ^ Fraction.GetHashCode();
+        }
+
+        /// <summary>The hit as text: ((0, 5), (-1, 0), 0.5).</summary>
+        [LocalSafe]
+        public override string ToString()
+        {
+            return "(" + Point + ", " + Normal + ", " + Fraction + ")";
         }
     }
 }
