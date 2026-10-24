@@ -70,6 +70,10 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "maths.raycast.polygon-hit", Run = RaycastCases.PolygonHit });
             list.Add(new Case { Name = "maths.raycast.polygon-first-edge", Run = RaycastCases.PolygonFirstEdge });
             list.Add(new Case { Name = "maths.raycast.ray-at", Run = RaycastCases.RayAt });
+            list.Add(new Case { Name = "maths.actors.position", Run = ActorMathsCases.Position });
+            list.Add(new Case { Name = "maths.actors.place-and-move", Run = ActorMathsCases.PlaceAndMove });
+            list.Add(new Case { Name = "maths.actors.distance-and-angle", Run = ActorMathsCases.DistanceAndAngle });
+            list.Add(new Case { Name = "maths.actors.face", Run = ActorMathsCases.Face });
         }
 
         /// <summary>Adds the first cases: the harness, collections, errors, ownership, timers, hooks, actors and objects (Lua allows 200 locals in a function, and each case made here is one).</summary>
