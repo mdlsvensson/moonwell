@@ -276,6 +276,27 @@ public sealed class Shield : Buff, IDamageTarget
   units that hit each other back never loop.
 - A hit spell immunity stops runs before armor only.
 
+## Maths
+
+Add the `Moonwell.Maths` package (the template's `.csproj` has the line, commented) for vectors, angles, easing,
+bounds, polygons and raycasts. A map that does not reference it carries none of its code.
+
+```csharp
+var start = target.Position();
+var end = start.Offset(caster.AngleTo(target), 300f);
+target.PlaceAt(Vector2.Lerp(start, end, Ease.OutQuad(t)));
+```
+
+- Angles are degrees, as `Facing`: 0 along +X, 90 along +Y. `MathF.Sin` takes radians; use `Angles.Sin`.
+- `Vector2`, `Vector3`, `Bounds`, `Ray` and `RayHit` are values that never change once made, so they are shared and
+  never copied. Their names follow Godot's; `Vector2.Up` is north on the map, and `AngleTo` is the facing to a point.
+- In the game a vector is a table to make: in code that runs every tick on many objects, use the float forms in
+  `Maths` (`Maths.Distance`, `Maths.AngleBetween`, `Maths.Polar`), which make none.
+- `unit.Position()` is a method. `PlaceAt` ignores pathing and keeps the unit's order, which a push wants; `MoveTo`
+  goes through pathing and ends it.
+- `Raycast.Circle`, `Segment`, `Bounds` and `Polygon` give the first hit along a segment in an `out` value, with a
+  normal for `Bounce` and `Slide`.
+
 ## Players
 
 `Player.One` to `Player.TwentyFour` are the player slots, as the lobby numbers them; `Player.Get(slot)` takes the
