@@ -1,8 +1,9 @@
 # Upstream workarounds
 
 What Moonwell does because War3Net or CSharp.lua (War3Net.CSharpLua 2.0.4) behaves in a way it has to work around.
-Moonwell builds with its own fork of CSharp.lua, `mdlsvensson/CSharp.lua` (decision 33), through the package
-`Moonwell.CSharpLua`; a row marked "fixed in the fork" is no longer a problem there. Nothing in the fork has been sent
+Moonwell builds with its own fork of CSharp.lua, `mdlsvensson/CSharp.lua` (decision 33), through its packages on nuget.org,
+`Moonwell.CSharpLua` and `Moonwell.CSharpLua.CoreSystem` (published by the fork's `publish.yml`); a row marked "fixed in the
+fork" is no longer a problem there. Nothing in the fork has been sent
 to Drake53 or yanghuan yet.
 Each entry says what upstream does, where Moonwell handles it, the upstream issue if there is one, and what removing
 the workaround would take. The evidence for each is in the workspace's `docs/game-facts.md`.
