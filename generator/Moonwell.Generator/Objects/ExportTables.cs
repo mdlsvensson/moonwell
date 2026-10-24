@@ -1,4 +1,5 @@
 using System.Text;
+using War3Net.IO.Slk;
 
 namespace Moonwell.Generator.Objects;
 
@@ -49,9 +50,10 @@ public sealed record ObjectRows(string Id, IReadOnlyDictionary<string, string> V
 /// set has replaces the base's file of the same name, a file it lacks is read from the base.
 /// </para>
 /// <para>
-/// SLK files are read here and not with <c>War3Net.IO.Slk</c> 6.0.2, which types each cell: it narrows decimals to a
-/// float (<c>19.7984999999999</c> becomes <c>19.7985</c>) and turns <c>#VALUE!</c> and <c>#REF!</c> into 0, by design.
-/// Its <c>Rows</c> and <c>Columns</c> are the highest indexes holding a cell, not counts.
+/// SLK files are read with <c>War3Net.IO.Slk</c> in its keep-text mode (<c>new SylkParser(keepText: true)</c>, in Moonwell's
+/// fork, <c>Moonwell.War3Net.IO.Slk</c>); the default parser types each cell: it narrows decimals to a float
+/// (<c>19.7984999999999</c> becomes <c>19.7985</c>) and turns <c>#VALUE!</c> and <c>#REF!</c> into 0, by design.
+/// The table's <c>Rows</c> and <c>Columns</c> are the highest indexes holding a cell, not counts.
 /// </para>
 /// </remarks>
 public sealed class ExportTables
@@ -591,85 +593,46 @@ public sealed class ExportTables
     /// </summary>
     private static List<TableRow> ReadTable(string path, string display)
     {
-        var cells = new SortedDictionary<int, SortedDictionary<int, string>>();
-        int x = 0, y = 0, number = 0;
-        foreach (var raw in ReadText(path).Split('\n'))
+        SylkTable table;
+        try
         {
-            number++;
-            var line = raw.TrimEnd('\r');
-            if (line == "E" || line.StartsWith("E;", StringComparison.Ordinal))
-            {
-                break;
-            }
-
-            if (!line.StartsWith("C;", StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            string? value = null;
-            foreach (var field in SplitFields(line.Substring(2)))
-            {
-                if (field.Length == 0)
-                {
-                    throw new FormatException($"{display} line {number}: empty field");
-                }
-
-                var text = field.Substring(1);
-                switch (field[0])
-                {
-                    case 'X':
-                        x = Coordinate(text, display, number);
-                        break;
-                    case 'Y':
-                        y = Coordinate(text, display, number);
-                        break;
-                    case 'K':
-                        value = text.Length >= 2 && text[0] == '"' && text[text.Length - 1] == '"'
-                            ? text.Substring(1, text.Length - 2).Replace("\"\"", "\"")
-                            : text;
-                        break;
-                }
-            }
-
-            if (value == null)
-            {
-                continue;
-            }
-
-            if (x < 1 || y < 1)
-            {
-                throw new FormatException($"{display} line {number}: cell has no coordinates");
-            }
-
-            if (!cells.TryGetValue(y, out var row))
-            {
-                cells[y] = row = new SortedDictionary<int, string>();
-            }
-
-            row[x] = value;
+            using var stream = File.OpenRead(path);
+            table = new SylkParser(keepText: true).Parse(stream);
+        }
+        catch (Exception failure) when (failure is FormatException or InvalidDataException or OverflowException)
+        {
+            throw new FormatException($"{display}: {failure.Message}", failure);
         }
 
-        if (!cells.TryGetValue(1, out var header) || header.Count == 0)
+        var header = new SortedDictionary<int, string>();
+        for (var x = 0; x <= table.Columns; x++)
+        {
+            if (table[x, 0] is string name)
+            {
+                header[x] = name;
+            }
+        }
+
+        if (header.Count == 0)
         {
             throw new FormatException($"{display} has no header row");
         }
 
         var idColumn = header.Keys.First();
         var rows = new List<TableRow>();
-        foreach (var row in cells)
+        for (var y = 1; y <= table.Rows; y++)
         {
-            if (row.Key == 1 || !row.Value.TryGetValue(idColumn, out var id) || id.Length == 0)
+            if (table[idColumn, y] is not string { Length: > 0 } id)
             {
                 continue;
             }
 
             var values = new Dictionary<string, string>(StringComparer.Ordinal);
-            foreach (var cell in row.Value)
+            foreach (var column in header)
             {
-                if (header.TryGetValue(cell.Key, out var column))
+                if (table[column.Key, y] is string text)
                 {
-                    values[column] = cell.Value;
+                    values[column.Value] = text;
                 }
             }
 
@@ -677,39 +640,6 @@ public sealed class ExportTables
         }
 
         return rows;
-    }
-
-    /// <summary>Splits a record on the semicolons outside quotes.</summary>
-    private static List<string> SplitFields(string record)
-    {
-        var fields = new List<string>();
-        var start = 0;
-        var quoted = false;
-        for (var i = 0; i < record.Length; i++)
-        {
-            if (record[i] == '"')
-            {
-                quoted = !quoted;
-            }
-            else if (record[i] == ';' && !quoted)
-            {
-                fields.Add(record.Substring(start, i - start));
-                start = i + 1;
-            }
-        }
-
-        fields.Add(record.Substring(start));
-        return fields;
-    }
-
-    private static int Coordinate(string text, string display, int line)
-    {
-        if (!int.TryParse(text, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var number))
-        {
-            throw new FormatException($"{display} line {line}: '{text}' is not a coordinate");
-        }
-
-        return number;
     }
 
     private sealed record Source(string Meta, string[] Tables, TextFiles Text);

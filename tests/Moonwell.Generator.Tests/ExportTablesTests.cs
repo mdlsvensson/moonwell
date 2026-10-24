@@ -313,6 +313,52 @@ public class ExportTablesTests
         Assert.Equal("2.5", item["level"]);
     }
 
+    [Fact]
+    public void a_cell_is_the_text_the_file_spells()
+    {
+        using var copy = new TempExport(MiniExport());
+        File.WriteAllText(
+            Path.Combine(copy.Folder, "units", "itemdata.slk"),
+            "ID;PWXL;N;E\r\nB;X6;Y2;D0\r\nC;X1;Y1;K\"itemID\"\r\nC;X2;K\"a\"\r\nC;X3;K\"b\"\r\nC;X4;K\"c\"\r\nC;X5;K\"d\"\r\nC;X6;K\"e\"\r\n"
+            + "C;X1;Y2;K\"ratf\"\r\nC;X2;K0.666666666666667\r\nC;X3;K19.7984999999999\r\nC;X4;K#VALUE!\r\nC;X5;K#REF!\r\nC;X6;KTRUE\r\nE\r\n");
+
+        var item = Find(ExportTables.Read(copy.Folder).Objects(Kind.Item, null), "ratf").Values;
+
+        Assert.Equal("0.666666666666667", item["a"]);
+        Assert.Equal("19.7984999999999", item["b"]);
+        Assert.Equal("#VALUE!", item["c"]);
+        Assert.Equal("#REF!", item["d"]);
+        Assert.Equal("TRUE", item["e"]);
+    }
+
+    [Fact]
+    public void a_cell_beyond_the_declared_size_and_a_record_that_is_not_a_cell_do_not_matter()
+    {
+        using var copy = new TempExport(MiniExport());
+        File.WriteAllText(
+            Path.Combine(copy.Folder, "units", "itemdata.slk"),
+            "ID;PWXL;N;E\r\nB;X2;Y1;D0\r\nP;PGeneral\r\nF;P0;FG0G;X1\r\nC;X1;Y1;K\"itemID\"\r\nC;X2;K\"comment\"\r\nC;X3;K\"level\"\r\n"
+            + "C;X1;Y2;K\"ratf\"\r\nC;X2;K\"x\"\r\nC;X3;K2.5\r\nE\r\n");
+
+        var item = Find(ExportTables.Read(copy.Folder).Objects(Kind.Item, null), "ratf").Values;
+
+        Assert.Equal("x", item["comment"]);
+        Assert.Equal("2.5", item["level"]);
+    }
+
+    [Fact]
+    public void a_broken_table_is_reported_with_its_path()
+    {
+        using var copy = new TempExport(MiniExport());
+        File.WriteAllText(
+            Path.Combine(copy.Folder, "units", "itemdata.slk"),
+            "ID;PWXL;N;E\r\nB;X2;Y2;D0\r\nC;Xone;Y1;K\"itemID\"\r\nE\r\n");
+
+        var error = Assert.Throws<FormatException>(() => ExportTables.Read(copy.Folder).Objects(Kind.Item, null));
+
+        Assert.Contains("itemdata.slk", error.Message);
+    }
+
     private sealed class TempExport : IDisposable
     {
         public TempExport(string source)

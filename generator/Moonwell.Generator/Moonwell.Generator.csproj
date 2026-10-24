@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Moonwell.War3Net.IO.Slk" Version="6.0.2-moonwell.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Objects\field-names.txt" LogicalName="field-names.txt" />
   </ItemGroup>
 
