@@ -156,6 +156,53 @@ namespace Moonwell.Testing
             Expect.Equal("[spot 2 as Q|]", $"[{spot:Q}|{none:Q}]", "a Spot? with a format");
         }
 
+        /// <summary>n.GetValueOrDefault() gives the value, and the type's default when null; with an argument, that argument (C22).</summary>
+        public static void NullableGetValueOrDefault(FakeWorld world)
+        {
+            int? three = Three();
+            int? noInt = NoInt();
+            float? noFloat = NoFloat();
+            bool? yes = Yes();
+            bool? noBool = NoBool();
+            Expect.Equal(3, three.GetValueOrDefault(), "int? 3");
+            Expect.Equal(0, noInt.GetValueOrDefault(), "a null int?");
+            Expect.Equal(7, noInt.GetValueOrDefault(7), "a null int? with a fallback");
+            Expect.Equal(3, three.GetValueOrDefault(7), "int? 3 with a fallback");
+            Expect.Equal(true, noFloat.GetValueOrDefault() == 0f, "a null float?");
+            Expect.Equal(true, yes.GetValueOrDefault(), "bool? true");
+            Expect.Equal(false, noBool.GetValueOrDefault(), "a null bool?");
+        }
+
+        /// <summary>e?.ToString() on a nullable enum gives the name, and null when e is null (C23).</summary>
+        public static void NullableEnumToString(FakeWorld world)
+        {
+            Mood? angry = Angry();
+            Mood? none = NoMood();
+            Expect.Equal("Angry", angry?.ToString(), "a Mood? ?.ToString()");
+            Expect.Equal(null, none?.ToString(), "a null Mood? ?.ToString()");
+            Expect.Equal("Angry", angry.ToString(), "a Mood? .ToString()");
+            Expect.Equal("", none.ToString(), "a null Mood? .ToString()");
+            Expect.Equal("x", "x" + none?.ToString(), "a null Mood? ?.ToString() joined");
+            Expect.Equal(5, angry?.ToString().Length ?? -1, "a Mood? ?.ToString().Length");
+            Expect.Equal(-1, none?.ToString().Length ?? -1, "a null Mood? ?.ToString().Length");
+        }
+
+        private static Mood? Angry()
+        {
+            return Mood.Angry;
+        }
+
+        private static Mood? NoMood()
+        {
+            return null;
+        }
+
+        private enum Mood
+        {
+            Calm,
+            Angry,
+        }
+
         private static char? Letter()
         {
             return 'A';

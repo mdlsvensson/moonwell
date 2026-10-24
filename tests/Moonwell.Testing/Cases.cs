@@ -297,6 +297,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "text.nullable-struct", Run = TextCases.NullableStruct });
             list.Add(new Case { Name = "text.nullable-to-string", Run = TextCases.NullableToString });
             list.Add(new Case { Name = "text.plain", Run = TextCases.Plain });
+            list.Add(new Case { Name = "text.nullable-get-value-or-default", Run = TextCases.NullableGetValueOrDefault });
+            list.Add(new Case { Name = "text.nullable-enum-to-string", Run = TextCases.NullableEnumToString });
         }
 
         /// <summary>Runs every case on a fresh world, and returns a PASS or FAIL line for each, then DONE.</summary>
