@@ -32,6 +32,16 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "maths.scalars.angles-difference", Run = ScalarCases.AnglesDifference });
             list.Add(new Case { Name = "maths.scalars.angles-lerp-and-move", Run = ScalarCases.AnglesLerpAndMove });
             list.Add(new Case { Name = "maths.scalars.angles-trig", Run = ScalarCases.AnglesTrig });
+            list.Add(new Case { Name = "maths.vector2.basics", Run = Vector2Cases.Basics });
+            list.Add(new Case { Name = "maths.vector2.angles", Run = Vector2Cases.Angles });
+            list.Add(new Case { Name = "maths.vector2.offset-and-rotate", Run = Vector2Cases.OffsetAndRotate });
+            list.Add(new Case { Name = "maths.vector2.products", Run = Vector2Cases.Products });
+            list.Add(new Case { Name = "maths.vector2.bounce-reflect-slide", Run = Vector2Cases.BounceReflectSlide });
+            list.Add(new Case { Name = "maths.vector2.limits", Run = Vector2Cases.Limits });
+            list.Add(new Case { Name = "maths.vector2.lerp", Run = Vector2Cases.Lerp });
+            list.Add(new Case { Name = "maths.vector2.operators", Run = Vector2Cases.Operators });
+            list.Add(new Case { Name = "maths.vector2.equality", Run = Vector2Cases.Equality });
+            list.Add(new Case { Name = "maths.vector2.text", Run = Vector2Cases.Text });
         }
 
         /// <summary>Adds the first cases: the harness, collections, errors, ownership, timers, hooks, actors and objects (Lua allows 200 locals in a function, and each case made here is one).</summary>
