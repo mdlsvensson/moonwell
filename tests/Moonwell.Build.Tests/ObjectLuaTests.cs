@@ -29,7 +29,7 @@ namespace Moonwell.Build.Tests
 
             Assert.Empty(run.Errors);
             // Damage is a float, so Lua prints it with its point (C18); so is a unit's MaxLife, Arthas's doubled total.
-            Assert.Contains($"objects: {2 * paladin} 200.0 1300.0", run.Lines);
+            Assert.Contains($"objects: {2 * paladin} 200 1300", run.Lines);
         }
 
         [Fact]
@@ -39,7 +39,7 @@ namespace Moonwell.Build.Tests
 
             // The Paladin's total life is 100 + 22 * 25, which Arthas doubles; his mana starts full at 0 + 17 * 15. The values are
             // the totals the build wrote, read through the kind base's hooks with no handle.
-            Assert.Equal("1300.0 255.0 1300.0 Arthas", Query(lua, "return Objects.Report.Shared()"));
+            Assert.Equal("1300 255 1300 Arthas", Query(lua, "return Objects.Report.Shared()"));
             Assert.Equal("1300.0 Arthas", Query(lua, "local a = Objects.Arthas(); return tostring(a:getMaxLife()) .. ' ' .. a:getName()"));
             Assert.Equal("1300.0 Dark Arthas", Query(lua, "local a = Objects.DarkArthas(); return tostring(a:getMaxLife()) .. ' ' .. a:getName()"));
             Assert.Equal("600.0", Query(lua, "return tostring(Objects.StrongFootman():getMaxLife())"));
@@ -89,9 +89,9 @@ namespace Moonwell.Build.Tests
 
             // The Objects map's StrongFootman replaces the footman; the knight and the archmage have no class of the map's. A unit
             // the game made has its type id and a plain class; its default object has neither handle nor class of the map's.
-            Assert.Equal("885.0 Knight", Query(lua, "local u = Moonwell.Unit(); u.TypeId = Moonwell.ObjectTypes.FourCC('hkni'); return Objects.Report.DefaultOf(u)"));
-            Assert.Equal("450.0 Archmage", Query(lua, "local h = Moonwell.Hero(); h.TypeId = Moonwell.ObjectTypes.FourCC('Hamg'); return Objects.Report.DefaultOf(h)"));
-            Assert.Equal("600.0 Footman", Query(lua, "local u = Moonwell.Unit(); u.TypeId = Moonwell.ObjectTypes.FourCC('hfoo'); return Objects.Report.DefaultOf(u)"));
+            Assert.Equal("885 Knight", Query(lua, "local u = Moonwell.Unit(); u.TypeId = Moonwell.ObjectTypes.FourCC('hkni'); return Objects.Report.DefaultOf(u)"));
+            Assert.Equal("450 Archmage", Query(lua, "local h = Moonwell.Hero(); h.TypeId = Moonwell.ObjectTypes.FourCC('Hamg'); return Objects.Report.DefaultOf(h)"));
+            Assert.Equal("600 Footman", Query(lua, "local u = Moonwell.Unit(); u.TypeId = Moonwell.ObjectTypes.FourCC('hfoo'); return Objects.Report.DefaultOf(u)"));
         }
 
         [Fact]
@@ -311,8 +311,8 @@ namespace Moonwell.Build.Tests
             // Sentinel's OnDeath and Flask's OnPickedUp read Default bare and through this (Flask's through base too): the class's
             // one default object. An int read bare and made a float (Sentinel's gold, Flask's charges, kept and passed to a float)
             // gets both its receiver and its conversion.
-            Assert.Equal("500.0 500.0 same 135.0", Query(lua, "local s = Moonwell.ObjectTypes.UnitMaker(Moonwell.ObjectTypes.FourCC('h006'))(); s:OnDeath(nil); return Objects.Sentinel.Read"));
-            Assert.Equal("3 3 same 3.0 1.5", Query(lua, "local f = Moonwell.ObjectTypes.ItemMaker(Moonwell.ObjectTypes.FourCC('I002'))(); f:OnPickedUp(nil); return Objects.Flask.Read"));
+            Assert.Equal("500 500 same 135", Query(lua, "local s = Moonwell.ObjectTypes.UnitMaker(Moonwell.ObjectTypes.FourCC('h006'))(); s:OnDeath(nil); return Objects.Sentinel.Read"));
+            Assert.Equal("3 3 same 3 1.5", Query(lua, "local f = Moonwell.ObjectTypes.ItemMaker(Moonwell.ObjectTypes.FourCC('I002'))(); f:OnPickedUp(nil); return Objects.Flask.Read"));
         }
 
         [Fact]

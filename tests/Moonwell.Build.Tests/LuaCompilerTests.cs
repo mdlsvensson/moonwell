@@ -183,7 +183,7 @@ namespace Moonwell.Build.Tests
             // come from Moonwell's library, so the build resolved it.
             foreach (var script in new[] { builds.Development.Script, builds.Release.Script })
             {
-                Assert.Contains("player:Print(\"sample: a footman, facing \" .. 270.0, -1.0)", script);
+                Assert.Contains("player:Print(\"sample: a footman, facing \" .. System.toString(270.0 --[[Unit.DefaultFacing]]), -1.0)", script);
                 Assert.Contains("Moonwell.Unit.Create(Moonwell.ObjectTypes.FourCC(\"hfoo\"), player, 0.0, 0.0, 270.0)", script);
             }
         }
