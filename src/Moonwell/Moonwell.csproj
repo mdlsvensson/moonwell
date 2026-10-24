@@ -33,7 +33,7 @@ namespace Moonwell
     /// &lt;summary&gt;The Moonwell package the map is built with.&lt;/summary&gt;
     public static class Package
     {
-        /// &lt;summary&gt;Moonwell's version, as the package gives it, such as "0.2.4".&lt;/summary&gt;
+        /// &lt;summary&gt;Moonwell's version, as the package gives it, such as "0.2.5".&lt;/summary&gt;
         public const string Version = "$(Version)"%3B
     }
 }
