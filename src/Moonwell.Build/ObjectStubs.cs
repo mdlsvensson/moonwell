@@ -282,8 +282,7 @@ namespace Moonwell.Build
             {
                 // A kind base's Default, typed as the kind base, is the default object the core's Default gives. CSharp.lua renames
                 // the core's getters of Default for this one (getDefault1, getDefault2, in an order of its own), so the call reads
-                // it by the class instead: Widget.Default<T>() of the object's class, the same object. CSharp.lua fills {this} only
-                // from a receiver, so a read of Default in the class's own code gets (this) in the marked copy (TemplateReceivers, C20).
+                // it by the class instead: Widget.Default<T>() of the object's class, the same object.
                 text.Append("        /// @CSharpLua.Get = \"Moonwell.Widget.Default(getmetatable({this}))\"\n");
             }
 

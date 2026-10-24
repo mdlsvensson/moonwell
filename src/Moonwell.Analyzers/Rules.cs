@@ -72,23 +72,14 @@ public static class Rules
 
     private const string LuaCategory = "Lua";
 
-    public static readonly DiagnosticDescriptor CollectionExpression = new(
-        "MW0007",
-        "Collection expression",
-        "CSharp.lua drops a collection expression or stops on it; write an initializer such as new List<int> { 1, 2 }, new() { 1, 2 } or new[] { 1, 2 }",
-        LuaCategory,
-        DiagnosticSeverity.Error,
-        isEnabledByDefault: true,
-        description: "CSharp.lua compiles a collection expression ([1, 2]) to nothing in a return or a field, and stops with \"Compiler has a bug\" in a local, an assignment or an argument.");
-
     public static readonly DiagnosticDescriptor StaticNatives = new(
         "MW0008",
         "using static Moonwell.Natives",
-        "using static Moonwell.Natives makes CSharp.lua stop on a handle constant (such as ATTACK_TYPE_MAGIC) and hides Moonwell.Player behind Natives.Player; write Natives.X",
+        "using static Moonwell.Natives hides Moonwell.Player behind Natives.Player; write Natives.X",
         LuaCategory,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "A handle constant used through the import makes CSharp.lua stop with a NullReferenceException, and Player.Get(0) fails with CS0119 because Natives.Player(int) wins.");
+        description: "Player.Get(0) fails with CS0119 because Natives.Player(int), imported by using static, wins over the type Moonwell.Player.");
 
     public static readonly DiagnosticDescriptor ChoiceNames = new(
         "MW0010",
@@ -109,7 +100,7 @@ public static class Rules
         description: "CSharp.lua writes c ? a : b as c and a or b when a is a value: Lua's or then gives b when a is nil or false. So a first branch that is a nullable value (int?, float?, bool?, an enum's or a struct's), or a type parameter's value that can be a bool, gives the second branch when it is null (or false), with no error. A first branch that is a class, a plain bool or null is written with if and is right; so is a plain value, one made nullable from a plain value other than a bool ((int?)i), one the condition has checked for null (n != null ? n : x), and c ? n : null, which gives nil either way, except for a bool?.");
 
     /// <summary>The rules of C# that CSharp.lua cannot compile.</summary>
-    public static ImmutableArray<DiagnosticDescriptor> Lua { get; } = ImmutableArray.Create(CollectionExpression, StaticNatives, ChoiceNames, NullableBranch);
+    public static ImmutableArray<DiagnosticDescriptor> Lua { get; } = ImmutableArray.Create(StaticNatives, ChoiceNames, NullableBranch);
 
     private const string ObjectsCategory = "Objects";
 

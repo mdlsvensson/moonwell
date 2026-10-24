@@ -299,6 +299,11 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "text.plain", Run = TextCases.Plain });
             list.Add(new Case { Name = "text.nullable-get-value-or-default", Run = TextCases.NullableGetValueOrDefault });
             list.Add(new Case { Name = "text.nullable-enum-to-string", Run = TextCases.NullableEnumToString });
+            list.Add(new Case { Name = "collection-expressions.everywhere", Run = CollectionExpressionCases.Everywhere });
+            list.Add(new Case { Name = "collection-expressions.spread", Run = CollectionExpressionCases.Spread });
+            list.Add(new Case { Name = "templates.static-through-using-static", Run = TemplateCases.StaticThroughUsingStatic });
+            list.Add(new Case { Name = "templates.instance-without-receiver", Run = TemplateCases.InstanceWithoutReceiver });
+            list.Add(new Case { Name = "templates.instance-put", Run = TemplateCases.InstancePut });
         }
 
         /// <summary>Runs every case on a fresh world, and returns a PASS or FAIL line for each, then DONE.</summary>

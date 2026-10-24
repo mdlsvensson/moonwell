@@ -1,19 +1,12 @@
 namespace Moonwell.Analyzers.Tests;
 
-/// <summary>MW0007, MW0008 and MW0010: C# that CSharp.lua cannot compile, or compiles to Lua that does not do what .NET does.</summary>
+/// <summary>MW0008 and MW0010: C# that CSharp.lua cannot compile, or compiles to Lua that does not do what .NET does.</summary>
 public class LuaTests
 {
     [Fact]
-    public void collection_expressions_are_rejected_wherever_they_are()
+    public void collection_expressions_are_accepted_wherever_they_are()
     {
-        Assert.Equal(new[]
-        {
-            "MW0007: [1, 2]",
-            "MW0007: []",
-            "MW0007: [..a, 3]",
-            "MW0007: [4]",
-            "MW0007: [5]",
-        }, MapCode.Check("""
+        Assert.Empty(MapCode.Check("""
             List<int> a = [1, 2];
             a = [];
             var b = new List<int>([..a, 3]);
@@ -22,14 +15,6 @@ public class LuaTests
                 static int[] Field = [5];
                 static void Take(List<int> list) { }
             """));
-    }
-
-    [Fact]
-    public void a_collection_expression_message_gives_what_to_write()
-    {
-        Assert.Equal(
-            "CSharp.lua drops a collection expression or stops on it; write an initializer such as new List<int> { 1, 2 }, new() { 1, 2 } or new[] { 1, 2 }",
-            MapCode.Message("List<int> a = [1];"));
     }
 
     [Fact]
@@ -66,7 +51,7 @@ public class LuaTests
     public void using_static_natives_message_gives_what_to_write()
     {
         Assert.Equal(
-            "using static Moonwell.Natives makes CSharp.lua stop on a handle constant (such as ATTACK_TYPE_MAGIC) and hides Moonwell.Player behind Natives.Player; write Natives.X",
+            "using static Moonwell.Natives hides Moonwell.Player behind Natives.Player; write Natives.X",
             Assert.Single(MapCode.MessagesOfFile("""
                 using static Moonwell.Natives;
 

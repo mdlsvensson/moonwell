@@ -17,9 +17,6 @@ public sealed class LuaAnalyzer : DiagnosticAnalyzer
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
-        context.RegisterSyntaxNodeAction(
-            node => node.ReportDiagnostic(Diagnostic.Create(Rules.CollectionExpression, node.Node.GetLocation())),
-            SyntaxKind.CollectionExpression);
         context.RegisterSyntaxNodeAction(Using, SyntaxKind.UsingDirective);
         context.RegisterSyntaxNodeAction(Invocation, SyntaxKind.InvocationExpression);
         context.RegisterSyntaxNodeAction(Joined, SyntaxKind.AddExpression);
