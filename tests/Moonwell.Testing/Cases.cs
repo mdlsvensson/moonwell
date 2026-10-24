@@ -59,6 +59,17 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "maths.shapes.polygon-area-center", Run = ShapeCases.PolygonAreaCenter });
             list.Add(new Case { Name = "maths.shapes.polygon-copies", Run = ShapeCases.PolygonCopies });
             list.Add(new Case { Name = "maths.shapes.polygon-too-few", Run = ShapeCases.PolygonTooFew });
+            list.Add(new Case { Name = "maths.raycast.circle-hit", Run = RaycastCases.CircleHit });
+            list.Add(new Case { Name = "maths.raycast.circle-miss", Run = RaycastCases.CircleMiss });
+            list.Add(new Case { Name = "maths.raycast.circle-short", Run = RaycastCases.CircleShort });
+            list.Add(new Case { Name = "maths.raycast.circle-inside", Run = RaycastCases.CircleInside });
+            list.Add(new Case { Name = "maths.raycast.circle-zero-length", Run = RaycastCases.CircleZeroLength });
+            list.Add(new Case { Name = "maths.raycast.segment-hit", Run = RaycastCases.SegmentHit });
+            list.Add(new Case { Name = "maths.raycast.segment-parallel", Run = RaycastCases.SegmentParallel });
+            list.Add(new Case { Name = "maths.raycast.bounds-hit", Run = RaycastCases.BoundsHit });
+            list.Add(new Case { Name = "maths.raycast.polygon-hit", Run = RaycastCases.PolygonHit });
+            list.Add(new Case { Name = "maths.raycast.polygon-first-edge", Run = RaycastCases.PolygonFirstEdge });
+            list.Add(new Case { Name = "maths.raycast.ray-at", Run = RaycastCases.RayAt });
         }
 
         /// <summary>Adds the first cases: the harness, collections, errors, ownership, timers, hooks, actors and objects (Lua allows 200 locals in a function, and each case made here is one).</summary>
