@@ -42,6 +42,15 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "maths.vector2.operators", Run = Vector2Cases.Operators });
             list.Add(new Case { Name = "maths.vector2.equality", Run = Vector2Cases.Equality });
             list.Add(new Case { Name = "maths.vector2.text", Run = Vector2Cases.Text });
+            list.Add(new Case { Name = "maths.vector3.basics", Run = Vector3Cases.Basics });
+            list.Add(new Case { Name = "maths.vector3.yaw-pitch", Run = Vector3Cases.YawPitch });
+            list.Add(new Case { Name = "maths.vector3.cross", Run = Vector3Cases.Cross });
+            list.Add(new Case { Name = "maths.vector3.bounce", Run = Vector3Cases.Bounce });
+            list.Add(new Case { Name = "maths.vector3.from-vector2", Run = Vector3Cases.FromVector2 });
+            list.Add(new Case { Name = "maths.vector3.equality-and-text", Run = Vector3Cases.EqualityAndText });
+            list.Add(new Case { Name = "maths.ease.ends", Run = Vector3Cases.EaseEnds });
+            list.Add(new Case { Name = "maths.ease.middles", Run = Vector3Cases.EaseMiddles });
+            list.Add(new Case { Name = "maths.ease.clamped-and-overshoot", Run = Vector3Cases.EaseClampedAndOvershoot });
         }
 
         /// <summary>Adds the first cases: the harness, collections, errors, ownership, timers, hooks, actors and objects (Lua allows 200 locals in a function, and each case made here is one).</summary>
