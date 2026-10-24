@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Vectors, angles, interpolation, shapes and raycasts for Moonwell maps.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- PrivateAssets none, so that a map that references only Moonwell.Maths still gets Moonwell's analyzer. -->
+    <ProjectReference Include="..\Moonwell\Moonwell.csproj" PrivateAssets="none" />
+  </ItemGroup>
+
+  <!--
+    The package carries its C# source beside its library, like Moonwell (see Moonwell.csproj). A map without it
+    carries none of its code: CSharp.lua compiles only the packages a map references.
+  -->
+  <ItemGroup>
+    <Content Include="**/*.cs" Exclude="obj/**;bin/**" Pack="true" PackagePath="contentFiles/cs/net10.0/Moonwell.Maths/" BuildAction="None" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Moonwell.Testing" />
+    <InternalsVisibleTo Include="Moonwell.Tests" />
+  </ItemGroup>
+
+</Project>

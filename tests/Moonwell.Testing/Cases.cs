@@ -13,7 +13,25 @@ namespace Moonwell.Testing
             AddFirst(list);
             AddMiddle(list);
             AddLast(list);
+            AddMaths(list);
             return list;
+        }
+
+        /// <summary>Adds the maths package's cases.</summary>
+        private static void AddMaths(List<Case> list)
+        {
+            list.Add(new Case { Name = "maths.scalars.lerp", Run = ScalarCases.Lerp });
+            list.Add(new Case { Name = "maths.scalars.inverse-lerp", Run = ScalarCases.InverseLerp });
+            list.Add(new Case { Name = "maths.scalars.remap", Run = ScalarCases.Remap });
+            list.Add(new Case { Name = "maths.scalars.clamp-and-wrap", Run = ScalarCases.ClampAndWrap });
+            list.Add(new Case { Name = "maths.scalars.move-toward", Run = ScalarCases.MoveToward });
+            list.Add(new Case { Name = "maths.scalars.sign-and-near", Run = ScalarCases.SignAndNear });
+            list.Add(new Case { Name = "maths.scalars.distance-and-angle", Run = ScalarCases.DistanceAndAngle });
+            list.Add(new Case { Name = "maths.scalars.polar", Run = ScalarCases.Polar });
+            list.Add(new Case { Name = "maths.scalars.angles-normalize", Run = ScalarCases.AnglesNormalize });
+            list.Add(new Case { Name = "maths.scalars.angles-difference", Run = ScalarCases.AnglesDifference });
+            list.Add(new Case { Name = "maths.scalars.angles-lerp-and-move", Run = ScalarCases.AnglesLerpAndMove });
+            list.Add(new Case { Name = "maths.scalars.angles-trig", Run = ScalarCases.AnglesTrig });
         }
 
         /// <summary>Adds the first cases: the harness, collections, errors, ownership, timers, hooks, actors and objects (Lua allows 200 locals in a function, and each case made here is one).</summary>

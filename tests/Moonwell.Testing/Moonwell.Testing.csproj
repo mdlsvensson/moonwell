@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Moonwell\Moonwell.csproj" />
     <ProjectReference Include="..\..\src\Moonwell.Damage\Moonwell.Damage.csproj" />
+    <ProjectReference Include="..\..\src\Moonwell.Maths\Moonwell.Maths.csproj" />
   </ItemGroup>
 
 </Project>
