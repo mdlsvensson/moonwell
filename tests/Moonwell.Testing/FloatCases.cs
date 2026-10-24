@@ -132,6 +132,42 @@ namespace Moonwell.Testing
             Expect.Equal("integer", NumberType(int.MaxValue), "int.MaxValue");
         }
 
+        /// <summary>An int field, auto-property, enum field, struct field or default(int) starts as the integer 0, and a loop counts in integers.</summary>
+        public static void IntsStart(FakeWorld world)
+        {
+            var bare = new IntHolder();
+            Expect.Equal("integer", NumberType(bare.Count), "an int field without an initializer");
+            Expect.Equal("integer", NumberType(IntHolder.Shared), "a static int field without an initializer");
+            Expect.Equal("integer", NumberType(bare.Auto), "an int auto-property without an initializer");
+            Expect.Equal("integer", NumberType((int)bare.Pick), "an enum field without an initializer");
+            Expect.Equal("integer", NumberType(new IntSpot().N), "a struct's int field");
+            int none = default;
+            Expect.Equal("integer", NumberType(none), "default(int)");
+            Expect.Equal("n=0", "n=" + bare.Count, "an int field joined to a string");
+            bare.Count++;
+            Expect.Equal("n=1", "n=" + bare.Count, "an int field after ++");
+            for (int i = 2; i >= 0; i--)
+            {
+                Expect.Equal("integer", NumberType(i), "a loop counting down");
+            }
+
+            for (int j = 0; j <= 4; j += 2)
+            {
+                Expect.Equal("integer", NumberType(j), "a loop counting by 2");
+            }
+        }
+
+        /// <summary>An int given to a user-defined operator's float, or returned by a lambda as a float, is a float.</summary>
+        public static void MadeFloatsInCalls(FakeWorld world)
+        {
+            int count = 3;
+            var scale = new Scale();
+            Expect.Equal("float", NumberType((scale * count).By), "an int given to an operator's float");
+            Expect.Equal("float", NumberType((scale * 2).By), "an int constant given to an operator's float");
+            System.Func<float> later = () => count;
+            Expect.Equal("float", NumberType(later()), "an int a lambda returns as a float");
+        }
+
         private static float Facing(float facing = 270f)
         {
             return facing;
@@ -193,6 +229,39 @@ namespace Moonwell.Testing
 
             public float Auto { get; set; }
         }
+
+        private enum Shade
+        {
+            Dark,
+            Light,
+        }
+
+        private sealed class IntHolder
+        {
+            public static int Shared;
+
+            public int Count;
+
+            public Shade Pick;
+
+            public int Auto { get; set; }
+        }
+
+        private struct IntSpot
+        {
+            public int N;
+        }
 #pragma warning restore CS0649
+
+        private struct Scale
+        {
+            public float By;
+
+            public static Scale operator *(Scale scale, float by)
+            {
+                scale.By = by;
+                return scale;
+            }
+        }
     }
 }

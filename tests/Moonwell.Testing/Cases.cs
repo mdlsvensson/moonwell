@@ -289,6 +289,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "floats.bare", Run = FloatCases.Bare });
             list.Add(new Case { Name = "floats.beyond-the-rewrite", Run = FloatCases.Beyond });
             list.Add(new Case { Name = "floats.ints-stay", Run = FloatCases.IntsStay });
+            list.Add(new Case { Name = "floats.ints-start-as-integers", Run = FloatCases.IntsStart });
+            list.Add(new Case { Name = "floats.made-floats-in-calls", Run = FloatCases.MadeFloatsInCalls });
             list.Add(new Case { Name = "text.nullable-concat", Run = TextCases.NullableConcat });
             list.Add(new Case { Name = "text.conditional-access-concat", Run = TextCases.ConditionalAccessConcat });
             list.Add(new Case { Name = "text.nullable-interpolation", Run = TextCases.NullableInterpolation });
@@ -310,6 +312,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "strings.utf8", Run = StringCases.Utf8 });
             list.Add(new Case { Name = "strings.interpolated", Run = StringCases.Interpolated });
             list.Add(new Case { Name = "strings.percent", Run = StringCases.Percent });
+            list.Add(new Case { Name = "strings.folded", Run = StringCases.Folded });
             list.Add(new Case { Name = "conditionals.nullable-first-branch", Run = ConditionalCases.NullableFirstBranch });
             list.Add(new Case { Name = "conditionals.nullable-bool-first-branch", Run = ConditionalCases.NullableBoolFirstBranch });
             list.Add(new Case { Name = "conditionals.struct-type-parameter", Run = ConditionalCases.StructTypeParameter });

@@ -59,6 +59,19 @@ namespace Moonwell.Testing
             Expect.Equal("50%%", @"50%%", "a verbatim string");
         }
 
+        private const string Reset = "\x1b[0m";
+
+        /// <summary>A const string and literals joined with +, which CSharp.lua writes by their value, mean what C# says.</summary>
+        public static void Folded(FakeWorld world)
+        {
+            Expect.Equal(27, Reset[0], "a const string's \\x1b");
+            Expect.Equal(4, Reset.Length, "a const string's length");
+            Expect.Equal(2, ("\e" + "y").Length, "\\e joined to a literal");
+            Expect.Equal(27, ("\e" + "y")[0], "\\e joined to a literal is the escape character");
+            Expect.Equal(3, ("b\0" + "2").Length, "\\0 joined to a digit is two characters");
+            Expect.Equal(50, ("b\0" + "2")[2], "the 2 after a joined \\0 stays a 2");
+        }
+
         private static int Three()
         {
             return 3;
