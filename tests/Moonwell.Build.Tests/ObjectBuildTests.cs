@@ -94,9 +94,9 @@ namespace Moonwell.Build.Tests
 
         // DataSet: 0 Default, 1 Custom, 2 Melee. DataVersion: 0 ReignOfChaos, 1 FrozenThrone, 2 ForsakenKingdom.
         [Theory]
-        [InlineData(0, 2, GameDataSet.Default, GameDataVersion.Unset, null, null)]
-        [InlineData(1, 2, GameDataSet.Custom, GameDataVersion.Unset, null, null)]
-        [InlineData(2, 2, GameDataSet.Melee, GameDataVersion.Unset, null, null)]
+        [InlineData(0, 2, GameDataSet.Default, GameDataVersion.ForsakenKingdom, null, null)]
+        [InlineData(1, 2, GameDataSet.Custom, GameDataVersion.ForsakenKingdom, null, null)]
+        [InlineData(2, 2, GameDataSet.Melee, GameDataVersion.ForsakenKingdom, null, null)]
         [InlineData(0, 1, GameDataSet.Default, GameDataVersion.TFT, "custom_v1", "custom_v1")]
         [InlineData(1, 1, GameDataSet.Custom, GameDataVersion.TFT, "custom_v1", "custom_v1")]
         [InlineData(2, 1, GameDataSet.Melee, GameDataVersion.TFT, null, "custom_v1")]
@@ -195,7 +195,7 @@ namespace Moonwell.Build.Tests
             {
                 ["ReignOfChaos"] = GameDataVersion.RoC,
                 ["FrozenThrone"] = GameDataVersion.TFT,
-                ["ForsakenKingdom"] = GameDataVersion.Unset,
+                ["ForsakenKingdom"] = GameDataVersion.ForsakenKingdom,
             };
             Assert.Equal(sets.Keys.Order(StringComparer.Ordinal), Enum.GetNames(dataSet).Order(StringComparer.Ordinal));
             Assert.Equal(versions.Keys.Order(StringComparer.Ordinal), Enum.GetNames(dataVersion).Order(StringComparer.Ordinal));

@@ -110,6 +110,11 @@ namespace Moonwell.Build
                 // CSharp.lua's own translation errors; a Roslyn error comes back as a result below.
                 throw new BuildException(marked.Unstage(failure.Message));
             }
+            catch (InvalidOperationException failure) when (map.Info is null || map.Environment is null)
+            {
+                // The fork's script builder refuses a map with no info or no environment file (W2).
+                throw new BuildException(failure.Message + " Save the map in World Editor.");
+            }
             if (!result.Success)
             {
                 var errors = result.Diagnostics
@@ -127,12 +132,6 @@ namespace Moonwell.Build
             }
 
             var script = ScriptLibraries.Trim(map.Script ?? throw new BuildException("CSharp.lua wrote no script"));
-
-            // Without war3map.w3e War3Net writes config but no main, and the game crashes to desktop.
-            if (!script.Contains("function main(", StringComparison.Ordinal))
-            {
-                throw new BuildException(@"the script has no main: map\war3map.w3e is missing (save the map in World Editor)");
-            }
 
             return script;
         }

@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Moonwell.War3Net.IO.Slk" Version="6.0.2-moonwell.2" />
+    <PackageReference Include="Moonwell.War3Net.IO.Slk" Version="6.0.2-moonwell.3" />
   </ItemGroup>
 
   <ItemGroup>

@@ -27,7 +27,7 @@ namespace Moonwell.Build
         /// <summary>The info file's game data set.</summary>
         public GameDataSet InfoSet { get; }
 
-        /// <summary>The info file's game data version; <c>Unset</c> is Forsaken Kingdom.</summary>
+        /// <summary>The info file's game data version.</summary>
         public GameDataVersion InfoVersion { get; }
 
         /// <summary>The tables the game takes values from: null for the base tables, else <c>custom_v0</c>, <c>custom_v1</c> or <c>melee_v0</c>.</summary>
@@ -54,7 +54,7 @@ namespace Moonwell.Build
             {
                 ReignOfChaos => GameDataVersion.RoC,
                 FrozenThrone => GameDataVersion.TFT,
-                ForsakenKingdom => GameDataVersion.Unset,
+                ForsakenKingdom => GameDataVersion.ForsakenKingdom,
                 _ => throw new BuildException($"DataVersion {dataVersion} is not a data version of this version of Moonwell"),
             };
 

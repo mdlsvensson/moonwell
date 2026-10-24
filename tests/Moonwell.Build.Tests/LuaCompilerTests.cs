@@ -169,7 +169,8 @@ namespace Moonwell.Build.Tests
 
             var error = Assert.Throws<BuildException>(() => MapBuild.Run(folder, new BuildOptions(), TextWriter.Null));
 
-            Assert.Equal(@"the script has no main: map\war3map.w3e is missing (save the map in World Editor)", error.Message);
+            // War3Net's script builder refuses a map with no environment file (the fork's package, W2); the build passes its message on.
+            Assert.Equal("The map has no environment file (war3map.w3e), which the map script needs. Save the map in World Editor.", error.Message);
         }
 
         [Fact]

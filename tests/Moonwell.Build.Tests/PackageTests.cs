@@ -248,7 +248,7 @@ namespace Moonwell.Build.Tests
             var data = reader.ReadMapInfo();
 
             Assert.Equal(GameDataSet.Default, data.GameDataSet);
-            Assert.Equal(GameDataVersion.Unset, data.GameDataVersion);
+            Assert.Equal(GameDataVersion.ForsakenKingdom, data.GameDataVersion);
         }
 
         [Fact]
