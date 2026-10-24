@@ -304,6 +304,15 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "templates.static-through-using-static", Run = TemplateCases.StaticThroughUsingStatic });
             list.Add(new Case { Name = "templates.instance-without-receiver", Run = TemplateCases.InstanceWithoutReceiver });
             list.Add(new Case { Name = "templates.instance-put", Run = TemplateCases.InstancePut });
+            list.Add(new Case { Name = "strings.escapes", Run = StringCases.Escapes });
+            list.Add(new Case { Name = "strings.raw-and-verbatim", Run = StringCases.RawAndVerbatim });
+            list.Add(new Case { Name = "strings.utf8", Run = StringCases.Utf8 });
+            list.Add(new Case { Name = "strings.interpolated", Run = StringCases.Interpolated });
+            list.Add(new Case { Name = "strings.percent", Run = StringCases.Percent });
+            list.Add(new Case { Name = "conditionals.nullable-first-branch", Run = ConditionalCases.NullableFirstBranch });
+            list.Add(new Case { Name = "conditionals.nullable-bool-first-branch", Run = ConditionalCases.NullableBoolFirstBranch });
+            list.Add(new Case { Name = "conditionals.struct-type-parameter", Run = ConditionalCases.StructTypeParameter });
+            list.Add(new Case { Name = "conditionals.still-right", Run = ConditionalCases.StillRight });
         }
 
         /// <summary>Runs every case on a fresh world, and returns a PASS or FAIL line for each, then DONE.</summary>

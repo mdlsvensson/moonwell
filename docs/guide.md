@@ -314,8 +314,7 @@ game with it. Both make a development build: it checks the values Moonwell recei
 `--release` makes the release build. `moonwell run --game <exe>` names the game when it is not in its usual place.
 
 The build also rejects `using static Moonwell.Natives` (write `Natives.X`), which hides `Player` behind
-`Natives.Player`. `c ? n : x` whose first branch can be null or false in the game (an `int?`, a `bool?`) is error
-MW0016: the game gives `x` there, so write an `if`. The build does not catch a
+`Natives.Player`. The build does not catch a
 `Dictionary` keyed by a map's own class that has a static field with a value: the map can stop while it loads, with
 nothing on the screen. Key by the handle, or set the field on first use. Moonwell's classes, `Unit` and the rest, are
 safe keys.

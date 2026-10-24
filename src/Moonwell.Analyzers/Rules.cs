@@ -90,17 +90,8 @@ public static class Rules
         isEnabledByDefault: true,
         description: "The enums of Moonwell.Objects (ArmorType, Targets, ...) are ignored by CSharp.lua: the game's Lua has their numbers only. ToString (also x?.ToString()), a string joined (+ or +=) or interpolated with one, one given to an object parameter (string.Format, string.Concat, StringBuilder.Append; Equals is left alone), and Enum methods given one (GetValues, GetNames, GetName, IsDefined, Parse, TryParse, Format, ToObject) give the number where .NET gives the name, or stop. Comparing, |, & and HasFlag work.");
 
-    public static readonly DiagnosticDescriptor NullableBranch = new(
-        "MW0016",
-        "Conditional whose first branch can be null or false",
-        "'{0}' gives its second branch in the game when its first is null or false, since CSharp.lua writes it with and/or; write an if",
-        LuaCategory,
-        DiagnosticSeverity.Error,
-        isEnabledByDefault: true,
-        description: "CSharp.lua writes c ? a : b as c and a or b when a is a value: Lua's or then gives b when a is nil or false. So a first branch that is a nullable value (int?, float?, bool?, an enum's or a struct's), or a type parameter's value that can be a bool, gives the second branch when it is null (or false), with no error. A first branch that is a class, a plain bool or null is written with if and is right; so is a plain value, one made nullable from a plain value other than a bool ((int?)i), one the condition has checked for null (n != null ? n : x), and c ? n : null, which gives nil either way, except for a bool?.");
-
     /// <summary>The rules of C# that CSharp.lua cannot compile.</summary>
-    public static ImmutableArray<DiagnosticDescriptor> Lua { get; } = ImmutableArray.Create(StaticNatives, ChoiceNames, NullableBranch);
+    public static ImmutableArray<DiagnosticDescriptor> Lua { get; } = ImmutableArray.Create(StaticNatives, ChoiceNames);
 
     private const string ObjectsCategory = "Objects";
 

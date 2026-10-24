@@ -13,8 +13,8 @@ namespace Moonwell.Build
     /// a constant it folds or inlines (<c>16777216f + 1f</c>, a const, a cast, an int stored in a float) by its value, without
     /// one. Each such constant becomes the one literal of its value (<c>16777216.0f</c>), which CSharp.lua copies as written; a
     /// whole-number default value a call leaves out, which CSharp.lua also writes by value, is written into the call, named.
-    /// What is a float only at run time is rewritten too (<see cref="RunTimeFloats"/>), and so is a nullable value joined to a
-    /// string (<see cref="NullableText"/>): the rewrite is the one pass with the semantic model of the copy CSharp.lua compiles.
+    /// What is a float only at run time is rewritten too (<see cref="RunTimeFloats"/>): the rewrite is the one pass with the
+    /// semantic model of the copy CSharp.lua compiles.
     /// </summary>
     public static class FloatLiterals
     {
@@ -151,7 +151,6 @@ namespace Moonwell.Build
             }
 
             RunTimeFloats.Edits(root, model, edits);
-            NullableText.Edits(root, model, edits);
             return edits;
         }
 

@@ -13,8 +13,10 @@ namespace Moonwell
         /// <summary>Set by a damage package: given the first object of each class whose mask is worked out; null without one.</summary>
         internal static Action<object>? Seen;
 
-        // Whether obj's class, below declaringBase, defines name itself. In Lua MoonwellOverrides (moonwell.lua) walks
-        // the class chain; .NET asks reflection. No summary goes above this line: CSharp.lua then ignores the template.
+        /// <summary>
+        /// Whether obj's class, below declaringBase, defines name itself. In Lua MoonwellOverrides (moonwell.lua) walks
+        /// the class chain; .NET asks reflection.
+        /// </summary>
         /// @CSharpLua.Template = "MoonwellOverrides({0}, {1}, {2})"
         internal static bool Overrides(object obj, string name, Type declaringBase)
         {

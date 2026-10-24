@@ -53,6 +53,9 @@ internal static class LuaScript
             throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
         }
 
+        // Kept next to the project copy, so a Lua error naming a line of the script can be looked up.
+        File.WriteAllText(Path.Combine(outputFolder, "script.lua"), map.Script);
+
         return map.Script;
     }
 

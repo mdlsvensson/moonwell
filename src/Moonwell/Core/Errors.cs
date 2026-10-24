@@ -46,9 +46,10 @@ namespace Moonwell
             counts.Clear();
         }
 
-        // The C# locations an error was raised at, innermost first, one a line; empty when none is known. In Lua MoonwellWhere
-        // (moonwell.lua) reads what the exception's traceback recorded; .NET has none. No summary goes above this line: CSharp.lua
-        // then ignores the template.
+        /// <summary>
+        /// The C# locations an error was raised at, innermost first, one a line; empty when none is known. In Lua MoonwellWhere
+        /// (moonwell.lua) reads what the exception's traceback recorded; .NET has none.
+        /// </summary>
         /// @CSharpLua.Template = "MoonwellWhere({0})"
         internal static string Where(Exception error)
         {
