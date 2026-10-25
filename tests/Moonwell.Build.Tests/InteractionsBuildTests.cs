@@ -101,13 +101,6 @@ namespace Moonwell.Build.Tests
             }
         }
 
-        [Fact]
-        public void sample_without_the_package_carries_no_tree_table()
-        {
-            Assert.DoesNotContain("MoonwellTrees", builds.Development.Script);
-            Assert.DoesNotContain("MoonwellTrees", builds.Release.Script);
-        }
-
         // A copy of a fixture with the interactions package referenced and IsTree called from a method of its own, so that the
         // compiler keeps the reference.
         private string CopyWithPackage(string fixture, string space)

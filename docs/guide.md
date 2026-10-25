@@ -300,8 +300,7 @@ target.PlaceAt(Vector2.Lerp(start, end, Ease.OutQuad(t)));
 ## Interactions and finding
 
 Add the `Moonwell.Interactions` package (the template's `.csproj` has the line, commented) for things that react to what
-comes near them, gizmos, and finding units, items and destructables. A map that does not reference it carries none of
-its code.
+comes near them, gizmos, and finding. A map that does not reference it carries none of its code.
 
 ```csharp
 public sealed class FireAura : Interaction<Unit, Unit> // held by a unit, pairs with units
@@ -312,27 +311,18 @@ public sealed class FireAura : Interaction<Unit, Unit> // held by a unit, pairs 
 }
 
 unit.Interact(new FireAura()); // made inside a buff, it ends with the buff
-
-public sealed class Well : Gizmo // a map's own object with a place
-{
-    protected override void OnCreated() { this.Interact(new Healing()); Timer.After(20f, End); }
-}
-
-var well = Gizmo.Create(new Well(), x, y, caster.Player);
-var near = Find.InRange<Unit>(caster.Position(), 500f); // a new list
-Find.InRange(x, y, 500f, targets);                      // fills a list the map keeps
+var well = Gizmo.Create(new Well(), x, y, caster.Player); // a gizmo is a map's own object with a place
+var near = Find.InRange<Unit>(x, y, 500f);                // a new list; or Find.InRange(x, y, 500f, list)
 ```
 
 - `Range` is centre to centre and flat. A pair is found at the next tick after they come within range, so a 1 s tick
-  may start up to 1 s late; `Tick = 0.03125f` for something fast. `OnPart` runs once, when the pair ends.
-- What has a place: a unit in the game, alive, not hidden and not loaded; an item on the ground; a live destructable; a
-  gizmo until it ends. Players and abilities have none.
-- `Find` has `InRange`, `InRect`, `InPolygon`, `AlongLine` and `Closest`, each in two forms: one gives a new list, the
-  other fills a list the map keeps, which makes none. Use that one in code that runs every tick.
-- `Interactions.CellSize` (128), `CellCheck` (0.1), `Slack` (64) and `Step` (1/32) are set in the map's `Map` constructor.
-- Everything runs on every machine, so `Find` is fine inside `Local.For`: there it reads and changes nothing, and for
-  a kind nothing outside has asked for yet it looks through the objects Moonwell knows, which is slower.
-- `IsTree()` is a method and needs `Moonwell.Objects` in the map; the build warns when it is missing.
+  may start up to 1 s late. Only a unit in the game (alive, not hidden, not loaded), a visible item on the ground, a
+  live destructable and a gizmo have a place; `OnPart` runs once, when a pair ends.
+- `Find` has `InRange`, `InRect`, `InPolygon`, `AlongLine` and `Closest`. Each gives a new list, or fills a list the
+  map keeps (which makes none; use it every tick); `Closest` gives the nearest one, or the nearest few into a list.
+- `Interactions.CellSize` (128), `CellCheck` (0.1), `Slack` (64) and `Step` (1/32) are set in the map's constructor.
+- `Find` is fine inside `Local.For`: it reads and changes nothing there (a kind nothing outside has asked for yet is
+  searched through the objects Moonwell knows, slower). `IsTree()` needs `Moonwell.Objects`; the build warns if missing.
 
 ## Players
 
