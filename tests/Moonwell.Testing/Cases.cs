@@ -48,6 +48,17 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "terrain.pathing.local-height", Run = PathingCases.LocalHeight });
             list.Add(new Case { Name = "terrain.pathing.not-installed", Run = PathingCases.NotInstalled });
             list.Add(new Case { Name = "terrain.pathing.reinstall", Run = PathingCases.Reinstall });
+            list.Add(new Case { Name = "terrain.raycast.hill-hit", Run = GroundRayCases.HillHit });
+            list.Add(new Case { Name = "terrain.raycast.miss", Run = GroundRayCases.Miss });
+            list.Add(new Case { Name = "terrain.raycast.cliff", Run = GroundRayCases.Cliff });
+            list.Add(new Case { Name = "terrain.raycast.starts-under", Run = GroundRayCases.StartsUnder });
+            list.Add(new Case { Name = "terrain.raycast.zero-length", Run = GroundRayCases.ZeroLength });
+            list.Add(new Case { Name = "terrain.raycast.vertical", Run = GroundRayCases.Vertical });
+            list.Add(new Case { Name = "terrain.raycast.leaves-map", Run = GroundRayCases.LeavesMap });
+            list.Add(new Case { Name = "terrain.raycast.long-ray", Run = GroundRayCases.LongRay });
+            list.Add(new Case { Name = "terrain.raycast.hit-values", Run = GroundRayCases.HitValues });
+            list.Add(new Case { Name = "terrain.raycast.not-installed", Run = GroundRayCases.NotInstalled });
+            list.Add(new Case { Name = "terrain.raycast.miss-makes-nothing", Run = MissCases.GroundMissMakesNothing });
         }
 
         /// <summary>Adds the maths package's cases.</summary>

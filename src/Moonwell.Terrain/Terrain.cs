@@ -96,6 +96,19 @@ namespace Moonwell
         }
 
         /// <summary>
+        /// The first place the segment from <paramref name="from"/> to <paramref name="to"/> meets the ground (the
+        /// blended <c>Height</c>), with the ground's <c>Normal</c> there. Sampled every 32 along its length, so a ridge
+        /// narrower than that can be stepped over. A segment that starts at or under the ground hits at fraction 0 with
+        /// the normal straight up (so does one of zero length that is under it); one that stays above it, or leaves the
+        /// map over its edge (which reads flat), gives false and an empty hit, and makes nothing.
+        /// </summary>
+        [LocalSafe]
+        public static bool Raycast(Vector3 from, Vector3 to, out TerrainHit hit)
+        {
+            return GroundRay.Cast(from.X, from.Y, from.Z, to.X, to.Y, to.Z, out hit);
+        }
+
+        /// <summary>
         /// Whether units can walk at a point, as the map's terrain says: cliffs, deep water and the like, not trees,
         /// buildings or units. A point outside the map reads the edge. Read a cell at a time, once, and kept until
         /// <c>Refresh</c>. On a bridge it reads false, as the water beneath does.
