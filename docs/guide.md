@@ -297,6 +297,29 @@ target.PlaceAt(Vector2.Lerp(start, end, Ease.OutQuad(t)));
 - `Raycast.Circle`, `Segment`, `Bounds` and `Polygon` give the first hit along a segment in an `out` value, with a
   normal for `Bounce` and `Slide`.
 
+## Terrain
+
+Add the `Moonwell.Terrain` package (the template's `.csproj` has the line, commented) for the ground's height, slope,
+pathing and rays. A map that does not reference it carries none of its code and no grid.
+
+```csharp
+var z = Terrain.Height(target.X, target.Y);
+if (Terrain.Raycast(from, to, out var hit)) { /* the missile meets the ground at hit.Point */ }
+```
+
+- The build writes the height grid from the map's terrain file, so it is the same on every machine. It does not see
+  deformations or bridges; `Terrain.LocalHeight`, inside `Local.For` only, reads the live height and sees both.
+- A height blends the four corners of each 128 tile, so it is rough within 128 of a cliff. `IsCliff` tells a cliff tile,
+  for treating it as a wall. Water reads its surface where that is above the ground. Over the water at the map's outer
+  edge, far outside the playable area, heights can differ from the game's.
+- `IsWalkable`, `IsFlyable`, `IsBuildable` and `IsWater` are terrain only, as the game's own. After changing pathing with
+  natives, call `Terrain.Refresh(area)`. `CanStand` also sees trees and buildings and needs walkable ground, but it
+  places a hidden item, so it changes game state and is not for `Local.For`.
+- On a bridge, `Height` reads the water or ground beneath, and `IsWalkable` and `CanStand` read false.
+- `Terrain.Raycast(from, to, out hit)` is for a missile against the ground; a ridge narrower than 32 can be stepped over.
+- A `Height` read costs about 9 microseconds in the game, so code that runs every tick on many objects should read it
+  sparingly.
+
 ## Players
 
 `Player.One` to `Player.TwentyFour` are the player slots, as the lobby numbers them; `Player.Get(slot)` takes the
