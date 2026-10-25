@@ -21,6 +21,7 @@
     <!-- The snippets are compiled against the built runtime and native layer, as a map project is. -->
     <ProjectReference Include="..\..\src\Moonwell\Moonwell.csproj" />
     <ProjectReference Include="..\..\src\Moonwell.Damage\Moonwell.Damage.csproj" />
+    <ProjectReference Include="..\..\src\Moonwell.Interactions\Moonwell.Interactions.csproj" />
     <ProjectReference Include="..\..\src\Moonwell.Maths\Moonwell.Maths.csproj" />
     <ProjectReference Include="..\..\src\Moonwell.Objects\Moonwell.Objects.csproj" />
   </ItemGroup>

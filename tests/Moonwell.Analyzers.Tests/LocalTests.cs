@@ -135,6 +135,75 @@ public class LocalTests
     }
 
     [Fact]
+    public void interactions_readers_are_allowed_inside()
+    {
+        Assert.Empty(MapCode.Check("""
+            var well = new Well();
+            Local.For(p, () =>
+            {
+                var near = Find.InRange<Unit>(0f, 0f, 100f);
+                var x = well.X + well.Position.X;
+            });
+            """, "public sealed class Well : Gizmo { }"));
+    }
+
+    [Fact]
+    public void gizmo_create_is_rejected_inside()
+    {
+        var found = MapCode.Check("""
+            Local.For(p, () =>
+            {
+                Gizmo.Create(new Well(), 0f, 0f);
+            });
+            """, "public sealed class Well : Gizmo { }");
+
+        Assert.Equal(new[] { "MW0001: Gizmo.Create(new Well(), 0f, 0f)" }, found);
+    }
+
+    [Fact]
+    public void interact_is_rejected_inside()
+    {
+        var found = MapCode.Check("""
+            var unit = Unit.Of(u)!;
+            var aura = new FireAura();
+            Local.For(p, () =>
+            {
+                unit.Interact(aura);
+            });
+            """, """
+            public sealed class FireAura : Interaction<Unit, Unit>
+            {
+                public FireAura()
+                {
+                    Range = 100f;
+                }
+            }
+            """);
+
+        Assert.Equal(new[] { "MW0001: unit.Interact(aura)" }, found);
+    }
+
+    [Fact]
+    public void interactions_settings_are_read_inside_and_not_set()
+    {
+        Assert.Empty(MapCode.Check("""
+            Local.For(p, () =>
+            {
+                var slack = Interactions.Slack + Interactions.CellSize + Interactions.CellCheck + Interactions.Step;
+            });
+            """));
+
+        var found = MapCode.Check("""
+            Local.For(p, () =>
+            {
+                Interactions.Slack = 32f;
+            });
+            """);
+
+        Assert.Equal(new[] { "MW0001: Interactions.Slack" }, found);
+    }
+
+    [Fact]
     public void player_reads_are_local_safe()
     {
         Assert.Empty(MapCode.Check("""

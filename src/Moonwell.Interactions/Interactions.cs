@@ -23,6 +23,7 @@ namespace Moonwell
         private static Action<Widget>? handler;
 
         /// <summary>The side of a grid cell, in game units; 128. Read when the grid is made.</summary>
+        [LocalSafe]
         public static float CellSize
         {
             get { return Current().CellSize; }
@@ -34,6 +35,7 @@ namespace Moonwell
         }
 
         /// <summary>How often a unit's or item's cell is read again, in seconds; 0.1. Read when the grid is made.</summary>
+        [LocalSafe]
         public static float CellCheck
         {
             get { return Current().CellCheck; }
@@ -45,6 +47,7 @@ namespace Moonwell
         }
 
         /// <summary>How far past an interaction's range a check looks, in game units, to cover what a unit moves between two reads of its cell; 64. Read when the grid is made.</summary>
+        [LocalSafe]
         public static float Slack
         {
             get { return Current().Slack; }
@@ -56,6 +59,7 @@ namespace Moonwell
         }
 
         /// <summary>The length of a step of the cycle, in seconds; 1/32. Read when the grid is made.</summary>
+        [LocalSafe]
         public static float Step
         {
             get { return Current().Step; }
