@@ -14,7 +14,19 @@ namespace Moonwell.Testing
             AddMiddle(list);
             AddLast(list);
             AddMaths(list);
+            AddTerrain(list);
             return list;
+        }
+
+        /// <summary>Adds the terrain package's cases.</summary>
+        private static void AddTerrain(List<Case> list)
+        {
+            list.Add(new Case { Name = "terrain.grid.pinned", Run = GridCases.Pinned });
+            list.Add(new Case { Name = "terrain.grid.clamped", Run = GridCases.Clamped });
+            list.Add(new Case { Name = "terrain.grid.wrong-length", Run = GridCases.WrongLength });
+            list.Add(new Case { Name = "terrain.grid.not-installed", Run = GridCases.NotInstalled });
+            list.Add(new Case { Name = "terrain.grid.playable", Run = GridCases.Playable });
+            list.Add(new Case { Name = "terrain.grid.blocks", Run = GridCases.Blocks });
         }
 
         /// <summary>Adds the maths package's cases.</summary>
