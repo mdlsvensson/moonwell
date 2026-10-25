@@ -154,13 +154,54 @@ namespace Moonwell.Build.Tests
             twoUp.TerrainTiles.Add(Ramp(0, 2));
             twoUp.TerrainTiles.Add(Ramp(0, 4));
             Assert.StartsWith("YAAS", TerrainWriter.Encode(twoUp));
+        }
 
-            var diagonal = MakeEnvironment(1, 1);
-            diagonal.TerrainTiles.Add(Ramp(0, 2));
-            diagonal.TerrainTiles.Add(Ramp(0, 2));
-            diagonal.TerrainTiles.Add(Ramp(0, 2));
-            diagonal.TerrainTiles.Add(Ramp(0, 3));
-            Assert.StartsWith("YAAS", TerrainWriter.Encode(diagonal));
+        [Fact]
+        public void a_ramp_corner_with_a_higher_ramp_corner_only_diagonal_is_raised_a_quarter_level()
+        {
+            var read = MakeEnvironment(1, 1);
+            read.TerrainTiles.Add(Ramp(0, 2));
+            read.TerrainTiles.Add(Ramp(0, 2));
+            read.TerrainTiles.Add(Ramp(0, 2));
+            read.TerrainTiles.Add(Ramp(0, 3));
+
+            var text = TerrainWriter.Encode(read);
+
+            // The bottom-left corner: z 32, level 2, ramp.
+            Assert.StartsWith("YUAS", text);
+        }
+
+        [Fact]
+        public void a_ramp_corner_in_an_l_of_higher_ramp_corners_is_raised_three_quarters()
+        {
+            var read = MakeEnvironment(2, 2);
+            for (var row = 0; row < 3; row++)
+            {
+                for (var column = 0; column < 3; column++)
+                {
+                    var higher = (column == 2 && row == 1) || (column == 1 && row == 2) || (column == 2 && row == 2);
+                    read.TerrainTiles.Add(Ramp(0, higher ? 3 : 2));
+                }
+            }
+
+            var text = TerrainWriter.Encode(read);
+
+            // The centre (index 4): z 96, level 2, ramp.
+            Assert.Equal("Y8AS", text.Substring(4 * 4, 4));
+        }
+
+        [Fact]
+        public void raising_runs_along_rows_too()
+        {
+            var read = MakeEnvironment(0, 2);
+            read.TerrainTiles.Add(Ramp(0, 2));
+            read.TerrainTiles.Add(Ramp(0, 3));
+            read.TerrainTiles.Add(Ramp(0, 3));
+
+            var text = TerrainWriter.Encode(read);
+
+            // z 64, level 2, ramp; then z 128, level 3, ramp twice.
+            Assert.Equal("YoASZQAaZQAa", text);
         }
 
         private static TerrainTile Ramp(float height, int cliffLevel)
