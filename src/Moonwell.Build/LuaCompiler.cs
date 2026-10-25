@@ -35,6 +35,7 @@ namespace Moonwell.Build
         /// <param name="ids">The object id of each declared class.</param>
         /// <param name="standard">The standard data.</param>
         /// <param name="set">The tables values are read from (<see cref="GameData.ValueSet"/>): null for the base tables.</param>
+        /// <param name="trees">Whether the map references the interactions package, so that the script gets the table of its tree types.</param>
         /// <returns>The script, also set on <paramref name="map"/>.</returns>
         /// <exception cref="BuildException">Common.j and Blizzard.j are missing, the C# does not compile to Lua, a declared list names a class with no id, or an object file cannot be read.</exception>
         public static string Compile(
@@ -45,7 +46,8 @@ namespace Moonwell.Build
             DeclarationSet declarations,
             IReadOnlyDictionary<string, string> ids,
             StandardData standard,
-            string? set)
+            string? set,
+            bool trees = false)
         {
             ObjectStubs.Write(project, declarations.Used, declarations.Support);
             var script = Compile(project, map, targetPath, release, ObjectLua.Definitions(declarations.Used), out var files);
@@ -58,7 +60,7 @@ namespace Moonwell.Build
             script = ObjectLua.AddToInit(script, declarations.Used);
             // A standard class reads its type as World Editor changed it, and a type's default object any type World Editor makes.
             var mapTypes = MapTypes.Read(project.MapFolder, map.TriggerStrings, standard);
-            script = ObjectLua.Values(script, declarations, named, standard, set, mapTypes);
+            script = ObjectLua.Values(script, declarations, named, standard, set, mapTypes, trees);
             script = LineTable.Apply(script, files);
             map.Script = script;
             return script;

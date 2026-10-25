@@ -6,6 +6,9 @@ namespace Moonwell.Build
         /// <summary>The damage package's assembly: a map that references it gets it installed by its Main.</summary>
         private const string DamageAssemblyName = "Moonwell.Damage";
 
+        /// <summary>The interactions package's assembly: a map that references it gets the table of its tree types in its object Lua.</summary>
+        private const string InteractionsAssemblyName = "Moonwell.Interactions";
+
         /// <summary>Runs every step of the build, in order.</summary>
         /// <param name="path">A project folder, or the path of its <c>.csproj</c> file.</param>
         /// <param name="options">What kind of build to make.</param>
@@ -64,7 +67,7 @@ namespace Moonwell.Build
             var ids = ObjectIds.Assign(declarations.Objects, standard.AllIds(), MapObjectIds.Defined(project));
             EntryWriter.Write(project, settings, true, Declarations.References(targetPath, DamageAssemblyName));
             RegistryWriter.Write(project, declarations.Used, declarations.Objects, ids);
-            LuaCompiler.Compile(project, map, targetPath, options.Release, declarations, ids, standard, data.ValueSet);
+            LuaCompiler.Compile(project, map, targetPath, options.Release, declarations, ids, standard, data.ValueSet, Declarations.References(targetPath, InteractionsAssemblyName));
             StageWith(project, () => Stage.Write(project, map, declarations.Objects, ids, declarations.StandardClassIds, standard, log));
         }
 

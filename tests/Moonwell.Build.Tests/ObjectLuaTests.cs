@@ -237,6 +237,53 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void trees_are_written_with_the_package()
+        {
+            var trees = TreesOf(ObjectLua.Values(compiled.Script, compiled.Declarations, NamedIds(), compiled.Standard, null, Array.Empty<MapType>(), true));
+
+            // Lordaeron Summer Tree Wall is targeted as a tree; the barrel is targeted as debris.
+            Assert.Contains($"[{ObjectLua.FourCC("LTlt")}] = true,", trees);
+            Assert.DoesNotContain($"[{ObjectLua.FourCC("LTbr")}]", trees);
+        }
+
+        [Fact]
+        public void no_trees_without_the_package()
+        {
+            var script = ObjectLua.Values(compiled.Script, compiled.Declarations, NamedIds(), compiled.Standard, null, Array.Empty<MapType>());
+
+            Assert.DoesNotContain("MoonwellTrees", script);
+            Assert.DoesNotContain("MoonwellTrees", compiled.Script);
+        }
+
+        [Fact]
+        public void trees_follow_the_destructable_types_the_map_makes_or_changes()
+        {
+            // World Editor made the barrel a tree and the tree wall a debris, and made a new tree on the barrel and a new barrel on it.
+            using var folders = new TestFolders();
+            var map = folders.TemporaryFolderOutsideRepository();
+            var main = new DestructableObjectData(ObjectDataFormatVersion.v3);
+            main.BaseDestructables.Add(WorldEditorObject("LTbr", string.Empty, Mod("btar", "tree")));
+            main.BaseDestructables.Add(WorldEditorObject("LTlt", string.Empty, Mod("btar", "debris")));
+            main.NewDestructables.Add(WorldEditorObject("LTbr", "B000", Mod("btar", "tree,debris")));
+            main.NewDestructables.Add(WorldEditorObject("LTlt", "B001", Mod("btar", "debris")));
+            main.NewDestructables.Add(WorldEditorObject("LTlt", "B002"));
+            using (var stream = File.Create(Path.Combine(map, "war3map.w3b")))
+            using (var writer = new BinaryWriter(stream, Encoding.UTF8))
+            {
+                writer.Write(main);
+            }
+
+            var trees = TreesOf(ObjectLua.Values(compiled.Script, compiled.Declarations, NamedIds(), compiled.Standard, null, MapTypes.Read(map, null, compiled.Standard), true));
+
+            Assert.Contains($"[{ObjectLua.FourCC("LTbr")}] = true,", trees);
+            Assert.DoesNotContain($"[{ObjectLua.FourCC("LTlt")}]", trees);
+            Assert.Contains($"[{ObjectLua.FourCC("B000")}] = true,", trees);
+            Assert.DoesNotContain($"[{ObjectLua.FourCC("B001")}]", trees);
+            // A new type reads its base's standard "Targeted As" where it changes none: the standard tree wall's, not the map's change to it.
+            Assert.Contains($"[{ObjectLua.FourCC("B002")}] = true,", trees);
+        }
+
+        [Fact]
         public void standard_class_used_in_code_is_defined()
         {
             // Footman is also the base of declared classes; Rifleman is used only inside a reaction.
@@ -693,6 +740,14 @@ namespace Moonwell.Build.Tests
         {
             var at = script.LastIndexOf("MoonwellTypeValues = {", StringComparison.Ordinal);
             Assert.True(at >= 0, "the script has no table of the types' values");
+            return script.Substring(at);
+        }
+
+        // The table of the tree types appended to a script.
+        private static string TreesOf(string script)
+        {
+            var at = script.LastIndexOf("MoonwellTrees = {", StringComparison.Ordinal);
+            Assert.True(at >= 0, "the script has no table of the tree types");
             return script.Substring(at);
         }
 

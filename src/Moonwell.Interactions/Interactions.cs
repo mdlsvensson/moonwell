@@ -16,6 +16,9 @@ namespace Moonwell
         /// <summary>The grid; made on first use after an Install.</summary>
         private static Grid? grid;
 
+        /// <summary>The game's own world, kept for the reads that must make nothing; made on first use.</summary>
+        private static IInteractionWorld? native;
+
         /// <summary>The package's handler of core's TakenIn hook; the package counts as installed while that hook is this one.</summary>
         private static Action<Widget>? handler;
 
@@ -94,7 +97,20 @@ namespace Moonwell
         /// <summary>The world a read of a place asks the game through. It is the package's world when it is installed; otherwise the game's natives, without installing the package, for a search inside Local.For, which may change no shared state.</summary>
         internal static IInteractionWorld PeekWorld
         {
-            get { return Installed() ? host! : new NativeInteractionWorld(); }
+            get
+            {
+                if (Installed())
+                {
+                    return host!;
+                }
+
+                if (native == null)
+                {
+                    native = new NativeInteractionWorld();
+                }
+
+                return native;
+            }
         }
 
         /// <summary>Forgets the settings, so the next use starts from the defaults; the tests call it between cases.</summary>

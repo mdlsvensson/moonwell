@@ -109,6 +109,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.pair.stop", Run = PairCases.Stop });
             list.Add(new Case { Name = "interactions.pair.data-and-since", Run = PairCases.DataAndSince });
             list.Add(new Case { Name = "interactions.pair.pair-owns", Run = PairCases.PairOwns });
+            list.Add(new Case { Name = "interactions.tree", Run = TreeCases.Tree });
         }
 
         /// <summary>Adds the maths package's cases.</summary>

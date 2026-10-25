@@ -17,6 +17,17 @@ namespace Moonwell.Engine
         /// <summary>Whether a destructable is alive.</summary>
         public bool IsAlive(destructable target) => Natives.GetDestructableLife(target) > 0.0f;
 
+        /// <summary>Whether a destructable type is a tree, by the table the build wrote.</summary>
+        public bool IsTreeType(int typeId) => TreeTypeOf(typeId);
+
+        // MoonwellTrees = { [typeId] = true }, written by the build only for a map that references the package; a read of a
+        // table makes nothing. False when there is no table or no entry (a template gives nil for a missing table otherwise).
+        /// @CSharpLua.Template = "(MoonwellTrees ~= nil and MoonwellTrees[{0}] == true)"
+        private static bool TreeTypeOf(int typeId)
+        {
+            return false;
+        }
+
         /// <summary>The world's bounds; GetWorldBounds makes a rect, which is read and left.</summary>
         public void WorldBounds(out float minX, out float minY, out float maxX, out float maxY)
         {

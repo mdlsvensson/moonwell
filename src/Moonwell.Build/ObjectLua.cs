@@ -20,6 +20,8 @@ namespace Moonwell.Build
         // The library's last line: a statement, not a comment, so that a release build keeps it. The compiled code is after it.
         private const string LibraryEnd = "local endOfMoonwellObjects = true";
         private const string ObjectsNamespace = "Moonwell.Objects";
+        // A destructable type's "Targeted As" field.
+        private const string TargetedAs = "btar";
 
         // The generic types whose names the ignored files' preambles evaluate when the script loads.
         private static readonly string[] Generics = { LevelsGeneric, "ObjectList_1", "ObjectRef_1" };
@@ -274,6 +276,8 @@ namespace Moonwell.Build
         /// When the map reads <c>Default</c> (<see cref="DeclarationSet.TypeFields"/>), appends <c>MoonwellTypeValues</c> too: by type
         /// id, the shared fields the map's code reads of every unit, hero and item type of the data set, of every type the map makes
         /// or changes in World Editor and of every class of the map, which a type's default object with no class of the map's reads.
+        /// When the map references the interactions package (<paramref name="trees"/>), appends <c>MoonwellTrees</c>: the ids of the
+        /// destructable types whose "Targeted As" holds tree, which <c>IsTree</c> reads.
         /// </summary>
         /// <param name="script">The compiled script, with the library before its compiled code; the fields read are found after the library.</param>
         /// <param name="declarations">The used classes, the declared objects, the map's hero bonuses and the fields read of a type's default object.</param>
@@ -281,6 +285,7 @@ namespace Moonwell.Build
         /// <param name="standard">The standard data.</param>
         /// <param name="set">The tables standard values are read from (<see cref="GameData.ValueSet"/>): null for the base tables.</param>
         /// <param name="mapTypes">The types the map makes or changes in World Editor (<see cref="MapTypes.Read"/>).</param>
+        /// <param name="trees">Whether the map references the interactions package, which reads the table of tree types.</param>
         /// <returns>The script with the values table at its end.</returns>
         /// <exception cref="BuildException">A declared list or reference names a class that has no object id.</exception>
         public static string Values(
@@ -289,7 +294,8 @@ namespace Moonwell.Build
             IReadOnlyDictionary<string, string> ids,
             StandardData standard,
             string? set,
-            IReadOnlyList<MapType> mapTypes)
+            IReadOnlyList<MapType> mapTypes,
+            bool trees = false)
         {
             var used = declarations.Used;
             var read = GettersCalled(script);
@@ -350,6 +356,11 @@ namespace Moonwell.Build
             if (declarations.TypeFields.Count > 0)
             {
                 AppendTypeValues(text, declarations, ids, standard, set, mapTypes);
+            }
+
+            if (trees)
+            {
+                AppendTrees(text, declarations, ids, standard, set, mapTypes);
             }
 
             return text.ToString();
@@ -524,6 +535,63 @@ namespace Moonwell.Build
                 text.Append("  [").Append(FourCC(type.Key).ToString(CultureInfo.InvariantCulture)).Append("] = ");
                 AppendEntries(text, type.Value);
                 text.Append(",\n");
+            }
+
+            text.Append("}\n");
+        }
+
+        // MoonwellTrees = { [typeId] = true }: every destructable type whose "Targeted As" (btar) holds tree, from the same data
+        // as the type values: the standard types, then the types the map makes or changes in World Editor, then the map's classes,
+        // which win where they have the id of either. The tree bit is the one the field's choice gives the text "tree".
+        private static void AppendTrees(
+            StringBuilder text,
+            DeclarationSet declarations,
+            IReadOnlyDictionary<string, string> ids,
+            StandardData standard,
+            string? set,
+            IReadOnlyList<MapType> mapTypes)
+        {
+            var targeted = new UsedField(TargetedAs, TargetedAs, "value");
+            var tree = standard.Fields("destructable").FirstOrDefault(field => field.Id == TargetedAs)?.Choice?.Number("tree") ?? 0;
+            var none = new Dictionary<string, object?>(StringComparer.Ordinal);
+            var types = new SortedDictionary<string, bool>(StringComparer.Ordinal);
+            void Add(string id, string name, string root, IReadOnlyDictionary<string, object?> changed)
+            {
+                var reader = new FieldValues(name, "destructable", root, changed, ids, standard, set);
+                types[id] = (int.Parse(reader.Literal(targeted), CultureInfo.InvariantCulture) & tree) != 0;
+            }
+
+            if (tree != 0)
+            {
+                foreach (var id in standard.Ids("destructable"))
+                {
+                    Add(id, id, id, none);
+                }
+
+                foreach (var one in mapTypes)
+                {
+                    if (one.Kind == "destructable")
+                    {
+                        Add(one.Id, one.Id, one.Root, one.Changed);
+                    }
+                }
+
+                foreach (var one in declarations.Objects)
+                {
+                    if (one.Kind == "destructable")
+                    {
+                        Add(ids[one.ClassName], one.ClassName, one.StandardRoot, one.Changed);
+                    }
+                }
+            }
+
+            text.Append("MoonwellTrees = {\n");
+            foreach (var type in types)
+            {
+                if (type.Value)
+                {
+                    text.Append("  [").Append(FourCC(type.Key).ToString(CultureInfo.InvariantCulture)).Append("] = true,\n");
+                }
             }
 
             text.Append("}\n");

@@ -15,6 +15,9 @@ namespace Moonwell.Hosting
         /// <summary>Whether a destructable is alive.</summary>
         bool IsAlive(destructable target);
 
+        /// <summary>Whether a destructable type is a tree, by the table the build writes into the map's object Lua; false for a map built without it.</summary>
+        bool IsTreeType(int typeId);
+
         /// <summary>The world's bounds, read once when the grid is made.</summary>
         void WorldBounds(out float minX, out float minY, out float maxX, out float maxY);
     }
