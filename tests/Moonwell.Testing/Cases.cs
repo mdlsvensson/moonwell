@@ -429,6 +429,12 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "conditionals.nullable-bool-first-branch", Run = ConditionalCases.NullableBoolFirstBranch });
             list.Add(new Case { Name = "conditionals.struct-type-parameter", Run = ConditionalCases.StructTypeParameter });
             list.Add(new Case { Name = "conditionals.still-right", Run = ConditionalCases.StillRight });
+            list.Add(new Case { Name = "compiler.out-discard-lambda", Run = CompilerCases.OutDiscardLambda });
+            list.Add(new Case { Name = "compiler.return-last-in-loop", Run = CompilerCases.ReturnLastInLoop });
+            list.Add(new Case { Name = "compiler.continue-in-switch", Run = CompilerCases.ContinueInSwitch });
+            list.Add(new Case { Name = "compiler.primary-constructors", Run = CompilerCases.PrimaryConstructors });
+            list.Add(new Case { Name = "compiler.initializer-temporaries", Run = CompilerCases.InitializerTemporaries });
+            list.Add(new Case { Name = "compiler.foreach-disposes", Run = CompilerCases.ForeachDisposes });
         }
 
         /// <summary>Runs every case on a fresh world, and returns a PASS or FAIL line for each, then DONE.</summary>

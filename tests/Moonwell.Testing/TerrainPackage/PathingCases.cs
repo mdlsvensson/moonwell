@@ -183,7 +183,7 @@ namespace Moonwell.Testing
             Expect.Throws<InvalidOperationException>(() => Terrain.IsBuildable(0f, 0f), "IsBuildable");
             Expect.Throws<InvalidOperationException>(() => Terrain.IsWater(0f, 0f), "IsWater");
             Expect.Throws<InvalidOperationException>(() => Terrain.Refresh(new Bounds(Vector2.Zero, Vector2.One)), "Refresh");
-            Expect.Throws<InvalidOperationException>(() => { Terrain.CanStand(0f, 0f, out var nearest); }, "CanStand");
+            Expect.Throws<InvalidOperationException>(() => Terrain.CanStand(0f, 0f, out _), "CanStand");
             Expect.Throws<InvalidOperationException>(() => Terrain.LocalHeight(0f, 0f), "LocalHeight");
         }
 

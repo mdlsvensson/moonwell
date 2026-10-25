@@ -188,12 +188,6 @@ public static class Rules
         "'{0}' is not a copy in the game's Lua: changing it changes the element of the array or collection; make a new struct, or write the copy back",
         "CSharp.lua does not copy a struct read from an array, a List or a Dictionary element (var c = arr[0]; c.X = 6; changes arr[0]). A copy from a local, a field, a property or a parameter is right.");
 
-    public static readonly DiagnosticDescriptor PrimaryParameter = Syntax(
-        "MW0021",
-        "Primary constructor parameter in an initializer",
-        "'{0}' is 0 or nil here: CSharp.lua reads a primary constructor's parameter in a field or property initializer, or in base(...), before it is set; assign it in a constructor body, or use an ordinary constructor",
-        "In class Pt(int x) { public int X = x; } the field gets nothing; the same for class D(string n) : Base(n). A parameter used in a method body is right. Records are not affected.");
-
     public static readonly DiagnosticDescriptor TupleForm = Syntax(
         "MW0022",
         "Tuple form that fails in the game's Lua",
@@ -260,12 +254,6 @@ public static class Rules
         "{0}",
         "An enum that is a [Flags] combination prints its number; Enum.Parse gives the number; Enum.GetValues and GetNames come in no fixed order; ToString(\"D\") and ToString(\"X\") on an enum give the name; and (Color)5 + \" x\" with a constant stops the compiler. Comparing, |, &, switch, TryParse and the name of a single value work.");
 
-    public static readonly DiagnosticDescriptor InitializerTemps = Syntax(
-        "MW0033",
-        "Two object initializers in one statement, one of them used with a dot",
-        "this statement has {0} object initializers; CSharp.lua gives their temporaries one name, so 'new T { ... }.Member' reads the wrong object; put each in a local first",
-        "new P { X = 1 }.X + \" \" + new P { X = 2 }.X prints 2 2. Initializers given as arguments are right.");
-
     public static readonly DiagnosticDescriptor UsingOrder = Syntax(
         "MW0034",
         "Two using declarations in one block",
@@ -274,6 +262,6 @@ public static class Rules
 
     /// <summary>The rules for syntax and library CSharp.lua or its Lua core cannot do.</summary>
     public static ImmutableArray<DiagnosticDescriptor> Syntaxes { get; } = ImmutableArray.Create(
-        PatternStops, PatternWrong, NegatedConstant, StructCopy, PrimaryParameter, TupleForm, FormWrong, RangeIndex, RefForm,
-        ParamsForm, StringCall, BoxedValue, CatchForm, LuaMember, CheckedForm, EnumText, InitializerTemps, UsingOrder);
+        PatternStops, PatternWrong, NegatedConstant, StructCopy, TupleForm, FormWrong, RangeIndex, RefForm,
+        ParamsForm, StringCall, BoxedValue, CatchForm, LuaMember, CheckedForm, EnumText, UsingOrder);
 }

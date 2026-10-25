@@ -98,9 +98,6 @@ public class SyntaxTests
     [InlineData("MW0032", "var s = Color.Green.ToString(\"D\");", "Color.Green.ToString(\"D\")")]
     [InlineData("MW0032", "var m = Mode.A | Mode.B; var s = \"m=\" + m;", "m")]
     [InlineData("MW0032", "var s = (Color)5 + \" x\";", "(Color)5")]
-    // MW0033: initializers
-    [InlineData("MW0033", "var s = new Box { X = 1 }.X + \" \" + new Box { X = 2 }.X;", "new Box { X = 1 }")]
-    [InlineData("MW0033", "var s = new Box { X = 1 }.Equals(new Box { X = 1 }) + \" \" + object.Equals(new Box { X = 2 }, new Box { X = 2 });", "new Box { X = 1 }")]
     // MW0034: using order
     [InlineData("MW0034", "using var a = new Res(); using var b = new Res();", "using var b = new Res();", "class Res : IDisposable { public void Dispose() { } }")]
     // MW0005: decimal
@@ -161,7 +158,7 @@ public class SyntaxTests
     }
 
     [Fact]
-    public void primary_constructor_parameters_are_rejected_in_initializers_and_base()
+    public void primary_constructor_parameters_are_allowed_in_initializers_and_base()
     {
         var found = MapCode.CheckFile("""
             class Base(string n) { public string N = n; }
@@ -169,7 +166,17 @@ public class SyntaxTests
             class Plain(int x) { public int Get() => x; }
             record Rec(int A) { public int B = A; }
             """);
-        Assert.Equal(new[] { "MW0021: n", "MW0021: n", "MW0021: k", "MW0021: k" }, found);
+        Assert.Empty(found);
+    }
+
+    [Fact]
+    public void initializers_read_in_one_statement_are_allowed()
+    {
+        var found = MapCode.Check("""
+            var s = new Box { X = 1 }.X + " " + new Box { X = 2 }.X;
+            var e = new Box { X = 1 }.Equals(new Box { X = 1 }) + " " + object.Equals(new Box { X = 2 }, new Box { X = 2 });
+            """, Types);
+        Assert.Empty(found);
     }
 
     [Fact]
