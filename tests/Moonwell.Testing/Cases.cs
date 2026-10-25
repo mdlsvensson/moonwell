@@ -30,6 +30,21 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.grid.settings", Run = GridCases.Settings });
             list.Add(new Case { Name = "interactions.grid.settings-locked", Run = GridCases.SettingsLocked });
             list.Add(new Case { Name = "interactions.grid.reset", Run = GridCases.Reset });
+            list.Add(new Case { Name = "interactions.gizmo.create", Run = GizmoCases.Create });
+            list.Add(new Case { Name = "interactions.gizmo.reaction-owner", Run = GizmoCases.ReactionOwner });
+            list.Add(new Case { Name = "interactions.gizmo.tick", Run = GizmoCases.Tick });
+            list.Add(new Case { Name = "interactions.gizmo.tick-rounding", Run = GizmoCases.TickRounding });
+            list.Add(new Case { Name = "interactions.gizmo.no-tick", Run = GizmoCases.NoTick });
+            list.Add(new Case { Name = "interactions.gizmo.move", Run = GizmoCases.Move });
+            list.Add(new Case { Name = "interactions.gizmo.ends-with-owner", Run = GizmoCases.EndsWithOwner });
+            list.Add(new Case { Name = "interactions.gizmo.leave-in-grid", Run = GizmoCases.LeaveInGrid });
+            list.Add(new Case { Name = "interactions.gizmo.cycle-stops", Run = GizmoCases.CycleStops });
+            list.Add(new Case { Name = "interactions.gizmo.end-in-tick", Run = GizmoCases.EndInTick });
+            list.Add(new Case { Name = "interactions.gizmo.made-in-tick", Run = GizmoCases.MadeInTick });
+            list.Add(new Case { Name = "interactions.gizmo.long-tick", Run = GizmoCases.LongTick });
+            list.Add(new Case { Name = "interactions.gizmo.throwing-tick", Run = GizmoCases.ThrowingTick });
+            list.Add(new Case { Name = "interactions.gizmo.tick-owner", Run = GizmoCases.TickOwner });
+            list.Add(new Case { Name = "interactions.gizmo.throwing-reactions", Run = GizmoCases.ThrowingReactions });
         }
 
         /// <summary>Adds the maths package's cases.</summary>

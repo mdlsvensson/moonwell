@@ -94,6 +94,7 @@ namespace Moonwell
         {
             host = world;
             grid = null;
+            Tracking.Reset();
             handler = TakenIn;
             Hooks.TakenIn = handler;
         }
