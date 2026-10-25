@@ -52,10 +52,10 @@ namespace Moonwell
         }
 
         /// <summary>
-        /// The ground's height at a point, from the map's terrain: tile corners blended, deformations (spells and the like) not in it,
-        /// which <c>LocalHeight</c> sees. A point outside the map reads the edge. A tile whose corners are on different cliff levels
-        /// and has no ramp steps in its middle: a point takes the level of the corner nearest it and blends only the corners on that
-        /// level. On a bridge it reads the ground or water beneath, as a bridge is a destructable, not terrain.
+        /// The ground's height at a point, from the map's terrain: the four corners of its tile blended, in every tile,
+        /// cliff tiles included. Deformations (spells and the like) are not in it; <c>LocalHeight</c> sees them. A
+        /// point outside the map reads the edge. On a bridge it reads the water or ground beneath (the game's
+        /// <c>GetLocationZ</c>, <c>LocalHeight</c>, reads the deck).
         /// </summary>
         [LocalSafe]
         public static float Height(float x, float y)
@@ -63,14 +63,20 @@ namespace Moonwell
             return Grid.Height(x, y);
         }
 
-        /// <summary>Whether a point is in a cliff tile, one whose corners are on more than one cliff level with no ramp: the face between the levels, which physics can treat as a wall.</summary>
+        /// <summary>
+        /// Whether a point is in a cliff tile, one whose corners are on more than one cliff level with no ramp: the
+        /// face between the levels, which physics can treat as a wall. <c>Height</c> still blends there.
+        /// </summary>
         [LocalSafe]
         public static bool IsCliff(float x, float y)
         {
             return Grid.IsCliff(x, y);
         }
 
-        /// <summary>The direction straight out of the ground at a point, a unit vector for bounces and slides. In a cliff tile the ground is flat at each level, so it is straight up (<c>Vector3.UnitZ</c>).</summary>
+        /// <summary>
+        /// The direction straight out of the ground at a point, a unit vector for bounces and slides, from the blended
+        /// ground's slope in every tile, cliff tiles included.
+        /// </summary>
         [LocalSafe]
         public static Vector3 Normal(float x, float y)
         {
@@ -78,7 +84,10 @@ namespace Moonwell
             return new Vector3(-alongX, -alongY, 1f).Normalized();
         }
 
-        /// <summary>How steep the ground is at a point, in degrees: 0 flat, 90 a wall. 0 in a cliff tile, where the ground is taken as flat at each level.</summary>
+        /// <summary>
+        /// How steep the ground is at a point, in degrees: 0 flat, 90 a wall. Of the blended ground in every tile, so a
+        /// cliff tile reads as the slope between its corners.
+        /// </summary>
         [LocalSafe]
         public static float Slope(float x, float y)
         {
@@ -89,8 +98,7 @@ namespace Moonwell
         /// <summary>
         /// Whether units can walk at a point, as the map's terrain says: cliffs, deep water and the like, not trees,
         /// buildings or units. A point outside the map reads the edge. Read a cell at a time, once, and kept until
-        /// <c>Refresh</c>. On a bridge it reads the ground or water beneath, as a bridge is a destructable, not
-        /// terrain.
+        /// <c>Refresh</c>. On a bridge it reads false, as the water beneath does.
         /// </summary>
         [LocalSafe]
         public static bool IsWalkable(float x, float y)
