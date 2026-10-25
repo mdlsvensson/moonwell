@@ -1,5 +1,6 @@
 using System.Globalization;
 using War3Net.Build.Environment;
+using War3Net.Build.Extensions;
 using Xunit;
 
 namespace Moonwell.Build.Tests
@@ -16,7 +17,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void encodes_the_pinned_corners()
         {
-            var environment = MakeEnvironment(2, 2);
+            var environment = MakeEnvironment(1, 1);
             environment.TerrainTiles.Add(new TerrainTile { Height = 0, CliffLevel = 2 });
             environment.TerrainTiles.Add(new TerrainTile { Flags = TileFlags.Water, WaterHeight = 0, CliffLevel = 2 });
             environment.TerrainTiles.Add(new TerrainTile { Height = 0, CliffLevel = 3, Flags = TileFlags.Ramp });
@@ -28,7 +29,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void largest_map_fits()
         {
-            var environment = MakeEnvironment(481, 481);
+            var environment = MakeEnvironment(480, 480);
             for (var i = 0; i < 481 * 481; i++)
             {
                 environment.TerrainTiles.Add(new TerrainTile { Height = 0, CliffLevel = 2 });
@@ -43,7 +44,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void out_of_range_fails()
         {
-            var environment = MakeEnvironment(2, 1);
+            var environment = MakeEnvironment(1, 0);
             environment.TerrainTiles.Add(new TerrainTile { Height = 0, CliffLevel = 2 });
             environment.TerrainTiles.Add(new TerrainTile { Height = 100, CliffLevel = 2 });
 
@@ -56,7 +57,7 @@ namespace Moonwell.Build.Tests
         public void writes_the_data_file_with_the_invariant_culture()
         {
             var project = MapProject.Find(folders.TemporaryCopyOfSample());
-            var environment = MakeEnvironment(1, 1);
+            var environment = MakeEnvironment(0, 0);
             environment.Left = -2560.5f;
             environment.Bottom = -3072;
             environment.TerrainTiles.Add(new TerrainTile { Height = 0, CliffLevel = 2 });
@@ -103,9 +104,23 @@ namespace Moonwell.Build.Tests
             Assert.True(damage >= 0 && damage < terrain && terrain < register, text);
         }
 
-        private static MapEnvironment MakeEnvironment(uint columns, uint rows)
+        [Fact]
+        public void a_real_map_has_one_more_corner_than_tiles_each_way()
         {
-            return new MapEnvironment(MapEnvironmentFormatVersion.v11) { Width = columns, Height = rows };
+            var path = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "template", "MoonwellMap", "map", "war3map.w3e"));
+            MapEnvironment environment;
+            using (var reader = new BinaryReader(File.OpenRead(path)))
+            {
+                environment = reader.ReadMapEnvironment();
+            }
+
+            Assert.Equal((int)((environment.Width + 1) * (environment.Height + 1)), environment.TerrainTiles.Count);
+            Assert.Equal(environment.TerrainTiles.Count * 4, TerrainWriter.Encode(environment).Length);
+        }
+
+        private static MapEnvironment MakeEnvironment(uint tilesAcross, uint tilesUp)
+        {
+            return new MapEnvironment(MapEnvironmentFormatVersion.v11) { Width = tilesAcross, Height = tilesUp };
         }
     }
 }

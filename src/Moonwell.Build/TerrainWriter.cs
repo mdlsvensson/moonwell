@@ -25,11 +25,11 @@ namespace Moonwell.Build
         /// <exception cref="BuildException">A corner's height is outside what the grid can hold, or the map lists the wrong number of corners.</exception>
         public static string Encode(MapEnvironment environment)
         {
-            var columns = (int)environment.Width;
-            var rows = (int)environment.Height;
+            var columns = Columns(environment);
+            var rows = Rows(environment);
             if (environment.TerrainTiles.Count != columns * rows)
             {
-                throw new BuildException($"war3map.w3e lists {environment.TerrainTiles.Count} corners, but its size is {columns} by {rows}");
+                throw new BuildException($"war3map.w3e lists {environment.TerrainTiles.Count} corners, but a map of {environment.Width} by {environment.Height} tiles has {columns} by {rows}");
             }
 
             var text = new StringBuilder(columns * rows * 4);
@@ -76,8 +76,8 @@ namespace Moonwell.Build
                 "{",
                 "    public static class TerrainData",
                 "    {",
-                "        public const int Columns = " + environment.Width.ToString(CultureInfo.InvariantCulture) + ";",
-                "        public const int Rows = " + environment.Height.ToString(CultureInfo.InvariantCulture) + ";",
+                "        public const int Columns = " + Columns(environment).ToString(CultureInfo.InvariantCulture) + ";",
+                "        public const int Rows = " + Rows(environment).ToString(CultureInfo.InvariantCulture) + ";",
                 "        public const float Left = " + Literal(environment.Left) + ";",
                 "        public const float Bottom = " + Literal(environment.Bottom) + ";",
                 "        public static string Corners() => \"" + corners + "\";",
@@ -97,6 +97,17 @@ namespace Moonwell.Build
             {
                 File.Delete(path);
             }
+        }
+
+        // War3Net's Width and Height count tiles; the grid counts the corners between and around them, one more each way.
+        private static int Columns(MapEnvironment environment)
+        {
+            return (int)environment.Width + 1;
+        }
+
+        private static int Rows(MapEnvironment environment)
+        {
+            return (int)environment.Height + 1;
         }
 
         private static string Literal(float value)
