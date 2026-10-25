@@ -50,6 +50,12 @@ namespace Objects
             return (declared ? "yes" : "no") + " " + (standard ? "yes" : "no") + " " + (int)zap.TargetsAllowed[3];
         }
 
+        // A destructable's "Targeted As": the declared Gate's chain reads it, so the standard Demonic Gate it is based on has its value too.
+        public static bool Debris(Gate gate)
+        {
+            return gate.TargetedAs == Moonwell.Objects.Targets.Debris;
+        }
+
         // The core enums are compiled to Lua with their names, so a name reads as on .NET.
         public static string CoreNamed(Mage mage)
         {

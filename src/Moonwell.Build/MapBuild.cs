@@ -83,6 +83,12 @@ namespace Moonwell.Build
 
             ObjectStubs.Delete(project);
 
+            // The table of tree types is made from the standard destructable data, which only Moonwell.Objects carries.
+            if (Declarations.References(targetPath, InteractionsAssemblyName))
+            {
+                log.WriteLine("warning: the map uses Moonwell.Interactions without Moonwell.Objects: IsTree needs Moonwell.Objects (its standard data makes the table of tree types), so it is false for every destructable");
+            }
+
             // The build reads no declarations, but a unit's Level is still set only in a declared class's constructor.
             Declarations.CheckSetters(targetPath);
 
