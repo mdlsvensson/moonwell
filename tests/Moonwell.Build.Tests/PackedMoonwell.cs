@@ -7,7 +7,7 @@ namespace Moonwell.Build.Tests
     {
         private readonly string root = Path.Combine(Path.GetTempPath(), "moonwell-feed-" + Guid.NewGuid().ToString("N"));
 
-        /// <summary>Packs the three runtime projects and the template.</summary>
+        /// <summary>Packs the six runtime projects and the template.</summary>
         public PackedMoonwell()
         {
             Version = "0.1.0-test." + DateTime.UtcNow.Ticks;
@@ -24,10 +24,10 @@ namespace Moonwell.Build.Tests
             Dotnet(repository, "pack", Path.Combine("template", "Moonwell.Templates.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
         }
 
-        /// <summary>The version all four packages were packed with, <c>0.1.0-test.</c> and a number nothing else uses.</summary>
+        /// <summary>The version all seven packages were packed with, <c>0.1.0-test.</c> and a number nothing else uses.</summary>
         public string Version { get; }
 
-        /// <summary>The folder holding the four <c>.nupkg</c> files.</summary>
+        /// <summary>The folder holding the seven <c>.nupkg</c> files.</summary>
         public string Feed { get; }
 
         /// <summary>The path of the Moonwell package.</summary>
@@ -52,7 +52,7 @@ namespace Moonwell.Build.Tests
         public void Dispose()
         {
             var packages = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
-            foreach (var id in new[] { "moonwell", "moonwell.natives", "moonwell.objects", "moonwell.damage" })
+            foreach (var id in new[] { "moonwell", "moonwell.natives", "moonwell.objects", "moonwell.damage", "moonwell.maths", "moonwell.terrain" })
             {
                 TestFolders.Delete(Path.Combine(packages, id, Version.ToLowerInvariant()));
 

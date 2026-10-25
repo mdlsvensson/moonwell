@@ -52,7 +52,8 @@ namespace Moonwell.Build.Tests
             lua.DoString("setmetatable(_G, { __index = function(_, name) return function() called[#called + 1] = name; return nil end end })");
             lua.DoString(script);
             lua.DoString("main()");
-            // The script loads with the package's code and the grid in it and main runs; the game check covers the reads.
+            // This proves the script loads with the package's code and the grid in it, and that main runs. It does not prove
+            // that Install unpacks the grid: the stubs never run the register callback. The game check covers the reads.
             var called = (string)lua.DoString("return ',' .. table.concat(called, ',') .. ','")[0];
             Assert.Contains(",GetWorldBounds,", called);
             Assert.Contains("Terrain.Install", script);
