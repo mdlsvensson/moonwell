@@ -143,6 +143,13 @@ public class LocalTests
                 var z = Terrain.Height(0f, 0f);
                 var walk = Terrain.IsWalkable(0f, 0f);
                 var n = Terrain.Normal(0f, 0f);
+                var steep = Terrain.Slope(0f, 0f);
+                var cliff = Terrain.IsCliff(0f, 0f);
+                var fly = Terrain.IsFlyable(0f, 0f);
+                var build = Terrain.IsBuildable(0f, 0f);
+                var water = Terrain.IsWater(0f, 0f);
+                var area = Terrain.Playable;
+                var hits = Terrain.Raycast(new Vector3(0f, 0f, 9f), new Vector3(9f, 0f, 0f), out var hit);
             });
             """));
     }
@@ -158,6 +165,19 @@ public class LocalTests
             """);
 
         Assert.Equal(new[] { "MW0001: Terrain.CanStand(0f, 0f, out _)" }, found);
+    }
+
+    [Fact]
+    public void terrain_refresh_is_rejected_inside()
+    {
+        var found = MapCode.Check("""
+            Local.For(p, () =>
+            {
+                Terrain.Refresh(new Bounds(Vector2.Zero, Vector2.One));
+            });
+            """);
+
+        Assert.Equal(new[] { "MW0001: Terrain.Refresh(new Bounds(Vector2.Zero, Vector2.One))" }, found);
     }
 
     [Fact]
