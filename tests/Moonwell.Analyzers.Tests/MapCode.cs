@@ -125,7 +125,7 @@ internal static class MapCode
     private static (SyntaxTree Tree, ImmutableArray<Diagnostic> Diagnostics) Analyze(string source, bool broken = false, ImmutableArray<DiagnosticAnalyzer>? analyzers = null)
     {
         var (tree, compilation) = Compile(source, broken);
-        analyzers ??= ImmutableArray.Create<DiagnosticAnalyzer>(new SyncAnalyzer(), new LuaAnalyzer(), new FieldRulesAnalyzer(), new MovedAnalyzer(), new DeclaredAnalyzer());
+        analyzers ??= ImmutableArray.Create<DiagnosticAnalyzer>(new SyncAnalyzer(), new LuaAnalyzer(), new SyntaxAnalyzer(), new FieldRulesAnalyzer(), new MovedAnalyzer(), new DeclaredAnalyzer());
         return (tree, compilation.WithAnalyzers(analyzers.Value).GetAnalyzerDiagnosticsAsync().Result);
     }
 }

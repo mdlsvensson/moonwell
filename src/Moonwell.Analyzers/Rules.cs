@@ -160,4 +160,120 @@ public static class Rules
 
     /// <summary>The rules for a declared object's id.</summary>
     public static ImmutableArray<DiagnosticDescriptor> Ids { get; } = ImmutableArray.Create(NoId, BadId);
+
+    private static DiagnosticDescriptor Syntax(string id, string title, string message, string description) =>
+        new(id, title, message, LuaCategory, DiagnosticSeverity.Error, isEnabledByDefault: true, description: description);
+
+    public static readonly DiagnosticDescriptor PatternStops = Syntax(
+        "MW0017",
+        "Pattern the compiler stops on",
+        "{0}: CSharp.lua stops with \"Compiler has a bug\" on this pattern",
+        "CSharp.lua cannot compile these patterns: in a switch expression a relational pattern (> 10), a type pattern without a name (int =>), var, not and a pattern in parentheses; anywhere a var or a declaration pattern (Y: int y) or not inside a property pattern, a pattern in parentheses, and a list pattern's slice with a name ([var first, .. var rest]). Constants, or, a typed name (int i =>) with when, property patterns of constants and tuples of constants work. Write a when clause on a named variable, or an if.");
+
+    public static readonly DiagnosticDescriptor PatternWrong = Syntax(
+        "MW0018",
+        "Pattern that gives the wrong answer",
+        "{0}",
+        "A positional pattern in an is test (p is (1, 2), t is (1, _), p is Pt(var a, var b)) and an extended property pattern (p is { Inner.X: 9 }) compile to Lua that is false, or stops the compiler. A positional pattern in a switch expression arm works; so does a property pattern with one name per level ({ Inner: { X: 9 } }).");
+
+    public static readonly DiagnosticDescriptor NegatedConstant = Syntax(
+        "MW0019",
+        "Minus in front of a negative constant",
+        "'{0}' is written as --{1}, which Lua reads as a comment, so the script does not load; write the number out, or 0 - {0}",
+        "CSharp.lua writes -N with N a negative constant as --5. Lua starts a comment at --, and the rest of the line is lost.");
+
+    public static readonly DiagnosticDescriptor StructCopy = Syntax(
+        "MW0020",
+        "Struct element changed through a copy",
+        "'{0}' is not a copy in the game's Lua: changing it changes the element of the array or collection; make a new struct, or write the copy back",
+        "CSharp.lua does not copy a struct read from an array, a List or a Dictionary element (var c = arr[0]; c.X = 6; changes arr[0]). A copy from a local, a field, a property or a parameter is right.");
+
+    public static readonly DiagnosticDescriptor PrimaryParameter = Syntax(
+        "MW0021",
+        "Primary constructor parameter in an initializer",
+        "'{0}' is 0 or nil here: CSharp.lua reads a primary constructor's parameter in a field or property initializer, or in base(...), before it is set; assign it in a constructor body, or use an ordinary constructor",
+        "In class Pt(int x) { public int X = x; } the field gets nothing; the same for class D(string n) : Base(n). A parameter used in a method body is right. Records are not affected.");
+
+    public static readonly DiagnosticDescriptor TupleForm = Syntax(
+        "MW0022",
+        "Tuple form that fails in the game's Lua",
+        "{0}",
+        "var (a, b) = (1, 2) gives a the tuple; (a[0], a[1]) = (a[1], a[0]) is a Lua syntax error; and turning a tuple into text (Console.WriteLine(t), \"t=\" + t, $\"{t}\", t.ToString()) fails in ValueTuple.ToString. Write the types ((int a, int b) = (1, 2)), a method's result, or the items.");
+
+    public static readonly DiagnosticDescriptor FormWrong = Syntax(
+        "MW0023",
+        "Declaration CSharp.lua writes wrong",
+        "{0}",
+        "A user-defined ++, --, operator true or operator false; a static abstract or static virtual member of an interface; a record that derives from a record (its == fails and its ToString leaves out the base's members); a class that implements two constructions of one generic interface (IG<int> and IG<string>); and with on an anonymous type.");
+
+    public static readonly DiagnosticDescriptor RangeIndex = Syntax(
+        "MW0024",
+        "Range or index",
+        "'{0}' needs System.Range or System.Index, which the game's Lua does not have; use Substring, Skip/Take or an index like list[list.Count - 1]",
+        "a[1..3], s[1..3], list[^1] and the types Index and Range are missing. a[^1] on an array works.");
+
+    public static readonly DiagnosticDescriptor RefForm = Syntax(
+        "MW0025",
+        "ref return or ref local of an element",
+        "{0}",
+        "A ref return and ref int r = ref First(arr) give a copy, so writes through r are lost; ref int r = ref a[i] and ref to a Span element are Lua syntax errors. ref parameters, out, in and ref to a local or field work.");
+
+    public static readonly DiagnosticDescriptor ParamsForm = Syntax(
+        "MW0026",
+        "params that is not an array",
+        "{0}",
+        "params List<int> (C# 13) stops the compiler; params in a lambda is a Lua error. params int[] works.");
+
+    public static readonly DiagnosticDescriptor StringCall = Syntax(
+        "MW0027",
+        "String call the game's Lua gets wrong",
+        "'{0}' {1}",
+        "s.Split(\"--\") with a string separator runs out of memory; StartsWith(char) and EndsWith(char) fail; IndexOf, StartsWith and EndsWith with an ignore-case StringComparison give the wrong answer or an error; LINQ Reverse() on a string fails. Split(char), Contains(char), the Ordinal comparisons and Replace/Equals/Compare with a comparison work.");
+
+    public static readonly DiagnosticDescriptor BoxedValue = Syntax(
+        "MW0028",
+        "char or enum given to an object parameter",
+        "'{0}' {1}",
+        "A char or an enum given to a library method's object parameter (string.Format, string.Concat, Console.WriteLine(object), StringBuilder.Append(object)) is shown as its number in the game's Lua. Joined with + or put in an interpolation hole it is right. Enums of Moonwell.Objects are MW0010.");
+
+    public static readonly DiagnosticDescriptor CatchForm = Syntax(
+        "MW0029",
+        "catch that does not catch",
+        "{0}",
+        "A null dereference, an index outside an array and % by zero are plain Lua errors there, not NullReferenceException, IndexOutOfRangeException or DivideByZeroException: catch (Exception) catches them. A pattern variable in a catch filter (when (e is X x)) is nil.");
+
+    public static readonly DiagnosticDescriptor LuaMember = Syntax(
+        "MW0030",
+        "Library member the game's Lua does not have",
+        "'{0}' {1}",
+        "The Lua core behind CSharp.lua has no such type or member, or gives another answer than .NET; the call fails when it runs, not when the map is built. The list: System.Range/Index, StringComparer, Monitor, Lock, Thread, Task, BitArray, BitOperations, HashCode, Guid, FormattableString, async/await, pointers; LINQ Append, Prepend, SkipLast, TakeLast, ToLookup, Empty, Zip, Chunk, ToHashSet, DefaultIfEmpty; List.ConvertAll; Span.ToArray/Fill/Clear; StringBuilder.Replace/Insert/Equals/AppendJoin; Exception.Source; Delegate.Target/Method; char.IsAscii/ToUpperInvariant; Environment.NewLine; Enum/Nullable.GetUnderlyingType; string.Create/Normalize/Intern/EnumerateRunes; Queue.TryPeek; Stack.TryPop/TryPeek; Dictionary.GetValueOrDefault; Convert.ToHexString; int.RotateLeft; Array.Sort(keys, items); HashSet.SetEquals; Math.DivRem; Dictionary.Remove(key, out v); ToList/ToArray of a Dictionary.");
+
+    public static readonly DiagnosticDescriptor CheckedForm = Syntax(
+        "MW0031",
+        "checked",
+        "checked never throws in the game's Lua; test the range yourself",
+        "checked(x + 1) and checked { } compile, but an overflow is never detected.");
+
+    public static readonly DiagnosticDescriptor EnumText = Syntax(
+        "MW0032",
+        "Enum shown as text",
+        "{0}",
+        "An enum that is a [Flags] combination prints its number; Enum.Parse gives the number; Enum.GetValues and GetNames come in no fixed order; ToString(\"D\") and ToString(\"X\") on an enum give the name; and (Color)5 + \" x\" with a constant stops the compiler. Comparing, |, &, switch, TryParse and the name of a single value work.");
+
+    public static readonly DiagnosticDescriptor InitializerTemps = Syntax(
+        "MW0033",
+        "Two object initializers in one statement, one of them used with a dot",
+        "this statement has {0} object initializers; CSharp.lua gives their temporaries one name, so 'new T { ... }.Member' reads the wrong object; put each in a local first",
+        "new P { X = 1 }.X + \" \" + new P { X = 2 }.X prints 2 2. Initializers given as arguments are right.");
+
+    public static readonly DiagnosticDescriptor UsingOrder = Syntax(
+        "MW0034",
+        "Two using declarations in one block",
+        "using var is disposed after the earlier using var here, not before it, in the game's Lua; use nested using (...) blocks",
+        "C# disposes using var declarations in reverse order; CSharp.lua disposes them in the order they are written.");
+
+    /// <summary>The rules for syntax and library CSharp.lua or its Lua core cannot do.</summary>
+    public static ImmutableArray<DiagnosticDescriptor> Syntaxes { get; } = ImmutableArray.Create(
+        PatternStops, PatternWrong, NegatedConstant, StructCopy, PrimaryParameter, TupleForm, FormWrong, RangeIndex, RefForm,
+        ParamsForm, StringCall, BoxedValue, CatchForm, LuaMember, CheckedForm, EnumText, InitializerTemps, UsingOrder);
 }

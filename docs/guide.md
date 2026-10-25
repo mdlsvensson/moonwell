@@ -307,6 +307,44 @@ errors, a change to the game inside it, a machine-local read outside it, `GetHan
 `HashSet` (use `OrderedMap` and `OrderedSet`), and `long`, `ulong`, `uint` and `double`. `[SyncUnchecked]` on a method
 turns the checks off in it.
 
+## C# the game's Lua cannot run
+
+Moonwell turns your C# into Lua with CSharp.lua, and the game runs the Lua. A few C# forms stop the compiler, write
+Lua that does something else, or call a library function the Lua core does not have. The analyzer rejects them as
+errors with their line, so the map does not build and then fail on the screen. Nothing silences them (`[SyncUnchecked]`
+does not), because the Lua cannot run them anywhere. The list comes from running about 770 small programs on .NET and
+in Lua and comparing what they printed.
+
+| Rule | Rejects | Write instead |
+|---|---|---|
+| MW0005 | `decimal` (with `long`, `ulong`, `uint`, `double`) | `int` or `float` |
+| MW0017 | in a `switch` expression: `> 10 =>`, `int =>`, `var n`, `not 1`; in any pattern: `(...)`, a name inside `{ X: int y }`, `not null` inside `{ }`, `.. var rest` | a `when` on a named variable (`int n when n > 10`), or an `if` |
+| MW0018 | `x is (1, _)`, `p is Pt(var a, var b)`, `p is { Inner.X: 9 }` | `{ X: 1 }`, a `switch`, `{ Inner: { X: 9 } }` |
+| MW0019 | `-N` with `const int N = -5` (Lua reads `--5` as a comment) | write the number, `0 - N` |
+| MW0020 | `var c = arr[0]; c.X = 6;` on a struct (it changes `arr[0]`) | make a new struct, or write `c` back |
+| MW0021 | a primary constructor's parameter in a field initializer or in `: Base(n)` (it is 0) | assign it in a constructor body |
+| MW0022 | `var (a, b) = (1, 2)`, `(x[0], x[1]) = (x[1], x[0])`, a tuple turned into text | `(int a, int b) = (1, 2)`, a temporary, its items |
+| MW0023 | a user-defined `++`, `--`, `operator true/false`; `static abstract`; a record deriving from a record; one class implementing `IG<int>` and `IG<string>`; `with` on an anonymous type | a method; an ordinary class |
+| MW0024 | `a[1..3]`, `s[1..]`, `list[^1]`, `Index`, `Range` (`array[^1]` is fine) | `Substring`, `Skip`/`Take`, `list[list.Count - 1]` |
+| MW0025 | a `ref` return, `ref int r = ref First(a)`, `ref int r = ref a[i]` | index the array each time |
+| MW0026 | `params List<int>`, `params` in a lambda | `params int[]` |
+| MW0027 | `s.Split("--")` (runs out of memory), `StartsWith('a')`, `EndsWith('a')`, ignore-case `IndexOf`/`StartsWith`/`EndsWith`, `"abc".Reverse()` | split on a char, a string argument, lower-case both |
+| MW0028 | a `char` or an enum given to `string.Format`, `Console.WriteLine(object)`, `StringBuilder.Append(object)`, `string.Join` (shown as its number) | `.ToString()` |
+| MW0029 | `catch (NullReferenceException)`, `catch (IndexOutOfRangeException)`, a pattern variable in a `catch ... when` | `catch (Exception)`, test first |
+| MW0030 | a library member the Lua core lacks: `StringComparer`, `Guid`, `Task`/`await`, `Range`, LINQ `Append`/`Prepend`/`Zip`/`TakeLast`/`ToHashSet`/`Chunk`, `List.ConvertAll`, `StringBuilder.Replace`/`Insert`, `Dictionary.GetValueOrDefault`, `TryPeek`/`TryPop`, `Environment.NewLine`, and more (the rule's description lists them); also `HashSet.SetEquals`, `Math.DivRem`, `d.Remove(k, out v)` and `ToList()` of a `Dictionary`, which give wrong answers | `TryGetValue`, `"
+"`, a loop |
+| MW0031 | `checked(a + b)`, `checked { }` (an overflow is never detected) | test the range yourself |
+| MW0032 | `Enum.Parse`, `Enum.GetValues`/`GetNames`, `ToString("D")` on an enum, a `[Flags]` combination turned into text, `(Color)5 + "x"` | a `switch` on the value, `HasFlag` |
+| MW0033 | `new A { ... }.M()` or `.X` twice in one statement, or once among three initializers (they share a Lua temporary) | put each in a local |
+| MW0034 | two `using var` in one block (disposed in the wrong order) | nested `using ( ) { }` |
+
+What works is most of the language: classes, structs, records, interfaces and default methods, generics with
+constraints, enums, delegates, events, `switch` statements, `is` patterns with constants, types and properties,
+`??`, `?.`, collection expressions, `foreach` over every collection, `yield`, lambdas and closures, `ref`/`out`/`in`
+parameters, `lock`, string interpolation, `List`, `Dictionary`, `HashSet`, `Queue`, `Stack`, arrays and most of LINQ.
+`float` and `int` arithmetic is the game's, see MW0005. Two things the analyzer cannot see: an iterator with a
+`try/finally` that the caller leaves early with `break` skips the `finally`, and `byte`/`short` arithmetic does not wrap.
+
 ## The build
 
 `moonwell build` builds the map in the current folder into `build\MyMap.w3x`; `moonwell run` builds it and starts the

@@ -562,6 +562,8 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
                     return "uint";
                 case SpecialType.System_Double:
                     return "double";
+                case SpecialType.System_Decimal:
+                    return "decimal";
             }
 
             return type switch
@@ -576,6 +578,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
         {
             "double" => "is a single-precision float in the game's Lua; use float",
             "uint" => "arithmetic becomes a float in the game's Lua; use int",
+            "decimal" => "is an ordinary number in the game's Lua, so 0.1m + 0.2m is not 0.3m; use int or float",
             _ => "is a 32-bit integer in the game's Lua; use int",
         };
 

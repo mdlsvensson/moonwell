@@ -141,7 +141,7 @@ public class LuaTests
             var armor = Moonwell.Objects.ArmorType.Metal;
             var a = Enum.IsDefined(typeof(Moonwell.Objects.ArmorType), armor);
             var b = armor.Equals(Moonwell.Objects.ArmorType.Stone) || object.Equals(armor, Moonwell.Objects.ArmorType.Stone);
-            var c = new System.Text.StringBuilder().Append((int)armor).Append(DayOfWeek.Monday);
+            var c = new System.Text.StringBuilder().Append((int)armor).Append(DayOfWeek.Monday.ToString());
             Show((int)armor);
             """, """
                 static void Show(object value) { }
