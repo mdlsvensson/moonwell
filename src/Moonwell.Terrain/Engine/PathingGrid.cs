@@ -94,11 +94,11 @@ namespace Moonwell.Engine
             }
         }
 
-        /// <summary>The column or row of the cell that holds a coordinate, kept from the first to the last. It is kept before it is floored, as a cast of a negative number rounds the wrong way.</summary>
+        /// <summary>The column or row of the cell that holds a coordinate, kept from the first to the last. It is kept before it is floored, as a cast of a negative number rounds the wrong way, and a NaN is kept as 0.</summary>
         private static int Cell(float coordinate, float origin, int count)
         {
             var cells = (coordinate - origin) / CellSize;
-            if (cells < 0f)
+            if (!(cells > 0f))
             {
                 cells = 0f;
             }

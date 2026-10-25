@@ -155,15 +155,15 @@ namespace Moonwell.Engine
             fy = v - j;
         }
 
-        /// <summary>A position in tiles, kept from 0 to the last corner's.</summary>
+        /// <summary>A position in tiles, kept from 0 to the last corner's. A NaN is kept as 0: it is neither above 0 nor below the last.</summary>
         private static float Clamp(float tiles, int last)
         {
-            if (tiles < 0f)
+            if (!(tiles > 0f))
             {
                 return 0f;
             }
 
-            return tiles > last ? last : tiles;
+            return tiles < last ? tiles : last;
         }
 
         /// <summary>A corner's column or row, kept inside the grid.</summary>

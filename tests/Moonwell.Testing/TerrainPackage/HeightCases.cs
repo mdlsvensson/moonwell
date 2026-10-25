@@ -43,6 +43,18 @@ namespace Moonwell.Testing
             Expect.True(!Terrain.IsCliff(-756f, 500f), "outside is no cliff on one level");
         }
 
+        /// <summary>A coordinate that is not a number reads the edge (the first corner's side), and does not fail.</summary>
+        public static void NotANumber(FakeWorld world)
+        {
+            Terrain.Install(new FakeTerrainWorld(), 2, 2, 0f, 0f, GridText.Tile(GridText.Corner(10f, 2), GridText.Corner(20f, 2), GridText.Corner(30f, 2), GridText.Corner(40f, 2)));
+            Expect.Near(10f, Terrain.Height(float.NaN, float.NaN), "NaN both ways reads the first corner");
+            Expect.Near(30f, Terrain.Height(float.NaN, 128f), "NaN across, at the top: the top left");
+            Expect.Near(20f, Terrain.Height(128f, float.NaN), "NaN up, at the right: the bottom right");
+            Expect.True(!Terrain.IsCliff(float.NaN, float.NaN), "NaN is no cliff on one level");
+            var normal = Terrain.Normal(float.NaN, float.NaN);
+            Expect.True(normal.Z > 0f, "the normal at NaN faces up");
+        }
+
         /// <summary>Levels 2 and 3 on its sides make a cliff; the height blends all four corners.</summary>
         public static void Step(FakeWorld world)
         {

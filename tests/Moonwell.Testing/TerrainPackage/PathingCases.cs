@@ -116,6 +116,18 @@ namespace Moonwell.Testing
             Expect.True(Terrain.IsWalkable(-257f, 200f), "just left of the edge reads the cell of that row");
         }
 
+        /// <summary>A coordinate that is not a number reads the first cell of its row or column, and does not fail.</summary>
+        public static void NotANumber(FakeWorld world)
+        {
+            var fake = new FakeTerrainWorld();
+            fake.Block(16f, 16f, FakeTerrainWorld.NoWalk | FakeTerrainWorld.NoFly | FakeTerrainWorld.NoBuild | FakeTerrainWorld.NoFloat);
+            Flat(fake, 0f, 0f);
+            Expect.True(!Terrain.IsWalkable(float.NaN, float.NaN), "NaN both ways reads the first cell: not walkable");
+            Expect.True(!Terrain.IsFlyable(float.NaN, 0f), "NaN across reads the first cell of the row: not flyable");
+            Expect.True(!Terrain.IsBuildable(0f, float.NaN), "NaN up reads the first cell of the column: not buildable");
+            Expect.True(!Terrain.IsWater(float.NaN, float.NaN), "the first cell cannot float ships, and the read did not fail");
+        }
+
         /// <summary>The item landing within 1 of the point is true; further is false, with where it landed.</summary>
         public static void CanStand(FakeWorld world)
         {
