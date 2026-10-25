@@ -451,6 +451,7 @@ namespace Moonwell.Testing
             var a = UnitAt(world, 0.0f, 0.0f);
             var b = UnitAt(world, 100.0f, 0.0f);
             var c = UnitAt(world, 200.0f, 0.0f);
+            Expect.True(new FireAura().view != null, "the view is made with the interaction, so no read makes it");
             var aura = a.Interact(new FireAura());
             Expect.Equal(0, aura.Pairs.Count, "none before the first check");
             Steps(world, 16);
@@ -508,6 +509,65 @@ namespace Moonwell.Testing
             Expect.Equal(2, Tracking.Count, "the unit is tracked once");
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "tick b" }, "it meets b");
+        }
+
+        /// <summary>An item on the ground holds an interaction through Interact, and the interaction ends with the item.</summary>
+        public static void ItemHolder(FakeWorld world)
+        {
+            Fresh();
+            var handle = world.NewItem(ObjectTypes.FourCC("ofoo"));
+            world.MoveItem(handle, 0.0f, 0.0f);
+            world.PlacedItems.Add(handle);
+            var item = Item.Of(handle)!;
+            var b = UnitAt(world, 100.0f, 0.0f);
+            var shine = new Shine();
+            shine.Tag = unit => unit == b ? "b" : "?";
+            Expect.Same(shine, item.Interact(shine), "Interact gives the interaction back");
+            Expect.Same(item, shine.Holder, "held by the item");
+            Steps(world, 1);
+            ExpectLog(new string[] { "meet b" }, "the item meets b");
+            item.Remove();
+            ExpectLog(new string[] { "meet b", "part b" }, "and parts with it when it is removed");
+            Expect.True(shine.HasEnded, "the interaction ended with the item");
+        }
+
+        /// <summary>A destructable holds an interaction through Interact, and the interaction ends with the destructable.</summary>
+        public static void DestructableHolder(FakeWorld world)
+        {
+            Fresh();
+            var handle = world.NewDestructable(ObjectTypes.FourCC("dfoo"));
+            world.PlaceDestructable(handle, 0.0f, 0.0f);
+            world.PlacedDestructables.Add(handle);
+            var barrel = Destructable.Of(handle)!;
+            var b = UnitAt(world, 100.0f, 0.0f);
+            var shine = new Shine();
+            shine.Tag = unit => unit == b ? "b" : "?";
+            Expect.Same(shine, barrel.Interact(shine), "Interact gives the interaction back");
+            Expect.Same(barrel, shine.Holder, "held by the destructable");
+            Steps(world, 1);
+            ExpectLog(new string[] { "meet b" }, "the destructable meets b");
+            barrel.Remove();
+            ExpectLog(new string[] { "meet b", "part b" }, "and parts with it when it is removed");
+            Expect.True(shine.HasEnded, "the interaction ended with the destructable");
+        }
+
+        /// <summary>Pause inside a reaction stops the check it is in: the pair that met does not tick and no other meets, until Resume.</summary>
+        public static void PauseInReaction(FakeWorld world)
+        {
+            Fresh();
+            var a = UnitAt(world, 0.0f, 0.0f);
+            var b = UnitAt(world, 100.0f, 0.0f);
+            var c = UnitAt(world, 200.0f, 0.0f);
+            var aura = new FireAura();
+            aura.Tag = unit => unit == b ? "b" : unit == c ? "c" : "?";
+            aura.Meeting = pair => aura.Pause();
+            a.Interact(aura);
+            Steps(world, 16);
+            ExpectLog(new string[] { "meet b" }, "b met, and the check stopped there");
+            aura.Meeting = null;
+            aura.Resume();
+            Steps(world, 16);
+            ExpectLog(new string[] { "meet b", "tick b", "meet c", "tick c" }, "resumed, b ticks and c meets");
         }
 
         /// <summary>A map's interaction may have fields of its own named as the package's (paused, range, tick, started, due, holder): each stays its own, in Lua too, and the interaction works as any other.</summary>

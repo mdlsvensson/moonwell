@@ -11,7 +11,7 @@ namespace Moonwell.Engine
         /// <summary>How many passes a step has: gizmos, cell checks, interactions.</summary>
         private const int Passes = 3;
 
-        /// <summary>The ring, a list of what is due for each step modulo 256, in the order it was scheduled.</summary>
+        /// <summary>The ring, a list of what is due for each step modulo 256, in the order it was put on: a due that runs puts itself on again, at the end of its next step's list, so the order is that of the last runs, not the order things were made.</summary>
         private readonly List<List<IDue?>> ring = new List<List<IDue?>>();
 
         /// <summary>The step the cycle is at: the one running, or the last one that ran. It counts up from 0 over the game, and does not reset when the cycle's timer stops.</summary>
@@ -49,7 +49,7 @@ namespace Moonwell.Engine
             ring[step % Slots].Add(due);
         }
 
-        /// <summary>Runs the next step: what is due at it, in three passes, each in the order it was scheduled. A due that is not due until a later turn of the ring is passed over, and one with nothing more to run is dropped.</summary>
+        /// <summary>Runs the next step: what is due at it, in three passes, each in the order it was put on the step's list (the order of the last runs, not the order things were made). A due that is not due until a later turn of the ring is passed over, and one with nothing more to run is dropped.</summary>
         public void Run()
         {
             StepNow++;

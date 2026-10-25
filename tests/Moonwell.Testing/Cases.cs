@@ -30,6 +30,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.grid.settings", Run = GridCases.Settings });
             list.Add(new Case { Name = "interactions.grid.settings-locked", Run = GridCases.SettingsLocked });
             list.Add(new Case { Name = "interactions.grid.reset", Run = GridCases.Reset });
+            list.Add(new Case { Name = "interactions.grid.settings-checked", Run = GridCases.SettingsChecked });
             list.Add(new Case { Name = "interactions.gizmo.create", Run = GizmoCases.Create });
             list.Add(new Case { Name = "interactions.gizmo.reaction-owner", Run = GizmoCases.ReactionOwner });
             list.Add(new Case { Name = "interactions.gizmo.tick", Run = GizmoCases.Tick });
@@ -108,6 +109,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.interaction.pairs-view", Run = InteractionCases.PairsView });
             list.Add(new Case { Name = "interactions.interaction.interact-checks", Run = InteractionCases.InteractChecks });
             list.Add(new Case { Name = "interactions.interaction.interact-in-created", Run = InteractionCases.InteractInCreated });
+            list.Add(new Case { Name = "interactions.interaction.item-holder", Run = InteractionCases.ItemHolder });
+            list.Add(new Case { Name = "interactions.interaction.destructable-holder", Run = InteractionCases.DestructableHolder });
+            list.Add(new Case { Name = "interactions.interaction.pause-in-reaction", Run = InteractionCases.PauseInReaction });
             list.Add(new Case { Name = "interactions.interaction.shadowed-fields", Run = InteractionCases.ShadowedFields });
             list.Add(new Case { Name = "interactions.pair.wait", Run = PairCases.Wait });
             list.Add(new Case { Name = "interactions.pair.try-cooldown", Run = PairCases.TryCooldown });

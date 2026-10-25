@@ -124,7 +124,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the gizmo ends, with the gizmo as the current owner. It is still in the grid and HasEnded is still false here.</summary>
+        /// <summary>Runs when the gizmo ends, with the gizmo as the current owner. It is still in the grid here, so a Find from it sees it, and leaves after; a unit, item or destructable has left the grid before its OnLeave. HasEnded is still false here.</summary>
         protected virtual void OnLeave()
         {
         }

@@ -38,19 +38,20 @@ namespace Moonwell.Engine
             return (Interaction<H, O>.Pair)pair;
         }
 
-        /// <summary>The read-only view of an interaction's pairs, made on the first ask and kept, so a read of Pairs makes no table.</summary>
+        /// <summary>Makes the read-only view of an interaction's pairs and keeps it on the interaction; the interaction's constructor calls it, so a read of Pairs makes nothing.</summary>
+        public static void MakeView<H, O>(Interaction interaction)
+            where H : Actor
+            where O : Actor
+        {
+            interaction.view = new PairList<H, O>(interaction.pairs);
+        }
+
+        /// <summary>The read-only view of an interaction's pairs, made with the interaction.</summary>
         public static IReadOnlyList<Interaction<H, O>.Pair> View<H, O>(Interaction interaction)
             where H : Actor
             where O : Actor
         {
-            var view = interaction.view as PairList<H, O>;
-            if (view == null)
-            {
-                view = new PairList<H, O>(interaction.pairs);
-                interaction.view = view;
-            }
-
-            return view;
+            return (PairList<H, O>)interaction.view!;
         }
 
         /// <summary>Takes the pairs a walk added off the end of the shared list, leaving those of the walks around it.</summary>

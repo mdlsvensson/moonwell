@@ -21,7 +21,7 @@ namespace Moonwell
         /// <summary>The pair of each other, by the other's entry id; a lookup only.</summary>
         internal readonly Dictionary<int, Owner> byOther = new Dictionary<int, Owner>();
 
-        /// <summary>The read-only view of the pairs that Pairs gives; made on the first ask.</summary>
+        /// <summary>The read-only view of the pairs that Pairs gives; made with the interaction.</summary>
         internal object? view;
 
         /// <summary>The holder's entry; null before the interaction starts.</summary>
@@ -83,13 +83,13 @@ namespace Moonwell
             get { return paused; }
         }
 
-        /// <summary>Whether the interaction should stop the check it is in: it, or its holder, has begun to end.</summary>
+        /// <summary>Whether the interaction should stop the check it is in: it is paused, or it or its holder has begun to end.</summary>
         internal bool Over
         {
-            get { return ending || HasEnded || (holderEntry != null && holderEntry.Ended); }
+            get { return paused || ending || HasEnded || (holderEntry != null && holderEntry.Ended); }
         }
 
-        /// <summary>Stops the checks: no pair meets, ticks or parts until Resume, and the pairs are kept.</summary>
+        /// <summary>Stops the checks, the one running too when a reaction pauses it: no pair meets, ticks or parts until Resume, and the pairs are kept.</summary>
         public void Pause()
         {
             paused = true;
@@ -204,7 +204,7 @@ namespace Moonwell
             return start;
         }
 
-        /// <summary>Parts every pair, in meeting order, as at a check of a holder with no place; stops when a reaction ends the interaction or its holder.</summary>
+        /// <summary>Parts every pair, in meeting order, as at a check of a holder with no place; stops when a reaction pauses or ends the interaction or ends its holder.</summary>
         internal void PartAll()
         {
             var walk = Pairing.Walk;
@@ -334,6 +334,12 @@ namespace Moonwell
         /// <summary>The holder; null before the interaction starts.</summary>
         internal THolder holder = null!;
 
+        /// <summary>Makes the interaction with its view of the pairs, so a read of Pairs makes nothing.</summary>
+        protected Interaction()
+        {
+            Pairing.MakeView<THolder, TOther>(this);
+        }
+
         /// <summary>The thing that holds the interaction.</summary>
         [LocalSafe]
         public THolder Holder
@@ -398,8 +404,8 @@ namespace Moonwell
         /// things within Range plus Slack are collected, and those of class TOther, not the holder, with a place and within
         /// Range are kept. The pairs whose other is not kept part, in meeting order; a stopped other that is not kept is
         /// forgotten. The kept pairs tick, in meeting order, unless paused or waiting. The kept others with no pair, in the
-        /// grid's order, are asked about unless stopped, and those accepted meet and tick. After any reaction that ends the
-        /// interaction or its holder, the check stops.
+        /// grid's order, are asked about unless stopped, and those accepted meet and tick. After any reaction that pauses or
+        /// ends the interaction or ends its holder, the check stops.
         /// </summary>
         internal sealed override void RunCheck()
         {
@@ -624,7 +630,9 @@ namespace Moonwell
         /// <summary>
         /// A holder and an other that have met, from the meeting until they part. It belongs to its interaction, and what its
         /// reactions make (a timer) is the pair's and ends when it parts. Its reads come from the places read at the last
-        /// check, as floats.
+        /// check that kept it, as floats: in OnPart, for a pair that parts because the other went out of range or a side has
+        /// no place, those are the check before. End parts the pair now, and an other still in range may meet again at once,
+        /// in the same check; Stop parts it and keeps the two apart until the other has been out of range.
         /// </summary>
         public sealed class Pair : Owner
         {

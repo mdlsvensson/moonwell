@@ -22,7 +22,7 @@ namespace Moonwell
         /// <summary>The package's handler of core's TakenIn hook; the package counts as installed while that hook is this one.</summary>
         private static Action<Widget>? handler;
 
-        /// <summary>The side of a grid cell, in game units; 128. Read when the grid is made.</summary>
+        /// <summary>The side of a grid cell, in game units, more than 0; 128. Read when the grid is made.</summary>
         [LocalSafe]
         public static float CellSize
         {
@@ -30,11 +30,12 @@ namespace Moonwell
             set
             {
                 Unlocked();
+                Dev.Check(value > 0.0f, "Interactions.CellSize: must be more than 0");
                 Current().CellSize = value;
             }
         }
 
-        /// <summary>How often a unit's or item's cell is read again, in seconds; 0.1. Read when the grid is made.</summary>
+        /// <summary>How often a unit's or item's cell is read again, in seconds, more than 0; 0.1. Read when the grid is made.</summary>
         [LocalSafe]
         public static float CellCheck
         {
@@ -42,6 +43,7 @@ namespace Moonwell
             set
             {
                 Unlocked();
+                Dev.Check(value > 0.0f, "Interactions.CellCheck: must be more than 0");
                 Current().CellCheck = value;
             }
         }
@@ -58,7 +60,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The length of a step of the cycle, in seconds; 1/32. Read when the grid is made.</summary>
+        /// <summary>The length of a step of the cycle, in seconds, more than 0; 1/32. Read when the grid is made.</summary>
         [LocalSafe]
         public static float Step
         {
@@ -66,6 +68,7 @@ namespace Moonwell
             set
             {
                 Unlocked();
+                Dev.Check(value > 0.0f, "Interactions.Step: must be more than 0");
                 Current().Step = value;
             }
         }
@@ -186,7 +189,7 @@ namespace Moonwell
             Tracking.TakenIn(widget);
         }
 
-        /// <summary>Core's hook for a widget ending: it is out of the grid at once, before its OnLeave runs.</summary>
+        /// <summary>Core's hook for a widget ending: it is out of the grid at once, before its OnLeave runs. A gizmo, the package's own, leaves the grid after its OnLeave.</summary>
         private static void Ending(Widget widget)
         {
             Tracking.WidgetEnding(widget);

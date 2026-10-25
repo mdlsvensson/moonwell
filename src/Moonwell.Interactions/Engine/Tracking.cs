@@ -571,7 +571,7 @@ namespace Moonwell.Engine
             }
         }
 
-        /// <summary>Core's hook for a widget ending: it leaves the grid and the cell checks at once. A widget the package never saw, such as one taken in before it was installed or one of a kind nobody asked for, is passed over.</summary>
+        /// <summary>Core's hook for a widget ending: it leaves the grid and the cell checks at once, before its OnLeave runs. A widget the package never saw, such as one taken in before it was installed or one of a kind nobody asked for, is passed over.</summary>
         public static void WidgetEnding(Widget widget)
         {
             var entry = EntryOf(widget);

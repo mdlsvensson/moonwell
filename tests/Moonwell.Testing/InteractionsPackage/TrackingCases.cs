@@ -343,11 +343,14 @@ namespace Moonwell.Testing
             Expect.True(Tracking.EntryOf(later) != null, "one made later is tracked");
         }
 
-        /// <summary>A unit, item or destructable that ends leaves the grid and the cell checks at once, before its OnLeave runs, and the last one tracked stops the cycle's timer.</summary>
+        /// <summary>A unit, item or destructable that ends leaves the grid at once, before its OnLeave runs, and is not read again; with items asked for, the cycle runs on when nothing is tracked.</summary>
         public static void Ending(FakeWorld world)
         {
             Fresh();
-            var unit = UnitAt(world, 10.0f, 10.0f);
+            ObjectTypes.Unit(ObjectTypes.FourCC("h006"), () => new LeaveWatch());
+            var unitHandle = world.NewUnit(ObjectTypes.FourCC("h006"));
+            world.MoveUnit(unitHandle, 10.0f, 10.0f);
+            var unit = (LeaveWatch)Unit.Of(unitHandle)!;
             var item = ItemAt(world, 10.0f, 10.0f);
             var handle = world.NewDestructable(ObjectTypes.FourCC("dfoo"));
             world.PlacedItems.Add(item.Handle);
@@ -358,8 +361,11 @@ namespace Moonwell.Testing
             var itemEntry = Tracked(item);
             var destructableEntry = Tracked(destructable);
             Expect.Equal(3, Tracking.Count, "three tracked");
+            var cellInLeave = 0;
+            unit.Leaving = () => { cellInLeave = unitEntry.Cell; };
             unit.Remove();
-            Expect.Equal(-1, unitEntry.Cell, "a removed unit is out of the grid at once");
+            Expect.Equal(-1, cellInLeave, "a removed unit is out of the grid when its OnLeave runs");
+            Expect.Equal(-1, unitEntry.Cell, "and after");
             Expect.True(!unitEntry.HasPlace, "and has no place");
             Expect.True(Tracking.EntryOf(unit) == null, "and no entry");
             Expect.Equal(2, Tracking.Count, "two tracked");

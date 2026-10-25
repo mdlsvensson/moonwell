@@ -16,7 +16,7 @@ namespace Moonwell
         /// <summary>Set by an interactions package: given each unit, item and destructable the runtime takes in, after its OnCreated; null without one.</summary>
         internal static Action<Widget>? TakenIn;
 
-        /// <summary>Set by an interactions package: given each unit, item and destructable as it ends, before its OnLeave runs and while its place can still be read; null without one.</summary>
+        /// <summary>Set by an interactions package: given each unit, item and destructable as it ends, before its OnLeave runs and while its place can still be read, so it has left the package's grid by its OnLeave (a gizmo, the package's own, leaves after); null without one.</summary>
         internal static Action<Widget>? Ending;
 
         /// <summary>
