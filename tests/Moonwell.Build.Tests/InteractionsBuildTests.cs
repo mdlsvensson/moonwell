@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Moonwell.Build.Tests
 {
-    /// <summary>A map with the interactions package gets the table of its tree types in its script; the Sample, without it, gets none.</summary>
+    /// <summary>A map with the interactions package builds, and gets the table of its tree types in its script; the Sample, without it, carries none of the package.</summary>
     [Collection("Sample")]
     public sealed class InteractionsBuildTests : IDisposable
     {
@@ -63,6 +63,42 @@ namespace Moonwell.Build.Tests
 
             Assert.Contains("warning: the map uses Moonwell.Interactions without Moonwell.Objects: IsTree needs Moonwell.Objects", output.ToString() + error);
             Assert.DoesNotContain("MoonwellTrees = {", File.ReadAllText(Path.Combine(project, "build", "Maths", "war3map.lua")));
+        }
+
+        [Fact]
+        public void map_with_the_package_builds()
+        {
+            var project = folders.TemporaryCopyOf("Interactions");
+            var output = new StringWriter();
+            var error = new StringWriter();
+            var exitCode = Cli.Run(new[] { "build", project }, output, error, (_, _) => throw new InvalidOperationException("build starts nothing"));
+            Assert.True(exitCode == 0, error.ToString() + output);
+
+            var script = File.ReadAllText(Path.Combine(project, "build", "Interactions", "war3map.lua"));
+            using var lua = new NLua.Lua();
+            lua.DoString("print = function() end");
+            lua.DoString("called = {}");
+            lua.DoString("setmetatable(_G, { __index = function(_, name) return function() called[#called + 1] = name; return nil end end })");
+            lua.DoString(script);
+            lua.DoString("main()");
+            // The script loads with the package's types in it and main runs under the stubbed natives; the game check covers the rest.
+            var called = (string)lua.DoString("return ',' .. table.concat(called, ',') .. ','")[0];
+            Assert.Contains(",GetWorldBounds,", called);
+            Assert.Contains("Moonwell.Gizmo", script);
+            Assert.Contains("Moonwell.Find", script);
+            Assert.Contains("Moonwell.Interaction", script);
+        }
+
+        [Fact]
+        public void sample_without_the_package_carries_none_of_it()
+        {
+            foreach (var script in new[] { builds.Development.Script, builds.Release.Script })
+            {
+                Assert.DoesNotContain("Gizmo", script);
+                Assert.DoesNotContain("Moonwell.Find", script); // not plain "Find": the runtime has Array.Find and KnownUnits.Find
+                Assert.DoesNotContain("Interaction", script);
+                Assert.DoesNotContain("MoonwellTrees", script);
+            }
         }
 
         [Fact]
