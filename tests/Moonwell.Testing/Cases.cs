@@ -14,7 +14,22 @@ namespace Moonwell.Testing
             AddMiddle(list);
             AddLast(list);
             AddMaths(list);
+            AddInteractions(list);
             return list;
+        }
+
+        /// <summary>Adds the interactions package's cases.</summary>
+        private static void AddInteractions(List<Case> list)
+        {
+            list.Add(new Case { Name = "interactions.grid.cells", Run = GridCases.Cells });
+            list.Add(new Case { Name = "interactions.grid.move", Run = GridCases.Move });
+            list.Add(new Case { Name = "interactions.grid.collect", Run = GridCases.Collect });
+            list.Add(new Case { Name = "interactions.grid.edge", Run = GridCases.Edge });
+            list.Add(new Case { Name = "interactions.grid.lazy", Run = GridCases.Lazy });
+            list.Add(new Case { Name = "interactions.grid.remove", Run = GridCases.Remove });
+            list.Add(new Case { Name = "interactions.grid.settings", Run = GridCases.Settings });
+            list.Add(new Case { Name = "interactions.grid.settings-locked", Run = GridCases.SettingsLocked });
+            list.Add(new Case { Name = "interactions.grid.reset", Run = GridCases.Reset });
         }
 
         /// <summary>Adds the maths package's cases.</summary>
