@@ -6,7 +6,10 @@ namespace Moonwell.Build
 {
     /// <summary>
     /// Writes the map's ground, read from <c>war3map.w3e</c>, as the C# file <c>Moonwell.Terrain</c> reads its grid from. Each corner
-    /// is a 24-bit number written as four characters (see <c>HeightGrid</c> in the package, which reads them).
+    /// is a 24-bit number written as four characters (see <c>HeightGrid</c> in the package, which reads them). A
+    /// water-flagged corner takes the water's surface only where that is above its ground; elsewhere it takes the ground
+    /// and its water bit is clear. (A water-flagged corner in the map's outer rings, which the game reads as ground,
+    /// is still given by this rule: those rings are outside the playable area.)
     /// </summary>
     public static class TerrainWriter
     {
@@ -36,9 +39,12 @@ namespace Moonwell.Build
             for (var index = 0; index < environment.TerrainTiles.Count; index++)
             {
                 var tile = environment.TerrainTiles[index];
-                var z = tile.IsWater
-                    ? (tile.WaterHeight * 128f) - 89.6f
-                    : (tile.Height * 128f) + ((tile.CliffLevel - 2) * 128f);
+                var ground = (tile.Height * 128f) + ((tile.CliffLevel - 2) * 128f);
+                var surface = (tile.WaterHeight * 128f) - 89.6f;
+
+                // Water counts only where its surface is above the ground; below it, the game reads the ground.
+                var water = tile.IsWater && surface > ground;
+                var z = water ? surface : ground;
                 var h = (int)MathF.Round(z * 20f) + ZeroHeight;
                 if (h < 0 || h >= HeightLimit)
                 {
@@ -46,7 +52,7 @@ namespace Moonwell.Build
                         $"war3map.w3e: the ground at corner ({index % columns}, {index / columns}) is {z.ToString("0.##", CultureInfo.InvariantCulture)} high, outside the -2457.6 to 4096 the terrain grid holds");
                 }
 
-                var value = (h << 7) | (tile.CliffLevel << 3) | (tile.IsRamp ? 2 : 0) | (tile.IsWater ? 1 : 0);
+                var value = (h << 7) | (tile.CliffLevel << 3) | (tile.IsRamp ? 2 : 0) | (water ? 1 : 0);
                 text.Append(Alphabet[(value >> 18) & 63]);
                 text.Append(Alphabet[(value >> 12) & 63]);
                 text.Append(Alphabet[(value >> 6) & 63]);

@@ -19,11 +19,20 @@ namespace Moonwell.Build.Tests
         {
             var environment = MakeEnvironment(1, 1);
             environment.TerrainTiles.Add(new TerrainTile { Height = 0, CliffLevel = 2 });
-            environment.TerrainTiles.Add(new TerrainTile { Flags = TileFlags.Water, WaterHeight = 0, CliffLevel = 2 });
+            environment.TerrainTiles.Add(new TerrainTile { Flags = TileFlags.Water, Height = -16, WaterHeight = 0, CliffLevel = 2 });
             environment.TerrainTiles.Add(new TerrainTile { Height = 0, CliffLevel = 3, Flags = TileFlags.Ramp });
             environment.TerrainTiles.Add(new TerrainTile { Height = -16, CliffLevel = 0 });
 
             Assert.Equal("YAAQXIARZQAaBgAA", TerrainWriter.Encode(environment));
+        }
+
+        [Fact]
+        public void shallow_water_reads_the_ground()
+        {
+            var environment = MakeEnvironment(0, 0);
+            environment.TerrainTiles.Add(new TerrainTile { Flags = TileFlags.Water, Height = 0, WaterHeight = 0, CliffLevel = 2 });
+
+            Assert.Equal("YAAQ", TerrainWriter.Encode(environment));
         }
 
         [Fact]
