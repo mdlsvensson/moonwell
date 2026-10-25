@@ -17,6 +17,9 @@ namespace Moonwell.Engine
         /// <summary>The step the cycle is at: the one running, or the last one that ran. It counts up from 0 over the game, and does not reset when the cycle's timer stops.</summary>
         public int StepNow;
 
+        /// <summary>Whether a step is running now. Outside one, StepNow is the last step that ran, and a place read between two steps is read again by the next ask.</summary>
+        public bool Running;
+
         /// <summary>Makes a cycle at step 0 with an empty list for every slot.</summary>
         public Cycle()
         {
@@ -50,33 +53,41 @@ namespace Moonwell.Engine
         public void Run()
         {
             StepNow++;
+            Running = true;
             var step = StepNow;
-            var list = ring[step % Slots];
-            var count = list.Count;
-            for (var pass = 0; pass < Passes; pass++)
+            try
             {
-                for (var i = 0; i < count; i++)
+                var list = ring[step % Slots];
+                var count = list.Count;
+                for (var pass = 0; pass < Passes; pass++)
                 {
-                    var due = list[i];
-                    if (due == null || due.Pass != pass)
+                    for (var i = 0; i < count; i++)
                     {
-                        continue;
-                    }
+                        var due = list[i];
+                        if (due == null || due.Pass != pass)
+                        {
+                            continue;
+                        }
 
-                    var at = due.DueStep;
-                    if (at < 0)
-                    {
-                        list[i] = null;
-                    }
-                    else if (at <= step)
-                    {
-                        list[i] = null;
-                        due.RunDue(step);
+                        var at = due.DueStep;
+                        if (at < 0)
+                        {
+                            list[i] = null;
+                        }
+                        else if (at <= step)
+                        {
+                            list[i] = null;
+                            due.RunDue(step);
+                        }
                     }
                 }
-            }
 
-            Pack(list);
+                Pack(list);
+            }
+            finally
+            {
+                Running = false;
+            }
         }
 
         /// <summary>Takes the nulls out of a list, keeping the order of the rest; what was scheduled onto the list while it ran is at its end and stays.</summary>

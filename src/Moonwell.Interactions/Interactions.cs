@@ -97,6 +97,7 @@ namespace Moonwell
             Tracking.Reset();
             handler = TakenIn;
             Hooks.TakenIn = handler;
+            Hooks.Ending = Ending;
         }
 
         /// <summary>Whether the package is installed: core's TakenIn hook is the package's own. Runtime.Reset clears the hook, so the next use starts afresh.</summary>
@@ -131,9 +132,16 @@ namespace Moonwell
             Dev.Check(grid == null || !Installed(), "Interactions: settings are read when the grid is made; set them in the map's constructor");
         }
 
-        /// <summary>Core's hook for a widget taken in. It does nothing yet.</summary>
+        /// <summary>Core's hook for a widget taken in: it is tracked when its kind has been asked for.</summary>
         private static void TakenIn(Widget widget)
         {
+            Tracking.TakenIn(widget);
+        }
+
+        /// <summary>Core's hook for a widget ending: it is out of the grid at once, before its OnLeave runs.</summary>
+        private static void Ending(Widget widget)
+        {
+            Tracking.WidgetEnding(widget);
         }
     }
 }

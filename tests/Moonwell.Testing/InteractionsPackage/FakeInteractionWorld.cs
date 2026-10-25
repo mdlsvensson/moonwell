@@ -21,6 +21,9 @@ namespace Moonwell.Testing
         /// <summary>How many times the package read the world's bounds.</summary>
         public int BoundsReads;
 
+        /// <summary>How many times the package asked whether a unit is hidden, an item is visible or a destructable is alive. It asks the first of a unit alive, so this counts the reads of units, and of items and destructables.</summary>
+        public int Reads;
+
         /// <summary>The units IsHidden answers true for.</summary>
         public List<unit> Hidden = new List<unit>();
 
@@ -33,17 +36,29 @@ namespace Moonwell.Testing
         /// <summary>The destructables IsAlive answers false for.</summary>
         public List<destructable> Dead = new List<destructable>();
 
-        /// <summary>Whether a unit is hidden.</summary>
-        public bool IsHidden(unit target) => Hidden.Contains(target);
+        /// <summary>Whether a unit is hidden; counts the read.</summary>
+        public bool IsHidden(unit target)
+        {
+            Reads++;
+            return Hidden.Contains(target);
+        }
 
         /// <summary>Whether a unit is loaded in a transport.</summary>
         public bool IsLoaded(unit target) => Loaded.Contains(target);
 
-        /// <summary>Whether an item is visible.</summary>
-        public bool IsVisible(item target) => !Unseen.Contains(target);
+        /// <summary>Whether an item is visible; counts the read.</summary>
+        public bool IsVisible(item target)
+        {
+            Reads++;
+            return !Unseen.Contains(target);
+        }
 
-        /// <summary>Whether a destructable is alive.</summary>
-        public bool IsAlive(destructable target) => !Dead.Contains(target);
+        /// <summary>Whether a destructable is alive; counts the read.</summary>
+        public bool IsAlive(destructable target)
+        {
+            Reads++;
+            return !Dead.Contains(target);
+        }
 
         /// <summary>The world's bounds; counts the read.</summary>
         public void WorldBounds(out float minX, out float minY, out float maxX, out float maxY)

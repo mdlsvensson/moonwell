@@ -83,7 +83,7 @@ namespace Moonwell
         {
             Dev.Check(gizmo.entry == null, Names.NameOf(gizmo) + ".Create: the gizmo has been created already");
             gizmo.player = player ?? Player.NeutralPassive;
-            gizmo.entry = Tracking.Begin(gizmo, 4, x, y);
+            gizmo.entry = Tracking.Begin(gizmo, Tracking.GizmoKind, x, y);
             (owner ?? Owner.Current).Adopt(gizmo);
             if (!gizmo.HasEnded)
             {

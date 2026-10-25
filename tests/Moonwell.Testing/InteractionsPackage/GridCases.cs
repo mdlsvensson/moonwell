@@ -17,7 +17,7 @@ namespace Moonwell.Testing
         /// <summary>An entry for a new actor, not yet in the grid.</summary>
         private static Entry EntryAt(int id, float x, float y)
         {
-            return new Entry(id, new TestActor(), 4) { X = x, Y = y };
+            return new Entry(id, new TestActor(), Tracking.GizmoKind) { X = x, Y = y };
         }
 
         /// <summary>An entry goes in the cell its position is in, counted row by row from the bottom-left, and the cell lists it.</summary>

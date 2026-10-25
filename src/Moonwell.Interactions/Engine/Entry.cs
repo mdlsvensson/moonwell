@@ -9,7 +9,7 @@ namespace Moonwell.Engine
         /// <summary>The thing the entry stands for.</summary>
         public Actor Thing;
 
-        /// <summary>What kind of thing it is: 1 for a unit, 2 for an item, 3 for a destructable, 4 for a gizmo.</summary>
+        /// <summary>What kind of thing it is: Tracking.UnitKind, ItemKind, DestructableKind or GizmoKind.</summary>
         public int Kind;
 
         /// <summary>The place the entry was last read at, left to right.</summary>
@@ -26,6 +26,9 @@ namespace Moonwell.Engine
 
         /// <summary>Whether the thing has a place now: a unit that is alive, not hidden and not loaded; an item on the ground; a destructable that is alive; a gizmo that has not ended.</summary>
         public bool HasPlace;
+
+        /// <summary>Whether the thing has begun to end: it has no place from then on, and no read gives it one again.</summary>
+        public bool Ended;
 
         /// <summary>Makes the entry of a thing, in no cell, with no place read.</summary>
         public Entry(int id, Actor thing, int kind)

@@ -45,6 +45,23 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.gizmo.throwing-tick", Run = GizmoCases.ThrowingTick });
             list.Add(new Case { Name = "interactions.gizmo.tick-owner", Run = GizmoCases.TickOwner });
             list.Add(new Case { Name = "interactions.gizmo.throwing-reactions", Run = GizmoCases.ThrowingReactions });
+            list.Add(new Case { Name = "interactions.tracking.only-when-asked", Run = TrackingCases.OnlyWhenAsked });
+            list.Add(new Case { Name = "interactions.tracking.units-filled", Run = TrackingCases.UnitsFilled });
+            list.Add(new Case { Name = "interactions.tracking.kinds-from-types", Run = TrackingCases.KindsFromTypes });
+            list.Add(new Case { Name = "interactions.tracking.no-place-class", Run = TrackingCases.NoPlaceClass });
+            list.Add(new Case { Name = "interactions.tracking.cell-check-spread", Run = TrackingCases.CellCheckSpread });
+            list.Add(new Case { Name = "interactions.tracking.cell-check-counts", Run = TrackingCases.CellCheckCounts });
+            list.Add(new Case { Name = "interactions.tracking.cell-check-after-ending", Run = TrackingCases.CellCheckAfterEnding });
+            list.Add(new Case { Name = "interactions.tracking.no-place", Run = TrackingCases.NoPlace });
+            list.Add(new Case { Name = "interactions.tracking.revived", Run = TrackingCases.Revived });
+            list.Add(new Case { Name = "interactions.tracking.items-filled", Run = TrackingCases.ItemsFilled });
+            list.Add(new Case { Name = "interactions.tracking.destructables-filled", Run = TrackingCases.DestructablesFilled });
+            list.Add(new Case { Name = "interactions.tracking.ending", Run = TrackingCases.Ending });
+            list.Add(new Case { Name = "interactions.tracking.ending-unseen", Run = TrackingCases.EndingUnseen });
+            list.Add(new Case { Name = "interactions.tracking.new-ground-item", Run = TrackingCases.NewGroundItem });
+            list.Add(new Case { Name = "interactions.tracking.read-once", Run = TrackingCases.ReadOnce });
+            list.Add(new Case { Name = "interactions.tracking.read-outside-step", Run = TrackingCases.ReadOutsideStep });
+            list.Add(new Case { Name = "interactions.tracking.gizmo-place", Run = TrackingCases.GizmoPlace });
         }
 
         /// <summary>Adds the maths package's cases.</summary>
