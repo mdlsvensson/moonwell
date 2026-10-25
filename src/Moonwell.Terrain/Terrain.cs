@@ -13,6 +13,9 @@ namespace Moonwell
         /// <summary>The ground's corners; null until Install.</summary>
         private static HeightGrid? grid;
 
+        /// <summary>The pathing flags of the ground, read a block at a time; null until Install.</summary>
+        private static PathingGrid? pathing;
+
         /// <summary>The playable area, read once in Install.</summary>
         private static Bounds playable;
 
@@ -30,6 +33,7 @@ namespace Moonwell
             playable = new Bounds(new Vector2(minX, minY), new Vector2(maxX, maxY));
             world = host;
             grid = made;
+            pathing = new PathingGrid(host, columns, rows, left, bottom);
         }
 
         /// <summary>The playable area: the map's bounds less the camera's margins, as the game's own playable area is. Read once, when the package was installed.</summary>
@@ -82,6 +86,75 @@ namespace Moonwell
             return Maths.AngleBetween(0f, 0f, 1f, MathF.Sqrt(alongX * alongX + alongY * alongY));
         }
 
+        /// <summary>
+        /// Whether units can walk at a point, as the map's terrain says: cliffs, deep water and the like, not trees,
+        /// buildings or units. A point outside the map reads the edge. Read a cell at a time, once, and kept until
+        /// <c>Refresh</c>. On a bridge it reads the ground or water beneath, as a bridge is a destructable, not
+        /// terrain.
+        /// </summary>
+        [LocalSafe]
+        public static bool IsWalkable(float x, float y)
+        {
+            return (Pathing.Flags(x, y) & PathingGrid.Walkable) != 0;
+        }
+
+        /// <summary>Whether flying units can fly at a point, as the map's terrain says. A point outside the map reads the edge.</summary>
+        [LocalSafe]
+        public static bool IsFlyable(float x, float y)
+        {
+            return (Pathing.Flags(x, y) & PathingGrid.Flyable) != 0;
+        }
+
+        /// <summary>Whether a building can be built at a point, as the map's terrain says. A point outside the map reads the edge.</summary>
+        [LocalSafe]
+        public static bool IsBuildable(float x, float y)
+        {
+            return (Pathing.Flags(x, y) & PathingGrid.Buildable) != 0;
+        }
+
+        /// <summary>Whether a point is water, where ships can float. A point outside the map reads the edge.</summary>
+        [LocalSafe]
+        public static bool IsWater(float x, float y)
+        {
+            return (Pathing.Flags(x, y) & PathingGrid.Water) != 0;
+        }
+
+        /// <summary>
+        /// Forgets the pathing read for the blocks of cells an area touches, so the next read of a point in them asks
+        /// the game again. Call it after a map changes the pathing with natives.
+        /// </summary>
+        [ChangesState]
+        public static void Refresh(Bounds area)
+        {
+            Pathing.Refresh(area);
+        }
+
+        /// <summary>
+        /// Whether something can stand at a point: an item put there lands within 1 of it, which trees, buildings and
+        /// unwalkable ground push it away from. <c>nearest</c> is where the item landed. This changes game state,
+        /// as the item is moved for a moment. On a bridge it lands on the ground or water beneath, as a bridge is a
+        /// destructable, not terrain.
+        /// </summary>
+        [ChangesState]
+        public static bool CanStand(float x, float y, out Vector2 nearest)
+        {
+            World.Place(x, y, out var landedX, out var landedY);
+            nearest = new Vector2(landedX, landedY);
+            var dx = landedX - x;
+            var dy = landedY - y;
+            return dx * dx + dy * dy <= 1f;
+        }
+
+        /// <summary>
+        /// The ground's height at a point as this machine's game reads it, deformations included. The game can answer
+        /// differently on each machine, so a map reads it only inside <c>Local.For</c>.
+        /// </summary>
+        [MachineLocal]
+        public static float LocalHeight(float x, float y)
+        {
+            return World.LocationZ(x, y);
+        }
+
         /// <summary>The world the package talks to.</summary>
         internal static ITerrainWorld World
         {
@@ -110,11 +183,26 @@ namespace Moonwell
             }
         }
 
+        /// <summary>The pathing flags of the ground.</summary>
+        internal static PathingGrid Pathing
+        {
+            get
+            {
+                if (pathing == null)
+                {
+                    throw NotInstalled();
+                }
+
+                return pathing;
+            }
+        }
+
         /// <summary>Forgets the install, so a case can check what reads before it do.</summary>
         internal static void Uninstall()
         {
             world = null;
             grid = null;
+            pathing = null;
         }
 
         /// <summary>The error of a read before Install.</summary>

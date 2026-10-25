@@ -39,6 +39,16 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "terrain.height.ramp", Run = HeightCases.Ramp });
             list.Add(new Case { Name = "terrain.height.normal-and-slope", Run = HeightCases.NormalAndSlope });
             list.Add(new Case { Name = "terrain.height.not-installed", Run = HeightCases.NotInstalled });
+            list.Add(new Case { Name = "terrain.pathing.flags", Run = PathingCases.Flags });
+            list.Add(new Case { Name = "terrain.pathing.filled-once", Run = PathingCases.FilledOnce });
+            list.Add(new Case { Name = "terrain.pathing.partial-block", Run = PathingCases.PartialBlock });
+            list.Add(new Case { Name = "terrain.pathing.refresh", Run = PathingCases.Refresh });
+            list.Add(new Case { Name = "terrain.pathing.refresh-span", Run = PathingCases.RefreshSpan });
+            list.Add(new Case { Name = "terrain.pathing.outside", Run = PathingCases.Outside });
+            list.Add(new Case { Name = "terrain.pathing.can-stand", Run = PathingCases.CanStand });
+            list.Add(new Case { Name = "terrain.pathing.local-height", Run = PathingCases.LocalHeight });
+            list.Add(new Case { Name = "terrain.pathing.not-installed", Run = PathingCases.NotInstalled });
+            list.Add(new Case { Name = "terrain.pathing.reinstall", Run = PathingCases.Reinstall });
         }
 
         /// <summary>Adds the maths package's cases.</summary>
