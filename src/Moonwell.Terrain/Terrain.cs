@@ -36,7 +36,7 @@ namespace Moonwell
             pathing = new PathingGrid(host, columns, rows, left, bottom);
         }
 
-        /// <summary>The playable area: the map's bounds less the camera's margins, as the game's own playable area is. Read once, when the package was installed.</summary>
+        /// <summary>The playable area: the map's bounds less the camera's margins, as the game's own playable area is. Read once, at the start, when the package is installed and before any map code.</summary>
         [LocalSafe]
         public static Bounds Playable
         {
@@ -75,7 +75,7 @@ namespace Moonwell
 
         /// <summary>
         /// The direction straight out of the ground at a point, a unit vector for bounces and slides, from the blended
-        /// ground's slope in every tile, cliff tiles included.
+        /// ground's slope in every tile, cliff tiles included. Outside the grid it is the slope of the edge tile.
         /// </summary>
         [LocalSafe]
         public static Vector3 Normal(float x, float y)
@@ -86,7 +86,7 @@ namespace Moonwell
 
         /// <summary>
         /// How steep the ground is at a point, in degrees: 0 flat, 90 a wall. Of the blended ground in every tile, so a
-        /// cliff tile reads as the slope between its corners.
+        /// cliff tile reads as the slope between its corners. Outside the grid it is the slope of the edge tile.
         /// </summary>
         [LocalSafe]
         public static float Slope(float x, float y)
