@@ -6,6 +6,9 @@ namespace Moonwell.Build
         /// <summary>The damage package's assembly: a map that references it gets it installed by its Main.</summary>
         private const string DamageAssemblyName = "Moonwell.Damage";
 
+        /// <summary>The terrain package's assembly: a map that references it gets its grid written from <c>war3map.w3e</c> and installed by its Main.</summary>
+        private const string TerrainAssemblyName = "Moonwell.Terrain";
+
         /// <summary>Runs every step of the build, in order.</summary>
         /// <param name="path">A project folder, or the path of its <c>.csproj</c> file.</param>
         /// <param name="options">What kind of build to make.</param>
@@ -62,7 +65,7 @@ namespace Moonwell.Build
             BalanceCheck.Run(declarations, standard, data);
 
             var ids = ObjectIds.Assign(declarations.Objects, standard.AllIds(), MapObjectIds.Defined(project));
-            EntryWriter.Write(project, settings, true, Declarations.References(targetPath, DamageAssemblyName));
+            EntryWriter.Write(project, settings, true, Installs(project, map, targetPath));
             RegistryWriter.Write(project, declarations.Used, declarations.Objects, ids);
             LuaCompiler.Compile(project, map, targetPath, options.Release, declarations, ids, standard, data.ValueSet);
             StageWith(project, () => Stage.Write(project, map, declarations.Objects, ids, declarations.StandardClassIds, standard, log));
@@ -83,9 +86,34 @@ namespace Moonwell.Build
             // The build reads no declarations, but a unit's Level is still set only in a declared class's constructor.
             Declarations.CheckSetters(targetPath);
 
-            EntryWriter.Write(project, settings, false, Declarations.References(targetPath, DamageAssemblyName));
+            EntryWriter.Write(project, settings, false, Installs(project, map, targetPath));
             LuaCompiler.Compile(project, map, targetPath, options.Release);
             StageWith(project, () => Stage.WriteWithoutObjects(project, map, log));
+        }
+
+        // What the map's Main installs before anything registers: each package the map references, in this order. The terrain's grid is
+        // written here too, from the map's ground, and a grid an earlier build wrote is removed when the map no longer uses the package.
+        private static List<string> Installs(MapProject project, War3Net.Build.Map map, string targetPath)
+        {
+            var installs = new List<string>();
+            if (Declarations.References(targetPath, DamageAssemblyName))
+            {
+                installs.Add("global::Moonwell.DamageSystem.Install();");
+            }
+
+            if (Declarations.References(targetPath, TerrainAssemblyName))
+            {
+                // The fork's W2 fix refuses a map without a war3map.w3e, so there is always one here.
+                TerrainWriter.Write(project, map.Environment!);
+                const string Data = "global::Moonwell.Generated.TerrainData";
+                installs.Add($"global::Moonwell.Terrain.Install({Data}.Columns, {Data}.Rows, {Data}.Left, {Data}.Bottom, {Data}.Corners());");
+            }
+            else
+            {
+                TerrainWriter.Delete(project);
+            }
+
+            return installs;
         }
 
         private static void StageWith(MapProject project, Action stage)
