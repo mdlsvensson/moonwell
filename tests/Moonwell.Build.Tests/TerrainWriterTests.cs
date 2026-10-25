@@ -127,6 +127,47 @@ namespace Moonwell.Build.Tests
             Assert.Equal(environment.TerrainTiles.Count * 4, TerrainWriter.Encode(environment).Length);
         }
 
+        [Fact]
+        public void a_ramp_corner_below_a_higher_ramp_corner_is_raised_half_a_level()
+        {
+            var read = MakeEnvironment(2, 0);
+            read.TerrainTiles.Add(Ramp(0, 2));
+            read.TerrainTiles.Add(Ramp(0, 3));
+            read.TerrainTiles.Add(Ramp(0, 3));
+
+            var text = TerrainWriter.Encode(read);
+
+            // z 64, level 2, ramp; then z 128, level 3, ramp twice (the pinned "ZQAa").
+            Assert.Equal("YoASZQAaZQAa", text);
+        }
+
+        [Fact]
+        public void a_ramp_corner_without_a_ramp_neighbour_one_level_up_is_not_raised()
+        {
+            var noRampFlag = MakeEnvironment(2, 0);
+            noRampFlag.TerrainTiles.Add(Ramp(0, 2));
+            noRampFlag.TerrainTiles.Add(new TerrainTile { Height = 0, CliffLevel = 3 });
+            noRampFlag.TerrainTiles.Add(Ramp(0, 3));
+            Assert.StartsWith("YAAS", TerrainWriter.Encode(noRampFlag));
+
+            var twoUp = MakeEnvironment(1, 0);
+            twoUp.TerrainTiles.Add(Ramp(0, 2));
+            twoUp.TerrainTiles.Add(Ramp(0, 4));
+            Assert.StartsWith("YAAS", TerrainWriter.Encode(twoUp));
+
+            var diagonal = MakeEnvironment(1, 1);
+            diagonal.TerrainTiles.Add(Ramp(0, 2));
+            diagonal.TerrainTiles.Add(Ramp(0, 2));
+            diagonal.TerrainTiles.Add(Ramp(0, 2));
+            diagonal.TerrainTiles.Add(Ramp(0, 3));
+            Assert.StartsWith("YAAS", TerrainWriter.Encode(diagonal));
+        }
+
+        private static TerrainTile Ramp(float height, int cliffLevel)
+        {
+            return new TerrainTile { Height = height, CliffLevel = cliffLevel, Flags = TileFlags.Ramp };
+        }
+
         private static MapEnvironment MakeEnvironment(uint tilesAcross, uint tilesUp)
         {
             return new MapEnvironment(MapEnvironmentFormatVersion.v11) { Width = tilesAcross, Height = tilesUp };

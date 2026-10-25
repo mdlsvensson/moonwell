@@ -9,7 +9,10 @@ namespace Moonwell.Build
     /// is a 24-bit number written as four characters (see <c>HeightGrid</c> in the package, which reads them). A
     /// water-flagged corner takes the water's surface only where that is above its ground; elsewhere it takes the ground
     /// and its water bit is clear. (A water-flagged corner in the map's outer rings, which the game reads as ground,
-    /// is still given by this rule: those rings are outside the playable area.)
+    /// is still given by this rule: those rings are outside the playable area.) A ramp-flagged corner with a ramp-flagged
+    /// neighbour along x or y (not diagonal) whose cliff level is exactly one higher is raised half a cliff level (64), as
+    /// the game reads it; the raised ground is what the water rule compares the surface with and what is written, while
+    /// the corner's cliff level and flags are unchanged (inferred from one map (Lost Temple, 10-25)).
     /// </summary>
     public static class TerrainWriter
     {
@@ -40,6 +43,11 @@ namespace Moonwell.Build
             {
                 var tile = environment.TerrainTiles[index];
                 var ground = (tile.Height * 128f) + ((tile.CliffLevel - 2) * 128f);
+                if (HasHigherRampNeighbour(environment, columns, rows, index))
+                {
+                    ground += 64f;
+                }
+
                 var surface = (tile.WaterHeight * 128f) - 89.6f;
 
                 // Water counts only where its surface is above the ground; below it, the game reads the ground.
@@ -103,6 +111,34 @@ namespace Moonwell.Build
             {
                 File.Delete(path);
             }
+        }
+
+        // A ramp corner is read half a level higher when a neighbour along x or y is a ramp corner one cliff level up.
+        private static bool HasHigherRampNeighbour(MapEnvironment environment, int columns, int rows, int index)
+        {
+            var tile = environment.TerrainTiles[index];
+            if (!tile.IsRamp)
+            {
+                return false;
+            }
+
+            var column = index % columns;
+            var row = index / columns;
+            return IsHigherRamp(environment, tile, column - 1, row, columns, rows)
+                || IsHigherRamp(environment, tile, column + 1, row, columns, rows)
+                || IsHigherRamp(environment, tile, column, row - 1, columns, rows)
+                || IsHigherRamp(environment, tile, column, row + 1, columns, rows);
+        }
+
+        private static bool IsHigherRamp(MapEnvironment environment, TerrainTile tile, int column, int row, int columns, int rows)
+        {
+            if (column < 0 || column >= columns || row < 0 || row >= rows)
+            {
+                return false;
+            }
+
+            var other = environment.TerrainTiles[(row * columns) + column];
+            return other.IsRamp && other.CliffLevel == tile.CliffLevel + 1;
         }
 
         // War3Net's Width and Height count tiles; the grid counts the corners between and around them, one more each way.
