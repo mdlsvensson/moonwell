@@ -23,6 +23,7 @@
     <ProjectReference Include="..\..\src\Moonwell.Damage\Moonwell.Damage.csproj" />
     <ProjectReference Include="..\..\src\Moonwell.Maths\Moonwell.Maths.csproj" />
     <ProjectReference Include="..\..\src\Moonwell.Objects\Moonwell.Objects.csproj" />
+    <ProjectReference Include="..\..\src\Moonwell.Terrain\Moonwell.Terrain.csproj" />
   </ItemGroup>
 
 </Project>

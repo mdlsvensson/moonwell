@@ -135,6 +135,46 @@ public class LocalTests
     }
 
     [Fact]
+    public void terrain_package_readers_are_allowed_inside()
+    {
+        Assert.Empty(MapCode.Check("""
+            Local.For(p, () =>
+            {
+                var z = Terrain.Height(0f, 0f);
+                var walk = Terrain.IsWalkable(0f, 0f);
+                var n = Terrain.Normal(0f, 0f);
+            });
+            """));
+    }
+
+    [Fact]
+    public void terrain_can_stand_is_rejected_inside()
+    {
+        var found = MapCode.Check("""
+            Local.For(p, () =>
+            {
+                Terrain.CanStand(0f, 0f, out _);
+            });
+            """);
+
+        Assert.Equal(new[] { "MW0001: Terrain.CanStand(0f, 0f, out _)" }, found);
+    }
+
+    [Fact]
+    public void terrain_local_height_is_rejected_outside()
+    {
+        var found = MapCode.Check("""
+            var z = Terrain.LocalHeight(0f, 0f);
+            Local.For(p, () =>
+            {
+                var y = Terrain.LocalHeight(0f, 0f);
+            });
+            """);
+
+        Assert.Equal(new[] { "MW0002: Terrain.LocalHeight(0f, 0f)" }, found);
+    }
+
+    [Fact]
     public void player_reads_are_local_safe()
     {
         Assert.Empty(MapCode.Check("""
