@@ -321,5 +321,23 @@ namespace Moonwell.Testing
 
             return false;
         }
+
+        /// <summary>A map's gizmo may have fields of its own named as the package's (z, player, tick, due): each stays its own, in Lua too, and the gizmo works as any other.</summary>
+        public static void ShadowedFields(FakeWorld world)
+        {
+            Fresh();
+            var well = Gizmo.Create(new ShadowWell(), 0.0f, 0.0f);
+            Expect.Same(Player.NeutralPassive, well.Player, "it plays for Neutral Passive");
+            Expect.True(well.OwnPlayer == null, "its own player is none");
+            Expect.Near(0.0f, well.Z, "Z is 0");
+            well.Z = 2.0f;
+            Expect.Near(2.0f, well.Z, "Z is set");
+            Expect.Near(5.0f, well.OwnZ, "its own height is 5");
+            Expect.Near(Interactions.Step, well.Tick, "Tick is a step");
+            Expect.Near(3.0f, well.OwnTick, "its own tick is 3");
+            Expect.Equal(9, well.OwnDue, "its own due is 9");
+            Steps(world, 2);
+            Expect.Equal(2, well.Ticks, "it ticks at every step");
+        }
     }
 }

@@ -509,5 +509,28 @@ namespace Moonwell.Testing
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "tick b" }, "it meets b");
         }
+
+        /// <summary>A map's interaction may have fields of its own named as the package's (paused, range, tick, started, due, holder): each stays its own, in Lua too, and the interaction works as any other.</summary>
+        public static void ShadowedFields(FakeWorld world)
+        {
+            Fresh();
+            var a = UnitAt(world, 0.0f, 0.0f);
+            UnitAt(world, 100.0f, 0.0f);
+            var aura = new ShadowAura();
+            Expect.True(!aura.IsPaused, "the interaction is not paused");
+            Expect.True(aura.OwnPaused, "its own paused is true");
+            Expect.Near(300.0f, aura.Range, "Range is 300");
+            Expect.Near(1.0f, aura.OwnRange, "its own range is 1");
+            Expect.Near(0.5f, aura.Tick, "Tick is half a second");
+            Expect.Near(2.0f, aura.OwnTick, "its own tick is 2");
+            aura.Resume();
+            a.Interact(aura);
+            Expect.Same(a, aura.Holder, "Holder is the unit");
+            Expect.True(aura.OwnHolder == null, "its own holder is none");
+            Expect.True(aura.OwnStarted, "its own started is true");
+            Expect.Equal(7, aura.OwnDue, "its own due is 7");
+            Steps(world, 16);
+            ExpectLog(new string[] { "meet" }, "it meets at its first check");
+        }
     }
 }

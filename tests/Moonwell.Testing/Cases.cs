@@ -45,6 +45,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.gizmo.throwing-tick", Run = GizmoCases.ThrowingTick });
             list.Add(new Case { Name = "interactions.gizmo.tick-owner", Run = GizmoCases.TickOwner });
             list.Add(new Case { Name = "interactions.gizmo.throwing-reactions", Run = GizmoCases.ThrowingReactions });
+            list.Add(new Case { Name = "interactions.gizmo.shadowed-fields", Run = GizmoCases.ShadowedFields });
             list.Add(new Case { Name = "interactions.tracking.only-when-asked", Run = TrackingCases.OnlyWhenAsked });
             list.Add(new Case { Name = "interactions.tracking.units-filled", Run = TrackingCases.UnitsFilled });
             list.Add(new Case { Name = "interactions.tracking.kinds-from-types", Run = TrackingCases.KindsFromTypes });
@@ -107,6 +108,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.interaction.pairs-view", Run = InteractionCases.PairsView });
             list.Add(new Case { Name = "interactions.interaction.interact-checks", Run = InteractionCases.InteractChecks });
             list.Add(new Case { Name = "interactions.interaction.interact-in-created", Run = InteractionCases.InteractInCreated });
+            list.Add(new Case { Name = "interactions.interaction.shadowed-fields", Run = InteractionCases.ShadowedFields });
             list.Add(new Case { Name = "interactions.pair.wait", Run = PairCases.Wait });
             list.Add(new Case { Name = "interactions.pair.try-cooldown", Run = PairCases.TryCooldown });
             list.Add(new Case { Name = "interactions.pair.pause-resume", Run = PairCases.PauseResume });

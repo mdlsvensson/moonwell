@@ -6,20 +6,24 @@ namespace Moonwell
     /// <summary>A map's own object with a place, for the things the game has no object for: a well, a trap, a missile. It belongs to the owner that made it and ends with it, or by End or Remove. It can tick on its own, in the package's cycle.</summary>
     public abstract class Gizmo : Actor
     {
+        // The fields are internal, not private, as a map's subclass may name a field of its own the same:
+        // CSharp.lua gives a subclass's field a name of its own only when it sees the base's field of that name,
+        // and it does not see a private one, so in Lua the two would be one field.
+
         /// <summary>The package's entry for the gizmo: its place and its cell. Null before Create.</summary>
         internal Entry? entry;
 
         /// <summary>The gizmo's place in the cycle; made when it first has a tick.</summary>
-        private GizmoDue? due;
+        internal GizmoDue? due;
 
         /// <summary>The height, kept for the missiles of a later part.</summary>
-        private float z;
+        internal float z;
 
         /// <summary>The player the gizmo plays for.</summary>
-        private Player player = null!;
+        internal Player player = null!;
 
         /// <summary>The seconds between ticks; 0 for none.</summary>
-        private float tick;
+        internal float tick;
 
         /// <summary>The gizmo's left-to-right place. Setting it moves the gizmo's entry to the cell of the new place at once.</summary>
         [LocalSafe]

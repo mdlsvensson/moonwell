@@ -11,6 +11,10 @@ namespace Moonwell
     /// </summary>
     public abstract class Interaction : Owner
     {
+        // The fields are internal, not private, as a map's subclass may name a field of its own the same:
+        // CSharp.lua gives a subclass's field a name of its own only when it sees the base's field of that name,
+        // and it does not see a private one, so in Lua the two would be one field.
+
         /// <summary>The pairs, in the order they met; each is an Interaction&lt;THolder, TOther&gt;.Pair, kept as an Owner (see Pairing).</summary>
         internal readonly List<Owner> pairs = new List<Owner>();
 
@@ -27,25 +31,25 @@ namespace Moonwell
         internal int checks;
 
         /// <summary>The entry ids of the others whose pair was stopped and that have not been out of range since, in the order they were stopped; null until a pair is stopped.</summary>
-        private List<int>? stopped;
+        internal List<int>? stopped;
 
         /// <summary>The check at which each stopped other was last kept, by its entry id; a lookup only.</summary>
-        private Dictionary<int, int>? stoppedSeen;
+        internal Dictionary<int, int>? stoppedSeen;
 
         /// <summary>The interaction's place in the cycle; made when it starts.</summary>
-        private InteractionDue? due;
+        internal InteractionDue? due;
 
         /// <summary>Whether Interact has started it.</summary>
-        private bool started;
+        internal bool started;
 
         /// <summary>Whether it is paused.</summary>
-        private bool paused;
+        internal bool paused;
 
         /// <summary>The range.</summary>
-        private float range;
+        internal float range;
 
         /// <summary>The seconds between checks.</summary>
-        private float tick;
+        internal float tick;
 
         /// <summary>Only Interaction&lt;THolder, TOther&gt; derives from it.</summary>
         internal Interaction()
@@ -325,8 +329,10 @@ namespace Moonwell
         where THolder : Actor
         where TOther : Actor
     {
+        // Internal, not private, for the same reason as Interaction's fields.
+
         /// <summary>The holder; null before the interaction starts.</summary>
-        private THolder holder = null!;
+        internal THolder holder = null!;
 
         /// <summary>The thing that holds the interaction.</summary>
         [LocalSafe]
