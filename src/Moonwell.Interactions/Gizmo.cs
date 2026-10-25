@@ -94,6 +94,14 @@ namespace Moonwell
             return gizmo;
         }
 
+        /// <summary>Starts an interaction held by the gizmo, and returns it. It belongs to the owner, or else the current owner, and ends with it, with the gizmo, or by End. Fails in a development build when the gizmo is not of the interaction's holder class, when its Range is not more than 0, or when it was started before.</summary>
+        public T Interact<T>(T interaction, Owner? owner = null)
+            where T : Interaction
+        {
+            interaction.Begin(this, Tracking.GizmoKind, owner);
+            return interaction;
+        }
+
         /// <summary>Ends the gizmo: OnLeave runs and it leaves the grid. The same as End.</summary>
         public void Remove()
         {
@@ -115,7 +123,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Tells the package the gizmo is ending, runs OnLeave, and takes the gizmo out of the grid. A gizmo is the package's own, so core's hook for a widget ending does not see it.</summary>
+        /// <summary>Tells the package the gizmo is ending, which ends the interactions it holds and parts the pairs it is the other of, runs OnLeave, and takes the gizmo out of the grid. A gizmo is the package's own, so core's hook for a widget ending does not see it.</summary>
         protected sealed override void OnEnd()
         {
             if (entry != null)

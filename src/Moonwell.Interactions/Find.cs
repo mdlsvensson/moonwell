@@ -460,6 +460,12 @@ namespace Moonwell
             return Closest<T>(center.X, center.Y, count, maxRange, results, where);
         }
 
+        /// <summary>The shared list of candidates, for an interaction's check, which adds its own at the end and takes them off with Release as a search does.</summary>
+        internal static List<Entry> Candidates
+        {
+            get { return candidates; }
+        }
+
         /// <summary>What a search is looking at now: how many candidates and squared distances the searches that are running hold. It is 0 whenever no search is running, however the searches ended.</summary>
         internal static int Pending
         {
@@ -503,8 +509,8 @@ namespace Moonwell
             return start;
         }
 
-        /// <summary>Takes the candidates a search added off the end of the shared list, leaving those of the searches around it.</summary>
-        private static void Release(int start)
+        /// <summary>Takes the candidates a search or a check added off the end of the shared list, leaving those of the searches around it.</summary>
+        internal static void Release(int start)
         {
             while (candidates.Count > start)
             {

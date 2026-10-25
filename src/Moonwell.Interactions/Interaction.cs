@@ -1,0 +1,841 @@
+using System;
+using System.Collections.Generic;
+using Moonwell.Engine;
+
+namespace Moonwell
+{
+    /// <summary>
+    /// What one thing, the holder, does with the things of a class near it. A map derives from Interaction&lt;THolder, TOther&gt;;
+    /// this base carries what the cycle and Interact need without the types. An interaction belongs to the owner that started
+    /// it and ends with it, with its holder, or by End; its pairs part first, newest first.
+    /// </summary>
+    public abstract class Interaction : Owner
+    {
+        /// <summary>The pairs, in the order they met; each is an Interaction&lt;THolder, TOther&gt;.Pair, kept as an Owner (see Pairing).</summary>
+        internal readonly List<Owner> pairs = new List<Owner>();
+
+        /// <summary>The pair of each other, by the other's entry id; a lookup only.</summary>
+        internal readonly Dictionary<int, Owner> byOther = new Dictionary<int, Owner>();
+
+        /// <summary>The read-only view of the pairs that Pairs gives; made on the first ask.</summary>
+        internal object? view;
+
+        /// <summary>The holder's entry; null before the interaction starts.</summary>
+        internal Entry? holderEntry;
+
+        /// <summary>How many checks have run; a pair or a stopped other kept at a check is marked with it.</summary>
+        internal int checks;
+
+        /// <summary>The entry ids of the others whose pair was stopped and that have not been out of range since, in the order they were stopped; null until a pair is stopped.</summary>
+        private List<int>? stopped;
+
+        /// <summary>The check at which each stopped other was last kept, by its entry id; a lookup only.</summary>
+        private Dictionary<int, int>? stoppedSeen;
+
+        /// <summary>The interaction's place in the cycle; made when it starts.</summary>
+        private InteractionDue? due;
+
+        /// <summary>Whether Interact has started it.</summary>
+        private bool started;
+
+        /// <summary>Whether it is paused.</summary>
+        private bool paused;
+
+        /// <summary>The range.</summary>
+        private float range;
+
+        /// <summary>The seconds between checks.</summary>
+        private float tick;
+
+        /// <summary>Only Interaction&lt;THolder, TOther&gt; derives from it.</summary>
+        internal Interaction()
+        {
+        }
+
+        /// <summary>How near, centre to centre and flat, the other must be to the holder to meet it, in game units; required, more than 0. A map sets it in its constructor; a change takes effect at the next check.</summary>
+        [LocalSafe]
+        public float Range
+        {
+            get { return range; }
+            protected set { range = value; }
+        }
+
+        /// <summary>The seconds between checks, rounded up to whole steps of the cycle and at least one step; a step unless set. A map sets it in its constructor; a change takes effect after the check that is waiting.</summary>
+        [LocalSafe]
+        public float Tick
+        {
+            get { return tick; }
+            protected set
+            {
+                Dev.Check(value >= 0.0f, Names.NameOf(this) + ".Tick: seconds must be 0 or more");
+                tick = value;
+            }
+        }
+
+        /// <summary>Whether the interaction is paused: it makes no checks, and its pairs are kept.</summary>
+        [LocalSafe]
+        public bool IsPaused
+        {
+            get { return paused; }
+        }
+
+        /// <summary>Whether the interaction should stop the check it is in: it, or its holder, has begun to end.</summary>
+        internal bool Over
+        {
+            get { return ending || HasEnded || (holderEntry != null && holderEntry.Ended); }
+        }
+
+        /// <summary>Stops the checks: no pair meets, ticks or parts until Resume, and the pairs are kept.</summary>
+        public void Pause()
+        {
+            paused = true;
+        }
+
+        /// <summary>Starts the checks again, the next a tick from now unless one is waiting.</summary>
+        public void Resume()
+        {
+            paused = false;
+            if (due != null)
+            {
+                due.Arm();
+            }
+        }
+
+        /// <summary>Whether a pair or another owned object has begun to end.</summary>
+        internal static bool Gone(Owned owned)
+        {
+            return owned.ending || owned.HasEnded;
+        }
+
+        /// <summary>Whether a thing is of the holder class.</summary>
+        internal abstract bool HeldBy(Actor holder);
+
+        /// <summary>Keeps the holder, typed.</summary>
+        internal abstract void BindHolder(Actor holder);
+
+        /// <summary>Asks for the kinds of thing the other class covers to be tracked.</summary>
+        internal abstract void NeedOthers();
+
+        /// <summary>The check at a tick: what is near now meets, ticks or parts.</summary>
+        internal abstract void RunCheck();
+
+        /// <summary>Runs OnPart for a pair that is parting, guarded.</summary>
+        internal abstract void RunPart(Owner pair);
+
+        /// <summary>Starts the interaction on a holder of a kind, for an owner or else the current one: Interact's work. Fails in a development build when it was started before, when the holder is not of the holder class, or when Range is not more than 0. A holder that has ended, or an owner that has, ends it at once.</summary>
+        internal void Begin(Actor holder, int kind, Owner? owner)
+        {
+            Dev.Check(!started, Names.NameOf(this) + ".Interact: the interaction has been started already");
+            Dev.Check(HeldBy(holder), Names.NameOf(this) + ".Interact: a " + Names.NameOf(holder) + " cannot hold it");
+            Dev.Check(range > 0.0f, Names.NameOf(this) + ".Interact: Range must be more than 0");
+            started = true;
+            Tracking.Need(kind);
+            NeedOthers();
+            BindHolder(holder);
+            (owner ?? Owner.Current).Adopt(this);
+            if (HasEnded)
+            {
+                return;
+            }
+
+            var entry = Tracking.EntryOf(holder);
+            if (entry == null)
+            {
+                End();
+                return;
+            }
+
+            holderEntry = entry;
+            Tracking.Hold(entry, this);
+            due = new InteractionDue(this);
+            due.Arm();
+        }
+
+        /// <summary>Joins a new pair to the interaction: it is the interaction's, last in meeting order, and found by its other's entry.</summary>
+        internal void Join(Owner pair, Entry other)
+        {
+            Adopt(pair);
+            pairs.Add(pair);
+            byOther[other.Id] = pair;
+            Tracking.AddPartner(other, pair);
+        }
+
+        /// <summary>Takes a parting pair out of the interaction's lists and its other's; one already out is passed over.</summary>
+        internal void Unpair(Owner pair, Entry other)
+        {
+            for (var i = pairs.Count - 1; i >= 0; i--)
+            {
+                if (pairs[i] == pair)
+                {
+                    pairs.RemoveAt(i);
+                    break;
+                }
+            }
+
+            Owner? found;
+            if (byOther.TryGetValue(other.Id, out found) && found == pair)
+            {
+                byOther.Remove(other.Id);
+            }
+
+            Tracking.RemovePartner(other, pair);
+        }
+
+        /// <summary>Adds the pairs, in meeting order, to the end of the shared walk; returns where they start.</summary>
+        internal int WalkPairs()
+        {
+            var walk = Pairing.Walk;
+            var start = walk.Count;
+            for (var i = 0; i < pairs.Count; i++)
+            {
+                walk.Add(pairs[i]);
+            }
+
+            return start;
+        }
+
+        /// <summary>Parts every pair, in meeting order, as at a check of a holder with no place; stops when a reaction ends the interaction or its holder.</summary>
+        internal void PartAll()
+        {
+            var walk = Pairing.Walk;
+            var start = WalkPairs();
+            try
+            {
+                var end = walk.Count;
+                for (var i = start; i < end; i++)
+                {
+                    var pair = walk[i];
+                    if (Gone(pair))
+                    {
+                        continue;
+                    }
+
+                    pair.End();
+                    if (Over)
+                    {
+                        return;
+                    }
+                }
+            }
+            finally
+            {
+                Pairing.Release(start);
+            }
+        }
+
+        /// <summary>Notes that the pair with an other was stopped: the two do not meet again until the other has been out of range at a check.</summary>
+        internal void Stopping(Entry other)
+        {
+            if (stopped == null || stoppedSeen == null)
+            {
+                stopped = new List<int>();
+                stoppedSeen = new Dictionary<int, int>();
+            }
+
+            if (!stoppedSeen.ContainsKey(other.Id))
+            {
+                stopped.Add(other.Id);
+            }
+
+            stoppedSeen[other.Id] = checks;
+        }
+
+        /// <summary>Whether an other's pair was stopped and it has not been out of range since.</summary>
+        internal bool IsStopped(Entry other)
+        {
+            return stoppedSeen != null && stoppedSeen.ContainsKey(other.Id);
+        }
+
+        /// <summary>Marks a stopped other as kept at this check; an other that was not stopped is passed over.</summary>
+        internal void SeeStopped(Entry other)
+        {
+            if (stoppedSeen != null && stoppedSeen.ContainsKey(other.Id))
+            {
+                stoppedSeen[other.Id] = checks;
+            }
+        }
+
+        /// <summary>Forgets the stopped others that were not kept at this check, so they meet again when next in range; all of them when every other is out of reach.</summary>
+        internal void ForgetStopped(bool all)
+        {
+            if (stopped == null || stoppedSeen == null)
+            {
+                return;
+            }
+
+            var kept = 0;
+            for (var i = 0; i < stopped.Count; i++)
+            {
+                var id = stopped[i];
+                if (!all && stoppedSeen[id] == checks)
+                {
+                    stopped[kept] = id;
+                    kept++;
+                }
+                else
+                {
+                    stoppedSeen.Remove(id);
+                }
+            }
+
+            while (stopped.Count > kept)
+            {
+                stopped.RemoveAt(stopped.Count - 1);
+            }
+        }
+
+        /// <summary>Ends the checks, forgets the holder, and parts the pairs, newest first; the interaction's other children end after.</summary>
+        protected sealed override void OnEnd()
+        {
+            if (due != null)
+            {
+                due.Cancel();
+            }
+
+            if (holderEntry != null)
+            {
+                Tracking.Unhold(holderEntry, this);
+            }
+
+            while (pairs.Count > 0)
+            {
+                var pair = pairs[pairs.Count - 1];
+                pairs.RemoveAt(pairs.Count - 1);
+                pair.End();
+            }
+        }
+    }
+
+    /// <summary>
+    /// What a holder of class THolder does with the things of class TOther near it: a map's aura, link or missile hit. The
+    /// constructor sets Range, and Tick unless a check at every step is wanted. At each tick the interaction checks what is
+    /// within Range: a new other is asked about with Accepts and, if accepted, meets (OnMeet, then OnTick); an other still
+    /// in range ticks (OnTick); one gone out of range, or with no place, parts (OnPart). Reactions run guarded, the pair's
+    /// with the pair as the current owner and Accepts with the interaction.
+    /// </summary>
+    /// <typeparam name="THolder">The class of the holder: Unit, Item, Destructable, Gizmo, a map's class of one of them, or Actor.</typeparam>
+    /// <typeparam name="TOther">The class of the things it pairs with, as Find takes: Unit, Item, Destructable, Gizmo, a map's gizmo class, or Actor.</typeparam>
+    public abstract class Interaction<THolder, TOther> : Interaction
+        where THolder : Actor
+        where TOther : Actor
+    {
+        /// <summary>The holder; null before the interaction starts.</summary>
+        private THolder holder = null!;
+
+        /// <summary>The thing that holds the interaction.</summary>
+        [LocalSafe]
+        public THolder Holder
+        {
+            get { return holder; }
+        }
+
+        /// <summary>The pairs, in the order they met: a view that follows them as they meet and part, the same one at every read.</summary>
+        [LocalSafe]
+        public IReadOnlyList<Pair> Pairs
+        {
+            get { return Pairing.View<THolder, TOther>(this); }
+        }
+
+        /// <summary>Whether a new other within range may meet the holder; true unless a map says. Refused, they do not meet, and it is asked again at the next tick. Runs with the interaction as the current owner.</summary>
+        public virtual bool Accepts(TOther other)
+        {
+            return true;
+        }
+
+        /// <summary>Runs when the two meet, with the pair as the current owner; OnTick runs right after, in the same check.</summary>
+        public virtual void OnMeet(Pair pair)
+        {
+        }
+
+        /// <summary>Runs at each tick while the two are in range, unless the pair waits or is paused, with the pair as the current owner.</summary>
+        public virtual void OnTick(Pair pair)
+        {
+        }
+
+        /// <summary>Runs once when the pair ends, for any reason: out of range, a side with no place or ending, Stop, or the interaction ending. The pair is the current owner; what it made ends after.</summary>
+        public virtual void OnPart(Pair pair)
+        {
+        }
+
+        /// <summary>Whether a thing is a THolder.</summary>
+        internal sealed override bool HeldBy(Actor thing)
+        {
+            return thing is THolder;
+        }
+
+        /// <summary>Keeps the holder as a THolder.</summary>
+        internal sealed override void BindHolder(Actor thing)
+        {
+            holder = (THolder)thing;
+        }
+
+        /// <summary>Asks for the kinds TOther covers.</summary>
+        internal sealed override void NeedOthers()
+        {
+            Tracking.NeedFor(typeof(TOther));
+        }
+
+        /// <summary>Runs OnPart for a parting pair.</summary>
+        internal sealed override void RunPart(Owner pair)
+        {
+            CallPart(Pairing.As<THolder, TOther>(pair));
+        }
+
+        /// <summary>
+        /// The check at a tick, in this order. The holder is read; with no place every pair parts and the check ends. The
+        /// things within Range plus Slack are collected, and those of class TOther, not the holder, with a place and within
+        /// Range are kept. The pairs whose other is not kept part, in meeting order; a stopped other that is not kept is
+        /// forgotten. The kept pairs tick, in meeting order, unless paused or waiting. The kept others with no pair, in the
+        /// grid's order, are asked about unless stopped, and those accepted meet and tick. After any reaction that ends the
+        /// interaction or its holder, the check stops.
+        /// </summary>
+        internal sealed override void RunCheck()
+        {
+            var home = holderEntry!;
+            checks++;
+            Tracking.ReadNow(home);
+            if (!home.HasPlace)
+            {
+                PartAll();
+                ForgetStopped(true);
+                return;
+            }
+
+            var hx = home.X;
+            var hy = home.Y;
+            var reach = Range + Interactions.Slack;
+            var limit = Range * Range;
+            var candidates = Find.Candidates;
+            var start = candidates.Count;
+            var walk = Pairing.Walk;
+            var walkStart = walk.Count;
+            try
+            {
+                Interactions.Grid.Collect(hx - reach, hy - reach, hx + reach, hy + reach, candidates);
+                var end = start;
+                var count = candidates.Count;
+                for (var i = start; i < count; i++)
+                {
+                    var entry = candidates[i];
+                    if (entry == home || !(entry.Thing is TOther))
+                    {
+                        continue;
+                    }
+
+                    Tracking.ReadNow(entry);
+                    if (!entry.HasPlace)
+                    {
+                        continue;
+                    }
+
+                    var dx = entry.X - hx;
+                    var dy = entry.Y - hy;
+                    if (dx * dx + dy * dy > limit)
+                    {
+                        continue;
+                    }
+
+                    candidates[end] = entry;
+                    end++;
+                }
+
+                Find.Release(end);
+                for (var i = start; i < end; i++)
+                {
+                    var entry = candidates[i];
+                    Owner? found;
+                    if (byOther.TryGetValue(entry.Id, out found))
+                    {
+                        Pair kept = Pairing.As<THolder, TOther>(found);
+                        kept.Keep(checks, hx, hy, entry.X, entry.Y);
+                    }
+                    else
+                    {
+                        SeeStopped(entry);
+                    }
+                }
+
+                WalkPairs();
+                var walkEnd = walk.Count;
+                for (var i = walkStart; i < walkEnd; i++)
+                {
+                    Pair pair = Pairing.As<THolder, TOther>(walk[i]);
+                    if (Gone(pair) || pair.kept == checks)
+                    {
+                        continue;
+                    }
+
+                    pair.End();
+                    if (Over)
+                    {
+                        return;
+                    }
+                }
+
+                ForgetStopped(false);
+                Pairing.Release(walkStart);
+                WalkPairs();
+                walkEnd = walk.Count;
+                for (var i = walkStart; i < walkEnd; i++)
+                {
+                    Pair pair = Pairing.As<THolder, TOther>(walk[i]);
+                    if (Gone(pair) || !pair.Ready)
+                    {
+                        continue;
+                    }
+
+                    CallTick(pair);
+                    if (Over)
+                    {
+                        return;
+                    }
+                }
+
+                Pairing.Release(walkStart);
+                for (var i = start; i < end; i++)
+                {
+                    var entry = candidates[i];
+                    if (entry.Ended || byOther.ContainsKey(entry.Id) || IsStopped(entry))
+                    {
+                        continue;
+                    }
+
+                    var accepted = CallAccepts((TOther)entry.Thing);
+                    if (Over)
+                    {
+                        return;
+                    }
+
+                    if (!accepted || entry.Ended || byOther.ContainsKey(entry.Id))
+                    {
+                        continue;
+                    }
+
+                    Pair pair = Pairing.Make<THolder, TOther>();
+                    pair.Begin(this, holder, (TOther)entry.Thing, entry, checks, hx, hy);
+                    Join(pair, entry);
+                    CallMeet(pair);
+                    if (Over)
+                    {
+                        return;
+                    }
+
+                    if (Gone(pair) || !pair.Ready)
+                    {
+                        continue;
+                    }
+
+                    CallTick(pair);
+                    if (Over)
+                    {
+                        return;
+                    }
+                }
+            }
+            finally
+            {
+                Pairing.Release(walkStart);
+                Find.Release(start);
+            }
+        }
+
+        /// <summary>Runs Accepts with the interaction as the current owner; an error it throws is reported and refuses.</summary>
+        private bool CallAccepts(TOther other)
+        {
+            var previous = Owner.current;
+            Owner.current = this;
+            var accepted = false;
+            try
+            {
+                accepted = Accepts(other);
+            }
+            catch (Exception error)
+            {
+                Errors.Report(Names.NameOf(this) + ".Accepts", error);
+            }
+
+            Owner.current = previous;
+            return accepted;
+        }
+
+        /// <summary>Runs OnMeet with the pair as the current owner, and reports an error it throws.</summary>
+        private void CallMeet(Pair pair)
+        {
+            var previous = Owner.current;
+            Owner.current = pair;
+            try
+            {
+                OnMeet(pair);
+            }
+            catch (Exception error)
+            {
+                Errors.Report(Names.NameOf(this) + ".OnMeet", error);
+            }
+
+            Owner.current = previous;
+        }
+
+        /// <summary>Runs OnTick with the pair as the current owner, and reports an error it throws.</summary>
+        private void CallTick(Pair pair)
+        {
+            var previous = Owner.current;
+            Owner.current = pair;
+            try
+            {
+                OnTick(pair);
+            }
+            catch (Exception error)
+            {
+                Errors.Report(Names.NameOf(this) + ".OnTick", error);
+            }
+
+            Owner.current = previous;
+        }
+
+        /// <summary>Runs OnPart with the pair as the current owner, and reports an error it throws.</summary>
+        private void CallPart(Pair pair)
+        {
+            var previous = Owner.current;
+            Owner.current = pair;
+            try
+            {
+                OnPart(pair);
+            }
+            catch (Exception error)
+            {
+                Errors.Report(Names.NameOf(this) + ".OnPart", error);
+            }
+
+            Owner.current = previous;
+        }
+
+        /// <summary>
+        /// A holder and an other that have met, from the meeting until they part. It belongs to its interaction, and what its
+        /// reactions make (a timer) is the pair's and ends when it parts. Its reads come from the places read at the last
+        /// check, as floats.
+        /// </summary>
+        public sealed class Pair : Owner
+        {
+            /// <summary>The interaction the pair is of.</summary>
+            internal Interaction interaction = null!;
+
+            /// <summary>The holder.</summary>
+            internal THolder holder = null!;
+
+            /// <summary>The other.</summary>
+            internal TOther other = null!;
+
+            /// <summary>The other's entry.</summary>
+            internal Entry otherEntry = null!;
+
+            /// <summary>The check that last kept the pair in range.</summary>
+            internal int kept;
+
+            /// <summary>The cycle's step the two met at.</summary>
+            private int met;
+
+            /// <summary>The first step the pair ticks at again after a Wait.</summary>
+            private int waitUntil;
+
+            /// <summary>The first step a cooldown has run out at.</summary>
+            private int coolUntil;
+
+            /// <summary>The holder's place at the last check, left to right.</summary>
+            private float holderX;
+
+            /// <summary>The holder's place at the last check, bottom to top.</summary>
+            private float holderY;
+
+            /// <summary>The other's place at the last check, left to right.</summary>
+            private float otherX;
+
+            /// <summary>The other's place at the last check, bottom to top.</summary>
+            private float otherY;
+
+            /// <summary>Whether the pair is paused.</summary>
+            private bool paused;
+
+            /// <summary>The map's own value.</summary>
+            private object? data;
+
+            /// <summary>Only Pairing makes a pair.</summary>
+            internal Pair()
+            {
+            }
+
+            /// <summary>The holder of the interaction.</summary>
+            [LocalSafe]
+            public THolder Holder
+            {
+                get { return holder; }
+            }
+
+            /// <summary>The thing the holder met.</summary>
+            [LocalSafe]
+            public TOther Other
+            {
+                get { return other; }
+            }
+
+            /// <summary>The distance between the two, centre to centre and flat, at the last check.</summary>
+            [LocalSafe]
+            public float Distance
+            {
+                get { return Maths.Distance(holderX, holderY, otherX, otherY); }
+            }
+
+            /// <summary>The angle from the holder to the other at the last check, in degrees, 0 to 360.</summary>
+            [LocalSafe]
+            public float Angle
+            {
+                get { return Maths.AngleBetween(holderX, holderY, otherX, otherY); }
+            }
+
+            /// <summary>The holder's place at the last check, left to right.</summary>
+            [LocalSafe]
+            public float HolderX
+            {
+                get { return holderX; }
+            }
+
+            /// <summary>The holder's place at the last check, bottom to top.</summary>
+            [LocalSafe]
+            public float HolderY
+            {
+                get { return holderY; }
+            }
+
+            /// <summary>The other's place at the last check, left to right.</summary>
+            [LocalSafe]
+            public float OtherX
+            {
+                get { return otherX; }
+            }
+
+            /// <summary>The other's place at the last check, bottom to top.</summary>
+            [LocalSafe]
+            public float OtherY
+            {
+                get { return otherY; }
+            }
+
+            /// <summary>The seconds since the two met, in whole steps of the cycle: 0 in OnMeet.</summary>
+            [LocalSafe]
+            public float Since
+            {
+                get { return (Tracking.StepNow - met) * Interactions.Step; }
+            }
+
+            /// <summary>The map's own value for this pair, kept until it parts; null until set.</summary>
+            [LocalSafe]
+            public object? Data
+            {
+                get { return data; }
+                set { data = value; }
+            }
+
+            /// <summary>The seconds left of the cooldown TryCooldown started; 0 when none runs.</summary>
+            [LocalSafe]
+            public float Cooldown
+            {
+                get
+                {
+                    var left = coolUntil - Tracking.StepNow;
+                    return left > 0 ? left * Interactions.Step : 0.0f;
+                }
+            }
+
+            /// <summary>Whether the pair is paused: it does not tick, and it still parts.</summary>
+            [LocalSafe]
+            public bool IsPaused
+            {
+                get { return paused; }
+            }
+
+            /// <summary>Whether the pair ticks at this step: it is not paused and does not wait.</summary>
+            internal bool Ready
+            {
+                get { return !paused && Tracking.StepNow >= waitUntil; }
+            }
+
+            /// <summary>True, and starts a cooldown of the seconds, rounded up to whole steps, when none runs; false while one does. For "at most once a second" with a fast tick.</summary>
+            public bool TryCooldown(float seconds)
+            {
+                Dev.Check(seconds >= 0.0f, "Pair.TryCooldown: seconds must be 0 or more");
+                var now = Tracking.StepNow;
+                if (now < coolUntil)
+                {
+                    return false;
+                }
+
+                coolUntil = now + StepsOf(seconds);
+                return true;
+            }
+
+            /// <summary>Skips this pair's OnTick for the seconds, rounded up to whole steps: it ticks again at the first tick after them. The pair stays, and still parts.</summary>
+            public void Wait(float seconds)
+            {
+                Dev.Check(seconds >= 0.0f, "Pair.Wait: seconds must be 0 or more");
+                waitUntil = Tracking.StepNow + StepsOf(seconds);
+            }
+
+            /// <summary>Stops the pair's OnTick until Resume; the pair stays, and still parts.</summary>
+            public void Pause()
+            {
+                paused = true;
+            }
+
+            /// <summary>Lets the pair tick again from the next tick.</summary>
+            public void Resume()
+            {
+                paused = false;
+            }
+
+            /// <summary>Parts the pair now (OnPart runs), and the two do not meet again until the other has been out of range at a check. To leave an other out for good, Accepts says no.</summary>
+            public void Stop()
+            {
+                if (Gone(this))
+                {
+                    return;
+                }
+
+                interaction.Stopping(otherEntry);
+                End();
+            }
+
+            /// <summary>Sets up a new pair: its interaction, its two sides, the step they met at, and the places of this check.</summary>
+            internal void Begin(Interaction of, THolder holderThing, TOther otherThing, Entry entry, int check, float hx, float hy)
+            {
+                interaction = of;
+                holder = holderThing;
+                other = otherThing;
+                otherEntry = entry;
+                met = Tracking.StepNow;
+                Keep(check, hx, hy, entry.X, entry.Y);
+            }
+
+            /// <summary>Marks the pair kept at a check, with the places read at it.</summary>
+            internal void Keep(int check, float hx, float hy, float ox, float oy)
+            {
+                kept = check;
+                holderX = hx;
+                holderY = hy;
+                otherX = ox;
+                otherY = oy;
+            }
+
+            /// <summary>Takes the pair out of its interaction's lists and its other's, then runs OnPart; what the pair made ends after.</summary>
+            protected sealed override void OnEnd()
+            {
+                interaction.Unpair(this, otherEntry);
+                interaction.RunPart(this);
+            }
+
+            /// <summary>Whole steps of the cycle for seconds, rounded up; 0 for none.</summary>
+            private static int StepsOf(float seconds)
+            {
+                return seconds <= 0.0f ? 0 : Cycle.Steps(seconds);
+            }
+        }
+    }
+}

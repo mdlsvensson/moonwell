@@ -409,11 +409,92 @@ namespace Moonwell.Engine
             return entry;
         }
 
-        /// <summary>Tells the package a thing is ending, before its own reaction runs: it has no place from now. It is still in the grid.</summary>
+        /// <summary>Tells the package a thing is ending, before its own reaction runs: it has no place from now, the interactions it holds end, newest first, and then the pairs whose other it is part, newest first, so every OnPart runs before the thing's OnLeave. It is still in the grid.</summary>
         public static void Ending(Entry entry)
         {
             entry.Ended = true;
             entry.HasPlace = false;
+            var held = entry.Held;
+            if (held != null)
+            {
+                while (held.Count > 0)
+                {
+                    var interaction = held[held.Count - 1];
+                    held.RemoveAt(held.Count - 1);
+                    interaction.End();
+                }
+            }
+
+            var partners = entry.Partners;
+            if (partners != null)
+            {
+                while (partners.Count > 0)
+                {
+                    var pair = partners[partners.Count - 1];
+                    partners.RemoveAt(partners.Count - 1);
+                    pair.End();
+                }
+            }
+        }
+
+        /// <summary>Notes that a thing holds an interaction, so the interaction ends when the thing does.</summary>
+        public static void Hold(Entry entry, Interaction interaction)
+        {
+            if (entry.Held == null)
+            {
+                entry.Held = new List<Interaction>();
+            }
+
+            entry.Held.Add(interaction);
+        }
+
+        /// <summary>Forgets that a thing holds an interaction that is ending; one it no longer holds is passed over.</summary>
+        public static void Unhold(Entry entry, Interaction interaction)
+        {
+            var held = entry.Held;
+            if (held == null)
+            {
+                return;
+            }
+
+            for (var i = held.Count - 1; i >= 0; i--)
+            {
+                if (held[i] == interaction)
+                {
+                    held.RemoveAt(i);
+                    return;
+                }
+            }
+        }
+
+        /// <summary>Notes that a thing is the other of a pair, so the pair parts when the thing ends.</summary>
+        public static void AddPartner(Entry entry, Owner pair)
+        {
+            if (entry.Partners == null)
+            {
+                entry.Partners = new List<Owner>();
+            }
+
+            entry.Partners.Add(pair);
+        }
+
+        /// <summary>Forgets that a thing is the other of a pair that is parting; one it is not the other of is passed over.</summary>
+        public static void RemovePartner(Entry entry, Owner pair)
+        {
+            var partners = entry.Partners;
+            if (partners == null)
+            {
+                return;
+            }
+
+            for (var i = partners.Count - 1; i >= 0; i--)
+            {
+                if (partners[i] == pair)
+                {
+                    partners.RemoveAt(i);
+                    return;
+                }
+            }
         }
 
         /// <summary>Takes an ending thing out of the grid and stops tracking it. The last one tracked ends the cycle's timer, unless items are asked for.</summary>

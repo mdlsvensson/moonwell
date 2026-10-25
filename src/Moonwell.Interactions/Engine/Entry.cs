@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Moonwell.Engine
 {
     /// <summary>What the package keeps of one thing that has a place: a unit, an item, a destructable or a gizmo. The grid and the cycle read these fields directly; a map never sees an entry.</summary>
@@ -29,6 +31,12 @@ namespace Moonwell.Engine
 
         /// <summary>Whether the thing has begun to end: it has no place from then on, and no read gives it one again.</summary>
         public bool Ended;
+
+        /// <summary>The interactions the thing holds that have not ended, in the order they started; null until it holds one.</summary>
+        public List<Interaction>? Held;
+
+        /// <summary>The pairs whose other is the thing that have not parted, in the order they met; null until it is the other of one.</summary>
+        public List<Owner>? Partners;
 
         /// <summary>Makes the entry of a thing, in no cell, with no place read.</summary>
         public Entry(int id, Actor thing, int kind)

@@ -85,6 +85,30 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.find.local-cached", Run = FindCases.LocalCached });
             list.Add(new Case { Name = "interactions.find.local-untracked", Run = FindCases.LocalUntracked });
             list.Add(new Case { Name = "interactions.find.local-mixed", Run = FindCases.LocalMixed });
+            list.Add(new Case { Name = "interactions.interaction.meet-tick-part", Run = InteractionCases.MeetTickPart });
+            list.Add(new Case { Name = "interactions.interaction.exact-range", Run = InteractionCases.ExactRange });
+            list.Add(new Case { Name = "interactions.interaction.accepts", Run = InteractionCases.Accepts });
+            list.Add(new Case { Name = "interactions.interaction.not-holder", Run = InteractionCases.NotHolder });
+            list.Add(new Case { Name = "interactions.interaction.two-ways", Run = InteractionCases.TwoWays });
+            list.Add(new Case { Name = "interactions.interaction.owned-by-buff", Run = InteractionCases.OwnedByBuff });
+            list.Add(new Case { Name = "interactions.interaction.holder-ends", Run = InteractionCases.HolderEnds });
+            list.Add(new Case { Name = "interactions.interaction.other-ends", Run = InteractionCases.OtherEnds });
+            list.Add(new Case { Name = "interactions.interaction.holder-no-place", Run = InteractionCases.HolderNoPlace });
+            list.Add(new Case { Name = "interactions.interaction.ends-in-meet", Run = InteractionCases.EndsInMeet });
+            list.Add(new Case { Name = "interactions.interaction.ends-in-tick", Run = InteractionCases.EndsInTick });
+            list.Add(new Case { Name = "interactions.interaction.other-ends-in-tick", Run = InteractionCases.OtherEndsInTick });
+            list.Add(new Case { Name = "interactions.interaction.interval", Run = InteractionCases.Interval });
+            list.Add(new Case { Name = "interactions.interaction.paused-interaction", Run = InteractionCases.PausedInteraction });
+            list.Add(new Case { Name = "interactions.interaction.error-reported", Run = InteractionCases.ErrorReported });
+            list.Add(new Case { Name = "interactions.interaction.made-in-reaction", Run = InteractionCases.MadeInReaction });
+            list.Add(new Case { Name = "interactions.interaction.pairs-view", Run = InteractionCases.PairsView });
+            list.Add(new Case { Name = "interactions.interaction.interact-checks", Run = InteractionCases.InteractChecks });
+            list.Add(new Case { Name = "interactions.pair.wait", Run = PairCases.Wait });
+            list.Add(new Case { Name = "interactions.pair.try-cooldown", Run = PairCases.TryCooldown });
+            list.Add(new Case { Name = "interactions.pair.pause-resume", Run = PairCases.PauseResume });
+            list.Add(new Case { Name = "interactions.pair.stop", Run = PairCases.Stop });
+            list.Add(new Case { Name = "interactions.pair.data-and-since", Run = PairCases.DataAndSince });
+            list.Add(new Case { Name = "interactions.pair.pair-owns", Run = PairCases.PairOwns });
         }
 
         /// <summary>Adds the maths package's cases.</summary>
