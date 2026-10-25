@@ -101,13 +101,18 @@ namespace Moonwell.Engine
             }
         }
 
-        /// <summary>Forgets the cycle, the entries and what was asked for; Interactions.Install calls it, as an install starts the package afresh.</summary>
+        /// <summary>Ends the cycle's timer, and forgets the cycle, the entries and what was asked for; Interactions.Install calls it, as an install starts the package afresh.</summary>
         public static void Reset()
         {
+            if (timer != null)
+            {
+                timer.End();
+                timer = null;
+            }
+
             cycle = null;
             checks = null;
             scan = null;
-            timer = null;
             tracked = 0;
             lastId = 0;
             unitsAsked = false;
@@ -118,9 +123,10 @@ namespace Moonwell.Engine
             destructableEntries.Clear();
         }
 
-        /// <summary>Asks for a kind of thing to be tracked. The first ask for a kind fills it with the things there are: the live units, the items and destructables of the world, taken in if the runtime has not. Those made after come in through core's take-in hook. Gizmos are always tracked.</summary>
+        /// <summary>Asks for a kind of thing to be tracked. The first ask for a kind fills it with the things there are: the live units, the items and destructables of the world, taken in if the runtime has not. Those made after come in through core's take-in hook. Gizmos are always tracked. The package installs itself on the game first if it is not installed, as an install after the ask would forget it.</summary>
         public static void Need(int kind)
         {
+            Interactions.EnsureInstalled();
             if (kind == UnitKind)
             {
                 if (!unitsAsked)
@@ -164,9 +170,10 @@ namespace Moonwell.Engine
             }
         }
 
-        /// <summary>Asks for the kinds of thing a class covers: Unit and its subclasses units, Item items, Destructable destructables, Gizmo and a map's gizmo classes gizmos, Widget the first three and Actor all four. Any other class has no place, which fails in a development build.</summary>
+        /// <summary>Asks for the kinds of thing a class covers: Unit and its subclasses units, Item items, Destructable destructables, Gizmo and a map's gizmo classes gizmos, Widget the first three and Actor all four. Any other class has no place, which fails in a development build. The package installs itself on the game first if it is not installed.</summary>
         public static void NeedFor(Type type)
         {
+            Interactions.EnsureInstalled();
             for (var kind = UnitKind; kind <= DestructableKind; kind++)
             {
                 if (Covers(type, kind))
@@ -551,6 +558,16 @@ namespace Moonwell.Engine
             else if (destructable != null && destructablesAsked)
             {
                 AddDestructable(destructable);
+            }
+        }
+
+        /// <summary>Tracks a unit, item or destructable of a kind asked for that the take-in hook has not brought in yet: one that starts an interaction in its OnCreated or a start component, which run before the runtime calls the hook. The hook after finds it tracked and passes it over. One that is ending, or a gizmo, is passed over.</summary>
+        public static void TakeInEarly(Actor thing)
+        {
+            var widget = thing as Widget;
+            if (widget != null && !widget.ending && !widget.HasEnded)
+            {
+                TakenIn(widget);
             }
         }
 

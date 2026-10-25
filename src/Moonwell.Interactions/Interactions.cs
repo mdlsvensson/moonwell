@@ -16,8 +16,8 @@ namespace Moonwell
         /// <summary>The grid; made on first use after an Install.</summary>
         private static Grid? grid;
 
-        /// <summary>The game's own world, kept for the reads that must make nothing; made on first use.</summary>
-        private static IInteractionWorld? native;
+        /// <summary>The game's own world: the package installs itself on it at first use, and the reads that must make nothing ask it. Made from the natives on first use; a test sets a fake one to take the game's first-use path, and null after.</summary>
+        internal static IInteractionWorld? native;
 
         /// <summary>The package's handler of core's TakenIn hook; the package counts as installed while that hook is this one.</summary>
         private static Action<Widget>? handler;
@@ -103,11 +103,15 @@ namespace Moonwell
         {
             get
             {
-                if (Installed())
-                {
-                    return host!;
-                }
+                return Installed() ? host! : Native;
+            }
+        }
 
+        /// <summary>The game's own world, made from the natives on first use.</summary>
+        private static IInteractionWorld Native
+        {
+            get
+            {
                 if (native == null)
                 {
                     native = new NativeInteractionWorld();
@@ -150,12 +154,12 @@ namespace Moonwell
             return handler != null && object.ReferenceEquals(Hooks.TakenIn, handler);
         }
 
-        /// <summary>Installs the package on the game's natives when it is not installed.</summary>
-        private static void EnsureInstalled()
+        /// <summary>Installs the package on the game's own world when it is not installed. Every first use calls it before it changes anything, as an install starts the package afresh.</summary>
+        internal static void EnsureInstalled()
         {
             if (!Installed())
             {
-                Install(new NativeInteractionWorld());
+                Install(Native);
             }
         }
 

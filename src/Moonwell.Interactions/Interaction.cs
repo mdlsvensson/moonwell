@@ -122,7 +122,7 @@ namespace Moonwell
         /// <summary>Runs OnPart for a pair that is parting, guarded.</summary>
         internal abstract void RunPart(Owner pair);
 
-        /// <summary>Starts the interaction on a holder of a kind, for an owner or else the current one: Interact's work. Fails in a development build when it was started before, when the holder is not of the holder class, or when Range is not more than 0. A holder that has ended, or an owner that has, ends it at once.</summary>
+        /// <summary>Starts the interaction on a holder of a kind, for an owner or else the current one: Interact's work. Fails in a development build when it was started before, when the holder is not of the holder class, or when Range is not more than 0. A unit, item or destructable that the runtime has not yet told the package of, as in its own OnCreated, is tracked here. A holder that has ended, or an owner that has, ends it at once.</summary>
         internal void Begin(Actor holder, int kind, Owner? owner)
         {
             Dev.Check(!started, Names.NameOf(this) + ".Interact: the interaction has been started already");
@@ -139,6 +139,12 @@ namespace Moonwell
             }
 
             var entry = Tracking.EntryOf(holder);
+            if (entry == null)
+            {
+                Tracking.TakeInEarly(holder);
+                entry = Tracking.EntryOf(holder);
+            }
+
             if (entry == null)
             {
                 End();

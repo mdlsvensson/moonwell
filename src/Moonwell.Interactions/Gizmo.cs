@@ -82,6 +82,7 @@ namespace Moonwell
             where T : Gizmo
         {
             Dev.Check(gizmo.entry == null, Names.NameOf(gizmo) + ".Create: the gizmo has been created already");
+            Interactions.EnsureInstalled();
             gizmo.player = player ?? Player.NeutralPassive;
             gizmo.entry = Tracking.Begin(gizmo, Tracking.GizmoKind, x, y);
             (owner ?? Owner.Current).Adopt(gizmo);
@@ -94,10 +95,11 @@ namespace Moonwell
             return gizmo;
         }
 
-        /// <summary>Starts an interaction held by the gizmo, and returns it. It belongs to the owner, or else the current owner, and ends with it, with the gizmo, or by End. Fails in a development build when the gizmo is not of the interaction's holder class, when its Range is not more than 0, or when it was started before.</summary>
+        /// <summary>Starts an interaction held by the gizmo, and returns it. It belongs to the owner, or else the current owner, and ends with it, with the gizmo, or by End. Fails in a development build when the gizmo has not been created, when it is not of the interaction's holder class, when its Range is not more than 0, or when it was started before.</summary>
         public T Interact<T>(T interaction, Owner? owner = null)
             where T : Interaction
         {
+            Dev.Check(entry != null, Names.NameOf(this) + ".Interact: the gizmo has not been created");
             interaction.Begin(this, Tracking.GizmoKind, owner);
             return interaction;
         }

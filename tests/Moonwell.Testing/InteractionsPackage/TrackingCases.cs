@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Moonwell.Engine;
 
@@ -13,6 +14,21 @@ namespace Moonwell.Testing
             Interactions.Install(fake);
             Interactions.CellSize = 256.0f;
             return fake;
+        }
+
+        /// <summary>Runs a case as the game's first use finds the package: not installed, nothing tracked or asked for, and a fake world standing in for the game's own, which the first use installs the package on. The game's world is the natives again after.</summary>
+        private static void FirstUse(FakeInteractionWorld fake, Action run)
+        {
+            Tracking.Reset();
+            Interactions.native = fake;
+            try
+            {
+                run();
+            }
+            finally
+            {
+                Interactions.native = null;
+            }
         }
 
         /// <summary>Moves the game on by a number of steps, one step at a time.</summary>
@@ -460,6 +476,48 @@ namespace Moonwell.Testing
             Expect.Near(10.0f, entry.X, "which is its own");
             Expect.Equal(0, fake.Reads, "and nothing is read of the game");
             Expect.Equal(Tracking.GizmoKind, entry.Kind, "of the gizmo kind");
+        }
+
+        /// <summary>The first use asking for items, with nothing installed before it, makes one cycle timer: a gizmo that ticks every step ticks once a step, and items stay asked for.</summary>
+        public static void FirstUseItems(FakeWorld world)
+        {
+            var item = ItemAt(world, 10.0f, 10.0f);
+            world.PlacedItems.Add(item.Handle);
+            FirstUse(new FakeInteractionWorld(), () =>
+            {
+                Expect.Equal(1, Find.InRange<Item>(0.0f, 0.0f, 100.0f).Count, "the first Find finds the item");
+                var well = Gizmo.Create(new Well(Interactions.Step), 0.0f, 0.0f);
+                Steps(world, 4);
+                Expect.Equal(4, well.TickSteps.Count, "four ticks in four steps");
+                Expect.True(Tracking.Asked(Tracking.ItemKind), "items are asked for");
+            });
+        }
+
+        /// <summary>The first use asking for units, with nothing installed before it, tracks the units there are and keeps units asked for: a unit made after comes in through the hook.</summary>
+        public static void FirstUseUnits(FakeWorld world)
+        {
+            UnitAt(world, 10.0f, 10.0f);
+            UnitAt(world, 20.0f, 10.0f);
+            FirstUse(new FakeInteractionWorld(), () =>
+            {
+                Expect.Equal(2, Find.InRange<Unit>(0.0f, 0.0f, 100.0f).Count, "the first Find finds both units");
+                var later = UnitAt(world, 30.0f, 10.0f);
+                Expect.True(Tracking.EntryOf(later) != null, "a unit made after is tracked");
+                Expect.True(Tracking.Asked(Tracking.UnitKind), "units are asked for");
+                Expect.Equal(3, Tracking.Count, "three tracked");
+            });
+        }
+
+        /// <summary>An install over one whose cycle runs ends that cycle's timer: a gizmo made after ticks once a step.</summary>
+        public static void InstallAgain(FakeWorld world)
+        {
+            Fresh();
+            Gizmo.Create(new Well(Interactions.Step), 0.0f, 0.0f);
+            Expect.True(Tracking.Running, "the first install's cycle runs");
+            Fresh();
+            var well = Gizmo.Create(new Well(Interactions.Step), 0.0f, 0.0f);
+            Steps(world, 4);
+            Expect.Equal(4, well.TickSteps.Count, "four ticks in four steps");
         }
     }
 }

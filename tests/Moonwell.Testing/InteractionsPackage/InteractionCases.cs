@@ -482,11 +482,32 @@ namespace Moonwell.Testing
 #if DEBUG
             Expect.Throws<MoonwellException>(() => a.Interact(new FireAura(0.0f, 0.5f)), "a Range of 0");
             Expect.Throws<MoonwellException>(() => a.Interact(new Healing()), "a unit holding an interaction for wells");
+            Expect.Throws<MoonwellException>(() => new Well().Interact(new Healing()), "a gizmo that was never created");
             var aura = a.Interact(new FireAura());
             Expect.Throws<MoonwellException>(() => b.Interact(aura), "an interaction started twice");
             Expect.Same(a, aura.Holder, "the first start stands");
 #endif
             Expect.True(b.IsAlive, "b is untouched");
+        }
+
+        /// <summary>A unit that starts an aura in its OnCreated while units are tracked holds it: the runtime tells the package of the unit only after OnCreated, so Interact tracks it then, and the hook after changes nothing.</summary>
+        public static void InteractInCreated(FakeWorld world)
+        {
+            Fresh();
+            var b = UnitAt(world, 100.0f, 0.0f);
+            Tracking.Need(Tracking.UnitKind);
+            ObjectTypes.Unit(ObjectTypes.FourCC("h005"), () => new AuraBearer());
+            var handle = world.NewUnit(ObjectTypes.FourCC("h005"));
+            world.MoveUnit(handle, 0.0f, 0.0f);
+            var a = (AuraBearer)Unit.Of(handle)!;
+            var aura = a.Aura;
+            aura.Tag = unit => unit == b ? "b" : "?";
+            Expect.True(!aura.HasEnded, "the aura started in OnCreated goes on");
+            Expect.Same(a, aura.Holder, "held by the unit");
+            Expect.Same(a, aura.Owner, "and the unit's, the current owner in OnCreated");
+            Expect.Equal(2, Tracking.Count, "the unit is tracked once");
+            Steps(world, 16);
+            ExpectLog(new string[] { "meet b", "tick b" }, "it meets b");
         }
     }
 }
