@@ -58,6 +58,7 @@ namespace Moonwell.Build.Tests
         [InlineData("Moonwell.Natives")]
         [InlineData("Moonwell.Objects")]
         [InlineData("Moonwell.Damage")]
+        [InlineData("Moonwell.Maths")]
         public void package_ships_xml_docs_beside_its_library(string id)
         {
             using var archive = ZipFile.OpenRead(Path.Combine(packed.Feed, id + "." + packed.Version + ".nupkg"));
@@ -177,6 +178,21 @@ namespace Moonwell.Build.Tests
             var files = nuspec.Descendants().Where(element => element.Name.LocalName == "files").ToList();
             var hit = files.Single(file => file.Attribute("include")!.Value.Replace('\\', '/') == "cs/net10.0/Moonwell.Damage/Hit.cs");
             Assert.Equal("None", hit.Attribute("buildAction")!.Value);
+            var dependency = Assert.Single(nuspec.Descendants(), element => element.Name.LocalName == "dependency" && element.Attribute("id")!.Value == "Moonwell");
+            Assert.Equal(packed.Version, dependency.Attribute("version")!.Value);
+        }
+
+        [Fact]
+        public void maths_package_carries_its_source()
+        {
+            using var archive = ZipFile.OpenRead(packed.MathsPackage);
+            var names = archive.Entries.Select(entry => entry.FullName).ToList();
+            Assert.Contains("contentFiles/cs/net10.0/Moonwell.Maths/Vector2.cs", names);
+            Assert.Contains(names, name => name.StartsWith("lib/", StringComparison.Ordinal) && name.EndsWith("/Moonwell.Maths.dll", StringComparison.Ordinal));
+            Assert.DoesNotContain(names, name => name.Contains("/obj/") || name.Contains("/bin/"));
+
+            using var reader = new StreamReader(archive.Entries.Single(entry => entry.FullName == "Moonwell.Maths.nuspec").Open());
+            var nuspec = XDocument.Parse(reader.ReadToEnd());
             var dependency = Assert.Single(nuspec.Descendants(), element => element.Name.LocalName == "dependency" && element.Attribute("id")!.Value == "Moonwell");
             Assert.Equal(packed.Version, dependency.Attribute("version")!.Value);
         }

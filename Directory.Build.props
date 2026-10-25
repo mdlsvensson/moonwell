@@ -19,11 +19,11 @@
 
   <!--
     The projects under src/ that end up inside a map (the native layer, the generated standard objects, the runtime,
-    the damage package)
+    the damage and maths packages)
     and tests/Moonwell.Testing (the cases the map runs) are compiled to Lua by CSharp.lua, whose Roslyn reads C# 13.
     They take no implicit usings, so every name they use is one the map's Lua must carry.
   -->
-  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Moonwell' Or '$(MSBuildProjectName)' == 'Moonwell.Natives' Or '$(MSBuildProjectName)' == 'Moonwell.Objects' Or '$(MSBuildProjectName)' == 'Moonwell.Damage' Or '$(MSBuildProjectName)' == 'Moonwell.Testing'">
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Moonwell' Or '$(MSBuildProjectName)' == 'Moonwell.Natives' Or '$(MSBuildProjectName)' == 'Moonwell.Objects' Or '$(MSBuildProjectName)' == 'Moonwell.Damage' Or '$(MSBuildProjectName)' == 'Moonwell.Maths' Or '$(MSBuildProjectName)' == 'Moonwell.Testing'">
     <LangVersion>13</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
@@ -32,12 +32,12 @@
     The libraries a map references ship their XML docs beside them, so an editor shows each member's summary on hover.
     A member without one is not an error: the generated natives and objects do not all have one.
   -->
-  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Moonwell' Or '$(MSBuildProjectName)' == 'Moonwell.Natives' Or '$(MSBuildProjectName)' == 'Moonwell.Objects' Or '$(MSBuildProjectName)' == 'Moonwell.Damage'">
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Moonwell' Or '$(MSBuildProjectName)' == 'Moonwell.Natives' Or '$(MSBuildProjectName)' == 'Moonwell.Objects' Or '$(MSBuildProjectName)' == 'Moonwell.Damage' Or '$(MSBuildProjectName)' == 'Moonwell.Maths'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(MSBuildProjectName)' != 'Moonwell' And '$(MSBuildProjectName)' != 'Moonwell.Natives' And '$(MSBuildProjectName)' != 'Moonwell.Objects' And '$(MSBuildProjectName)' != 'Moonwell.Damage' And '$(MSBuildProjectName)' != 'Moonwell.Testing'">
+  <PropertyGroup Condition="'$(MSBuildProjectName)' != 'Moonwell' And '$(MSBuildProjectName)' != 'Moonwell.Natives' And '$(MSBuildProjectName)' != 'Moonwell.Objects' And '$(MSBuildProjectName)' != 'Moonwell.Damage' And '$(MSBuildProjectName)' != 'Moonwell.Maths' And '$(MSBuildProjectName)' != 'Moonwell.Testing'">
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 

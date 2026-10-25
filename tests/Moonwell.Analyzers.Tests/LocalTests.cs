@@ -104,6 +104,37 @@ public class LocalTests
     }
 
     [Fact]
+    public void maths_package_readers_are_allowed_inside()
+    {
+        Assert.Empty(MapCode.Check("""
+            var a = Unit.Of(u)!;
+            var b = Unit.Of(u)!;
+            Local.For(p, () =>
+            {
+                var d = a.DistanceTo(b) + a.AngleTo(b) + Maths.Lerp(0f, 1f, 0.5f) + Angles.Normalize(-90f);
+                var v = Vector2.Up.Rotated(30f) + a.Position();
+                var inside = new Polygon(Vector2.Zero, Vector2.Right, Vector2.Up).Contains(v);
+                var hit = Raycast.Circle(Vector2.Zero, v, Vector2.One, 2f, out var first);
+            });
+            """));
+    }
+
+    [Fact]
+    public void maths_package_moves_are_rejected_inside()
+    {
+        var found = MapCode.Check("""
+            var unit = Unit.Of(u)!;
+            Local.For(p, () =>
+            {
+                unit.PlaceAt(Vector2.Zero);
+                unit.FaceNow(Vector2.Up);
+            });
+            """);
+
+        Assert.Equal(new[] { "MW0001: unit.PlaceAt(Vector2.Zero)", "MW0001: unit.FaceNow(Vector2.Up)" }, found);
+    }
+
+    [Fact]
     public void player_reads_are_local_safe()
     {
         Assert.Empty(MapCode.Check("""

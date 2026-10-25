@@ -13,7 +13,72 @@ namespace Moonwell.Testing
             AddFirst(list);
             AddMiddle(list);
             AddLast(list);
+            AddMaths(list);
             return list;
+        }
+
+        /// <summary>Adds the maths package's cases.</summary>
+        private static void AddMaths(List<Case> list)
+        {
+            list.Add(new Case { Name = "maths.scalars.lerp", Run = ScalarCases.Lerp });
+            list.Add(new Case { Name = "maths.scalars.inverse-lerp", Run = ScalarCases.InverseLerp });
+            list.Add(new Case { Name = "maths.scalars.remap", Run = ScalarCases.Remap });
+            list.Add(new Case { Name = "maths.scalars.clamp-and-wrap", Run = ScalarCases.ClampAndWrap });
+            list.Add(new Case { Name = "maths.scalars.move-toward", Run = ScalarCases.MoveToward });
+            list.Add(new Case { Name = "maths.scalars.sign-and-near", Run = ScalarCases.SignAndNear });
+            list.Add(new Case { Name = "maths.scalars.distance-and-angle", Run = ScalarCases.DistanceAndAngle });
+            list.Add(new Case { Name = "maths.scalars.polar", Run = ScalarCases.Polar });
+            list.Add(new Case { Name = "maths.scalars.angles-normalize", Run = ScalarCases.AnglesNormalize });
+            list.Add(new Case { Name = "maths.scalars.angles-difference", Run = ScalarCases.AnglesDifference });
+            list.Add(new Case { Name = "maths.scalars.angles-lerp-and-move", Run = ScalarCases.AnglesLerpAndMove });
+            list.Add(new Case { Name = "maths.scalars.angles-trig", Run = ScalarCases.AnglesTrig });
+            list.Add(new Case { Name = "maths.vector2.basics", Run = Vector2Cases.Basics });
+            list.Add(new Case { Name = "maths.vector2.angles", Run = Vector2Cases.Angles });
+            list.Add(new Case { Name = "maths.vector2.offset-and-rotate", Run = Vector2Cases.OffsetAndRotate });
+            list.Add(new Case { Name = "maths.vector2.products", Run = Vector2Cases.Products });
+            list.Add(new Case { Name = "maths.vector2.bounce-reflect-slide", Run = Vector2Cases.BounceReflectSlide });
+            list.Add(new Case { Name = "maths.vector2.limits", Run = Vector2Cases.Limits });
+            list.Add(new Case { Name = "maths.vector2.lerp", Run = Vector2Cases.Lerp });
+            list.Add(new Case { Name = "maths.vector2.operators", Run = Vector2Cases.Operators });
+            list.Add(new Case { Name = "maths.vector2.equality", Run = Vector2Cases.Equality });
+            list.Add(new Case { Name = "maths.vector2.text", Run = Vector2Cases.Text });
+            list.Add(new Case { Name = "maths.vector3.basics", Run = Vector3Cases.Basics });
+            list.Add(new Case { Name = "maths.vector3.yaw-pitch", Run = Vector3Cases.YawPitch });
+            list.Add(new Case { Name = "maths.vector3.cross", Run = Vector3Cases.Cross });
+            list.Add(new Case { Name = "maths.vector3.bounce", Run = Vector3Cases.Bounce });
+            list.Add(new Case { Name = "maths.vector3.from-vector2", Run = Vector3Cases.FromVector2 });
+            list.Add(new Case { Name = "maths.vector3.equality-and-text", Run = Vector3Cases.EqualityAndText });
+            list.Add(new Case { Name = "maths.ease.ends", Run = Vector3Cases.EaseEnds });
+            list.Add(new Case { Name = "maths.ease.middles", Run = Vector3Cases.EaseMiddles });
+            list.Add(new Case { Name = "maths.ease.clamped-and-overshoot", Run = Vector3Cases.EaseClampedAndOvershoot });
+            list.Add(new Case { Name = "maths.shapes.bounds-corners", Run = ShapeCases.BoundsCorners });
+            list.Add(new Case { Name = "maths.shapes.bounds-contains", Run = ShapeCases.BoundsContains });
+            list.Add(new Case { Name = "maths.shapes.bounds-intersects", Run = ShapeCases.BoundsIntersects });
+            list.Add(new Case { Name = "maths.shapes.bounds-clamp-expand", Run = ShapeCases.BoundsClampExpand });
+            list.Add(new Case { Name = "maths.shapes.polygon-contains", Run = ShapeCases.PolygonContains });
+            list.Add(new Case { Name = "maths.shapes.polygon-area-center", Run = ShapeCases.PolygonAreaCenter });
+            list.Add(new Case { Name = "maths.shapes.polygon-copies", Run = ShapeCases.PolygonCopies });
+            list.Add(new Case { Name = "maths.shapes.polygon-too-few", Run = ShapeCases.PolygonTooFew });
+            list.Add(new Case { Name = "maths.raycast.circle-hit", Run = RaycastCases.CircleHit });
+            list.Add(new Case { Name = "maths.raycast.circle-miss", Run = RaycastCases.CircleMiss });
+            list.Add(new Case { Name = "maths.raycast.circle-short", Run = RaycastCases.CircleShort });
+            list.Add(new Case { Name = "maths.raycast.circle-inside", Run = RaycastCases.CircleInside });
+            list.Add(new Case { Name = "maths.raycast.circle-zero-length", Run = RaycastCases.CircleZeroLength });
+            list.Add(new Case { Name = "maths.raycast.segment-hit", Run = RaycastCases.SegmentHit });
+            list.Add(new Case { Name = "maths.raycast.segment-parallel", Run = RaycastCases.SegmentParallel });
+            list.Add(new Case { Name = "maths.raycast.bounds-hit", Run = RaycastCases.BoundsHit });
+            list.Add(new Case { Name = "maths.raycast.polygon-hit", Run = RaycastCases.PolygonHit });
+            list.Add(new Case { Name = "maths.raycast.polygon-first-edge", Run = RaycastCases.PolygonFirstEdge });
+            list.Add(new Case { Name = "maths.raycast.ray-at", Run = RaycastCases.RayAt });
+            list.Add(new Case { Name = "maths.actors.position", Run = ActorMathsCases.Position });
+            list.Add(new Case { Name = "maths.actors.place-and-move", Run = ActorMathsCases.PlaceAndMove });
+            list.Add(new Case { Name = "maths.actors.distance-and-angle", Run = ActorMathsCases.DistanceAndAngle });
+            list.Add(new Case { Name = "maths.actors.face", Run = ActorMathsCases.Face });
+            list.Add(new Case { Name = "maths.lua.shared-not-copied", Run = LuaShapeCases.SharedNotCopied });
+            list.Add(new Case { Name = "maths.lua.out-pair", Run = LuaShapeCases.OutPair });
+            list.Add(new Case { Name = "maths.lua.number-types", Run = LuaShapeCases.NumberTypes });
+            list.Add(new Case { Name = "maths.lua.miss-makes-nothing", Run = MissCases.MissMakesNothing });
+            list.Add(new Case { Name = "maths.raycast.ray-values", Run = MissCases.RayValues });
         }
 
         /// <summary>Adds the first cases: the harness, collections, errors, ownership, timers, hooks, actors and objects (Lua allows 200 locals in a function, and each case made here is one).</summary>

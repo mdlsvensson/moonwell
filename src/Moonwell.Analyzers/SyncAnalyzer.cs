@@ -57,7 +57,8 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
         private readonly INamedTypeSymbol? natives;
         private readonly IMethodSymbol? localFor;
         private readonly IAssemblySymbol? runtime;
-        private readonly IAssemblySymbol? damage;
+        /// <summary>Moonwell's packages that the map references, checked as the runtime is.</summary>
+        private readonly IAssemblySymbol[] packages;
         private readonly INamedTypeSymbol? createsHandle;
         private readonly INamedTypeSymbol? changesState;
         private readonly INamedTypeSymbol? machineLocal;
@@ -78,7 +79,12 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             var local = compilation.GetTypeByMetadataName("Moonwell.Local");
             localFor = local?.GetMembers("For").OfType<IMethodSymbol>().FirstOrDefault();
             runtime = local?.ContainingAssembly;
-            damage = compilation.GetTypeByMetadataName("Moonwell.DamageSystem")?.ContainingAssembly;
+            // Each package is found by one of its types.
+            packages = new[] { "Moonwell.DamageSystem", "Moonwell.Vector2" }
+                .Select(name => compilation.GetTypeByMetadataName(name)?.ContainingAssembly)
+                .Where(assembly => assembly != null)
+                .Select(assembly => assembly!)
+                .ToArray();
             createsHandle = compilation.GetTypeByMetadataName("Moonwell.CreatesHandleAttribute");
             changesState = compilation.GetTypeByMetadataName("Moonwell.ChangesStateAttribute");
             machineLocal = compilation.GetTypeByMetadataName("Moonwell.MachineLocalAttribute");
@@ -334,7 +340,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             }
 
             if ((runtime != null && SymbolEqualityComparer.Default.Equals(member.ContainingAssembly, runtime))
-                || (damage != null && SymbolEqualityComparer.Default.Equals(member.ContainingAssembly, damage)))
+                || packages.Any(package => SymbolEqualityComparer.Default.Equals(member.ContainingAssembly, package)))
             {
                 // Making a Moonwell object changes nothing in the game until it is added or started.
                 if (member is IMethodSymbol { MethodKind: MethodKind.Constructor } || IsLocalSafe(member, write) || IsMachineLocal(member, write))

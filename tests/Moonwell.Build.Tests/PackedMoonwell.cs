@@ -2,7 +2,7 @@ using System.Diagnostics;
 
 namespace Moonwell.Build.Tests
 {
-    /// <summary>Moonwell, Moonwell.Natives, Moonwell.Objects and Moonwell.Templates packed with a version of their own into a feed in the temporary folder; removes everything it made, including what a restore left in the NuGet folder.</summary>
+    /// <summary>Moonwell, Moonwell.Natives, Moonwell.Objects, Moonwell.Damage, Moonwell.Maths and Moonwell.Templates packed with a version of their own into a feed in the temporary folder; removes everything it made, including what a restore left in the NuGet folder.</summary>
     public sealed class PackedMoonwell : IDisposable
     {
         private readonly string root = Path.Combine(Path.GetTempPath(), "moonwell-feed-" + Guid.NewGuid().ToString("N"));
@@ -19,6 +19,7 @@ namespace Moonwell.Build.Tests
             Dotnet(repository, "pack", Path.Combine("src", "Moonwell", "Moonwell.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
             Dotnet(repository, "pack", Path.Combine("src", "Moonwell.Objects", "Moonwell.Objects.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
             Dotnet(repository, "pack", Path.Combine("src", "Moonwell.Damage", "Moonwell.Damage.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
+            Dotnet(repository, "pack", Path.Combine("src", "Moonwell.Maths", "Moonwell.Maths.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
             Dotnet(repository, "pack", Path.Combine("template", "Moonwell.Templates.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
         }
 
@@ -36,6 +37,9 @@ namespace Moonwell.Build.Tests
 
         /// <summary>The path of the Moonwell.Damage package.</summary>
         public string DamagePackage => Path.Combine(Feed, "Moonwell.Damage." + Version + ".nupkg");
+
+        /// <summary>The path of the Moonwell.Maths package.</summary>
+        public string MathsPackage => Path.Combine(Feed, "Moonwell.Maths." + Version + ".nupkg");
 
         /// <summary>The path of the Moonwell.Templates package.</summary>
         public string TemplatesPackage => Path.Combine(Feed, "Moonwell.Templates." + Version + ".nupkg");
