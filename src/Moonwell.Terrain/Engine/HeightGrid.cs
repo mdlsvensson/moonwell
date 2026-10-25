@@ -13,6 +13,9 @@ namespace Moonwell.Engine
         /// <summary>The corners across and up one block.</summary>
         private const int Side = 16;
 
+        /// <summary>The width of a tile, between corners.</summary>
+        private const float TileSize = 128f;
+
         /// <summary>The 17-bit number that stands for a height of 0.</summary>
         private const int ZeroHeight = 49152;
 
@@ -88,6 +91,104 @@ namespace Moonwell.Engine
         {
             var block = Unpack(i, j);
             return (flags[block][Slot(i, j)] & 1) != 0;
+        }
+
+        /// <summary>
+        /// The ground's height at a point, which is first kept inside the grid. A tile whose corners are on more than one
+        /// cliff level, with no ramp corner, is a step: the point takes the level of the corner nearest it (the higher one
+        /// on the middle line) and blends only the corners on that level. Any other tile blends its four corners.
+        /// </summary>
+        internal float Height(float x, float y)
+        {
+            Locate(x, y, out var i, out var j, out var fx, out var fy);
+            var step = IsStep(i, j);
+            var level = 0;
+            if (step)
+            {
+                level = CliffLevel(fx < 0.5f ? i : i + 1, fy < 0.5f ? j : j + 1);
+            }
+
+            var sum = 0f;
+            var weights = 0f;
+            for (var dj = 0; dj < 2; dj++)
+            {
+                for (var di = 0; di < 2; di++)
+                {
+                    if (step && CliffLevel(i + di, j + dj) != level)
+                    {
+                        continue;
+                    }
+
+                    var weight = (di == 0 ? 1f - fx : fx) * (dj == 0 ? 1f - fy : fy);
+                    sum += Z(i + di, j + dj) * weight;
+                    weights += weight;
+                }
+            }
+
+            return sum / weights;
+        }
+
+        /// <summary>Whether the tile that holds a point (kept inside the grid) is a step: on more than one cliff level, with no ramp corner.</summary>
+        internal bool IsCliff(float x, float y)
+        {
+            Locate(x, y, out var i, out var j, out _, out _);
+            return IsStep(i, j);
+        }
+
+        /// <summary>
+        /// The slope of the blended ground at a point, as the height's change along x and along y. Zero in a step tile,
+        /// where the ground is taken as flat at each level.
+        /// </summary>
+        internal void Gradient(float x, float y, out float alongX, out float alongY)
+        {
+            Locate(x, y, out var i, out var j, out var fx, out var fy);
+            if (IsStep(i, j))
+            {
+                alongX = 0f;
+                alongY = 0f;
+                return;
+            }
+
+            var z00 = Z(i, j);
+            var z10 = Z(i + 1, j);
+            var z01 = Z(i, j + 1);
+            var z11 = Z(i + 1, j + 1);
+            alongX = ((1f - fy) * (z10 - z00) + fy * (z11 - z01)) / TileSize;
+            alongY = ((1f - fx) * (z01 - z00) + fx * (z11 - z10)) / TileSize;
+        }
+
+        /// <summary>Whether the tile whose lower-left corner is (i, j) has corners on more than one cliff level and no ramp corner.</summary>
+        private bool IsStep(int i, int j)
+        {
+            if (IsRamp(i, j) || IsRamp(i + 1, j) || IsRamp(i, j + 1) || IsRamp(i + 1, j + 1))
+            {
+                return false;
+            }
+
+            var level = CliffLevel(i, j);
+            return CliffLevel(i + 1, j) != level || CliffLevel(i, j + 1) != level || CliffLevel(i + 1, j + 1) != level;
+        }
+
+        /// <summary>Finds the tile of a point kept inside the grid: its lower-left corner and where the point is in it, 0 to 1 across and up.</summary>
+        private void Locate(float x, float y, out int i, out int j, out float fx, out float fy)
+        {
+            var u = Clamp((x - Left) / TileSize, Columns - 1);
+            var v = Clamp((y - Bottom) / TileSize, Rows - 1);
+            i = Math.Min((int)MathF.Floor(u), Math.Max(Columns - 2, 0));
+            j = Math.Min((int)MathF.Floor(v), Math.Max(Rows - 2, 0));
+            fx = u - i;
+            fy = v - j;
+        }
+
+        /// <summary>A position in tiles, kept from 0 to the last corner's.</summary>
+        private static float Clamp(float tiles, int last)
+        {
+            if (tiles < 0f)
+            {
+                return 0f;
+            }
+
+            return tiles > last ? last : tiles;
         }
 
         /// <summary>A corner's column or row, kept inside the grid.</summary>

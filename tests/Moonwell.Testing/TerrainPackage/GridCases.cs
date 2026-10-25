@@ -88,5 +88,38 @@ namespace Moonwell.Testing
             Expect.Near(0f, grid.Z(100, 100), "Z(100,100) clamps into the same block");
             Expect.Equal(3, grid.Unpacked, "a clamped read unpacks nothing new");
         }
+
+        /// <summary>Corners in the second and third blocks, across and up, each read back as its own height.</summary>
+        public static void ManyBlocks(FakeWorld world)
+        {
+            var text = new StringBuilder();
+            for (var row = 0; row < 18; row++)
+            {
+                for (var column = 0; column < 20; column++)
+                {
+                    text.Append(GridText.Corner(column + 100 * row, 2));
+                }
+            }
+
+            var grid = new HeightGrid(20, 18, 0f, 0f, text.ToString());
+            Expect.Near(0f, grid.Z(0, 0), "Z(0,0), in the first block");
+            Expect.Near(505f, grid.Z(5, 5), "Z(5,5), in the first block");
+            Expect.Near(317f, grid.Z(17, 3), "Z(17,3), in the second block");
+            Expect.Near(1702f, grid.Z(2, 17), "Z(2,17), in the third block");
+            Expect.Near(1719f, grid.Z(19, 17), "Z(19,17), in the fourth block");
+            Expect.Equal(4, grid.Unpacked, "four blocks hold 20 by 18 corners");
+        }
+
+        /// <summary>The digits, + and / stand for 52 to 63, and a character outside the alphabet is refused.</summary>
+        public static void Alphabet(FakeWorld world)
+        {
+            var grid = new HeightGrid(1, 1, 0f, 0f, "+/09");
+            Expect.Near(3993.3f, grid.Z(0, 0), "+/09 is 62, 63, 52, 61: h 129018");
+            Expect.Equal(7, grid.CliffLevel(0, 0), "level of +/09");
+            Expect.True(grid.IsWater(0, 0) && !grid.IsRamp(0, 0), "+/09 is water, no ramp");
+            Expect.Throws<ArgumentException>(() => new HeightGrid(1, 1, 0f, 0f, "AA-A").Z(0, 0), "a dash");
+            Expect.Throws<ArgumentException>(() => new HeightGrid(1, 1, 0f, 0f, "AA A").Z(0, 0), "a space");
+            Expect.Throws<ArgumentException>(() => new HeightGrid(1, 1, 0f, 0f, "AA=A").Z(0, 0), "a padding sign");
+        }
     }
 }

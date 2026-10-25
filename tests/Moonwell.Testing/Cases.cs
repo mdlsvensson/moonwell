@@ -27,6 +27,18 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "terrain.grid.not-installed", Run = GridCases.NotInstalled });
             list.Add(new Case { Name = "terrain.grid.playable", Run = GridCases.Playable });
             list.Add(new Case { Name = "terrain.grid.blocks", Run = GridCases.Blocks });
+            list.Add(new Case { Name = "terrain.grid.many-blocks", Run = GridCases.ManyBlocks });
+            list.Add(new Case { Name = "terrain.grid.alphabet", Run = GridCases.Alphabet });
+            list.Add(new Case { Name = "terrain.height.corners", Run = HeightCases.Corners });
+            list.Add(new Case { Name = "terrain.height.blend", Run = HeightCases.Blend });
+            list.Add(new Case { Name = "terrain.height.clamped", Run = HeightCases.Clamped });
+            list.Add(new Case { Name = "terrain.height.step", Run = HeightCases.Step });
+            list.Add(new Case { Name = "terrain.height.step-blend", Run = HeightCases.StepBlend });
+            list.Add(new Case { Name = "terrain.height.step-tie", Run = HeightCases.StepTie });
+            list.Add(new Case { Name = "terrain.height.step-l", Run = HeightCases.StepL });
+            list.Add(new Case { Name = "terrain.height.ramp", Run = HeightCases.Ramp });
+            list.Add(new Case { Name = "terrain.height.normal-and-slope", Run = HeightCases.NormalAndSlope });
+            list.Add(new Case { Name = "terrain.height.not-installed", Run = HeightCases.NotInstalled });
         }
 
         /// <summary>Adds the maths package's cases.</summary>
