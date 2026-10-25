@@ -138,10 +138,11 @@ namespace Moonwell
         }
 
         /// <summary>
-        /// Whether something can stand at a point: an item put there lands within 1 of it, which trees, buildings and
-        /// unwalkable ground push it away from. <c>nearest</c> is where the item landed. This changes game state,
-        /// as the item is moved for a moment. On a bridge it lands on the ground or water beneath, as a bridge is a
-        /// destructable, not terrain.
+        /// Whether something can stand at a point: the pathing grid says the point is walkable (<c>IsWalkable</c>) and
+        /// an item put there lands within 1 of it, which trees, buildings and unwalkable ground push it away from. Both
+        /// are needed, as the game lays the item exactly on deep water. <c>nearest</c> is where the item landed, always
+        /// set, as the item is put down either way. This changes game state, as the item is moved for a moment. On a
+        /// bridge it reads false, as the item will not lie on one.
         /// </summary>
         [ChangesState]
         public static bool CanStand(float x, float y, out Vector2 nearest)
@@ -150,7 +151,7 @@ namespace Moonwell
             nearest = new Vector2(landedX, landedY);
             var dx = landedX - x;
             var dy = landedY - y;
-            return dx * dx + dy * dy <= 1f;
+            return IsWalkable(x, y) && dx * dx + dy * dy <= 1f;
         }
 
         /// <summary>

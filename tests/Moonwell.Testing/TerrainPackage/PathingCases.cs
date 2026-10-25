@@ -137,6 +137,20 @@ namespace Moonwell.Testing
             Expect.True(!Terrain.CanStand(10f, 0f, out landed), "more than 1 away");
         }
 
+        /// <summary>An item that lands exactly on a cell units cannot walk (deep water) is no place to stand.</summary>
+        public static void CanStandWater(FakeWorld world)
+        {
+            var fake = new FakeTerrainWorld();
+            fake.Block(112f, 80f, FakeTerrainWorld.NoWalk);
+            Flat(fake, 0f, 0f);
+            fake.Lands = true;
+            fake.LandsX = 112f;
+            fake.LandsY = 80f;
+            Expect.True(!Terrain.CanStand(112f, 80f, out var landed), "the item lands on the spot, but it is not walkable");
+            Expect.True(landed == new Vector2(112f, 80f), "nearest is where the item landed");
+            Expect.Equal(1, fake.PlaceCalls, "the item was placed all the same");
+        }
+
         /// <summary>LocalHeight asks the world, deformations and all, not the grid.</summary>
         public static void LocalHeight(FakeWorld world)
         {

@@ -44,6 +44,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "terrain.pathing.refresh-span", Run = PathingCases.RefreshSpan });
             list.Add(new Case { Name = "terrain.pathing.outside", Run = PathingCases.Outside });
             list.Add(new Case { Name = "terrain.pathing.can-stand", Run = PathingCases.CanStand });
+            list.Add(new Case { Name = "terrain.pathing.can-stand-water", Run = PathingCases.CanStandWater });
             list.Add(new Case { Name = "terrain.pathing.local-height", Run = PathingCases.LocalHeight });
             list.Add(new Case { Name = "terrain.pathing.not-installed", Run = PathingCases.NotInstalled });
             list.Add(new Case { Name = "terrain.pathing.reinstall", Run = PathingCases.Reinstall });
