@@ -2,23 +2,29 @@ using Moonwell.Hosting;
 
 namespace Moonwell.Engine
 {
-    /// <summary>The game as the terrain package sees it, through the game's natives; the only class of the package that calls them.</summary>
+    /// <summary>
+    /// The game as the terrain package sees it, through the game's natives; the only class of the package that calls
+    /// them. The location behind <c>LocationZ</c> is made when the world is made, which is in <c>Terrain.Install</c>, in
+    /// synced code: <c>LocationZ</c> is machine-local, a map calls it only inside <c>Local.For</c>, and making a handle
+    /// there would make it on one machine only.
+    /// </summary>
     internal sealed class NativeTerrainWorld : ITerrainWorld
     {
-        /// <summary>The location LocationZ moves about, made on first use.</summary>
-        private location? spot;
+        /// <summary>The location LocationZ moves about: one handle, made at install, for the map's life.</summary>
+        private readonly location spot;
 
         /// <summary>The item Place puts down, made on first use.</summary>
         private item? marker;
 
+        /// <summary>Makes the world, and the location LocationZ moves about.</summary>
+        internal NativeTerrainWorld()
+        {
+            spot = Natives.Location(0f, 0f);
+        }
+
         /// <summary>The ground's height at a point, as the game gives it on this machine.</summary>
         public float LocationZ(float x, float y)
         {
-            if (spot == null)
-            {
-                spot = Natives.Location(0f, 0f);
-            }
-
             Natives.MoveLocation(spot, x, y);
             return Natives.GetLocationZ(spot);
         }

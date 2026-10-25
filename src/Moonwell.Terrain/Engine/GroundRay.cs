@@ -6,7 +6,8 @@ namespace Moonwell.Engine
     /// A segment against the blended ground. The segment is sampled every 32 along its length in XY (and at its end);
     /// at the first sample at or under the ground the span back to the sample before is bisected five times, then the
     /// last span is crossed by a straight line between its two gaps, so a ray straight down (one sample, at its end)
-    /// still lands on the ground. All of it is worked out in floats: a miss makes nothing.
+    /// still lands on the ground. A segment with a NaN or an infinite end misses at once (it would never reach its end).
+    /// All of it is worked out in floats: a miss makes nothing.
     /// </summary>
     internal static class GroundRay
     {
@@ -25,6 +26,12 @@ namespace Moonwell.Engine
             var dx = toX - fromX;
             var dy = toY - fromY;
             var dz = toZ - fromZ;
+            if (!Finite(dx) || !Finite(dy) || !Finite(dz) || !Finite(fromX) || !Finite(fromY) || !Finite(fromZ))
+            {
+                hit = Miss();
+                return false;
+            }
+
             var startGap = fromZ - Terrain.Height(fromX, fromY);
             if (startGap <= 0f)
             {
@@ -33,6 +40,12 @@ namespace Moonwell.Engine
             }
 
             var length = MathF.Sqrt(dx * dx + dy * dy);
+            if (!Finite(length))
+            {
+                hit = Miss();
+                return false;
+            }
+
             var before = 0f;
             var gapBefore = startGap;
             var k = 0;
@@ -40,7 +53,7 @@ namespace Moonwell.Engine
             {
                 k++;
                 var t = length > 0f ? k * Step / length : 1f;
-                if (t > 1f)
+                if (!(t < 1f))
                 {
                     t = 1f;
                 }
@@ -61,6 +74,12 @@ namespace Moonwell.Engine
                 before = t;
                 gapBefore = gap;
             }
+        }
+
+        /// <summary>Whether a number is neither NaN nor infinite: only then is it taken away from itself to 0.</summary>
+        private static bool Finite(float value)
+        {
+            return value - value == 0f;
         }
 
         /// <summary>The hit in the span from a fraction above the ground to one at or under it.</summary>

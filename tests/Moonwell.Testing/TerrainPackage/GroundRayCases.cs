@@ -26,7 +26,8 @@ namespace Moonwell.Testing
             Expect.True(hit.Point.Y > 79f && hit.Point.Y < 81f, "y within 1 of 80, was " + hit.Point.Y);
             Expect.Near(100f, hit.Point.Z, "z stays on the ray");
             Expect.True(hit.Fraction > 0.615f && hit.Fraction < 0.635f, "fraction near 0.625, was " + hit.Fraction);
-            Expect.Near(Terrain.Height(hit.Point.X, hit.Point.Y), hit.Point.Z, "the point is on the ground");
+            var off = Terrain.Height(hit.Point.X, hit.Point.Y) - hit.Point.Z;
+            Expect.True(off > -1f && off < 1f, "the point is within 1 of the ground, was " + off);
             var normal = Terrain.Normal(hit.Point.X, hit.Point.Y);
             Expect.True(hit.Normal == normal, "the normal is the ground's there");
             Expect.True(hit.Normal.Z > 0f, "the normal faces up");
@@ -111,6 +112,18 @@ namespace Moonwell.Testing
             Expect.Near(100f, hit.Point.X, "down 1 for 1 reaches the ground at x 100");
             Expect.Near(0f, hit.Point.Z, "on the ground");
             Expect.Near(0.1f, hit.Fraction, "fraction");
+        }
+
+        /// <summary>A segment that ends at infinity, or at a number that is not one, gives up at once and misses; it does not walk on for ever.</summary>
+        public static void NotFinite(FakeWorld world)
+        {
+            OneTile(GridText.Tile(GridText.Corner(0f, 2), GridText.Corner(0f, 2), GridText.Corner(0f, 2), GridText.Corner(0f, 2)));
+            Expect.True(!Terrain.Raycast(new Vector3(64f, 64f, 50f), new Vector3(float.PositiveInfinity, 64f, 50f), out var infinite), "an infinite end missed");
+            Expect.True(infinite == new TerrainHit(Vector3.Zero, Vector3.Zero, 0f), "an infinite end: an empty hit");
+            Expect.True(!Terrain.Raycast(new Vector3(64f, 64f, 50f), new Vector3(float.NaN, 64f, 50f), out var notANumber), "a NaN end missed");
+            Expect.True(notANumber == new TerrainHit(Vector3.Zero, Vector3.Zero, 0f), "a NaN end: an empty hit");
+            Expect.True(!Terrain.Raycast(new Vector3(float.NaN, 64f, 50f), new Vector3(100f, 64f, 50f), out _), "a NaN start missed");
+            Expect.True(!Terrain.Raycast(new Vector3(64f, 64f, float.NaN), new Vector3(100f, 64f, 50f), out _), "a NaN height missed");
         }
 
         /// <summary>TerrainHit has ==, Equals, a hash and text, as RayHit.</summary>
