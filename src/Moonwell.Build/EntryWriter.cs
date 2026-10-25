@@ -19,25 +19,25 @@ namespace Moonwell.Build
         /// <returns>The path of the written file.</returns>
         public static string Write(MapProject project, MapSettings settings, bool registry)
         {
-            return Write(project, settings, registry, false);
+            return Write(project, settings, registry, Array.Empty<string>());
         }
 
         /// <summary>Writes <c>MapMain.g.cs</c> into the project's generated folder.</summary>
         /// <param name="project">The map project.</param>
         /// <param name="settings">The settings read from the map class, which name the class to start.</param>
         /// <param name="registry">True starts the runtime with <c>ObjectRegistry.Register</c>, which <see cref="RegistryWriter"/> writes.</param>
-        /// <param name="damage">True installs the damage package first in the register step, before anything registers.</param>
+        /// <param name="installs">C# statements, such as <c>global::Moonwell.DamageSystem.Install();</c>, that run in order in the register step, before anything registers.</param>
         /// <returns>The path of the written file.</returns>
-        public static string Write(MapProject project, MapSettings settings, bool registry, bool damage)
+        public static string Write(MapProject project, MapSettings settings, bool registry, IReadOnlyList<string> installs)
         {
             Directory.CreateDirectory(project.GeneratedFolder);
             var path = Path.Combine(project.GeneratedFolder, "MapMain.g.cs");
             var map = "new global::" + settings.TypeName + "()";
             string start;
-            if (damage)
+            if (installs.Count > 0)
             {
                 var register = registry ? " global::Moonwell.Generated.ObjectRegistry.Register();" : string.Empty;
-                start = "global::Moonwell.Runtime.Start(" + map + ", () => { global::Moonwell.DamageSystem.Install();" + register + " });";
+                start = "global::Moonwell.Runtime.Start(" + map + ", () => { " + string.Join(" ", installs) + register + " });";
             }
             else
             {

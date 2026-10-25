@@ -14,7 +14,54 @@ namespace Moonwell.Testing
             AddMiddle(list);
             AddLast(list);
             AddMaths(list);
+            AddTerrain(list);
             return list;
+        }
+
+        /// <summary>Adds the terrain package's cases.</summary>
+        private static void AddTerrain(List<Case> list)
+        {
+            list.Add(new Case { Name = "terrain.grid.pinned", Run = GridCases.Pinned });
+            list.Add(new Case { Name = "terrain.grid.clamped", Run = GridCases.Clamped });
+            list.Add(new Case { Name = "terrain.grid.wrong-length", Run = GridCases.WrongLength });
+            list.Add(new Case { Name = "terrain.grid.not-installed", Run = GridCases.NotInstalled });
+            list.Add(new Case { Name = "terrain.grid.playable", Run = GridCases.Playable });
+            list.Add(new Case { Name = "terrain.grid.blocks", Run = GridCases.Blocks });
+            list.Add(new Case { Name = "terrain.grid.many-blocks", Run = GridCases.ManyBlocks });
+            list.Add(new Case { Name = "terrain.grid.alphabet", Run = GridCases.Alphabet });
+            list.Add(new Case { Name = "terrain.height.corners", Run = HeightCases.Corners });
+            list.Add(new Case { Name = "terrain.height.blend", Run = HeightCases.Blend });
+            list.Add(new Case { Name = "terrain.height.clamped", Run = HeightCases.Clamped });
+            list.Add(new Case { Name = "terrain.height.step", Run = HeightCases.Step });
+            list.Add(new Case { Name = "terrain.height.cliff-blend", Run = HeightCases.CliffBlend });
+            list.Add(new Case { Name = "terrain.height.ramp", Run = HeightCases.Ramp });
+            list.Add(new Case { Name = "terrain.height.normal-and-slope", Run = HeightCases.NormalAndSlope });
+            list.Add(new Case { Name = "terrain.height.not-a-number", Run = HeightCases.NotANumber });
+            list.Add(new Case { Name = "terrain.height.not-installed", Run = HeightCases.NotInstalled });
+            list.Add(new Case { Name = "terrain.pathing.flags", Run = PathingCases.Flags });
+            list.Add(new Case { Name = "terrain.pathing.filled-once", Run = PathingCases.FilledOnce });
+            list.Add(new Case { Name = "terrain.pathing.partial-block", Run = PathingCases.PartialBlock });
+            list.Add(new Case { Name = "terrain.pathing.refresh", Run = PathingCases.Refresh });
+            list.Add(new Case { Name = "terrain.pathing.refresh-span", Run = PathingCases.RefreshSpan });
+            list.Add(new Case { Name = "terrain.pathing.outside", Run = PathingCases.Outside });
+            list.Add(new Case { Name = "terrain.pathing.not-a-number", Run = PathingCases.NotANumber });
+            list.Add(new Case { Name = "terrain.pathing.can-stand", Run = PathingCases.CanStand });
+            list.Add(new Case { Name = "terrain.pathing.can-stand-water", Run = PathingCases.CanStandWater });
+            list.Add(new Case { Name = "terrain.pathing.local-height", Run = PathingCases.LocalHeight });
+            list.Add(new Case { Name = "terrain.pathing.not-installed", Run = PathingCases.NotInstalled });
+            list.Add(new Case { Name = "terrain.pathing.reinstall", Run = PathingCases.Reinstall });
+            list.Add(new Case { Name = "terrain.raycast.hill-hit", Run = GroundRayCases.HillHit });
+            list.Add(new Case { Name = "terrain.raycast.miss", Run = GroundRayCases.Miss });
+            list.Add(new Case { Name = "terrain.raycast.cliff", Run = GroundRayCases.Cliff });
+            list.Add(new Case { Name = "terrain.raycast.starts-under", Run = GroundRayCases.StartsUnder });
+            list.Add(new Case { Name = "terrain.raycast.zero-length", Run = GroundRayCases.ZeroLength });
+            list.Add(new Case { Name = "terrain.raycast.vertical", Run = GroundRayCases.Vertical });
+            list.Add(new Case { Name = "terrain.raycast.leaves-map", Run = GroundRayCases.LeavesMap });
+            list.Add(new Case { Name = "terrain.raycast.long-ray", Run = GroundRayCases.LongRay });
+            list.Add(new Case { Name = "terrain.raycast.not-finite", Run = GroundRayCases.NotFinite });
+            list.Add(new Case { Name = "terrain.raycast.hit-values", Run = GroundRayCases.HitValues });
+            list.Add(new Case { Name = "terrain.raycast.not-installed", Run = GroundRayCases.NotInstalled });
+            list.Add(new Case { Name = "terrain.raycast.miss-makes-nothing", Run = MissCases.GroundMissMakesNothing });
         }
 
         /// <summary>Adds the maths package's cases.</summary>

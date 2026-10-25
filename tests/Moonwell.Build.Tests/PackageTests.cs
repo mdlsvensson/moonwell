@@ -59,6 +59,7 @@ namespace Moonwell.Build.Tests
         [InlineData("Moonwell.Objects")]
         [InlineData("Moonwell.Damage")]
         [InlineData("Moonwell.Maths")]
+        [InlineData("Moonwell.Terrain")]
         public void package_ships_xml_docs_beside_its_library(string id)
         {
             using var archive = ZipFile.OpenRead(Path.Combine(packed.Feed, id + "." + packed.Version + ".nupkg"));
@@ -192,6 +193,21 @@ namespace Moonwell.Build.Tests
             Assert.DoesNotContain(names, name => name.Contains("/obj/") || name.Contains("/bin/"));
 
             using var reader = new StreamReader(archive.Entries.Single(entry => entry.FullName == "Moonwell.Maths.nuspec").Open());
+            var nuspec = XDocument.Parse(reader.ReadToEnd());
+            var dependency = Assert.Single(nuspec.Descendants(), element => element.Name.LocalName == "dependency" && element.Attribute("id")!.Value == "Moonwell");
+            Assert.Equal(packed.Version, dependency.Attribute("version")!.Value);
+        }
+
+        [Fact]
+        public void terrain_package_carries_its_source()
+        {
+            using var archive = ZipFile.OpenRead(packed.TerrainPackage);
+            var names = archive.Entries.Select(entry => entry.FullName).ToList();
+            Assert.Contains("contentFiles/cs/net10.0/Moonwell.Terrain/Terrain.cs", names);
+            Assert.Contains(names, name => name.StartsWith("lib/", StringComparison.Ordinal) && name.EndsWith("/Moonwell.Terrain.dll", StringComparison.Ordinal));
+            Assert.DoesNotContain(names, name => name.Contains("/obj/") || name.Contains("/bin/"));
+
+            using var reader = new StreamReader(archive.Entries.Single(entry => entry.FullName == "Moonwell.Terrain.nuspec").Open());
             var nuspec = XDocument.Parse(reader.ReadToEnd());
             var dependency = Assert.Single(nuspec.Descendants(), element => element.Name.LocalName == "dependency" && element.Attribute("id")!.Value == "Moonwell");
             Assert.Equal(packed.Version, dependency.Attribute("version")!.Value);
