@@ -35,6 +35,19 @@ namespace Moonwell.Testing
             ExpectLog(new string[] { "gate died", "part died" }, "the log");
         }
 
+        /// <summary>A destructable's X and Y are read once, when it is taken in, and kept after it is gone.</summary>
+        public static void Position(FakeWorld world)
+        {
+            var handle = world.NewDestructable(ObjectTypes.FourCC("dfoo"));
+            var found = Destructable.Of(handle)!;
+            Expect.Near(100f, found.X, "X");
+            Expect.Near(-50f, found.Y, "Y");
+            found.Remove();
+            Expect.Near(0f, world.DestructableX(handle), "the world no longer knows it");
+            Expect.Near(100f, found.X, "X after Remove");
+            Expect.Near(-50f, found.Y, "Y after Remove");
+        }
+
         /// <summary>A destructable that vanishes is ended by the sweep, and the game is not asked to remove it.</summary>
         public static void SweepDetectsRemoval(FakeWorld world)
         {

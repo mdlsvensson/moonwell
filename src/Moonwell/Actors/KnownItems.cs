@@ -78,6 +78,11 @@ namespace Moonwell
                 Owner.current = previous;
             }
 
+            if (!made.HasEnded)
+            {
+                Hooks.CallTakenIn(made);
+            }
+
             return made;
         }
 

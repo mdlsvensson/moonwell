@@ -74,6 +74,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "maths.actors.place-and-move", Run = ActorMathsCases.PlaceAndMove });
             list.Add(new Case { Name = "maths.actors.distance-and-angle", Run = ActorMathsCases.DistanceAndAngle });
             list.Add(new Case { Name = "maths.actors.face", Run = ActorMathsCases.Face });
+            list.Add(new Case { Name = "maths.actors.destructable", Run = ActorMathsCases.DestructableDistances });
+            list.Add(new Case { Name = "maths.polygon.contains-floats", Run = ShapeCases.PolygonContainsFloats });
             list.Add(new Case { Name = "maths.lua.shared-not-copied", Run = LuaShapeCases.SharedNotCopied });
             list.Add(new Case { Name = "maths.lua.out-pair", Run = LuaShapeCases.OutPair });
             list.Add(new Case { Name = "maths.lua.number-types", Run = LuaShapeCases.NumberTypes });
@@ -124,6 +126,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "hooks.damage-listener", Run = HookCases.DamageListener });
             list.Add(new Case { Name = "hooks.seen-once-per-class", Run = HookCases.SeenOncePerClass });
             list.Add(new Case { Name = "hooks.reset-clears", Run = HookCases.ResetClears });
+            list.Add(new Case { Name = "hooks.taken-in-and-ending", Run = HookCases.TakenInAndEnding });
+            list.Add(new Case { Name = "hooks.reset", Run = HookCases.WidgetHooksReset });
             list.Add(new Case { Name = "events.need-listens-once", Run = HookCases.NeedListensOnce });
             list.Add(new Case { Name = "actors.add-and-get", Run = ActorCases.AddAndGet });
             list.Add(new Case { Name = "actors.remove", Run = ActorCases.RemoveOne });
@@ -284,6 +288,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "items.gone-reads-last", Run = ItemCases.ItemGoneReadsLast });
             list.Add(new Case { Name = "items.gone-before-sweep", Run = ItemCases.GoneBeforeSweep });
             list.Add(new Case { Name = "items.shared-without-handle", Run = ItemCases.SharedWithoutHandle });
+            list.Add(new Case { Name = "destructable.position", Run = DestructableCases.Position });
             list.Add(new Case { Name = "destructables.watch", Run = DestructableCases.Watch });
             list.Add(new Case { Name = "destructables.sweep", Run = DestructableCases.SweepDetectsRemoval });
             list.Add(new Case { Name = "destructables.remove-after-death", Run = DestructableCases.RemoveAfterDeath });

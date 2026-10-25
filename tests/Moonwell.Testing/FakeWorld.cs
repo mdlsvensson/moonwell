@@ -93,6 +93,9 @@ namespace Moonwell.Testing
         /// <summary>The type id of each destructable the world made.</summary>
         private readonly Dictionary<destructable, int> destructableTypes = new Dictionary<destructable, int>();
 
+        /// <summary>Where PlaceDestructable put each destructable; one not placed stands at (100, -50).</summary>
+        private readonly Dictionary<destructable, float[]> destructablePlaces = new Dictionary<destructable, float[]>();
+
         /// <summary>The calls that changed a unit's place or facing, as "move", "place", "turn" or "face-now".</summary>
         public List<string> UnitCalls = new List<string>();
 
@@ -288,6 +291,12 @@ namespace Moonwell.Testing
             var created = new destructable();
             destructableTypes[created] = typeId;
             return created;
+        }
+
+        /// <summary>Puts a destructable at a place; one not placed stands at (100, -50).</summary>
+        public void PlaceDestructable(destructable d, float x, float y)
+        {
+            destructablePlaces[d] = new float[] { x, y };
         }
 
         /// <summary>Makes a unit vanish the way the game does: its type id and its owner read 0 and null, and nothing is told.</summary>
@@ -697,6 +706,28 @@ namespace Moonwell.Testing
         {
             RemovedItems.Add(item);
             itemTypes[item] = 0;
+        }
+
+        /// <summary>The x of a destructable; 100 unless placed, and 0 once it is removed or vanished.</summary>
+        public float DestructableX(destructable destructable)
+        {
+            if (DestructableTypeId(destructable) == 0)
+            {
+                return 0.0f;
+            }
+
+            return destructablePlaces.TryGetValue(destructable, out var place) ? place[0] : 100f;
+        }
+
+        /// <summary>The y of a destructable; -50 unless placed, and 0 once it is removed or vanished.</summary>
+        public float DestructableY(destructable destructable)
+        {
+            if (DestructableTypeId(destructable) == 0)
+            {
+                return 0.0f;
+            }
+
+            return destructablePlaces.TryGetValue(destructable, out var place) ? place[1] : -50f;
         }
 
         /// <summary>Records a destructable removed by the runtime, and reads its type id as 0.</summary>

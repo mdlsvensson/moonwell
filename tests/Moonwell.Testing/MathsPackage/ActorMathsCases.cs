@@ -59,6 +59,32 @@ namespace Moonwell.Testing
             Expect.Near(10f, item.DistanceTo(ItemAt(world, 0f, 0f)), "item to item");
         }
 
+        /// <summary>A destructable has a position, and the distance and facing between it and units, items, destructables and points work both ways.</summary>
+        public static void DestructableDistances(FakeWorld world)
+        {
+            var handle = world.NewDestructable(ObjectTypes.FourCC("dfoo"));
+            world.PlaceDestructable(handle, 30f, 40f);
+            var tree = Destructable.Of(handle)!;
+            var other = Destructable.Of(world.NewDestructable(ObjectTypes.FourCC("dfoo")))!;
+            Expect.True(tree.Position() == new Vector2(30f, 40f), "position");
+            var unit = UnitAt(world, 30f, 140f);
+            var item = ItemAt(world, 20f, 40f);
+            Expect.Near(100f, tree.DistanceTo(unit), "destructable to unit");
+            Expect.Near(90f, tree.AngleTo(unit), "destructable to unit angle");
+            Expect.Near(100f, unit.DistanceTo(tree), "unit to destructable");
+            Expect.Near(270f, unit.AngleTo(tree), "unit to destructable angle");
+            Expect.Near(10f, tree.DistanceTo(item), "destructable to item");
+            Expect.Near(180f, tree.AngleTo(item), "destructable to item angle");
+            Expect.Near(10f, item.DistanceTo(tree), "item to destructable");
+            Expect.Near(0f, item.AngleTo(tree), "item to destructable angle");
+            Expect.Near(5f, tree.DistanceTo(new Vector2(33f, 44f)), "destructable to point");
+            Expect.Near(270f, tree.AngleTo(new Vector2(30f, 0f)), "destructable to point angle");
+            Expect.Near(Maths.Distance(30f, 40f, 100f, -50f), tree.DistanceTo(other), "destructable to destructable");
+            Expect.Near(Maths.AngleBetween(30f, 40f, 100f, -50f), tree.AngleTo(other), "destructable to destructable angle");
+            Expect.Near(Maths.Distance(100f, -50f, 30f, 40f), other.DistanceTo(tree), "destructable to destructable, the other way");
+            Expect.Near(Maths.AngleBetween(100f, -50f, 30f, 40f), other.AngleTo(tree), "destructable to destructable angle, the other way");
+        }
+
         /// <summary>FaceToward turns as setting Facing does; FaceNow turns at once.</summary>
         public static void Face(FakeWorld world)
         {

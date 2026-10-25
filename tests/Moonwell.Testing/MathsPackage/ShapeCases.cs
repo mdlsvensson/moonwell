@@ -69,6 +69,20 @@ namespace Moonwell.Testing
             Expect.True(!l.Contains(new Vector2(-1f, 5f)), "left of it");
         }
 
+        /// <summary>Contains on floats answers as it does on a vector, for the L shape's notch, arms and edges.</summary>
+        public static void PolygonContainsFloats(FakeWorld world)
+        {
+            var l = LShape();
+            Expect.True(!l.Contains(7f, 7f), "the notch");
+            Expect.True(l.Contains(7f, 2f), "the bottom arm");
+            Expect.True(l.Contains(2f, 7f), "the left arm");
+            Expect.True(l.Contains(5f, 0f), "on the bottom edge");
+            Expect.True(l.Contains(4f, 7f), "on the notch's edge");
+            Expect.True(!l.Contains(-1f, 5f), "left of it");
+            Expect.True(!l.Contains(5f, 11f), "above it");
+            Expect.True(l.Contains(0f, 0f), "on a corner");
+        }
+
         /// <summary>Area is positive in either winding; Center is the area's centroid; Bounds holds every point.</summary>
         public static void PolygonAreaCenter(FakeWorld world)
         {

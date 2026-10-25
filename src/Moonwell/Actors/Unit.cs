@@ -984,9 +984,10 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs OnLeave first; the components then end, and the unit leaves the game.</summary>
+        /// <summary>Tells the interactions package, if there is one; runs OnLeave; the components then end, and the unit leaves the game.</summary>
         protected sealed override void OnEnd()
         {
+            Hooks.CallEnding(this);
             var previous = Owner.current;
             Owner.current = this;
             try

@@ -350,6 +350,18 @@ namespace Moonwell.Engine
             return Natives.GetDestructableTypeId(destructable);
         }
 
+        /// <summary>The x of a destructable.</summary>
+        public float DestructableX(destructable destructable)
+        {
+            return Natives.GetDestructableX(destructable);
+        }
+
+        /// <summary>The y of a destructable.</summary>
+        public float DestructableY(destructable destructable)
+        {
+            return Natives.GetDestructableY(destructable);
+        }
+
         /// <summary>Removes a unit from the world.</summary>
         public void DeleteUnit(unit unit)
         {

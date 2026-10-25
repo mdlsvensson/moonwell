@@ -51,6 +51,8 @@ namespace Moonwell
 
             made.Handle = handle;
             made.TypeId = typeId;
+            made.X = Runtime.World.DestructableX(handle);
+            made.Y = Runtime.World.DestructableY(handle);
             known[handle] = made;
             Live.Add(made);
             owner?.Adopt(made);
@@ -76,6 +78,11 @@ namespace Moonwell
                 }
 
                 Owner.current = previous;
+            }
+
+            if (!made.HasEnded)
+            {
+                Hooks.CallTakenIn(made);
             }
 
             return made;
