@@ -62,6 +62,23 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.tracking.read-once", Run = TrackingCases.ReadOnce });
             list.Add(new Case { Name = "interactions.tracking.read-outside-step", Run = TrackingCases.ReadOutsideStep });
             list.Add(new Case { Name = "interactions.tracking.gizmo-place", Run = TrackingCases.GizmoPlace });
+            list.Add(new Case { Name = "interactions.find.in-range", Run = FindCases.InRange });
+            list.Add(new Case { Name = "interactions.find.kinds", Run = FindCases.Kinds });
+            list.Add(new Case { Name = "interactions.find.no-place-class", Run = FindCases.NoPlaceClass });
+            list.Add(new Case { Name = "interactions.find.filter", Run = FindCases.Filter });
+            list.Add(new Case { Name = "interactions.find.fills", Run = FindCases.Fills });
+            list.Add(new Case { Name = "interactions.find.in-rect", Run = FindCases.InRect });
+            list.Add(new Case { Name = "interactions.find.in-polygon", Run = FindCases.InPolygon });
+            list.Add(new Case { Name = "interactions.find.along-line", Run = FindCases.AlongLine });
+            list.Add(new Case { Name = "interactions.find.along-slanted-line", Run = FindCases.AlongSlantedLine });
+            list.Add(new Case { Name = "interactions.find.closest", Run = FindCases.Closest });
+            list.Add(new Case { Name = "interactions.find.closest-n", Run = FindCases.ClosestN });
+            list.Add(new Case { Name = "interactions.find.stale", Run = FindCases.Stale });
+            list.Add(new Case { Name = "interactions.find.no-place", Run = FindCases.NoPlace });
+            list.Add(new Case { Name = "interactions.find.order", Run = FindCases.Order });
+            list.Add(new Case { Name = "interactions.find.inside-reaction", Run = FindCases.InsideReaction });
+            list.Add(new Case { Name = "interactions.find.nested", Run = FindCases.Nested });
+            list.Add(new Case { Name = "interactions.find.throwing", Run = FindCases.Throwing });
         }
 
         /// <summary>Adds the maths package's cases.</summary>
