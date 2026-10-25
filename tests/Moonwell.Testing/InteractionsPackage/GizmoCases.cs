@@ -7,10 +7,11 @@ namespace Moonwell.Testing
     /// <summary>Cases for gizmos and the cycle that ticks them, with the default step of 1/32 second: a tick of 0.1 second is 4 steps.</summary>
     public static class GizmoCases
     {
-        /// <summary>Installs a fake interactions world.</summary>
+        /// <summary>Installs a fake interactions world with cells of 256, which the expected cells of these cases count in (the default is 128).</summary>
         private static void Fresh()
         {
             Interactions.Install(new FakeInteractionWorld());
+            Interactions.CellSize = 256.0f;
         }
 
         /// <summary>Moves the game on by a number of steps, one step at a time.</summary>

@@ -19,7 +19,7 @@ namespace Moonwell
         /// <summary>The package's handler of core's TakenIn hook; the package counts as installed while that hook is this one.</summary>
         private static Action<Widget>? handler;
 
-        /// <summary>The side of a grid cell, in game units; 256. Read when the grid is made.</summary>
+        /// <summary>The side of a grid cell, in game units; 128. Read when the grid is made.</summary>
         public static float CellSize
         {
             get { return Current().CellSize; }
@@ -77,6 +77,30 @@ namespace Moonwell
 
                 return grid;
             }
+        }
+
+        /// <summary>The grid when the package is installed and it has been made; null otherwise. Unlike Grid it installs nothing and makes nothing, for a search inside Local.For, which may change no shared state.</summary>
+        internal static Grid? GridIfMade
+        {
+            get { return Installed() ? grid : null; }
+        }
+
+        /// <summary>Whether the package is installed on a world.</summary>
+        internal static bool IsInstalled
+        {
+            get { return Installed(); }
+        }
+
+        /// <summary>The world a read of a place asks the game through. It is the package's world when it is installed; otherwise the game's natives, without installing the package, for a search inside Local.For, which may change no shared state.</summary>
+        internal static IInteractionWorld PeekWorld
+        {
+            get { return Installed() ? host! : new NativeInteractionWorld(); }
+        }
+
+        /// <summary>Forgets the settings, so the next use starts from the defaults; the tests call it between cases.</summary>
+        internal static void ResetSettings()
+        {
+            settings = null;
         }
 
         /// <summary>The world the package talks to. The package installs itself on the game first if it is not installed.</summary>

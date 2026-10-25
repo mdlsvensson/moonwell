@@ -6,11 +6,12 @@ namespace Moonwell.Testing
     /// <summary>Cases for the interactions package's settings and grid, on a 2,048 by 2,048 world from (-1024, -1024) with cells of 256: 8 columns and 8 rows.</summary>
     public static class GridCases
     {
-        /// <summary>Installs a fake world and returns it.</summary>
+        /// <summary>Installs a fake world with cells of 256, which the expected cells of these cases count in (the default is 128), and returns it.</summary>
         private static FakeInteractionWorld Fresh()
         {
             var fake = new FakeInteractionWorld();
             Interactions.Install(fake);
+            Interactions.CellSize = 256.0f;
             return fake;
         }
 
@@ -172,8 +173,8 @@ namespace Moonwell.Testing
         /// <summary>The settings start at their defaults, and are read when the grid is made.</summary>
         public static void Settings(FakeWorld world)
         {
-            Fresh();
-            Expect.Near(256.0f, Interactions.CellSize, "CellSize");
+            Interactions.Install(new FakeInteractionWorld());
+            Expect.Near(128.0f, Interactions.CellSize, "CellSize");
             Expect.Near(0.1f, Interactions.CellCheck, "CellCheck");
             Expect.Near(64.0f, Interactions.Slack, "Slack");
             Expect.Near(0.03125f, Interactions.Step, "Step");
@@ -186,11 +187,11 @@ namespace Moonwell.Testing
             }
             finally
             {
-                Fresh();
-                Interactions.CellSize = 256.0f;
+                Interactions.Install(new FakeInteractionWorld());
+                Interactions.CellSize = 128.0f;
             }
 
-            Expect.Near(256.0f, Interactions.CellSize, "CellSize is back");
+            Expect.Near(128.0f, Interactions.CellSize, "CellSize is back");
         }
 
         /// <summary>A setting changed after the grid exists is an error in a development build, and changes nothing.</summary>

@@ -263,6 +263,7 @@ namespace Moonwell.Testing
         {
             var world = new FakeWorld();
             Runtime.Reset(world);
+            Interactions.ResetSettings();
             Runtime.ListenForCarriers();
             return world;
         }

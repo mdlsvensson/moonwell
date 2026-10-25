@@ -3,14 +3,15 @@ using Moonwell.Engine;
 
 namespace Moonwell.Testing
 {
-    /// <summary>Cases for what the package tracks, on the default settings: a step of 1/32 second, a cell check of 0.1 second and cells of 256 over a 2,048 by 2,048 world from (-1024, -1024).</summary>
+    /// <summary>Cases for what the package tracks, on the default settings but cells of 256: a step of 1/32 second, a cell check of 0.1 second over a 2,048 by 2,048 world from (-1024, -1024).</summary>
     public static class TrackingCases
     {
-        /// <summary>Installs a fake interactions world and returns it.</summary>
+        /// <summary>Installs a fake interactions world with cells of 256, which the expected cells of these cases count in (the default is 128), and returns it.</summary>
         private static FakeInteractionWorld Fresh()
         {
             var fake = new FakeInteractionWorld();
             Interactions.Install(fake);
+            Interactions.CellSize = 256.0f;
             return fake;
         }
 

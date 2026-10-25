@@ -11,7 +11,7 @@ namespace Moonwell
     /// ended), has its centre inside the shape, and is accepted by the filter. Each shape has a form that returns a new list, for
     /// a cast or a click, and a form that fills a list the map keeps (cleared first, returns the count), for code that runs
     /// often. Results come in the grid's order, the same on every machine; Closest gives the nearest first and keeps the grid's
-    /// order among things at the same distance.
+    /// order among things at the same distance. Inside Local.For a search reads and changes nothing: it tracks no kind, and keeps no place it reads.
     /// </summary>
     public static class Find
     {
@@ -47,6 +47,7 @@ namespace Moonwell
             where T : Actor
         {
             results.Clear();
+            Ask<T>();
             if (range < 0.0f)
             {
                 return 0;
@@ -57,17 +58,19 @@ namespace Moonwell
             try
             {
                 var end = candidates.Count;
+                var px = 0.0f;
+                var py = 0.0f;
                 for (var i = start; i < end; i++)
                 {
                     var entry = candidates[i];
-                    var thing = Placed<T>(entry);
+                    var thing = Placed<T>(entry, out px, out py);
                     if (thing == null)
                     {
                         continue;
                     }
 
-                    var dx = entry.X - x;
-                    var dy = entry.Y - y;
+                    var dx = px - x;
+                    var dy = py - y;
                     if (dx * dx + dy * dy > limit)
                     {
                         continue;
@@ -113,6 +116,7 @@ namespace Moonwell
             where T : Actor
         {
             results.Clear();
+            Ask<T>();
             var minX = bounds.Min.X;
             var minY = bounds.Min.Y;
             var maxX = bounds.Max.X;
@@ -121,18 +125,18 @@ namespace Moonwell
             try
             {
                 var end = candidates.Count;
+                var px = 0.0f;
+                var py = 0.0f;
                 for (var i = start; i < end; i++)
                 {
                     var entry = candidates[i];
-                    var thing = Placed<T>(entry);
+                    var thing = Placed<T>(entry, out px, out py);
                     if (thing == null)
                     {
                         continue;
                     }
 
-                    var x = entry.X;
-                    var y = entry.Y;
-                    if (x < minX || x > maxX || y < minY || y > maxY)
+                    if (px < minX || px > maxX || py < minY || py > maxY)
                     {
                         continue;
                     }
@@ -169,21 +173,24 @@ namespace Moonwell
             where T : Actor
         {
             results.Clear();
+            Ask<T>();
             var bounds = polygon.Bounds;
             var start = Gather<T>(bounds.Min.X, bounds.Min.Y, bounds.Max.X, bounds.Max.Y);
             try
             {
                 var end = candidates.Count;
+                var px = 0.0f;
+                var py = 0.0f;
                 for (var i = start; i < end; i++)
                 {
                     var entry = candidates[i];
-                    var thing = Placed<T>(entry);
+                    var thing = Placed<T>(entry, out px, out py);
                     if (thing == null)
                     {
                         continue;
                     }
 
-                    if (!polygon.Contains(entry.X, entry.Y))
+                    if (!polygon.Contains(px, py))
                     {
                         continue;
                     }
@@ -230,6 +237,7 @@ namespace Moonwell
             where T : Actor
         {
             results.Clear();
+            Ask<T>();
             if (width < 0.0f)
             {
                 return 0;
@@ -248,17 +256,17 @@ namespace Moonwell
             try
             {
                 var end = candidates.Count;
+                var px = 0.0f;
+                var py = 0.0f;
                 for (var i = start; i < end; i++)
                 {
                     var entry = candidates[i];
-                    var thing = Placed<T>(entry);
+                    var thing = Placed<T>(entry, out px, out py);
                     if (thing == null)
                     {
                         continue;
                     }
 
-                    var px = entry.X;
-                    var py = entry.Y;
                     var along = 0.0f;
                     if (lengthSquared > 0.0f)
                     {
@@ -304,11 +312,12 @@ namespace Moonwell
             return AlongLine<T>(from.X, from.Y, to.X, to.Y, width, results, where);
         }
 
-        /// <summary>The nearest thing of class T within maxRange of a point that the filter accepts; null when there is none. Of two at the same distance, the one the grid reads first.</summary>
+        /// <summary>The nearest thing of class T within maxRange of a point that the filter accepts; null when there is none. Of two at the same distance, the one the grid reads first. The filter is asked only of a candidate that could be kept.</summary>
         [LocalSafe]
         public static T? Closest<T>(float x, float y, float maxRange, Func<T, bool>? where = null)
             where T : Actor
         {
+            Ask<T>();
             T? best = null;
             if (maxRange < 0.0f)
             {
@@ -321,17 +330,19 @@ namespace Moonwell
             try
             {
                 var end = candidates.Count;
+                var px = 0.0f;
+                var py = 0.0f;
                 for (var i = start; i < end; i++)
                 {
                     var entry = candidates[i];
-                    var thing = Placed<T>(entry);
+                    var thing = Placed<T>(entry, out px, out py);
                     if (thing == null)
                     {
                         continue;
                     }
 
-                    var dx = entry.X - x;
-                    var dy = entry.Y - y;
+                    var dx = px - x;
+                    var dy = py - y;
                     var squared = dx * dx + dy * dy;
                     if (squared > limit || (best != null && squared >= bestSquared))
                     {
@@ -355,7 +366,7 @@ namespace Moonwell
             return best;
         }
 
-        /// <summary>The nearest thing of class T within maxRange of a point that the filter accepts; null when there is none. Of two at the same distance, the one the grid reads first.</summary>
+        /// <summary>The nearest thing of class T within maxRange of a point that the filter accepts; null when there is none. Of two at the same distance, the one the grid reads first. The filter is asked only of a candidate that could be kept.</summary>
         [LocalSafe]
         public static T? Closest<T>(Vector2 center, float maxRange, Func<T, bool>? where = null)
             where T : Actor
@@ -363,12 +374,13 @@ namespace Moonwell
             return Closest<T>(center.X, center.Y, maxRange, where);
         }
 
-        /// <summary>Clears the list and fills it with the nearest count things of class T within maxRange of a point, nearest first, and returns how many; things at the same distance come in the grid's order.</summary>
+        /// <summary>Clears the list and fills it with the nearest count things of class T within maxRange of a point, nearest first, and returns how many; things at the same distance come in the grid's order. The filter is asked only of a candidate that could be kept.</summary>
         [LocalSafe]
         public static int Closest<T>(float x, float y, int count, float maxRange, List<T> results, Func<T, bool>? where = null)
             where T : Actor
         {
             results.Clear();
+            Ask<T>();
             if (count <= 0 || maxRange < 0.0f)
             {
                 return 0;
@@ -380,17 +392,19 @@ namespace Moonwell
             try
             {
                 var end = candidates.Count;
+                var px = 0.0f;
+                var py = 0.0f;
                 for (var i = start; i < end; i++)
                 {
                     var entry = candidates[i];
-                    var thing = Placed<T>(entry);
+                    var thing = Placed<T>(entry, out px, out py);
                     if (thing == null)
                     {
                         continue;
                     }
 
-                    var dx = entry.X - x;
-                    var dy = entry.Y - y;
+                    var dx = px - x;
+                    var dy = py - y;
                     var squared = dx * dx + dy * dy;
                     if (squared > limit)
                     {
@@ -438,7 +452,7 @@ namespace Moonwell
             return results.Count;
         }
 
-        /// <summary>Clears the list and fills it with the nearest count things of class T within maxRange of a point, nearest first, and returns how many; things at the same distance come in the grid's order.</summary>
+        /// <summary>Clears the list and fills it with the nearest count things of class T within maxRange of a point, nearest first, and returns how many; things at the same distance come in the grid's order. The filter is asked only of a candidate that could be kept.</summary>
         [LocalSafe]
         public static int Closest<T>(Vector2 center, int count, float maxRange, List<T> results, Func<T, bool>? where = null)
             where T : Actor
@@ -446,14 +460,46 @@ namespace Moonwell
             return Closest<T>(center.X, center.Y, count, maxRange, results, where);
         }
 
-        /// <summary>Asks for the kinds of thing T covers, then adds the entries of the cells a box touches, grown by the slack, to the end of the shared candidates; returns where they start.</summary>
+        /// <summary>What a search is looking at now: how many candidates and squared distances the searches that are running hold. It is 0 whenever no search is running, however the searches ended.</summary>
+        internal static int Pending
+        {
+            get { return candidates.Count + distances.Count; }
+        }
+
+        /// <summary>Asks for the kinds of thing T covers, which tracks the kinds not tracked yet, and fails in a development build for a class with no place. Inside Local.For it only checks the class: a search there may track nothing.</summary>
+        private static void Ask<T>()
+            where T : Actor
+        {
+            if (Local.Depth > 0)
+            {
+                Tracking.CheckPlace(typeof(T));
+            }
+            else
+            {
+                Tracking.NeedFor(typeof(T));
+            }
+        }
+
+        /// <summary>Adds the entries of the cells a box touches, grown by the slack, to the end of the shared candidates; returns where they start. Inside Local.For it makes and installs nothing: it takes the cells of what is tracked, if there is a grid, and an entry of the search's own for each live thing of a kind nobody has asked for.</summary>
         private static int Gather<T>(float minX, float minY, float maxX, float maxY)
             where T : Actor
         {
-            Tracking.NeedFor(typeof(T));
-            var slack = Interactions.Slack;
             var start = candidates.Count;
-            Interactions.Grid.Collect(minX - slack, minY - slack, maxX + slack, maxY + slack, candidates);
+            if (Local.Depth > 0)
+            {
+                var made = Interactions.GridIfMade;
+                if (made != null)
+                {
+                    var slack = Interactions.Slack;
+                    made.Collect(minX - slack, minY - slack, maxX + slack, maxY + slack, candidates);
+                }
+
+                Tracking.AddUntracked<T>(candidates);
+                return start;
+            }
+
+            var spread = Interactions.Slack;
+            Interactions.Grid.Collect(minX - spread, minY - spread, maxX + spread, maxY + spread, candidates);
             return start;
         }
 
@@ -466,17 +512,26 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The thing of an entry when it is of class T and has a place now, read at most once a step; null otherwise. An entry of another class is not read.</summary>
-        private static T? Placed<T>(Entry entry)
+        /// <summary>The thing of an entry when it is of class T and has a place now, with where it is through out; null otherwise. An entry of another class is not read. A place is read at most once a step and kept; inside Local.For it is read into locals and kept nowhere.</summary>
+        private static T? Placed<T>(Entry entry, out float x, out float y)
             where T : Actor
         {
+            x = 0.0f;
+            y = 0.0f;
             var thing = entry.Thing as T;
             if (thing == null)
             {
                 return null;
             }
 
+            if (Local.Depth > 0)
+            {
+                return Tracking.Peek(entry, out x, out y) ? thing : null;
+            }
+
             Tracking.ReadNow(entry);
+            x = entry.X;
+            y = entry.Y;
             return entry.HasPlace ? thing : null;
         }
     }

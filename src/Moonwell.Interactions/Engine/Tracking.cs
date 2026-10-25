@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Moonwell.Hosting;
 
 namespace Moonwell.Engine
 {
@@ -166,33 +167,116 @@ namespace Moonwell.Engine
         /// <summary>Asks for the kinds of thing a class covers: Unit and its subclasses units, Item items, Destructable destructables, Gizmo and a map's gizmo classes gizmos, Widget the first three and Actor all four. Any other class has no place, which fails in a development build.</summary>
         public static void NeedFor(Type type)
         {
-            var widget = type == typeof(Widget);
-            var all = type == typeof(Actor);
-            var any = false;
-            if (all || widget || typeof(Unit).IsAssignableFrom(type))
+            for (var kind = UnitKind; kind <= DestructableKind; kind++)
             {
-                Need(UnitKind);
-                any = true;
+                if (Covers(type, kind))
+                {
+                    Need(kind);
+                }
             }
 
-            if (all || widget || typeof(Item).IsAssignableFrom(type))
+            CheckPlace(type);
+        }
+
+        /// <summary>Fails in a development build when a class covers no kind of thing, as Player and the game do not have a place.</summary>
+        public static void CheckPlace(Type type)
+        {
+            Dev.Check(Covers(type, UnitKind) || Covers(type, ItemKind) || Covers(type, DestructableKind) || Covers(type, GizmoKind), type.Name + " has no place");
+        }
+
+        /// <summary>Whether a class covers a kind of thing: Unit and its subclasses units, Item items, Destructable destructables, Gizmo and a map's gizmo classes gizmos, Widget the first three and Actor all four.</summary>
+        public static bool Covers(Type type, int kind)
+        {
+            if (type == typeof(Actor))
             {
-                Need(ItemKind);
-                any = true;
+                return true;
             }
 
-            if (all || widget || typeof(Destructable).IsAssignableFrom(type))
+            if (kind == UnitKind)
             {
-                Need(DestructableKind);
-                any = true;
+                return type == typeof(Widget) || typeof(Unit).IsAssignableFrom(type);
             }
 
-            if (all || typeof(Gizmo).IsAssignableFrom(type))
+            if (kind == ItemKind)
             {
-                any = true;
+                return type == typeof(Widget) || typeof(Item).IsAssignableFrom(type);
             }
 
-            Dev.Check(any, type.Name + " has no place");
+            if (kind == DestructableKind)
+            {
+                return type == typeof(Widget) || typeof(Destructable).IsAssignableFrom(type);
+            }
+
+            return typeof(Gizmo).IsAssignableFrom(type);
+        }
+
+        /// <summary>Whether a kind of thing is tracked: it has been asked for while the package is installed. Gizmos always are.</summary>
+        public static bool Asked(int kind)
+        {
+            if (kind == GizmoKind)
+            {
+                return true;
+            }
+
+            if (!Interactions.IsInstalled)
+            {
+                return false;
+            }
+
+            if (kind == UnitKind)
+            {
+                return unitsAsked;
+            }
+
+            return kind == ItemKind ? itemsAsked : destructablesAsked;
+        }
+
+        /// <summary>Adds, to the end of a list, an entry that is in no grid for each live thing of class T of a kind nobody has asked for, in the order the runtime took them in. It tracks nothing and keeps nothing: the entries are the search's own, to be dropped with it. For a search inside Local.For, which may not track a kind.</summary>
+        public static void AddUntracked<T>(List<Entry> into)
+            where T : Actor
+        {
+            var type = typeof(T);
+            if (Covers(type, UnitKind) && !Asked(UnitKind))
+            {
+                var live = KnownUnits.Live;
+                for (var i = 0; i < live.Count; i++)
+                {
+                    var unit = live[i];
+                    if (unit is T && !unit.IsGone && !unit.HasEnded && unit.Handle != null)
+                    {
+                        into.Add(new Entry(0, unit, UnitKind));
+                    }
+                }
+            }
+
+            if (Covers(type, ItemKind) && !Asked(ItemKind))
+            {
+                var live = KnownItems.Live;
+                for (var i = 0; i < live.Count; i++)
+                {
+                    var item = live[i];
+                    if (item is T && !item.IsGone && !item.HasEnded && item.Handle != null)
+                    {
+                        into.Add(new Entry(0, item, ItemKind));
+                    }
+                }
+            }
+
+            if (Covers(type, DestructableKind) && !Asked(DestructableKind))
+            {
+                var live = KnownDestructables.Live;
+                for (var i = 0; i < live.Count; i++)
+                {
+                    var destructable = live[i];
+                    if (destructable is T && !destructable.IsGone && !destructable.HasEnded)
+                    {
+                        var entry = new Entry(0, destructable, DestructableKind);
+                        entry.X = destructable.X;
+                        entry.Y = destructable.Y;
+                        into.Add(entry);
+                    }
+                }
+            }
         }
 
         /// <summary>The entry of a thing; null when it is not tracked, has ended, or is a default object with no handle.</summary>
@@ -257,6 +341,57 @@ namespace Moonwell.Engine
             {
                 ReadDestructable(entry, (Destructable)entry.Thing);
             }
+        }
+
+        /// <summary>Reads the place of an entry without keeping it, for a search inside Local.For, which may change no shared state: whether it has a place and, if it has, where, through out. An entry read this step gives what that read kept; any other is read from the game into locals, and its cache, its cell and the grid are left as they were. The same rule as ReadNow decides what has a place.</summary>
+        public static bool Peek(Entry entry, out float x, out float y)
+        {
+            x = entry.X;
+            y = entry.Y;
+            if (entry.Ended)
+            {
+                return false;
+            }
+
+            if (entry.Kind == GizmoKind)
+            {
+                return entry.HasPlace;
+            }
+
+            if (cycle != null && cycle.Running && entry.ReadStep == cycle.StepNow)
+            {
+                return entry.HasPlace;
+            }
+
+            var world = Interactions.PeekWorld;
+            if (entry.Kind == UnitKind)
+            {
+                var unit = (Unit)entry.Thing;
+                if (!UnitHasPlace(unit, world))
+                {
+                    return false;
+                }
+
+                x = unit.X;
+                y = unit.Y;
+                return true;
+            }
+
+            if (entry.Kind == ItemKind)
+            {
+                var item = (Item)entry.Thing;
+                if (!ItemHasPlace(item, world))
+                {
+                    return false;
+                }
+
+                x = item.X;
+                y = item.Y;
+                return true;
+            }
+
+            var destructable = (Destructable)entry.Thing;
+            return !destructable.IsGone && world.IsAlive(destructable.Handle);
         }
 
         /// <summary>Gives a thing its entry: the next id and its place, in the grid and with a place. The first thing tracked starts the cycle's timer.</summary>
@@ -438,14 +573,25 @@ namespace Moonwell.Engine
         /// <summary>Whether a unit has a place: alive, not hidden and not loaded in a transport.</summary>
         private static bool UnitHasPlace(Unit unit)
         {
-            var world = Interactions.World;
+            return UnitHasPlace(unit, Interactions.World);
+        }
+
+        /// <summary>Whether a unit has a place, asking a world.</summary>
+        private static bool UnitHasPlace(Unit unit, IInteractionWorld world)
+        {
             return unit.IsAlive && !world.IsHidden(unit.Handle) && !world.IsLoaded(unit.Handle);
         }
 
         /// <summary>Whether an item has a place: on the ground, so not carried, and visible.</summary>
         private static bool ItemHasPlace(Item item)
         {
-            return !item.IsGone && !item.IsCarried && Interactions.World.IsVisible(item.Handle);
+            return ItemHasPlace(item, Interactions.World);
+        }
+
+        /// <summary>Whether an item has a place, asking a world.</summary>
+        private static bool ItemHasPlace(Item item, IInteractionWorld world)
+        {
+            return !item.IsGone && !item.IsCarried && world.IsVisible(item.Handle);
         }
 
         /// <summary>Reads a unit: whether it has a place and, if it has, where. A unit with none keeps the place it was last read at.</summary>

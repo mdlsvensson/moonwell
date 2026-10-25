@@ -4,7 +4,7 @@ namespace Moonwell.Engine
     internal sealed class Settings
     {
         /// <summary>The side of a grid cell, in game units.</summary>
-        public float CellSize = 256.0f;
+        public float CellSize = 128.0f;
 
         /// <summary>How often a unit's or item's cell is read again, in seconds.</summary>
         public float CellCheck = 0.1f;

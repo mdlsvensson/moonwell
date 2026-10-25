@@ -79,6 +79,12 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.find.inside-reaction", Run = FindCases.InsideReaction });
             list.Add(new Case { Name = "interactions.find.nested", Run = FindCases.Nested });
             list.Add(new Case { Name = "interactions.find.throwing", Run = FindCases.Throwing });
+            list.Add(new Case { Name = "interactions.find.throwing-closest", Run = FindCases.ThrowingClosest });
+            list.Add(new Case { Name = "interactions.find.edge", Run = FindCases.Edge });
+            list.Add(new Case { Name = "interactions.find.local-tracked", Run = FindCases.LocalTracked });
+            list.Add(new Case { Name = "interactions.find.local-cached", Run = FindCases.LocalCached });
+            list.Add(new Case { Name = "interactions.find.local-untracked", Run = FindCases.LocalUntracked });
+            list.Add(new Case { Name = "interactions.find.local-mixed", Run = FindCases.LocalMixed });
         }
 
         /// <summary>Adds the maths package's cases.</summary>
