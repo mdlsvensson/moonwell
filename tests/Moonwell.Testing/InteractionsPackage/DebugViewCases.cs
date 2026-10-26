@@ -166,7 +166,7 @@ namespace Moonwell.Testing
             Expect.Equal(40, debug.Lines.Count, "lines a step later");
         }
 
-        /// <summary>A holder with 40 pairs draws 32 pair lines, to the 32 nearest others, nearest first.</summary>
+        /// <summary>A holder with 40 pairs draws 32 pair lines, to the 32 nearest others, nearest first, and the drawing keeps no more than 32 pairs on the way.</summary>
         public static void PairLimit(FakeWorld world)
         {
             RegisterFootman();
@@ -184,6 +184,7 @@ namespace Moonwell.Testing
             Expect.Equal(40, aura.Pairs.Count, "the aura's pairs");
             DebugMode.Select(a);
             Expect.Equal(24 + 14 + 32, debug.Lines.Count, "lines: a circle, the grid lines and 32 pair lines");
+            Expect.Equal(32, InteractionsView.Instance.LastDrawKept, "the pairs the drawing kept");
             for (var k = 0; k < 32; k++)
             {
                 Expect.Equal(DebugDraw.Ticking, debug.LineStyles[38 + k], "the style of pair line " + k);

@@ -53,6 +53,9 @@ namespace Moonwell.Engine
         /// <summary>The facts of the pair read last.</summary>
         private readonly PairFacts facts = new PairFacts();
 
+        /// <summary>How many pairs the last Draw kept to draw lines to; the cases read it.</summary>
+        internal int LastDrawKept;
+
         /// <summary>The view, made on first use; Interactions.Install adds it to the debug mode.</summary>
         internal static InteractionsView Instance
         {
@@ -192,7 +195,7 @@ namespace Moonwell.Engine
                     var interaction = held[i];
                     lines.Add(InteractionLine(interaction));
                     ClearPairs();
-                    AddPairs(interaction);
+                    AddPairs(interaction, int.MaxValue);
                     for (var p = 0; p < pairs.Count; p++)
                     {
                         interaction.ReadPair(pairs[p], facts);
@@ -277,7 +280,7 @@ namespace Moonwell.Engine
             {
                 for (var i = 0; i < held.Count; i++)
                 {
-                    AddPairs(held[i]);
+                    AddPairs(held[i], MostPairLines);
                 }
             }
 
@@ -289,13 +292,13 @@ namespace Moonwell.Engine
                     var of = partners[i].Owner as Interaction;
                     if (of != null)
                     {
-                        AddPair(of, partners[i]);
+                        AddPair(of, partners[i], MostPairLines);
                     }
                 }
             }
 
-            var lines = pairs.Count < MostPairLines ? pairs.Count : MostPairLines;
-            for (var i = 0; i < lines; i++)
+            LastDrawKept = pairs.Count;
+            for (var i = 0; i < pairs.Count; i++)
             {
                 var of = pairsOf[i];
                 of.ReadPair(pairs[i], facts);
@@ -486,18 +489,22 @@ namespace Moonwell.Engine
             distances.Clear();
         }
 
-        /// <summary>Adds an interaction's pairs to the pairs being shown, each at its place by distance.</summary>
-        private void AddPairs(Interaction interaction)
+        /// <summary>Adds an interaction's pairs to the pairs being shown, each at its place by distance, keeping the nearest up to a number.</summary>
+        private void AddPairs(Interaction interaction, int most)
         {
             var list = interaction.pairs;
             for (var i = 0; i < list.Count; i++)
             {
-                AddPair(interaction, list[i]);
+                AddPair(interaction, list[i], most);
             }
         }
 
-        /// <summary>Adds a pair of an interaction to the pairs being shown, after those nearer or as near.</summary>
-        private void AddPair(Interaction interaction, Owner pair)
+        /// <summary>
+        /// Adds a pair of an interaction to the pairs being shown, after those nearer or as near, keeping only the nearest up
+        /// to a number: a pair no nearer than the farthest of a full list is left out, and one nearer pushes the farthest out.
+        /// No pair is kept past the number, so a frame is never a sort of every pair.
+        /// </summary>
+        private void AddPair(Interaction interaction, Owner pair, int most)
         {
             interaction.ReadPair(pair, facts);
             var distance = facts.Distance;
@@ -507,9 +514,21 @@ namespace Moonwell.Engine
                 at--;
             }
 
+            if (at >= most)
+            {
+                return;
+            }
+
             pairs.Insert(at, pair);
             pairsOf.Insert(at, interaction);
             distances.Insert(at, distance);
+            if (pairs.Count > most)
+            {
+                var last = pairs.Count - 1;
+                pairs.RemoveAt(last);
+                pairsOf.RemoveAt(last);
+                distances.RemoveAt(last);
+            }
         }
 
         /// <summary>"1 pair", "2 pairs": a count and a noun, plural unless the count is 1.</summary>
