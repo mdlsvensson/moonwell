@@ -16,10 +16,18 @@ namespace Moonwell
         /// <summary>The scheduler that runs the timers; set by Reset.</summary>
         internal static Scheduler Scheduler = null!;
 
+#if DEBUG
+        /// <summary>Moonwell's clock in a development build, which the world's Now and WakeIn go through; set by Reset.</summary>
+        internal static DebugClock Clock = null!;
+#endif
+
         /// <summary>Makes a world the runtime's world and clears the state of every task.</summary>
         internal static void Reset(IWorld world)
         {
             World = world;
+#if DEBUG
+            Clock = new DebugClock();
+#endif
             Errors.Reset();
             Scheduler = new Scheduler();
             Hooks.Reset();

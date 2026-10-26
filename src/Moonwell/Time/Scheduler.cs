@@ -51,12 +51,21 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Runs every timer that is due, then asks the world to wake for the next one.</summary>
+        /// <summary>Runs every timer that is due, then asks the world to wake for the next one; in a development build, a timer that halts Moonwell's clock ends the run, and the timers due after it wait for the next step.</summary>
         internal void Wake()
         {
             var now = Runtime.World.Now();
+#if DEBUG
+            var wasHalted = Runtime.Clock.IsHalted;
+#endif
             while (heap.Count > 0 && heap[0].due <= now + 0.001f)
             {
+#if DEBUG
+                if (!wasHalted && Runtime.Clock.IsHalted)
+                {
+                    break;
+                }
+#endif
                 var entry = Pop();
                 var timer = entry.timer;
                 if (timer.HasEnded)

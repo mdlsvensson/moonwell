@@ -18,7 +18,22 @@ namespace Moonwell.Testing
             AddTerrain(list);
             AddAreas(list);
             AddInput(list);
+            AddDebug(list);
             return list;
+        }
+
+        /// <summary>Adds the debug mode's cases; they exist only in a development build, as the debug mode does.</summary>
+        private static void AddDebug(List<Case> list)
+        {
+#if DEBUG
+            list.Add(new Case { Name = "debug.clock.halt", Run = ClockCases.Halt });
+            list.Add(new Case { Name = "debug.clock.step-advances", Run = ClockCases.StepAdvances });
+            list.Add(new Case { Name = "debug.clock.speed", Run = ClockCases.Speed });
+            list.Add(new Case { Name = "debug.clock.no-jump", Run = ClockCases.NoJump });
+            list.Add(new Case { Name = "debug.clock.timer-while-halted", Run = ClockCases.TimerWhileHalted });
+            list.Add(new Case { Name = "debug.clock.halt-inside-timer", Run = ClockCases.HaltInsideTimer });
+            list.Add(new Case { Name = "debug.clock.catchup", Run = ClockCases.Catchup });
+#endif
         }
 
         /// <summary>Adds the interactions package's cases.</summary>

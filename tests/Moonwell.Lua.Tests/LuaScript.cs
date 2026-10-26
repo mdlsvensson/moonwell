@@ -17,13 +17,15 @@ internal static class LuaScript
 
     public static string RepoRoot => Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
 
-    public static string Compile(string csproj)
+    // A development build compiles with DEBUG, as `moonwell build` does; otherwise the script is a release build's.
+    public static string Compile(string csproj, bool development = false)
     {
         var map = War3Net.Build.Map.Open(Path.Combine(RepoRoot, "tests", "Moonwell.Lua.Tests", "map"), MapFiles.All & ~MapFiles.Triggers & ~MapFiles.CustomTextTriggers);
         var outputFolder = Path.Combine(Path.GetTempPath(), "moonwell-lua", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(outputFolder);
         var copy = Rewritten(csproj, Path.Combine(outputFolder, "project"));
-        var compiler = new Compiler(copy, outputFolder, string.Empty, null, null, string.Empty, string.Empty, false, null, string.Empty)
+        var defines = development ? "-define:DEBUG" : string.Empty;
+        var compiler = new Compiler(copy, outputFolder, string.Empty, null, null, string.Empty, defines, false, null, string.Empty)
         {
             IsExportMetadata = false,
             IsModule = false,
