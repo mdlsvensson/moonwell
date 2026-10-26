@@ -4,6 +4,17 @@ using Moonwell.Hosting;
 namespace Moonwell
 {
     /// <summary>Runs each hit through its stages: the package's state, and its actions on the game's damage events.</summary>
+    /// <remarks>
+    /// A hit's path, one step a method:
+    /// Deal (code damage only) leaves a pending deal for the hit its call makes.
+    /// Damaging, the game's before-armor event, makes the Hit, runs the before-armor stage, writes its changes to the
+    /// game and pushes the hit on the open stack; it then waits for the after-armor event.
+    /// Damaged, the game's after-armor event, takes the hit off the stack, runs core's reactions and the after-armor
+    /// stage, then the lethal stage when the hit would kill, and adds it to the moment.
+    /// Settle, a 0 s timer later, ends the hits still waiting, lands the moment's hits in order, then runs each source's
+    /// burst.
+    /// Hits a reaction deals run this whole path inside the reaction, as the game deals them inside the call.
+    /// </remarks>
     internal static class Pipeline
     {
         /// <summary>How long a chain of hits dealt from reactions may be.</summary>
@@ -58,7 +69,7 @@ namespace Moonwell
             World.Listen(Damaging, Damaged);
         }
 
-        /// <summary>A class seen for the first time: one implementing a damage interface makes the package listen.</summary>
+        /// <summary>A class seen for the first time: one implementing a damage interface has its reactions learned and makes the package listen.</summary>
         private static void Saw(object obj)
         {
             if (obj is IDamageWatch)
@@ -68,6 +79,7 @@ namespace Moonwell
 
             if (obj is IDamageSource || obj is IDamageTarget || obj is IDamageWatch)
             {
+                Reactions.Learn(obj);
                 Listen();
             }
         }
@@ -236,7 +248,7 @@ namespace Moonwell
             }
 
             // Spell immunity: the game will not send this hit's after-armor event, so it ends here.
-            if (Immunity.Stops(World.IsMagicImmune(target), hit.AttackTypeCode, (int)hit.DamageKind))
+            if (Immunity.Stops(World.IsMagicImmune(target), hit.AttackTypeCode, hit.DamageKind))
             {
                 hit.Stage = Stage.Stopped;
                 PutBack(hit);
@@ -325,17 +337,24 @@ namespace Moonwell
 
             var landed = moment;
             moment = new List<Hit>();
-            var bursts = new List<Burst>();
+
+            // Bursts are made only when some class reacts to one.
+            var bursts = Reactions.Wants(Stage.Burst) ? new List<Burst>() : null;
             for (var i = 0; i < landed.Count; i++)
             {
                 var hit = landed[i];
                 hit.Stage = Stage.Landed;
                 hit.Killed = hit.WouldKill && World.IsDead(hit.Target.Handle);
                 Reactions.Run(hit, Stage.Landed);
-                if (hit.Source != null)
+                if (bursts != null && hit.Source != null)
                 {
                     AddToBurst(bursts, hit);
                 }
+            }
+
+            if (bursts == null)
+            {
+                return;
             }
 
             for (var i = 0; i < bursts.Count; i++)

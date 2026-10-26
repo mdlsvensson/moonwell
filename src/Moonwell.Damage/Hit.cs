@@ -145,7 +145,7 @@ namespace Moonwell
         /// <summary>In the lethal stage: lowers the amount so that the target keeps that much life.</summary>
         public void Spare(float life = 1.0f)
         {
-            Dev.Check(Stage == Stage.Lethal, "Hit.Spare can be called only in the lethal stage (OnKilling, OnLethal)");
+            Dev.Check(Stage == Stage.Lethal, "Hit.Spare can be called only in the lethal stage (OnKilling, OnDying, OnUnitDying)");
             if (Stage != Stage.Lethal)
             {
                 // A release build has no check: outside the lethal stage the life it would keep is not known.
@@ -167,7 +167,7 @@ namespace Moonwell
         /// <summary>Reports a change made after armor, which the game would ignore.</summary>
         private void CheckBeforeArmor(string member)
         {
-            Dev.Check(Stage == Stage.BeforeArmor, "Hit." + member + " can be changed only before armor (OnDealing, OnTaking, OnBeforeArmor)");
+            Dev.Check(Stage == Stage.BeforeArmor, "Hit." + member + " can be changed only before armor (OnDealing, OnTaking, OnUnitTaking)");
         }
     }
 }

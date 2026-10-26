@@ -202,6 +202,24 @@ namespace Moonwell.Testing
             Expect.True(hurt, "the hit landed");
         }
 
+        /// <summary>A landed reaction that first appears after hits have landed still runs for the next hit: a stage nobody reacted to is not skipped for good.</summary>
+        public static void LateReactionRuns(FakeWorld world)
+        {
+            fake = new FakeDamageWorld(world);
+            DamageSystem.Install(fake);
+            Game.Instance.Add(new TakingWatch());
+            ObjectTypes.Unit(ObjectTypes.FourCC("h002"), () => new Unit());
+            var first = Unit.Of(world.NewUnit(ObjectTypes.FourCC("h002"), slot: 0))!;
+            var second = Unit.Of(world.NewUnit(ObjectTypes.FourCC("h002"), slot: 1))!;
+            fake.Hit(first.Handle, second.Handle, 10f, damageType: 4);
+            fake.RunZero();
+            var counter = new HurtCounter();
+            second.Add(counter);
+            fake.Hit(first.Handle, second.Handle, 10f, damageType: 4);
+            fake.RunZero();
+            Expect.Equal(1, counter.Count, "the second hit's landing reached the new reaction");
+        }
+
         /// <summary>A unit that is both melee and ranged deals a ranged hit when the hit has no sound, a melee one when it has.</summary>
         public static void MeleeOrRanged(FakeWorld world)
         {

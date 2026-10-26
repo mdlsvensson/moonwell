@@ -113,7 +113,7 @@ namespace Moonwell.Testing
             Expect.Equal("original 100, armor 2", string.Join("|", taken), "the outer hit after armor");
         }
 
-        /// <summary>A lethal hit runs OnLethal; Spare keeps the target at 1 life; without it the target dies, and OnHurt says so.</summary>
+        /// <summary>A lethal hit runs OnDying; Spare keeps the target at 1 life; without it the target dies, and OnHurt says so.</summary>
         public static void LethalSpare(FakeWorld world)
         {
             StageCases.Arena(world, out var source, out var target);
