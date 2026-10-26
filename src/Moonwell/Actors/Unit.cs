@@ -76,7 +76,7 @@ namespace Moonwell
         /// <summary>The game's player that owned the unit when it was last read; kept for when the game no longer gives it.</summary>
         internal player owner = null!;
 
-        /// <summary>The player that owns the unit; once the game has removed the unit, the last owner read.</summary>
+        /// <summary>The player that owns the unit. Setting it takes effect at once and gives the unit the new player's colour (SetUnitOwner). Once the game has removed the unit, the last owner read or set, and setting does nothing.</summary>
         [LocalSafe]
         public Player Player
         {
@@ -97,6 +97,15 @@ namespace Moonwell
                 }
 
                 return Player.Of(owner)!;
+            }
+
+            set
+            {
+                if (!IsGone)
+                {
+                    owner = value.Handle;
+                    Runtime.World.SetOwner(Handle, value.Handle);
+                }
             }
         }
 

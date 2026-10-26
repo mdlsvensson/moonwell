@@ -392,6 +392,12 @@ namespace Moonwell.Engine
             return Natives.GetOwningPlayer(unit);
         }
 
+        /// <summary>Sets the owner of a unit and its colour: SetUnitOwner.</summary>
+        public void SetOwner(unit unit, player player)
+        {
+            Natives.SetUnitOwner(unit, player, true);
+        }
+
         /// <summary>The level a player has of an upgrade; 0 when the player has none.</summary>
         public int UpgradeLevel(player p, int upgradeId)
         {
