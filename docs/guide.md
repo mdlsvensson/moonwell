@@ -348,6 +348,65 @@ var near = Find.InRange<Unit>(x, y, 500f);                // a new list; or Find
 - `Find` is fine inside `Local.For`: it reads and changes nothing there (a kind nothing outside has asked for yet is
   searched through the objects Moonwell knows, slower). `IsTree()` needs `Moonwell.Objects`; the build warns if missing.
 
+## Areas
+
+Add the `Moonwell.Areas` package (the template's `.csproj` has the line, commented) for parts of the map that units enter,
+stay in and leave. A map that does not reference it carries none of its code.
+
+```csharp
+public sealed class ShopFloor : Area // a game component, added in play: Game.Instance.Add(new ShopFloor())
+{
+    public ShopFloor() { Shape = AreaShape.Region("Shop"); Tick = 1f; } // the region's name in World Editor
+    public override bool Accepts(Unit unit) => unit is Hero;
+    public override void OnUnitEntered(Unit enteringUnit) { enteringUnit.Player.Print("Welcome."); }
+    public override void OnUnitStays(Unit stayingUnit) { stayingUnit.Life += 20f; }
+    public override void OnUnitLeft(Unit leavingUnit) { leavingUnit.Player.Print("Come again."); }
+}
+```
+
+- A shape is a World Editor region by name (the build fails at the line of a name the map does not have), a rect, a
+  polygon, a circle, or `AreaShape.Of(a, b)` for several. `Tick` is the seconds between `OnUnitStays`; 0 never runs it.
+- Only units count, and only while alive and with a place: a dead, hidden or loaded unit leaves, and one hidden at the
+  start enters once shown. The game sends no event for hiding or loading, so those come up to 0.25 s late.
+- The game sees an area in whole 32 cells: a rect is rounded out, and a polygon or a circle is the cells whose centre is
+  inside it. `Contains` is the true shape, so the two can disagree within a cell of an edge.
+- Add an area from a reaction such as `OnGameStart`, and end it with `End()`: every unit inside then leaves. An area on
+  a region must be added in play, since the map's `Components` are made while the map is built, before the regions are
+  known; one with another shape can be listed there. A moving area is an interaction, not an area.
+- `Units`, `Has`, `Since` and `Contains` read anywhere.
+
+## Mouse and camera
+
+Add the `Moonwell.Input` package (the template's `.csproj` has the line, commented) for each player's mouse and camera.
+A map that does not reference it carries none of its code, and one that never names `Mouse` or `IMouseWatch` listens to
+no mouse event.
+
+```csharp
+public sealed class Aim : PlayerComponent, IMouseWatch // write only the reactions needed
+{
+    private readonly Unit hero;
+    public Aim(Unit hero) { this.hero = hero; }
+
+    public void OnMousePressed(Mouse mouse, MouseButton button)
+    {
+        if (button == MouseButton.Right) hero.FaceNow(hero.AngleTo(mouse.Position)); // the press is synced: safe to act on
+    }
+}
+player.Camera().Apply(CameraSetup.Named("Intro"), 2f); // World Editor's camera, checked by the build
+```
+
+- The mouse's `Position`, `X`, `Y`, `HasPosition` and `IsDown` come from synced events, so they are the same on every
+  machine and read anywhere. `ScreenX`, `ScreenY`, `FocusUnit` and `IsHeldNow` are this machine's own: inside `Local.For`.
+- The reactions run at the same game time everywhere, so they may change the game. Online they arrive after the network
+  delay, so a cursor-following effect lags by that much. A game component hears every mouse, a player's its own.
+- The mouse keeps its last position on a reading of (0, 0) and on the world's top-right corner less 32, which are not a
+  place. The position does not follow the camera: the world moves under a still cursor and no event comes.
+- A press over the command card, minimap or portrait arrives with the ground under it, so a click on a command button
+  fires `OnMousePressed` too; nothing synced says the cursor was over the interface.
+- A camera is read inside `Local.For` (`Distance`, `Target`, `Eye` and the rest are this machine's own); changing it
+  (`PanTo`, `SetDistance`, `Follow`, `Apply`, `Reset`, `SetBounds`) is safe anywhere, and moves only that player's camera.
+- Key presses are not in Moonwell yet.
+
 ## Players
 
 `Player.One` to `Player.TwentyFour` are the player slots, as the lobby numbers them; `Player.Get(slot)` takes the
