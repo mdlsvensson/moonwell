@@ -142,7 +142,8 @@ Default. A map on another data set plays that set's values for the fields it lea
 `Default` is the class's declared values as an object, which never changes when the unit does. Every unit, hero and
 item has it, a plain standard unit too: `unit.Default.MaxMana` is 300 whatever this Champion's is now. From the class
 alone it is `Unit.Default<Champion>().MaxMana`: `Unit.Default<T>()` takes a unit class (`Hero.Default<T>()` works too),
-`Item.Default<T>()` an item class. On a declared class `Default` is typed as its kind base (`StandardUnit`,
+`Item.Default<T>()` an item class; a class of another kind (`Item.Default<Guard>()`) or a destructable class, which has
+no default object, is error MW0037. On a declared class `Default` is typed as its kind base (`StandardUnit`,
 `StandardHero` or `StandardItem`), so it holds every field of it (`Default.Model`, `Default.GoldCost`); the class's own
 members come through `Unit.Default<T>()`. Its live actions do nothing. In the class's own constructor the default
 object is what the constructor is making, so `Default` and `Unit.Default<T>()` of the class there are error MW0012:
@@ -204,6 +205,7 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 | Unit | |
 |---|---|
 | `Life`, `MaxLife`, `Mana`, `MaxMana` | read and set; a `Life` under 0.405 kills, above the most it clamps; the most are whole numbers |
+| `Player` | read and set; setting gives the unit the new owner's colour |
 | `X`, `Y` | read; `MoveTo(x, y)` through the game's pathing, `PlaceAt(x, y)` with none, not even the map's edge |
 | `Facing` | read and set (the unit turns, so a read at once gives the old one); `FaceNow(degrees)` turns at once, a walking unit turns back |
 | `Level` | read; a hero's hero level; a unit's level is set only in its declared class's constructor |

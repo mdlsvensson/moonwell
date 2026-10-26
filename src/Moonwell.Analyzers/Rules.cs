@@ -158,8 +158,17 @@ public static class Rules
         isEnabledByDefault: true,
         description: "The game has no setter for a unit's level, so Level is a unit's declared value: it is set in the constructor of the class that declares the unit (and in a lambda or local function there), and only read anywhere else. A hero's level is set with SetLevel; a hero's constructor does not declare it. The build rejects the same set.");
 
-    /// <summary>The rules for the constructor of a declared object class.</summary>
-    public static ImmutableArray<DiagnosticDescriptor> Declared { get; } = ImmutableArray.Create(LiveInDeclaration, LevelOutsideConstructor);
+    public static readonly DiagnosticDescriptor DefaultKind = new(
+        "MW0037",
+        "Default<T>() of a class of another kind",
+        "{0}",
+        ObjectsCategory,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Default<T>() is declared on Widget, so C# accepts any widget class through Unit, Hero or Item: Item.Default<Guard>() compiles for a unit class, and a destructable class compiles and throws in the game. The rule rejects a class that is not of the kind the call is written on (a unit class through Item or Hero, an item class through Unit), and a destructable class anywhere, which has no default object.");
+
+    /// <summary>The rules for the constructor of a declared object class, and for a class's default object.</summary>
+    public static ImmutableArray<DiagnosticDescriptor> Declared { get; } = ImmutableArray.Create(LiveInDeclaration, LevelOutsideConstructor, DefaultKind);
 
     public static readonly DiagnosticDescriptor NoId = new(
         "MW0013",
