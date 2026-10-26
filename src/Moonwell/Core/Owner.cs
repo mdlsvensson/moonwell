@@ -8,6 +8,10 @@ namespace Moonwell
         /// <summary>The owner that running code makes new objects for; null outside Run.</summary>
         internal static Owner? current;
 
+        // The instance fields are internal, not private, as a map's subclass may name a field of its own the same:
+        // CSharp.lua gives a subclass's field a name of its own only when it sees the base's field of that name,
+        // and it does not see a private one, so in Lua the two would be one field (PrivateFieldTests).
+
         /// <summary>The newest child, the first one to end.</summary>
         internal Owned? newest;
 
@@ -15,7 +19,7 @@ namespace Moonwell
         internal bool childrenEnded;
 
         /// <summary>How many children are linked to this owner.</summary>
-        private int count;
+        internal int count;
 
         /// <summary>The owner running code makes new objects for: the one set by Run, else the root.</summary>
         [LocalSafe]

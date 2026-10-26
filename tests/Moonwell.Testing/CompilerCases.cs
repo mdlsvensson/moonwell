@@ -6,7 +6,8 @@ namespace Moonwell.Testing
     /// <summary>
     /// Cases for C# that CSharp.lua wrote wrong until the fork's 2.0.4-moonwell.10: a lambda leaving a temporary as a
     /// statement (C28), a return with code after it (C29), a continue inside a switch (C30), a primary constructor's
-    /// parameters (C25, C31), two object initializers in one statement and a foreach left early over an iterator (C25).
+    /// parameters (C25, C31), two object initializers in one statement and a foreach left early over an iterator (C25);
+    /// and until 2.0.4-moonwell.11, a field named as a base class's private field (C32).
     /// The build's line marks put a comment after a loop body's last return, which is the shape C29 was found in.
     /// </summary>
     public static class CompilerCases
@@ -57,6 +58,15 @@ namespace Moonwell.Testing
             var derived = new NamedDerived("q");
             Expect.Equal("q!", derived.FromBase(), "the base class's parameter");
             Expect.Equal("q", derived.FromDerived(), "the derived class's parameter of the same name");
+        }
+
+        /// <summary>A derived class's field and its base class's private field of the same name are two fields.</summary>
+        public static void PrivateBaseFields(FakeWorld world)
+        {
+            var counted = new CountedDerived();
+            counted.Add();
+            Expect.Equal(1, counted.Count, "the base class's count");
+            Expect.Equal(100, counted.Own, "the derived class's count");
         }
 
         /// <summary>Two object initializers read in one statement keep their own objects.</summary>
@@ -157,6 +167,25 @@ namespace Moonwell.Testing
         private sealed class NamedDerived(string name) : NamedBase(name + "!")
         {
             public string FromDerived() => name;
+        }
+
+        private class CountedBase
+        {
+            private int count;
+
+            public int Count => count;
+
+            public void Add()
+            {
+                count++;
+            }
+        }
+
+        private sealed class CountedDerived : CountedBase
+        {
+            private int count = 100;
+
+            public int Own => count;
         }
     }
 }

@@ -65,17 +65,19 @@ namespace Moonwell
         {
         }
 
+        // The instance fields are internal, not private, as a map's subclass may name a field of its own the same (see Owner).
+
         /// <summary>The charges last read or set.</summary>
-        private int lastCharges;
+        internal int lastCharges;
 
         /// <summary>The game's player that owned the item when it was last read or set; kept for when the game no longer gives it.</summary>
         internal player OwningPlayer = null!;
 
         /// <summary>The x last read or set.</summary>
-        private float lastX = 0.0f;
+        internal float lastX = 0.0f;
 
         /// <summary>The y last read or set.</summary>
-        private float lastY = 0.0f;
+        internal float lastY = 0.0f;
 
         /// <summary>The unit that last picked the item up, as the pick-up events Moonwell has seen say; a candidate that Carrier checks with the game.</summary>
         internal Unit? CarrierUnit;
