@@ -256,25 +256,38 @@ public sealed class Shield : Buff, IDamageTarget
 }
 ```
 
+The game sends two events for each hit. Before armor, the hit has its full amount and its types can still change;
+after armor, the target's armor has cut it and only the amount can change. The life drops after that.
+
 | Stage | When | `IDamageSource` | `IDamageTarget` | `IDamageWatch` |
 |---|---|---|---|---|
-| Before armor | the hit starts | `OnDealing` | `OnTaking` | `OnBeforeArmor` |
-| After armor | armor has counted | `OnDealt` | `OnTaken` | `OnAfterArmor` |
-| Lethal | the hit would kill | `OnKilling` | `OnLethal` | `OnLethal` |
-| Landed | 0 s later, the life has dropped | `OnLanded` | `OnHurt` | `OnLanded` |
-| Burst | 0 s later, once per source | `OnBurst` | | `OnBurst` |
+| Before armor | the hit starts | `OnDealing` | `OnTaking` | `OnUnitTaking` |
+| After armor | armor has counted | `OnDealt` | `OnTaken` | `OnUnitTaken` |
+| Lethal | the hit would kill | `OnKilling` | `OnDying` | `OnUnitDying` |
+| Landed | 0 s later, the life has dropped | `OnLanded` | `OnHurt` | `OnUnitHurt` |
+| Burst | 0 s later, once per source | `OnBurst` | | `OnUnitBurst` |
 
 - Each stage runs the source and its components, then the target and its components, then the game's and the
   players' components that implement `IDamageWatch`. `OnDamaged` and `OnDealtDamage` still run, first in the
   after-armor stage.
 - A `Hit` has the amount, `Original`, `IsAttack`, `IsSpell`, `IsMelee`, `IsRanged`, `IsCode` and `Tag`. Before armor
   a reaction may also change `DamageKind`, `WeaponSound`, `AttackType`, the target's `DefenseType` and its `Armor` for
-  this hit; the target has its own defense type and armor back afterwards. In the lethal stage
-  `hit.Spare()` keeps the target alive; `hit.Killed` tells in the landed stage.
+  this hit; the target has its own defense type and armor back afterwards.
+- The lethal stage sees the life after any hit the after-armor reactions dealt, such as an on-hit bonus.
+  `hit.Spare()` keeps the target alive, and the lethal reactions after it no longer run. In the landed stage
+  `hit.Killed` tells whether this hit was the one that killed.
 - `source.Damage(...)` goes through the stages too, and what it returns is the `Hit`: `(Hit?)source.Damage(target, 10f)`.
-- Damage dealt from a reaction belongs to the hit it reacted to; a chain of 8 such hits ends with an error, so two
-  units that hit each other back never loop.
-- A hit spell immunity stops runs before armor only.
+  It is null when the hit dealt nothing, as when spell immunity stops it; such a hit runs before armor only.
+- Every hit made while a reaction runs belongs to the hit it reacted to, whether it comes from `source.Damage`, a native
+  or an area. A chain ends at 8 hits, so two units that hit each other back never loop: a ninth `source.Damage`
+  throws, which ends that reaction with its error, and a ninth hit from the game is set to 0 and reported.
+- A hit of 0 that the game starts and that is no attack, such as Storm Bolt's first and Fireball's extra two, runs no
+  reaction of the package; `OnDamaged` still sees it. An attack of 0, and a hit of 0 from `source.Damage`, are not
+  silenced.
+- A reaction the package would never call is an error, MW0036: one that is not public or takes another parameter, a
+  public one a letter off a reaction's name, a name from before 0.3, a reaction in a unit or component without its
+  interface, or an interface on a class the package does not call it on. `#pragma warning disable MW0036` keeps a
+  helper's name.
 
 ## Maths
 
@@ -330,7 +343,7 @@ public sealed class FireAura : Interaction<Unit, Unit> // held by a unit, pairs 
 {
     public FireAura() { Range = 300f; Tick = 0.5f; }
     public override bool Accepts(Unit other) => Holder.Player.IsEnemy(other.Player);
-    public override void OnTick(Pair pair) { pair.Other.Life -= 10f; }
+    public override void OnTick(Pair pair) { Holder.Damage(pair.Other, 10f); }
 }
 
 unit.Interact(new FireAura()); // made inside a buff, it ends with the buff

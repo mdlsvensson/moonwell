@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Moonwell.Hosting;
 
 namespace Moonwell.Engine
@@ -12,9 +13,33 @@ namespace Moonwell.Engine
         /// <summary>The action the running 0 s timer will run; null when it is not running.</summary>
         private Action? zeroAction;
 
-        /// <summary>Registers both damage events for every player slot.</summary>
+        /// <summary>The game's attack types by number, 0 to 6, made once in Listen: a hit's type is looked up here, with no native call.</summary>
+        private readonly List<attacktype> attackTypes = new List<attacktype>();
+
+        /// <summary>The game's damage types by number, 0 to 26, made once in Listen.</summary>
+        private readonly List<damagetype> damageTypes = new List<damagetype>();
+
+        /// <summary>The game's weapon types by number, 0 to 23, made once in Listen.</summary>
+        private readonly List<weapontype> weaponTypes = new List<weapontype>();
+
+        /// <summary>Makes the type lists, then registers both damage events for every player slot.</summary>
         public void Listen(Action damaging, Action damaged)
         {
+            for (var i = 0; i <= 6; i++)
+            {
+                attackTypes.Add(Natives.ConvertAttackType(i));
+            }
+
+            for (var i = 0; i <= 26; i++)
+            {
+                damageTypes.Add(Natives.ConvertDamageType(i));
+            }
+
+            for (var i = 0; i <= 23; i++)
+            {
+                weaponTypes.Add(Natives.ConvertWeaponType(i));
+            }
+
             Register(Natives.EVENT_PLAYER_UNIT_DAMAGING, damaging);
             Register(Natives.EVENT_PLAYER_UNIT_DAMAGED, damaged);
         }
@@ -29,49 +54,13 @@ namespace Moonwell.Engine
         public float EventAmount() => Natives.GetEventDamage();
 
         /// <summary>The current damage event's attack type, 0 to 6.</summary>
-        public int EventAttackType()
-        {
-            var type = Natives.BlzGetEventAttackType();
-            for (var i = 0; i <= 6; i++)
-            {
-                if (type == Natives.ConvertAttackType(i))
-                {
-                    return i;
-                }
-            }
-
-            return 0;
-        }
+        public int EventAttackType() => NumberIn(attackTypes, Natives.BlzGetEventAttackType());
 
         /// <summary>The current damage event's damage type, 0 to 26.</summary>
-        public int EventDamageType()
-        {
-            var type = Natives.BlzGetEventDamageType();
-            for (var i = 0; i <= 26; i++)
-            {
-                if (type == Natives.ConvertDamageType(i))
-                {
-                    return i;
-                }
-            }
-
-            return 0;
-        }
+        public int EventDamageType() => NumberIn(damageTypes, Natives.BlzGetEventDamageType());
 
         /// <summary>The current damage event's weapon type, 0 to 23.</summary>
-        public int EventWeaponType()
-        {
-            var type = Natives.BlzGetEventWeaponType();
-            for (var i = 0; i <= 23; i++)
-            {
-                if (type == Natives.ConvertWeaponType(i))
-                {
-                    return i;
-                }
-            }
-
-            return 0;
-        }
+        public int EventWeaponType() => NumberIn(weaponTypes, Natives.BlzGetEventWeaponType());
 
         /// <summary>Whether the current damage event is an attack.</summary>
         public bool EventIsAttack() => Natives.BlzGetEventIsAttack();
@@ -80,13 +69,13 @@ namespace Moonwell.Engine
         public void SetEventAmount(float amount) => Natives.BlzSetEventDamage(amount);
 
         /// <summary>Sets the current damage event's attack type.</summary>
-        public void SetEventAttackType(int type) => Natives.BlzSetEventAttackType(Natives.ConvertAttackType(type));
+        public void SetEventAttackType(int type) => Natives.BlzSetEventAttackType(attackTypes[type]);
 
         /// <summary>Sets the current damage event's damage type.</summary>
-        public void SetEventDamageType(int type) => Natives.BlzSetEventDamageType(Natives.ConvertDamageType(type));
+        public void SetEventDamageType(int type) => Natives.BlzSetEventDamageType(damageTypes[type]);
 
         /// <summary>Sets the current damage event's weapon type.</summary>
-        public void SetEventWeaponType(int type) => Natives.BlzSetEventWeaponType(Natives.ConvertWeaponType(type));
+        public void SetEventWeaponType(int type) => Natives.BlzSetEventWeaponType(weaponTypes[type]);
 
         /// <summary>A unit's life.</summary>
         public float Life(unit target) => Natives.GetWidgetLife(target);
@@ -118,7 +107,22 @@ namespace Moonwell.Engine
         /// <summary>Deals damage from code.</summary>
         public void Deal(unit source, unit target, float amount, bool attack, bool ranged, int attackType, int damageType, int weaponType)
         {
-            Natives.UnitDamageTarget(source, target, amount, attack, ranged, Natives.ConvertAttackType(attackType), Natives.ConvertDamageType(damageType), Natives.ConvertWeaponType(weaponType));
+            Natives.UnitDamageTarget(source, target, amount, attack, ranged, attackTypes[attackType], damageTypes[damageType], weaponTypes[weaponType]);
+        }
+
+        /// <summary>The number of a type in its list; 0 for one the list lacks.</summary>
+        private static int NumberIn<T>(List<T> types, T type)
+            where T : class
+        {
+            for (var i = 0; i < types.Count; i++)
+            {
+                if (types[i] == type)
+                {
+                    return i;
+                }
+            }
+
+            return 0;
         }
 
         /// <summary>Runs the action after a 0 s timer; a call while it runs replaces the action.</summary>

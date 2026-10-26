@@ -432,6 +432,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "damage.deal-from-code", Run = DamageCases.DealFromCode });
             list.Add(new Case { Name = "damage.deal-runs-reactions", Run = DamageCases.DealRunsReactions });
             list.Add(new Case { Name = "damage.deal-refused", Run = DamageCases.DealRefused });
+            list.Add(new Case { Name = "damage.deal-is-attack", Run = DamageCases.DealIsAttack });
             list.Add(new Case { Name = "items.charges", Run = ItemCases.Charges });
             list.Add(new Case { Name = "items.player", Run = ItemCases.PlayerOf });
             list.Add(new Case { Name = "items.position", Run = ItemCases.Position });
@@ -488,6 +489,20 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "damage-package.immunity-inside-hit", Run = LandingCases.ImmunityInsideHit });
             list.Add(new Case { Name = "damage-package.nested-keeps-outer", Run = LandingCases.NestedKeepsOuter });
             list.Add(new Case { Name = "damage-package.stray-open-ended", Run = LandingCases.StrayOpenEnded });
+            list.Add(new Case { Name = "damage-package.lethal-after-bonus", Run = LandingCases.LethalAfterBonus });
+            list.Add(new Case { Name = "damage-package.killed-only-killing-hit", Run = LandingCases.KilledOnlyKillingHit });
+            list.Add(new Case { Name = "damage-package.bonus-kill-credits-the-bonus", Run = LandingCases.BonusKillCreditsTheBonus });
+            list.Add(new Case { Name = "damage-package.lethal-stops-when-spared", Run = LandingCases.LethalStopsWhenSpared });
+            list.Add(new Case { Name = "damage-package.removed-target-not-killed", Run = LandingCases.RemovedTargetNotKilled });
+            list.Add(new Case { Name = "damage-package.outer-found-below-stray", Run = LandingCases.OuterFoundBelowStray });
+            list.Add(new Case { Name = "damage-package.deal-stopped-returns-null", Run = DealCases.DealStoppedReturnsNull });
+            list.Add(new Case { Name = "damage-package.raw-deal-chain-cut", Run = DealCases.RawDealChainCut });
+            list.Add(new Case { Name = "damage-package.code-deal-of-zero-runs", Run = DealCases.CodeDealOfZeroRuns });
+            list.Add(new Case { Name = "damage-package.zero-hit-quiet", Run = StageCases.ZeroHitQuiet });
+            list.Add(new Case { Name = "damage-package.sourceless-hit-runs", Run = StageCases.SourcelessHitRuns });
+            list.Add(new Case { Name = "damage-package.late-reaction-runs", Run = StageCases.LateReactionRuns });
+            list.Add(new Case { Name = "damage-package.zero-attack-runs", Run = StageCases.ZeroAttackRuns });
+            list.Add(new Case { Name = "damage-package.lethal-reaction-kill-credits-its-hit", Run = LandingCases.LethalReactionKillCreditsItsHit });
             list.Add(new Case { Name = "damage-package.deal-returns-hit", Run = DealCases.DealReturnsHit });
             list.Add(new Case { Name = "damage-package.deal-attack-type", Run = DealCases.DealAttackType });
             list.Add(new Case { Name = "damage-package.deal-starts-listening", Run = DealCases.DealStartsListening });

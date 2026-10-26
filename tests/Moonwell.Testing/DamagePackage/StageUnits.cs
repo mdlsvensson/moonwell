@@ -76,14 +76,14 @@ namespace Moonwell.Testing
             }
         }
 
-        /// <summary>Run in OnLethal; null for nothing.</summary>
+        /// <summary>Run in OnDying; null for nothing.</summary>
         public System.Action<Hit>? Lethal;
 
         /// <summary>Run in OnHurt; null for nothing.</summary>
         public System.Action<Hit>? Hurt;
 
         /// <summary>Runs Lethal.</summary>
-        public void OnLethal(Hit hit)
+        public void OnDying(Hit hit)
         {
             if (Lethal != null)
             {
@@ -118,10 +118,10 @@ namespace Moonwell.Testing
     public class GameHitWatch : GameComponent, IDamageWatch
     {
         /// <summary>Logs the stage.</summary>
-        public void OnBeforeArmor(Hit hit) => TestLog.Lines.Add("game before");
+        public void OnUnitTaking(Hit hit) => TestLog.Lines.Add("game before");
 
         /// <summary>Logs the stage.</summary>
-        public void OnAfterArmor(Hit hit) => TestLog.Lines.Add("game after");
+        public void OnUnitTaken(Hit hit) => TestLog.Lines.Add("game after");
     }
 
     /// <summary>A player component that logs the stages of its player's hits, with its name.</summary>
@@ -137,10 +137,10 @@ namespace Moonwell.Testing
         }
 
         /// <summary>Logs the stage.</summary>
-        public void OnBeforeArmor(Hit hit) => TestLog.Lines.Add(name + " before");
+        public void OnUnitTaking(Hit hit) => TestLog.Lines.Add(name + " before");
 
         /// <summary>Logs the stage.</summary>
-        public void OnAfterArmor(Hit hit) => TestLog.Lines.Add(name + " after");
+        public void OnUnitTaken(Hit hit) => TestLog.Lines.Add(name + " after");
     }
 
     /// <summary>A target component that removes its unit before armor.</summary>
@@ -148,5 +148,50 @@ namespace Moonwell.Testing
     {
         /// <summary>Removes the unit.</summary>
         public void OnTaking(Hit hit) => Unit.Remove();
+    }
+
+    /// <summary>A unit whose hits add 20 bonus damage from code after armor, the usual on-hit bonus.</summary>
+    public class Bonuser : Unit, IDamageSource
+    {
+        /// <summary>Deals the bonus for every hit that is not itself dealt by code.</summary>
+        public void OnDealt(Hit hit)
+        {
+            if (!hit.IsCode)
+            {
+                this.Damage(hit.Target, 20f, DamageKind.Normal);
+            }
+        }
+    }
+
+    /// <summary>A game component that records the map-wide lethal and landed stages it sees.</summary>
+    public class StageWatch : GameComponent, IDamageWatch
+    {
+        /// <summary>A line for each lethal or landed stage seen.</summary>
+        public readonly System.Collections.Generic.List<string> Seen = new System.Collections.Generic.List<string>();
+
+        /// <summary>Records the lethal stage.</summary>
+        public void OnUnitDying(Hit hit) => Seen.Add("lethal");
+
+        /// <summary>Records the landed stage and whether the hit killed.</summary>
+        public void OnUnitHurt(Hit hit) => Seen.Add("landed " + (hit.Killed ? "killed" : "alive"));
+    }
+
+    /// <summary>A game component with only a before-armor reaction, so the package listens without any landed reaction.</summary>
+    public class TakingWatch : GameComponent, IDamageWatch
+    {
+        /// <summary>Does nothing.</summary>
+        public void OnUnitTaking(Hit hit)
+        {
+        }
+    }
+
+    /// <summary>A component that counts the hits its unit was hurt by.</summary>
+    public class HurtCounter : UnitComponent, IDamageTarget
+    {
+        /// <summary>The hits counted.</summary>
+        public int Count;
+
+        /// <summary>Counts the hit.</summary>
+        public void OnHurt(Hit hit) => Count++;
     }
 }

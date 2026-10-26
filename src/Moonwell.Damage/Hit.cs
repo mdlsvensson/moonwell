@@ -109,14 +109,26 @@ namespace Moonwell
         /// <summary>The game's number of the target's defense type for this hit.</summary>
         internal int DefenseTypeCode;
 
-        /// <summary>How many hits dealt from reactions led to this one: 0 for a hit the game or plain code dealt.</summary>
+        /// <summary>How many hits led to this one, each made while the reactions of the one before ran: 0 for a hit made while no reaction ran.</summary>
         internal int Chain;
 
         /// <summary>The stage the hit is in.</summary>
         internal Stage Stage;
 
-        /// <summary>The target's life when the after-armor stage began, before the hit lowered it.</summary>
-        internal float LifeBefore = 0.0f;
+        /// <summary>The target's life when the lethal check ran: after the after-armor reactions, so after any hit they dealt, and before this hit lowers it.</summary>
+        internal float TargetLife = 0.0f;
+
+        /// <summary>Whether the hit, at its amount now, leaves the target at death's life or below.</summary>
+        internal bool Kills => TargetLife - Amount <= Pipeline.DeathLife;
+
+        /// <summary>Whether the hit left its after-armor stage killing a living target; Killed is this and the target dead 0 s later.</summary>
+        internal bool WouldKill;
+
+        /// <summary>Whether no package reaction runs for the hit and it does not land: the game started it at 0, or it was cut.</summary>
+        internal bool Quiet;
+
+        /// <summary>Whether the hit was cut as the ninth of a chain: set to 0, and core's reactions do not run for it either.</summary>
+        internal bool Cut;
 
         /// <summary>Whether the package put armor on the target for this hit, to be put back.</summary>
         internal bool ArmorChanged;
@@ -133,8 +145,14 @@ namespace Moonwell
         /// <summary>In the lethal stage: lowers the amount so that the target keeps that much life.</summary>
         public void Spare(float life = 1.0f)
         {
-            Dev.Check(Stage == Stage.Lethal, "Hit.Spare can be called only in the lethal stage (OnKilling, OnLethal)");
-            var amount = LifeBefore - life;
+            Dev.Check(Stage == Stage.Lethal, "Hit.Spare can be called only in the lethal stage (OnKilling, OnDying, OnUnitDying)");
+            if (Stage != Stage.Lethal)
+            {
+                // A release build has no check: outside the lethal stage the life it would keep is not known.
+                return;
+            }
+
+            var amount = TargetLife - life;
             Amount = amount < 0.0f ? 0.0f : amount;
         }
 
@@ -149,7 +167,7 @@ namespace Moonwell
         /// <summary>Reports a change made after armor, which the game would ignore.</summary>
         private void CheckBeforeArmor(string member)
         {
-            Dev.Check(Stage == Stage.BeforeArmor, "Hit." + member + " can be changed only before armor (OnDealing, OnTaking, OnBeforeArmor)");
+            Dev.Check(Stage == Stage.BeforeArmor, "Hit." + member + " can be changed only before armor (OnDealing, OnTaking, OnUnitTaking)");
         }
     }
 }
