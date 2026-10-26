@@ -194,7 +194,12 @@ namespace Moonwell
         /// <summary>Sets the gizmo's place, and its cell with it.</summary>
         private void Place(float x, float y)
         {
-            Dev.Check(entry != null, Names.NameOf(this) + ": the gizmo has not been created");
+            // The check's message is built only when it fails: a moving gizmo sets X and Y every tick.
+            if (entry == null)
+            {
+                Dev.Check(false, Names.NameOf(this) + ": the gizmo has not been created");
+            }
+
             Interactions.Grid.Move(entry!, x, y);
         }
 

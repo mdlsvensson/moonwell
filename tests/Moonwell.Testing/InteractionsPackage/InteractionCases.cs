@@ -743,5 +743,44 @@ namespace Moonwell.Testing
             Steps(world, 2);
             ExpectLog(new string[] { "meet", "tick" }, "the error left the interaction off the cycle, so it checks no more");
         }
+
+        /// <summary>A check takes in the things of its class of other: Unit takes a unit and a unit of a map's class and nothing else, Gizmo every gizmo, a map's gizmo class only its own, Item the item, Destructable the destructable, and Actor all of them, each in the grid's order; the holder is never one.</summary>
+        public static void OtherKinds(FakeWorld world)
+        {
+            Fresh();
+            var a = UnitAt(world, 0.0f, 0.0f);
+            var plain = UnitAt(world, 50.0f, 0.0f);
+            var logger = LoggerAt(world, 60.0f, 0.0f);
+            var itemHandle = world.NewItem(ObjectTypes.FourCC("ofoo"));
+            world.MoveItem(itemHandle, 70.0f, 0.0f);
+            world.PlacedItems.Add(itemHandle);
+            var item = Item.Of(itemHandle)!;
+            var handle = world.NewDestructable(ObjectTypes.FourCC("dfoo"));
+            world.PlaceDestructable(handle, 80.0f, 0.0f);
+            world.PlacedDestructables.Add(handle);
+            var barrel = Destructable.Of(handle)!;
+            var well = Gizmo.Create(new Well(), 90.0f, 0.0f);
+            var shadow = Gizmo.Create(new ShadowWell(), 95.0f, 0.0f);
+            var units = a.Interact(new Census<Unit>());
+            var gizmos = a.Interact(new Census<Gizmo>());
+            var wells = a.Interact(new Census<Well>());
+            var items = a.Interact(new Census<Item>());
+            var destructables = a.Interact(new Census<Destructable>());
+            var actors = a.Interact(new Census<Actor>());
+            Steps(world, 1);
+            Expect.Equal(2, units.Met.Count, "Unit takes the two units");
+            Expect.Same(plain, units.Met[0], "the plain one first, in the grid's order");
+            Expect.Same(logger, units.Met[1], "then the one of a map's class");
+            Expect.Equal(2, gizmos.Met.Count, "Gizmo takes both gizmos");
+            Expect.Same(well, gizmos.Met[0], "the well");
+            Expect.Same(shadow, gizmos.Met[1], "and the other class of gizmo");
+            Expect.Equal(1, wells.Met.Count, "Well takes only the well");
+            Expect.Same(well, wells.Met[0], "which is it");
+            Expect.Equal(1, items.Met.Count, "Item takes the item");
+            Expect.Same(item, items.Met[0], "which is it");
+            Expect.Equal(1, destructables.Met.Count, "Destructable takes the destructable");
+            Expect.Same(barrel, destructables.Met[0], "which is it");
+            Expect.Equal(6, actors.Met.Count, "Actor takes all six, and not the holder");
+        }
     }
 }

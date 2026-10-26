@@ -170,6 +170,27 @@ namespace Moonwell.Engine
             }
         }
 
+        /// <summary>The kind of thing a class is exactly: Unit, Item, Destructable or Gizmo; 0 for any other class, a subclass of one of them or one that covers more than one kind, which a check tests with is.</summary>
+        public static int ExactKind(Type type)
+        {
+            if (type == typeof(Unit))
+            {
+                return UnitKind;
+            }
+
+            if (type == typeof(Item))
+            {
+                return ItemKind;
+            }
+
+            if (type == typeof(Destructable))
+            {
+                return DestructableKind;
+            }
+
+            return type == typeof(Gizmo) ? GizmoKind : 0;
+        }
+
         /// <summary>Asks for the kinds of thing a class covers: Unit and its subclasses units, Item items, Destructable destructables, Gizmo and a map's gizmo classes gizmos, Widget the first three and Actor all four. Any other class has no place, which fails in a development build. The package installs itself on the game first if it is not installed.</summary>
         public static void NeedFor(Type type)
         {
@@ -633,6 +654,9 @@ namespace Moonwell.Engine
                 return;
             }
 
+            // In Lua IsGone is a class default until it is set, so each read of a tracked unit walks up the class chain to
+            // find it; set on the unit, it is one lookup. It is false here, so nothing changes.
+            unit.IsGone = false;
             var entry = Begin(unit, UnitKind, unit.X, unit.Y);
             entry.ReadStep = StepNow;
             unitEntries[unit.Handle] = entry;

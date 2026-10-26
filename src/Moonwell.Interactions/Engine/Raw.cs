@@ -51,7 +51,7 @@ namespace Moonwell.Engine
         }
 
         // Raw: in Lua an object is its own table, and System.cast checks its class through a call. Safe: the caller knows
-        // the class, as an entry's kind says what its thing is.
+        // the class, as an entry's kind says what its thing is, or a check kept the thing for being of it.
         /// <summary>An object as the class the caller knows it is.</summary>
         /// @CSharpLua.Template = "{0}"
         public static T As<T>(object thing)

@@ -50,9 +50,16 @@ namespace Moonwell
         /// <summary>The seconds between checks.</summary>
         internal float tick;
 
+        /// <summary>The kind of thing TOther is exactly (Tracking.ExactKind), which a check compares an entry's kind with; 0 when it tests the thing's class.</summary>
+        internal int otherKind;
+
         /// <summary>Only Interaction&lt;THolder, TOther&gt; derives from it.</summary>
         internal Interaction()
         {
+            // In Lua a field left at its default is the class's, read up the class chain; the check reads these at every
+            // reaction, so the interaction keeps them as its own. They are false already.
+            ending = false;
+            paused = false;
         }
 
         /// <summary>How near, centre to centre and flat, the other must be to the holder to meet it, in game units; required, more than 0. A map sets it in its constructor; a change takes effect at the next check.</summary>
@@ -82,10 +89,10 @@ namespace Moonwell
             get { return paused; }
         }
 
-        /// <summary>Whether the interaction should stop the check it is in: it is paused, or it or its holder has begun to end.</summary>
+        /// <summary>Whether the interaction should stop the check it is in: it is paused, or it or its holder has begun to end. An object that has ended began to end first, so ending covers HasEnded.</summary>
         internal bool Over
         {
-            get { return paused || ending || HasEnded || (holderEntry != null && holderEntry.Ended); }
+            get { return paused || ending || (holderEntry != null && holderEntry.Ended); }
         }
 
         /// <summary>Stops the checks, the one running too when a reaction pauses it: no pair meets, ticks or parts until Resume, and the pairs are kept.</summary>
@@ -104,10 +111,10 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Whether a pair or another owned object has begun to end.</summary>
+        /// <summary>Whether a pair or another owned object has begun to end. An object that has ended began to end first, so ending covers HasEnded.</summary>
         internal static bool Gone(Owned owned)
         {
-            return owned.ending || owned.HasEnded;
+            return owned.ending;
         }
 
         /// <summary>Whether a thing is of the holder class.</summary>
@@ -196,7 +203,7 @@ namespace Moonwell
         /// <summary>Adds the pairs, in meeting order, to the end of the shared walk; returns where they start.</summary>
         internal int WalkPairs()
         {
-            var walk = Pairing.Walk;
+            var walk = Pairing.walk;
             var start = walk.Count;
             var count = pairs.Count;
             for (var i = 0; i < count; i++)
@@ -210,7 +217,7 @@ namespace Moonwell
         /// <summary>Parts every pair, in meeting order, as at a check of a holder with no place; stops when a reaction pauses or ends the interaction or ends its holder.</summary>
         internal void PartAll()
         {
-            var walk = Pairing.Walk;
+            var walk = Pairing.walk;
             var start = WalkPairs();
             try
             {
@@ -339,6 +346,7 @@ namespace Moonwell
         protected Interaction()
         {
             Pairing.MakeView<THolder, TOther>(this);
+            otherKind = Tracking.ExactKind(typeof(TOther));
         }
 
         /// <summary>The thing that holds the interaction.</summary>
@@ -422,8 +430,8 @@ namespace Moonwell
 
             // A try and finally here would make two closures a check in Lua; Guard runs CheckNear with none. What it added
             // to the shared lists comes off after, then an error it raised goes on up, as with the finally.
-            var start = Find.Candidates.Count;
-            var walkStart = Pairing.Walk.Count;
+            var start = Find.candidates.Count;
+            var walkStart = Pairing.walk.Count;
             var failure = Guard.Check(this);
             Pairing.Release(walkStart);
             Find.Release(start);
@@ -439,19 +447,24 @@ namespace Moonwell
             var home = holderEntry!;
             var hx = home.X;
             var hy = home.Y;
-            var reach = Range + Interactions.Slack;
-            var limit = Range * Range;
-            var candidates = Find.Candidates;
+            // The check runs only once the package is installed, so it reads the settings and the grid as they are.
+            var settings = Interactions.settings;
+            var reach = range + (settings != null ? settings.Slack : Interactions.Slack);
+            var limit = range * range;
+            var candidates = Find.candidates;
             var start = candidates.Count;
-            var walk = Pairing.Walk;
+            var walk = Pairing.walk;
             var walkStart = walk.Count;
-            Interactions.Grid.Collect(hx - reach, hy - reach, hx + reach, hy + reach, candidates);
+            var grid = Interactions.grid ?? Interactions.Grid;
+            grid.Collect(hx - reach, hy - reach, hx + reach, hy + reach, candidates);
             var end = start;
             var count = candidates.Count;
+            var kind = otherKind;
             for (var i = start; i < count; i++)
             {
+                // An entry's kind says its thing's class: when TOther is exactly that class, the kinds compare for is.
                 var entry = Raw.At(candidates, i);
-                if (entry == home || !(entry.Thing is TOther))
+                if (entry == home || (kind != 0 ? entry.Kind != kind : !(entry.Thing is TOther)))
                 {
                     continue;
                 }
@@ -534,7 +547,7 @@ namespace Moonwell
                     continue;
                 }
 
-                var accepted = CallAccepts((TOther)entry.Thing);
+                var accepted = CallAccepts(Raw.As<TOther>(entry.Thing));
                 if (Over)
                 {
                     return;
@@ -546,7 +559,7 @@ namespace Moonwell
                 }
 
                 Pair pair = Pairing.Make<THolder, TOther>();
-                pair.Begin(this, holder, (TOther)entry.Thing, entry, checks, hx, hy);
+                pair.Begin(this, holder, Raw.As<TOther>(entry.Thing), entry, checks, hx, hy);
                 Join(pair, entry);
                 CallMeet(pair);
                 if (Over)
@@ -679,6 +692,8 @@ namespace Moonwell
             /// <summary>Only Pairing makes a pair.</summary>
             internal Pair()
             {
+                // As for the interaction: a check reads ending at every pair, and keeps it as the pair's own.
+                ending = false;
             }
 
             /// <summary>The holder of the interaction.</summary>
@@ -773,7 +788,7 @@ namespace Moonwell
             /// <summary>Whether the pair ticks at this step: it is not paused and does not wait.</summary>
             internal bool Ready
             {
-                get { return !paused && Tracking.StepNow >= waitUntil; }
+                get { return !paused && (Tracking.cycle ?? Tracking.Beat).StepNow >= waitUntil; }
             }
 
             /// <summary>True, and starts a cooldown of the seconds, rounded up to whole steps, when none runs; false while one does. For "at most once a second" with a fast tick.</summary>

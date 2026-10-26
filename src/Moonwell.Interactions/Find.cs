@@ -15,8 +15,8 @@ namespace Moonwell
     /// </summary>
     public static class Find
     {
-        /// <summary>The entries of the cells a search looks in. One list is shared: a search adds its own candidates at the end and takes them off again when it is done, so a Find from inside a filter or a reaction, while an outer search walks its candidates, never changes what the outer one walks.</summary>
-        private static readonly List<Entry> candidates = new List<Entry>();
+        /// <summary>The entries of the cells a search looks in. One list is shared: a search adds its own candidates at the end and takes them off again when it is done, so a Find from inside a filter or a reaction, while an outer search walks its candidates, never changes what the outer one walks. An interaction's check reads it here rather than through Candidates.</summary>
+        internal static readonly List<Entry> candidates = new List<Entry>();
 
         /// <summary>The squared distances of the results a Closest search has kept, in step with its results. Shared in the same way as the candidates.</summary>
         private static readonly List<float> distances = new List<float>();

@@ -10,8 +10,8 @@ namespace Moonwell.Engine
     /// </summary>
     internal static class Pairing
     {
-        /// <summary>The pairs a check walks. One list is shared, as Find's candidates are: a walk adds the pairs at the end and takes them off again when it is done, so a check never walks a list that a reaction changes.</summary>
-        private static readonly List<Owner> walk = new List<Owner>();
+        /// <summary>The pairs a check walks. One list is shared, as Find's candidates are: a walk adds the pairs at the end and takes them off again when it is done, so a check never walks a list that a reaction changes. An interaction's check reads it here rather than through Walk.</summary>
+        internal static readonly List<Owner> walk = new List<Owner>();
 
         /// <summary>The shared list of pairs being walked.</summary>
         public static List<Owner> Walk
