@@ -91,7 +91,7 @@ namespace Moonwell.Engine
             var reads = ReadsFor(count);
             for (var i = 0; i < reads; i++)
             {
-                Tracking.ReadNow(ring[cursor]);
+                Tracking.ReadNow(Raw.At(ring, cursor));
                 cursor++;
                 if (cursor >= count)
                 {

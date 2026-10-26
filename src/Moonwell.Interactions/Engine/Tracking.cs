@@ -325,7 +325,7 @@ namespace Moonwell.Engine
                 return;
             }
 
-            var beat = Beat;
+            var beat = cycle ?? Beat;
             if (beat.Running)
             {
                 if (entry.ReadStep == beat.StepNow)
@@ -336,11 +336,12 @@ namespace Moonwell.Engine
                 entry.ReadStep = beat.StepNow;
             }
 
-            if (entry.Kind == UnitKind)
+            var kind = entry.Kind;
+            if (kind == UnitKind)
             {
-                ReadUnit(entry, (Unit)entry.Thing);
+                ReadUnit(entry, Raw.As<Unit>(entry.Thing));
             }
-            else if (entry.Kind == ItemKind)
+            else if (kind == ItemKind)
             {
                 ReadItem(entry, (Item)entry.Thing);
             }
@@ -692,13 +693,57 @@ namespace Moonwell.Engine
             return !item.IsGone && !item.IsCarried && world.IsVisible(item.Handle);
         }
 
-        /// <summary>Reads a unit: whether it has a place and, if it has, where. A unit with none keeps the place it was last read at.</summary>
+        /// <summary>
+        /// Reads a unit: whether it has a place and, if it has, where. A unit with none keeps the place it was last read at.
+        /// It asks the worlds what UnitHasPlace, X and Y ask, in the same order, and keeps the unit's last x and y as X and Y
+        /// do; it is written out here, as the cycle reads a few hundred units a step. A read runs only once the package is
+        /// installed, so it takes the package's world and grid as they are; the entry's cell changes only when the index does.
+        /// </summary>
         private static void ReadUnit(Entry entry, Unit unit)
         {
-            entry.HasPlace = UnitHasPlace(unit);
-            if (entry.HasPlace)
+            var world = Runtime.World;
+            var host = Interactions.host!;
+            var handle = unit.Handle;
+            if (unit.IsGone || !world.IsAlive(handle) || host.IsHidden(handle) || host.IsLoaded(handle))
             {
-                Interactions.Grid.Move(entry, unit.X, unit.Y);
+                entry.HasPlace = false;
+                return;
+            }
+
+            entry.HasPlace = true;
+            var x = world.UnitX(handle);
+            if (x == 0.0f && world.UnitTypeId(handle) == 0)
+            {
+                x = unit.lastX;
+            }
+            else if (Local.Depth == 0)
+            {
+                unit.lastX = x;
+            }
+
+            var y = world.UnitY(handle);
+            if (y == 0.0f && world.UnitTypeId(handle) == 0)
+            {
+                y = unit.lastY;
+            }
+            else if (Local.Depth == 0)
+            {
+                unit.lastY = y;
+            }
+
+            entry.X = x;
+            entry.Y = y;
+            var cell = entry.Cell;
+            if (cell < 0)
+            {
+                return;
+            }
+
+            var grid = Interactions.grid ?? Interactions.Grid;
+            var index = grid.IndexOf(x, y);
+            if (index != cell)
+            {
+                grid.Shift(entry, index);
             }
         }
 

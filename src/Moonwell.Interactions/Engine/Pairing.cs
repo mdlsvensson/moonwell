@@ -57,10 +57,7 @@ namespace Moonwell.Engine
         /// <summary>Takes the pairs a walk added off the end of the shared list, leaving those of the walks around it.</summary>
         public static void Release(int start)
         {
-            while (walk.Count > start)
-            {
-                walk.RemoveAt(walk.Count - 1);
-            }
+            Raw.Truncate(walk, start);
         }
     }
 }

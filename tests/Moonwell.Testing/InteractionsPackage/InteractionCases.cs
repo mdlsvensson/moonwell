@@ -592,5 +592,68 @@ namespace Moonwell.Testing
             Steps(world, 16);
             ExpectLog(new string[] { "meet" }, "it meets at its first check");
         }
+
+        /// <summary>
+        /// The check's inner loops, which in Lua read and write the package's lists raw: things in five cells around the holder
+        /// meet in the grid's order, the cells row by row from the bottom and a cell's things in the order they came in, with
+        /// the ones out of range, the holder and one far away left out; the pairs tick and part in meeting order; a Find inside
+        /// a reaction leaves the check's things as they were; a stopped other is forgotten when it leaves range while another
+        /// stays stopped; and the shared candidates and walk are empty after every check.
+        /// </summary>
+        public static void InnerLoops(FakeWorld world)
+        {
+            Fresh();
+            var a = UnitAt(world, 0.0f, 0.0f);
+            var near = UnitAt(world, 0.0f, -350.0f);
+            var south = UnitAt(world, 0.0f, -200.0f);
+            var west = UnitAt(world, -200.0f, 0.0f);
+            var beside = UnitAt(world, 100.0f, 100.0f);
+            var past = UnitAt(world, 310.0f, 0.0f);
+            var east = UnitAt(world, 200.0f, 0.0f);
+            var north = UnitAt(world, 0.0f, 200.0f);
+            UnitAt(world, 1000.0f, 1000.0f);
+            var aura = new FireAura();
+            aura.Tag = unit => unit == south ? "s" : unit == west ? "w" : unit == beside ? "b" : unit == east ? "e" : unit == north ? "n" : unit == near ? "near" : unit == past ? "past" : "?";
+            var found = -1;
+            aura.Ticking = pair =>
+            {
+                if (pair.Other == south && found < 0)
+                {
+                    found = Find.InRange<Unit>(0.0f, 0.0f, 2000.0f).Count;
+                }
+            };
+            a.Interact(aura);
+            Steps(world, 16);
+            ExpectLog(new string[] { "meet s", "tick s", "meet w", "tick w", "meet b", "tick b", "meet e", "tick e", "meet n", "tick n" }, "they meet in the grid's order");
+            Expect.Equal(9, found, "the Find inside a reaction found all nine units");
+            Expect.Equal(0, Find.Pending, "no candidate is left");
+            Expect.Equal(0, Pairing.Walk.Count, "no pair is left on the walk");
+            TestLog.Lines.Clear();
+            world.MoveUnit(west.Handle, -500.0f, 0.0f);
+            world.MoveUnit(beside.Handle, 500.0f, 500.0f);
+            Steps(world, 16);
+            ExpectLog(new string[] { "part w", "part b", "tick s", "tick e", "tick n" }, "the ones gone part, then the rest tick, in meeting order");
+            TestLog.Lines.Clear();
+            aura.Ticking = pair =>
+            {
+                if (pair.Other == south || pair.Other == north)
+                {
+                    pair.Stop();
+                }
+            };
+            Steps(world, 16);
+            ExpectLog(new string[] { "tick s", "part s", "tick e", "tick n", "part n" }, "two pairs stop in their ticks");
+            TestLog.Lines.Clear();
+            aura.Ticking = null;
+            world.MoveUnit(south.Handle, 0.0f, -900.0f);
+            Steps(world, 16);
+            ExpectLog(new string[] { "tick e" }, "the stopped one still in range does not meet");
+            TestLog.Lines.Clear();
+            world.MoveUnit(south.Handle, 0.0f, -200.0f);
+            Steps(world, 16);
+            ExpectLog(new string[] { "tick e", "meet s", "tick s" }, "the one that left range meets again; the other is still stopped");
+            Expect.Equal(0, Find.Pending, "no candidate is left at the end");
+            Expect.Equal(0, Pairing.Walk.Count, "and no pair on the walk");
+        }
     }
 }

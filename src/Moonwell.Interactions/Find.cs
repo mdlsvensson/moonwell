@@ -512,10 +512,7 @@ namespace Moonwell
         /// <summary>Takes the candidates a search or a check added off the end of the shared list, leaving those of the searches around it.</summary>
         internal static void Release(int start)
         {
-            while (candidates.Count > start)
-            {
-                candidates.RemoveAt(candidates.Count - 1);
-            }
+            Raw.Truncate(candidates, start);
         }
 
         /// <summary>The thing of an entry when it is of class T and has a place now, with where it is through out; null otherwise. An entry of another class is not read. A place is read at most once a step and kept; inside Local.For it is read into locals and kept nowhere.</summary>

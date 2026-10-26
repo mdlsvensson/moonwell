@@ -68,6 +68,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.tracking.first-use-items", Run = TrackingCases.FirstUseItems });
             list.Add(new Case { Name = "interactions.tracking.first-use-units", Run = TrackingCases.FirstUseUnits });
             list.Add(new Case { Name = "interactions.tracking.install-again", Run = TrackingCases.InstallAgain });
+            list.Add(new Case { Name = "interactions.tracking.unit-read", Run = TrackingCases.UnitRead });
             list.Add(new Case { Name = "interactions.find.in-range", Run = FindCases.InRange });
             list.Add(new Case { Name = "interactions.find.kinds", Run = FindCases.Kinds });
             list.Add(new Case { Name = "interactions.find.no-place-class", Run = FindCases.NoPlaceClass });
@@ -114,6 +115,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.interaction.destructable-holder", Run = InteractionCases.DestructableHolder });
             list.Add(new Case { Name = "interactions.interaction.pause-in-reaction", Run = InteractionCases.PauseInReaction });
             list.Add(new Case { Name = "interactions.interaction.shadowed-fields", Run = InteractionCases.ShadowedFields });
+            list.Add(new Case { Name = "interactions.interaction.inner-loops", Run = InteractionCases.InnerLoops });
             list.Add(new Case { Name = "interactions.pair.wait", Run = PairCases.Wait });
             list.Add(new Case { Name = "interactions.pair.try-cooldown", Run = PairCases.TryCooldown });
             list.Add(new Case { Name = "interactions.pair.pause-resume", Run = PairCases.PauseResume });

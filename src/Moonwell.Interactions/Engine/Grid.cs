@@ -63,6 +63,12 @@ namespace Moonwell.Engine
                 return;
             }
 
+            Shift(entry, index);
+        }
+
+        /// <summary>Moves an entry that is in a cell to the end of another cell's list; a unit read that finds it in a new cell calls it, having set its place.</summary>
+        public void Shift(Entry entry, int index)
+        {
             Detach(entry);
             Attach(entry, index);
         }
@@ -87,15 +93,17 @@ namespace Moonwell.Engine
             {
                 for (var column = firstColumn; column <= lastColumn; column++)
                 {
+                    // A cell not made yet holds null (System.null in Lua), so the cell is read through the List.
                     var cell = cells[row * columns + column];
                     if (cell == null)
                     {
                         continue;
                     }
 
-                    for (var i = 0; i < cell.Count; i++)
+                    var count = cell.Count;
+                    for (var i = 0; i < count; i++)
                     {
-                        into.Add(cell[i]);
+                        Raw.Append(into, Raw.At(cell, i));
                     }
                 }
             }
@@ -107,10 +115,14 @@ namespace Moonwell.Engine
             return cells[index];
         }
 
-        /// <summary>The index of the cell a place is in.</summary>
-        private int IndexOf(float x, float y)
+        /// <summary>The index of the cell a place is in, with the edge cell for what lies outside. It is worked in one call, as a unit read asks it for every unit it reads.</summary>
+        public int IndexOf(float x, float y)
         {
-            return RowOf(y) * columns + ColumnOf(x);
+            var across = (x - left) / side;
+            var column = across <= 0.0f ? 0 : across >= columns ? columns - 1 : Raw.Whole(across);
+            var up = (y - bottom) / side;
+            var row = up <= 0.0f ? 0 : up >= rows ? rows - 1 : Raw.Whole(up);
+            return row * columns + column;
         }
 
         /// <summary>The column a position from left to right falls in, with the edge column for what lies outside.</summary>
@@ -160,7 +172,7 @@ namespace Moonwell.Engine
                 return count - 1;
             }
 
-            return (int)distance;
+            return Raw.Whole(distance);
         }
 
         /// <summary>How many cells of a side cover a length, at least 1.</summary>

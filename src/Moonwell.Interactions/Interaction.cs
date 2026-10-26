@@ -175,7 +175,7 @@ namespace Moonwell
         {
             for (var i = pairs.Count - 1; i >= 0; i--)
             {
-                if (pairs[i] == pair)
+                if (Raw.At(pairs, i) == pair)
                 {
                     pairs.RemoveAt(i);
                     break;
@@ -196,9 +196,10 @@ namespace Moonwell
         {
             var walk = Pairing.Walk;
             var start = walk.Count;
-            for (var i = 0; i < pairs.Count; i++)
+            var count = pairs.Count;
+            for (var i = 0; i < count; i++)
             {
-                walk.Add(pairs[i]);
+                Raw.Append(walk, Raw.At(pairs, i));
             }
 
             return start;
@@ -214,7 +215,7 @@ namespace Moonwell
                 var end = walk.Count;
                 for (var i = start; i < end; i++)
                 {
-                    var pair = walk[i];
+                    var pair = Raw.At(walk, i);
                     if (Gone(pair))
                     {
                         continue;
@@ -274,12 +275,13 @@ namespace Moonwell
             }
 
             var kept = 0;
-            for (var i = 0; i < stopped.Count; i++)
+            var count = stopped.Count;
+            for (var i = 0; i < count; i++)
             {
-                var id = stopped[i];
+                var id = Raw.At(stopped, i);
                 if (!all && stoppedSeen[id] == checks)
                 {
-                    stopped[kept] = id;
+                    Raw.Put(stopped, kept, id);
                     kept++;
                 }
                 else
@@ -288,10 +290,7 @@ namespace Moonwell
                 }
             }
 
-            while (stopped.Count > kept)
-            {
-                stopped.RemoveAt(stopped.Count - 1);
-            }
+            Raw.Truncate(stopped, kept);
         }
 
         /// <summary>Ends the checks, forgets the holder, and parts the pairs, newest first; the interaction's other children end after.</summary>
@@ -434,7 +433,7 @@ namespace Moonwell
                 var count = candidates.Count;
                 for (var i = start; i < count; i++)
                 {
-                    var entry = candidates[i];
+                    var entry = Raw.At(candidates, i);
                     if (entry == home || !(entry.Thing is TOther))
                     {
                         continue;
@@ -453,14 +452,14 @@ namespace Moonwell
                         continue;
                     }
 
-                    candidates[end] = entry;
+                    Raw.Put(candidates, end, entry);
                     end++;
                 }
 
                 Find.Release(end);
                 for (var i = start; i < end; i++)
                 {
-                    var entry = candidates[i];
+                    var entry = Raw.At(candidates, i);
                     Owner? found;
                     if (byOther.TryGetValue(entry.Id, out found))
                     {
@@ -477,7 +476,7 @@ namespace Moonwell
                 var walkEnd = walk.Count;
                 for (var i = walkStart; i < walkEnd; i++)
                 {
-                    Pair pair = Pairing.As<THolder, TOther>(walk[i]);
+                    Pair pair = Pairing.As<THolder, TOther>(Raw.At(walk, i));
                     if (Gone(pair) || pair.kept == checks)
                     {
                         continue;
@@ -496,7 +495,7 @@ namespace Moonwell
                 walkEnd = walk.Count;
                 for (var i = walkStart; i < walkEnd; i++)
                 {
-                    Pair pair = Pairing.As<THolder, TOther>(walk[i]);
+                    Pair pair = Pairing.As<THolder, TOther>(Raw.At(walk, i));
                     if (Gone(pair) || !pair.Ready)
                     {
                         continue;
@@ -512,7 +511,7 @@ namespace Moonwell
                 Pairing.Release(walkStart);
                 for (var i = start; i < end; i++)
                 {
-                    var entry = candidates[i];
+                    var entry = Raw.At(candidates, i);
                     if (entry.Ended || byOther.ContainsKey(entry.Id) || IsStopped(entry))
                     {
                         continue;

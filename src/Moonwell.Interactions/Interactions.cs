@@ -10,11 +10,11 @@ namespace Moonwell
         /// <summary>The settings; made on first use.</summary>
         private static Settings? settings;
 
-        /// <summary>The world the package talks to; set by Install.</summary>
-        private static IInteractionWorld? host;
+        /// <summary>The world the package talks to; set by Install. The cycle and a search, which run only once the package is installed, read it here rather than through World, which checks the install at every read.</summary>
+        internal static IInteractionWorld? host;
 
-        /// <summary>The grid; made on first use after an Install.</summary>
-        private static Grid? grid;
+        /// <summary>The grid; made on first use after an Install. The cycle and a search read it here rather than through Grid, which checks the install at every read, and take Grid when it is not made.</summary>
+        internal static Grid? grid;
 
         /// <summary>The game's own world: the package installs itself on it at first use, and the reads that must make nothing ask it. Made from the natives on first use; a test sets a fake one to take the game's first-use path, and null after.</summary>
         internal static IInteractionWorld? native;
