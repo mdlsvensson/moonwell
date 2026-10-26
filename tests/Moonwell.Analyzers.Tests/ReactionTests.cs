@@ -225,4 +225,99 @@ public class ReactionTests
             }
             """));
     }
+
+    [Fact]
+    public void push_target_typo_is_MW0036()
+    {
+        Assert.Equal(new[] { "MW0036: OnSlamed" }, MapCode.CheckFile("""
+            using Moonwell;
+
+            namespace Map
+            {
+                public class Typo : Unit, IPushTarget
+                {
+                    public void OnSlamed(Slam slam) { }
+                }
+            }
+            """));
+    }
+
+    [Fact]
+    public void struck_without_interface_is_MW0036()
+    {
+        Assert.Equal(new[] { "MW0036: OnStruck" }, MapCode.CheckFile("""
+            using Moonwell;
+
+            namespace Map
+            {
+                public class Dazed : Buff
+                {
+                    public void OnStruck(Impact impact) { }
+                }
+            }
+            """));
+    }
+
+    [Fact]
+    public void the_other_physics_slips_are_MW0036_with_messages()
+    {
+        Assert.Equal(new[]
+        {
+            "'OnLanded' never runs: IPushTarget's reaction of that stage is OnGrounded",
+            "'OnPushd' is not a reaction of IPushTarget, so it never runs; did you mean OnPushed?",
+            "'OnGrounded' never runs: a reaction of IPushTarget is public, not static, and takes a float",
+            "'OnStruck' never runs: it is a reaction of IMissileTarget, which this class does not implement",
+            "'IPushTarget' on this class never runs: the physics package calls IPushTarget only on a unit's class and its components (buffs too)",
+        }, MapCode.MessagesOfFile("""
+            using Moonwell;
+
+            namespace Map
+            {
+                public class Landed : Unit, IPushTarget
+                {
+                    public void OnLanded(float speed) { }
+                }
+
+                public class Typo : Unit, IPushTarget
+                {
+                    public void OnPushd(Unit? pusher) { }
+                }
+
+                public class Wrong : Unit, IPushTarget
+                {
+                    public void OnGrounded(int speed) { }
+                }
+
+                public class Forgot : Unit
+                {
+                    public void OnStruck(Impact impact) { }
+                }
+
+                public class Rules : GameComponent, IPushTarget
+                {
+                }
+            }
+            """));
+    }
+
+    [Fact]
+    public void written_right_physics_reactions_are_left_alone()
+    {
+        Assert.Empty(MapCode.CheckFile("""
+            using Moonwell;
+
+            namespace Map
+            {
+                public class Heavy : Unit, IPushTarget, IMissileTarget, IDamageSource
+                {
+                    public void OnPushed(Unit? pusher) { }
+                    public void OnSlammed(Slam slam) { }
+                    public void OnGrounded(float speed) { }
+                    public void OnStruck(Impact impact) { }
+                    public void OnLanded(Hit hit) { }
+                    public void Helper(Impact impact) { }
+                }
+            }
+            """));
+    }
 }

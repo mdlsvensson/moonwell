@@ -80,7 +80,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             localFor = local?.GetMembers("For").OfType<IMethodSymbol>().FirstOrDefault();
             runtime = local?.ContainingAssembly;
             // Each package is found by one of its types.
-            packages = new[] { "Moonwell.DamageSystem", "Moonwell.Vector2", "Moonwell.Find", "Moonwell.Terrain", "Moonwell.Area", "Moonwell.Mouse" }
+            packages = new[] { "Moonwell.DamageSystem", "Moonwell.Vector2", "Moonwell.Find", "Moonwell.Terrain", "Moonwell.Area", "Moonwell.Mouse", "Moonwell.Missile" }
                 .Select(name => compilation.GetTypeByMetadataName(name)?.ContainingAssembly)
                 .Where(assembly => assembly != null)
                 .Select(assembly => assembly!)

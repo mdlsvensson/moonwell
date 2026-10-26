@@ -104,6 +104,61 @@ public class LocalTests
     }
 
     [Fact]
+    public void physics_readers_are_allowed_inside()
+    {
+        Assert.Empty(MapCode.Check("""
+            var unit = Unit.Of(u)!;
+            var bolt = new Bolt();
+            Local.For(p, () =>
+            {
+                var x = bolt.X + bolt.Speed + bolt.Radius + bolt.Velocity.X;
+                var pushed = unit.PushVelocity();
+                var is_pushed = unit.IsPushed();
+                var ground = Physics.GroundHeight(x, x);
+                var solved = Ballistics.Velocity(Vector3.Zero, Vector3.Zero, 100f, false, 800f, out var velocity);
+            });
+            """, "public class Bolt : Missile { }"));
+    }
+
+    [Fact]
+    public void fire_is_rejected_inside()
+    {
+        Assert.Equal(new[] { "MW0001: unit.Fire(new Bolt(), 0f, 0f)" }, MapCode.Check("""
+            var unit = Unit.Of(u)!;
+            Local.For(p, () =>
+            {
+                unit.Fire(new Bolt(), 0f, 0f);
+            });
+            """, "public class Bolt : Missile { }"));
+    }
+
+    [Fact]
+    public void push_is_rejected_inside()
+    {
+        Assert.Equal(new[] { "MW0001: unit.Push(100f, 0f)", "MW0001: unit.StopPush()" }, MapCode.Check("""
+            var unit = Unit.Of(u)!;
+            Local.For(p, () =>
+            {
+                unit.Push(100f, 0f);
+                unit.StopPush();
+            });
+            """));
+    }
+
+    [Fact]
+    public void destructable_damage_is_rejected_inside()
+    {
+        Assert.Equal(new[] { "MW0001: unit.Damage(tree, 10f)" }, MapCode.Check("""
+            var unit = Unit.Of(u)!;
+            var tree = Destructable.Of(null)!;
+            Local.For(p, () =>
+            {
+                unit.Damage(tree, 10f);
+            });
+            """));
+    }
+
+    [Fact]
     public void maths_package_readers_are_allowed_inside()
     {
         Assert.Empty(MapCode.Check("""

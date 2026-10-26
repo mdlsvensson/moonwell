@@ -9,10 +9,11 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Moonwell.Analyzers;
 
 /// <summary>
-/// MW0036: a damage reaction the package would never call. The package's interfaces give every reaction an empty
+/// MW0036: a reaction the package would never call: the damage package's (IDamageSource, IDamageTarget, IDamageWatch) and
+/// the physics package's (IPushTarget, IMissileTarget). The package's interfaces give every reaction an empty
 /// default body, so the compiler takes a misspelt, non-public or wrongly typed reaction without a word, while the
-/// package finds a class's reactions by name and calls only the interface's own. It does nothing in a map without the
-/// package.
+/// package finds a class's reactions by name and calls only the interface's own. It does nothing for a package the
+/// map does not reference.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class ReactionAnalyzer : DiagnosticAnalyzer
@@ -34,6 +35,12 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
                 new KeyValuePair<string, string>("OnLanded", "OnUnitHurt"),
                 new KeyValuePair<string, string>("OnBurst", "OnUnitBurst"),
             })),
+            // OnLanded is IDamageSource's name: a push's landing is OnGrounded.
+            new KeyValuePair<string, ImmutableDictionary<string, string>>("IPushTarget", ImmutableDictionary.CreateRange(new[]
+            {
+                new KeyValuePair<string, string>("OnLanded", "OnGrounded"),
+            })),
+            new KeyValuePair<string, ImmutableDictionary<string, string>>("IMissileTarget", ImmutableDictionary<string, string>.Empty),
         });
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules.Reactions;
@@ -48,15 +55,24 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
             var source = compilation.GetTypeByMetadataName("Moonwell.IDamageSource");
             var target = compilation.GetTypeByMetadataName("Moonwell.IDamageTarget");
             var watch = compilation.GetTypeByMetadataName("Moonwell.IDamageWatch");
+            var pushTarget = compilation.GetTypeByMetadataName("Moonwell.IPushTarget");
+            var missileTarget = compilation.GetTypeByMetadataName("Moonwell.IMissileTarget");
             var unit = compilation.GetTypeByMetadataName("Moonwell.Unit");
             var unitComponent = compilation.GetTypeByMetadataName("Moonwell.UnitComponent");
             var mapComponent = compilation.GetTypeByMetadataName("Moonwell.MapComponent");
-            if (source == null || target == null || watch == null || unit == null || unitComponent == null || mapComponent == null)
+            if (unit == null || unitComponent == null || mapComponent == null)
             {
                 return;
             }
 
-            var checker = new Checker(source, target, watch, unit, unitComponent, mapComponent);
+            // A package the map does not reference has no interfaces to check.
+            var interfaces = ImmutableArray.CreateRange(new[] { source, target, watch, pushTarget, missileTarget }.Where(i => i != null).Select(i => i!));
+            if (interfaces.IsEmpty)
+            {
+                return;
+            }
+
+            var checker = new Checker(interfaces, source, target, watch, unit, unitComponent, mapComponent);
             start.RegisterSymbolAction(checker.Check, SymbolKind.NamedType);
         });
     }
@@ -64,15 +80,15 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
     /// <summary>The checks of one compilation, with the package's types found once.</summary>
     private sealed class Checker
     {
-        private readonly INamedTypeSymbol source;
-        private readonly INamedTypeSymbol target;
-        private readonly INamedTypeSymbol watch;
+        private readonly INamedTypeSymbol? source;
+        private readonly INamedTypeSymbol? target;
+        private readonly INamedTypeSymbol? watch;
         private readonly INamedTypeSymbol unit;
         private readonly INamedTypeSymbol unitComponent;
         private readonly INamedTypeSymbol mapComponent;
         private readonly ImmutableArray<INamedTypeSymbol> interfaces;
 
-        public Checker(INamedTypeSymbol source, INamedTypeSymbol target, INamedTypeSymbol watch, INamedTypeSymbol unit, INamedTypeSymbol unitComponent, INamedTypeSymbol mapComponent)
+        public Checker(ImmutableArray<INamedTypeSymbol> interfaces, INamedTypeSymbol? source, INamedTypeSymbol? target, INamedTypeSymbol? watch, INamedTypeSymbol unit, INamedTypeSymbol unitComponent, INamedTypeSymbol mapComponent)
         {
             this.source = source;
             this.target = target;
@@ -80,10 +96,10 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
             this.unit = unit;
             this.unitComponent = unitComponent;
             this.mapComponent = mapComponent;
-            interfaces = ImmutableArray.Create(source, target, watch);
+            this.interfaces = interfaces;
         }
 
-        /// <summary>Checks a class that implements a damage interface, or is a unit or a component (which might have forgotten one).</summary>
+        /// <summary>Checks a class that implements a reaction interface, or is a unit or a component (which might have forgotten one).</summary>
         public void Check(SymbolAnalysisContext context)
         {
             if (context.Symbol is not INamedTypeSymbol { TypeKind: TypeKind.Class } type)
@@ -110,7 +126,7 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
                     var reaction = method.ExplicitInterfaceImplementations.FirstOrDefault(m => interfaces.Contains(m.ContainingType, SymbolEqualityComparer.Default));
                     if (reaction != null)
                     {
-                        Report(context, method, reaction.Name, "never runs: the damage package calls only public methods, so write it as public void " + reaction.Name + "(...)");
+                        Report(context, method, reaction.Name, "never runs: the package calls only public methods, so write it as public void " + reaction.Name + "(...)");
                     }
 
                     continue;
@@ -149,22 +165,25 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
                     return "is not " + i.Name + "'s reaction here, as " + type.Name + " gets " + i.Name + " from a base class: list " + i.Name + " among " + type.Name + "'s own bases too";
                 }
 
-                return "never runs: a reaction of " + i.Name + " is public, not static, and takes a " + reaction.Parameters[0].Type.Name;
+                return "never runs: a reaction of " + i.Name + " is public, not static, and takes a " + reaction.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
             }
 
-            // The rest is only for methods shaped like a reaction: one Hit or Burst.
-            if (method.Parameters.Length != 1 || !IsReactionParameter(method.Parameters[0].Type))
+            // The rest is only for methods shaped like a reaction: one parameter, a Hit, Burst, Impact or Slam, or the type
+            // the reaction in question takes.
+            if (method.Parameters.Length != 1)
             {
                 return null;
             }
 
             var renamed = implemented
-                .Where(i => Renamed.TryGetValue(i.Name, out var names) && names.ContainsKey(name))
-                .Select(i => i.Name + "'s reaction of that stage is " + Renamed[i.Name][name])
+                .Where(i => Renamed.TryGetValue(i.Name, out var names) && names.TryGetValue(name, out var now)
+                    && Shaped(method, Reactions(i).FirstOrDefault(r => r.Name == now)))
                 .ToList();
             if (renamed.Count > 0)
             {
-                return "never runs: " + string.Join(", and ", renamed) + " since Moonwell 0.3";
+                // Only the damage package's names changed in 0.3; the physics package began in it.
+                var since = renamed.All(i => i.Name.StartsWith("IDamage", StringComparison.Ordinal)) ? " since Moonwell 0.3" : string.Empty;
+                return "never runs: " + string.Join(", and ", renamed.Select(i => i.Name + "'s reaction of that stage is " + Renamed[i.Name][name])) + since;
             }
 
             // A forgotten interface; an abstract class may be writing reactions for subclasses that list it.
@@ -172,7 +191,7 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
             {
                 foreach (var i in interfaces)
                 {
-                    if (Reactions(i).Any(r => r.Name == name))
+                    if (Reactions(i).Any(r => r.Name == name && Shaped(method, r)))
                     {
                         return "never runs: it is a reaction of " + i.Name + ", which this class does not implement";
                     }
@@ -187,7 +206,7 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
             }
 
             var near = implemented
-                .SelectMany(i => Reactions(i).Select(r => (Interface: i, Name: r.Name, Distance: Distance(name, r.Name))))
+                .SelectMany(i => Reactions(i).Where(r => Shaped(method, r)).Select(r => (Interface: i, Name: r.Name, Distance: Distance(name, r.Name))))
                 .OrderBy(candidate => candidate.Distance)
                 .FirstOrDefault();
             if (near.Interface != null && near.Distance <= 1)
@@ -204,11 +223,21 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
             foreach (var i in type.Interfaces)
             {
                 string? hosts = null;
-                if ((SymbolEqualityComparer.Default.Equals(i, source) || SymbolEqualityComparer.Default.Equals(i, target)) && !IsA(type, unit) && !IsA(type, unitComponent))
+                if (!interfaces.Contains(i, SymbolEqualityComparer.Default))
                 {
-                    hosts = "a unit's class and its components (buffs too)";
+                    continue;
                 }
-                else if (SymbolEqualityComparer.Default.Equals(i, watch) && !IsA(type, mapComponent))
+
+                if (!SymbolEqualityComparer.Default.Equals(i, watch))
+                {
+                    // Every other reaction interface (damage source and target, push and missile targets) is called on a unit's
+                    // class and its components.
+                    if (!IsA(type, unit) && !IsA(type, unitComponent))
+                    {
+                        hosts = "a unit's class and its components (buffs too)";
+                    }
+                }
+                else if (!IsA(type, mapComponent))
                 {
                     hosts = "the game's and players' components";
                 }
@@ -219,7 +248,7 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
                 }
 
                 var location = BaseTypeLocation(type, i) ?? type.Locations[0];
-                context.ReportDiagnostic(Diagnostic.Create(Rules.UnseenReaction, location, i.Name, "on this class never runs: the damage package calls " + i.Name + " only on " + hosts));
+                context.ReportDiagnostic(Diagnostic.Create(Rules.UnseenReaction, location, i.Name, "on this class never runs: the " + PackageOf(i) + " package calls " + i.Name + " only on " + hosts));
             }
         }
 
@@ -240,10 +269,24 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
             return false;
         }
 
-        /// <summary>Whether a type is the package's Hit or Burst.</summary>
+        /// <summary>Whether a type is one a reaction takes: the damage package's Hit or Burst, or the physics package's Impact or Slam.</summary>
         private static bool IsReactionParameter(ITypeSymbol type)
         {
-            return type.ContainingNamespace?.ToDisplayString() == "Moonwell" && (type.Name == "Hit" || type.Name == "Burst");
+            return type.ContainingNamespace?.ToDisplayString() == "Moonwell" && (type.Name == "Hit" || type.Name == "Burst" || type.Name == "Impact" || type.Name == "Slam");
+        }
+
+        /// <summary>Whether a one-parameter method is shaped like a reaction: its parameter is a type reactions take, or the type this one takes.</summary>
+        private static bool Shaped(IMethodSymbol method, IMethodSymbol? reaction)
+        {
+            var parameter = method.Parameters[0].Type;
+            return IsReactionParameter(parameter)
+                || (reaction != null && SymbolEqualityComparer.Default.Equals(parameter, reaction.Parameters[0].Type));
+        }
+
+        /// <summary>The name of the package an interface is from, for the message.</summary>
+        private static string PackageOf(INamedTypeSymbol i)
+        {
+            return i.Name == "IPushTarget" || i.Name == "IMissileTarget" ? "physics" : "damage";
         }
 
         /// <summary>The reaction methods of a damage interface.</summary>
