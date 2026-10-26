@@ -27,10 +27,10 @@ namespace Moonwell.Build.Tests
             Dotnet(repository, "pack", Path.Combine("template", "Moonwell.Templates.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
         }
 
-        /// <summary>The version all eleven packages were packed with, <c>0.1.0-test.</c> and a number nothing else uses.</summary>
+        /// <summary>The version all ten packages were packed with, <c>0.1.0-test.</c> and a number nothing else uses.</summary>
         public string Version { get; }
 
-        /// <summary>The folder holding the eleven <c>.nupkg</c> files.</summary>
+        /// <summary>The folder holding the ten <c>.nupkg</c> files.</summary>
         public string Feed { get; }
 
         /// <summary>The path of the Moonwell package.</summary>

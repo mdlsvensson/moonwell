@@ -11,8 +11,9 @@ namespace Moonwell
     /// traps: the game sees the area in whole 32 by 32 cells, so <c>Contains</c> (the true shape) and the area can
     /// disagree within a cell of an edge; and the game sends no event for a unit hidden, shown, loaded or unloaded, so
     /// the package checks those on its own timer every quarter of a second, and such a unit leaves and enters up to
-    /// 0.25 seconds late. Add it in the map's <c>Components</c> or with <c>Game.Instance.Add</c>; ending it lets every
-    /// unit inside leave.
+    /// 0.25 seconds late. A unit that stays hidden or loaded inside an area keeps the package's timer stepping (about
+    /// 0.3 ms a second) until it leaves or the area ends. Add it in the map's <c>Components</c> or with
+    /// <c>Game.Instance.Add</c>; ending it lets every unit inside leave.
     /// </summary>
     public abstract class Area : GameComponent
     {
@@ -182,7 +183,7 @@ namespace Moonwell
             }
 
             // A region the map does not have, or a read before the package is installed, fails here, before anything is made.
-            var resolved = shape.Bounds;
+            _ = shape.Bounds;
             tickSteps = AreaTracker.StepsOf(tick);
             var made = AreaTracker.Current();
             tracker = made;

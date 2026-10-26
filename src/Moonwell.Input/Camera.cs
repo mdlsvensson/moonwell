@@ -36,7 +36,7 @@ namespace Moonwell
             get { return InputSystem.World.CameraTargetY(); }
         }
 
-        /// <summary>The z the camera looks at, on this machine. This machine's alone, so it is read inside Local.For.</summary>
+        /// <summary>The z the camera looks at, on this machine. After a pan or a move it reads the old place until the next frame. This machine's alone, so it is read inside Local.For.</summary>
         public float TargetZ
         {
             [MachineLocal]

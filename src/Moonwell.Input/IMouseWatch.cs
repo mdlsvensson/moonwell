@@ -10,8 +10,9 @@ namespace Moonwell
     public interface IMouseWatch
     {
         /// <summary>
-        /// At each move event, up to 190 times a second for a player. The mouse's position is already the event's, unless
-        /// the event read (0, 0) or the world's top-right corner less 32, which are not a place and keep the last one.
+        /// At each move event: 120 to 240 times a second for a player while the mouse moves, and none while it is still. The
+        /// mouse's position is already the event's, unless the event read (0, 0) or the world's top-right corner less 32,
+        /// which are not a place and keep the last one.
         /// </summary>
         /// @CSharpLua.Ignore
         void OnMouseMoved(Mouse mouse)
