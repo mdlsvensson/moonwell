@@ -170,7 +170,7 @@ namespace Moonwell.Testing
             Expect.Equal(1, aura.Asked, "and only that unit was asked about");
         }
 
-        /// <summary>Two units with an aura each burn each other through two pairs, one of each aura.</summary>
+        /// <summary>Two units with an aura each burn each other through two pairs, one of each aura; the second aura, started after the first with the same tick, first checks a step sooner.</summary>
         public static void TwoWays(FakeWorld world)
         {
             Fresh();
@@ -183,7 +183,7 @@ namespace Moonwell.Testing
             a.Interact(first);
             b.Interact(second);
             Steps(world, 16);
-            ExpectLog(new string[] { "meet b", "tick b", "meet a", "tick a" }, "each aura meets the other unit, in the order they were made");
+            ExpectLog(new string[] { "meet a", "tick a", "meet b", "tick b" }, "each aura meets the other unit, the second a step before the first");
             Expect.Same(b, first.Pairs[0].Other, "a's aura pairs with b");
             Expect.Same(a, second.Pairs[0].Other, "b's aura pairs with a");
         }
@@ -781,6 +781,60 @@ namespace Moonwell.Testing
             Expect.Equal(1, destructables.Met.Count, "Destructable takes the destructable");
             Expect.Same(barrel, destructables.Met[0], "which is it");
             Expect.Equal(6, actors.Met.Count, "Actor takes all six, and not the holder");
+        }
+
+        /// <summary>50 auras of a half-second tick (16 steps) started in one step take turns over its steps for their first checks: the first a whole tick later, the next a step sooner, and so on round, so each step of the tick has three or four; each then checks a tick after its first. One started alone later still first checks within a tick, and a lone aura after an install a whole tick after it starts.</summary>
+        public static void SpreadFirstChecks(FakeWorld world)
+        {
+            Fresh();
+            var auras = new List<FireAura>();
+            for (var i = 0; i < 50; i++)
+            {
+                var holder = UnitAt(world, i * 20.0f - 500.0f, 0.0f);
+                auras.Add(holder.Interact(new FireAura()));
+            }
+
+            var start = Tracking.StepNow;
+            Steps(world, 33);
+            var perStep = new int[17];
+            for (var i = 0; i < 50; i++)
+            {
+                // Each pair ticks at a check, so the steps after the first that differ from it are the next check's.
+                var steps = auras[i].TickSteps;
+                var first = steps[0] - start;
+                var next = -1;
+                for (var k = 1; k < steps.Count && next < 0; k++)
+                {
+                    if (steps[k] != steps[0])
+                    {
+                        next = steps[k];
+                    }
+                }
+
+                Expect.Equal(16 - i % 16, first, "aura " + i + "'s first check");
+                Expect.Equal(16, next - steps[0], "aura " + i + " checks a tick after its first");
+                perStep[first]++;
+            }
+
+            for (var step = 1; step <= 16; step++)
+            {
+                Expect.True(perStep[step] == 3 || perStep[step] == 4, "three or four first checks at step " + step);
+            }
+
+            var late = UnitAt(world, 600.0f, 0.0f);
+            var alone = late.Interact(new FireAura());
+            var at = Tracking.StepNow;
+            Steps(world, 16);
+            Expect.True(alone.TickSteps.Count >= 1, "one started later checks within a tick");
+            Expect.True(alone.TickSteps[0] > at && alone.TickSteps[0] <= at + 16, "at a step of that tick");
+            Fresh();
+            var a = UnitAt(world, 0.0f, 0.0f);
+            var lone = a.Interact(new FireAura());
+            var from = Tracking.StepNow;
+            Steps(world, 16);
+            Expect.True(lone.TickSteps.Count >= 1, "a lone aura after an install checks in its first tick");
+            Expect.Equal(from + 16, lone.TickSteps[0], "a whole tick after it starts");
+            Expect.Equal(from + 16, lone.TickSteps[lone.TickSteps.Count - 1], "and only then");
         }
     }
 }

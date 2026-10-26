@@ -70,7 +70,7 @@ namespace Moonwell
             protected set { range = value; }
         }
 
-        /// <summary>The seconds between checks, rounded up to whole steps of the cycle and at least one step; a step unless set. A map sets it in its constructor; a change takes effect after the check that is waiting.</summary>
+        /// <summary>The seconds between checks, rounded up to whole steps of the cycle and at least one step; a step unless set. The first check comes within a tick of Interact: interactions of the same tick take turns over its steps in the order they start, so many started at once do not all check at the same step. A map sets it in its constructor; a change takes effect after the check that is waiting.</summary>
         [LocalSafe]
         public float Tick
         {
@@ -135,7 +135,7 @@ namespace Moonwell
         /// <summary>Runs OnPart for a pair that is parting, guarded.</summary>
         internal abstract void RunPart(Owner pair);
 
-        /// <summary>Starts the interaction on a holder of a kind, for an owner or else the current one: Interact's work. Fails in a development build when it was started before, when the holder is not of the holder class, or when Range is not more than 0. A unit, item or destructable that the runtime has not yet told the package of, as in its own OnCreated, is tracked here. A holder that has ended, or an owner that has, ends it at once.</summary>
+        /// <summary>Starts the interaction on a holder of a kind, for an owner or else the current one, with its first check within a tick: Interact's work. Fails in a development build when it was started before, when the holder is not of the holder class, or when Range is not more than 0. A unit, item or destructable that the runtime has not yet told the package of, as in its own OnCreated, is tracked here. A holder that has ended, or an owner that has, ends it at once.</summary>
         internal void Begin(Actor holder, int kind, Owner? owner)
         {
             Dev.Check(!started, Names.NameOf(this) + ".Interact: the interaction has been started already");
@@ -167,7 +167,7 @@ namespace Moonwell
             holderEntry = entry;
             Tracking.Hold(entry, this);
             due = new InteractionDue(this);
-            due.Arm();
+            due.ArmFirst();
         }
 
         /// <summary>Joins a new pair to the interaction: it is the interaction's, last in meeting order, and found by its other's entry.</summary>

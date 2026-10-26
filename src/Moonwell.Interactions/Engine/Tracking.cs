@@ -28,6 +28,9 @@ namespace Moonwell.Engine
         /// <summary>The entry of each destructable tracked, keyed by the game's handle; a lookup only.</summary>
         private static readonly Dictionary<destructable, Entry> destructableEntries = new Dictionary<destructable, Entry>();
 
+        /// <summary>How many interactions have started, by the steps of their tick; a lookup only.</summary>
+        private static readonly Dictionary<int, int> startsBySteps = new Dictionary<int, int>();
+
         /// <summary>The cycle; made on first use after an Install. What runs many times a step reads it here, and takes Beat when it is not made.</summary>
         internal static Cycle? cycle;
 
@@ -121,6 +124,16 @@ namespace Moonwell.Engine
             unitEntries.Clear();
             itemEntries.Clear();
             destructableEntries.Clear();
+            startsBySteps.Clear();
+        }
+
+        /// <summary>How many interactions with a tick of these steps started before this one, which counts it: the order the first checks of interactions of one tick are spread by.</summary>
+        public static int StartOrder(int steps)
+        {
+            int order;
+            startsBySteps.TryGetValue(steps, out order);
+            startsBySteps[steps] = order + 1;
+            return order;
         }
 
         /// <summary>Asks for a kind of thing to be tracked. The first ask for a kind fills it with the things there are: the live units, the items and destructables of the world, taken in if the runtime has not. Those made after come in through core's take-in hook. Gizmos are always tracked. The package installs itself on the game first if it is not installed, as an install after the ask would forget it.</summary>
