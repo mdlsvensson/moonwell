@@ -109,7 +109,7 @@ namespace Moonwell
         /// <summary>The game's number of the target's defense type for this hit.</summary>
         internal int DefenseTypeCode;
 
-        /// <summary>How many hits dealt from reactions led to this one: 0 for a hit the game or plain code dealt.</summary>
+        /// <summary>How many hits led to this one, each made while the reactions of the one before ran: 0 for a hit made while no reaction ran.</summary>
         internal int Chain;
 
         /// <summary>The stage the hit is in.</summary>

@@ -178,7 +178,7 @@ namespace Moonwell
             return hit;
         }
 
-        /// <summary>Ends a chain at a hit the game made: the hit is set to 0, no reaction runs for it, and the cut is reported once.</summary>
+        /// <summary>Ends a chain at a hit the game made: the hit is set to 0, no reaction runs for it, and the cut is reported (once for each hit cut).</summary>
         private static void Cut(Hit hit)
         {
             hit.Quiet = true;

@@ -279,12 +279,15 @@ after armor, the target's armor has cut it and only the amount can change. The l
 - `source.Damage(...)` goes through the stages too, and what it returns is the `Hit`: `(Hit?)source.Damage(target, 10f)`.
   It is null when the hit dealt nothing, as when spell immunity stops it; such a hit runs before armor only.
 - Every hit made while a reaction runs belongs to the hit it reacted to, whether it comes from `source.Damage`, a native
-  or an area. A chain ends at 8 hits: the ninth is set to 0 and reported, so two units that hit each other back
-  never loop.
-- A hit the game starts at 0, such as Storm Bolt's first and Fireball's extra two, runs no reaction of the package;
-  `OnDamaged` still sees it. A hit of 0 from `source.Damage` runs as any other.
+  or an area. A chain ends at 8 hits, so two units that hit each other back never loop: a ninth `source.Damage`
+  throws, which ends that reaction with its error, and a ninth hit from the game is set to 0 and reported.
+- A hit of 0 that the game starts and that is no attack, such as Storm Bolt's first and Fireball's extra two, runs no
+  reaction of the package; `OnDamaged` still sees it. An attack of 0, and a hit of 0 from `source.Damage`, are not
+  silenced.
 - A reaction the package would never call is an error, MW0036: one that is not public or takes another parameter, a
-  misspelt one, a name from before 0.3, or an interface on a class the package does not call it on.
+  public one a letter off a reaction's name, a name from before 0.3, a reaction in a unit or component without its
+  interface, or an interface on a class the package does not call it on. `#pragma warning disable MW0036` keeps a
+  helper's name.
 
 ## Maths
 

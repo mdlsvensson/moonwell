@@ -121,7 +121,7 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
                     continue;
                 }
 
-                var why = Why(method, implemented);
+                var why = Why(type, method, implemented);
                 if (why != null)
                 {
                     Report(context, method, method.Name, why);
@@ -130,16 +130,26 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
         }
 
         /// <summary>Why a method that implements no reaction looks like one; null when it does not.</summary>
-        private string? Why(IMethodSymbol method, List<INamedTypeSymbol> implemented)
+        private string? Why(INamedTypeSymbol type, IMethodSymbol method, List<INamedTypeSymbol> implemented)
         {
             var name = method.Name;
             foreach (var i in implemented)
             {
                 var reaction = Reactions(i).FirstOrDefault(r => r.Name == name);
-                if (reaction != null)
+                if (reaction == null)
                 {
-                    return "never runs: a reaction of " + i.Name + " is public, not static, and takes a " + reaction.Parameters[0].Type.Name;
+                    continue;
                 }
+
+                // Written right, yet not the implementation: the class gets the interface from a base class, whose mapping
+                // it keeps (the game's Lua calls it by name, .NET through the interface).
+                if (method.DeclaredAccessibility == Accessibility.Public && !method.IsStatic && method.Parameters.Length == 1
+                    && SymbolEqualityComparer.Default.Equals(method.Parameters[0].Type, reaction.Parameters[0].Type))
+                {
+                    return "is not " + i.Name + "'s reaction here, as " + type.Name + " gets " + i.Name + " from a base class: list " + i.Name + " among " + type.Name + "'s own bases too";
+                }
+
+                return "never runs: a reaction of " + i.Name + " is public, not static, and takes a " + reaction.Parameters[0].Type.Name;
             }
 
             // The rest is only for methods shaped like a reaction: one Hit or Burst.
@@ -157,19 +167,30 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
                 return "never runs: " + string.Join(", and ", renamed) + " since Moonwell 0.3";
             }
 
-            foreach (var i in interfaces)
+            // A forgotten interface; an abstract class may be writing reactions for subclasses that list it.
+            if (!type.IsAbstract)
             {
-                if (Reactions(i).Any(r => r.Name == name))
+                foreach (var i in interfaces)
                 {
-                    return "never runs: it is a reaction of " + i.Name + ", which this class does not implement";
+                    if (Reactions(i).Any(r => r.Name == name))
+                    {
+                        return "never runs: it is a reaction of " + i.Name + ", which this class does not implement";
+                    }
                 }
             }
 
-            var near = (implemented.Count > 0 ? implemented : interfaces.ToList())
+            // A one-letter slip (a letter missing, extra, changed or two swapped) in a public method of a class that has
+            // reactions; a helper of another name, or a private one, is left alone.
+            if (implemented.Count == 0 || method.DeclaredAccessibility != Accessibility.Public)
+            {
+                return null;
+            }
+
+            var near = implemented
                 .SelectMany(i => Reactions(i).Select(r => (Interface: i, Name: r.Name, Distance: Distance(name, r.Name))))
                 .OrderBy(candidate => candidate.Distance)
                 .FirstOrDefault();
-            if (near.Interface != null && near.Distance <= 2)
+            if (near.Interface != null && near.Distance <= 1)
             {
                 return "is not a reaction of " + near.Interface.Name + ", so it never runs; did you mean " + near.Name + "?";
             }
@@ -263,29 +284,34 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
             return null;
         }
 
-        /// <summary>The number of letters to add, remove or change to turn one name into another.</summary>
+        /// <summary>The number of slips that turn one name into another: a letter added, removed or changed, or two next to each other swapped.</summary>
         private static int Distance(string a, string b)
         {
-            var previous = new int[b.Length + 1];
-            var current = new int[b.Length + 1];
+            var d = new int[a.Length + 1, b.Length + 1];
+            for (var i = 0; i <= a.Length; i++)
+            {
+                d[i, 0] = i;
+            }
+
             for (var j = 0; j <= b.Length; j++)
             {
-                previous[j] = j;
+                d[0, j] = j;
             }
 
             for (var i = 1; i <= a.Length; i++)
             {
-                current[0] = i;
                 for (var j = 1; j <= b.Length; j++)
                 {
                     var change = a[i - 1] == b[j - 1] ? 0 : 1;
-                    current[j] = Math.Min(Math.Min(current[j - 1] + 1, previous[j] + 1), previous[j - 1] + change);
+                    d[i, j] = Math.Min(Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1), d[i - 1, j - 1] + change);
+                    if (i > 1 && j > 1 && a[i - 1] == b[j - 2] && a[i - 2] == b[j - 1])
+                    {
+                        d[i, j] = Math.Min(d[i, j], d[i - 2, j - 2] + 1);
+                    }
                 }
-
-                (previous, current) = (current, previous);
             }
 
-            return previous[b.Length];
+            return d[a.Length, b.Length];
         }
 
         private static void Report(SymbolAnalysisContext context, IMethodSymbol method, string name, string why)

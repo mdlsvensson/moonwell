@@ -118,6 +118,74 @@ public class ReactionTests
     }
 
     [Fact]
+    public void helpers_named_near_a_reaction_pass()
+    {
+        Assert.Empty(MapCode.CheckFile("""
+            using Moonwell;
+
+            namespace Map
+            {
+                public class Guard : Unit, IDamageTarget
+                {
+                    public void OnTaken(Hit hit) { OnHit(hit); }
+
+                    private void OnHit(Hit hit) { }
+
+                    public void OnHeal(Hit hit) { }
+                }
+
+                public class Marker : UnitComponent
+                {
+                    public void OnHit(Hit hit) { }
+                }
+            }
+            """));
+    }
+
+    [Fact]
+    public void an_abstract_base_with_reactions_for_its_subclasses_passes()
+    {
+        Assert.Empty(MapCode.CheckFile("""
+            using Moonwell;
+
+            namespace Map
+            {
+                public abstract class Base : Unit
+                {
+                    public void OnTaken(Hit hit) { }
+                }
+
+                public class Derived : Base, IDamageTarget
+                {
+                }
+            }
+            """));
+    }
+
+    [Fact]
+    public void a_reaction_in_a_class_that_inherits_the_interface_says_to_list_it()
+    {
+        Assert.Equal(new[]
+        {
+            "'OnHurt' is not IDamageTarget's reaction here, as Arthas gets IDamageTarget from a base class: list IDamageTarget among Arthas's own bases too",
+        }, MapCode.MessagesOfFile("""
+            using Moonwell;
+
+            namespace Map
+            {
+                public abstract class Champion : Unit, IDamageTarget
+                {
+                }
+
+                public class Arthas : Champion
+                {
+                    public void OnHurt(Hit hit) { }
+                }
+            }
+            """));
+    }
+
+    [Fact]
     public void right_reactions_and_helpers_pass()
     {
         Assert.Empty(MapCode.CheckFile("""
