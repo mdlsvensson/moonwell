@@ -12,8 +12,8 @@ namespace Moonwell.Analyzers;
 /// <summary>
 /// Rejects the C# syntax and library calls that CSharp.lua stops on, writes wrong or leaves to a Lua core that does not have
 /// them, so the editor and dotnet build show it with its line (MW0017 to MW0034). Found by running about 770 checks
-/// against .NET; each rule's description says what was seen. MW0021 and MW0033 are gone: the fork's CSharp.lua writes
-/// their forms right.
+/// against .NET; each rule's description says what was seen. MW0019, MW0021 and MW0033 are gone: the fork's CSharp.lua
+/// writes their forms right.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
@@ -27,7 +27,6 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
 
         context.RegisterSyntaxNodeAction(SwitchArm, SyntaxKind.SwitchExpressionArm);
         context.RegisterSyntaxNodeAction(IsPattern, SyntaxKind.IsPatternExpression);
-        context.RegisterSyntaxNodeAction(Negated, SyntaxKind.UnaryMinusExpression);
         context.RegisterSyntaxNodeAction(DeclaredFromElement, SyntaxKind.VariableDeclarator);
         context.RegisterSyntaxNodeAction(AssignedFromElement, SyntaxKind.SimpleAssignmentExpression);
         context.RegisterSyntaxNodeAction(Deconstruction, SyntaxKind.SimpleAssignmentExpression);
@@ -144,23 +143,6 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
     private static void Stops(SyntaxNodeAnalysisContext context, SyntaxNode node, string what)
     {
         context.ReportDiagnostic(Diagnostic.Create(Rules.PatternStops, node.GetLocation(), what));
-    }
-
-    // ---- MW0019 ----
-
-    private static void Negated(SyntaxNodeAnalysisContext context)
-    {
-        var minus = (PrefixUnaryExpressionSyntax)context.Node;
-        if (minus.Operand is not (IdentifierNameSyntax or MemberAccessExpressionSyntax))
-        {
-            return;
-        }
-
-        var value = context.SemanticModel.GetConstantValue(minus.Operand, context.CancellationToken);
-        if (value.HasValue && value.Value is sbyte or short or int or long && System.Convert.ToInt64(value.Value) < 0)
-        {
-            context.ReportDiagnostic(Diagnostic.Create(Rules.NegatedConstant, minus.GetLocation(), minus.ToString(), System.Convert.ToInt64(value.Value).ToString().TrimStart('-')));
-        }
     }
 
     // ---- MW0020 ----

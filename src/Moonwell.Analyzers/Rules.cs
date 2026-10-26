@@ -206,12 +206,6 @@ public static class Rules
         "{0}",
         "A positional pattern in an is test (p is (1, 2), t is (1, _), p is Pt(var a, var b)) and an extended property pattern (p is { Inner.X: 9 }) compile to Lua that is false, or stops the compiler. A positional pattern in a switch expression arm works; so does a property pattern with one name per level ({ Inner: { X: 9 } }).");
 
-    public static readonly DiagnosticDescriptor NegatedConstant = Syntax(
-        "MW0019",
-        "Minus in front of a negative constant",
-        "'{0}' is written as --{1}, which Lua reads as a comment, so the script does not load; write the number out, or 0 - {0}",
-        "CSharp.lua writes -N with N a negative constant as --5. Lua starts a comment at --, and the rest of the line is lost.");
-
     public static readonly DiagnosticDescriptor StructCopy = Syntax(
         "MW0020",
         "Struct element changed through a copy",
@@ -292,6 +286,6 @@ public static class Rules
 
     /// <summary>The rules for syntax and library CSharp.lua or its Lua core cannot do.</summary>
     public static ImmutableArray<DiagnosticDescriptor> Syntaxes { get; } = ImmutableArray.Create(
-        PatternStops, PatternWrong, NegatedConstant, StructCopy, TupleForm, FormWrong, RangeIndex, RefForm,
+        PatternStops, PatternWrong, StructCopy, TupleForm, FormWrong, RangeIndex, RefForm,
         ParamsForm, StringCall, BoxedValue, CatchForm, LuaMember, CheckedForm, EnumText, UsingOrder);
 }

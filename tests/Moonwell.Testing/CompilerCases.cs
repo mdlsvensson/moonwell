@@ -7,7 +7,9 @@ namespace Moonwell.Testing
     /// Cases for C# that CSharp.lua wrote wrong until the fork's 2.0.4-moonwell.10: a lambda leaving a temporary as a
     /// statement (C28), a return with code after it (C29), a continue inside a switch (C30), a primary constructor's
     /// parameters (C25, C31), two object initializers in one statement and a foreach left early over an iterator (C25);
-    /// and until 2.0.4-moonwell.11, a field named as a base class's private field (C32).
+    /// until 2.0.4-moonwell.11, a field named as a base class's private field (C32); and until 2.0.4-moonwell.12, a local
+    /// function used above its declaration (C36), a return after a using declaration (C37), a nullable struct compared
+    /// with null (C38), patterns in a switch statement (C39) and the negation of a negative constant (C40).
     /// The build's line marks put a comment after a loop body's last return, which is the shape C29 was found in.
     /// </summary>
     public static class CompilerCases
@@ -89,6 +91,150 @@ namespace Moonwell.Testing
             Expect.Equal(2, log.Count, "a return");
         }
 
+        /// <summary>Local functions called above their declaration: plain, recursive, two that call each other, one with a local.</summary>
+        public static void LocalFunctionBeforeDeclaration(FakeWorld world)
+        {
+            var scale = 3;
+            Expect.Equal(5, Add(2, 3), "a call above the declaration");
+            Expect.Equal(120, Factorial(5), "a recursive one");
+            Expect.Equal(true, IsEven(10), "two that call each other");
+            Expect.Equal(6, Scale(2), "one that reads a local declared above the call");
+
+            int Add(int a, int b) => a + b;
+
+            int Factorial(int n) => n <= 1 ? 1 : n * Factorial(n - 1);
+
+            bool IsEven(int n) => n == 0 || IsOdd(n - 1);
+
+            bool IsOdd(int n) => n != 0 && IsEven(n - 1);
+
+            int Scale(int value) => value * scale;
+        }
+
+        /// <summary>A return inside an if, a loop or a switch after a using declaration gives its value.</summary>
+        public static void UsingDeclarationReturns(FakeWorld world)
+        {
+            var log = new List<string>();
+            Expect.Equal(1, ReturnInIf(log, true), "a return inside an if");
+            Expect.Equal(2, ReturnInIf(log, false), "the return after it");
+            Expect.Equal(5, ReturnInLoop(log, new List<int> { 1, 5, 7 }), "a return inside a loop");
+            Expect.Equal("one", ReturnInSwitch(log, 1), "a return inside a switch");
+            Expect.Equal(4, log.Count, "each one disposed");
+        }
+
+        /// <summary>A nullable struct with its own == compared with null, on either side.</summary>
+        public static void NullableEqualsNull(FakeWorld world)
+        {
+            Vector2? none = null;
+            Vector2? some = new Vector2(1f, 2f);
+            Expect.Equal(true, none == null, "null == null");
+            Expect.Equal(false, none != null, "null != null");
+            Expect.Equal(false, some == null, "a value == null");
+            Expect.Equal(true, null != some, "null != a value");
+            Expect.Equal(true, some == new Vector2(1f, 2f), "a value == the same value");
+        }
+
+        /// <summary>Relational, not, parenthesized and property patterns in a switch statement's case labels.</summary>
+        public static void SwitchStatementPatterns(FakeWorld world)
+        {
+            Expect.Equal("neg small big zero", Size(-3) + " " + Size(3) + " " + Size(9) + " " + Size(0), "relational patterns");
+            Expect.Equal("low out mid", Range(2) + " " + Range(12) + " " + Range(5), "or, not and parentheses");
+            Expect.Equal("nine", Inner(new Holder { Next = new Holder { Count = 9 } }), "an extended property pattern");
+            Expect.Equal("not three", Inner(new Holder { Count = 4 }), "not inside a property pattern");
+            Expect.Equal("none", Inner(null), "a property pattern does not match null");
+        }
+
+        /// <summary>A minus before a negative constant.</summary>
+        public static void NegatedNegativeConstant(FakeWorld world)
+        {
+            var single = -NegativeSingle;
+            var integer = -NegativeInteger;
+            Expect.Near(2f, single, "a float constant");
+            Expect.Equal(5, integer, "an int constant");
+        }
+
+        private const float NegativeSingle = -2f;
+
+        private const int NegativeInteger = -5;
+
+        private static int ReturnInIf(List<string> log, bool early)
+        {
+            using var logged = new Logged(log);
+            if (early)
+            {
+                return 1;
+            }
+
+            return 2;
+        }
+
+        private static int ReturnInLoop(List<string> log, List<int> items)
+        {
+            using var logged = new Logged(log);
+            foreach (var item in items)
+            {
+                if (item > 1)
+                {
+                    return item;
+                }
+            }
+
+            return -1;
+        }
+
+        private static string ReturnInSwitch(List<string> log, int n)
+        {
+            using var logged = new Logged(log);
+            switch (n)
+            {
+                case 1:
+                    return "one";
+                default:
+                    return "other";
+            }
+        }
+
+        private static string Size(int n)
+        {
+            switch (n)
+            {
+                case < 0:
+                    return "neg";
+                case >= 1 and <= 5:
+                    return "small";
+                case > 5:
+                    return "big";
+                default:
+                    return "zero";
+            }
+        }
+
+        private static string Range(int n)
+        {
+            switch (n)
+            {
+                case (1 or 2):
+                    return "low";
+                case not (> 2 and < 9):
+                    return "out";
+                default:
+                    return "mid";
+            }
+        }
+
+        private static string Inner(Holder? holder)
+        {
+            switch (holder)
+            {
+                case { Next.Count: 9 }:
+                    return "nine";
+                case { Count: not 3 }:
+                    return "not three";
+                default:
+                    return "none";
+            }
+        }
+
         private static bool Stand(List<string> calls, out int nearest)
         {
             calls.Add("stand");
@@ -152,6 +298,16 @@ namespace Moonwell.Testing
         private sealed class Holder
         {
             public int Count;
+
+            public Holder? Next;
+        }
+
+        private sealed class Logged(List<string> log) : IDisposable
+        {
+            public void Dispose()
+            {
+                log.Add("disposed");
+            }
         }
 
         private sealed class Initialized(int value)
