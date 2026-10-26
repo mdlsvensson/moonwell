@@ -29,9 +29,6 @@ public class SyntaxTests
     // MW0018: patterns that give the wrong answer
     [InlineData("MW0018", "var bx = new Box(); var b = bx is { Inner.X: 9 };", "Inner.X: 9")]
     [InlineData("MW0018", "(int, int) t = (1, 2); var b = t is (1, _);", "(1, _)")]
-    // MW0019: --N
-    [InlineData("MW0019", "var a = -N;", "-N")]
-    [InlineData("MW0019", "var a = unchecked(-int.MinValue);", "-int.MinValue")]
     // MW0020: a struct changed through a copy of an element
     [InlineData("MW0020", "var arr = new Pt[1]; var c = arr[0]; c.X = 6;", "arr[0]")]
     [InlineData("MW0020", "var l = new List<Pt> { new Pt() }; var c = l[0]; c.X++;", "l[0]")]
@@ -166,6 +163,17 @@ public class SyntaxTests
             class Plain(int x) { public int Get() => x; }
             record Rec(int A) { public int B = A; }
             """);
+        Assert.Empty(found);
+    }
+
+    [Fact]
+    public void a_minus_before_a_negative_constant_is_allowed()
+    {
+        var found = MapCode.Check("""
+            var a = -N;
+            var b = unchecked(-int.MinValue);
+            var c = -(N);
+            """, Types);
         Assert.Empty(found);
     }
 

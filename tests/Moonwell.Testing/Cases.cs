@@ -660,6 +660,11 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "compiler.initializer-temporaries", Run = CompilerCases.InitializerTemporaries });
             list.Add(new Case { Name = "compiler.foreach-disposes", Run = CompilerCases.ForeachDisposes });
             list.Add(new Case { Name = "compiler.private-base-fields", Run = CompilerCases.PrivateBaseFields });
+            list.Add(new Case { Name = "compiler.local-function-before-declaration", Run = CompilerCases.LocalFunctionBeforeDeclaration });
+            list.Add(new Case { Name = "compiler.using-declaration-returns", Run = CompilerCases.UsingDeclarationReturns });
+            list.Add(new Case { Name = "compiler.nullable-equals-null", Run = CompilerCases.NullableEqualsNull });
+            list.Add(new Case { Name = "compiler.switch-statement-patterns", Run = CompilerCases.SwitchStatementPatterns });
+            list.Add(new Case { Name = "compiler.negated-negative-constant", Run = CompilerCases.NegatedNegativeConstant });
         }
 
         /// <summary>Runs every case on a fresh world, and returns a PASS or FAIL line for each, then DONE.</summary>
