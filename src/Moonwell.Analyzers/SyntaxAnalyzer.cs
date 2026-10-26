@@ -12,7 +12,8 @@ namespace Moonwell.Analyzers;
 /// <summary>
 /// Rejects the C# syntax and library calls that CSharp.lua stops on, writes wrong or leaves to a Lua core that does not have
 /// them, so the editor and dotnet build show it with its line (MW0017 to MW0034). Found by running about 770 checks
-/// against .NET; each rule's description says what was seen.
+/// against .NET; each rule's description says what was seen. MW0021 and MW0033 are gone: the fork's CSharp.lua writes
+/// their forms right.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
@@ -29,7 +30,6 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
         context.RegisterSyntaxNodeAction(Negated, SyntaxKind.UnaryMinusExpression);
         context.RegisterSyntaxNodeAction(DeclaredFromElement, SyntaxKind.VariableDeclarator);
         context.RegisterSyntaxNodeAction(AssignedFromElement, SyntaxKind.SimpleAssignmentExpression);
-        context.RegisterSyntaxNodeAction(Primary, SyntaxKind.ClassDeclaration, SyntaxKind.StructDeclaration);
         context.RegisterSyntaxNodeAction(Deconstruction, SyntaxKind.SimpleAssignmentExpression);
         context.RegisterSyntaxNodeAction(TupleSum, SyntaxKind.AddExpression);
         context.RegisterSyntaxNodeAction(TupleHole, SyntaxKind.Interpolation);
@@ -56,7 +56,6 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
         context.RegisterSyntaxNodeAction(EnumSum, SyntaxKind.AddExpression);
         context.RegisterSyntaxNodeAction(EnumHole, SyntaxKind.Interpolation);
         context.RegisterSyntaxNodeAction(EnumCast, SyntaxKind.CastExpression);
-        context.RegisterSyntaxNodeAction(Initializers, SyntaxKind.ObjectCreationExpression, SyntaxKind.ImplicitObjectCreationExpression);
         context.RegisterSyntaxNodeAction(Usings, SyntaxKind.LocalDeclarationStatement);
     }
 
@@ -215,59 +214,6 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
             {
                 context.ReportDiagnostic(Diagnostic.Create(Rules.StructCopy, access.GetLocation(), local.Name));
                 return;
-            }
-        }
-    }
-
-    // ---- MW0021 ----
-
-    private static void Primary(SyntaxNodeAnalysisContext context)
-    {
-        var type = (TypeDeclarationSyntax)context.Node;
-        if (type.ParameterList == null)
-        {
-            return;
-        }
-
-        foreach (var member in type.Members)
-        {
-            switch (member)
-            {
-                case FieldDeclarationSyntax field:
-                    foreach (var variable in field.Declaration.Variables)
-                    {
-                        UsesParameter(context, variable.Initializer);
-                    }
-
-                    break;
-                case PropertyDeclarationSyntax property:
-                    UsesParameter(context, property.Initializer);
-                    break;
-            }
-        }
-
-        if (type.BaseList != null)
-        {
-            foreach (var baseType in type.BaseList.Types.OfType<PrimaryConstructorBaseTypeSyntax>())
-            {
-                UsesParameter(context, baseType.ArgumentList);
-            }
-        }
-    }
-
-    private static void UsesParameter(SyntaxNodeAnalysisContext context, SyntaxNode? node)
-    {
-        if (node == null)
-        {
-            return;
-        }
-
-        foreach (var name in node.DescendantNodes().OfType<IdentifierNameSyntax>())
-        {
-            if (context.SemanticModel.GetSymbolInfo(name, context.CancellationToken).Symbol is IParameterSymbol parameter
-                && parameter.DeclaringSyntaxReferences.Any(r => r.GetSyntax(context.CancellationToken) is ParameterSyntax { Parent.Parent: TypeDeclarationSyntax }))
-            {
-                context.ReportDiagnostic(Diagnostic.Create(Rules.PrimaryParameter, name.GetLocation(), name.Identifier.Text));
             }
         }
     }
@@ -851,28 +797,7 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
         context.ReportDiagnostic(Diagnostic.Create(Rules.EnumText, node.GetLocation(), message));
     }
 
-    // ---- MW0033, MW0034 ----
-
-    private static void Initializers(SyntaxNodeAnalysisContext context)
-    {
-        var creation = (BaseObjectCreationExpressionSyntax)context.Node;
-        if (creation.Initializer == null || creation.Parent is not MemberAccessExpressionSyntax access || access.Expression != creation)
-        {
-            return;
-        }
-
-        var statement = creation.Ancestors().OfType<StatementSyntax>().FirstOrDefault();
-        var all = statement?.DescendantNodes().OfType<BaseObjectCreationExpressionSyntax>().Where(c => c.Initializer != null).ToList()
-            ?? new List<BaseObjectCreationExpressionSyntax>();
-        var count = all.Count;
-        var receivers = all.Count(c => c.Parent is MemberAccessExpressionSyntax access && access.Expression == c);
-
-        // Two used with a dot (new P{..}.X + new P{..}.X), or one of them among three or more, shares a temporary; one beside one does not.
-        if (receivers >= 2 || count >= 3)
-        {
-            context.ReportDiagnostic(Diagnostic.Create(Rules.InitializerTemps, creation.GetLocation(), count));
-        }
-    }
+    // ---- MW0034 ----
 
     private static void Usings(SyntaxNodeAnalysisContext context)
     {

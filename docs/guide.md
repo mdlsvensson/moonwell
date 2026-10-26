@@ -297,6 +297,29 @@ target.PlaceAt(Vector2.Lerp(start, end, Ease.OutQuad(t)));
 - `Raycast.Circle`, `Segment`, `Bounds` and `Polygon` give the first hit along a segment in an `out` value, with a
   normal for `Bounce` and `Slide`.
 
+## Terrain
+
+Add the `Moonwell.Terrain` package (the template's `.csproj` has the line, commented) for the ground's height, slope,
+pathing and rays. A map that does not reference it carries none of its code and no grid.
+
+```csharp
+var z = Terrain.Height(target.X, target.Y);
+if (Terrain.Raycast(from, to, out var hit)) { /* the missile meets the ground at hit.Point */ }
+```
+
+- The build writes the height grid from the map's terrain file, so it is the same on every machine. It does not see
+  deformations or bridges; `Terrain.LocalHeight`, inside `Local.For` only, reads the live height and sees both.
+- A height blends the four corners of each 128 tile, so it is rough within 128 of a cliff. `IsCliff` tells a cliff tile,
+  for treating it as a wall. Water reads its surface where that is above the ground. Over the water at the map's outer
+  edge, far outside the playable area, heights can differ from the game's.
+- `IsWalkable`, `IsFlyable`, `IsBuildable` and `IsWater` are terrain only, as the game's own. After changing pathing with
+  natives, call `Terrain.Refresh(area)`. `CanStand` also sees trees and buildings and needs walkable ground, but it
+  places a hidden item, so it changes game state and is not for `Local.For`.
+- On a bridge, `Height` reads the water or ground beneath, and `IsWalkable` and `CanStand` read false.
+- `Terrain.Raycast(from, to, out hit)` is for a missile against the ground; a ridge narrower than 32 can be stepped over.
+- A `Height` read costs about 9 microseconds in the game, so code that runs every tick on many objects should read it
+  sparingly.
+
 ## Interactions and finding
 
 Add the `Moonwell.Interactions` package (the template's `.csproj` has the line, commented) for things that react to what
@@ -370,7 +393,6 @@ in Lua and comparing what they printed.
 | MW0018 | `x is (1, _)`, `p is Pt(var a, var b)`, `p is { Inner.X: 9 }` | `{ X: 1 }`, a `switch`, `{ Inner: { X: 9 } }` |
 | MW0019 | `-N` with `const int N = -5` (Lua reads `--5` as a comment) | write the number, `0 - N` |
 | MW0020 | `var c = arr[0]; c.X = 6;` on a struct (it changes `arr[0]`) | make a new struct, or write `c` back |
-| MW0021 | a primary constructor's parameter in a field initializer or in `: Base(n)` (it is 0) | assign it in a constructor body |
 | MW0022 | `var (a, b) = (1, 2)`, `(x[0], x[1]) = (x[1], x[0])`, a tuple turned into text | `(int a, int b) = (1, 2)`, a temporary, its items |
 | MW0023 | a user-defined `++`, `--`, `operator true/false`; `static abstract`; a record deriving from a record; one class implementing `IG<int>` and `IG<string>`; `with` on an anonymous type | a method; an ordinary class |
 | MW0024 | `a[1..3]`, `s[1..]`, `list[^1]`, `Index`, `Range` (`array[^1]` is fine) | `Substring`, `Skip`/`Take`, `list[list.Count - 1]` |
@@ -383,15 +405,14 @@ in Lua and comparing what they printed.
 "`, a loop |
 | MW0031 | `checked(a + b)`, `checked { }` (an overflow is never detected) | test the range yourself |
 | MW0032 | `Enum.Parse`, `Enum.GetValues`/`GetNames`, `ToString("D")` on an enum, a `[Flags]` combination turned into text, `(Color)5 + "x"` | a `switch` on the value, `HasFlag` |
-| MW0033 | `new A { ... }.M()` or `.X` twice in one statement, or once among three initializers (they share a Lua temporary) | put each in a local |
 | MW0034 | two `using var` in one block (disposed in the wrong order) | nested `using ( ) { }` |
 
-What works is most of the language: classes, structs, records, interfaces and default methods, generics with
-constraints, enums, delegates, events, `switch` statements, `is` patterns with constants, types and properties,
-`??`, `?.`, collection expressions, `foreach` over every collection, `yield`, lambdas and closures, `ref`/`out`/`in`
-parameters, `lock`, string interpolation, `List`, `Dictionary`, `HashSet`, `Queue`, `Stack`, arrays and most of LINQ.
-`float` and `int` arithmetic is the game's, see MW0005. Two things the analyzer cannot see: an iterator with a
-`try/finally` that the caller leaves early with `break` skips the `finally`, and `byte`/`short` arithmetic does not wrap.
+What works is most of the language: classes, structs, records, primary constructors, interfaces and default methods,
+generics with constraints, enums, delegates, events, `switch` statements, `is` patterns with constants, types and
+properties, `??`, `?.`, collection expressions, `foreach` over every collection, `yield`, lambdas and closures,
+`ref`/`out`/`in` parameters, `lock`, string interpolation, `List`, `Dictionary`, `HashSet`, `Queue`, `Stack`, arrays and
+most of LINQ. `float` and `int` arithmetic is the game's, see MW0005. One thing the analyzer cannot see: `byte`/`short`
+arithmetic does not wrap.
 
 ## The build
 

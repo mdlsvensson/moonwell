@@ -70,6 +70,49 @@ namespace Moonwell.Testing
             return hits;
         }
 
+        /// <summary>A thousand misses of the ground ray, over a hill, leave Lua's memory where it was.</summary>
+        public static void GroundMissMakesNothing(FakeWorld world)
+        {
+            Terrain.Install(new FakeTerrainWorld(), 2, 2, 0f, 0f, GridText.Tile(GridText.Corner(0f, 2), GridText.Corner(0f, 2), GridText.Corner(0f, 2), GridText.Corner(256f, 2)));
+            var from = new Vector3(0f, 0f, 500f);
+            var to = new Vector3(128f, 128f, 500f);
+            var outside = new Vector3(5000f, -3000f, 500f);
+            var hits = 0;
+            // A first round, so anything made once (the shared empty hit, the unpacked block) is made before the count.
+            for (var i = 0; i < 2; i++)
+            {
+                hits += GroundMisses(from, to, outside);
+            }
+
+            StopCollector();
+            var before = MemoryKb();
+            for (var i = 0; i < 1000; i++)
+            {
+                hits += GroundMisses(from, to, outside);
+            }
+
+            var grown = MemoryKb() - before;
+            RestartCollector();
+            Expect.Equal(0, hits, "every ground ray missed");
+            Expect.True(grown < 1f, "a thousand rounds of ground misses grew Lua's memory by " + grown + " KB");
+        }
+
+        private static int GroundMisses(Vector3 from, Vector3 to, Vector3 outside)
+        {
+            var hits = 0;
+            if (Terrain.Raycast(from, to, out _))
+            {
+                hits++;
+            }
+
+            if (Terrain.Raycast(from, outside, out _))
+            {
+                hits++;
+            }
+
+            return hits;
+        }
+
         /// <summary>Ray and RayHit have ==, Equals, a hash and text, as Vector2.</summary>
         public static void RayValues(FakeWorld world)
         {

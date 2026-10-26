@@ -4,7 +4,7 @@ using Moonwell.Engine;
 namespace Moonwell.Testing
 {
     /// <summary>Cases for the interactions package's settings and grid, on a 2,048 by 2,048 world from (-1024, -1024) with cells of 256: 8 columns and 8 rows.</summary>
-    public static class GridCases
+    public static class InteractionsGridCases
     {
         /// <summary>Installs a fake world with cells of 256, which the expected cells of these cases count in (the default is 128), and returns it.</summary>
         private static FakeInteractionWorld Fresh()

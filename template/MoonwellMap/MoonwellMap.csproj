@@ -16,6 +16,8 @@
     <!-- <PackageReference Include="Moonwell.Maths" Version="MOONWELL_VERSION" /> -->
     <!-- For interactions between things that come near each other, gizmos, and finding units, items and destructables, take the comment off the next line. -->
     <!-- <PackageReference Include="Moonwell.Interactions" Version="MOONWELL_VERSION" /> -->
+    <!-- For the ground's height, slope, pathing and ground raycasts, take the comment off the next line. -->
+    <!-- <PackageReference Include="Moonwell.Terrain" Version="MOONWELL_VERSION" /> -->
   </ItemGroup>
 
 </Project>
