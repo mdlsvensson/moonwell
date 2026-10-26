@@ -166,6 +166,10 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "areas.area.hidden", Run = AreaCases.Hidden });
             list.Add(new Case { Name = "areas.area.hidden-then-gone", Run = AreaCases.HiddenThenGone });
             list.Add(new Case { Name = "areas.area.hidden-at-start", Run = AreaCases.HiddenAtStart });
+            list.Add(new Case { Name = "areas.area.step-ends-both-areas", Run = AreaCases.StepEndsBothAreas });
+            list.Add(new Case { Name = "areas.area.step-hands-over-and-restarts", Run = AreaCases.StepHandsOverAndRestarts });
+            list.Add(new Case { Name = "areas.area.step-hands-over-and-keeps-running", Run = AreaCases.StepHandsOverAndKeepsRunning });
+            list.Add(new Case { Name = "areas.area.step-leaves-and-reenters", Run = AreaCases.StepLeavesAndReenters });
         }
 
         /// <summary>Adds the input package's cases.</summary>

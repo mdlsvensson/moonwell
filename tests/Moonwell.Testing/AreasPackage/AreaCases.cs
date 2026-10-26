@@ -405,6 +405,121 @@ namespace Moonwell.Testing
             Expect.Equal(4, half.SinceAtStay.Count, "nothing ran after");
         }
 
+        /// <summary>An OnUnitStays that ends both areas ends the step: the other area's stays do not run, and the package timer is gone.</summary>
+        public static void StepEndsBothAreas(FakeWorld world)
+        {
+            var fake = Fresh();
+            var first = Added(world, new LogArea(Square(), AreaTracker.Interval));
+            var second = Added(world, new LogArea(Square(), AreaTracker.Interval));
+            var a = UnitAt(world, 10f, 10f);
+            var b = UnitAt(world, 20f, 20f);
+            first.Labels[a] = "a";
+            second.Labels[b] = "b";
+            fake.Enter(fake.Regions[0], a.Handle);
+            fake.Enter(fake.Regions[1], b.Handle);
+            first.WhenStays = u =>
+            {
+                first.End();
+                second.End();
+            };
+            world.Advance(AreaTracker.Interval);
+            ExpectLog(first, new[] { "entered a", "stays a", "left a" }, "the first area stays once, then ends");
+            ExpectLog(second, new[] { "entered b", "left b" }, "the second ended before its stay was due");
+            Expect.True(!AreaTracker.Running, "the package timer is gone");
+            world.Advance(1f);
+            Expect.Equal(3, first.Log.Count, "nothing runs after");
+            Expect.Equal(2, second.Log.Count, "nothing runs after");
+        }
+
+        /// <summary>A unit that leaves the one area with a unit and enters the other, inside the first one's OnUnitStays: the timer stops and restarts under the step, which ends there; each area stays its unit once per due step, none twice or skipped.</summary>
+        public static void StepHandsOverAndRestarts(FakeWorld world)
+        {
+            var fake = Fresh();
+            var from = Added(world, new LogArea(Square(), AreaTracker.Interval));
+            var to = Added(world, new LogArea(Square(), AreaTracker.Interval));
+            var a = UnitAt(world, 10f, 10f);
+            from.Labels[a] = "a";
+            to.Labels[a] = "a";
+            fake.Enter(fake.Regions[0], a.Handle);
+            from.WhenStays = u =>
+            {
+                fake.Leave(fake.Regions[0], a.Handle);
+                fake.Enter(fake.Regions[1], a.Handle);
+            };
+            var owned = Game.Instance.OwnedCount;
+            world.Advance(AreaTracker.Interval);
+            ExpectLog(from, new[] { "entered a", "stays a", "left a" }, "the first area stayed once and the unit left it");
+            ExpectLog(to, new[] { "entered a" }, "the unit entered the second, which is not due in the step the timer restarted in");
+            Expect.True(AreaTracker.Running, "the timer runs again for the second area");
+            Expect.Equal(owned, Game.Instance.OwnedCount, "as one timer, the old one gone");
+            world.Advance(AreaTracker.Interval);
+            ExpectLog(to, new[] { "entered a", "stays a" }, "the second stays at the new timer's first step");
+            world.Advance(AreaTracker.Interval * 2f);
+            ExpectLog(to, new[] { "entered a", "stays a", "stays a", "stays a" }, "and at each step after");
+            Expect.Equal(3, from.Log.Count, "the first has nothing more");
+            fake.Leave(fake.Regions[1], a.Handle);
+            Expect.True(!AreaTracker.Running, "the timer ends with the last unit");
+        }
+
+        /// <summary>The same hand-over with the unit entering the second area before it leaves the first: the timer never stops, and the second area's stay waits for the step after.</summary>
+        public static void StepHandsOverAndKeepsRunning(FakeWorld world)
+        {
+            var fake = Fresh();
+            var from = Added(world, new LogArea(Square(), AreaTracker.Interval));
+            var to = Added(world, new LogArea(Square(), AreaTracker.Interval));
+            var a = UnitAt(world, 10f, 10f);
+            from.Labels[a] = "a";
+            to.Labels[a] = "a";
+            fake.Enter(fake.Regions[0], a.Handle);
+            from.WhenStays = u =>
+            {
+                fake.Enter(fake.Regions[1], a.Handle);
+                fake.Leave(fake.Regions[0], a.Handle);
+            };
+            var owned = Game.Instance.OwnedCount;
+            world.Advance(AreaTracker.Interval);
+            ExpectLog(from, new[] { "entered a", "stays a", "left a" }, "the first area stayed once and the unit left it");
+            ExpectLog(to, new[] { "entered a" }, "the unit entered the second, which is not due in the step it entered in");
+            Expect.True(AreaTracker.Running, "the timer kept running");
+            Expect.Equal(owned, Game.Instance.OwnedCount, "as the same one timer");
+            world.Advance(AreaTracker.Interval);
+            ExpectLog(to, new[] { "entered a", "stays a" }, "the second stays at the next step");
+            world.Advance(AreaTracker.Interval * 2f);
+            ExpectLog(to, new[] { "entered a", "stays a", "stays a", "stays a" }, "and at each step after");
+            Expect.Equal(3, from.Log.Count, "the first has nothing more");
+        }
+
+        /// <summary>A unit that leaves and comes back inside its OnUnitStays leaves, then enters, once, and goes last among the units inside; the other unit still stays in that step, and the unit it stays for is not run twice.</summary>
+        public static void StepLeavesAndReenters(FakeWorld world)
+        {
+            var fake = Fresh();
+            var area = Added(world, new LogArea(Square(), AreaTracker.Interval));
+            var a = UnitAt(world, 10f, 10f);
+            var b = UnitAt(world, 20f, 20f);
+            area.Labels[a] = "a";
+            area.Labels[b] = "b";
+            fake.Enter(fake.Regions[0], a.Handle);
+            fake.Enter(fake.Regions[0], b.Handle);
+            area.WhenStays = u =>
+            {
+                if (u == a)
+                {
+                    fake.Leave(fake.Regions[0], a.Handle);
+                    fake.Enter(fake.Regions[0], a.Handle);
+                }
+            };
+            world.Advance(AreaTracker.Interval);
+            ExpectLog(area, new[] { "entered a", "entered b", "stays a", "left a", "entered a", "stays b" }, "a stays, leaves and enters; b still stays in the step");
+            Expect.Equal(2, area.Units.Count, "both are inside, each once");
+            Expect.Same(b, area.Units[0], "b is first now");
+            Expect.Same(a, area.Units[1], "a entered last");
+            Expect.True(AreaTracker.Running, "the timer runs on");
+            area.WhenStays = null;
+            world.Advance(AreaTracker.Interval);
+            Expect.Equal("stays b, stays a", string.Join(", ", new[] { area.Log[6], area.Log[7] }), "the next step stays them in the new order");
+            Expect.Equal(8, area.Log.Count, "and nothing else");
+        }
+
         /// <summary>An area counts from its own first unit: the first stay comes a Tick after it, however long the timer has been running for another area.</summary>
         public static void CountsFromFirstUnit(FakeWorld world)
         {
