@@ -4,6 +4,7 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/Moonwell.Analyzers/Moonwell.Analyzers.csproj" />
+    <Project Path="src/Moonwell.Areas/Moonwell.Areas.csproj" />
     <Project Path="src/Moonwell.Build/Moonwell.Build.csproj" />
     <Project Path="src/Moonwell.Cli/Moonwell.Cli.csproj" />
     <Project Path="src/Moonwell.Damage/Moonwell.Damage.csproj" />

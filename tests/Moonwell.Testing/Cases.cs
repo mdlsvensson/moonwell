@@ -16,6 +16,7 @@ namespace Moonwell.Testing
             AddMaths(list);
             AddInteractions(list);
             AddTerrain(list);
+            AddAreas(list);
             return list;
         }
 
@@ -131,6 +132,18 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.pair.data-and-since", Run = PairCases.DataAndSince });
             list.Add(new Case { Name = "interactions.pair.pair-owns", Run = PairCases.PairOwns });
             list.Add(new Case { Name = "interactions.tree", Run = TreeCases.Tree });
+        }
+
+        /// <summary>Adds the areas package's cases.</summary>
+        private static void AddAreas(List<Case> list)
+        {
+            list.Add(new Case { Name = "areas.shapes.named", Run = AreaShapeCases.Named });
+            list.Add(new Case { Name = "areas.shapes.unknown-name", Run = AreaShapeCases.UnknownName });
+            list.Add(new Case { Name = "areas.shapes.circle", Run = AreaShapeCases.Circle });
+            list.Add(new Case { Name = "areas.shapes.polygon", Run = AreaShapeCases.Polygon });
+            list.Add(new Case { Name = "areas.shapes.of", Run = AreaShapeCases.Of });
+            list.Add(new Case { Name = "areas.shapes.not-installed", Run = AreaShapeCases.NotInstalled });
+            list.Add(new Case { Name = "areas.shapes.wrong-length", Run = AreaShapeCases.WrongLength });
         }
 
         /// <summary>Adds the terrain package's cases.</summary>
