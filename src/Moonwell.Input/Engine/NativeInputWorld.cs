@@ -68,7 +68,7 @@ namespace Moonwell.Engine
         /// <summary>The unit under the cursor on this machine; null when none.</summary>
         public unit? MouseFocusUnit() => Natives.BlzGetMouseFocusUnit();
 
-        /// <summary>Whether a button is held on this machine now.</summary>
+        /// <summary>Whether a button (1 left, 2 middle, 3 right) is held on this machine now; false for any other number.</summary>
         public bool IsMouseButtonPressed(int button)
         {
             if (button == 1)
@@ -81,7 +81,12 @@ namespace Moonwell.Engine
                 return Natives.BlzIsMouseButtonPressed(Natives.MOUSE_BUTTON_TYPE_MIDDLE);
             }
 
-            return Natives.BlzIsMouseButtonPressed(Natives.MOUSE_BUTTON_TYPE_RIGHT);
+            if (button == 3)
+            {
+                return Natives.BlzIsMouseButtonPressed(Natives.MOUSE_BUTTON_TYPE_RIGHT);
+            }
+
+            return false;
         }
 
         /// <summary>Moves a player's cursor on that player's machine only.</summary>

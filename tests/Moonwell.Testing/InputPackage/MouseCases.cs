@@ -114,6 +114,18 @@ namespace Moonwell.Testing
             Expect.True(!Player.Two.Mouse().IsDown(MouseButton.Middle), "another player's mouse is not");
         }
 
+        /// <summary>A number that is not one of the three buttons is never down, and asking for it does not throw.</summary>
+        public static void UnknownButton(FakeWorld world)
+        {
+            var fake = Fresh(world);
+            var mouse = Player.One.Mouse();
+            fake.Press(Player.One, MouseButton.Left, 10f, 10f);
+            Expect.True(!mouse.IsDown((MouseButton)4), "4 is not down");
+            Expect.True(!mouse.IsDown((MouseButton)0), "0 is not down");
+            Expect.True(!mouse.IsDown((MouseButton)(-1)), "-1 is not down");
+            Expect.True(mouse.IsDown(MouseButton.Left), "and the left button still is");
+        }
+
         /// <summary>An event of Player 1 runs the game's components in add order, then Player 1's, never Player 2's; the reactions give the mouse and the button and run with the component as the current owner.</summary>
         public static void Order(FakeWorld world)
         {

@@ -180,6 +180,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "input.mouse.corner-of-the-world", Run = MouseCases.CornerOfTheWorld });
             list.Add(new Case { Name = "input.mouse.first-not-a-place", Run = MouseCases.FirstNotAPlace });
             list.Add(new Case { Name = "input.mouse.buttons", Run = MouseCases.Buttons });
+            list.Add(new Case { Name = "input.mouse.unknown-button", Run = MouseCases.UnknownButton });
             list.Add(new Case { Name = "input.mouse.order", Run = MouseCases.Order });
             list.Add(new Case { Name = "input.mouse.only-written", Run = MouseCases.OnlyWritten });
             list.Add(new Case { Name = "input.mouse.throwing", Run = MouseCases.Throwing });

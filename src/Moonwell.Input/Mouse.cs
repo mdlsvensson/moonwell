@@ -52,11 +52,17 @@ namespace Moonwell
         [LocalSafe]
         public bool HasPosition { get; private set; }
 
-        /// <summary>Whether the events say a button is down: kept from the press and release events, so online it is the network delay behind the physical button.</summary>
+        /// <summary>Whether the events say a button is down: kept from the press and release events, so online it is the network delay behind the physical button. False for a number that is not one of the three buttons.</summary>
         [LocalSafe]
         public bool IsDown(MouseButton button)
         {
-            return down[(int)button];
+            var number = (int)button;
+            if (number < 1 || number > 3)
+            {
+                return false;
+            }
+
+            return down[number];
         }
 
         /// <summary>The cursor's x on this machine's screen, in pixels. This machine's alone, so it is read inside Local.For.</summary>
