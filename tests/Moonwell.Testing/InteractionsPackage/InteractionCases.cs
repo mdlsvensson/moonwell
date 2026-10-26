@@ -836,5 +836,44 @@ namespace Moonwell.Testing
             Expect.Equal(from + 16, lone.TickSteps[0], "a whole tick after it starts");
             Expect.Equal(from + 16, lone.TickSteps[lone.TickSteps.Count - 1], "and only then");
         }
+
+        /// <summary>
+        /// With no slack the check's reach is its range, 300, so the corner cells of the box around a holder at (0, 0), on a
+        /// cell's corner, are left out when they are farther than 300: things on the diagonals just within range, in those
+        /// corner cells' neighbours and on the cells' edges, meet; things just past range, and things in the corner cells
+        /// beyond reach, do not; and the order is the grid's.
+        /// </summary>
+        public static void CornerCells(FakeWorld world)
+        {
+            Fresh();
+            Interactions.Slack = 0.0f;
+            var a = UnitAt(world, 0.0f, 0.0f);
+            var names = new Dictionary<Unit, string>();
+            var spots = new float[]
+            {
+                212.0f, 212.0f, -212.0f, 212.0f, 212.0f, -212.0f, -212.0f, -212.0f,
+                212.5f, 212.5f, -212.5f, -212.5f,
+                300.0f, 0.0f, 0.0f, -300.0f, 256.0f, 128.0f, -128.0f, 256.0f,
+                290.0f, 290.0f, -290.0f, 290.0f, 380.0f, 380.0f,
+            };
+            var tags = new string[]
+            {
+                "ne", "nw", "se", "sw", "ne past", "sw past", "e", "s", "e up", "n left", "ne far", "nw far", "ne corner",
+            };
+            for (var i = 0; i < spots.Length; i += 2)
+            {
+                names[UnitAt(world, spots[i], spots[i + 1])] = tags[i / 2];
+            }
+
+            var aura = new FireAura();
+            aura.Tag = unit => names[unit];
+            a.Interact(aura);
+            Steps(world, 16);
+            ExpectLog(new string[]
+            {
+                "meet s", "tick s", "meet sw", "tick sw", "meet se", "tick se", "meet e", "tick e",
+                "meet nw", "tick nw", "meet ne", "tick ne", "meet e up", "tick e up", "meet n left", "tick n left",
+            }, "the things within range meet, in the grid's order, and none past it");
+        }
     }
 }

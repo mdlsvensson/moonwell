@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Moonwell.Engine
@@ -92,6 +93,71 @@ namespace Moonwell.Engine
             for (var row = firstRow; row <= lastRow; row++)
             {
                 for (var column = firstColumn; column <= lastColumn; column++)
+                {
+                    // A cell not made yet holds null (System.null in Lua), so the cell is read through the List.
+                    var cell = cells[row * columns + column];
+                    if (cell == null)
+                    {
+                        continue;
+                    }
+
+                    var count = cell.Count;
+                    for (var i = 0; i < count; i++)
+                    {
+                        Raw.Append(into, Raw.At(cell, i));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds to the list the entries of the cells within reach of a point, each entry once, in Collect's order: the cells
+        /// of the box reach around the point, less those whose nearest point to it is farther than reach, the corners of the
+        /// box for a reach of a cell or more. A row above or below the point's keeps the columns within the reach left at its
+        /// distance; an edge cell reaches out past the world's edge, as it holds what lies outside. A cell is taken as a
+        /// thousandth of a cell larger on each side, so a place that float rounding put in a cell from just outside it is
+        /// never left out. An entry in a cell within reach of the point is found as by Collect over the box.
+        /// </summary>
+        public void CollectNear(float x, float y, float reach, List<Entry> into)
+        {
+            var firstColumn = ColumnOf(x - reach);
+            var lastColumn = ColumnOf(x + reach);
+            var firstRow = RowOf(y - reach);
+            var lastRow = RowOf(y + reach);
+            var limit = reach * reach;
+            var pad = side * 0.001f;
+            for (var row = firstRow; row <= lastRow; row++)
+            {
+                var from = firstColumn;
+                var to = lastColumn;
+                var low = bottom + row * side - pad;
+                var high = low + side + pad + pad;
+                var dy = 0.0f;
+                if (row > 0 && y < low)
+                {
+                    dy = low - y;
+                }
+                else if (row < rows - 1 && y > high)
+                {
+                    dy = y - high;
+                }
+
+                if (dy > 0.0f)
+                {
+                    var rest = limit - dy * dy;
+                    if (rest < 0.0f)
+                    {
+                        continue;
+                    }
+
+                    var half = MathF.Sqrt(rest) + pad;
+                    var west = ColumnOf(x - half);
+                    var east = ColumnOf(x + half);
+                    from = west > from ? west : from;
+                    to = east < to ? east : to;
+                }
+
+                for (var column = from; column <= to; column++)
                 {
                     // A cell not made yet holds null (System.null in Lua), so the cell is read through the List.
                     var cell = cells[row * columns + column];

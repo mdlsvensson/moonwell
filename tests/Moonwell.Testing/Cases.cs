@@ -32,6 +32,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.grid.settings-locked", Run = InteractionsGridCases.SettingsLocked });
             list.Add(new Case { Name = "interactions.grid.reset", Run = InteractionsGridCases.Reset });
             list.Add(new Case { Name = "interactions.grid.settings-checked", Run = InteractionsGridCases.SettingsChecked });
+            list.Add(new Case { Name = "interactions.grid.collect-near", Run = InteractionsGridCases.CollectNear });
             list.Add(new Case { Name = "interactions.gizmo.create", Run = GizmoCases.Create });
             list.Add(new Case { Name = "interactions.gizmo.reaction-owner", Run = GizmoCases.ReactionOwner });
             list.Add(new Case { Name = "interactions.gizmo.tick", Run = GizmoCases.Tick });
@@ -121,6 +122,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.interaction.check-fails", Run = InteractionCases.CheckFails });
             list.Add(new Case { Name = "interactions.interaction.other-kinds", Run = InteractionCases.OtherKinds });
             list.Add(new Case { Name = "interactions.interaction.spread-first-checks", Run = InteractionCases.SpreadFirstChecks });
+            list.Add(new Case { Name = "interactions.interaction.corner-cells", Run = InteractionCases.CornerCells });
             list.Add(new Case { Name = "interactions.guard.turn", Run = GuardCases.Turn });
             list.Add(new Case { Name = "interactions.pair.wait", Run = PairCases.Wait });
             list.Add(new Case { Name = "interactions.pair.try-cooldown", Run = PairCases.TryCooldown });

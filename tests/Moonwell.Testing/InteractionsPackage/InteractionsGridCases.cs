@@ -248,5 +248,54 @@ namespace Moonwell.Testing
             Interactions.Slack = 0.0f;
             Expect.Near(0.0f, Interactions.Slack, "a Slack of 0 is allowed");
         }
+
+        /// <summary>
+        /// CollectNear takes the cells within reach of a point, in Collect's order: from the centre of cell (4, 4) at
+        /// (128, 128), the corner cells' nearest points are 181 away, so a reach of 180 leaves the four corners out and keeps
+        /// the sides, and one of 182 takes all nine, as Collect over the box does; a point past the world's edge takes the
+        /// edge cell, which holds what lies outside.
+        /// </summary>
+        public static void CollectNear(FakeWorld world)
+        {
+            Fresh();
+            var grid = Interactions.Grid;
+            var centre = EntryAt(1, 100.0f, 100.0f);
+            var east = EntryAt(2, 300.0f, 128.0f);
+            var north = EntryAt(3, 128.0f, 300.0f);
+            var corners = new[] { EntryAt(4, -10.0f, -10.0f), EntryAt(5, 300.0f, -10.0f), EntryAt(6, -10.0f, 300.0f), EntryAt(7, 300.0f, 300.0f) };
+            var west = EntryAt(8, -10.0f, 128.0f);
+            var south = EntryAt(9, 128.0f, -10.0f);
+            grid.Add(centre);
+            grid.Add(east);
+            grid.Add(north);
+            for (var i = 0; i < corners.Length; i++)
+            {
+                grid.Add(corners[i]);
+            }
+
+            grid.Add(west);
+            grid.Add(south);
+            var near = new List<Entry>();
+            grid.CollectNear(128.0f, 128.0f, 180.0f, near);
+            Expect.Equal(5, near.Count, "a reach of 180 takes the centre and the four sides");
+            Expect.True(near[0] == south && near[1] == west && near[2] == centre && near[3] == east && near[4] == north, "row by row from the bottom");
+            near.Clear();
+            grid.CollectNear(128.0f, 128.0f, 182.0f, near);
+            var box = new List<Entry>();
+            grid.Collect(128.0f - 182.0f, 128.0f - 182.0f, 128.0f + 182.0f, 128.0f + 182.0f, box);
+            Expect.Equal(9, near.Count, "a reach of 182 takes all nine cells");
+            Expect.Equal(box.Count, near.Count, "as many as Collect over the box");
+            for (var i = 0; i < box.Count; i++)
+            {
+                Expect.Same(box[i], near[i], "in Collect's order, at " + i);
+            }
+
+            var outside = EntryAt(10, 5000.0f, 10.0f);
+            grid.Add(outside);
+            near.Clear();
+            grid.CollectNear(5000.0f, 0.0f, 100.0f, near);
+            Expect.Equal(1, near.Count, "a point past the edge takes the edge cell");
+            Expect.Same(outside, near[0], "and what lies outside in it");
+        }
     }
 }
