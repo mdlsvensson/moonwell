@@ -16,7 +16,7 @@ namespace Moonwell
         /// <summary>The game's own world: the package installs itself on it at first use. Made from the natives on first use; a test sets a fake one to take the game's first-use path, and null after.</summary>
         internal static IPhysicsWorld? native;
 
-        /// <summary>The package's hook before the gizmos' ticks; the package counts as installed while the interactions package's hook is this one. Interactions' own Install clears that hook, so this package sets it again after every install.</summary>
+        /// <summary>The package's hook before the gizmos' ticks, the physics pass; the package counts as installed while the interactions package's hook is this one. Interactions' own Install clears that hook, so this package sets it again after every install.</summary>
         private static Action? hook;
 
         /// <summary>The downward acceleration, in game units a second squared; 800. Read as a missile or a pushed unit moves, so a change takes hold at once.</summary>
@@ -62,7 +62,8 @@ namespace Moonwell
         {
             Interactions.EnsureInstalled();
             host = world;
-            hook = Step;
+            Pass.Reset();
+            hook = Pass.Run;
             Tracking.BeforeGizmos = hook;
         }
 
@@ -72,6 +73,7 @@ namespace Moonwell
             settings = null;
             host = null;
             hook = null;
+            Pass.Reset();
         }
 
         /// <summary>Whether the package is installed: the interactions package is, and its hook before the gizmos is the package's own. Interactions' Install and Runtime.Reset clear the hook, so the next use starts afresh.</summary>
@@ -98,11 +100,6 @@ namespace Moonwell
             }
 
             return settings;
-        }
-
-        /// <summary>What the package runs each step before the gizmos' ticks. Nothing moves yet; missiles and pushed units do, in the tasks that follow.</summary>
-        private static void Step()
-        {
         }
     }
 }

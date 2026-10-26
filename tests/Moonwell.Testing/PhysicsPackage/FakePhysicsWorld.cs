@@ -33,6 +33,24 @@ namespace Moonwell.Testing
         /// <summary>The yaw, pitch and roll, in radians, last given to each effect, in the order they were given: three numbers to a call.</summary>
         public List<float> Orientations = new List<float>();
 
+        /// <summary>The model each effect was made of.</summary>
+        public Dictionary<effect, string> Models = new Dictionary<effect, string>();
+
+        /// <summary>The x, y and z each effect was last put at; one never put has none.</summary>
+        public Dictionary<effect, float[]> Places = new Dictionary<effect, float[]>();
+
+        /// <summary>The scale each effect was last given; one never scaled has none.</summary>
+        public Dictionary<effect, float> Scales = new Dictionary<effect, float>();
+
+        /// <summary>The red, green and blue each effect was last tinted with; one never tinted has none.</summary>
+        public Dictionary<effect, int[]> Colors = new Dictionary<effect, int[]>();
+
+        /// <summary>The opacity each effect was last given; one never given one has none.</summary>
+        public Dictionary<effect, int> Alphas = new Dictionary<effect, int>();
+
+        /// <summary>The effects removed, in the order they were removed.</summary>
+        public List<effect> Removed = new List<effect>();
+
         /// <summary>The collision size of each unit a case gave one; a unit with none reads 16.</summary>
         public Dictionary<unit, float> Sizes = new Dictionary<unit, float>();
 
@@ -59,12 +77,15 @@ namespace Moonwell.Testing
         {
             var made = new effect();
             Effects.Add(made);
+            Models[made] = model;
+            Places[made] = new float[] { x, y, 0.0f };
             return made;
         }
 
-        /// <summary>Puts an effect at a place; nothing is kept.</summary>
+        /// <summary>Keeps the place an effect was put at.</summary>
         public void SetEffectPosition(effect target, float x, float y, float z)
         {
+            Places[target] = new float[] { x, y, z };
         }
 
         /// <summary>Records the angles given.</summary>
@@ -75,25 +96,29 @@ namespace Moonwell.Testing
             Orientations.Add(roll);
         }
 
-        /// <summary>Scales an effect; nothing is kept.</summary>
+        /// <summary>Keeps the scale an effect was given.</summary>
         public void SetEffectScale(effect target, float scale)
         {
+            Scales[target] = scale;
         }
 
-        /// <summary>Tints an effect; nothing is kept.</summary>
+        /// <summary>Keeps the tint an effect was given.</summary>
         public void SetEffectColor(effect target, int red, int green, int blue)
         {
+            Colors[target] = new int[] { red, green, blue };
         }
 
-        /// <summary>Sets an effect's opacity; nothing is kept.</summary>
+        /// <summary>Keeps the opacity an effect was given.</summary>
         public void SetEffectAlpha(effect target, int alpha)
         {
+            Alphas[target] = alpha;
         }
 
-        /// <summary>Removes an effect.</summary>
+        /// <summary>Removes an effect, and records it.</summary>
         public void RemoveEffect(effect target)
         {
             Effects.Remove(target);
+            Removed.Add(target);
         }
 
         /// <summary>Makes an image.</summary>

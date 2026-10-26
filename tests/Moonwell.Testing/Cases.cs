@@ -154,6 +154,20 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "ballistics.speed-then-velocity", Run = BallisticsCases.SpeedThenVelocity });
             list.Add(new Case { Name = "ballistics.gravity-zero", Run = BallisticsCases.GravityZero });
             list.Add(new Case { Name = "ballistics.vertical", Run = BallisticsCases.Vertical });
+            list.Add(new Case { Name = "flight.straight", Run = FlightCases.Straight });
+            list.Add(new Case { Name = "flight.gravity", Run = FlightCases.Gravity });
+            list.Add(new Case { Name = "flight.acceleration", Run = FlightCases.Acceleration });
+            list.Add(new Case { Name = "flight.arc", Run = FlightCases.Arc });
+            list.Add(new Case { Name = "flight.aim-unit", Run = FlightCases.AimUnit });
+            list.Add(new Case { Name = "flight.aim-point-level", Run = FlightCases.AimPointLevel });
+            list.Add(new Case { Name = "flight.follows-ground", Run = FlightCases.FollowsGround });
+            list.Add(new Case { Name = "flight.duration", Run = FlightCases.Duration });
+            list.Add(new Case { Name = "flight.max-distance", Run = FlightCases.MaxDistance });
+            list.Add(new Case { Name = "flight.bounds", Run = FlightCases.Bounds });
+            list.Add(new Case { Name = "flight.owner", Run = FlightCases.Ownership });
+            list.Add(new Case { Name = "flight.facing", Run = FlightCases.Facing });
+            list.Add(new Case { Name = "flight.fire-at-self", Run = FlightCases.FireAtSelf });
+            list.Add(new Case { Name = "flight.effect", Run = FlightCases.Effects });
         }
 
         /// <summary>Adds the areas package's cases.</summary>
