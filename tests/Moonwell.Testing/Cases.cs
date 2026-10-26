@@ -290,6 +290,10 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "hooks.reset-clears", Run = HookCases.ResetClears });
             list.Add(new Case { Name = "hooks.taken-in-and-ending", Run = HookCases.TakenInAndEnding });
             list.Add(new Case { Name = "hooks.reset", Run = HookCases.WidgetHooksReset });
+            list.Add(new Case { Name = "hooks.ending-two", Run = HookCases.EndingTwo });
+            list.Add(new Case { Name = "hooks.ending-throwing", Run = HookCases.EndingThrowing });
+            list.Add(new Case { Name = "hooks.ending-none", Run = HookCases.EndingNone });
+            list.Add(new Case { Name = "hooks.ending-reset", Run = HookCases.EndingReset });
             list.Add(new Case { Name = "events.need-listens-once", Run = HookCases.NeedListensOnce });
             list.Add(new Case { Name = "actors.add-and-get", Run = ActorCases.AddAndGet });
             list.Add(new Case { Name = "actors.remove", Run = ActorCases.RemoveOne });

@@ -16,8 +16,8 @@ namespace Moonwell
         /// <summary>Set by an interactions package: given each unit, item and destructable the runtime takes in, after its OnCreated; null without one.</summary>
         internal static Action<Widget>? TakenIn;
 
-        /// <summary>Set by an interactions package: given each unit, item and destructable as it ends, before its OnLeave runs and while its place can still be read, so it has left the package's grid by its OnLeave (a gizmo, the package's own, leaves after); null without one.</summary>
-        internal static Action<Widget>? Ending;
+        /// <summary>Added by the packages that need it (interactions, areas): each is given every unit, item and destructable as it ends, before its OnLeave runs and while its place can still be read, so the interactions package has it out of its grid by its OnLeave (a gizmo, the package's own, leaves after). In the order added; empty without one.</summary>
+        private static readonly List<Action<Widget>> endings = new List<Action<Widget>>();
 
         /// <summary>
         /// Whether obj's class, below declaringBase, defines name itself. In Lua MoonwellOverrides (moonwell.lua) walks
@@ -73,14 +73,20 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Tells the interactions package that a widget is ending; an error in it is reported and goes no further.</summary>
+        /// <summary>Adds a listener to the ending of every unit, item and destructable; it is called after those added before it. Runtime.Reset removes them all.</summary>
+        internal static void AddEnding(Action<Widget> listener)
+        {
+            endings.Add(listener);
+        }
+
+        /// <summary>Tells each ending listener, in the order added, that a widget is ending; an error in one is reported and the next still runs.</summary>
         internal static void CallEnding(Widget widget)
         {
-            if (Ending != null)
+            for (var i = 0; i < endings.Count; i++)
             {
                 try
                 {
-                    Ending(widget);
+                    endings[i](widget);
                 }
                 catch (Exception error)
                 {
@@ -89,13 +95,13 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Forgets every class's mask and the hooks a package set; Runtime.Reset calls it.</summary>
+        /// <summary>Forgets every class's mask and the hooks the packages set; Runtime.Reset calls it.</summary>
         internal static void Reset()
         {
             masks.Clear();
             Seen = null;
             TakenIn = null;
-            Ending = null;
+            endings.Clear();
         }
     }
 }

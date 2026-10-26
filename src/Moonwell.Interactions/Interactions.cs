@@ -148,7 +148,7 @@ namespace Moonwell
             Tracking.Reset();
             handler = TakenIn;
             Hooks.TakenIn = handler;
-            Hooks.Ending = Ending;
+            Hooks.AddEnding(Ending);
         }
 
         /// <summary>Whether the package is installed: core's TakenIn hook is the package's own. Runtime.Reset clears the hook, so the next use starts afresh.</summary>
