@@ -783,7 +783,7 @@ namespace Moonwell.Testing
             Expect.Equal(6, actors.Met.Count, "Actor takes all six, and not the holder");
         }
 
-        /// <summary>50 auras of a half-second tick (16 steps) started in one step take turns over its steps for their first checks: the first a whole tick later, the next a step sooner, and so on round, so each step of the tick has three or four; each then checks a tick after its first. One started alone later still first checks within a tick, and a lone aura after an install a whole tick after it starts.</summary>
+        /// <summary>50 auras of a half-second tick (16 steps) started in one step take turns over its steps for their first checks: the first a whole tick later, the next a step sooner, and so on round, so each step of the tick has three or four; each then checks a tick after its first. One started alone later first checks a whole tick after it starts; eight started one a step keep that spread, each a whole tick after its start; and a lone aura after an install checks a whole tick after it starts.</summary>
         public static void SpreadFirstChecks(FakeWorld world)
         {
             Fresh();
@@ -825,8 +825,22 @@ namespace Moonwell.Testing
             var alone = late.Interact(new FireAura());
             var at = Tracking.StepNow;
             Steps(world, 16);
-            Expect.True(alone.TickSteps.Count >= 1, "one started later checks within a tick");
-            Expect.True(alone.TickSteps[0] > at && alone.TickSteps[0] <= at + 16, "at a step of that tick");
+            Expect.True(alone.TickSteps.Count >= 1, "one started alone later checks within a tick");
+            Expect.Equal(at + 16, alone.TickSteps[0], "a whole tick after it starts, as the first of its step");
+            var spaced = new List<FireAura>();
+            var starts = new List<int>();
+            for (var i = 0; i < 8; i++)
+            {
+                spaced.Add(UnitAt(world, i * 20.0f + 700.0f, 300.0f).Interact(new FireAura()));
+                starts.Add(Tracking.StepNow);
+                Steps(world, 1);
+            }
+
+            Steps(world, 16);
+            for (var i = 0; i < 8; i++)
+            {
+                Expect.Equal(starts[i] + 16, spaced[i].TickSteps[0], "one started a step after another checks a step after it, a whole tick after its start");
+            }
             Fresh();
             var a = UnitAt(world, 0.0f, 0.0f);
             var lone = a.Interact(new FireAura());

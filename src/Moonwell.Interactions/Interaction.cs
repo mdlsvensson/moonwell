@@ -70,7 +70,7 @@ namespace Moonwell
             protected set { range = value; }
         }
 
-        /// <summary>The seconds between checks, rounded up to whole steps of the cycle and at least one step; a step unless set. The first check comes within a tick of Interact: interactions of the same tick take turns over its steps in the order they start, so many started at once do not all check at the same step. A map sets it in its constructor; a change takes effect after the check that is waiting.</summary>
+        /// <summary>The seconds between checks, rounded up to whole steps of the cycle and at least one step; a step unless set. The first check comes within a tick of Interact: interactions of the same tick started in the same step take turns over its steps in the order they start, so many started at once do not all check at the same step. A map sets it in its constructor; a change takes effect after the check that is waiting.</summary>
         [LocalSafe]
         public float Tick
         {

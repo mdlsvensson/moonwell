@@ -28,8 +28,11 @@ namespace Moonwell.Engine
         /// <summary>The entry of each destructable tracked, keyed by the game's handle; a lookup only.</summary>
         private static readonly Dictionary<destructable, Entry> destructableEntries = new Dictionary<destructable, Entry>();
 
-        /// <summary>How many interactions have started, by the steps of their tick; a lookup only.</summary>
+        /// <summary>How many interactions have started in the step of the last start, by the steps of their tick; a lookup only.</summary>
         private static readonly Dictionary<int, int> startsBySteps = new Dictionary<int, int>();
+
+        /// <summary>The step of the last start, by the steps of the tick; a lookup only.</summary>
+        private static readonly Dictionary<int, int> lastStartBySteps = new Dictionary<int, int>();
 
         /// <summary>The cycle; made on first use after an Install. What runs many times a step reads it here, and takes Beat when it is not made.</summary>
         internal static Cycle? cycle;
@@ -125,13 +128,20 @@ namespace Moonwell.Engine
             itemEntries.Clear();
             destructableEntries.Clear();
             startsBySteps.Clear();
+            lastStartBySteps.Clear();
         }
 
-        /// <summary>How many interactions with a tick of these steps started before this one, which counts it: the order the first checks of interactions of one tick are spread by.</summary>
-        public static int StartOrder(int steps)
+        /// <summary>How many interactions with a tick of these steps started before this one in the same step, which counts it: the order the first checks of interactions of one tick started together are spread by. The count starts again at 0 in each step that starts one.</summary>
+        public static int StartOrder(int steps, int step)
         {
-            int order;
-            startsBySteps.TryGetValue(steps, out order);
+            int last;
+            var order = 0;
+            if (lastStartBySteps.TryGetValue(steps, out last) && last == step)
+            {
+                startsBySteps.TryGetValue(steps, out order);
+            }
+
+            lastStartBySteps[steps] = step;
             startsBySteps[steps] = order + 1;
             return order;
         }

@@ -47,10 +47,11 @@ namespace Moonwell.Engine
         }
 
         /// <summary>
-        /// Puts a new interaction on the ring for its first check, within a tick from now: the interactions of one tick take
-        /// turns over its steps in the order they started, the first a whole tick from now, the next a step sooner, and so
-        /// on round, so many started at once, 50 auras in one step, do not all check at the same step. The order is the same
-        /// on every machine, as interactions start in the same order on each.
+        /// Puts a new interaction on the ring for its first check, within a tick from now: the interactions of one tick that
+        /// start in the same step take turns over its steps in the order they started, the first a whole tick from now, the
+        /// next a step sooner, and so on round, so many started at once, 50 auras in one step, do not all check at the same
+        /// step; ones started in different steps keep the spread of their starts. The order is the same on every machine, as
+        /// interactions start in the same order on each.
         /// </summary>
         public void ArmFirst()
         {
@@ -61,7 +62,7 @@ namespace Moonwell.Engine
 
             var beat = Tracking.cycle ?? Tracking.Beat;
             var tick = steps.Of(interaction.tick);
-            dueStep = beat.StepNow + tick - Tracking.StartOrder(tick) % tick;
+            dueStep = beat.StepNow + tick - Tracking.StartOrder(tick, beat.StepNow) % tick;
             beat.Schedule(this, dueStep);
         }
 
