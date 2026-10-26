@@ -126,6 +126,12 @@ namespace Moonwell.Build
                 throw new BuildException($"{owner} has the id \"{id}\", which is not four characters");
             }
 
+            // An id is four bytes: the object file would write a character past ASCII as '?', and the Lua as another id still.
+            if (id.Any(letter => letter < '!' || letter > '~'))
+            {
+                throw new BuildException($"{owner} has the id \"{id}\", with a character that is not an ASCII letter, digit or sign");
+            }
+
             if (standardIds.Contains(id))
             {
                 throw new BuildException($"{owner} has the id {id}, which a standard object has");
