@@ -630,11 +630,14 @@ namespace Moonwell.Testing
             return new List<destructable>(PlacedDestructables);
         }
 
-        /// <summary>Makes a unit owned by the owner's slot, and keeps the facing in LastFacing; the place is not kept.</summary>
+        /// <summary>Makes a unit owned by the owner's slot at the place, and keeps the facing in LastFacing.</summary>
         public unit SpawnUnit(player owner, int typeId, float x, float y, float facing)
         {
             LastFacing = facing;
-            return NewUnit(typeId, SlotOf(owner));
+            var created = NewUnit(typeId, SlotOf(owner));
+            unitXs[created] = x;
+            unitYs[created] = y;
+            return created;
         }
 
         /// <summary>Makes an item; the place is not kept.</summary>

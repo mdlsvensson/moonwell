@@ -431,6 +431,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "units.owned", Run = UnitCases.OwnedByOwner });
             list.Add(new Case { Name = "units.not-owned-by-current", Run = UnitCases.NotOwnedByCurrent });
             list.Add(new Case { Name = "units.create-generic", Run = UnitCases.CreateGeneric });
+            list.Add(new Case { Name = "units.create-place", Run = UnitCases.CreatePlace });
             list.Add(new Case { Name = "units.sweep-continues-after-error", Run = UnitCases.SweepContinuesAfterError });
             list.Add(new Case { Name = "units.add-in-onleave", Run = UnitCases.AddInOnLeave });
             list.Add(new Case { Name = "units.enter", Run = UnitCases.Enter });
