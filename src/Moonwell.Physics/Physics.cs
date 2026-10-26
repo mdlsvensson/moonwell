@@ -27,6 +27,20 @@ namespace Moonwell
             set { Current().Gravity = value; }
         }
 
+        /// <summary>The ground's height at a point for a ground unit: the deck of a placed bridge where one stands, else the terrain (water's surface where it is above the ground). The same on every machine.</summary>
+        [LocalSafe]
+        public static float GroundHeight(float x, float y)
+        {
+            return Ground.Height(x, y);
+        }
+
+        /// <summary>The ground's height at a point for something at a height: the highest of the terrain (water's surface where it is above the ground) and any placed bridge's deck there that is not above that height, so something under a bridge is under it. The same on every machine.</summary>
+        [LocalSafe]
+        public static float GroundHeight(float x, float y, float z)
+        {
+            return Ground.Height(x, y, z);
+        }
+
         /// <summary>Whether the package is installed on a world.</summary>
         internal static bool IsInstalled
         {

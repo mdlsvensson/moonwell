@@ -171,6 +171,14 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "flight.effect", Run = FlightCases.Effects });
             list.Add(new Case { Name = "flight.gizmo-create", Run = FlightCases.GizmoCreate });
             list.Add(new Case { Name = "flight.end-mid-pass", Run = FlightCases.EndMidPass });
+            list.Add(new Case { Name = "ground.stop", Run = GroundCases.Stop });
+            list.Add(new Case { Name = "ground.bounce", Run = GroundCases.Bounce });
+            list.Add(new Case { Name = "ground.slide-rest", Run = GroundCases.SlideRest });
+            list.Add(new Case { Name = "ground.crest", Run = GroundCases.Crest });
+            list.Add(new Case { Name = "ground.cliff", Run = GroundCases.Cliff });
+            list.Add(new Case { Name = "ground.none", Run = GroundCases.None });
+            list.Add(new Case { Name = "ground.reads", Run = GroundCases.Reads });
+            list.Add(new Case { Name = "ground.water", Run = GroundCases.Water });
         }
 
         /// <summary>Adds the areas package's cases.</summary>

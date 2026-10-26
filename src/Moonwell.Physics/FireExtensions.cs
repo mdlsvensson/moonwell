@@ -31,7 +31,7 @@ namespace Moonwell
         public static T Fire<T>(this Unit source, T missile, float x, float y, float z, Owner? owner = null)
             where T : Missile
         {
-            Flight.Launch(source, missile, x, y, z - Flight.Ground(x, y), false, owner);
+            Flight.Launch(source, missile, x, y, z - Ground.Height(x, y), false, owner);
             return missile;
         }
     }

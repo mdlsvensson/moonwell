@@ -19,19 +19,53 @@ namespace Moonwell.Engine
         /// <summary>The share of a step a Duration or MaxDistance is forgiven, as a sum of steps can come out a little under in a float.</summary>
         private const float Forgiven = 0.001f;
 
-        /// <summary>The ground's height at a point: the one place the package reads it, so that the decks of bridges can join it.</summary>
-        public static float Ground(float x, float y)
-        {
-            return Terrain.Height(x, y);
-        }
+        /// <summary>
+        /// How fast, in game units a second, the ground under a missile may rise toward it as it moves, between two reads:
+        /// the ground is read again once a missile's height above the last read is no more than this times the seconds
+        /// since (ALICE's slow case). Its own fall is in its height, so a change of its velocity is seen at once.
+        /// </summary>
+        private const float Slack = 600.0f;
+
+        /// <summary>A Slide slower than this into the ground rolls instead of bouncing; a rolling missile moving out of the ground faster than this flies.</summary>
+        private const float SlideSpeed = 5.0f;
+
+        /// <summary>How far above the ground it would roll on, a rolling missile's free fall must be to leave the ground over a crest.</summary>
+        private const float LiftOff = 0.5f;
 
         /// <summary>
         /// Moves a missile one step: the speed change, gravity, then the move, added exactly for the step; a missile that
         /// follows the ground keeps its height above it. Then its Duration and MaxDistance, which end it after OnExpire, and
-        /// the world's bounds, which end it. Then its effects are placed and turned.
+        /// the world's bounds, which end it. Then the ground, and its effects are placed and turned. A rolling missile rolls
+        /// instead, and a resting one lies still until something gives it a velocity.
         /// </summary>
         public static void Step(Missile missile, float step, Grid grid, IPhysicsWorld world)
         {
+            if (missile.resting)
+            {
+                if (missile.vx == 0.0f && missile.vy == 0.0f && missile.vz == 0.0f)
+                {
+                    missile.flown += step;
+                    var lasts = missile.duration;
+                    if (lasts > 0.0f && missile.flown >= lasts - step * Forgiven)
+                    {
+                        Expire(missile);
+                    }
+
+                    return;
+                }
+
+                missile.resting = false;
+            }
+
+            var entry = missile.entry!;
+            var fromX = entry.X;
+            var fromY = entry.Y;
+            var fromZ = missile.z;
+            if (missile.rolling && Roll(missile, step, grid, world, entry, fromX, fromY, fromZ))
+            {
+                return;
+            }
+
             var vx = missile.vx;
             var vy = missile.vy;
             var vz = missile.vz;
@@ -58,27 +92,43 @@ namespace Moonwell.Engine
             missile.vy = vy;
             missile.vz = vz;
 
-            var entry = missile.entry!;
-            var fromX = entry.X;
-            var fromY = entry.Y;
-            var fromZ = missile.z;
             var x = fromX + vx * step;
             var y = fromY + vy * step;
             var z = fromZ + rise;
             if (missile.followsGround)
             {
-                var below = missile.groundRead && missile.groundX == fromX && missile.groundY == fromY ? missile.groundZ : Ground(fromX, fromY);
-                var ground = Ground(x, y);
+                var below = missile.groundRead && missile.groundX == fromX && missile.groundY == fromY ? missile.groundZ : Ground.Height(fromX, fromY, fromZ);
+                var ground = Ground.Height(x, y, fromZ);
                 z = ground + z - below;
                 missile.groundRead = true;
                 missile.groundX = x;
                 missile.groundY = y;
                 missile.groundZ = ground;
+                missile.groundSince = 0.0f;
             }
 
             grid.Move(entry, x, y);
             missile.z = z;
+            if (Ends(missile, world, fromX, fromY, fromZ, x, y, z, step))
+            {
+                return;
+            }
 
+            var contact = missile.groundContact;
+            if (contact != Contact.None && contact != Contact.Pass && Land(missile, step, grid, world, entry, fromX, fromY, fromZ, x, y, z, rise))
+            {
+                return;
+            }
+
+            Place(missile, world, x, y, z);
+        }
+
+        /// <summary>
+        /// Counts a missile's step and the distance it moved, and ends it when its Duration or MaxDistance has run out (after
+        /// OnExpire) or it is outside the world's bounds, its effects drawn at its last place first. Whether it ended.
+        /// </summary>
+        private static bool Ends(Missile missile, IPhysicsWorld world, float fromX, float fromY, float fromZ, float x, float y, float z, float step)
+        {
             var dx = x - fromX;
             var dy = y - fromY;
             var dz = z - fromZ;
@@ -86,22 +136,432 @@ namespace Moonwell.Engine
             missile.travelled += Trig.Sqrt(dx * dx + dy * dy + dz * dz);
             var duration = missile.duration;
             var maxDistance = missile.maxDistance;
+            var vx = missile.vx;
+            var vy = missile.vy;
+            var vz = missile.vz;
             if ((duration > 0.0f && missile.flown >= duration - step * Forgiven) || (maxDistance > 0.0f && missile.travelled >= maxDistance - Trig.Sqrt(vx * vx + vy * vy + vz * vz) * step * Forgiven))
             {
                 Place(missile, world, x, y, z);
                 Expire(missile);
-                return;
+                return true;
             }
 
             if (x < Pass.minX || x > Pass.maxX || y < Pass.minY || y > Pass.maxY || z < Lowest || z > Highest)
             {
                 Place(missile, world, x, y, z);
                 missile.End();
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// The ground's contact after a flying missile's move, its ball's lowest point against the ground. The ground is read
+        /// only when the missile may have reached it: when its height above the ground last read is no more than the Slack
+        /// times the seconds since: after (z - radius - lastGround) / (fallSpeed + Slack) seconds at a steady fall, worked out
+        /// a step at a time from where it is, so a change of its velocity is seen at once; one that follows the ground was read this step.
+        /// Below the ground, its move is cast against it for the point of contact. Whether it placed or ended the missile.
+        /// </summary>
+        private static bool Land(Missile missile, float step, Grid grid, IPhysicsWorld world, Entry entry, float fromX, float fromY, float fromZ, float x, float y, float z, float rise)
+        {
+            var radius = missile.radius;
+            var bottom = z - radius;
+            float hitX;
+            float hitY;
+            float hitZ;
+            var fraction = 1.0f;
+            if (missile.followsGround)
+            {
+                // It keeps its height above the ground, so it meets the ground only when it comes down onto it.
+                var ground = missile.groundZ;
+                if (bottom > ground || rise >= 0.0f)
+                {
+                    return false;
+                }
+
+                hitX = x;
+                hitY = y;
+                hitZ = ground;
+            }
+            else
+            {
+                missile.groundSince += step;
+                if (missile.groundRead && bottom - missile.groundZ > Slack * missile.groundSince)
+                {
+                    return false;
+                }
+
+                var ground = Ground.Height(x, y, fromZ);
+                missile.groundRead = true;
+                missile.groundX = x;
+                missile.groundY = y;
+                missile.groundZ = ground;
+                missile.groundSince = 0.0f;
+                if (bottom > ground)
+                {
+                    missile.throughGround = false;
+                    return false;
+                }
+
+                if (missile.throughGround)
+                {
+                    return false;
+                }
+
+                if (!Ground.Cast(fromX, fromY, fromZ - radius, x, y, bottom, out hitX, out hitY, out hitZ, out fraction))
+                {
+                    hitX = x;
+                    hitY = y;
+                    hitZ = ground;
+                    fraction = 1.0f;
+                }
+            }
+
+            // The velocity where it met the ground: gravity has acted only for the part of the step before.
+            var vx = missile.vx;
+            var vy = missile.vy;
+            var vz = missile.vz + missile.gravity * step * (1.0f - fraction);
+            var again = fraction <= 0.0f;
+            if (again)
+            {
+                // It began the step on the ground: it left it and came back within the step, or went along it. It is met
+                // at the end of its move, on the ground there, coming back as fast as it left.
+                hitX = x;
+                hitY = y;
+                hitZ = missile.groundZ;
+            }
+
+            float nx;
+            float ny;
+            float nz;
+            Ground.Normal(hitX, hitY, hitZ, out nx, out ny, out nz);
+            if (nz == 0.0f && vx * nx + vy * ny >= 0.0f)
+            {
+                // A cliff's face it is not moving into, as one falling onto it: it meets the blend.
+                Ground.Slope(hitX, hitY, hitZ, out nx, out ny, out nz);
+            }
+
+            if (again)
+            {
+                var leaving = vx * nx + vy * ny + vz * nz;
+                if (leaving > 0.0f)
+                {
+                    vx -= 2.0f * leaving * nx;
+                    vy -= 2.0f * leaving * ny;
+                    vz -= 2.0f * leaving * nz;
+                }
+            }
+
+            Meet(missile, grid, world, entry, hitX, hitY, hitZ, nx, ny, nz, vx, vy, vz, x, y, z, again);
+            return true;
+        }
+
+        /// <summary>
+        /// A missile meets the ground at a point (its ball's lowest point there), with the ground's normal and the velocity
+        /// it met it at. Moving out of the ground, it is set on it and goes on. Else OnImpact runs, then the outcome: Stop ends
+        /// it at the point, its effects moved there and its ImpactModel and ImpactSound played there; Bounce reflects it,
+        /// keeping its Bounciness of the speed into the ground; Slide bounces, or rolls once slower than SlideSpeed into it;
+        /// None and Pass let it on through to where its move took it (endX, endY, endZ). A Bounce or Slide that was on the
+        /// ground already (<paramref name="along"/>) and comes back to it slower than SlideSpeed goes on along it with no
+        /// impact, a Slide rolling; a Stop that touches the ground stops, however slowly.
+        /// </summary>
+        private static void Meet(Missile missile, Grid grid, IPhysicsWorld world, Entry entry, float hitX, float hitY, float hitZ, float nx, float ny, float nz, float vx, float vy, float vz, float endX, float endY, float endZ, bool along)
+        {
+            var radius = missile.radius;
+            var into = vx * nx + vy * ny + vz * nz;
+            grid.Move(entry, hitX, hitY);
+            missile.z = hitZ + radius;
+            missile.groundRead = false;
+            var setting = missile.groundContact;
+            if (setting != Contact.Stop && (into >= 0.0f || (along && -into < SlideSpeed)))
+            {
+                if (into < 0.0f)
+                {
+                    vx -= into * nx;
+                    vy -= into * ny;
+                    vz -= into * nz;
+                }
+
+                if (setting == Contact.Slide && nz > 0.0f)
+                {
+                    missile.rolling = true;
+                }
+
+                missile.vx = vx;
+                missile.vy = vy;
+                missile.vz = vz;
+                Place(missile, world, hitX, hitY, hitZ + radius);
                 return;
             }
 
-            // The ground comes here.
+            var impact = new Impact(ImpactKind.Ground, hitX, hitY, hitZ, nx, ny, nz, into < 0.0f ? -into : 0.0f, setting);
+            Impacted(missile, impact);
+            if (missile.ending || missile.HasEnded)
+            {
+                return;
+            }
+
+            var outcome = impact.contact;
+            if (outcome == Contact.Stop)
+            {
+                missile.z = hitZ;
+                Place(missile, world, hitX, hitY, hitZ);
+                Burst(missile, world, hitX, hitY, hitZ);
+                missile.End();
+                return;
+            }
+
+            if (outcome == Contact.None || outcome == Contact.Pass)
+            {
+                missile.throughGround = true;
+                missile.rolling = false;
+                grid.Move(entry, endX, endY);
+                missile.z = endZ;
+                Place(missile, world, endX, endY, endZ);
+                return;
+            }
+
+            if (outcome == Contact.Slide && -into < SlideSpeed)
+            {
+                // Slow: it goes on along the surface, rolling on the ground, or along a cliff's face.
+                vx -= into * nx;
+                vy -= into * ny;
+                vz -= into * nz;
+                if (nz > 0.0f)
+                {
+                    missile.rolling = true;
+                }
+            }
+            else
+            {
+                var back = (1.0f + missile.bounciness) * into;
+                vx -= back * nx;
+                vy -= back * ny;
+                vz -= back * nz;
+            }
+
+            missile.vx = vx;
+            missile.vy = vy;
+            missile.vz = vz;
+            Place(missile, world, hitX, hitY, hitZ + radius);
+        }
+
+        /// <summary>
+        /// Rolls a missile one step along the ground: what of its velocity goes into the ground is taken away, the slope
+        /// pulls it down it with Physics.Gravity, and it loses its Friction a second. It leaves the ground over a crest,
+        /// where the ground falls away faster than it would fall, and meets a cliff's face as a wall. When it has stopped
+        /// and the slope cannot move it against its friction, it rests and OnRest runs. False, and it flies this step
+        /// instead, when it is no longer a Slide or something is moving it out of the ground.
+        /// </summary>
+        private static bool Roll(Missile missile, float step, Grid grid, IPhysicsWorld world, Entry entry, float fromX, float fromY, float fromZ)
+        {
+            if (missile.groundContact != Contact.Slide)
+            {
+                missile.rolling = false;
+                return false;
+            }
+
+            var radius = missile.radius;
+            float nx;
+            float ny;
+            float nz;
+            Ground.Slope(fromX, fromY, fromZ, out nx, out ny, out nz);
+            var vx = missile.vx;
+            var vy = missile.vy;
+            var vz = missile.vz;
+            var into = vx * nx + vy * ny + vz * nz;
+            if (into > SlideSpeed)
+            {
+                missile.rolling = false;
+                missile.groundRead = false;
+                return false;
+            }
+
+            vx -= into * nx;
+            vy -= into * ny;
+            vz -= into * nz;
+            var gravity = Physics.Current().Gravity;
+            vx += gravity * nz * nx * step;
+            vy += gravity * nz * ny * step;
+            vz += gravity * (nz * nz - 1.0f) * step;
+            var steep = 1.0f - nz * nz;
+            var pull = steep > 0.0f ? gravity * Trig.Sqrt(steep) : 0.0f;
+            var friction = missile.friction;
+            var speed = Trig.Sqrt(vx * vx + vy * vy + vz * vz);
+            var lost = friction * step;
+            var stopped = speed <= lost;
+            var x = fromX;
+            var y = fromY;
+            var z = fromZ;
+            if (stopped)
+            {
+                vx = 0.0f;
+                vy = 0.0f;
+                vz = 0.0f;
+            }
+            else
+            {
+                var share = (speed - lost) / speed;
+                vx *= share;
+                vy *= share;
+                vz *= share;
+                x = fromX + vx * step;
+                y = fromY + vy * step;
+                var bottom = fromZ - radius;
+                var ground = Ground.Height(x, y, fromZ);
+                if (ground > bottom)
+                {
+                    float wx;
+                    float wy;
+                    float wz;
+                    Ground.Normal(x, y, fromZ, out wx, out wy, out wz);
+                    if (wz == 0.0f && vx * wx + vy * wy < 0.0f)
+                    {
+                        // A cliff's face ahead: met as a wall, from where it is.
+                        missile.vx = vx;
+                        missile.vy = vy;
+                        missile.vz = vz;
+                        Meet(missile, grid, world, entry, fromX, fromY, bottom, wx, wy, wz, vx, vy, vz, x, y, ground + radius, true);
+                        return true;
+                    }
+                }
+
+                var follow = ground + radius;
+                var fall = missile.gravity;
+                var free = fromZ + vz * step - fall * step * step * 0.5f;
+                if (free > follow + LiftOff)
+                {
+                    // Over a crest: the ground falls away faster than it would fall, so it flies.
+                    z = free;
+                    vz -= fall * step;
+                    missile.rolling = false;
+                    missile.groundRead = false;
+                }
+                else
+                {
+                    z = follow;
+                }
+            }
+
+            missile.vx = vx;
+            missile.vy = vy;
+            missile.vz = vz;
+            grid.Move(entry, x, y);
+            missile.z = z;
+            if (Ends(missile, world, fromX, fromY, fromZ, x, y, z, step))
+            {
+                return true;
+            }
+
+            if (stopped)
+            {
+                if (pull <= friction)
+                {
+                    Rest(missile);
+                }
+
+                return true;
+            }
+
             Place(missile, world, x, y, z);
+            return true;
+        }
+
+        /// <summary>Runs OnImpact on a missile, then on its components in the order they were added, each with the missile's owner as the current owner and each reporting an error it throws; none runs once the missile has ended.</summary>
+        private static void Impacted(Missile missile, Impact impact)
+        {
+            var previous = Owner.current;
+            Owner.current = missile.Owner ?? Game.Instance;
+            try
+            {
+                missile.OnImpact(impact);
+            }
+            catch (Exception error)
+            {
+                Errors.Report(Names.NameOf(missile) + ".OnImpact", error);
+            }
+
+            var count = missile.BeginDispatch();
+            for (var i = 0; i < count && !missile.ending && !missile.HasEnded; i++)
+            {
+                var component = missile.ComponentAt(i) as MissileComponent;
+                if (component == null || component.HasEnded)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    component.OnImpact(impact);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(component) + ".OnImpact", error);
+                }
+            }
+
+            missile.EndDispatch();
+            Owner.current = previous;
+        }
+
+        /// <summary>Lays a missile still on the ground, with no velocity, and runs OnRest on it, then on its components in the order they were added, each with the missile as the current owner and each reporting an error it throws; none runs once the missile has ended.</summary>
+        private static void Rest(Missile missile)
+        {
+            missile.resting = true;
+            missile.vx = 0.0f;
+            missile.vy = 0.0f;
+            missile.vz = 0.0f;
+            var previous = Owner.current;
+            Owner.current = missile;
+            try
+            {
+                missile.OnRest();
+            }
+            catch (Exception error)
+            {
+                Errors.Report(Names.NameOf(missile) + ".OnRest", error);
+            }
+
+            var count = missile.BeginDispatch();
+            for (var i = 0; i < count && !missile.ending && !missile.HasEnded; i++)
+            {
+                var component = missile.ComponentAt(i) as MissileComponent;
+                if (component == null || component.HasEnded)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    component.OnRest();
+                }
+                catch (Exception error)
+                {
+                    Errors.Report(Names.NameOf(component) + ".OnRest", error);
+                }
+            }
+
+            missile.EndDispatch();
+            Owner.current = previous;
+        }
+
+        /// <summary>Plays a missile's ImpactModel once (an effect made and destroyed at once, which plays its death) and its ImpactSound at a point; nothing for an empty one.</summary>
+        private static void Burst(Missile missile, IPhysicsWorld world, float x, float y, float z)
+        {
+            var model = missile.impactModel;
+            if (model.Length > 0)
+            {
+                var made = world.AddEffect(model, x, y);
+                world.SetEffectPosition(made, x, y, z);
+                world.RemoveEffect(made);
+            }
+
+            var sound = missile.impactSound;
+            if (sound.Length > 0)
+            {
+                world.PlaySoundAt(sound, x, y, z);
+            }
         }
 
         /// <summary>A speed after a change: down to 0 at the least, and up to the cap when there is one, unless it was over it already.</summary>
@@ -156,13 +616,13 @@ namespace Moonwell.Engine
             var startX = sourceX + offset * Angles.Cos(facing);
             var startY = sourceY + offset * Angles.Sin(facing);
             var startAbove = source.FlyHeight + missile.launchHeight;
-            var startZ = Ground(sourceX, sourceY) + startAbove;
+            var startZ = Ground.Height(sourceX, sourceY) + startAbove;
             if (level)
             {
                 above = missile.arc > 0.0f ? 0.0f : startAbove;
             }
 
-            var dz = missile.followsGround ? above - startAbove : Ground(x, y) + above - startZ;
+            var dz = missile.followsGround ? above - startAbove : Ground.Height(x, y) + above - startZ;
             Aim(missile, x - startX, y - startY, dz, facing);
             missile.source = source;
             Missile.Create(missile, startX, startY, startZ, source.Player, owner);

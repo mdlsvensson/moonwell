@@ -7,8 +7,9 @@ namespace Moonwell
     /// A map's own object that flies: a bolt, a shell, a boulder. Every missile moves the same way, once a step: its speed
     /// changes by its Acceleration, gravity pulls it down, and it moves by its velocity. Its settings are declared in the
     /// constructor and are live after. A unit fires one with <c>unit.Fire(missile, target)</c>; <c>Missile.Create</c> places
-    /// one for code that sets its velocity itself. It belongs to the game unless it is given an owner, and ends when its
-    /// Duration or MaxDistance runs out, when it leaves the world, by End, or with its owner.
+    /// one for code that sets its velocity itself. It belongs to the game unless it is given an owner, and ends when it
+    /// stops on the ground (its GroundContact), when its Duration or MaxDistance runs out, when it leaves the world, by End,
+    /// or with its owner.
     /// </summary>
     public abstract class Missile : Gizmo
     {
@@ -167,6 +168,21 @@ namespace Moonwell
         /// <summary>The ground's height last read.</summary>
         internal float groundZ;
 
+        /// <summary>The seconds since the ground was last read, for the ground's contact.</summary>
+        internal float groundSince;
+
+        /// <summary>What it does on meeting the ground.</summary>
+        internal Contact groundContact = Contact.Stop;
+
+        /// <summary>Whether it rolls along the ground: a Slide that has slowed.</summary>
+        internal bool rolling;
+
+        /// <summary>Whether it lies still on the ground; it moves again when something gives it a velocity.</summary>
+        internal bool resting;
+
+        /// <summary>Whether a reaction let it through the ground: it is not met again until it is above the ground.</summary>
+        internal bool throughGround;
+
         /// <summary>The velocity along x, in game units a second.</summary>
         [LocalSafe]
         public float VX
@@ -299,6 +315,14 @@ namespace Moonwell
         {
             get { return friction; }
             set { friction = value; }
+        }
+
+        /// <summary>What it does on meeting the ground (water's surface and bridges' decks too): Stop, the default, ends it there; Bounce bounces off; Slide bounces until slow, then rolls and comes to rest; None flies through, and so does Pass, as the ground has no such outcome.</summary>
+        [LocalSafe]
+        public Contact GroundContact
+        {
+            get { return groundContact; }
+            set { groundContact = value; }
         }
 
         /// <summary>The seconds it flies, counted from Create; then OnExpire runs and it ends. 0, the default, for no end.</summary>
@@ -529,7 +553,7 @@ namespace Moonwell
             var y = entry.Y;
             if (!heightGiven)
             {
-                z = Flight.Ground(x, y) + launchHeight;
+                z = Ground.Height(x, y) + launchHeight;
             }
 
             Flight.Show(this, x, y);
