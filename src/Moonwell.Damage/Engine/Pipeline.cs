@@ -9,6 +9,9 @@ namespace Moonwell
         /// <summary>How long a chain of hits dealt from reactions may be.</summary>
         internal const int MaxChain = 8;
 
+        /// <summary>A unit dies when a hit leaves it at this life or below (the damage probe of 2026-10-20 on 3.0.1).</summary>
+        internal const float DeathLife = 0.405f;
+
         /// <summary>The world the package talks to; set by Install.</summary>
         internal static IDamageWorld World = null!;
 
@@ -170,7 +173,9 @@ namespace Moonwell
             var defense = hit.DefenseTypeCode;
             hit.Stage = Stage.BeforeArmor;
             Reactions.Run(hit, Stage.BeforeArmor);
-            hit.Stage = Stage.AfterArmor;
+
+            // The game takes no more changes to the types or the armor, so the hit's setters refuse them from here.
+            hit.Stage = Stage.Waiting;
 
             if (hit.Amount != amount)
             {
@@ -240,18 +245,24 @@ namespace Moonwell
 
             var amount = hit.Amount;
             hit.Stage = Stage.AfterArmor;
-            hit.LifeBefore = World.Life(targetHandle);
 
             // Core's OnDamaged family runs as reactions to this hit too, so damage it deals continues the hit's chain.
             Reactions.Running.Add(hit);
             Inbound.Dispatch(hit);
             Reactions.Running.RemoveAt(Reactions.Running.Count - 1);
             Reactions.Run(hit, Stage.AfterArmor);
-            if (hit.LifeBefore - hit.Amount <= 0.405f)
+
+            // The life is read only now: a hit those reactions dealt has already lowered it (game facts: the life drops
+            // before UnitDamageTarget returns). A target such a hit killed is not this hit's to kill.
+            hit.TargetLife = World.Life(targetHandle);
+            var living = !World.IsDead(targetHandle);
+            if (living && hit.Kills)
             {
                 hit.Stage = Stage.Lethal;
                 Reactions.Run(hit, Stage.Lethal);
             }
+
+            hit.WouldKill = living && hit.Kills;
 
             if (hit.Amount != amount)
             {
@@ -278,7 +289,7 @@ namespace Moonwell
             {
                 var hit = landed[i];
                 hit.Stage = Stage.Landed;
-                hit.Killed = World.IsDead(hit.Target.Handle);
+                hit.Killed = hit.WouldKill && World.IsDead(hit.Target.Handle);
                 Reactions.Run(hit, Stage.Landed);
                 if (hit.Source != null)
                 {

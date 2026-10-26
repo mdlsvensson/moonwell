@@ -115,8 +115,14 @@ namespace Moonwell
         /// <summary>The stage the hit is in.</summary>
         internal Stage Stage;
 
-        /// <summary>The target's life when the after-armor stage began, before the hit lowered it.</summary>
-        internal float LifeBefore = 0.0f;
+        /// <summary>The target's life when the lethal check ran: after the after-armor reactions, so after any hit they dealt, and before this hit lowers it.</summary>
+        internal float TargetLife = 0.0f;
+
+        /// <summary>Whether the hit, at its amount now, leaves the target at death's life or below.</summary>
+        internal bool Kills => TargetLife - Amount <= Pipeline.DeathLife;
+
+        /// <summary>Whether the hit left its after-armor stage killing a living target; Killed is this and the target dead 0 s later.</summary>
+        internal bool WouldKill;
 
         /// <summary>Whether the package put armor on the target for this hit, to be put back.</summary>
         internal bool ArmorChanged;
@@ -134,7 +140,13 @@ namespace Moonwell
         public void Spare(float life = 1.0f)
         {
             Dev.Check(Stage == Stage.Lethal, "Hit.Spare can be called only in the lethal stage (OnKilling, OnLethal)");
-            var amount = LifeBefore - life;
+            if (Stage != Stage.Lethal)
+            {
+                // A release build has no check: outside the lethal stage the life it would keep is not known.
+                return;
+            }
+
+            var amount = TargetLife - life;
             Amount = amount < 0.0f ? 0.0f : amount;
         }
 

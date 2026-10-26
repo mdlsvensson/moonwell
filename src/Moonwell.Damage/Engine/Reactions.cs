@@ -71,7 +71,7 @@ namespace Moonwell
         private static void RunUnit(Unit unit, Hit? hit, Burst? burst, Stage stage, bool isSource)
         {
             var bit = burst != null ? Burst : isSource ? SourceBit(stage) : TargetBit(stage);
-            if (!unit.HasEnded && (MaskOf(unit) & bit) != 0)
+            if (!unit.HasEnded && (MaskOf(unit) & bit) != 0 && !Spared(hit, stage))
             {
                 Call(unit, hit, burst, bit);
             }
@@ -80,7 +80,7 @@ namespace Moonwell
             for (var i = 0; i < count; i++)
             {
                 var component = unit.ComponentAt(i) as UnitComponent;
-                if (component != null && !component.HasEnded && (MaskOf(component) & bit) != 0)
+                if (component != null && !component.HasEnded && (MaskOf(component) & bit) != 0 && !Spared(hit, stage))
                 {
                     Call(component, hit, burst, bit);
                 }
@@ -97,13 +97,19 @@ namespace Moonwell
             for (var i = 0; i < count; i++)
             {
                 var component = actor.ComponentAt(i) as MapComponent;
-                if (component != null && !component.HasEnded && (MaskOf(component) & bit) != 0)
+                if (component != null && !component.HasEnded && (MaskOf(component) & bit) != 0 && !Spared(hit, stage))
                 {
                     Call(component, hit, burst, bit);
                 }
             }
 
             actor.EndDispatch();
+        }
+
+        /// <summary>Whether a lethal stage's hit no longer kills, as an earlier reaction lowered it: the later lethal reactions do not run.</summary>
+        private static bool Spared(Hit? hit, Stage stage)
+        {
+            return stage == Stage.Lethal && hit != null && !hit.Kills;
         }
 
         /// <summary>Calls one reaction with the object as the current owner; a failing reaction is reported.</summary>

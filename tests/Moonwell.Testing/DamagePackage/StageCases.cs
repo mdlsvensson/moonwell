@@ -22,7 +22,7 @@ namespace Moonwell.Testing
         /// <summary>Installs the package on a fake, registers SourceUnit (H001) and TargetUnit (h001), and makes one of each: the source for player 0, the target for player 1.</summary>
         internal static void Arena(FakeWorld world, out SourceUnit source, out TargetUnit target)
         {
-            fake = new FakeDamageWorld();
+            fake = new FakeDamageWorld(world);
             DamageSystem.Install(fake);
             ObjectTypes.Unit(ObjectTypes.FourCC("H001"), () => new SourceUnit());
             ObjectTypes.Unit(ObjectTypes.FourCC("h001"), () => new TargetUnit());

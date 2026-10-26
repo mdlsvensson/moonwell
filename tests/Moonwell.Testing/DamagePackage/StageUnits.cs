@@ -149,4 +149,30 @@ namespace Moonwell.Testing
         /// <summary>Removes the unit.</summary>
         public void OnTaking(Hit hit) => Unit.Remove();
     }
+
+    /// <summary>A unit whose hits add 20 bonus damage from code after armor, the usual on-hit bonus.</summary>
+    public class Bonuser : Unit, IDamageSource
+    {
+        /// <summary>Deals the bonus for every hit that is not itself dealt by code.</summary>
+        public void OnDealt(Hit hit)
+        {
+            if (!hit.IsCode)
+            {
+                this.Damage(hit.Target, 20f, DamageKind.Normal);
+            }
+        }
+    }
+
+    /// <summary>A game component that records the map-wide lethal and landed stages it sees.</summary>
+    public class StageWatch : GameComponent, IDamageWatch
+    {
+        /// <summary>A line for each lethal or landed stage seen.</summary>
+        public readonly System.Collections.Generic.List<string> Seen = new System.Collections.Generic.List<string>();
+
+        /// <summary>Records the lethal stage.</summary>
+        public void OnLethal(Hit hit) => Seen.Add("lethal");
+
+        /// <summary>Records the landed stage and whether the hit killed.</summary>
+        public void OnLanded(Hit hit) => Seen.Add("landed " + (hit.Killed ? "killed" : "alive"));
+    }
 }

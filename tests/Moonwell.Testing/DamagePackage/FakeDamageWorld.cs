@@ -31,6 +31,15 @@ namespace Moonwell.Testing
         /// <summary>When true, the next hit's after-armor event is withheld even without spell immunity, as for a case the package's table misses.</summary>
         public bool WithholdNextDamaged;
 
+        /// <summary>The core fake, when given: a unit it has removed reads as dead, as the game's removed unit does to NativeDamageWorld.IsDead.</summary>
+        private readonly FakeWorld? world;
+
+        /// <summary>Makes a fake damage world; with core's fake, a removed unit reads as dead.</summary>
+        public FakeDamageWorld(FakeWorld? world = null)
+        {
+            this.world = world;
+        }
+
         /// <summary>The state of a unit, made with 100 life, no armor, normal defense, when first asked for.</summary>
         public FakeBody Body(unit target)
         {
@@ -149,8 +158,8 @@ namespace Moonwell.Testing
         /// <summary>A unit's life.</summary>
         public float Life(unit target) => Body(target).Life;
 
-        /// <summary>Whether a unit is dead.</summary>
-        public bool IsDead(unit target) => Body(target).Dead;
+        /// <summary>Whether a unit is dead, or removed from core's fake.</summary>
+        public bool IsDead(unit target) => Body(target).Dead || (world != null && world.RemovedUnits.Contains(target));
 
         /// <summary>Whether a unit is magic immune.</summary>
         public bool IsMagicImmune(unit target) => Body(target).Immune;
