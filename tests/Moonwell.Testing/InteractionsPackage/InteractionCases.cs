@@ -720,7 +720,7 @@ namespace Moonwell.Testing
             Expect.Same(Runtime.Root, Owner.Current, "and the root is the current owner");
         }
 
-        /// <summary>A check that fails outside a reaction, here the world's read of a destructable, takes what it added off the shared candidates and walk, and its error goes on up to the cycle's timer, which reports it; nothing parts, and the interaction, which the cycle took off its list before the check, is not put on again.</summary>
+        /// <summary>A check that fails outside a reaction, here the world's read of a destructable, takes what it added off the shared candidates and walk, and its error is reported as Scorch.Check; nothing parts, an interaction due after it in the same step still checks in that step, and the one that failed checks again at its next tick.</summary>
         public static void CheckFails(FakeWorld world)
         {
             var fake = Fresh();
@@ -728,20 +728,27 @@ namespace Moonwell.Testing
             world.PlaceDestructable(handle, 100.0f, 0.0f);
             world.PlacedDestructables.Add(handle);
             var a = UnitAt(world, 0.0f, 0.0f);
+            var b = UnitAt(world, 900.0f, 0.0f);
             var scorch = new Scorch();
             a.Interact(scorch);
+            var shine = new Shine();
+            shine.Tag = unit => unit == b ? "b" : "?";
+            a.Interact(shine);
             Steps(world, 1);
             ExpectLog(new string[] { "meet", "tick" }, "the scorch meets the destructable");
             fake.Failing.Add(handle);
+            world.MoveUnit(b.Handle, 100.0f, 0.0f);
             Steps(world, 1);
-            ExpectLog(new string[] { "meet", "tick" }, "the failed check ran no reaction");
-            Expect.True(Logged(world, ".Timer failed"), "its error went on up to the cycle's timer");
+            ExpectLog(new string[] { "meet", "tick", "meet b" }, "the failed check ran no reaction, and the shine after it checked in the same step");
+            Expect.True(Logged(world, "Scorch.Check failed"), "the error is reported as Scorch.Check");
+            Expect.True(!Logged(world, ".Timer failed"), "and nothing went on up to the cycle's timer");
             Expect.Equal(0, Find.Pending, "no candidate is left");
             Expect.Equal(0, Pairing.Walk.Count, "no pair is left on the walk");
             Expect.Equal(1, scorch.Pairs.Count, "the pair is kept");
+            Expect.Same(Runtime.Root, Owner.Current, "the root is the current owner after the step");
             fake.Failing.Clear();
-            Steps(world, 2);
-            ExpectLog(new string[] { "meet", "tick" }, "the error left the interaction off the cycle, so it checks no more");
+            Steps(world, 1);
+            ExpectLog(new string[] { "meet", "tick", "meet b", "tick" }, "the scorch checks again at its next tick");
         }
 
         /// <summary>A check takes in the things of its class of other: Unit takes a unit and a unit of a map's class and nothing else, Gizmo every gizmo, a map's gizmo class only its own, Item the item, Destructable the destructable, and Actor all of them, each in the grid's order; the holder is never one.</summary>

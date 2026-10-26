@@ -36,6 +36,9 @@ namespace Moonwell.Testing
         /// <summary>The destructables IsAlive answers false for.</summary>
         public List<destructable> Dead = new List<destructable>();
 
+        /// <summary>The units IsHidden throws for, as a world whose call fails.</summary>
+        public List<unit> FailingUnits = new List<unit>();
+
         /// <summary>The destructables IsAlive throws for, as a world whose call fails.</summary>
         public List<destructable> Failing = new List<destructable>();
 
@@ -46,6 +49,11 @@ namespace Moonwell.Testing
         public bool IsHidden(unit target)
         {
             Reads++;
+            if (FailingUnits.Contains(target))
+            {
+                throw new System.InvalidOperationException("the call failed");
+            }
+
             return Hidden.Contains(target);
         }
 

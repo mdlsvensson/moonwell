@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.ExceptionServices;
 
 namespace Moonwell.Engine
 {
@@ -8,7 +7,8 @@ namespace Moonwell.Engine
     /// makes in Lua. CSharp.lua compiles a try to System.try with a closure for the body and one for the catch, and a box for
     /// each local they capture, at every call. Here a call is one xpcall of the method itself with its arguments, under Turn,
     /// which turns an error as CoreSystem's own handler does. Each call gives the error the method raised, or null, and the
-    /// caller reports it or raises it again as its catch or finally did. .NET runs the bodies: a try and catch.
+    /// caller reports it as its catch did, so nothing an error raises leaves the cycle's step. .NET runs the bodies: a try
+    /// and catch.
     /// </summary>
     internal static class Guard
     {
@@ -107,8 +107,8 @@ namespace Moonwell.Engine
             }
         }
 
-        // Raw: as Tick, for the part of an interaction's check that its try covered; CheckNear returns nothing.
-        /// <summary>Runs the part of an interaction's check after the holder's read, and gives the error it raised, or null.</summary>
+        // Raw: as Tick, for an interaction's check; CheckNear returns nothing.
+        /// <summary>Runs an interaction's check, and gives the error the package's own code raised in it, or null.</summary>
         /// @CSharpLua.Template = "select(2, xpcall({0}.CheckNear, Moonwell.Engine.Guard.Turn, {0}))"
         internal static Exception? Check(Interaction interaction)
         {
@@ -123,13 +123,36 @@ namespace Moonwell.Engine
             }
         }
 
-        // Raw: error, as System.try raises again the error of a try with a finally. Safe: the error is the exception Turn
-        // gave, whose traceback is taken, so nothing is lost.
-        /// <summary>Raises again an error a guarded call gave, as a finally does after it has run.</summary>
-        /// @CSharpLua.Template = "error({0})"
-        internal static void Raise(Exception error)
+        // Raw: as Tick, for the cell checks' reads of a step; ReadRound returns nothing.
+        /// <summary>Runs the cell checks' reads of a step, and gives the error a read raised, or null.</summary>
+        /// @CSharpLua.Template = "select(2, xpcall({0}.ReadRound, Moonwell.Engine.Guard.Turn, {0}))"
+        internal static Exception? Read(CellChecks checks)
         {
-            ExceptionDispatchInfo.Capture(error).Throw();
+            try
+            {
+                checks.ReadRound();
+                return null;
+            }
+            catch (Exception error)
+            {
+                return error;
+            }
+        }
+
+        // Raw: as Tick, for the scan for items; ScanWorld returns nothing.
+        /// <summary>Runs the scan for items, and gives the error it raised, or null.</summary>
+        /// @CSharpLua.Template = "select(2, xpcall({0}.ScanWorld, Moonwell.Engine.Guard.Turn, {0}))"
+        internal static Exception? Scan(ItemScan scan)
+        {
+            try
+            {
+                scan.ScanWorld();
+                return null;
+            }
+            catch (Exception error)
+            {
+                return error;
+            }
         }
 
         /// <summary>Lua only: keeps what xpcall gave for Accepts, the answer on success, false otherwise, and gives the error, or null.</summary>

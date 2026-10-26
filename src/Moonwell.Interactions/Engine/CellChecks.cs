@@ -78,28 +78,39 @@ namespace Moonwell.Engine
             }
         }
 
-        /// <summary>Reads the next entries of the round, and puts the checks on the ring for the next step unless the list is empty.</summary>
+        /// <summary>Reads the next entries of the round, and puts the checks on the ring for the next step unless the list is empty. An error a read raises, the world's, ends the step's reads and is reported as Interactions.CellCheck, and the round goes on from the entry after at the next step: nothing leaves the cycle's step.</summary>
         public void RunDue(int step)
         {
             dueStep = -1;
-            var count = ring.Count;
-            if (count == 0)
+            if (ring.Count == 0)
             {
                 return;
             }
 
+            var failure = Guard.Read(this);
+            Arm();
+            if (failure != null)
+            {
+                Errors.Report("Interactions.CellCheck", failure);
+            }
+        }
+
+        /// <summary>Reads the step's share of the round. The cursor moves past an entry before it is read, so a read that fails does not stop the round at that entry.</summary>
+        internal void ReadRound()
+        {
+            var count = ring.Count;
             var reads = ReadsFor(count);
             for (var i = 0; i < reads; i++)
             {
-                Tracking.ReadNow(Raw.At(ring, cursor));
+                var entry = Raw.At(ring, cursor);
                 cursor++;
                 if (cursor >= count)
                 {
                     cursor = 0;
                 }
-            }
 
-            Arm();
+                Tracking.ReadNow(entry);
+            }
         }
 
         /// <summary>Puts the checks on the ring for the step after this one, unless they are on it or the list is empty.</summary>

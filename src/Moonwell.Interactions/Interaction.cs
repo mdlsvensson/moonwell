@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Moonwell.Engine;
 
@@ -126,10 +127,10 @@ namespace Moonwell
         /// <summary>Asks for the kinds of thing the other class covers to be tracked.</summary>
         internal abstract void NeedOthers();
 
-        /// <summary>The check at a tick: what is near now meets, ticks or parts.</summary>
-        internal abstract void RunCheck();
+        /// <summary>The check at a tick: what is near now meets, ticks or parts. It gives the error the package's own code raised in it, or null; the reactions' errors are reported where they run.</summary>
+        internal abstract Exception? RunCheck();
 
-        /// <summary>The part of the check after the holder's read, for a holder with a place; RunCheck runs it guarded, and takes what it added off the shared lists after, as a finally would.</summary>
+        /// <summary>The check itself, from the holder's read on; RunCheck runs it guarded, and takes what it added off the shared lists after, as a finally would.</summary>
         internal abstract void CheckNear();
 
         /// <summary>Runs OnPart for a pair that is parting, guarded.</summary>
@@ -217,30 +218,28 @@ namespace Moonwell
         /// <summary>Parts every pair, in meeting order, as at a check of a holder with no place; stops when a reaction pauses or ends the interaction or ends its holder.</summary>
         internal void PartAll()
         {
+            // It runs inside the check's guard, which takes the walk back to where it was however the check ends, so a
+            // finally here, two closures in Lua, is not needed.
             var walk = Pairing.walk;
             var start = WalkPairs();
-            try
+            var end = walk.Count;
+            for (var i = start; i < end; i++)
             {
-                var end = walk.Count;
-                for (var i = start; i < end; i++)
+                var pair = Raw.At(walk, i);
+                if (Gone(pair))
                 {
-                    var pair = Raw.At(walk, i);
-                    if (Gone(pair))
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    pair.End();
-                    if (Over)
-                    {
-                        return;
-                    }
+                pair.End();
+                if (Over)
+                {
+                    Pairing.Release(start);
+                    return;
                 }
             }
-            finally
-            {
-                Pairing.Release(start);
-            }
+
+            Pairing.Release(start);
         }
 
         /// <summary>Notes that the pair with an other was stopped: the two do not meet again until the other has been out of range at a check.</summary>
@@ -414,9 +413,24 @@ namespace Moonwell
         /// Range are kept. The pairs whose other is not kept part, in meeting order; a stopped other that is not kept is
         /// forgotten. The kept pairs tick, in meeting order, unless paused or waiting. The kept others with no pair, in the
         /// grid's order, are asked about unless stopped, and those accepted meet and tick. After any reaction that pauses or
-        /// ends the interaction or ends its holder, the check stops.
+        /// ends the interaction or ends its holder, the check stops. An error the package's own code raises stops the check
+        /// and is given back, and the cycle's due reports it as ClassName.Check; a reaction's error is reported where it runs.
         /// </summary>
-        internal sealed override void RunCheck()
+        internal sealed override Exception? RunCheck()
+        {
+            // A try and finally here would make two closures a check in Lua; Guard runs CheckNear with none. What it added
+            // to the shared lists comes off after, as with the finally, and an error it raised is given to the cycle's due,
+            // which reports it, so the cycle goes on.
+            var start = Find.candidates.Count;
+            var walkStart = Pairing.walk.Count;
+            var failure = Guard.Check(this);
+            Pairing.Release(walkStart);
+            Find.Release(start);
+            return failure;
+        }
+
+        /// <summary>The check itself, as RunCheck says: the holder's read, then the things near collected, kept, parted, ticked and met. It leaves on the shared lists what it added, for RunCheck to take off.</summary>
+        internal sealed override void CheckNear()
         {
             var home = holderEntry!;
             checks++;
@@ -428,28 +442,11 @@ namespace Moonwell
                 return;
             }
 
-            // A try and finally here would make two closures a check in Lua; Guard runs CheckNear with none. What it added
-            // to the shared lists comes off after, then an error it raised goes on up, as with the finally.
-            var start = Find.candidates.Count;
-            var walkStart = Pairing.walk.Count;
-            var failure = Guard.Check(this);
-            Pairing.Release(walkStart);
-            Find.Release(start);
-            if (failure != null)
-            {
-                Guard.Raise(failure);
-            }
-        }
-
-        /// <summary>The check from the holder's place on: the things near are collected, kept, parted, ticked and met, as RunCheck says. It leaves on the shared lists what it added, for RunCheck to take off.</summary>
-        internal sealed override void CheckNear()
-        {
-            var home = holderEntry!;
             var hx = home.X;
             var hy = home.Y;
+
             // The check runs only once the package is installed, so it reads the settings and the grid as they are.
-            var settings = Interactions.settings;
-            var reach = range + (settings != null ? settings.Slack : Interactions.Slack);
+            var reach = range + Interactions.Current().Slack;
             var limit = range * range;
             var candidates = Find.candidates;
             var start = candidates.Count;

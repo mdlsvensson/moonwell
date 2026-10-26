@@ -49,7 +49,8 @@ namespace Moonwell.Engine
         public void Schedule(IDue due, int step)
         {
             Dev.Check(step > StepNow, "Cycle.Schedule: a due must be scheduled for a step after the one running");
-            Raw.Append(Raw.At(ring, (step & (Slots - 1)) * Passes + due.Pass), due);
+            var list = Raw.At(ring, (step & (Slots - 1)) * Passes + due.Pass);
+            Raw.Append(list, due);
         }
 
         /// <summary>Runs the next step: what is due at it, in three passes, each in the order it was put on its list (the order of the last runs, not the order things were made). Each pass runs what was on its list when the step began; what a step schedules is for a later step. A due that is not due until a later turn of the ring is passed over, and one with nothing more to run is dropped.</summary>

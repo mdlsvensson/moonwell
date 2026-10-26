@@ -31,12 +31,22 @@ namespace Moonwell.Engine
             beat.Schedule(this, dueStep);
         }
 
-        /// <summary>Takes in and tracks the items of the world that are not tracked yet, and puts the scan on the ring for a second on.</summary>
+        /// <summary>Takes in and tracks the items of the world that are not tracked yet, and puts the scan on the ring for a second on. An error it raises is reported as Interactions.ItemScan: nothing leaves the cycle's step.</summary>
         public void RunDue(int step)
         {
             dueStep = -1;
-            Tracking.TrackItemsInWorld();
+            var failure = Guard.Scan(this);
             Arm();
+            if (failure != null)
+            {
+                Errors.Report("Interactions.ItemScan", failure);
+            }
+        }
+
+        /// <summary>The scan itself, which RunDue runs guarded.</summary>
+        internal void ScanWorld()
+        {
+            Tracking.TrackItemsInWorld();
         }
     }
 }

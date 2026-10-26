@@ -70,6 +70,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.tracking.first-use-units", Run = TrackingCases.FirstUseUnits });
             list.Add(new Case { Name = "interactions.tracking.install-again", Run = TrackingCases.InstallAgain });
             list.Add(new Case { Name = "interactions.tracking.unit-read", Run = TrackingCases.UnitRead });
+            list.Add(new Case { Name = "interactions.tracking.cell-check-fails", Run = TrackingCases.CellCheckFails });
             list.Add(new Case { Name = "interactions.find.in-range", Run = FindCases.InRange });
             list.Add(new Case { Name = "interactions.find.kinds", Run = FindCases.Kinds });
             list.Add(new Case { Name = "interactions.find.no-place-class", Run = FindCases.NoPlaceClass });

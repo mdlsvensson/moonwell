@@ -14,7 +14,7 @@ namespace Moonwell.Engine
     {
         // Raw: the slot of a List item in Lua. Safe: the callers' lists never hold null and the index is below the count.
         /// <summary>The item at an index of a list that holds no null, the index below the count.</summary>
-        /// @CSharpLua.Template = "{0}[{1} + 1]"
+        /// @CSharpLua.Template = "{0}[({1}) + 1]"
         public static T At<T>(List<T> list, int index)
         {
             return list[index];
@@ -23,7 +23,7 @@ namespace Moonwell.Engine
         // Raw: a write to the slot of a List item in Lua, with no version counted. Safe: the item is not null and the index
         // is below the count, so the table keeps no hole.
         /// <summary>Sets the item at an index below the count to an item that is not null.</summary>
-        /// @CSharpLua.Template = "{0}[{1} + 1] = {2}"
+        /// @CSharpLua.Template = "{0}[({1}) + 1] = {2}"
         public static void Put<T>(List<T> list, int index, T item)
         {
             list[index] = item;
@@ -41,7 +41,7 @@ namespace Moonwell.Engine
         // Raw: the slots past the count cleared from the last down, so the table's length is the count at every point.
         // Safe: no foreach walks the list, so no version needs counting.
         /// <summary>Takes the items from an index to the end off a list; a list no longer than that is left as it is.</summary>
-        /// @CSharpLua.Template = "for rawSlot = #{0}, {1} + 1, -1 do {0}[rawSlot] = nil end"
+        /// @CSharpLua.Template = "for rawSlot = #{0}, ({1}) + 1, -1 do {0}[rawSlot] = nil end"
         public static void Truncate<T>(List<T> list, int count)
         {
             while (list.Count > count)

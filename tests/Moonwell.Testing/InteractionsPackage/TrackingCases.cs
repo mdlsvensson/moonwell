@@ -567,6 +567,9 @@ namespace Moonwell.Testing
             Expect.Equal(7, entry.Cell, "so it stays in its cell");
             Expect.Near(5000.0f, unit.X, "and Unit.X gives the last x");
             world.MoveUnit(other.Handle, 100.0f, 900.0f);
+
+            // Not a path the package takes (inside Local.For a search peeks and calls no ReadNow): it checks that the read
+            // keeps Local.For's rule for the last place, as Unit.X does.
             Local.For(Player.Get(world.LocalSlot), () => Tracking.ReadNow(otherEntry));
             Expect.Near(100.0f, otherEntry.X, "a read inside Local.For reads the place");
             world.MoveUnit(other.Handle, 0.0f, 0.0f);
@@ -589,6 +592,42 @@ namespace Moonwell.Testing
             world.SlayUnit(victim.Handle);
             Tracking.ReadNow(victimEntry);
             Expect.True(!victimEntry.HasPlace, "a dead unit has none");
+        }
+
+        /// <summary>A cell check whose read fails, here the world's, is reported as Interactions.CellCheck and goes no further that step, the interactions after it in the step still check, and the round goes on from the unit after at the next step.</summary>
+        public static void CellCheckFails(FakeWorld world)
+        {
+            var fake = Fresh();
+            var failing = UnitAt(world, -900.0f, -900.0f);
+            var other = UnitAt(world, 200.0f, 0.0f);
+            Tracking.Need(Tracking.UnitKind);
+            fake.FailingUnits.Add(failing.Handle);
+            var well = Gizmo.Create(new Well(), 100.0f, 0.0f);
+            var healing = well.Interact(new Healing());
+            healing.Tag = unit => unit == other ? "other" : "?";
+            TestLog.Lines.Clear();
+            Steps(world, 1);
+            Expect.True(Logged(world, "Interactions.CellCheck failed"), "the failed read is reported as Interactions.CellCheck");
+            Expect.True(!Logged(world, ".Timer failed"), "and nothing went on up to the cycle's timer");
+            Expect.True(TestLog.Lines.Count > 0 && TestLog.Lines[0] == "meet other", "the interaction after it checked in the same step");
+            healing.End();
+            world.MoveUnit(other.Handle, 250.0f, 0.0f);
+            Steps(world, 1);
+            Expect.Near(250.0f, Tracked(other).X, "with nothing else reading it, the next step's cell check read the unit after the one that failed");
+        }
+
+        /// <summary>Whether a line of the game's log has the text.</summary>
+        private static bool Logged(FakeWorld world, string text)
+        {
+            foreach (var line in world.Logged)
+            {
+                if (line.Contains(text))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

@@ -15,8 +15,7 @@ namespace Moonwell.Engine
         /// <summary>The steps a tick takes at the step length now, as Cycle.Steps gives them.</summary>
         public int Of(float seconds)
         {
-            var settings = Interactions.settings;
-            var now = settings != null ? settings.Step : Interactions.Step;
+            var now = Interactions.Current().Step;
             if (seconds != tick || now != length)
             {
                 steps = Cycle.Steps(seconds);
