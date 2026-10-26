@@ -292,7 +292,7 @@ namespace Moonwell.Testing
         }
 
         /// <summary>Remembers the field change.</summary>
-        public void SetCameraField(player p, int field, float value, float seconds)
+        public void SetField(player p, int field, float value, float seconds)
         {
             var call = Record("field", p);
             call.Field = field;
@@ -328,7 +328,7 @@ namespace Moonwell.Testing
         }
 
         /// <summary>Remembers the bounds.</summary>
-        public void SetCameraBounds(player p, float minX, float minY, float maxX, float maxY)
+        public void SetBounds(player p, float minX, float minY, float maxX, float maxY)
         {
             var call = Record("bounds", p);
             call.A = minX;

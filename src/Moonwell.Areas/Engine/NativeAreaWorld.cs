@@ -28,7 +28,7 @@ namespace Moonwell.Engine
         private trigger? deaths;
 
         /// <summary>Makes an empty region.</summary>
-        public region CreateRegion() => Natives.CreateRegion();
+        public region NewRegion() => Natives.CreateRegion();
 
         /// <summary>Adds a rect to a region: the game rounds it out to whole cells.</summary>
         public void AddRect(region r, float minX, float minY, float maxX, float maxY)

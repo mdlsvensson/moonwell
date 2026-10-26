@@ -145,49 +145,49 @@ namespace Moonwell
         [LocalSafe]
         public void SetDistance(float distance, float seconds = 0f)
         {
-            InputSystem.World.SetCameraField(Player.Handle, CameraFields.Distance, distance, seconds);
+            InputSystem.World.SetField(Player.Handle, CameraFields.Distance, distance, seconds);
         }
 
         /// <summary>Sets the angle of attack, in degrees, over some seconds. It changes only that player's camera, so it is safe anywhere.</summary>
         [LocalSafe]
         public void SetAngleOfAttack(float degrees, float seconds = 0f)
         {
-            InputSystem.World.SetCameraField(Player.Handle, CameraFields.AngleOfAttack, degrees, seconds);
+            InputSystem.World.SetField(Player.Handle, CameraFields.AngleOfAttack, degrees, seconds);
         }
 
         /// <summary>Sets the rotation, in degrees, over some seconds. It changes only that player's camera, so it is safe anywhere.</summary>
         [LocalSafe]
         public void SetRotation(float degrees, float seconds = 0f)
         {
-            InputSystem.World.SetCameraField(Player.Handle, CameraFields.Rotation, degrees, seconds);
+            InputSystem.World.SetField(Player.Handle, CameraFields.Rotation, degrees, seconds);
         }
 
         /// <summary>Sets the roll, in degrees, over some seconds. It changes only that player's camera, so it is safe anywhere.</summary>
         [LocalSafe]
         public void SetRoll(float degrees, float seconds = 0f)
         {
-            InputSystem.World.SetCameraField(Player.Handle, CameraFields.Roll, degrees, seconds);
+            InputSystem.World.SetField(Player.Handle, CameraFields.Roll, degrees, seconds);
         }
 
         /// <summary>Sets the field of view, in degrees, over some seconds. It changes only that player's camera, so it is safe anywhere.</summary>
         [LocalSafe]
         public void SetFieldOfView(float degrees, float seconds = 0f)
         {
-            InputSystem.World.SetCameraField(Player.Handle, CameraFields.FieldOfView, degrees, seconds);
+            InputSystem.World.SetField(Player.Handle, CameraFields.FieldOfView, degrees, seconds);
         }
 
         /// <summary>Sets the far clipping distance over some seconds. It changes only that player's camera, so it is safe anywhere.</summary>
         [LocalSafe]
         public void SetFarZ(float distance, float seconds = 0f)
         {
-            InputSystem.World.SetCameraField(Player.Handle, CameraFields.FarZ, distance, seconds);
+            InputSystem.World.SetField(Player.Handle, CameraFields.FarZ, distance, seconds);
         }
 
         /// <summary>Sets the height offset over some seconds. It changes only that player's camera, so it is safe anywhere.</summary>
         [LocalSafe]
         public void SetZOffset(float offset, float seconds = 0f)
         {
-            InputSystem.World.SetCameraField(Player.Handle, CameraFields.ZOffset, offset, seconds);
+            InputSystem.World.SetField(Player.Handle, CameraFields.ZOffset, offset, seconds);
         }
 
         /// <summary>Locks the player's camera on a unit, so it moves with it, until StopFollowing or a pan. It changes only that player's camera, so it is safe anywhere.</summary>
@@ -222,7 +222,7 @@ namespace Moonwell
         [LocalSafe]
         public void SetBounds(Bounds bounds)
         {
-            InputSystem.World.SetCameraBounds(Player.Handle, bounds.Min.X, bounds.Min.Y, bounds.Max.X, bounds.Max.Y);
+            InputSystem.World.SetBounds(Player.Handle, bounds.Min.X, bounds.Min.Y, bounds.Max.X, bounds.Max.Y);
         }
     }
 }

@@ -87,7 +87,7 @@ namespace Moonwell.Engine
         /// <summary>Starts an area: makes its region, listens to it, and runs its first sweep after 0 seconds.</summary>
         internal void Begin(Area area, AreaShape shape)
         {
-            var made = World.CreateRegion();
+            var made = World.NewRegion();
             area.handle = made;
             AddParts(made, shape);
             World.Listen(made, area.HearEnter, area.HearLeave);

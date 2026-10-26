@@ -7,7 +7,7 @@ namespace Moonwell.Hosting
     public interface IAreaWorld
     {
         /// <summary>Makes an empty region.</summary>
-        region CreateRegion();
+        region NewRegion();
 
         /// <summary>Adds a rect to a region. The game rounds it out to whole 32 cells.</summary>
         void AddRect(region r, float minX, float minY, float maxX, float maxY);

@@ -135,7 +135,7 @@ namespace Moonwell.Testing
         }
 
         /// <summary>Makes an empty region.</summary>
-        public region CreateRegion()
+        public region NewRegion()
         {
             var made = new Made();
             Regions.Add(made);

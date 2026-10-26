@@ -205,7 +205,7 @@ namespace Moonwell.Engine
         public float CameraEyeZ() => Natives.GetCameraEyePositionZ();
 
         /// <summary>Changes a field of a player's camera on that player's machine only; the game takes the angles in degrees.</summary>
-        public void SetCameraField(player p, int field, float value, float seconds)
+        public void SetField(player p, int field, float value, float seconds)
         {
             var which = FieldOf(field);
             if (Natives.GetLocalPlayer() == p)
@@ -251,7 +251,7 @@ namespace Moonwell.Engine
         }
 
         /// <summary>Limits a player's camera on that player's machine only; the four corners go in the order World Editor's own script gives them.</summary>
-        public void SetCameraBounds(player p, float minX, float minY, float maxX, float maxY)
+        public void SetBounds(player p, float minX, float minY, float maxX, float maxY)
         {
             if (Natives.GetLocalPlayer() == p)
             {

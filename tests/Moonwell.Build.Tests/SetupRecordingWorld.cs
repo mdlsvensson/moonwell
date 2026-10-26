@@ -90,7 +90,7 @@ namespace Moonwell.Build.Tests
 
         public float CameraEyeZ() => throw Unused();
 
-        public void SetCameraField(player p, int field, float value, float seconds) => throw Unused();
+        public void SetField(player p, int field, float value, float seconds) => throw Unused();
 
         public void PanCamera(player p, float x, float y, float seconds) => throw Unused();
 
@@ -100,7 +100,7 @@ namespace Moonwell.Build.Tests
 
         public void ResetCamera(player p, float seconds) => throw Unused();
 
-        public void SetCameraBounds(player p, float minX, float minY, float maxX, float maxY) => throw Unused();
+        public void SetBounds(player p, float minX, float minY, float maxX, float maxY) => throw Unused();
 
         public void ApplySetup(player p, camerasetup setup, float seconds) => throw Unused();
 

@@ -74,7 +74,7 @@ namespace Moonwell.Hosting
         float CameraEyeZ();
 
         /// <summary>Changes a field of a player's camera over some seconds, on that player's machine only. The code is as in CameraField; angles are in degrees.</summary>
-        void SetCameraField(player p, int field, float value, float seconds);
+        void SetField(player p, int field, float value, float seconds);
 
         /// <summary>Pans a player's camera to a place over some seconds, on that player's machine only.</summary>
         void PanCamera(player p, float x, float y, float seconds);
@@ -89,7 +89,7 @@ namespace Moonwell.Hosting
         void ResetCamera(player p, float seconds);
 
         /// <summary>Limits where a player's camera can go to a rectangle, on that player's machine only.</summary>
-        void SetCameraBounds(player p, float minX, float minY, float maxX, float maxY);
+        void SetBounds(player p, float minX, float minY, float maxX, float maxY);
 
         /// <summary>Makes a camera setup from one camera's numbers, starting at an offset: target x, target y, the count n, n pairs of field code and value, and the camera type (-1 for none), as the build writes them.</summary>
         camerasetup MakeSetup(float[] values, int offset);
