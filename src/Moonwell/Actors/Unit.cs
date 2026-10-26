@@ -110,11 +110,11 @@ namespace Moonwell
         /// <summary>The most mana last read.</summary>
         private float lastMaxMana = 0.0f;
 
-        /// <summary>The x last read.</summary>
-        private float lastX = 0.0f;
+        /// <summary>The x last read. Internal, as the interactions package reads a unit's place through the natives and keeps it here, as X does.</summary>
+        internal float lastX = 0.0f;
 
-        /// <summary>The y last read.</summary>
-        private float lastY = 0.0f;
+        /// <summary>The y last read. Internal, as the interactions package reads a unit's place through the natives and keeps it here, as Y does.</summary>
+        internal float lastY = 0.0f;
 
         /// <summary>The facing last read.</summary>
         private float lastFacing = 0.0f;
