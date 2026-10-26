@@ -491,3 +491,42 @@ the file and line.
 
 To place objects declared in code in World Editor, save `build\MyMap.w3x` from World Editor as the `map/` folder. The
 next build keeps the placed units; code wins over any object it also declares.
+
+## Debug mode
+
+`moonwell run` builds a map you can look into while you play it. Type `-debug` in chat to turn the debug mode on or
+off; a panel at the right edge shows the selected object, and lightning on the map shows its ranges, cells and area
+outlines (one colour), its ticking pairs (another) and its waiting or paused pairs (a third).
+
+| Input | Does |
+|---|---|
+| Ctrl + left click | selects the nearest object within 150; again near the same spot, the next nearest; on empty ground, nothing |
+| Ctrl + H | halts Moonwell and holds every unit; again, resumes |
+| Ctrl + Shift + H | halts Moonwell only; units go on walking; again, resumes |
+| Ctrl + N | while halted, one step (`Interactions.Step`, else 1/32 s); held down, the key's repeat |
+| Ctrl + `-` / Ctrl + `=` | slower / faster: ¼, ½, 1, 2, 4, 8 times |
+| `-step 10`, `-speed 4`, `-stats` | in chat: that many steps (1 to 320), a speed, the statistics shown or hidden |
+
+A map writes nothing to have it. Two optional things: its own lines in the panel for a class or component that
+implements `IDebugShown`, and `DebugMode` for code that speaks only about the selected object, or halts like a breakpoint.
+
+```csharp
+public sealed class Well : Gizmo, IDebugShown
+{
+    public int Healed;
+    public void ShowDebug(DebugLines lines) { lines.Add("healed " + Healed); } // while a Well is selected
+}
+
+public override void OnTick(Pair pair) // in an interaction
+{
+    if (DebugMode.IsSelected(Holder)) { Game.Print("burns at " + pair.Distance); }
+    if (pair.Distance < 32f) { DebugMode.Halt(); } // closer than it should get: stop here and look
+}
+```
+
+- `DebugMode.Halt()` turns the mode on if it is off, then halts as Ctrl + H does; the code after the call still runs and
+  what is due after it waits for a step or a resume. `IsOn`, `Selected` and `IsSelected(actor)` read it, and
+  `Select(actor)` selects, as a click does.
+- Development builds only. A release build leaves the mode out: `IsOn` and `IsSelected` read false, `Selected` is
+  null, and the compiler takes out the calls to `Select` and `Halt`. An error in a `ShowDebug` shows as
+  `Class.ShowDebug` and the panel goes on.
