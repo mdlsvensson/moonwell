@@ -191,6 +191,35 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void numerics_the_map_uses_stay_in_the_script()
+        {
+            // The Sample names no System.Numerics, so its script has none of CSharp.lua's numerics files.
+            Assert.DoesNotContain("System.defStc(\"System.Numerics.Vector2\"", builds.Development.Script);
+
+            // CSharp.lua names the namespace through an alias at the top of the file (local SystemNumerics = System.Numerics).
+            var folder = folders.TemporaryCopyOfSample();
+            File.WriteAllText(Path.Combine(folder, "Numerics.cs"), """
+                namespace Sample
+                {
+                    public static class Numerics
+                    {
+                        public static float Length()
+                        {
+                            var v = new System.Numerics.Vector2(3f, 4f);
+                            return v.Length();
+                        }
+                    }
+                }
+                """);
+
+            MapBuild.Run(folder, new BuildOptions(), TextWriter.Null);
+
+            var script = File.ReadAllText(Path.Combine(folder, "build", "Sample", "war3map.lua"));
+            Assert.Contains("local SystemNumerics = System.Numerics", script);
+            Assert.Contains("System.defStc(\"System.Numerics.Vector2\"", script);
+        }
+
+        [Fact]
         public void missing_libraries_are_an_error()
         {
             var empty = Path.Combine(Path.GetTempPath(), "moonwell-empty-" + Guid.NewGuid().ToString("N"));

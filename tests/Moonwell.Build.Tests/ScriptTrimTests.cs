@@ -64,9 +64,18 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void a_short_name_the_code_names_keeps_its_group()
         {
-            var compiled = "local t = System.Task.Run()\nlocal v = System.Numerics.Vector2s\n";
+            var compiled = "local t = System.Task.Run()\nlocal v = System.NumericsExtra.Vector2\n";
 
             Assert.Equal(Linked(vector: false, marked: false) + compiled, ScriptLibraries.Trim(Linked() + compiled));
+        }
+
+        [Fact]
+        public void a_namespace_the_code_names_keeps_its_group()
+        {
+            // CSharp.lua's alias of a namespace a file uses: the full name of what it uses is not written.
+            var compiled = "local SystemNumerics = System.Numerics\nlocal SystemThreadingTasks = System.Threading.Tasks\n";
+
+            Assert.Equal(Linked(marked: false) + compiled, ScriptLibraries.Trim(Linked() + compiled));
         }
     }
 }
