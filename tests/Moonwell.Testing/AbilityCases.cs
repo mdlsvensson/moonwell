@@ -106,6 +106,61 @@ namespace Moonwell.Testing
             Expect.True(!bolt.Given!.HasEnded, "the second cast is live");
         }
 
+        /// <summary>A cast ends with its unit: removing the caster mid-cast ends the cast, and the timer its OnCast started stops.</summary>
+        public static void EndsWithUnit(FakeWorld world)
+        {
+            Arena();
+            var striker = Unit.Of(world.NewUnit(ObjectTypes.FourCC("H001"), slot: 0))!;
+            var bolt = striker.AbilityOf<TestBolt>();
+            Inbound.SpellEffect(striker.Handle, ObjectTypes.FourCC("A000"), null, 0f, 0f);
+            var cast = bolt.Given!;
+            world.Advance(0.6f);
+            Expect.Equal(1, bolt.Ticks, "the ticks before the caster is removed");
+            striker.Remove();
+            Expect.True(cast.HasEnded, "the cast has ended with its unit");
+            world.Advance(2f);
+            Expect.Equal(1, bolt.Ticks, "the ticks after the caster is removed");
+        }
+
+        /// <summary>The end of another ability's spell does not end the running cast (the game sends one after a later spell has begun); its own end does.</summary>
+        public static void OtherAbilityEndKeeps(FakeWorld world)
+        {
+            Arena();
+            var striker = Unit.Of(world.NewUnit(ObjectTypes.FourCC("H001"), slot: 0))!;
+            var bolt = striker.AbilityOf<TestBolt>();
+            Inbound.SpellEffect(striker.Handle, ObjectTypes.FourCC("A000"), null, 0f, 0f);
+            var cast = bolt.Given!;
+            Inbound.SpellEnded(striker.Handle, ObjectTypes.FourCC("AHhb"));
+            Expect.True(!cast.HasEnded, "the cast after another ability's end");
+            Inbound.SpellEnded(striker.Handle, ObjectTypes.FourCC("A000"));
+            Expect.True(cast.HasEnded, "the cast after its own ability's end");
+        }
+
+        /// <summary>A map whose only cast reaction is a game component's OnUnitCast makes the world deliver spells, and hears them.</summary>
+        public static void MapCastListens(FakeWorld world)
+        {
+            Expect.True(!world.Listening.Contains(GameEvent.Spell), "Spell is not listened for before a reaction needs it");
+            var watch = new CastWatch();
+            Game.Instance.Add(watch);
+            Expect.True(world.Listening.Contains(GameEvent.Spell), "Spell is listened for");
+            var caster = world.NewUnit(ObjectTypes.FourCC("hfoo"), slot: 0);
+            Inbound.SpellEffect(caster, ObjectTypes.FourCC("AHhb"), null, 0f, 0f);
+            Expect.Equal(1, watch.Casts, "the casts OnUnitCast saw");
+        }
+
+        /// <summary>A game component whose only reaction is OnUnitCast, counting the casts.</summary>
+        private sealed class CastWatch : GameComponent
+        {
+            /// <summary>How many casts it saw.</summary>
+            public int Casts;
+
+            /// <summary>Counts the cast.</summary>
+            public override void OnUnitCast(Cast cast)
+            {
+                Casts++;
+            }
+        }
+
         /// <summary>Registering an ability with a reaction makes the world deliver the spell event, once.</summary>
         public static void Listens(FakeWorld world)
         {

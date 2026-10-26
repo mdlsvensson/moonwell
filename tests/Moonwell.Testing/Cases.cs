@@ -336,6 +336,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "ownership.ends-newest-first", Run = OwnershipCases.EndsNewestFirst });
             list.Add(new Case { Name = "ownership.ends-grandchildren", Run = OwnershipCases.EndsGrandchildren });
             list.Add(new Case { Name = "ownership.end-once", Run = OwnershipCases.EndOnce });
+            list.Add(new Case { Name = "ownership.end-inside-end", Run = OwnershipCases.EndInsideEnd });
             list.Add(new Case { Name = "ownership.adopt-into-ended", Run = OwnershipCases.AdoptIntoEnded });
             list.Add(new Case { Name = "ownership.child-ends-alone", Run = OwnershipCases.ChildEndsAlone });
             list.Add(new Case { Name = "ownership.adopt-while-ending", Run = OwnershipCases.AdoptWhileEnding });
@@ -542,6 +543,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "damage.nested", Run = DamageCases.Nested });
             list.Add(new Case { Name = "damage.actor-ends-mid-dispatch", Run = DamageCases.ActorEndsMidDispatch });
             list.Add(new Case { Name = "damage.error-isolated", Run = DamageCases.ErrorIsolated });
+            list.Add(new Case { Name = "damage.same-player", Run = DamageCases.SamePlayer });
+            list.Add(new Case { Name = "damage.deal-tag-in-reactions", Run = DamageCases.DealTagInReactions });
             list.Add(new Case { Name = "damage-package.no-trigger-without-need", Run = InstallCases.NoTriggerWithoutNeed });
             list.Add(new Case { Name = "damage-package.listens-for-an-interface", Run = InstallCases.ListensForAnInterface });
             list.Add(new Case { Name = "damage-package.listens-for-on-damaged", Run = InstallCases.ListensForOnDamaged });
@@ -587,6 +590,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "damage-package.chain-through-on-damaged", Run = DealCases.ChainThroughOnDamaged });
             list.Add(new Case { Name = "death.order", Run = DeathCases.Order });
             list.Add(new Case { Name = "death.self", Run = DeathCases.Self });
+            list.Add(new Case { Name = "death.same-player", Run = DeathCases.SamePlayer });
             list.Add(new Case { Name = "death.not-an-end", Run = DeathCases.NotAnEnd });
             list.Add(new Case { Name = "abilities.registered", Run = AbilityCases.Registered });
             list.Add(new Case { Name = "abilities.generic", Run = AbilityCases.Generic });
@@ -595,6 +599,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "cast.owns-what-it-starts", Run = AbilityCases.OwnsWhatItStarts });
             list.Add(new Case { Name = "cast.next-ends-previous", Run = AbilityCases.NextEndsPrevious });
             list.Add(new Case { Name = "cast.listen", Run = AbilityCases.Listens });
+            list.Add(new Case { Name = "cast.ends-with-unit", Run = AbilityCases.EndsWithUnit });
+            list.Add(new Case { Name = "cast.other-ability-end-keeps", Run = AbilityCases.OtherAbilityEndKeeps });
+            list.Add(new Case { Name = "cast.map-cast-listens", Run = AbilityCases.MapCastListens });
             list.Add(new Case { Name = "buff.ticks-then-expiry", Run = BuffCases.TicksThenExpiry });
             list.Add(new Case { Name = "buff.refresh", Run = BuffCases.Refresh });
             list.Add(new Case { Name = "buff.separate", Run = BuffCases.Separate });
