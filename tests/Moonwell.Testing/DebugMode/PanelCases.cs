@@ -194,6 +194,30 @@ namespace Moonwell.Testing
             Expect.Equal("Footman 1 ended", debug.PanelLines()[1], "the line after a step");
         }
 
+        /// <summary>Halted with units running, a selected footman the game moves: its marker follows each 1/32 s and the text is set 4 times a second; halted with units held, the marker stays.</summary>
+        public static void FreeHaltFollows(FakeWorld world)
+        {
+            RegisterFootman();
+            var footman = FootmanAt(world, 0.0f, 0.0f);
+            var debug = On(world);
+            debug.CtrlClick(0, 0.0f, 0.0f);
+            debug.Ctrl(0, DebugKey.H, shift: true);
+            var sets = debug.PanelTextSets;
+            world.PlaceUnit(footman.Handle, 200.0f, 0.0f);
+            debug.Advance(Step);
+            Expect.Near(200.0f, debug.MarkerXs[0], "the marker's x a step after the footman moved, halted with units running");
+            debug.Advance(1.0f - Step);
+            Expect.Equal(sets + 4, debug.PanelTextSets, "texts set in a second halted with units running");
+            Expect.Equal("Footman 1 (unit) at 200, 0 · Player 1", debug.PanelLines()[1], "the object line, halted with units running");
+            debug.Ctrl(0, DebugKey.H, shift: true);
+            debug.Ctrl(0, DebugKey.H);
+            sets = debug.PanelTextSets;
+            world.PlaceUnit(footman.Handle, 400.0f, 0.0f);
+            debug.Advance(1.0f);
+            Expect.Near(200.0f, debug.MarkerXs[0], "the marker's x a second after the footman moved, halted with units held");
+            Expect.Equal(sets, debug.PanelTextSets, "texts set in a second halted with units held");
+        }
+
         /// <summary>-debug off hides the panel and removes every line and marker, and nothing is drawn or set after; on again shows it.</summary>
         public static void Off(FakeWorld world)
         {

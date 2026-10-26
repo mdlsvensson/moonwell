@@ -292,7 +292,7 @@ namespace Moonwell.Testing
                 return;
             }
 
-            var registered = key == DebugKey.Control || (key == DebugKey.H && !down) || (down && (meta == 2 || meta == 3));
+            var registered = key == DebugKey.Control || key == DebugKey.RightControl || (key == DebugKey.H && !down) || (down && (meta == 2 || meta == 3));
             if (registered)
             {
                 keyHeard(slot, key, meta, down);

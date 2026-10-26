@@ -88,8 +88,8 @@ namespace Moonwell.Engine
 
         /// <summary>
         /// One trigger for every player slot's debug keys: H, N, "-" and "=" with Ctrl (meta 2) and Ctrl + Shift (meta 3),
-        /// pressed; H let go with every meta, so the session can tell a held H's repeats; left Ctrl with every meta, pressed
-        /// and let go (held, it repeats with meta 2, and its release comes with meta 0). One more for every slot's mouse
+        /// pressed; H let go with every meta, so the session can tell a held H's repeats; left and right Ctrl with every meta,
+        /// pressed and let go (held, it repeats with meta 2, and its release comes with meta 0). One more for every slot's mouse
         /// presses, which hands on the left button's.
         /// </summary>
         public void ListenInput(Action<int, int, int, bool> key, Action<int, float, float> leftPress)
@@ -111,6 +111,8 @@ namespace Moonwell.Engine
                 {
                     Natives.BlzTriggerRegisterPlayerKeyEvent(keys, p, Natives.OSKEY_LCONTROL, meta, true);
                     Natives.BlzTriggerRegisterPlayerKeyEvent(keys, p, Natives.OSKEY_LCONTROL, meta, false);
+                    Natives.BlzTriggerRegisterPlayerKeyEvent(keys, p, Natives.OSKEY_RCONTROL, meta, true);
+                    Natives.BlzTriggerRegisterPlayerKeyEvent(keys, p, Natives.OSKEY_RCONTROL, meta, false);
                     Natives.BlzTriggerRegisterPlayerKeyEvent(keys, p, Natives.OSKEY_H, meta, false);
                 }
 
@@ -367,6 +369,11 @@ namespace Moonwell.Engine
             if (key == Natives.OSKEY_OEM_PLUS)
             {
                 return DebugKey.Plus;
+            }
+
+            if (key == Natives.OSKEY_RCONTROL)
+            {
+                return DebugKey.RightControl;
             }
 
             return key == Natives.OSKEY_LCONTROL ? DebugKey.Control : 0;

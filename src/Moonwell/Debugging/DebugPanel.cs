@@ -8,8 +8,9 @@ namespace Moonwell
     /// <summary>
     /// The debug mode's panel and drawings: the status, the selected object's lines, the views' lines and the map's own
     /// (IDebugShown), and with -stats the statistics; on the map, a marker on the selected object and the views' drawings.
-    /// A refresher on game time (Moonwell's timers stop when halted) draws every 1/32 s while running and sets the text
-    /// every 8th time; while halted it does nothing, and each step, selection, halt and resume refreshes at once.
+    /// A refresher on game time (Moonwell's timers stop when halted) draws every 1/32 s while running or halted with units
+    /// running, and sets the text every 8th time; halted with units held it does nothing, and each step, selection, halt
+    /// and resume refreshes at once.
     /// </summary>
     internal static class DebugPanel
     {
@@ -184,7 +185,12 @@ namespace Moonwell
             return Count(tenths / 10) + "." + (tenths % 10);
         }
 
-        /// <summary>One run of the refresher, which asks for the next first: while running it closes a statistics step, draws, and sets the text every 8th run or when the selected object ended; while halted, it refreshes only for a selected object that ended.</summary>
+        /// <summary>
+        /// One run of the refresher, which asks for the next first: while running it closes a statistics step, draws, and sets
+        /// the text every 8th run or when the selected object ended; halted with units running, it does the same with no
+        /// statistics step, as the units still move; halted with units held, it refreshes only for a selected object that
+        /// ended.
+        /// </summary>
         private static void Run(int number)
         {
             if (number != generation || world == null)
@@ -195,7 +201,8 @@ namespace Moonwell
             world.After(RefreshEvery, () => Run(number));
             var selected = DebugSession.Selected;
             var ended = selected != null && selected.HasEnded;
-            if (Runtime.Clock.IsHalted)
+            var halted = Runtime.Clock.IsHalted;
+            if (halted && DebugSession.HoldsUnits)
             {
                 if (ended)
                 {
@@ -205,7 +212,11 @@ namespace Moonwell
                 return;
             }
 
-            DebugStats.Tick();
+            if (!halted)
+            {
+                DebugStats.Tick();
+            }
+
             runs++;
             Draw();
             if (ended || runs % TextEvery == 0)

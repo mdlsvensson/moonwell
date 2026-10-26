@@ -11,7 +11,7 @@ namespace Moonwell.Hosting
 
         /// <summary>
         /// Starts delivering every player slot's debug keys and left presses: H, N, "-" and "=" pressed with Ctrl (meta 2) or
-        /// Ctrl + Shift (meta 3), H let go with any meta, and left Ctrl pressed and let go with any meta, to the key action
+        /// Ctrl + Shift (meta 3), H let go with any meta, and left and right Ctrl pressed and let go with any meta, to the key action
         /// with the slot, the key (DebugKey), the meta and whether it is down; the left mouse button's press to the press
         /// action with the slot and its ground point. Called once, at the first -debug.
         /// </summary>
@@ -77,6 +77,9 @@ namespace Moonwell.Hosting
 
         /// <summary>Left Ctrl.</summary>
         internal const int Control = 5;
+
+        /// <summary>Right Ctrl, which does as left Ctrl.</summary>
+        internal const int RightControl = 6;
     }
 }
 #endif

@@ -455,6 +455,104 @@ namespace Moonwell.Testing
             DebugMode.Select(null);
             Expect.Same(null, DebugMode.Selected, "Selected after Select(null)");
         }
+
+        /// <summary>
+        /// A breakpoint whose condition always holds, in a timer every step: the first halt turns the mode on; after Ctrl + H
+        /// the next step halts again; -debug off escapes it, the mode staying off and the clock running; -debug on again lets it
+        /// halt once more.
+        /// </summary>
+        public static void BreakpointEscapes(FakeWorld world)
+        {
+            var unit = UnitAt(world, 0.0f, 0.0f);
+            var debug = FakeDebugWorld.Install(world);
+            Timer.Every(Step, () => { DebugMode.Halt(); });
+            debug.Advance(Step);
+            Expect.True(DebugSession.IsOn, "the mode after the first halt from code");
+            Expect.True(Runtime.Clock.IsHalted, "the clock after the first halt from code");
+            debug.Ctrl(0, DebugKey.H);
+            Expect.True(!Runtime.Clock.IsHalted, "the clock after Ctrl + H");
+            debug.Advance(Step);
+            Expect.True(Runtime.Clock.IsHalted, "the clock a step after Ctrl + H: the breakpoint halts again");
+            debug.Chat(0, "-debug");
+            Expect.True(!DebugSession.IsOn, "the mode after -debug off");
+            Expect.True(!Runtime.Clock.IsHalted, "the clock after -debug off");
+            var before = Runtime.World.Now();
+            debug.Advance(1.0f);
+            Expect.True(!DebugSession.IsOn, "the mode a second after -debug off");
+            Expect.True(!Runtime.Clock.IsHalted, "the clock a second after -debug off");
+            Expect.True(!Paused(world, unit), "the unit a second after -debug off");
+            Expect.Near(before + 1.0f, Runtime.World.Now(), "Moonwell's time a second after -debug off");
+            debug.Chat(0, "-debug");
+            debug.Advance(Step);
+            Expect.True(Runtime.Clock.IsHalted, "the clock a step after -debug on again");
+        }
+
+        /// <summary>Right Ctrl does as left Ctrl: with it down a press selects; with left let go and right still down, too; with both up, nothing.</summary>
+        public static void RightCtrlSelects(FakeWorld world)
+        {
+            var a = UnitAt(world, 0.0f, 0.0f);
+            var b = UnitAt(world, 600.0f, 0.0f);
+            var c = UnitAt(world, 1200.0f, 0.0f);
+            var debug = On(world);
+            debug.Key(0, DebugKey.RightControl, 0, true);
+            debug.Press(0, 0.0f, 0.0f);
+            Expect.Same(a, DebugSession.Selected, "the unit selected with right Ctrl down");
+            debug.Key(0, DebugKey.Control, 2, true);
+            debug.Key(0, DebugKey.Control, 0, false);
+            debug.Press(0, 600.0f, 0.0f);
+            Expect.Same(b, DebugSession.Selected, "the unit selected with left Ctrl let go and right Ctrl still down");
+            debug.Key(0, DebugKey.RightControl, 0, false);
+            debug.Press(0, 1200.0f, 0.0f);
+            Expect.Same(b, DebugSession.Selected, "the selection after a press with both Ctrl keys up");
+            debug.Key(0, DebugKey.RightControl, 0, true);
+            debug.Key(0, DebugKey.H, 2, true);
+            Expect.True(Runtime.Clock.IsHalted, "the clock after right Ctrl + H");
+            debug.Press(0, 1200.0f, 0.0f);
+            Expect.Same(c, DebugSession.Selected, "the unit selected with right Ctrl down while halted");
+        }
+
+        /// <summary>-step alone takes one step and prints "1 step.", as -step 1 does; running, it prints that the clock is not halted.</summary>
+        public static void StepBare(FakeWorld world)
+        {
+            var debug = On(world);
+            var printed = world.PrintedTexts.Count;
+            debug.Chat(0, "-step");
+            Expect.Equal(printed + 1, world.PrintedTexts.Count, "lines printed by -step while running");
+            Expect.Equal("Not halted: Ctrl + H halts.", world.PrintedTexts[printed], "the line of -step while running");
+            debug.Ctrl(0, DebugKey.H, shift: true);
+            var before = Runtime.World.Now();
+            printed = world.PrintedTexts.Count;
+            debug.Chat(0, "-step");
+            Expect.Near(before + Step, Runtime.World.Now(), "Moonwell's time after -step");
+            Expect.Equal(printed + 1, world.PrintedTexts.Count, "lines printed by -step");
+            Expect.Equal("1 step.", world.PrintedTexts[printed], "the line of -step");
+        }
+
+        /// <summary>-speed alone prints the six speeds in one line and changes nothing.</summary>
+        public static void SpeedBare(FakeWorld world)
+        {
+            var debug = On(world);
+            debug.Chat(0, "-speed 2");
+            var printed = world.PrintedTexts.Count;
+            debug.Chat(0, "-speed");
+            Expect.Equal(printed + 1, world.PrintedTexts.Count, "lines printed by -speed");
+            Expect.Equal("Speeds: 1/4, 1/2, 1, 2, 4, 8.", world.PrintedTexts[printed], "the line of -speed");
+            Expect.Near(2.0f, Runtime.Clock.Speed, "the speed after -speed");
+        }
+
+        /// <summary>A selected unit removed: DebugMode.Selected reads null and IsSelected false at once, before the panel's next run.</summary>
+        public static void EndedSelectedReadsNull(FakeWorld world)
+        {
+            var unit = UnitAt(world, 0.0f, 0.0f);
+            var debug = On(world);
+            debug.CtrlClick(0, 0.0f, 0.0f);
+            Expect.Same(unit, DebugMode.Selected, "Selected after the click");
+            unit.Remove();
+            Expect.Same(null, DebugMode.Selected, "Selected after the unit is removed");
+            Expect.True(!DebugMode.IsSelected(unit), "IsSelected of the removed unit");
+            debug.Advance(Step);
+            Expect.Same(null, DebugMode.Selected, "Selected after the panel's next run");
+        }
     }
 #endif
 }

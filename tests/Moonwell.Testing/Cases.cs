@@ -54,6 +54,11 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "debug.session.halt-from-code-turns-on", Run = SessionCases.HaltFromCodeTurnsOn });
             list.Add(new Case { Name = "debug.session.held-h-toggles-once", Run = SessionCases.HeldHTogglesOnce });
             list.Add(new Case { Name = "debug.session.held-unit-removed", Run = SessionCases.HeldUnitRemoved });
+            list.Add(new Case { Name = "debug.session.breakpoint-escapes", Run = SessionCases.BreakpointEscapes });
+            list.Add(new Case { Name = "debug.session.right-ctrl-selects", Run = SessionCases.RightCtrlSelects });
+            list.Add(new Case { Name = "debug.session.step-bare", Run = SessionCases.StepBare });
+            list.Add(new Case { Name = "debug.session.speed-bare", Run = SessionCases.SpeedBare });
+            list.Add(new Case { Name = "debug.session.ended-selected-reads-null", Run = SessionCases.EndedSelectedReadsNull });
             list.Add(new Case { Name = "debug.panel.status", Run = PanelCases.Status });
             list.Add(new Case { Name = "debug.panel.unit", Run = PanelCases.SelectedUnit });
             list.Add(new Case { Name = "debug.panel.numbers", Run = PanelCases.Numbers });
@@ -64,6 +69,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "debug.panel.off", Run = PanelCases.Off });
             list.Add(new Case { Name = "debug.panel.reuse", Run = PanelCases.Reuse });
             list.Add(new Case { Name = "debug.panel.stats", Run = PanelCases.Stats });
+            list.Add(new Case { Name = "debug.panel.free-halt-follows", Run = PanelCases.FreeHaltFollows });
             list.Add(new Case { Name = "debug.interactions.candidates-no-tracking", Run = DebugViewCases.CandidatesNoTracking });
             list.Add(new Case { Name = "debug.interactions.lines", Run = DebugViewCases.Lines });
             list.Add(new Case { Name = "debug.interactions.paired-by", Run = DebugViewCases.PairedBy });

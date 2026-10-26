@@ -42,6 +42,9 @@ namespace Moonwell
         /// <summary>Whether each player slot's left Ctrl is down.</summary>
         private static bool[] controlDown = new bool[24];
 
+        /// <summary>Whether each player slot's right Ctrl is down; either Ctrl selects.</summary>
+        private static bool[] rightControlDown = new bool[24];
+
         /// <summary>Whether each player slot's H is down: a held key repeats its down event, and only the first toggles the halt.</summary>
         private static bool[] hDown = new bool[24];
 
@@ -68,6 +71,9 @@ namespace Moonwell
 
         /// <summary>The place of the speed in Speeds.</summary>
         private static int speedIndex = NormalSpeed;
+
+        /// <summary>Whether -debug turned the mode off, and it has not been turned on since: a halt from code then does nothing, so a breakpoint whose condition still holds can be escaped.</summary>
+        private static bool turnedOff;
 
         /// <summary>Whether the debug mode is on.</summary>
         internal static bool IsOn { get; private set; }
@@ -111,6 +117,7 @@ namespace Moonwell
             held = null;
             listening = false;
             controlDown = new bool[24];
+            rightControlDown = new bool[24];
             hDown = new bool[24];
             clicked = false;
             holdsUnits = false;
@@ -118,6 +125,7 @@ namespace Moonwell
             stepsLeft = 0;
             stepNumber++;
             speedIndex = NormalSpeed;
+            turnedOff = false;
             IsOn = false;
             Selected = null;
             StepRunning = false;
@@ -140,6 +148,7 @@ namespace Moonwell
             if (!IsOn)
             {
                 IsOn = true;
+                turnedOff = false;
                 if (!listening)
                 {
                     listening = true;
@@ -155,6 +164,7 @@ namespace Moonwell
             ChangeSpeed(NormalSpeed);
             Selected = null;
             IsOn = false;
+            turnedOff = true;
             DebugPanel.TurnedOff();
             Game.Print("Debug mode off.");
         }
@@ -202,10 +212,14 @@ namespace Moonwell
             DebugPanel.Refresh();
         }
 
-        /// <summary>A halt from code (DebugMode.Halt), like a breakpoint: turns the mode on first when it is off, as -debug does, then halts with every unit held; nothing when already halted.</summary>
+        /// <summary>
+        /// A halt from code (DebugMode.Halt), like a breakpoint: turns the mode on first when it is off, as -debug does, then
+        /// halts with every unit held; nothing when already halted, and nothing once -debug has turned the mode off, until it
+        /// is turned on again, so a breakpoint whose condition still holds can be escaped.
+        /// </summary>
         internal static void HaltFromCode()
         {
-            if (world == null || Runtime.Clock.IsHalted)
+            if (world == null || Runtime.Clock.IsHalted || turnedOff)
             {
                 return;
             }
@@ -343,7 +357,7 @@ namespace Moonwell
             Runtime.Scheduler.Rearm();
         }
 
-        /// <summary>A chat line with "-" in it from a slot: -debug always; -step, -speed and -stats while on. Anything else is left alone.</summary>
+        /// <summary>A chat line with "-" in it from a slot: -debug always; -step, -speed and -stats while on (-step alone takes one step, -speed alone names the speeds). Anything else is left alone.</summary>
         private static void Heard(int slot, string text)
         {
             var line = text.Trim().ToLower();
@@ -362,9 +376,17 @@ namespace Moonwell
             {
                 DebugPanel.ToggleStats();
             }
+            else if (line == "-step")
+            {
+                StepCommand("1");
+            }
             else if (line.StartsWith("-step "))
             {
                 StepCommand(line.Substring(6));
+            }
+            else if (line == "-speed")
+            {
+                Game.Print("Speeds: 1/4, 1/2, 1, 2, 4, 8.");
             }
             else if (line.StartsWith("-speed "))
             {
@@ -417,7 +439,7 @@ namespace Moonwell
             Step();
         }
 
-        /// <summary>A key event from a slot: Ctrl's and H's state always; while on, H halts or resumes (a repeat of a held H does nothing), N steps, "-" and "=" change the speed.</summary>
+        /// <summary>A key event from a slot: left and right Ctrl's and H's state always; while on, H halts or resumes (a repeat of a held H does nothing), N steps, "-" and "=" change the speed.</summary>
         private static void KeyHeard(int slot, int key, int meta, bool down)
         {
             if (key == DebugKey.Control)
@@ -425,6 +447,16 @@ namespace Moonwell
                 if (slot >= 0 && slot < controlDown.Length)
                 {
                     controlDown[slot] = down;
+                }
+
+                return;
+            }
+
+            if (key == DebugKey.RightControl)
+            {
+                if (slot >= 0 && slot < rightControlDown.Length)
+                {
+                    rightControlDown[slot] = down;
                 }
 
                 return;
@@ -476,10 +508,10 @@ namespace Moonwell
             }
         }
 
-        /// <summary>A left press from a slot at a ground point: with that slot's Ctrl down while on, selects the nearest object within 150, the next nearest at the same spot, or nothing.</summary>
+        /// <summary>A left press from a slot at a ground point: with that slot's left or right Ctrl down while on, selects the nearest object within 150, the next nearest at the same spot, or nothing.</summary>
         private static void LeftPressed(int slot, float x, float y)
         {
-            if (!IsOn || slot < 0 || slot >= controlDown.Length || !controlDown[slot])
+            if (!IsOn || slot < 0 || slot >= controlDown.Length || (!controlDown[slot] && !rightControlDown[slot]))
             {
                 return;
             }
