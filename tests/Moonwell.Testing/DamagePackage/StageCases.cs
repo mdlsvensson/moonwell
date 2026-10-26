@@ -190,6 +190,16 @@ namespace Moonwell.Testing
             Expect.Equal(0, bursts, "no burst");
         }
 
+        /// <summary>An attack of 0 is not quiet: a map whose units attack for 0 and set the amount before armor gets its reactions.</summary>
+        public static void ZeroAttackRuns(FakeWorld world)
+        {
+            Arena(world, out var source, out var target);
+            target.Taking = hit => hit.Amount = 25f;
+            fake.Hit(source.Handle, target.Handle, 0f, damageType: 4, isAttack: true);
+            Expect.True(TestLog.Lines.Contains("target taking") && TestLog.Lines.Contains("target taken"), "the target's reactions ran");
+            Expect.Near(75f, fake.Body(target.Handle).Life, "the amount set before armor was dealt");
+        }
+
         /// <summary>A hit with no source runs the target's stages.</summary>
         public static void SourcelessHitRuns(FakeWorld world)
         {

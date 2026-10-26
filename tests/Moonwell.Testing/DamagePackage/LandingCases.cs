@@ -66,6 +66,28 @@ namespace Moonwell.Testing
             Expect.Equal("bonus killed|outer alive", string.Join("|", landed), "the bonus hit got the kill");
         }
 
+        /// <summary>A lethal reaction that kills the target with a hit of its own gets the kill: that hit says Killed, the lethal hit does not.</summary>
+        public static void LethalReactionKillCreditsItsHit(FakeWorld world)
+        {
+            StageCases.Arena(world, out var source, out var target);
+            var fake = StageCases.Fake;
+            fake.Body(target.Handle).Life = 50f;
+            var landed = new System.Collections.Generic.List<string>();
+            var dealt = false;
+            target.Lethal = hit =>
+            {
+                if (!dealt)
+                {
+                    dealt = true;
+                    source.Damage(target, 1000f, DamageKind.Normal);
+                }
+            };
+            target.Hurt = hit => landed.Add((hit.IsCode ? "finisher " : "lethal ") + (hit.Killed ? "killed" : "alive"));
+            fake.Hit(source.Handle, target.Handle, 60f, damageType: 4);
+            fake.RunZero();
+            Expect.Equal("finisher killed|lethal alive", string.Join("|", landed), "the finishing hit got the kill");
+        }
+
         /// <summary>Once a lethal reaction spares the target, the later lethal reactions do not run: the hit no longer kills.</summary>
         public static void LethalStopsWhenSpared(FakeWorld world)
         {

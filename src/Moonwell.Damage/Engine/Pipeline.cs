@@ -143,8 +143,9 @@ namespace Moonwell
                 // Damage the game makes while a reaction runs (a raw native, an area hit) belongs to that reaction's hit too.
                 hit.Chain = Reactions.NextChain();
 
-                // The game's 0-damage hits (Storm Bolt's first, Fireball's extra two) are not hits a map reacts to.
-                hit.Quiet = hit.Original == 0.0f;
+                // The game's 0-damage hits that are no attack (Storm Bolt's first, Fireball's extra two) are not hits a map
+                // reacts to; an attack of 0 is one, as a map may set its amount before armor.
+                hit.Quiet = hit.Original == 0.0f && !hit.IsAttack;
             }
 
             if (hit.Chain >= MaxChain)
@@ -303,14 +304,14 @@ namespace Moonwell
             // The life is read only now: a hit those reactions dealt has already lowered it (game facts: the life drops
             // before UnitDamageTarget returns). A target such a hit killed is not this hit's to kill.
             hit.TargetLife = World.Life(targetHandle);
-            var living = !World.IsDead(targetHandle);
-            if (living && hit.Kills)
+            if (hit.Kills && !World.IsDead(targetHandle))
             {
                 hit.Stage = Stage.Lethal;
                 Reactions.Run(hit, Stage.Lethal);
             }
 
-            hit.WouldKill = living && hit.Kills;
+            // Read again after the lethal stage: a hit a lethal reaction dealt may have killed the target first.
+            hit.WouldKill = hit.Kills && !World.IsDead(targetHandle);
 
             if (hit.Amount != amount)
             {

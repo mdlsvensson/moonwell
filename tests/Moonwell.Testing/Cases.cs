@@ -501,6 +501,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "damage-package.zero-hit-quiet", Run = StageCases.ZeroHitQuiet });
             list.Add(new Case { Name = "damage-package.sourceless-hit-runs", Run = StageCases.SourcelessHitRuns });
             list.Add(new Case { Name = "damage-package.late-reaction-runs", Run = StageCases.LateReactionRuns });
+            list.Add(new Case { Name = "damage-package.zero-attack-runs", Run = StageCases.ZeroAttackRuns });
+            list.Add(new Case { Name = "damage-package.lethal-reaction-kill-credits-its-hit", Run = LandingCases.LethalReactionKillCreditsItsHit });
             list.Add(new Case { Name = "damage-package.deal-returns-hit", Run = DealCases.DealReturnsHit });
             list.Add(new Case { Name = "damage-package.deal-attack-type", Run = DealCases.DealAttackType });
             list.Add(new Case { Name = "damage-package.deal-starts-listening", Run = DealCases.DealStartsListening });
