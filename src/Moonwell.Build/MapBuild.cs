@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Moonwell.Build
 {
     /// <summary>Builds a map project into a map archive.</summary>
@@ -25,6 +27,32 @@ namespace Moonwell.Build
         /// <returns>The full path of the map archive.</returns>
         /// <exception cref="BuildException">A step failed in a way the modder can act on.</exception>
         public static string Run(string path, BuildOptions options, TextWriter log)
+        {
+            // The map's own C# that runs here (a tooltip's formula) and CSharp.lua (a negative constant) write numbers in the
+            // current culture, and the game reads them as the invariant culture writes them: 37.5 and -1, not a Swedish 37,5
+            // and its minus sign U+2212. Threads the build starts take it too; the caller gets its cultures back.
+            var culture = CultureInfo.CurrentCulture;
+            var uiCulture = CultureInfo.CurrentUICulture;
+            var threadCulture = CultureInfo.DefaultThreadCurrentCulture;
+            var threadUiCulture = CultureInfo.DefaultThreadCurrentUICulture;
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+            try
+            {
+                return Build(path, options, log);
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = culture;
+                CultureInfo.CurrentUICulture = uiCulture;
+                CultureInfo.DefaultThreadCurrentCulture = threadCulture;
+                CultureInfo.DefaultThreadCurrentUICulture = threadUiCulture;
+            }
+        }
+
+        private static string Build(string path, BuildOptions options, TextWriter log)
         {
             var project = MapProject.Find(path);
             log.WriteLine($"moonwell: {project.Name} ({(options.Release ? "release" : "development")} build)");
