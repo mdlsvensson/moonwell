@@ -64,6 +64,9 @@ namespace Moonwell.Hosting
         /// <summary>Whether a unit flies.</summary>
         bool IsFlying(unit target);
 
+        /// <summary>The fly height of a unit's type, which a flying unit pushed up or down drifts back to: the game's GetUnitDefaultFlyHeight.</summary>
+        float DefaultFlyHeight(unit target);
+
         /// <summary>Puts a unit at an x, keeping its orders. The game's SetUnitX; named otherwise for the same reason as RemoveEffect.</summary>
         void PlaceUnitX(unit target, float x);
 

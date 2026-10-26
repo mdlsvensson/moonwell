@@ -75,8 +75,10 @@ namespace Moonwell
         public static void Install(IPhysicsWorld world)
         {
             Interactions.EnsureInstalled();
+            // Installed: interactions has not been installed afresh since, so the count pushes added to its Awake is still there.
+            var kept = Installed();
             host = world;
-            Pass.Reset();
+            Pass.Reset(kept);
             hook = Pass.Run;
             Tracking.BeforeGizmos = hook;
         }
@@ -84,10 +86,12 @@ namespace Moonwell
         /// <summary>Forgets the settings and the world, so the next use starts from the defaults; the tests call it between cases.</summary>
         internal static void ResetSettings()
         {
+            // Installed: interactions has not been installed afresh since, so the count pushes added to its Awake is still there.
+            var kept = Installed();
             settings = null;
             host = null;
             hook = null;
-            Pass.Reset();
+            Pass.Reset(kept);
         }
 
         /// <summary>Whether the package is installed: the interactions package is, and its hook before the gizmos is the package's own. Interactions' Install and Runtime.Reset clear the hook, so the next use starts afresh.</summary>

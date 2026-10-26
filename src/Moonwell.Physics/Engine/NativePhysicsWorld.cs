@@ -101,6 +101,9 @@ namespace Moonwell.Engine
         /// <summary>Whether a unit flies.</summary>
         public bool IsFlying(unit target) => Natives.IsUnitType(target, Natives.UNIT_TYPE_FLYING);
 
+        /// <summary>The fly height of a unit's type.</summary>
+        public float DefaultFlyHeight(unit target) => Natives.GetUnitDefaultFlyHeight(target);
+
         /// <summary>Puts a unit at an x, keeping its orders.</summary>
         public void PlaceUnitX(unit target, float x) => Natives.SetUnitX(target, x);
 

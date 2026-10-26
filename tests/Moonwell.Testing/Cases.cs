@@ -184,6 +184,20 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "ground.wake-moved", Run = GroundCases.WakeMoved });
             list.Add(new Case { Name = "ground.fast-ridge", Run = GroundCases.FastRidge });
             list.Add(new Case { Name = "ground.cliff-roll", Run = GroundCases.CliffRoll });
+            list.Add(new Case { Name = "push.knockback", Run = PushCases.Knockback });
+            list.Add(new Case { Name = "push.blocked", Run = PushCases.Blocked });
+            list.Add(new Case { Name = "push.slide-along", Run = PushCases.SlideAlong });
+            list.Add(new Case { Name = "push.tree", Run = PushCases.Tree });
+            list.Add(new Case { Name = "push.lift-land", Run = PushCases.LiftLand });
+            list.Add(new Case { Name = "push.flyer", Run = PushCases.Flyer });
+            list.Add(new Case { Name = "push.overlap", Run = PushCases.Overlap });
+            list.Add(new Case { Name = "push.ends-on-death", Run = PushCases.EndsOnDeath });
+            list.Add(new Case { Name = "push.structure", Run = PushCases.Structure });
+            list.Add(new Case { Name = "push.body", Run = PushCases.BodyDefaults });
+            list.Add(new Case { Name = "push.order-kept", Run = PushCases.OrderKept });
+            list.Add(new Case { Name = "push.cell", Run = PushCases.Cell });
+            list.Add(new Case { Name = "push.zero", Run = PushCases.Zero });
+            list.Add(new Case { Name = "push.reaction-order", Run = PushCases.ReactionOrder });
         }
 
         /// <summary>Adds the areas package's cases.</summary>

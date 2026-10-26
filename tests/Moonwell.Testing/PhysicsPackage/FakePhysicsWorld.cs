@@ -60,6 +60,9 @@ namespace Moonwell.Testing
         /// <summary>The units IsFlying answers true for.</summary>
         public List<unit> Flyers = new List<unit>();
 
+        /// <summary>The fly height of each unit's type a case gave one; a unit with none reads 0.</summary>
+        public Dictionary<unit, float> DefaultHeights = new Dictionary<unit, float>();
+
         /// <summary>The x of each unit PlaceUnitX moved, in the order of the calls.</summary>
         public List<float> PlacedX = new List<float>();
 
@@ -192,6 +195,18 @@ namespace Moonwell.Testing
 
         /// <summary>Whether a unit flies.</summary>
         public bool IsFlying(unit target) => Flyers.Contains(target);
+
+        /// <summary>The fly height of a unit's type: the one a case gave it, else 0.</summary>
+        public float DefaultFlyHeight(unit target)
+        {
+            float height;
+            if (DefaultHeights.TryGetValue(target, out height))
+            {
+                return height;
+            }
+
+            return 0.0f;
+        }
 
         /// <summary>Records the x a unit was put at.</summary>
         public void PlaceUnitX(unit target, float x)

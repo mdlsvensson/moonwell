@@ -168,6 +168,19 @@ namespace Moonwell
         }
 
         /// <summary>
+        /// Whether an item put at a point lands within 1 of it: CanStand's test after IsWalkable, in floats and with no
+        /// vector, for the physics package, which asks it for every pushed unit each step. Changes game state as CanStand
+        /// does.
+        /// </summary>
+        internal static bool ItemLands(float x, float y)
+        {
+            World.Place(x, y, out var landedX, out var landedY);
+            var dx = landedX - x;
+            var dy = landedY - y;
+            return dx * dx + dy * dy <= 1f;
+        }
+
+        /// <summary>
         /// The ground's height at a point as this machine's game reads it, deformations included. The game can answer
         /// differently on each machine, so a map reads it only inside <c>Local.For</c>.
         /// </summary>
