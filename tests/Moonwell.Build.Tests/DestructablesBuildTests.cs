@@ -1,4 +1,3 @@
-using System.Numerics;
 using System.Text.RegularExpressions;
 using War3Net.Build.Common;
 using War3Net.Build.Extensions;
@@ -8,6 +7,10 @@ using Xunit;
 
 namespace Moonwell.Build.Tests
 {
+    // War3Net's positions are System.Numerics vectors; inside namespace Moonwell, Vector3 alone would be Moonwell.Maths' (this project
+    // references Moonwell.Input, which brings it).
+    using Vector3 = System.Numerics.Vector3;
+
     /// <summary>
     /// The game makes a preplaced destructable from <c>war3map.doo</c> unless World Editor cleared its state's visible and solid
     /// bits, which it does for the ones its script makes (triggers name them, or they drop items). A built map makes each once.
