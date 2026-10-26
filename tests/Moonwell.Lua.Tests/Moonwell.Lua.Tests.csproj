@@ -13,7 +13,7 @@
     <PackageReference Include="Moonwell.War3Net.Build" Version="6.1.2-moonwell.4" />
     <!-- As in Moonwell.Build: the fork's CSharp.lua (through Moonwell.Build) takes the place of the one War3Net.Build brings. -->
     <PackageReference Include="War3Net.CSharpLua" Version="2.0.4" ExcludeAssets="all" />
-    <PackageReference Include="Moonwell.CSharpLua.CoreSystem" Version="2.0.3-moonwell.3" />
+    <PackageReference Include="Moonwell.CSharpLua.CoreSystem" Version="2.0.3-moonwell.4" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
   </ItemGroup>
