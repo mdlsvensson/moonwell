@@ -125,6 +125,44 @@ namespace Moonwell.Engine
             return row * columns + column;
         }
 
+#if DEBUG
+        /// <summary>The column of a cell by its index, counted from the left, for the debug mode.</summary>
+        public int ColumnOfCell(int index)
+        {
+            return index % columns;
+        }
+
+        /// <summary>The row of a cell by its index, counted from the bottom, for the debug mode.</summary>
+        public int RowOfCell(int index)
+        {
+            return index / columns;
+        }
+
+        /// <summary>The column a position from left to right falls in, with the edge column for what lies outside, for the debug mode.</summary>
+        public int ColumnAt(float x)
+        {
+            return ColumnOf(x);
+        }
+
+        /// <summary>The row a position from bottom to top falls in, with the edge row for what lies outside, for the debug mode.</summary>
+        public int RowAt(float y)
+        {
+            return RowOf(y);
+        }
+
+        /// <summary>The left edge of a column, for the debug mode.</summary>
+        public float ColumnLeft(int column)
+        {
+            return left + column * side;
+        }
+
+        /// <summary>The bottom edge of a row, for the debug mode.</summary>
+        public float RowBottom(int row)
+        {
+            return bottom + row * side;
+        }
+#endif
+
         /// <summary>The column a position from left to right falls in, with the edge column for what lies outside.</summary>
         private int ColumnOf(float x)
         {

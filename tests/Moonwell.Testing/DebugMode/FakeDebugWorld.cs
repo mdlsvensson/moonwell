@@ -32,6 +32,18 @@ namespace Moonwell.Testing
         /// <summary>The style of each line in Lines.</summary>
         public List<int> LineStyles = new List<int>();
 
+        /// <summary>The first point's x of each line in Lines, as last drawn or moved.</summary>
+        public List<float> LineX1s = new List<float>();
+
+        /// <summary>The first point's y of each line in Lines, as last drawn or moved.</summary>
+        public List<float> LineY1s = new List<float>();
+
+        /// <summary>The second point's x of each line in Lines, as last drawn or moved.</summary>
+        public List<float> LineX2s = new List<float>();
+
+        /// <summary>The second point's y of each line in Lines, as last drawn or moved.</summary>
+        public List<float> LineY2s = new List<float>();
+
         /// <summary>How many lines have been drawn.</summary>
         public int LinesAdded;
 
@@ -158,6 +170,10 @@ namespace Moonwell.Testing
             nextNumber++;
             Lines.Add(line);
             LineStyles.Add(style);
+            LineX1s.Add(x1);
+            LineY1s.Add(y1);
+            LineX2s.Add(x2);
+            LineY2s.Add(y2);
             LinesAdded++;
             return line;
         }
@@ -165,7 +181,12 @@ namespace Moonwell.Testing
         /// <summary>Records a line moved; a line not drawn fails the case.</summary>
         public void MoveLine(int line, float x1, float y1, float x2, float y2)
         {
-            Expect.True(Lines.Contains(line), "a line moved is drawn");
+            var at = Lines.IndexOf(line);
+            Expect.True(at >= 0, "a line moved is drawn");
+            LineX1s[at] = x1;
+            LineY1s[at] = y1;
+            LineX2s[at] = x2;
+            LineY2s[at] = y2;
             LinesMoved++;
         }
 
@@ -176,6 +197,10 @@ namespace Moonwell.Testing
             Expect.True(at >= 0, "a line removed is drawn");
             Lines.RemoveAt(at);
             LineStyles.RemoveAt(at);
+            LineX1s.RemoveAt(at);
+            LineY1s.RemoveAt(at);
+            LineX2s.RemoveAt(at);
+            LineY2s.RemoveAt(at);
             LinesRemoved++;
         }
 

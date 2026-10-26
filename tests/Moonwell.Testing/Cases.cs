@@ -64,6 +64,14 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "debug.panel.off", Run = PanelCases.Off });
             list.Add(new Case { Name = "debug.panel.reuse", Run = PanelCases.Reuse });
             list.Add(new Case { Name = "debug.panel.stats", Run = PanelCases.Stats });
+            list.Add(new Case { Name = "debug.interactions.candidates-no-tracking", Run = DebugViewCases.CandidatesNoTracking });
+            list.Add(new Case { Name = "debug.interactions.lines", Run = DebugViewCases.Lines });
+            list.Add(new Case { Name = "debug.interactions.paired-by", Run = DebugViewCases.PairedBy });
+            list.Add(new Case { Name = "debug.interactions.draw", Run = DebugViewCases.Draw });
+            list.Add(new Case { Name = "debug.interactions.pair-limit", Run = DebugViewCases.PairLimit });
+            list.Add(new Case { Name = "debug.interactions.gizmo-ends", Run = DebugViewCases.GizmoEnds });
+            list.Add(new Case { Name = "debug.interactions.stats", Run = DebugViewCases.Stats });
+            list.Add(new Case { Name = "debug.interactions.step-length", Run = DebugViewCases.StepLength });
 #endif
         }
 
