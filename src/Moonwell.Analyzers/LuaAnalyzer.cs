@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace Moonwell.Analyzers;
 
@@ -22,6 +23,9 @@ public sealed class LuaAnalyzer : DiagnosticAnalyzer
         context.RegisterSyntaxNodeAction(Joined, SyntaxKind.AddExpression);
         context.RegisterSyntaxNodeAction(JoinedByAssignment, SyntaxKind.AddAssignmentExpression);
         context.RegisterSyntaxNodeAction(Interpolated, SyntaxKind.Interpolation);
+        context.RegisterOperationAction(HandleConversion, OperationKind.Conversion);
+        context.RegisterOperationAction(HandleIsType, OperationKind.IsType);
+        context.RegisterOperationAction(HandlePattern, OperationKind.DeclarationPattern, OperationKind.TypePattern, OperationKind.RecursivePattern);
     }
 
     // The methods of System.Enum that read an enum's names or members from its type.
@@ -172,6 +176,74 @@ public sealed class LuaAnalyzer : DiagnosticAnalyzer
             TypeKind: TypeKind.Enum,
             ContainingNamespace: { Name: "Objects", ContainingNamespace: { Name: "Moonwell", ContainingNamespace.IsGlobalNamespace: true } },
         } choice ? choice : null;
+    }
+
+    /// <summary>MW0035: a cast or as to a handle type the value is not known to be, which CSharp.lua checks against a class the game's handles do not have.</summary>
+    private static void HandleConversion(OperationAnalysisContext context)
+    {
+        var conversion = (IConversionOperation)context.Operation;
+        if (!conversion.Conversion.IsImplicit && conversion.Operand.Type != null && IsHandle(conversion.Type))
+        {
+            ReportHandle(context, conversion.Type!);
+        }
+    }
+
+    /// <summary>MW0035: x is T for a handle type T that x is not known to be.</summary>
+    private static void HandleIsType(OperationAnalysisContext context)
+    {
+        var test = (IIsTypeOperation)context.Operation;
+        if (IsHandle(test.TypeOperand) && Checks(context, test.ValueOperand.Type, test.TypeOperand))
+        {
+            ReportHandle(context, test.TypeOperand);
+        }
+    }
+
+    /// <summary>MW0035: a type, declaration or recursive pattern of a handle type that the value is not known to be.</summary>
+    private static void HandlePattern(OperationAnalysisContext context)
+    {
+        var pattern = (IPatternOperation)context.Operation;
+        var matched = pattern switch
+        {
+            IDeclarationPatternOperation declaration => declaration.MatchedType,
+            ITypePatternOperation type => type.MatchedType,
+            IRecursivePatternOperation recursive => recursive.MatchedType,
+            _ => null,
+        };
+        if (IsHandle(matched) && Checks(context, pattern.InputType, matched!))
+        {
+            ReportHandle(context, matched!);
+        }
+    }
+
+    // Whether testing a value of one type for another checks its class: not when every value of it already is one (unit is widget).
+    private static bool Checks(OperationAnalysisContext context, ITypeSymbol? from, ITypeSymbol to)
+    {
+        return from != null && !context.Compilation.ClassifyCommonConversion(from, to).IsImplicit;
+    }
+
+    private static void ReportHandle(OperationAnalysisContext context, ITypeSymbol checkedType)
+    {
+        var syntax = context.Operation.Syntax;
+        context.ReportDiagnostic(Diagnostic.Create(Rules.HandleCheck, syntax.GetLocation(), syntax.ToString(), checkedType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
+    }
+
+    // Whether a type is Moonwell.handle or a class deriving from it, or a type parameter limited to one.
+    private static bool IsHandle(ITypeSymbol? type)
+    {
+        if (type is ITypeParameterSymbol parameter)
+        {
+            return parameter.ConstraintTypes.Any(IsHandle);
+        }
+
+        for (var current = type; current != null; current = current.BaseType)
+        {
+            if (current is { Name: "handle", ContainingNamespace: { Name: "Moonwell", ContainingNamespace.IsGlobalNamespace: true } })
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static void Using(SyntaxNodeAnalysisContext context)

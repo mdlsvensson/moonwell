@@ -3,32 +3,34 @@ namespace Moonwell
     /// <summary>A hero unit: the class of a unit the game makes as a hero when no class is registered for its type. It has experience, a level, stats and skill points, and can be revived.</summary>
     public class Hero : Unit
     {
+        // The instance fields are internal, not private, as a map's subclass may name a field of its own the same (see Owner).
+
         /// <summary>The experience last read or set.</summary>
-        private int lastExperience;
+        internal int lastExperience;
 
         /// <summary>The base strength last read or set.</summary>
-        private int lastStrength;
+        internal int lastStrength;
 
         /// <summary>The base agility last read or set.</summary>
-        private int lastAgility;
+        internal int lastAgility;
 
         /// <summary>The base intelligence last read or set.</summary>
-        private int lastIntelligence;
+        internal int lastIntelligence;
 
         /// <summary>The strength with bonuses last read.</summary>
-        private int lastStrengthWithBonus;
+        internal int lastStrengthWithBonus;
 
         /// <summary>The agility with bonuses last read.</summary>
-        private int lastAgilityWithBonus;
+        internal int lastAgilityWithBonus;
 
         /// <summary>The intelligence with bonuses last read.</summary>
-        private int lastIntelligenceWithBonus;
+        internal int lastIntelligenceWithBonus;
 
         /// <summary>The skill points last read or set.</summary>
-        private int lastSkillPoints;
+        internal int lastSkillPoints;
 
         /// <summary>The proper name last set.</summary>
-        private string lastProperName = "";
+        internal string lastProperName = "";
 
         /// <summary>The default object of the hero's type (see Unit.Default), a Hero.</summary>
         [LocalSafe]

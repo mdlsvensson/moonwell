@@ -407,6 +407,7 @@ in Lua and comparing what they printed.
 | MW0031 | `checked(a + b)`, `checked { }` (an overflow is never detected) | test the range yourself |
 | MW0032 | `Enum.Parse`, `Enum.GetValues`/`GetNames`, `ToString("D")` on an enum, a `[Flags]` combination turned into text, `(Color)5 + "x"` | a `switch` on the value, `HasFlag` |
 | MW0034 | two `using var` in one block (disposed in the wrong order) | nested `using ( ) { }` |
+| MW0035 | `(unit)data`, `data as unit`, `data is unit`, `case unit u` from an `object`, a `widget` or a `T`: a game handle fails every check for its type | a field or variable of the handle's type, or a class of your own that holds it |
 
 What works is most of the language: classes, structs, records, primary constructors, interfaces and default methods,
 generics with constraints, enums, delegates, events, `switch` statements, `is` patterns with constants, types and

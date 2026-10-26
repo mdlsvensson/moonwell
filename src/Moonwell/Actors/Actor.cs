@@ -6,14 +6,16 @@ namespace Moonwell
     /// <summary>An owner that holds components, in the order they were added, and ends them when it ends.</summary>
     public abstract class Actor : Owner
     {
+        // The instance fields are internal, not private, as a map's subclass may name a field of its own the same (see Owner).
+
         /// <summary>The components in add order; a removed one is null until the list is compacted.</summary>
-        private List<Component?> components = new List<Component?>();
+        internal List<Component?> components = new List<Component?>();
 
         /// <summary>How many dispatches are running; the list is compacted only when none is.</summary>
-        private int dispatching;
+        internal int dispatching;
 
         /// <summary>Whether the list holds a null left by a removal that is not compacted yet.</summary>
-        private bool holes;
+        internal bool holes;
 
         /// <summary>How many components are on this actor.</summary>
         [LocalSafe]

@@ -33,8 +33,10 @@ namespace Moonwell
         /// <summary>The components the class starts with, added in order when the unit enters. Assigning a new list drops what a parent class listed.</summary>
         protected List<UnitComponent> Components { get; set; } = new List<UnitComponent>();
 
+        // The instance fields are internal, not private, as a map's subclass may name a field of its own the same (see Owner).
+
         /// <summary>The ability objects of the unit, one per ability id, in the order they were first asked for.</summary>
-        private readonly OrderedMap<int, Ability> abilities = new OrderedMap<int, Ability>();
+        internal readonly OrderedMap<int, Ability> abilities = new OrderedMap<int, Ability>();
 
         /// <summary>The game's handle of the unit.</summary>
         [LocalSafe]
@@ -99,16 +101,16 @@ namespace Moonwell
         }
 
         /// <summary>The life last read, kept for when the game no longer gives it.</summary>
-        private float lastLife = 0.0f;
+        internal float lastLife = 0.0f;
 
         /// <summary>The most life last read.</summary>
-        private float lastMaxLife = 0.0f;
+        internal float lastMaxLife = 0.0f;
 
         /// <summary>The mana last read.</summary>
-        private float lastMana = 0.0f;
+        internal float lastMana = 0.0f;
 
         /// <summary>The most mana last read.</summary>
-        private float lastMaxMana = 0.0f;
+        internal float lastMaxMana = 0.0f;
 
         /// <summary>The x last read. Internal, as the interactions package reads a unit's place through the natives and keeps it here, as X does.</summary>
         internal float lastX = 0.0f;
@@ -117,31 +119,31 @@ namespace Moonwell
         internal float lastY = 0.0f;
 
         /// <summary>The facing last read.</summary>
-        private float lastFacing = 0.0f;
+        internal float lastFacing = 0.0f;
 
         /// <summary>The level last read.</summary>
-        private int lastLevel;
+        internal int lastLevel;
 
         /// <summary>Whether the unit is paused, as last read or set.</summary>
-        private bool lastPaused;
+        internal bool lastPaused;
 
         /// <summary>The scale last read or set.</summary>
-        private float lastScale = 1.0f;
+        internal float lastScale = 1.0f;
 
         /// <summary>Whether the scale has been read or set, so that lastScale holds it.</summary>
-        private bool scaleKnown;
+        internal bool scaleKnown;
 
         /// <summary>The fly height last read or set.</summary>
-        private float lastFlyHeight = 0.0f;
+        internal float lastFlyHeight = 0.0f;
 
         /// <summary>The inventory size last read.</summary>
-        private int lastInventorySize;
+        internal int lastInventorySize;
 
         /// <summary>The name last set.</summary>
-        private string lastName = "";
+        internal string lastName = "";
 
         /// <summary>Whether the unit can show a fly height: it flies, or FlyHeight has done the Amrf trick on it.</summary>
-        private bool flyReady;
+        internal bool flyReady;
 
         /// <summary>Whether a getter that read 0 read it from a unit the game has removed: the game gives 0 for everything then, and the type id 0, before the sweep finds the unit. The getter then keeps the last value instead of the 0.</summary>
         internal bool RemovedByGame()

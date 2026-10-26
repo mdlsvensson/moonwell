@@ -1,6 +1,6 @@
 namespace Moonwell.Analyzers.Tests;
 
-/// <summary>MW0008 and MW0010: C# that CSharp.lua cannot compile, or compiles to Lua that does not do what .NET does.</summary>
+/// <summary>MW0008, MW0010 and MW0035: C# that CSharp.lua cannot compile, or compiles to Lua that does not do what .NET does.</summary>
 public class LuaTests
 {
     [Fact]
@@ -176,5 +176,62 @@ public class LuaTests
             var attack = AttackType.Magic;
             var a = AttackType.Magic.ToString() + " " + DefenseType.Divine + $"{attack}";
             """));
+    }
+
+    [Fact]
+    public void a_type_check_of_a_handle_is_rejected()
+    {
+        Assert.Equal(new[]
+        {
+            "MW0035: (lightning)data",
+            "MW0035: data as unit",
+            "MW0035: data is unit",
+            "MW0035: unit found",
+            "MW0035: (unit)w",
+            "MW0035: unit",
+            "MW0035: unit counted",
+            "MW0035: (T)data",
+        }, MapCode.Check("""
+            object data = u;
+            var bolt = (lightning)data;
+            var a = data as unit;
+            var b = data is unit;
+            if (data is unit found) { }
+            widget w = u;
+            var c = (unit)w;
+            var d = w is not unit;
+            switch (data)
+            {
+                case unit counted:
+                    break;
+            }
+            """, """
+                static T As<T>(object data) where T : handle => (T)data;
+            """));
+    }
+
+    [Fact]
+    public void a_conversion_to_a_handle_type_the_value_is_and_checks_of_other_types_are_accepted()
+    {
+        Assert.Empty(MapCode.Check("""
+            widget w = u;
+            var a = (widget)u;
+            var b = u as widget;
+            var c = u is widget;
+            var d = u is unit;
+            handle h = u;
+            object data = "text";
+            var e = (string)data;
+            var f = data is Unit;
+            var g = (Unit?)(object?)null;
+            """));
+    }
+
+    [Fact]
+    public void a_type_check_of_a_handle_message_says_what_to_write()
+    {
+        Assert.Equal(
+            "'(lightning)data' checks that a value is a lightning, which the game's Lua cannot: there a cast throws and is, as or a pattern gives false or null, even for a lightning; keep the handle in a field or variable of type lightning, or in a class of your own",
+            MapCode.Message("object data = u; var bolt = (lightning)data;"));
     }
 }

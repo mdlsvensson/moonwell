@@ -90,8 +90,17 @@ public static class Rules
         isEnabledByDefault: true,
         description: "The enums of Moonwell.Objects (ArmorType, Targets, ...) are ignored by CSharp.lua: the game's Lua has their numbers only. ToString (also x?.ToString()), a string joined (+ or +=) or interpolated with one, one given to an object parameter (string.Format, string.Concat, StringBuilder.Append; Equals is left alone), and Enum methods given one (GetValues, GetNames, GetName, IsDefined, Parse, TryParse, Format, ToObject) give the number where .NET gives the name, or stop. Comparing, |, & and HasFlag work.");
 
+    public static readonly DiagnosticDescriptor HandleCheck = new(
+        "MW0035",
+        "Type check of a handle",
+        "'{0}' checks that a value is a {1}, which the game's Lua cannot: there a cast throws and is, as or a pattern gives false or null, even for a {1}; keep the handle in a field or variable of type {1}, or in a class of your own",
+        LuaCategory,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "CSharp.lua checks a cast, is, as or a type pattern against the value's CSharp.lua class. A game handle is the game's own value (userdata), which has no such class, so a check for a handle type (unit, lightning, or a type parameter limited to one) never passes in the game: a cast throws an InvalidCastException, and is, as and patterns give false or null. A conversion to a handle type the value already is (unit to widget) checks nothing and works. The Lua cases do not show it: there the fake world's handles are CSharp.lua objects.");
+
     /// <summary>The rules of C# that CSharp.lua cannot compile.</summary>
-    public static ImmutableArray<DiagnosticDescriptor> Lua { get; } = ImmutableArray.Create(StaticNatives, ChoiceNames);
+    public static ImmutableArray<DiagnosticDescriptor> Lua { get; } = ImmutableArray.Create(StaticNatives, ChoiceNames, HandleCheck);
 
     private const string ObjectsCategory = "Objects";
 
