@@ -205,7 +205,7 @@ namespace Moonwell
             {
                 if (Handle == null)
                 {
-                    return DeclaredValue<int>("uhpm") + 0.0f;
+                    return DeclaredValue<int>("uhpm");
                 }
 
                 if (IsGone)
@@ -238,7 +238,7 @@ namespace Moonwell
                 if (!IsGone)
                 {
                     // The game keeps the whole number, and lowers the life to it.
-                    lastMaxLife = (int)value + 0.0f;
+                    lastMaxLife = (int)value;
                     if (lastLife > lastMaxLife)
                     {
                         lastLife = lastMaxLife;
@@ -257,7 +257,7 @@ namespace Moonwell
             {
                 if (Handle == null)
                 {
-                    return DeclaredValue<int>("umpi") + 0.0f;
+                    return DeclaredValue<int>("umpi");
                 }
 
                 if (IsGone)
@@ -310,7 +310,7 @@ namespace Moonwell
             {
                 if (Handle == null)
                 {
-                    return DeclaredValue<int>("umpm") + 0.0f;
+                    return DeclaredValue<int>("umpm");
                 }
 
                 if (IsGone)
@@ -343,7 +343,7 @@ namespace Moonwell
                 if (!IsGone)
                 {
                     // The game keeps the whole number, and lowers the mana to it.
-                    lastMaxMana = (int)value + 0.0f;
+                    lastMaxMana = (int)value;
                     if (lastMana > lastMaxMana)
                     {
                         lastMana = lastMaxMana;
