@@ -265,6 +265,69 @@ namespace Moonwell.Testing
             Expect.Equal(2, exact.TickSteps.Count, "and the other goes on");
         }
 
+        /// <summary>
+        /// The cycle's lists, which it reads and writes raw in Lua: at a step the gizmos tick first, in order, then the
+        /// interactions check; a gizmo ended by an earlier one's tick is passed over and dropped, and the rest keep their
+        /// order; each list is in the order things were put on it, so a gizmo made in a tick, which is put on before the one
+        /// that made it puts itself on again, ticks before it from the next step, and one that sets its tick in its tick comes
+        /// back first at its new step; and a tick of 300 steps waits in its slot as the ring comes round, and ticks exactly at
+        /// its step.
+        /// </summary>
+        public static void CycleLists(FakeWorld world)
+        {
+            Fresh();
+            var log = new List<string>();
+            var first = new Well(Interactions.Step);
+            var second = new Well(Interactions.Step);
+            var third = new Well(Interactions.Step);
+            Well? made = null;
+            first.Ticking = () => log.Add("1");
+            second.Ticking = () => log.Add("2");
+            third.Ticking = () => log.Add("3");
+            Gizmo.Create(first, 0.0f, 0.0f);
+            Gizmo.Create(second, 0.0f, 0.0f);
+            Gizmo.Create(third, 0.0f, 0.0f);
+            var holder = Gizmo.Create(new Well(), 0.0f, 0.0f);
+            var aura = new Healing();
+            holder.Interact(aura);
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            world.MoveUnit(handle, 100.0f, 0.0f);
+            Unit.Of(handle);
+            aura.Meeting = pair => log.Add("check");
+            var longer = Gizmo.Create(new Well(300.0f * Interactions.Step), 0.0f, 0.0f);
+            var start = Tracking.StepNow;
+            Steps(world, 1);
+            Expect.Equal(string.Join(",", new[] { "1", "2", "3", "check" }), string.Join(",", log), "the gizmos tick in order, then the interaction checks");
+            log.Clear();
+            second.Ticking = () =>
+            {
+                log.Add("2");
+                third.End();
+                made = Gizmo.Create(new Well(Interactions.Step), 0.0f, 0.0f);
+                made.Ticking = () => log.Add("m");
+                second.Ticking = () => log.Add("2");
+            };
+            first.Ticking = () =>
+            {
+                log.Add("1");
+                first.SetTick(Interactions.Step * 2.0f);
+                first.Ticking = () => log.Add("1");
+            };
+            Steps(world, 1);
+            Expect.Equal("1,2", string.Join(",", log), "the ended one is passed over, the one made does not tick in the step");
+            log.Clear();
+            Steps(world, 1);
+            Expect.Equal("m,2", string.Join(",", log), "the one whose tick grew waits; the one made was put on before the one that made it");
+            log.Clear();
+            Steps(world, 1);
+            Expect.Equal("1,m,2", string.Join(",", log), "and it comes back first, as it was put on for this step in its tick, before the others ticked");
+            Steps(world, 300 - 4);
+            Expect.Equal(1, longer.TickSteps.Count, "the tick of 300 steps came round the ring once");
+            Expect.Equal(start + 300, longer.TickSteps[0], "and ticked exactly at its step");
+            Expect.Equal(1, third.TickSteps.Count, "the ended one ticked only before it ended");
+            Expect.True(made != null && made.TickSteps.Count == 298, "the one made ticked at every step since");
+        }
+
         /// <summary>A throwing OnTick is reported as Well.OnTick, and the next gizmo still ticks, as does the one that threw at the next tick.</summary>
         public static void ThrowingTick(FakeWorld world)
         {

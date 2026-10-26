@@ -7,8 +7,8 @@ namespace Moonwell
     /// <summary>The interactions package: its settings, and the world and grid it keeps. The package starts on its first use, and a map sets the settings in its Map constructor, before that.</summary>
     public static class Interactions
     {
-        /// <summary>The settings; made on first use.</summary>
-        private static Settings? settings;
+        /// <summary>The settings; made on first use. What runs many times a step reads them here, and takes the getters when they are not made.</summary>
+        internal static Settings? settings;
 
         /// <summary>The world the package talks to; set by Install. The cycle and a search, which run only once the package is installed, read it here rather than through World, which checks the install at every read.</summary>
         internal static IInteractionWorld? host;

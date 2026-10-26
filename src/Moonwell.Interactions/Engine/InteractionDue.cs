@@ -12,6 +12,9 @@ namespace Moonwell.Engine
         /// <summary>Whether the interaction has ended; it then checks no more, and its entry on the ring is dropped when the ring comes to it.</summary>
         private bool cancelled;
 
+        /// <summary>The steps of the tick, worked out for the tick and the step length below.</summary>
+        private readonly TickSteps steps = new TickSteps();
+
         /// <summary>Makes the due of an interaction, not on the ring yet.</summary>
         public InteractionDue(Interaction interaction)
         {
@@ -38,8 +41,8 @@ namespace Moonwell.Engine
                 return;
             }
 
-            var beat = Tracking.Beat;
-            dueStep = beat.StepNow + Cycle.Steps(interaction.Tick);
+            var beat = Tracking.cycle ?? Tracking.Beat;
+            dueStep = beat.StepNow + steps.Of(interaction.tick);
             beat.Schedule(this, dueStep);
         }
 
@@ -54,7 +57,7 @@ namespace Moonwell.Engine
         public void RunDue(int step)
         {
             dueStep = -1;
-            if (cancelled || interaction.IsPaused)
+            if (cancelled || interaction.paused)
             {
                 return;
             }

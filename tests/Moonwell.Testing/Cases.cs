@@ -44,6 +44,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.gizmo.end-in-tick", Run = GizmoCases.EndInTick });
             list.Add(new Case { Name = "interactions.gizmo.made-in-tick", Run = GizmoCases.MadeInTick });
             list.Add(new Case { Name = "interactions.gizmo.long-tick", Run = GizmoCases.LongTick });
+            list.Add(new Case { Name = "interactions.gizmo.cycle-lists", Run = GizmoCases.CycleLists });
             list.Add(new Case { Name = "interactions.gizmo.throwing-tick", Run = GizmoCases.ThrowingTick });
             list.Add(new Case { Name = "interactions.gizmo.tick-owner", Run = GizmoCases.TickOwner });
             list.Add(new Case { Name = "interactions.gizmo.throwing-reactions", Run = GizmoCases.ThrowingReactions });

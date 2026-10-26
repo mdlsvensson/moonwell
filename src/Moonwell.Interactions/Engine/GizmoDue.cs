@@ -12,6 +12,9 @@ namespace Moonwell.Engine
         /// <summary>Whether the gizmo has ended; it then ticks no more, and its entry on the ring is dropped when the ring comes to it.</summary>
         private bool cancelled;
 
+        /// <summary>The steps of the tick, worked out for the tick and the step length below.</summary>
+        private readonly TickSteps steps = new TickSteps();
+
         /// <summary>Makes the due of a gizmo, not on the ring yet.</summary>
         public GizmoDue(Gizmo gizmo)
         {
@@ -33,13 +36,14 @@ namespace Moonwell.Engine
         /// <summary>Puts the gizmo on the ring for its next tick, a tick from now, unless it is on the ring already, ticks no more or has ended. A tick set to 0 and back before its entry came up stays where it is.</summary>
         public void Arm()
         {
-            if (dueStep >= 0 || cancelled || gizmo.Tick <= 0.0f)
+            var tick = gizmo.tick;
+            if (dueStep >= 0 || cancelled || tick <= 0.0f)
             {
                 return;
             }
 
-            var beat = Tracking.Beat;
-            dueStep = beat.StepNow + Cycle.Steps(gizmo.Tick);
+            var beat = Tracking.cycle ?? Tracking.Beat;
+            dueStep = beat.StepNow + steps.Of(tick);
             beat.Schedule(this, dueStep);
         }
 
@@ -54,7 +58,7 @@ namespace Moonwell.Engine
         public void RunDue(int step)
         {
             dueStep = -1;
-            if (cancelled || gizmo.Tick <= 0.0f)
+            if (cancelled || gizmo.tick <= 0.0f)
             {
                 return;
             }

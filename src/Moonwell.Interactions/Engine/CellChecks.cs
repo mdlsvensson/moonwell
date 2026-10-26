@@ -110,7 +110,7 @@ namespace Moonwell.Engine
                 return;
             }
 
-            var beat = Tracking.Beat;
+            var beat = Tracking.cycle ?? Tracking.Beat;
             dueStep = beat.StepNow + 1;
             beat.Schedule(this, dueStep);
         }

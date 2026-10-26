@@ -28,8 +28,8 @@ namespace Moonwell.Engine
         /// <summary>The entry of each destructable tracked, keyed by the game's handle; a lookup only.</summary>
         private static readonly Dictionary<destructable, Entry> destructableEntries = new Dictionary<destructable, Entry>();
 
-        /// <summary>The cycle; made on first use after an Install.</summary>
-        private static Cycle? cycle;
+        /// <summary>The cycle; made on first use after an Install. What runs many times a step reads it here, and takes Beat when it is not made.</summary>
+        internal static Cycle? cycle;
 
         /// <summary>The cell checks of the units and items; made on first use after an Install.</summary>
         private static CellChecks? checks;
