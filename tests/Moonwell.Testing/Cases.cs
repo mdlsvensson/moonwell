@@ -158,6 +158,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "areas.area.reaction-owner", Run = AreaCases.ReactionOwner });
             list.Add(new Case { Name = "areas.area.cells", Run = AreaCases.Cells });
             list.Add(new Case { Name = "areas.area.no-shape", Run = AreaCases.NoShape });
+            list.Add(new Case { Name = "areas.area.region-before-install", Run = AreaCases.RegionBeforeInstall });
             list.Add(new Case { Name = "areas.area.fixed-once-added", Run = AreaCases.FixedOnceAdded });
             list.Add(new Case { Name = "areas.area.reads", Run = AreaCases.Reads });
             list.Add(new Case { Name = "areas.area.shared-timer", Run = AreaCases.SharedTimer });

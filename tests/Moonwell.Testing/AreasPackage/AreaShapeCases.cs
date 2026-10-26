@@ -41,19 +41,24 @@ namespace Moonwell.Testing
             Expect.Equal(0, cells.Count, "a region goes to the game as a rect, so it adds no cells");
         }
 
-        /// <summary>A name the map has no region for throws, and says the name.</summary>
+        /// <summary>A name the map has no region for throws at the first read, not when the shape is made, and says the name.</summary>
         public static void UnknownName(FakeWorld world)
         {
             InstallShop();
-            Expect.Throws<ArgumentException>(() => AreaShape.Region("Bank"), "an unknown name");
+            var shape = AreaShape.Region("Bank");
+            Expect.Throws<ArgumentException>(() => { var unused = shape.Bounds; }, "an unknown name, at the first read");
+            Expect.Throws<ArgumentException>(() => shape.Contains(1f, 1f), "and at every read");
             try
             {
-                AreaShape.Region("Bank");
+                var bounds = shape.Bounds;
             }
             catch (ArgumentException error)
             {
                 Expect.Equal("No World Editor region is named 'Bank'.", error.Message, "the message");
             }
+
+            var union = AreaShape.Of(AreaShape.Region("Shop"), shape);
+            Expect.Throws<ArgumentException>(() => { var unused = union.Bounds; }, "a union with an unknown region");
         }
 
         /// <summary>A circle is the cells whose centre is within the radius; Contains is the true circle.</summary>
@@ -133,13 +138,20 @@ namespace Moonwell.Testing
             Expect.Throws<ArgumentException>(() => AreaShape.Of(), "no shapes");
         }
 
-        /// <summary>A region read before the package is installed throws InvalidOperationException.</summary>
+        /// <summary>A region shape may be made before the package is installed; reading its members then throws InvalidOperationException, and after Install it reads.</summary>
         public static void NotInstalled(FakeWorld world)
         {
             AreaSystem.Uninstall();
-            Expect.Throws<InvalidOperationException>(() => AreaShape.Region("Shop"), "Region before Install");
+            var shape = AreaShape.Region("Shop");
+            var union = AreaShape.Of(shape, AreaShape.Rect(new Bounds(new Vector2(512f, 0f), new Vector2(600f, 64f))));
+            Expect.Throws<InvalidOperationException>(() => { var unused = shape.Bounds; }, "Bounds before Install");
+            Expect.Throws<InvalidOperationException>(() => shape.Contains(1f, 1f), "Contains before Install");
+            Expect.Throws<InvalidOperationException>(() => { var unused = union.Bounds; }, "a union holding a region, before Install");
             InstallShop();
-            Expect.True(AreaShape.Region("Shop").Contains(1f, 1f), "after Install it reads");
+            Expect.True(shape.Contains(1f, 1f), "after Install it reads");
+            Expect.True(shape.Bounds == new Bounds(new Vector2(0f, 0f), new Vector2(256f, 128f)), "its bounds");
+            Expect.True(union.Bounds == new Bounds(new Vector2(0f, 0f), new Vector2(600f, 128f)), "a union holding it resolves the same way");
+            Expect.True(union.Contains(550f, 10f) && union.Contains(10f, 10f), "and holds both parts");
         }
 
         /// <summary>The install refuses rects that are not four floats a name.</summary>

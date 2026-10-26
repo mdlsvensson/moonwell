@@ -316,6 +316,30 @@ namespace Moonwell.Testing
             Expect.Equal(1, world.Logged.Count, "and ends without a further error");
         }
 
+        /// <summary>An area whose constructor sets a region shape, made before the package is installed and added after, enters units as a rect area does; an unknown name is reported from OnAdded and makes no region.</summary>
+        public static void RegionBeforeInstall(FakeWorld world)
+        {
+            AreaSystem.Uninstall();
+            var area = new LogArea(AreaShape.Region("Shop"), 1f);
+            var lost = new LogArea(AreaShape.Region("Bank"));
+            var fake = new FakeAreaWorld();
+            AreaSystem.Install(fake, new[] { "Shop" }, new[] { 0f, 0f, 256f, 128f });
+            Added(world, area);
+            Expect.Equal(1, fake.Regions.Count, "the region is made when the area is added");
+            Expect.Near(256f, fake.Regions[0].Rects[2], "its right edge");
+            var unit = UnitAt(world, 10f, 10f);
+            area.Labels[unit] = "a";
+            fake.Enter(fake.Regions[0], unit.Handle);
+            world.Advance(1f);
+            ExpectLog(area, new[] { "entered a", "stays a" }, "it enters and stays as a rect area does");
+            Expect.True(area.Contains(10f, 10f) && !area.Contains(300f, 10f), "Contains is the region's");
+
+            Game.Instance.Add(lost);
+            Expect.Equal(1, world.Logged.Count, "the unknown name is logged once");
+            Expect.Equal("Moonwell: LogArea.OnAdded failed: No World Editor region is named 'Bank'.", world.Logged[0], "the logged line");
+            Expect.Equal(1, fake.Regions.Count, "and no region is made for it");
+        }
+
         /// <summary>The shape is fixed once the area is added.</summary>
         public static void FixedOnceAdded(FakeWorld world)
         {

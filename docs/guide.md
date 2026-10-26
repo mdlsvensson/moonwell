@@ -354,7 +354,7 @@ Add the `Moonwell.Areas` package (the template's `.csproj` has the line, comment
 stay in and leave. A map that does not reference it carries none of its code.
 
 ```csharp
-public sealed class ShopFloor : Area // a game component, added in play: Game.Instance.Add(new ShopFloor())
+public sealed class ShopFloor : Area // a game component: Components.Add(new ShopFloor()) in the map, or Game.Instance.Add
 {
     public ShopFloor() { Shape = AreaShape.Region("Shop"); Tick = 1f; } // the region's name in World Editor
     public override bool Accepts(Unit unit) => unit is Hero;
@@ -365,47 +365,32 @@ public sealed class ShopFloor : Area // a game component, added in play: Game.In
 ```
 
 - A shape is a World Editor region by name (the build fails at the line of a name the map does not have), a rect, a
-  polygon, a circle, or `AreaShape.Of(a, b)` for several. `Tick` is the seconds between `OnUnitStays`; 0 never runs it.
-- Only units count, and only while alive and with a place: a dead, hidden or loaded unit leaves, and one hidden at the
-  start enters once shown. The game sends no event for hiding or loading, so those come up to 0.25 s late.
-- The game sees an area in whole 32 cells: a rect is rounded out, and a polygon or a circle is the cells whose centre is
-  inside it. `Contains` is the true shape, so the two can disagree within a cell of an edge.
-- Add an area from a reaction such as `OnGameStart`, and end it with `End()`: every unit inside then leaves. An area on
-  a region must be added in play, since the map's `Components` are made while the map is built, before the regions are
-  known; one with another shape can be listed there. A moving area is an interaction, not an area.
-- `Units`, `Has`, `Since` and `Contains` read anywhere.
+  polygon, a circle, or `AreaShape.Of(a, b)` for several. `OnUnitStays` runs every `Tick` seconds; 0 never runs it.
+- Only units count, alive and with a place: a dead, hidden or loaded unit leaves, and one hidden at the start enters
+  once shown (the game sends no event for hiding, so that is up to 0.25 s late). `End()` lets every unit inside leave.
+- The game sees an area in whole 32 cells: a rect is rounded out, a polygon or circle is the cells whose centre is inside.
+  `Contains` is the true shape, so the two can disagree within a cell of an edge.
 
 ## Mouse and camera
 
 Add the `Moonwell.Input` package (the template's `.csproj` has the line, commented) for each player's mouse and camera.
-A map that does not reference it carries none of its code, and one that never names `Mouse` or `IMouseWatch` listens to
-no mouse event.
+A map that never names `Mouse` or `IMouseWatch` listens to no mouse event.
 
 ```csharp
 public sealed class Aim : PlayerComponent, IMouseWatch // write only the reactions needed
 {
-    private readonly Unit hero;
-    public Aim(Unit hero) { this.hero = hero; }
-
-    public void OnMousePressed(Mouse mouse, MouseButton button)
-    {
-        if (button == MouseButton.Right) hero.FaceNow(hero.AngleTo(mouse.Position)); // the press is synced: safe to act on
-    }
+    public void OnMousePressed(Mouse mouse, MouseButton button) { /* the press is synced: safe to change the game */ }
 }
 player.Camera().Apply(CameraSetup.Named("Intro"), 2f); // World Editor's camera, checked by the build
 ```
 
-- The mouse's `Position`, `X`, `Y`, `HasPosition` and `IsDown` come from synced events, so they are the same on every
-  machine and read anywhere. `ScreenX`, `ScreenY`, `FocusUnit` and `IsHeldNow` are this machine's own: inside `Local.For`.
-- The reactions run at the same game time everywhere, so they may change the game. Online they arrive after the network
-  delay, so a cursor-following effect lags by that much. A game component hears every mouse, a player's its own.
-- The mouse keeps its last position on a reading of (0, 0) and on the world's top-right corner less 32, which are not a
-  place. The position does not follow the camera: the world moves under a still cursor and no event comes.
-- A press over the command card, minimap or portrait arrives with the ground under it, so a click on a command button
-  fires `OnMousePressed` too; nothing synced says the cursor was over the interface.
-- A camera is read inside `Local.For` (`Distance`, `Target`, `Eye` and the rest are this machine's own); changing it
-  (`PanTo`, `SetDistance`, `Follow`, `Apply`, `Reset`, `SetBounds`) is safe anywhere, and moves only that player's camera.
-- Key presses are not in Moonwell yet.
+- The mouse's `Position`, `X`, `Y`, `HasPosition` and `IsDown` are the same on every machine and read anywhere;
+  `ScreenX`, `ScreenY`, `FocusUnit` and `IsHeldNow` are this machine's own: inside `Local.For`.
+- Online the events arrive after the network delay. A press over the command card, minimap or portrait arrives with the
+  ground under it. The position does not follow a camera move, and (0, 0) and the world's top-right corner less 32 are
+  not places: the mouse keeps its last position on them.
+- A camera is read inside `Local.For`; changing it (`PanTo`, `SetDistance`, `Follow`, `Apply`, `Reset`) is safe anywhere
+  and moves only that player's camera. Key presses are not in Moonwell yet.
 
 ## Players
 

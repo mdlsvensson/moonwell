@@ -181,6 +181,8 @@ namespace Moonwell
                 throw new InvalidOperationException(NoShape);
             }
 
+            // A region the map does not have, or a read before the package is installed, fails here, before anything is made.
+            var resolved = shape.Bounds;
             tickSteps = AreaTracker.StepsOf(tick);
             var made = AreaTracker.Current();
             tracker = made;

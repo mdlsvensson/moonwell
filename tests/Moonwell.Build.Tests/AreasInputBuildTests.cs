@@ -139,7 +139,7 @@ namespace Moonwell.Build.Tests
                 Path.Combine(project, "Look.cs"),
                 "using Moonwell;\n\nnamespace AreasFixture\n{\n    public sealed class Look : GameComponent\n    {\n        public override void OnGameStart()\n        {\n            Player.One.Camera().Reset();\n        }\n    }\n}\n");
             var map = File.ReadAllText(Path.Combine(project, "Map.cs"));
-            File.WriteAllText(Path.Combine(project, "Map.cs"), map.Replace("Components.Add(new Town());", "Components.Add(new Town());\n            Components.Add(new Look());"));
+            File.WriteAllText(Path.Combine(project, "Map.cs"), map.Replace("Components.Add(new ShopFloor());", "Components.Add(new ShopFloor());\n            Components.Add(new Look());"));
             Build(project);
 
             var generated = Path.Combine(project, "build", "generated");
@@ -148,9 +148,8 @@ namespace Moonwell.Build.Tests
 
             File.WriteAllText(csproj, references.Replace(Areas, "<!-- no packages -->"));
             File.Delete(Path.Combine(project, "ShopFloor.cs"));
-            File.Delete(Path.Combine(project, "Town.cs"));
             File.Delete(Path.Combine(project, "Look.cs"));
-            File.WriteAllText(Path.Combine(project, "Map.cs"), map.Replace("Components.Add(new Town());", string.Empty));
+            File.WriteAllText(Path.Combine(project, "Map.cs"), map.Replace("Components.Add(new ShopFloor());", string.Empty));
             Build(project);
 
             Assert.False(File.Exists(Path.Combine(generated, "AreaData.g.cs")));

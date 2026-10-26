@@ -43,10 +43,21 @@ namespace Moonwell
         /// <summary>The shapes of a union, in the order given; empty otherwise.</summary>
         internal readonly AreaShape[] Parts;
 
-        private AreaShape(ShapeKind kind, Bounds bounds, Polygon? corners, Vector2 centre, float radius, AreaShape[] parts)
+        /// <summary>The World Editor region's name of a region shape; null for the others.</summary>
+        private readonly string? regionName;
+
+        /// <summary>The bounds, once known: made with the shape, except for a region and for shapes holding one, which are worked out on first use.</summary>
+        private Bounds bounds;
+
+        /// <summary>Whether <c>bounds</c> is known.</summary>
+        private bool resolved;
+
+        private AreaShape(ShapeKind kind, Bounds bounds, bool resolved, string? regionName, Polygon? corners, Vector2 centre, float radius, AreaShape[] parts)
         {
             Kind = kind;
-            Bounds = bounds;
+            this.bounds = bounds;
+            this.resolved = resolved;
+            this.regionName = regionName;
             Corners = corners;
             Centre = centre;
             Radius = radius;
@@ -55,32 +66,29 @@ namespace Moonwell
 
         /// <summary>
         /// A World Editor region by the name it has there. The game gives the area the region's rect rounded out to
-        /// whole 32 cells. An unknown name throws ArgumentException, and a read before the package is installed throws
-        /// InvalidOperationException.
+        /// whole 32 cells. The shape may be made before the package is installed (a map's constructors run while it is
+        /// built); the region is looked up at the first read of its members, or when the area is added. An unknown name
+        /// then throws ArgumentException, and a read before the package is installed throws InvalidOperationException.
+        /// The build checks a name written as a literal against the map's regions.
         /// </summary>
         [LocalSafe]
         public static AreaShape Region(string name)
         {
-            if (!AreaSystem.TryRegion(name, out var bounds))
-            {
-                throw new ArgumentException("No World Editor region is named '" + name + "'.");
-            }
-
-            return Rect(bounds);
+            return new AreaShape(ShapeKind.Rect, new Bounds(Vector2.Zero, Vector2.Zero), false, name, null, Vector2.Zero, 0f, new AreaShape[0]);
         }
 
         /// <summary>A rect. The game gives the area the rect rounded out to whole 32 cells; <c>Contains</c> tests the true rect, its edges included.</summary>
         [LocalSafe]
         public static AreaShape Rect(Bounds bounds)
         {
-            return new AreaShape(ShapeKind.Rect, bounds, null, bounds.Center, 0f, new AreaShape[0]);
+            return new AreaShape(ShapeKind.Rect, bounds, true, null, null, bounds.Center, 0f, new AreaShape[0]);
         }
 
         /// <summary>A polygon. The game gives the area the 32 cells whose centre is inside the polygon; <c>Contains</c> tests the true polygon. The game is given one cell for each 32 by 32 square inside it, so a very large polygon makes a very large region.</summary>
         [LocalSafe]
         public static AreaShape Polygon(Polygon polygon)
         {
-            return new AreaShape(ShapeKind.Polygon, polygon.Bounds, polygon, polygon.Center, 0f, new AreaShape[0]);
+            return new AreaShape(ShapeKind.Polygon, polygon.Bounds, true, null, polygon, polygon.Center, 0f, new AreaShape[0]);
         }
 
         /// <summary>A circle. The game gives the area the 32 cells whose centre is inside the circle; <c>Contains</c> tests the true circle. A radius that is not above 0 throws ArgumentException. The game is given one cell for each 32 by 32 square inside it, so a radius of 4,096 makes about 51,000 cells.</summary>
@@ -93,7 +101,7 @@ namespace Moonwell
             }
 
             var bounds = new Bounds(new Vector2(center.X - radius, center.Y - radius), new Vector2(center.X + radius, center.Y + radius));
-            return new AreaShape(ShapeKind.Circle, bounds, null, center, radius, new AreaShape[0]);
+            return new AreaShape(ShapeKind.Circle, bounds, true, null, null, center, radius, new AreaShape[0]);
         }
 
         /// <summary>The shapes together: a point is inside when it is inside any of them. At least one is needed, else ArgumentException.</summary>
@@ -106,20 +114,56 @@ namespace Moonwell
             }
 
             var parts = new AreaShape[shapes.Length];
-            var minX = 0f;
-            var minY = 0f;
-            var maxX = 0f;
-            var maxY = 0f;
             for (var i = 0; i < shapes.Length; i++)
             {
-                var part = shapes[i];
-                if (part == null)
+                if (shapes[i] == null)
                 {
                     throw new ArgumentException("Of was given a shape that is null.");
                 }
 
-                parts[i] = part;
-                var b = part.Bounds;
+                parts[i] = shapes[i];
+            }
+
+            return new AreaShape(ShapeKind.Union, new Bounds(Vector2.Zero, Vector2.Zero), false, null, null, Vector2.Zero, 0f, parts);
+        }
+
+        /// <summary>The smallest bounds that cover the whole shape, the true shape and not the cells.</summary>
+        [LocalSafe]
+        public Bounds Bounds
+        {
+            get
+            {
+                if (!resolved)
+                {
+                    Resolve();
+                }
+
+                return bounds;
+            }
+        }
+
+        /// <summary>Works out the bounds of a region (looked up by name) or of a union (the parts together); nothing is kept when it throws.</summary>
+        private void Resolve()
+        {
+            if (Kind == ShapeKind.Rect)
+            {
+                if (!AreaSystem.TryRegion(regionName!, out var found))
+                {
+                    throw new ArgumentException("No World Editor region is named '" + regionName + "'.");
+                }
+
+                bounds = found;
+                resolved = true;
+                return;
+            }
+
+            var minX = 0f;
+            var minY = 0f;
+            var maxX = 0f;
+            var maxY = 0f;
+            for (var i = 0; i < Parts.Length; i++)
+            {
+                var b = Parts[i].Bounds;
                 if (i == 0)
                 {
                     minX = b.Min.X;
@@ -136,13 +180,9 @@ namespace Moonwell
                 }
             }
 
-            var bounds = new Bounds(new Vector2(minX, minY), new Vector2(maxX, maxY));
-            return new AreaShape(ShapeKind.Union, bounds, null, bounds.Center, 0f, parts);
+            bounds = new Bounds(new Vector2(minX, minY), new Vector2(maxX, maxY));
+            resolved = true;
         }
-
-        /// <summary>The smallest bounds that cover the whole shape, the true shape and not the cells.</summary>
-        [LocalSafe]
-        public Bounds Bounds { get; }
 
         /// <summary>Whether a point is inside the true shape: a rect's edges count, a polygon as <c>Polygon.Contains</c>, a circle at a distance of at most its radius, and a union when any part has it.</summary>
         [LocalSafe]
