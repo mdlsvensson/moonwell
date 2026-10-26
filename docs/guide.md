@@ -507,11 +507,12 @@ outlines (one colour), its ticking pairs (another) and its waiting or paused pai
 | Ctrl + Shift + H | halts Moonwell only; units go on walking; again, resumes |
 | Ctrl + N | while halted, one step (`Interactions.Step`, else 1/32 s); held down, it repeats |
 | Ctrl + `-` / Ctrl + `=` | slower / faster: ¼, ½, 1, 2, 4, 8 times |
-| `-step 10`, `-speed 4`, `-stats` | in chat: while halted, that many steps (1 to 320; `-step` alone, one), a speed (`-speed` alone lists them), the statistics shown or hidden |
+| `-step 10`, `-speed 4`, `-stats` | in chat: that many steps while halted (1 to 320; `-step` alone, one), a speed (`-speed` alone lists them), the statistics shown or hidden |
 
 Either Ctrl works. A halt and the speed change Moonwell's time only: its timers, interactions and areas. The game's
 own attacks, buffs, cooldowns and timers made with the raw natives do not halt (Ctrl + H holds units, nothing more),
-and the speed does not make units faster or slower. Units are always selectable; items, destructables and gizmos only
+and the speed does not make units faster or slower. With units held, a step lets them go for one step, but they come
+back to their orders slowly and move only about a quarter of a step. Units are always selectable; items, destructables and gizmos only
 once the interactions grid tracks their kind. `-debug` off resumes at speed 1 and clears the selection.
 
 A map writes nothing to have it. Two optional things: its own lines in the panel for a class or component that
