@@ -100,12 +100,11 @@ namespace Moonwell.Build
                 IsCommentsDisabled = release,
             };
 
-            var builder = new MapScriptBuilder(triggerData: null!);
-            builder.SetDefaultOptionsForCSharpLua();
+            var builder = new ScriptBuilder();
             CompileResult result;
             try
             {
-                result = map.CompileScript(compiler, builder, libraries, commonJ, blizzardJ);
+                result = ScriptBuilder.WithScriptDestructables(map, () => map.CompileScript(compiler, builder, libraries, commonJ, blizzardJ));
             }
             catch (CompilationErrorException failure)
             {
