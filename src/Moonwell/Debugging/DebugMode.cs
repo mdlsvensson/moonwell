@@ -56,12 +56,12 @@ namespace Moonwell
 #endif
         }
 
-        /// <summary>Halts Moonwell and holds every unit, as Ctrl + H does, like a breakpoint: the code after the call still runs, and what is due after it waits for a step or a resume. Nothing while the mode is off or already halted. A release build leaves the call out.</summary>
+        /// <summary>Halts Moonwell and holds every unit, as Ctrl + H does, like a breakpoint: the code after the call still runs, and what is due after it waits for a step or a resume. While the mode is off it is turned on first, as -debug does; nothing when already halted. A release build leaves the call out.</summary>
         [Conditional("DEBUG")]
         public static void Halt()
         {
 #if DEBUG
-            DebugSession.Halt(true);
+            DebugSession.HaltFromCode();
 #endif
         }
     }

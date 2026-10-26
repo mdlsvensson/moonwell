@@ -51,6 +51,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "debug.session.select-next", Run = SessionCases.SelectNext });
             list.Add(new Case { Name = "debug.session.select-nothing", Run = SessionCases.SelectNothing });
             list.Add(new Case { Name = "debug.session.facade", Run = SessionCases.Facade });
+            list.Add(new Case { Name = "debug.session.halt-from-code-turns-on", Run = SessionCases.HaltFromCodeTurnsOn });
+            list.Add(new Case { Name = "debug.session.held-h-toggles-once", Run = SessionCases.HeldHTogglesOnce });
+            list.Add(new Case { Name = "debug.session.held-unit-removed", Run = SessionCases.HeldUnitRemoved });
 #endif
         }
 

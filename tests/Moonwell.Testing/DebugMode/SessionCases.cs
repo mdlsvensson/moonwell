@@ -46,15 +46,22 @@ namespace Moonwell.Testing
             Expect.Near(1.0f, Runtime.Clock.Speed, "the speed after -speed 4 while off");
         }
 
-        /// <summary>-debug turns the mode on and listens to the keys and the mouse once; again turns it off; a third time on, with no second listen.</summary>
+        /// <summary>
+        /// Only lines that start with "-" reach the session, and it trims them: "hello -debug" and " -debug" do nothing,
+        /// "-debug " turns the mode on and listens to the keys and the mouse once; again turns it off; a third time on, with
+        /// no second listen.
+        /// </summary>
         public static void Toggle(FakeWorld world)
         {
             var debug = FakeDebugWorld.Install(world);
             var printed = world.PrintedTexts.Count;
-            debug.Chat(0, "hello - there");
-            Expect.True(!DebugSession.IsOn, "the mode after a line with a dash in it");
-            debug.Chat(3, "-debug");
-            Expect.True(DebugSession.IsOn, "the mode after -debug");
+            debug.Chat(0, "hello -debug");
+            Expect.True(!DebugSession.IsOn, "the mode after \"hello -debug\"");
+            debug.Chat(0, " -debug");
+            Expect.True(!DebugSession.IsOn, "the mode after \" -debug\"");
+            Expect.Equal(printed, world.PrintedTexts.Count, "lines printed by lines that do not start with -");
+            debug.Chat(3, "-debug ");
+            Expect.True(DebugSession.IsOn, "the mode after \"-debug \"");
             Expect.Equal(1, debug.InputListens, "input listens after -debug");
             Expect.Equal(printed + 1, world.PrintedTexts.Count, "lines printed by -debug");
             Expect.Equal(-1, world.PrintedSlots[world.PrintedSlots.Count - 1], "the line is printed to everyone");
@@ -250,20 +257,27 @@ namespace Moonwell.Testing
             Expect.Equal(8, ran, "runs of a 0.5 s timer in 1 second at -speed 4");
         }
 
-        /// <summary>-step 10 moves 10 steps, at once with units running and one after another with units held; 0 and 321 print a line and do nothing.</summary>
+        /// <summary>-step 10 moves 10 steps, at once with units running and one after another with units held, and prints "10 steps."; -step 1 prints "1 step."; 0 and 321 print a line and do nothing.</summary>
         public static void StepCount(FakeWorld world)
         {
             var unit = UnitAt(world, 0.0f, 0.0f);
             var debug = On(world);
             debug.Ctrl(0, DebugKey.H, shift: true);
             var before = Runtime.World.Now();
+            var printed = world.PrintedTexts.Count;
             debug.Chat(0, "-step 10");
             Expect.Near(before + Step * 10.0f, Runtime.World.Now(), "Moonwell's time after -step 10 with units running");
-            var printed = world.PrintedTexts.Count;
+            Expect.Equal(printed + 1, world.PrintedTexts.Count, "lines printed by -step 10");
+            Expect.Equal("10 steps.", world.PrintedTexts[printed], "the line of -step 10");
+            debug.Chat(0, "-step 1");
+            Expect.Near(before + Step * 11.0f, Runtime.World.Now(), "Moonwell's time after -step 1");
+            Expect.Equal("1 step.", world.PrintedTexts[printed + 1], "the line of -step 1");
+            before = Runtime.World.Now();
+            printed = world.PrintedTexts.Count;
             debug.Chat(0, "-step 0");
             debug.Chat(0, "-step 321");
             Expect.Equal(printed + 2, world.PrintedTexts.Count, "lines printed by -step 0 and -step 321");
-            Expect.Near(before + Step * 10.0f, Runtime.World.Now(), "Moonwell's time after -step 0 and -step 321");
+            Expect.Near(before, Runtime.World.Now(), "Moonwell's time after -step 0 and -step 321");
             debug.Ctrl(0, DebugKey.H, shift: true);
             debug.Ctrl(0, DebugKey.H);
             before = Runtime.World.Now();
@@ -347,7 +361,75 @@ namespace Moonwell.Testing
             Expect.Same(null, DebugSession.Selected, "the selection after a click 200 away");
         }
 
-        /// <summary>DebugMode's IsOn, Selected and IsSelected follow the session, Select selects, and Halt halts with units held; while off, Select and Halt do nothing.</summary>
+        /// <summary>DebugMode.Halt() while off turns the mode on as -debug does, its keys listened to and its line printed, then halts with units held; Ctrl + H then resumes.</summary>
+        public static void HaltFromCodeTurnsOn(FakeWorld world)
+        {
+            var unit = UnitAt(world, 0.0f, 0.0f);
+            var debug = FakeDebugWorld.Install(world);
+            var printed = world.PrintedTexts.Count;
+            DebugMode.Halt();
+            Expect.True(DebugMode.IsOn, "IsOn after Halt while off");
+            Expect.Equal(1, debug.InputListens, "input listens after Halt while off");
+            Expect.True(Runtime.Clock.IsHalted, "the clock after Halt while off");
+            Expect.True(Paused(world, unit), "the unit after Halt while off");
+            Expect.Equal(printed + 2, world.PrintedTexts.Count, "lines printed: the mode's and the halt's");
+            Expect.True(world.PrintedTexts[printed].StartsWith("Debug mode on"), "the first line is -debug's");
+            DebugMode.Halt();
+            Expect.Equal(printed + 2, world.PrintedTexts.Count, "lines printed by a second Halt");
+            debug.Ctrl(0, DebugKey.H);
+            Expect.True(!Runtime.Clock.IsHalted, "the clock after Ctrl + H");
+            Expect.True(!Paused(world, unit), "the unit after Ctrl + H");
+        }
+
+        /// <summary>A held Ctrl + H, its down event repeated with no up between, halts once; after the up, the next down resumes.</summary>
+        public static void HeldHTogglesOnce(FakeWorld world)
+        {
+            var debug = On(world);
+            debug.Key(0, DebugKey.Control, 0, true);
+            debug.Key(0, DebugKey.H, 2, true);
+            Expect.True(Runtime.Clock.IsHalted, "the clock after the first H down");
+            debug.Key(0, DebugKey.H, 2, true);
+            Expect.True(Runtime.Clock.IsHalted, "the clock after a repeat");
+            debug.Key(0, DebugKey.H, 2, true);
+            Expect.True(Runtime.Clock.IsHalted, "the clock after a second repeat");
+            debug.Key(1, DebugKey.H, 2, true);
+            Expect.True(!Runtime.Clock.IsHalted, "the clock after another slot's H down");
+            debug.Key(1, DebugKey.H, 0, false);
+            debug.Key(1, DebugKey.H, 2, true);
+            Expect.True(Runtime.Clock.IsHalted, "the clock after the other slot's next H down");
+            debug.Key(0, DebugKey.H, 0, false);
+            debug.Key(0, DebugKey.H, 2, true);
+            Expect.True(!Runtime.Clock.IsHalted, "the clock after the first slot's up and down");
+        }
+
+        /// <summary>A held unit removed while held: the resume lets go of the others, makes no call on it, and reports no error.</summary>
+        public static void HeldUnitRemoved(FakeWorld world)
+        {
+            var a = UnitAt(world, 0.0f, 0.0f);
+            var removed = UnitAt(world, 100.0f, 0.0f);
+            var b = UnitAt(world, 200.0f, 0.0f);
+            var debug = On(world);
+            debug.Ctrl(0, DebugKey.H);
+            Expect.True(Paused(world, removed), "the unit is held");
+            removed.Remove();
+            var logged = world.Logged.Count;
+            debug.Ctrl(0, DebugKey.H);
+            Expect.True(!Runtime.Clock.IsHalted, "the clock after Ctrl + H");
+            Expect.True(!Paused(world, a) && !Paused(world, b), "the other units after the resume");
+            Expect.Equal(logged, world.Logged.Count, "errors logged by the resume");
+            var callsOnRemoved = 0;
+            for (var i = 0; i < debug.PausedOrLetGo.Count; i++)
+            {
+                if (debug.PausedOrLetGo[i] == removed.Handle)
+                {
+                    callsOnRemoved++;
+                }
+            }
+
+            Expect.Equal(1, callsOnRemoved, "pause calls on the removed unit: its hold only");
+        }
+
+        /// <summary>DebugMode's IsOn, Selected and IsSelected follow the session, Select selects, and Halt halts with units held; while off, Select does nothing.</summary>
         public static void Facade(FakeWorld world)
         {
             var a = UnitAt(world, 0.0f, 0.0f);
@@ -355,9 +437,7 @@ namespace Moonwell.Testing
             var debug = FakeDebugWorld.Install(world);
             Expect.True(!DebugMode.IsOn, "IsOn while off");
             DebugMode.Select(a);
-            DebugMode.Halt();
             Expect.Same(null, DebugMode.Selected, "Selected after Select while off");
-            Expect.True(!Runtime.Clock.IsHalted, "the clock after Halt while off");
             debug.Chat(0, "-debug");
             Expect.True(DebugMode.IsOn, "IsOn while on");
             debug.CtrlClick(0, 0.0f, 0.0f);

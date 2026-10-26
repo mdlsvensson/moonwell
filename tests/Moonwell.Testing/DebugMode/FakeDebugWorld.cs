@@ -103,10 +103,10 @@ namespace Moonwell.Testing
             return world.Time;
         }
 
-        /// <summary>A player's chat line: heard, as the game's chat event with "-" anywhere in it, once the session listens.</summary>
+        /// <summary>A player's chat line: heard once the session listens, when the text starts with "-", untrimmed, as the native world passes on.</summary>
         public void Chat(int slot, string text)
         {
-            if (heard != null && text.Contains("-"))
+            if (heard != null && text.StartsWith("-"))
             {
                 heard(slot, text);
             }
@@ -120,18 +120,19 @@ namespace Moonwell.Testing
                 return;
             }
 
-            var registered = key == DebugKey.Control || (down && (meta == 2 || meta == 3));
+            var registered = key == DebugKey.Control || (key == DebugKey.H && !down) || (down && (meta == 2 || meta == 3));
             if (registered)
             {
                 keyHeard(slot, key, meta, down);
             }
         }
 
-        /// <summary>A player presses Ctrl and a key, with Shift too when asked, and lets go of Ctrl.</summary>
+        /// <summary>A player presses Ctrl and a key, with Shift too when asked, and lets go of the key and of Ctrl.</summary>
         public void Ctrl(int slot, int key, bool shift = false)
         {
             Key(slot, DebugKey.Control, 0, true);
             Key(slot, key, shift ? 3 : 2, true);
+            Key(slot, key, shift ? 3 : 2, false);
             Key(slot, DebugKey.Control, 0, false);
         }
 

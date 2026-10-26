@@ -42,6 +42,9 @@ namespace Moonwell
         /// <summary>Whether each player slot's left Ctrl is down.</summary>
         private static bool[] controlDown = new bool[24];
 
+        /// <summary>Whether each player slot's H is down: a held key repeats its down event, and only the first toggles the halt.</summary>
+        private static bool[] hDown = new bool[24];
+
         /// <summary>Whether a click has been taken, and where the last was.</summary>
         private static bool clicked;
 
@@ -90,6 +93,7 @@ namespace Moonwell
             held = null;
             listening = false;
             controlDown = new bool[24];
+            hDown = new bool[24];
             clicked = false;
             holdsUnits = false;
             holding = false;
@@ -167,6 +171,22 @@ namespace Moonwell
             {
                 Game.Print("Halted, units running: Ctrl + N steps, Ctrl + Shift + H resumes.");
             }
+        }
+
+        /// <summary>A halt from code (DebugMode.Halt), like a breakpoint: turns the mode on first when it is off, as -debug does, then halts with every unit held; nothing when already halted.</summary>
+        internal static void HaltFromCode()
+        {
+            if (world == null || Runtime.Clock.IsHalted)
+            {
+                return;
+            }
+
+            if (!IsOn)
+            {
+                Toggle();
+            }
+
+            Halt(true);
         }
 
         /// <summary>Lets Moonwell's clock run on, and lets go of the held units; nothing while the mode is off or not halted.</summary>
@@ -337,6 +357,7 @@ namespace Moonwell
             }
 
             var whole = (int)steps;
+            Game.Print(whole == 1 ? "1 step." : whole + " steps.");
             if (!holdsUnits)
             {
                 for (var i = 0; i < whole; i++)
@@ -351,7 +372,7 @@ namespace Moonwell
             Step();
         }
 
-        /// <summary>A key event from a slot: Ctrl's state always; while on, H halts or resumes, N steps, "-" and "=" change the speed.</summary>
+        /// <summary>A key event from a slot: Ctrl's and H's state always; while on, H halts or resumes (a repeat of a held H does nothing), N steps, "-" and "=" change the speed.</summary>
         private static void KeyHeard(int slot, int key, int meta, bool down)
         {
             if (key == DebugKey.Control)
@@ -362,6 +383,16 @@ namespace Moonwell
                 }
 
                 return;
+            }
+
+            if (key == DebugKey.H && slot >= 0 && slot < hDown.Length)
+            {
+                var repeat = down && hDown[slot];
+                hDown[slot] = down;
+                if (repeat)
+                {
+                    return;
+                }
             }
 
             if (!IsOn || !down)

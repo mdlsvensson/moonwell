@@ -11,9 +11,9 @@ namespace Moonwell.Hosting
 
         /// <summary>
         /// Starts delivering every player slot's debug keys and left presses: H, N, "-" and "=" pressed with Ctrl (meta 2) or
-        /// Ctrl + Shift (meta 3), and left Ctrl pressed and let go with any meta, to the key action with the slot, the key
-        /// (DebugKey), the meta and whether it is down; the left mouse button's press to the press action with the slot and
-        /// its ground point. Called once, at the first -debug.
+        /// Ctrl + Shift (meta 3), H let go with any meta, and left Ctrl pressed and let go with any meta, to the key action
+        /// with the slot, the key (DebugKey), the meta and whether it is down; the left mouse button's press to the press
+        /// action with the slot and its ground point. Called once, at the first -debug.
         /// </summary>
         void ListenInput(Action<int, int, int, bool> key, Action<int, float, float> leftPress);
 
@@ -29,7 +29,7 @@ namespace Moonwell.Hosting
         /// <summary>Real seconds of this machine's processor (os.clock), for timing; never the same on two machines.</summary>
         float Clock();
 
-        /// <summary>The game's seconds since the runtime started, under Moonwell's clock.</summary>
+        /// <summary>Raw game seconds since the runtime started, before Moonwell's clock halts or scales them.</summary>
         float GameNow();
     }
 

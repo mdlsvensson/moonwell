@@ -45,8 +45,9 @@ namespace Moonwell.Engine
 
         /// <summary>
         /// One trigger for every player slot's debug keys: H, N, "-" and "=" with Ctrl (meta 2) and Ctrl + Shift (meta 3),
-        /// pressed; left Ctrl with every meta, pressed and let go (held, it repeats with meta 2, and its release comes with
-        /// meta 0). One more for every slot's mouse presses, which hands on the left button's.
+        /// pressed; H let go with every meta, so the session can tell a held H's repeats; left Ctrl with every meta, pressed
+        /// and let go (held, it repeats with meta 2, and its release comes with meta 0). One more for every slot's mouse
+        /// presses, which hands on the left button's.
         /// </summary>
         public void ListenInput(Action<int, int, int, bool> key, Action<int, float, float> leftPress)
         {
@@ -67,6 +68,7 @@ namespace Moonwell.Engine
                 {
                     Natives.BlzTriggerRegisterPlayerKeyEvent(keys, p, Natives.OSKEY_LCONTROL, meta, true);
                     Natives.BlzTriggerRegisterPlayerKeyEvent(keys, p, Natives.OSKEY_LCONTROL, meta, false);
+                    Natives.BlzTriggerRegisterPlayerKeyEvent(keys, p, Natives.OSKEY_H, meta, false);
                 }
 
                 Natives.TriggerRegisterPlayerEvent(mouse, p, Natives.EVENT_PLAYER_MOUSE_DOWN);
@@ -139,7 +141,7 @@ namespace Moonwell.Engine
             return OsClock();
         }
 
-        /// <summary>The game's seconds since the runtime started, from the native world's clock.</summary>
+        /// <summary>Raw game seconds since the runtime started, from the native world's clock, before Moonwell's clock halts or scales them.</summary>
         public float GameNow()
         {
             return native.GameNow();
