@@ -182,6 +182,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "input.mouse.no-mouse", Run = MouseCases.NoMouse });
             list.Add(new Case { Name = "input.mouse.per-slot", Run = MouseCases.PerSlot });
             list.Add(new Case { Name = "input.mouse.local", Run = MouseCases.Local });
+            list.Add(new Case { Name = "input.mouse.local-unknown-focus", Run = MouseCases.LocalUnknownFocus });
             list.Add(new Case { Name = "input.mouse.setters", Run = MouseCases.Setters });
         }
 

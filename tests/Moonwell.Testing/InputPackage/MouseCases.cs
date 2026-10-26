@@ -247,6 +247,20 @@ namespace Moonwell.Testing
             Expect.True(focus == null, "no unit under the cursor");
         }
 
+        /// <summary>A focus unit the runtime does not know reads null, and reading it does not take the unit in.</summary>
+        public static void LocalUnknownFocus(FakeWorld world)
+        {
+            var fake = Fresh(world);
+            var live = KnownUnits.Live.Count;
+            fake.Focus = world.NewUnit(ObjectTypes.FourCC("hfoo"));
+            var mouse = Player.One.Mouse();
+            Unit? focus = null;
+            Moonwell.Local.For(Player.One, () => focus = mouse.FocusUnit);
+            Expect.True(focus == null, "an unknown unit reads null");
+            Expect.Equal(live, KnownUnits.Live.Count, "nothing was taken in");
+            Expect.True(KnownUnits.Find(fake.Focus) == null, "the unit is still unknown");
+        }
+
         /// <summary>SetScreenPosition and ShowCursor reach the world with the mouse's player.</summary>
         public static void Setters(FakeWorld world)
         {

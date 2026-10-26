@@ -73,11 +73,15 @@ namespace Moonwell
             get { return InputSystem.World.MouseScreenY(); }
         }
 
-        /// <summary>The unit under the cursor on this machine now, or null. This machine's alone, so it is read inside Local.For.</summary>
+        /// <summary>The unit under the cursor on this machine now; null when no unit is under the cursor, or when Moonwell has not taken that unit in (reading it takes nothing in, as that would change the game on this machine only). This machine's alone, so it is read inside Local.For.</summary>
         public Unit? FocusUnit
         {
             [MachineLocal]
-            get { return Unit.Of(InputSystem.World.MouseFocusUnit()); }
+            get
+            {
+                var handle = InputSystem.World.MouseFocusUnit();
+                return handle == null ? null : KnownUnits.Find(handle);
+            }
         }
 
         /// <summary>Whether a button is held on this machine now, with no network delay (IsDown has it). This machine's alone, so it is read inside Local.For.</summary>
