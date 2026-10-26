@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Moonwell.Engine;
 
 namespace Moonwell
@@ -24,6 +25,9 @@ namespace Moonwell
 
         /// <summary>The seconds between ticks; 0 for none.</summary>
         internal float tick;
+
+        /// <summary>The components the class starts with, added in order when the gizmo is created: after its owner is set and before OnCreated runs. A class lists them in its constructor. Assigning a new list drops what a parent class listed.</summary>
+        protected List<GizmoComponent> Components { get; set; } = new List<GizmoComponent>();
 
         /// <summary>The gizmo's left-to-right place. Setting it moves the gizmo's entry to the cell of the new place at once.</summary>
         [LocalSafe]
@@ -92,6 +96,15 @@ namespace Moonwell
             (owner ?? Owner.Current).Adopt(gizmo);
             if (!gizmo.HasEnded)
             {
+                var starting = gizmo.Components;
+                for (var i = 0; i < starting.Count; i++)
+                {
+                    gizmo.Add(starting[i]);
+                }
+            }
+
+            if (!gizmo.HasEnded)
+            {
                 gizmo.CallCreated();
                 gizmo.Arm();
             }
@@ -107,6 +120,10 @@ namespace Moonwell
             interaction.Begin(this, Tracking.GizmoKind, owner);
             return interaction;
         }
+
+        /// <summary>Adds a component to the gizmo, and returns it. It ends with the gizmo, or by Remove. Fails in a development build when the component is on an actor already or has ended.</summary>
+        public T Add<T>(T component)
+            where T : GizmoComponent => AddComponent(component);
 
         /// <summary>Ends the gizmo: OnLeave runs and it leaves the grid. The same as End.</summary>
         public void Remove()

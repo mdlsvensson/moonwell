@@ -51,6 +51,10 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.gizmo.tick-owner", Run = GizmoCases.TickOwner });
             list.Add(new Case { Name = "interactions.gizmo.throwing-reactions", Run = GizmoCases.ThrowingReactions });
             list.Add(new Case { Name = "interactions.gizmo.shadowed-fields", Run = GizmoCases.ShadowedFields });
+            list.Add(new Case { Name = "interactions.gizmo.components", Run = GizmoCases.Components });
+            list.Add(new Case { Name = "interactions.gizmo.add-later", Run = GizmoCases.AddLater });
+            list.Add(new Case { Name = "interactions.cycle.before-gizmos", Run = GizmoCases.BeforeGizmos });
+            list.Add(new Case { Name = "interactions.cycle.awake", Run = GizmoCases.Awake });
             list.Add(new Case { Name = "interactions.tracking.only-when-asked", Run = TrackingCases.OnlyWhenAsked });
             list.Add(new Case { Name = "interactions.tracking.units-filled", Run = TrackingCases.UnitsFilled });
             list.Add(new Case { Name = "interactions.tracking.kinds-from-types", Run = TrackingCases.KindsFromTypes });
@@ -66,6 +70,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.tracking.ending-unseen", Run = TrackingCases.EndingUnseen });
             list.Add(new Case { Name = "interactions.tracking.new-ground-item", Run = TrackingCases.NewGroundItem });
             list.Add(new Case { Name = "interactions.tracking.read-once", Run = TrackingCases.ReadOnce });
+            list.Add(new Case { Name = "interactions.tracking.moved", Run = TrackingCases.Moved });
             list.Add(new Case { Name = "interactions.tracking.read-outside-step", Run = TrackingCases.ReadOutsideStep });
             list.Add(new Case { Name = "interactions.tracking.gizmo-place", Run = TrackingCases.GizmoPlace });
             list.Add(new Case { Name = "interactions.tracking.first-use-items", Run = TrackingCases.FirstUseItems });

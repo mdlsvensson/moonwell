@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Moonwell.Engine
@@ -53,7 +54,7 @@ namespace Moonwell.Engine
             Raw.Append(list, due);
         }
 
-        /// <summary>Runs the next step: what is due at it, in three passes, each in the order it was put on its list (the order of the last runs, not the order things were made). Each pass runs what was on its list when the step began; what a step schedules is for a later step. A due that is not due until a later turn of the ring is passed over, and one with nothing more to run is dropped.</summary>
+        /// <summary>Runs the next step: first the hook before the gizmos, if one is set, and then what is due at it, in three passes, each in the order it was put on its list (the order of the last runs, not the order things were made). Each pass runs what was on its list when the step began; what a step schedules is for a later step. A due that is not due until a later turn of the ring is passed over, and one with nothing more to run is dropped.</summary>
         public void Run()
         {
             StepNow++;
@@ -61,6 +62,12 @@ namespace Moonwell.Engine
             var step = StepNow;
             try
             {
+                var before = Tracking.BeforeGizmos;
+                if (before != null)
+                {
+                    CallBefore(before);
+                }
+
                 var first = (step & (Slots - 1)) * Passes;
                 var gizmos = Raw.At(ring, first);
                 var checks = Raw.At(ring, first + 1);
@@ -78,6 +85,19 @@ namespace Moonwell.Engine
             finally
             {
                 Running = false;
+            }
+        }
+
+        /// <summary>Runs the hook before the gizmos, and reports an error it throws as the physics package's; the step goes on. Apart from Run so that a step with no hook builds no closure for it.</summary>
+        private static void CallBefore(Action before)
+        {
+            try
+            {
+                before();
+            }
+            catch (Exception error)
+            {
+                Errors.Report("Moonwell.Physics", error);
             }
         }
 
