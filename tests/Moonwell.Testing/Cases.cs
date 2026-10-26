@@ -15,6 +15,7 @@ namespace Moonwell.Testing
             AddLast(list);
             AddMaths(list);
             AddInteractions(list);
+            AddPhysics(list);
             AddTerrain(list);
             AddAreas(list);
             AddInput(list);
@@ -138,6 +139,21 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.pair.data-and-since", Run = PairCases.DataAndSince });
             list.Add(new Case { Name = "interactions.pair.pair-owns", Run = PairCases.PairOwns });
             list.Add(new Case { Name = "interactions.tree", Run = TreeCases.Tree });
+        }
+
+        /// <summary>Adds the physics package's cases.</summary>
+        private static void AddPhysics(List<Case> list)
+        {
+            list.Add(new Case { Name = "physics.gravity-setting", Run = BallisticsCases.GravitySetting });
+            list.Add(new Case { Name = "physics.install", Run = BallisticsCases.Install });
+            list.Add(new Case { Name = "ballistics.velocity-hits", Run = BallisticsCases.VelocityHits });
+            list.Add(new Case { Name = "ballistics.velocity-slanted", Run = BallisticsCases.VelocitySlanted });
+            list.Add(new Case { Name = "ballistics.out-of-reach", Run = BallisticsCases.OutOfReach });
+            list.Add(new Case { Name = "ballistics.speed-for-angle", Run = BallisticsCases.SpeedForAngle });
+            list.Add(new Case { Name = "ballistics.above", Run = BallisticsCases.Above });
+            list.Add(new Case { Name = "ballistics.speed-then-velocity", Run = BallisticsCases.SpeedThenVelocity });
+            list.Add(new Case { Name = "ballistics.gravity-zero", Run = BallisticsCases.GravityZero });
+            list.Add(new Case { Name = "ballistics.vertical", Run = BallisticsCases.Vertical });
         }
 
         /// <summary>Adds the areas package's cases.</summary>

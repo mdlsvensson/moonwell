@@ -21,6 +21,7 @@ public class PrivateFieldTests
                 typeof(Moonwell.Gizmo).Assembly,
                 typeof(Moonwell.Maths).Assembly,
                 typeof(Moonwell.Terrain).Assembly,
+                typeof(Moonwell.Physics).Assembly,
             }
             .SelectMany(assembly => assembly.GetTypes())
             .Where(type => type.IsClass && type.IsVisible && !type.IsSealed)
