@@ -70,6 +70,35 @@ namespace Moonwell.Testing
             Expect.Equal("b", log[1], "the second run");
         }
 
+        /// <summary>
+        /// Many timers at once run in due order, those due at the same time in the order they were made, each at its due time: 16
+        /// one-shot timers made at shuffled times, three pairs of them equal, share the scheduler's heap with the runtime's sweep.
+        /// </summary>
+        public static void ManyInDueOrder(FakeWorld world)
+        {
+            var dues = new float[] { 9f, 3f, 7f, 1f, 8f, 2f, 6f, 4f, 5f, 10f, 12f, 11f, 3f, 7f, 1.5f, 6f };
+            var order = new List<int>();
+            var times = new List<float>();
+            for (var i = 0; i < dues.Length; i++)
+            {
+                var index = i;
+                Timer.After(dues[index], () =>
+                {
+                    order.Add(index);
+                    times.Add(world.Now());
+                });
+            }
+
+            world.Advance(13f);
+            var expected = new int[] { 3, 14, 5, 1, 12, 7, 8, 6, 15, 2, 13, 4, 0, 9, 11, 10 };
+            Expect.Equal(expected.Length, order.Count, "the timers that ran");
+            for (var i = 0; i < expected.Length; i++)
+            {
+                Expect.Equal(expected[i], order[i], "the timer of run " + i);
+                Expect.Near(dues[expected[i]], times[i], "the time of run " + i);
+            }
+        }
+
         /// <summary>A timer that has ended never runs.</summary>
         public static void EndCancels(FakeWorld world)
         {
