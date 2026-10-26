@@ -229,6 +229,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "contact.owner", Run = ContactCases.Ownership });
             list.Add(new Case { Name = "contact.none-costs-nothing", Run = ContactCases.NoneCostsNothing });
             list.Add(new Case { Name = "contact.dead-source", Run = ContactCases.DeadSource });
+            list.Add(new Case { Name = "contact.settles-on-top", Run = ContactCases.SettlesOnTop });
+            list.Add(new Case { Name = "contact.teleport", Run = ContactCases.Teleport });
         }
 
         /// <summary>Adds the areas package's cases.</summary>

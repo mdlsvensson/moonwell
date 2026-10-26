@@ -207,6 +207,15 @@ namespace Moonwell
         /// <summary>Where the step's move began, its height.</summary>
         internal float lastZ;
 
+        /// <summary>Where its flight or its contacts last put it, x: a check that finds it elsewhere knows its X, Y or Z was set from outside, and starts its sweep there instead of sweeping along the jump.</summary>
+        internal float placedX;
+
+        /// <summary>Where its flight or its contacts last put it, y.</summary>
+        internal float placedY;
+
+        /// <summary>Where its flight or its contacts last put it, its height.</summary>
+        internal float placedZ;
+
         /// <summary>Whether the next step keeps the place its move began from: a missile woken from rest, whose checks resume a step late, so the next check sweeps both steps.</summary>
         internal bool keepLast;
 
@@ -379,7 +388,7 @@ namespace Moonwell
             set { groundContact = value; }
         }
 
-        /// <summary>What it does on meeting a unit: Stop, the default, ends it there; Bounce bounces it off (Slide too); Pass reacts once and flies on, not again until they part; None does not check units at all. Set to another than None after Create, the checks start then.</summary>
+        /// <summary>What it does on meeting a unit: Stop, the default, ends it there; Bounce bounces it off (Slide too); Pass reacts once and flies on, not again until it has left the unit; None does not check units at all. Set to another than None after Create, the checks start (or resume) then; set to None, they pause.</summary>
         [LocalSafe]
         public Contact UnitContact
         {
@@ -671,6 +680,9 @@ namespace Moonwell
             lastX = x;
             lastY = y;
             lastZ = z;
+            placedX = x;
+            placedY = y;
+            placedZ = z;
             Flight.Show(this, x, y);
             Pass.Add(this);
             Contacts.Begin(this);

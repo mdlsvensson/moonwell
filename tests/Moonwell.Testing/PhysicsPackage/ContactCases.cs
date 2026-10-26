@@ -10,6 +10,9 @@ namespace Moonwell.Testing
         /// <summary>The type id the Struck class is registered with.</summary>
         private const string StruckId = "h0S1";
 
+        /// <summary>The type id the Pushee class is registered with.</summary>
+        private const string PusheeId = "h0P1";
+
         /// <summary>Installs the interactions, physics and terrain packages on fakes, the terrain flat at 0 over 16 by 16 tiles from (0, 0), and registers Struck. Gives the physics fake.</summary>
         private static FakePhysicsWorld Fresh()
         {
@@ -31,6 +34,7 @@ namespace Moonwell.Testing
 
             Terrain.Install(new FakeTerrainWorld(), 17, 17, 0.0f, 0.0f, text);
             ObjectTypes.Unit(ObjectTypes.FourCC(StruckId), () => new Struck());
+            ObjectTypes.Unit(ObjectTypes.FourCC(PusheeId), () => new Pushee());
             TestLog.Lines.Clear();
             return fake;
         }
@@ -347,7 +351,11 @@ namespace Moonwell.Testing
             Expect.True(!ball.HasEnded, "a bounce does not end it");
         }
 
-        /// <summary>Pass through three units: each reacts once, in the order met, though it is inside each for steps; back through the last after leaving it, once more.</summary>
+        /// <summary>
+        /// Pass reacts once each time it enters a thing, not again until it has left it: through a, which it is inside for
+        /// steps, once; back into a from just outside it (still within the checks' range, so the pair has not parted), once
+        /// more; then through a, b and c, each once, in the order met; back through c after leaving it, once more.
+        /// </summary>
         public static void Pass(FakeWorld world)
         {
             Fresh();
@@ -357,19 +365,95 @@ namespace Moonwell.Testing
             var ball = new Shot();
             ball.UnitContact = Contact.Pass;
             ShotAt(ball, 50.0f, 500.0f, 32.0f, 600.0f, 0.0f, 0.0f);
-            Steps(world, 50);
-            Expect.Equal(3, ball.Met.Count, "three impacts");
-            Expect.Same(a, ball.Met[0], "a first");
-            Expect.Same(b, ball.Met[1], "then b");
-            Expect.Same(c, ball.Met[2], "then c");
-            Expect.Equal(1, Lines("a struck"), "a's OnStruck once");
+            for (var i = 0; i < 32 && ball.X <= 250.0f; i++)
+            {
+                Steps(world, 1);
+            }
+
+            Expect.Equal(1, ball.Met.Count, "through a: once, though inside it for steps");
+            Expect.True(ball.X > 232.0f && ball.X < 200.0f + 98.75f, "it has left a's shape but is within the range of its checks: at " + ball.X);
+            ball.VX = -600.0f;
+            Steps(world, 7);
+            Expect.Equal(2, ball.Met.Count, "back into a after leaving its shape: once more");
+            Expect.Same(a, ball.Met[1], "a");
+            Expect.True(ball.X < 168.0f, "and out the other side: at " + ball.X);
+            ball.VX = 600.0f;
+            Steps(world, 45);
+            Expect.Equal(5, ball.Met.Count, "through a, b and c");
+            Expect.Same(a, ball.Met[2], "a first");
+            Expect.Same(b, ball.Met[3], "then b");
+            Expect.Same(c, ball.Met[4], "then c");
+            Expect.Equal(3, Lines("a struck"), "a's OnStruck once each time");
             Expect.True(ball.X > 950.0f, "it flew on through them: at " + ball.X);
             Within(600.0f, ball.VX, 0.01f, "at its speed");
             ball.VX = -600.0f;
             Steps(world, 20);
-            Expect.Equal(4, ball.Met.Count, "back through c after leaving it: once more");
-            Expect.Same(c, ball.Met[3], "c");
+            Expect.Equal(6, ball.Met.Count, "back through c after leaving it: once more");
+            Expect.Same(c, ball.Met[5], "c");
             Expect.Equal(2, Lines("c struck"), "c's OnStruck twice in all");
+        }
+
+        /// <summary>
+        /// A bouncing bomb with damage dropped from 300 onto a standing footman's top (80 for its ball): it deals its damage at
+        /// its real bounces, a few, then settles on the top and deals no more, with no impact, sitting at 80. One dropped with
+        /// a little speed along the ground settles, rolls off the top and stops on the ground, dealing no more.
+        /// </summary>
+        public static void SettlesOnTop(FakeWorld world)
+        {
+            Fresh();
+            var source = FootmanAt(world, 100.0f, 100.0f, 0);
+            var footman = StruckAt(world, 500.0f, 500.0f, 1, "footman");
+            var bomb = new Shot();
+            bomb.UnitContact = Contact.Bounce;
+            bomb.Gravity = 800.0f;
+            bomb.ImpactDamage = 10.0f;
+            bomb.Source = source;
+            ShotAt(bomb, 500.0f, 500.0f, 300.0f, 0.0f, 0.0f, 0.0f);
+            Steps(world, 96);
+            var dealt = footman.Tags.Count;
+            Expect.True(dealt >= 2 && dealt <= 6, "a few real bounces dealt their damage: " + dealt);
+            Expect.Equal(dealt, bomb.Impacts.Count, "one impact each");
+            Steps(world, 64);
+            Expect.Equal(dealt, footman.Tags.Count, "no more damage while it sits");
+            Expect.Equal(dealt, bomb.Impacts.Count, "and no impact");
+            Within(80.0f, bomb.Z, 0.5f, "it sits on the top");
+            Expect.True(!bomb.HasEnded, "a bounce does not end it");
+
+            var other = StruckAt(world, 500.0f, 800.0f, 1, "other");
+            var roller = new Shot();
+            roller.UnitContact = Contact.Bounce;
+            roller.Gravity = 800.0f;
+            roller.ImpactDamage = 10.0f;
+            roller.Source = source;
+            ShotAt(roller, 500.0f, 800.0f, 300.0f, 20.0f, 0.0f, 0.0f);
+            Steps(world, 192);
+            Expect.True(roller.HasEnded, "it rolled off the top and stopped on the ground");
+            Expect.True(roller.X > 532.0f, "beyond the top's edge: at " + roller.X);
+            Expect.True(other.Tags.Count >= 2 && other.Tags.Count <= 6, "it dealt damage at a few real bounces only: " + other.Tags.Count);
+            Expect.Equal(other.Tags.Count + 1, roller.Impacts.Count, "an impact for each, and one with the ground");
+        }
+
+        /// <summary>A bolt moved across a unit by setting its X in its own OnTick, after its step, is not swept along the jump: it does not hit the unit, and flies on.</summary>
+        public static void Teleport(FakeWorld world)
+        {
+            Fresh();
+            StruckAt(world, 500.0f, 500.0f, 1, "unit");
+            var bolt = new Shot();
+            var jumped = false;
+            bolt.Ticking = () =>
+            {
+                if (!jumped && bolt.X > 390.0f)
+                {
+                    jumped = true;
+                    bolt.X = 590.0f;
+                }
+            };
+            bolt.TickEachStep();
+            ShotAt(bolt, 300.0f, 500.0f, 32.0f, 600.0f, 0.0f, 0.0f);
+            Steps(world, 20);
+            Expect.True(jumped, "it was moved across the unit");
+            Expect.Equal(0, bolt.Impacts.Count, "it did not hit the unit it jumped over");
+            Expect.True(!bolt.HasEnded && bolt.X > 700.0f, "it flies on: at " + bolt.X);
         }
 
         /// <summary>A bolt at 3,000 a second (93.75 a step) through a footman's middle, and one 28 off its middle: one contact each; one 33 off it misses.</summary>
@@ -518,13 +602,19 @@ namespace Moonwell.Testing
         public static void Mass(FakeWorld world)
         {
             var fake = Fresh();
-            var footman = FootmanAt(world, 500.0f, 200.0f, 1);
+            var shooter = FootmanAt(world, 100.0f, 50.0f, 0);
+            var handle = world.NewUnit(ObjectTypes.FourCC(PusheeId), 1);
+            world.MoveUnit(handle, 500.0f, 200.0f);
+            var footman = (Pushee)Unit.Of(handle)!;
             var ball = new Shot();
             ball.UnitContact = Contact.Bounce;
             ball.Mass = 30.0f;
+            ball.Source = shooter;
             ShotAt(ball, 300.0f, 200.0f, 32.0f, 600.0f, 0.0f, 0.0f);
             UntilImpacts(world, ball, 1, 64);
             Expect.Equal(1, ball.Impacts.Count, "it met the footman");
+            Expect.Equal(1, footman.Pushers.Count, "OnPushed ran once");
+            Expect.Same(shooter, footman.Pushers[0], "with the missile's Source as the pusher");
             Within(586.96f, footman.PushVelocity().X, 0.05f, "the footman pushed by its share");
             Within(0.0f, footman.PushVelocity().Y, 0.001f, "along the normal");
             Within(286.96f, ball.VX, 0.05f, "the ball slowed by its share");
@@ -761,7 +851,7 @@ namespace Moonwell.Testing
             Expect.Equal(1, fired, "the timer made in OnImpact outlived the missile");
         }
 
-        /// <summary>A kind whose setting is None starts no interaction; a missile with UnitContact None flies through a unit, asking nothing.</summary>
+        /// <summary>A kind whose setting is None starts no interaction; a missile with UnitContact None flies through a unit, asking nothing. A kind set to None after Create pauses its checks, and set back resumes them.</summary>
         public static void NoneCostsNothing(FakeWorld world)
         {
             Fresh();
@@ -781,6 +871,18 @@ namespace Moonwell.Testing
             Expect.True(bolt.unitChecks != null, "the default starts the unit checks");
             Expect.True(bolt.destructableChecks == null && bolt.itemChecks == null, "and no other");
             Expect.Equal(1, Tracking.EntryOf(bolt)!.Held!.Count, "it holds one");
+
+            var target = StruckAt(world, 700.0f, 900.0f, 1, "target");
+            var toggled = new Shot();
+            ShotAt(toggled, 300.0f, 900.0f, 32.0f, 600.0f, 0.0f, 0.0f);
+            toggled.UnitContact = Contact.None;
+            Expect.True(toggled.unitChecks!.IsPaused, "set to None after Create, its checks pause: they cost nothing");
+            Steps(world, 4);
+            toggled.UnitContact = Contact.Stop;
+            Expect.True(!toggled.unitChecks.IsPaused, "set back, they resume");
+            UntilEnded(world, toggled, 64);
+            Expect.True(toggled.HasEnded, "it stopped");
+            Expect.Same(target, toggled.Met[0], "at the unit");
         }
 
         /// <summary>A source that died while its missile flew still deals the damage, as that unit (the design's assumption; Task 1's probe checks it in the game). One removed from the game deals none, and nothing is reported.</summary>

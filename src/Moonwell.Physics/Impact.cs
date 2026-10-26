@@ -129,7 +129,7 @@ namespace Moonwell
             get { return speed; }
         }
 
-        /// <summary>The outcome: the missile's setting for the kind met. A reaction may change it, and the outcome changes with it: Stop ends the missile at the point, Bounce bounces it off, Pass and None let it fly on, not meeting the thing again until they part. Slide is Bounce on anything but the ground and walls.</summary>
+        /// <summary>The outcome: the missile's setting for the kind met. A reaction may change it, and the outcome changes with it: Stop ends the missile at the point, Bounce bounces it off, Pass and None let it fly on, not meeting the thing again until it has left it. Slide is Bounce on anything but the ground and walls.</summary>
         [LocalSafe]
         public Contact Contact
         {

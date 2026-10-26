@@ -30,6 +30,24 @@ namespace Moonwell.Testing
         /// <summary>An action OnImpact runs after it has recorded; null for none.</summary>
         public Action<Impact>? Impacting;
 
+        /// <summary>An action OnTick runs; null for none. It ticks only after TickEachStep.</summary>
+        public Action? Ticking;
+
+        /// <summary>Makes it tick every step of the cycle, after the physics pass; called before Create.</summary>
+        public void TickEachStep()
+        {
+            Tick = Interactions.Step;
+        }
+
+        /// <summary>Runs the action.</summary>
+        public override void OnTick()
+        {
+            if (Ticking != null)
+            {
+                Ticking();
+            }
+        }
+
         /// <summary>Lists a ShotWatch among the components it starts with; called before Create.</summary>
         public void Watch()
         {

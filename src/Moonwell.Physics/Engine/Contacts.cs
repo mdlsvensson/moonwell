@@ -40,6 +40,12 @@ namespace Moonwell.Engine
         /// <summary>A time past either end of every step, for a sweep that stays inside the round part or the heights.</summary>
         private const float Always = 1000000.0f;
 
+        /// <summary>A Bounce or Slide that comes back to a thing's top slower than this (plus a step's gravity) soon after it touched it goes on along the top with no impact, as the ground's slow bounce does.</summary>
+        private const float Settle = 5.0f;
+
+        /// <summary>How many steps after a pair last touched a ball coming back onto the thing's top counts as settling on it.</summary>
+        private const int Recent = 4;
+
         /// <summary>The largest radius of a unit met so far, at least FirstUnit; the unit checks' range covers it.</summary>
         private static float largestUnit;
 
@@ -80,7 +86,7 @@ namespace Moonwell.Engine
             }
         }
 
-        /// <summary>A setting changed: a created missile that has not begun to end starts the checks of a kind set to other than None, if they have not started.</summary>
+        /// <summary>A setting changed: a created missile that has not begun to end starts the checks of a kind set to other than None, if they have not started; the checks of a kind set to None pause, and those set back resume unless it rests.</summary>
         internal static void Changed(Missile missile)
         {
             if (missile.entry == null || missile.ending || missile.HasEnded)
@@ -89,6 +95,10 @@ namespace Moonwell.Engine
             }
 
             Begin(missile);
+            var resting = missile.resting;
+            Turn(missile.unitChecks, missile.unitContact, resting);
+            Turn(missile.destructableChecks, missile.destructableContact, resting);
+            Turn(missile.itemChecks, missile.itemContact, resting);
         }
 
         /// <summary>Pauses a missile's checks, as it comes to rest.</summary>
@@ -110,28 +120,45 @@ namespace Moonwell.Engine
             }
         }
 
-        /// <summary>Resumes a missile's checks, as it wakes from rest; the next comes at the next step.</summary>
+        /// <summary>Resumes a missile's checks of the kinds whose setting is not None, as it wakes from rest; the next comes at the next step.</summary>
         internal static void Resume(Missile missile)
         {
-            if (missile.unitChecks != null)
+            Turn(missile.unitChecks, missile.unitContact, false);
+            Turn(missile.destructableChecks, missile.destructableContact, false);
+            Turn(missile.itemChecks, missile.itemContact, false);
+        }
+
+        /// <summary>Pauses checks whose kind is set to None, so they cost nothing; resumes paused ones whose kind is not, unless the missile rests.</summary>
+        private static void Turn(Interaction? checks, Contact setting, bool resting)
+        {
+            if (checks == null)
             {
-                missile.unitChecks.Resume();
+                return;
             }
 
-            if (missile.destructableChecks != null)
+            if (setting == Contact.None)
             {
-                missile.destructableChecks.Resume();
+                checks.Pause();
             }
-
-            if (missile.itemChecks != null)
+            else if (!resting && checks.IsPaused)
             {
-                missile.itemChecks.Resume();
+                checks.Resume();
             }
         }
 
-        /// <summary>Sets the range of a missile's checks after its step: its radius, the largest thing of the kind met so far, and how far it moved this step along the ground, so the thing its move swept is in range where it ended.</summary>
+        /// <summary>Keeps where the missile is now as where its flight or its contacts last put it; a check that finds it elsewhere knows it was moved from outside, and does not sweep it along the jump.</summary>
+        private static void Placed(Missile missile, float x, float y, float z)
+        {
+            missile.placedX = x;
+            missile.placedY = y;
+            missile.placedZ = z;
+        }
+
+        /// <summary>Keeps where the missile's step put it, and sets the range of its checks: its radius, the largest thing of the kind met so far, and how far it moved this step along the ground, so the thing its move swept is in range where it ended.</summary>
         internal static void Reach(Missile missile)
         {
+            var entry = missile.entry!;
+            Placed(missile, entry.X, entry.Y, missile.z);
             var units = missile.unitChecks;
             var destructables = missile.destructableChecks;
             var items = missile.itemChecks;
@@ -140,7 +167,6 @@ namespace Moonwell.Engine
                 return;
             }
 
-            var entry = missile.entry!;
             var dx = entry.X - missile.lastX;
             var dy = entry.Y - missile.lastY;
             var reach = missile.radius + Trig.Sqrt(dx * dx + dy * dy);
@@ -294,18 +320,28 @@ namespace Moonwell.Engine
             wait = 0.0f;
             if (setting == Contact.None || missile.ending)
             {
-                touch.touching = false;
-                return Go;
+                // Set to None in this check: the checks pause, and this pair waits until they part.
+                Leave(touch);
+                return Hold;
             }
 
             var entry = missile.entry!;
+            var bx = entry.X;
+            var by = entry.Y;
+            var bz = missile.z;
+            if (bx != missile.placedX || by != missile.placedY || bz != missile.placedZ)
+            {
+                // Moved from outside its flight since (its X, Y or Z set): it is not swept along the jump.
+                missile.lastX = bx;
+                missile.lastY = by;
+                missile.lastZ = bz;
+                Placed(missile, bx, by, bz);
+            }
+
             var radius = missile.radius;
             var ax = missile.lastX;
             var ay = missile.lastY;
             var az = missile.lastZ;
-            var bx = entry.X;
-            var by = entry.Y;
-            var bz = missile.z;
             var dx = bx - ax;
             var dy = by - ay;
             var dz = bz - az;
@@ -368,7 +404,7 @@ namespace Moonwell.Engine
             {
                 if (az < bottom || az > top)
                 {
-                    touch.touching = false;
+                    Leave(touch);
                     return Go;
                 }
 
@@ -391,7 +427,14 @@ namespace Moonwell.Engine
             var exit = t1 < z1 ? t1 : z1;
             if (enter > exit || exit < 0.0f || enter > 1.0f)
             {
-                touch.touching = false;
+                Leave(touch);
+                return Go;
+            }
+
+            if (touch.passed)
+            {
+                // A Pass reacted on entering and has not left the thing since.
+                touch.touching = true;
                 return Go;
             }
 
@@ -443,6 +486,25 @@ namespace Moonwell.Engine
             var late = flat > 0.0f || dz != 0.0f ? missile.gravity * Interactions.Current().Step * (1.0f - t) : 0.0f;
             var vz = missile.vz + late;
             var into = (vx - otherVX) * nx + (vy - otherVY) * ny + vz * nz;
+            var now = Tracking.StepNow;
+            var grid = Interactions.Grid;
+            var world = Physics.World;
+            if (nz > 0.0f && bz < top && (setting == Contact.Bounce || setting == Contact.Slide) && touch.contacted && now - touch.lastTouch <= Recent && into > -(Settle + missile.gravity * Interactions.Current().Step))
+            {
+                // Back on the thing's top soon after touching it, slowly: it goes on along the top with no impact, and may
+                // roll off it.
+                touch.touching = true;
+                touch.lastTouch = now;
+                missile.vx = vx;
+                missile.vy = vy;
+                missile.vz = into < 0.0f ? vz - into : vz;
+                grid.Move(entry, bx, by);
+                missile.z = top;
+                Placed(missile, bx, by, top);
+                Flight.Place(missile, world, bx, by, top);
+                return Go;
+            }
+
             if (inside && touch.touching && into >= 0.0f)
             {
                 // It touched the thing at the last check and is not moving into it: it is leaving, as after a bounce.
@@ -450,6 +512,8 @@ namespace Moonwell.Engine
             }
 
             touch.touching = true;
+            touch.contacted = true;
+            touch.lastTouch = now;
             if (!Asks(missile, other))
             {
                 return Hold;
@@ -459,7 +523,6 @@ namespace Moonwell.Engine
             var hitX = ax + t * dx;
             var hitY = ay + t * dy;
             var hitZ = az + t * dz;
-            var grid = Interactions.Grid;
             grid.Move(entry, hitX, hitY);
             missile.z = hitZ;
             missile.vx = vx;
@@ -490,13 +553,13 @@ namespace Moonwell.Engine
                 return Go;
             }
 
-            // The outcome, from the velocity the reactions left.
+            // The outcome, from the velocity the reactions left; a reaction that moved it leaves it where it put it.
             vx = missile.vx;
             vy = missile.vy;
             vz = missile.vz;
             into = (vx - otherVX) * nx + (vy - otherVY) * ny + vz * nz;
             var outcome = impact.contact;
-            var world = Physics.World;
+            var moved = entry.X != hitX || entry.Y != hitY || missile.z != hitZ;
             if (outcome == Contact.Stop)
             {
                 if (unit != null && into < 0.0f)
@@ -519,11 +582,20 @@ namespace Moonwell.Engine
 
             if (outcome == Contact.Pass || outcome == Contact.None)
             {
-                // It flies on from where its move took it, as it was; gravity acts on for the rest of the step.
+                // It flies on from where its move took it, as it was; gravity acts on for the rest of the step. It does
+                // not react to the thing again until it has left it.
+                touch.passed = true;
+                missile.vz = vz - late;
+                if (moved)
+                {
+                    Jumped(missile, entry);
+                    return Go;
+                }
+
                 grid.Move(entry, bx, by);
                 missile.z = bz;
-                missile.vz = vz - late;
-                return Hold;
+                Placed(missile, bx, by, bz);
+                return Go;
             }
 
             // Bounce, and Slide, which is Bounce off anything but the ground and walls.
@@ -544,14 +616,40 @@ namespace Moonwell.Engine
                 }
             }
 
+            if (moved)
+            {
+                Jumped(missile, entry);
+                return Go;
+            }
+
+            Placed(missile, hitX, hitY, hitZ);
             Flight.Place(missile, world, hitX, hitY, hitZ);
             return Go;
+        }
+
+        /// <summary>A reaction moved the missile at a contact: it stays where it was put, and its next sweep starts there.</summary>
+        private static void Jumped(Missile missile, Entry entry)
+        {
+            var x = entry.X;
+            var y = entry.Y;
+            var z = missile.z;
+            missile.lastX = x;
+            missile.lastY = y;
+            missile.lastZ = z;
+            Placed(missile, x, y, z);
+        }
+
+        /// <summary>The ball is not touching the thing: a Pass that reacted to it may react again when it next enters.</summary>
+        private static void Leave(Touch touch)
+        {
+            touch.touching = false;
+            touch.passed = false;
         }
 
         /// <summary>The two are apart along the move: not touching, and the pair waits until they could touch, from their distance now and how fast they could close.</summary>
         private static int Apart(Missile missile, Touch touch, float ox, float oy, float reach, float closing, out float wait)
         {
-            touch.touching = false;
+            Leave(touch);
             wait = Until(missile, ox, oy, reach, closing);
             return wait > 0.0f ? Later : Go;
         }
@@ -795,11 +893,20 @@ namespace Moonwell.Engine
         }
     }
 
-    /// <summary>What the package keeps of a pair of a missile and a thing it checks: whether the ball touched the thing at the last check, the thing's size, and, for a unit, its place at the last check for its velocity. Made when they meet; the pair's Data.</summary>
+    /// <summary>What the package keeps of a pair of a missile and a thing it checks: whether the ball touched the thing at the last check, whether a Pass is inside it, when it last met it, the thing's size, and, for a unit, its place at the last check for its velocity. Made when they meet; the pair's Data.</summary>
     internal sealed class Touch
     {
         /// <summary>Whether the ball touched the thing at the last check.</summary>
         public bool touching;
+
+        /// <summary>Whether a Pass has reacted to the thing and the ball has not left it since.</summary>
+        public bool passed;
+
+        /// <summary>Whether the ball has met the thing since they met.</summary>
+        public bool contacted;
+
+        /// <summary>The step of the cycle the ball last met the thing or settled on its top at.</summary>
+        public int lastTouch;
 
         /// <summary>Whether a unit's place has been seen at a check.</summary>
         public bool seen;
