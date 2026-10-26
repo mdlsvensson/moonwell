@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Moonwell.Hosting;
 
 namespace Moonwell.Engine
 {
@@ -21,8 +20,8 @@ namespace Moonwell.Engine
         /// <summary>The bit of OnSlammed in a class's mask.</summary>
         private const int SlammedBit = 2;
 
-        /// <summary>The bit of OnLanded in a class's mask.</summary>
-        private const int LandedBit = 4;
+        /// <summary>The bit of OnGrounded in a class's mask.</summary>
+        private const int GroundedBit = 4;
 
         /// <summary>Degrees to radians.</summary>
         private const float Radians = 0.0174532925f;
@@ -41,6 +40,9 @@ namespace Moonwell.Engine
 
         /// <summary>Whether the step is moving the pushes, so the list is not emptied under it.</summary>
         private static bool stepping;
+
+        /// <summary>Whether a reaction has run since the step last looked: one may have killed, hidden or removed the unit.</summary>
+        private static bool reacted;
 
         /// <summary>The reactions each class writes, keyed by the class (never by an actor); made on first use.</summary>
         private static Dictionary<object, int>? masks;
@@ -165,7 +167,7 @@ namespace Moonwell.Engine
         }
 
         /// <summary>Moves each push that was in the list when the step began and has not ended, in the order they began; then packs away the ended ones. A push begun by a reaction moves from the next step.</summary>
-        internal static void Run(float step, IPhysicsWorld world)
+        internal static void Run(float step)
         {
             var list = pushes;
             if (list == null)
@@ -240,7 +242,7 @@ namespace Moonwell.Engine
             return push;
         }
 
-        /// <summary>Lifts a push that is not lifted yet: its height is the unit's fly height, and it comes back to the ground, or to its type's height for a flyer.</summary>
+        /// <summary>Lifts a push that is not lifted yet: its height is the unit's fly height, and it comes back to its type's fly height (the ground for most units that do not fly), so a hovering unit is not left on the ground.</summary>
         private static void Lift(Pushed push)
         {
             if (push.lifted)
@@ -251,7 +253,7 @@ namespace Moonwell.Engine
             push.lifted = true;
             push.vz = 0.0f;
             push.height = push.unit.FlyHeight;
-            push.home = push.flyer ? Physics.World.DefaultFlyHeight(push.unit.Handle) : 0.0f;
+            push.home = Physics.World.DefaultFlyHeight(push.unit.Handle);
         }
 
         /// <summary>Ends a push; with settle, a lifted unit that is still in the game is put back at its height. When no push is left, the cycle may sleep.</summary>
@@ -301,12 +303,13 @@ namespace Moonwell.Engine
                 return;
             }
 
+            reacted = false;
             if (push.vx != 0.0f || push.vy != 0.0f)
             {
                 Slide(push, step);
             }
 
-            if (push.ended)
+            if (push.ended || Unplaced(push))
             {
                 return;
             }
@@ -327,12 +330,36 @@ namespace Moonwell.Engine
                 {
                     Fall(push, step);
                 }
+
+                if (push.ended || Unplaced(push))
+                {
+                    return;
+                }
             }
 
             if (!push.ended && push.vx == 0.0f && push.vy == 0.0f && !push.lifted)
             {
                 End(push, false);
             }
+        }
+
+        /// <summary>After a reaction has run in the step: ends the push, with no more reactions, when the reaction killed, hid, loaded or removed the unit, and says so.</summary>
+        private static bool Unplaced(Pushed push)
+        {
+            if (!reacted)
+            {
+                return false;
+            }
+
+            reacted = false;
+            var unit = push.unit;
+            if (!Gone(unit))
+            {
+                return false;
+            }
+
+            End(push, !unit.IsGone && !unit.HasEnded);
+            return true;
         }
 
         /// <summary>Whether a unit has no place for a push: it has left the game, is leaving it, is dead, hidden or loaded.</summary>
@@ -479,15 +506,16 @@ namespace Moonwell.Engine
             React(push, SlammedBit, null, new Slam(speed, x, y, nx, ny, push.pusher), 0.0f);
         }
 
-        /// <summary>A lifted unit that does not fly, for a step: gravity pulls it down, and it lands (OnLanded, with the speed it fell at) when its height reaches the ground; pushed down while on the ground, it stays there.</summary>
+        /// <summary>A lifted unit that does not fly, for a step: gravity pulls it down, and it comes down (OnGrounded, with the speed it fell at) when its height reaches its own, its type's fly height; pushed down while at its height, it stays there.</summary>
         private static void Fall(Pushed push, float step)
         {
             var gravity = Physics.Current().Gravity;
             var height = push.height;
+            var home = push.home;
             var vz = push.vz;
             var next = vz - gravity * step;
             var to = height + (vz + next) * 0.5f * step;
-            if (to > 0.0f)
+            if (to > home)
             {
                 push.height = to;
                 push.vz = next;
@@ -495,14 +523,14 @@ namespace Moonwell.Engine
                 return;
             }
 
-            push.height = 0.0f;
+            push.height = home;
             push.vz = 0.0f;
             push.lifted = false;
-            push.unit.FlyHeight = 0.0f;
-            if (height > 0.0f)
+            push.unit.FlyHeight = home;
+            if (height > home)
             {
-                var square = vz * vz + 2.0f * gravity * height;
-                React(push, LandedBit, null, null, square > 0.0f ? Trig.Sqrt(square) : 0.0f);
+                var square = vz * vz + 2.0f * gravity * (height - home);
+                React(push, GroundedBit, null, null, square > 0.0f ? Trig.Sqrt(square) : 0.0f);
             }
         }
 
@@ -538,10 +566,11 @@ namespace Moonwell.Engine
             push.unit.FlyHeight = to;
         }
 
-        /// <summary>Runs a reaction on the unit's class, then its components and buffs in the order they were added, with the unit as the current owner; only where the class writes it, and not on what has ended. A failing one is reported and the rest run.</summary>
+        /// <summary>Runs a reaction on the unit's class, then its components and buffs in the order they were added, with the unit as the current owner; only where the class writes it, and not on what has ended. A failing one is reported and the rest run; once one has killed, hidden, loaded or removed the unit, none after it runs.</summary>
         private static void React(Pushed push, int bit, Unit? pusher, Slam? slam, float speed)
         {
             var unit = push.unit;
+            reacted = true;
             var previous = Owner.current;
             Owner.current = unit;
             if (!unit.HasEnded && (MaskOf(unit) & bit) != 0)
@@ -555,6 +584,11 @@ namespace Moonwell.Engine
                 var component = unit.ComponentAt(i) as UnitComponent;
                 if (component != null && !component.HasEnded && (MaskOf(component) & bit) != 0)
                 {
+                    if (Gone(unit))
+                    {
+                        break;
+                    }
+
                     Call(component, bit, pusher, slam, speed);
                 }
             }
@@ -579,12 +613,12 @@ namespace Moonwell.Engine
                 }
                 else
                 {
-                    target.OnLanded(speed);
+                    target.OnGrounded(speed);
                 }
             }
             catch (Exception error)
             {
-                var name = bit == PushedBit ? ".OnPushed" : (bit == SlammedBit ? ".OnSlammed" : ".OnLanded");
+                var name = bit == PushedBit ? ".OnPushed" : (bit == SlammedBit ? ".OnSlammed" : ".OnGrounded");
                 Errors.Report(Names.NameOf(obj) + name, error);
             }
         }
@@ -616,9 +650,9 @@ namespace Moonwell.Engine
                     mask |= SlammedBit;
                 }
 
-                if (Hooks.Overrides(obj, "OnLanded", typeof(object)))
+                if (Hooks.Overrides(obj, "OnGrounded", typeof(object)))
                 {
-                    mask |= LandedBit;
+                    mask |= GroundedBit;
                 }
             }
 

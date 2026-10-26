@@ -71,7 +71,7 @@ namespace Moonwell.Engine
             }
 
             var step = Interactions.Current().Step;
-            Pushes.Run(step, world);
+            Pushes.Run(step);
             var list = missiles;
             if (list == null)
             {

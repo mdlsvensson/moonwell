@@ -61,6 +61,15 @@ namespace Moonwell.Testing
             }
         }
 
+        /// <summary>Makes the row of 32 by 32 cells that holds a y unwalkable, from x 0 to 2,048: a line square across y.</summary>
+        private static void RowAt(FakeTerrainWorld terrain, float y, int flags)
+        {
+            for (var x = 16.0f; x < 2048.0f; x += 32.0f)
+            {
+                terrain.Block(x, y, flags);
+            }
+        }
+
         /// <summary>Moves the game on by a number of steps, one step at a time.</summary>
         private static void Steps(FakeWorld world, int count)
         {
@@ -218,7 +227,7 @@ namespace Moonwell.Testing
             Expect.True(Terrain.IsWalkable(690.0f, 512.0f), "where the ground itself is walkable");
         }
 
-        /// <summary>Push(0, 0, 400) on a footman: its fly height rises to 100 and falls back to 0 under gravity, OnLanded runs once at 400, and the push ends; it does not move along the ground.</summary>
+        /// <summary>Push(0, 0, 400) on a footman: its fly height rises to 100 and falls back to 0 under gravity, OnGrounded runs once at 400, and the push ends; it does not move along the ground.</summary>
         public static void LiftLand(FakeWorld world)
         {
             FakeTerrainWorld terrain;
@@ -241,7 +250,7 @@ namespace Moonwell.Testing
 
             Within(100.0f, peak, 1.0f, "it rises to 400 * 400 / (2 * 800)");
             Expect.True(steps >= 32 && steps <= 33, "it is down after a second, within a step; " + steps + " steps");
-            Expect.Equal(1, unit.Landings.Count, "OnLanded once");
+            Expect.Equal(1, unit.Landings.Count, "OnGrounded once");
             Within(400.0f, unit.Landings[0], 1.0f, "at the speed it left at");
             Within(0.0f, unit.FlyHeight, 0.0f, "on the ground");
             Expect.True(!unit.IsPushed(), "the push has ended");
@@ -277,7 +286,7 @@ namespace Moonwell.Testing
             Expect.True(lowest >= 239.99f, "it never went below its height; to " + lowest);
             Expect.True(!unit.IsPushed(), "the push has ended");
             Within(240.0f, unit.FlyHeight, 0.01f, "back at its type's height");
-            Expect.Equal(0, unit.Landings.Count, "no OnLanded");
+            Expect.Equal(0, unit.Landings.Count, "no OnGrounded");
             LineAt(terrain, 650.0f, FakeTerrainWorld.NoWalk);
             LineAt(terrain, 1000.0f, FakeTerrainWorld.NoFly);
             unit.Push(1200.0f, 0.0f);
@@ -317,7 +326,7 @@ namespace Moonwell.Testing
             Expect.Equal(3, unit.Pushers.Count, "OnPushed at each push");
         }
 
-        /// <summary>A pushed unit that dies, is removed, is hidden or is loaded: its push ends, it is moved no more and no reaction runs, though each was about to slam into a line; a lifted one that dies is put down with no OnLanded.</summary>
+        /// <summary>A pushed unit that dies, is removed, is hidden or is loaded: its push ends, it is moved no more and no reaction runs, though each was about to slam into a line; a lifted one that dies is put down with no OnGrounded.</summary>
         public static void EndsOnDeath(FakeWorld world)
         {
             FakeTerrainWorld terrain;
@@ -348,7 +357,7 @@ namespace Moonwell.Testing
             Expect.Equal(0, TestLog.Lines.Count, "no reaction runs");
             Expect.True(!dead.IsPushed() && !gone.IsPushed() && !hidden.IsPushed() && !loaded.IsPushed() && !lifted.IsPushed(), "every push has ended");
             Expect.Equal(0, dead.Slams.Count + gone.Slams.Count + hidden.Slams.Count + loaded.Slams.Count, "no OnSlammed");
-            Expect.Equal(0, lifted.Landings.Count, "no OnLanded");
+            Expect.Equal(0, lifted.Landings.Count, "no OnGrounded");
             Within(0.0f, lifted.FlyHeight, 0.0f, "the lifted corpse is put down");
             Expect.True(!Tracking.Running, "the cycle's timer stops");
         }
@@ -507,10 +516,139 @@ namespace Moonwell.Testing
             unit.Push(0.0f, 0.0f, 200.0f);
             TestLog.Lines.Clear();
             Steps(world, 32);
-            Expect.Equal(2, TestLog.Lines.Count, "two OnLanded: the components write none");
-            Expect.Equal("unit landed", TestLog.Lines[0], "the class first");
-            Expect.Equal("buff landed", TestLog.Lines[1], "then the buff");
+            Expect.Equal(2, TestLog.Lines.Count, "two OnGrounded: the components write none");
+            Expect.Equal("unit grounded", TestLog.Lines[0], "the class first");
+            Expect.Equal("buff grounded", TestLog.Lines[1], "then the buff");
             Expect.Equal(1, world.Logged.Count, "no other failure: nothing unwritten was called");
+        }
+
+        /// <summary>Pushed at 45 degrees into an unwalkable row across y: it loses the speed into the row (OnSlammed once with it, the normal down) and slides on along x.</summary>
+        public static void SlideAlongX(FakeWorld world)
+        {
+            FakeTerrainWorld terrain;
+            FakeInteractionWorld interactions;
+            Fresh(out terrain, out interactions);
+            RowAt(terrain, 650.0f, FakeTerrainWorld.NoWalk);
+            var unit = PusheeAt(world, 512.0f, 560.0f);
+            unit.Push(400.0f, 400.0f);
+            var into = 0.0f;
+            for (var i = 0; i < 64 && unit.Slams.Count == 0; i++)
+            {
+                into = unit.PushVelocity().Y;
+                Steps(world, 1);
+            }
+
+            Expect.Equal(1, unit.Slams.Count, "OnSlammed once");
+            Within(into, unit.SlamSpeeds[0], 0.01f, "with the speed into the row");
+            Within(0.0f, unit.Slams[0].Normal.X, 0.001f, "the normal out of the row: x");
+            Within(-1.0f, unit.Slams[0].Normal.Y, 0.001f, "the normal out of the row: y");
+            Expect.True(unit.IsPushed(), "still pushed");
+            Within(0.0f, unit.PushVelocity().Y, 0.0f, "with no speed into the row");
+            Expect.True(unit.PushVelocity().X > 300.0f, "and its speed along it; was " + unit.PushVelocity().X);
+            var x = unit.X;
+            var y = unit.Y;
+            Steps(world, 4);
+            Expect.True(unit.X > x + 30.0f, "it keeps moving along the row; from " + x + " to " + unit.X);
+            Within(y, unit.Y, 0.0f, "not into it");
+            Expect.Equal(1, unit.Slams.Count, "slammed once only");
+        }
+
+        /// <summary>In one pass, one unit's OnSlammed kills it and the next unit's OnSlammed pushes it back: the pass goes on to the second, nothing runs on the dead one after its own reaction (not its component's), the second bounces away, and once every push has ended the cycle's Awake count is back to 0.</summary>
+        public static void Reentrant(FakeWorld world)
+        {
+            FakeTerrainWorld terrain;
+            FakeInteractionWorld interactions;
+            Fresh(out terrain, out interactions);
+            LineAt(terrain, 650.0f, FakeTerrainWorld.NoWalk);
+            var suicide = PusheeAt(world, 600.0f, 300.0f);
+            var bouncer = PusheeAt(world, 600.0f, 700.0f);
+            suicide.Slamming = slam => suicide.Kill();
+            bouncer.Slamming = slam => bouncer.Push(-400.0f, 0.0f);
+            suicide.Push(600.0f, 0.0f);
+            bouncer.Push(600.0f, 0.0f);
+            TestLog.Lines.Clear();
+            for (var i = 0; i < 16 && bouncer.Slams.Count == 0; i++)
+            {
+                Steps(world, 1);
+            }
+
+            Expect.Equal(1, suicide.Slams.Count, "the first slammed");
+            Expect.Equal(1, bouncer.Slams.Count, "the second slammed in the same pass");
+            var components = 0;
+            for (var i = 0; i < TestLog.Lines.Count; i++)
+            {
+                if (TestLog.Lines[i] == "component slammed")
+                {
+                    components++;
+                }
+            }
+
+            Expect.Equal(1, components, "only the living one's component ran");
+            Expect.True(!suicide.IsPushed(), "the dead one's push has ended");
+            Expect.True(bouncer.IsPushed(), "the second is pushed again");
+            Expect.True(bouncer.PushVelocity().X < 0.0f, "back from the line");
+            var deadX = suicide.X;
+            var x = bouncer.X;
+            Steps(world, 4);
+            Expect.True(bouncer.X < x - 20.0f, "it bounces away; from " + x + " to " + bouncer.X);
+            Within(deadX, suicide.X, 0.0f, "the dead one is not moved");
+            Steps(world, 60);
+            Expect.True(!bouncer.IsPushed(), "the bounce has ended");
+            Expect.Equal(1, suicide.Slams.Count + suicide.Landings.Count, "no reaction on the dead one after");
+            Expect.Equal(1, bouncer.Slams.Count, "the bouncer slammed once");
+            Expect.Equal(0, Tracking.Awake, "the Awake count is back to 0");
+            Expect.True(!Tracking.Running, "and the cycle's timer stops");
+            Expect.Equal(0, world.Logged.Count, "no failure");
+        }
+
+        /// <summary>A unit that does not fly whose type hovers at 50: lifted, it comes back down to 50, not to the ground, with OnGrounded once.</summary>
+        public static void Hover(FakeWorld world)
+        {
+            FakeTerrainWorld terrain;
+            FakeInteractionWorld interactions;
+            var fake = Fresh(out terrain, out interactions);
+            var unit = PusheeAt(world, 512.0f, 512.0f);
+            fake.DefaultHeights[unit.Handle] = 50.0f;
+            unit.FlyHeight = 50.0f;
+            unit.Push(0.0f, 0.0f, 400.0f);
+            var lowest = 1000.0f;
+            var highest = 0.0f;
+            for (var i = 0; i < 64 && unit.IsPushed(); i++)
+            {
+                Steps(world, 1);
+                lowest = Math.Min(lowest, unit.FlyHeight);
+                highest = Math.Max(highest, unit.FlyHeight);
+            }
+
+            Within(150.0f, highest, 1.0f, "it rises 100 above its height");
+            Expect.True(lowest >= 50.0f, "never below its height; to " + lowest);
+            Expect.True(!unit.IsPushed(), "the push has ended");
+            Within(50.0f, unit.FlyHeight, 0.0f, "back at its type's height");
+            Expect.Equal(1, unit.Landings.Count, "OnGrounded once");
+            Within(400.0f, unit.Landings[0], 1.0f, "at the speed it left at");
+        }
+
+        /// <summary>A unit class that writes both IDamageSource.OnLanded(Hit) and IPushTarget.OnGrounded(float): the damage package and the push both work out its reactions without error, and coming down after a lift runs OnGrounded, never OnLanded.</summary>
+        public static void GroundedNames(FakeWorld world)
+        {
+            FakeTerrainWorld terrain;
+            FakeInteractionWorld interactions;
+            Fresh(out terrain, out interactions);
+            DamageSystem.Install(new FakeDamageWorld(world));
+            ObjectTypes.Unit(ObjectTypes.FourCC("h0P2"), () => new GroundedSource());
+            var handle = world.NewUnit(ObjectTypes.FourCC("h0P2"));
+            world.MoveUnit(handle, 512.0f, 512.0f);
+            var unit = (GroundedSource)Unit.Of(handle)!;
+            Moonwell.Reactions.Learn(unit);
+            Expect.True(Moonwell.Reactions.Wants(Stage.Landed), "the damage package sees its OnLanded");
+            TestLog.Lines.Clear();
+            unit.Push(0.0f, 0.0f, 400.0f);
+            Steps(world, 40);
+            Expect.True(!unit.IsPushed(), "the push has ended");
+            Expect.Equal(1, TestLog.Lines.Count, "one reaction");
+            Expect.Equal("grounded", TestLog.Lines[0], "OnGrounded, not OnLanded");
+            Within(400.0f, unit.Groundings[0], 1.0f, "with its speed");
+            Expect.Equal(0, world.Logged.Count, "no failure");
         }
     }
 }

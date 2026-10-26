@@ -16,10 +16,10 @@ namespace Moonwell
         {
         }
 
-        /// <summary>A unit that does not fly, lifted by a push, came down on the ground.</summary>
-        /// <param name="speed">How fast it was falling when it landed, in game units a second.</param>
+        /// <summary>A unit that does not fly, lifted by a push, came back down to its own height (its type's fly height: the ground for most). Named apart from IDamageSource.OnLanded, which a unit class may also write.</summary>
+        /// <param name="speed">How fast it was falling when it came down, in game units a second.</param>
         /// @CSharpLua.Ignore
-        void OnLanded(float speed)
+        void OnGrounded(float speed)
         {
         }
     }

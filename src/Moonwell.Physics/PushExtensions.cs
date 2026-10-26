@@ -6,9 +6,10 @@ namespace Moonwell
     /// Pushing units: <c>target.Knockback(caster.AngleTo(target), 300f, 0.5f)</c>. A push moves the unit each step with
     /// SetUnitX/Y, which keeps its order, so its own walking carries on and adds to it; it is kept on ground it could
     /// stand on, sliding along what blocks it or stopping (OnSlammed). A push up lifts it: a unit that does not fly
-    /// falls back under Physics.Gravity (OnLanded), a flying one drifts back to its height. It slows by its Body's
-    /// Friction a second unless a Knockback set its own, and ends when it stops, by StopPush, or when the unit dies,
-    /// leaves the game, is hidden or is loaded. A structure, or a unit whose Body is Immovable, is never pushed.
+    /// falls back to its own height under Physics.Gravity (OnGrounded), a flying one drifts back to its height. It
+    /// slows by its Body's Friction a second unless a Knockback set its own, and ends when it stops, by StopPush, or when
+    /// the unit dies, leaves the game, is hidden or is loaded. A structure, or a unit whose Body is Immovable, is never
+    /// pushed.
     /// </summary>
     public static class PushExtensions
     {
@@ -42,7 +43,7 @@ namespace Moonwell
             return Pushes.Find(unit) != null;
         }
 
-        /// <summary>Ends the unit's push where it is, with no reaction; a lifted unit is put back at its height (on the ground for one that does not fly). Nothing when it is not pushed.</summary>
+        /// <summary>Ends the unit's push where it is, with no reaction; a lifted unit is put back at its type's fly height (the ground for most units that do not fly). Nothing when it is not pushed.</summary>
         public static void StopPush(this Unit unit)
         {
             Pushes.Stop(unit);

@@ -1,6 +1,6 @@
 namespace Moonwell.Testing
 {
-    /// <summary>A buff that writes "buff pushed", "buff slammed" and "buff landed" to the test log; it lasts until it is removed.</summary>
+    /// <summary>A buff that writes "buff pushed", "buff slammed" and "buff grounded" to the test log; it lasts until it is removed.</summary>
     public class PushGuard : Buff, IPushTarget
     {
         /// <summary>Makes a buff that lasts until it is removed.</summary>
@@ -16,6 +16,6 @@ namespace Moonwell.Testing
         public void OnSlammed(Slam slam) => TestLog.Lines.Add("buff slammed");
 
         /// <summary>Logs the landing.</summary>
-        public void OnLanded(float speed) => TestLog.Lines.Add("buff landed");
+        public void OnGrounded(float speed) => TestLog.Lines.Add("buff grounded");
     }
 }

@@ -198,6 +198,10 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "push.cell", Run = PushCases.Cell });
             list.Add(new Case { Name = "push.zero", Run = PushCases.Zero });
             list.Add(new Case { Name = "push.reaction-order", Run = PushCases.ReactionOrder });
+            list.Add(new Case { Name = "push.slide-along-x", Run = PushCases.SlideAlongX });
+            list.Add(new Case { Name = "push.reentrant", Run = PushCases.Reentrant });
+            list.Add(new Case { Name = "push.hover", Run = PushCases.Hover });
+            list.Add(new Case { Name = "push.grounded-names", Run = PushCases.GroundedNames });
         }
 
         /// <summary>Adds the areas package's cases.</summary>

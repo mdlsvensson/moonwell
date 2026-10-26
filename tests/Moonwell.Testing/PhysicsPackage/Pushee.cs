@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Moonwell.Testing
 {
-    /// <summary>A unit the push cases make: it writes "unit pushed", "unit slammed" and "unit landed" to the test log, and records the slams, the landings, the pushers and the owner current at each reaction. It starts with a PushWatch.</summary>
+    /// <summary>A unit the push cases make: it writes "unit pushed", "unit slammed" and "unit grounded" to the test log, and records the slams, the comings down, the pushers and the owner current at each reaction. It starts with a PushWatch.</summary>
     public class Pushee : Unit, IPushTarget
     {
         /// <summary>The slams, in the order they came.</summary>
@@ -19,6 +19,9 @@ namespace Moonwell.Testing
 
         /// <summary>The pusher of each push.</summary>
         public List<Unit?> Pushers = new List<Unit?>();
+
+        /// <summary>Run at the end of OnSlammed; null for nothing.</summary>
+        public System.Action<Slam>? Slamming;
 
         /// <summary>The owner current at the last reaction.</summary>
         public Owner? RanWith;
@@ -45,12 +48,16 @@ namespace Moonwell.Testing
             SlamSpeeds.Add(slam.Speed);
             SlamPushers.Add(slam.Pusher);
             RanWith = Owner.Current;
+            if (Slamming != null)
+            {
+                Slamming(slam);
+            }
         }
 
         /// <summary>Logs the landing and its speed.</summary>
-        public void OnLanded(float speed)
+        public void OnGrounded(float speed)
         {
-            TestLog.Lines.Add("unit landed");
+            TestLog.Lines.Add("unit grounded");
             Landings.Add(speed);
             RanWith = Owner.Current;
         }
