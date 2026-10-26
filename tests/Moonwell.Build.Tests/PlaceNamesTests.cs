@@ -74,6 +74,17 @@ namespace Moonwell.Build.Tests
             Assert.EndsWith("Its regions: none.", error.Message);
         }
 
+        [Fact]
+        public void unknown_camera_fails_with_line()
+        {
+            var source = string.Join("\n", "using Moonwell;", string.Empty, "class A", "{", "    void F()", "    {", "        var a = CameraSetup.Named(\"Intro\");", "        var b = CameraSetup.Named(\"Entro\");", "    }", "}");
+            var project = Project(("Map.cs", source));
+
+            var error = Assert.Throws<BuildException>(() => PlaceNames.Check(project, "CameraSetup.Named", new[] { "Intro", "Boss" }, "camera"));
+
+            Assert.Equal("Map.cs:8: the map has no World Editor camera named 'Entro'. Its cameras: Intro, Boss.", error.Message);
+        }
+
         private MapProject Project(params (string Path, string Text)[] files)
         {
             var folder = folders.TemporaryFolderOutsideRepository();

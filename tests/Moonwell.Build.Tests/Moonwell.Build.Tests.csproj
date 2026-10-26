@@ -24,6 +24,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Moonwell.Build\Moonwell.Build.csproj" />
     <ProjectReference Include="..\..\src\Moonwell.Cli\Moonwell.Cli.csproj" />
+    <!-- Its built library, which the tests compile a small map assembly against. -->
+    <ProjectReference Include="..\..\src\Moonwell.Input\Moonwell.Input.csproj" />
   </ItemGroup>
 
 </Project>

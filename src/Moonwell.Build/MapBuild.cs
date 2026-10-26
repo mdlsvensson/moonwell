@@ -15,6 +15,9 @@ namespace Moonwell.Build
         /// <summary>The areas package's assembly: a map that references it gets its World Editor regions written from <c>war3map.w3r</c>, their names in its code checked, and the package installed by its Main.</summary>
         private const string AreasAssemblyName = "Moonwell.Areas";
 
+        /// <summary>The input package's assembly: a map that references it gets World Editor's cameras written from <c>war3map.w3c</c>, their names in its code checked, and the package installed by its Main, listening for the mouse only when the code names <c>Mouse</c> or <c>IMouseWatch</c>.</summary>
+        private const string InputAssemblyName = "Moonwell.Input";
+
         /// <summary>Runs every step of the build, in order.</summary>
         /// <param name="path">A project folder, or the path of its <c>.csproj</c> file.</param>
         /// <param name="options">What kind of build to make.</param>
@@ -104,7 +107,7 @@ namespace Moonwell.Build
         }
 
         // What the map's Main installs before anything registers: each package the map references, in this order. The terrain's grid and the
-        // areas' regions are written here too, from the map's ground and regions, and a file an earlier build wrote is removed when the map no longer uses the package.
+        // areas' regions and the input's cameras are written here too, from the map's ground, regions and cameras, and a file an earlier build wrote is removed when the map no longer uses the package.
         private static List<string> Installs(MapProject project, War3Net.Build.Map map, string targetPath)
         {
             var installs = new List<string>();
@@ -135,6 +138,20 @@ namespace Moonwell.Build
             else
             {
                 PlaceWriter.DeleteAreas(project);
+            }
+
+            if (Declarations.References(targetPath, InputAssemblyName))
+            {
+                // A map that references the package but never names Mouse or IMouseWatch registers no mouse event: the package listens
+                // only when asked. A map with no war3map.w3c has no cameras: Cameras is null, and the arrays are empty.
+                var mouse = Declarations.ReferencesType(targetPath, "Moonwell", "Mouse") || Declarations.ReferencesType(targetPath, "Moonwell", "IMouseWatch");
+                PlaceWriter.WriteInput(project, map.Cameras, mouse);
+                PlaceNames.Check(project, "CameraSetup.Named", map.Cameras?.Cameras.Select(camera => camera.Name).ToList() ?? new List<string>(), "camera");
+                installs.Add("global::Moonwell.InputSystem.Install(global::Moonwell.Generated.InputData.Mouse, global::Moonwell.Generated.InputData.CameraNames(), global::Moonwell.Generated.InputData.Cameras());");
+            }
+            else
+            {
+                PlaceWriter.DeleteInput(project);
             }
 
             return installs;
