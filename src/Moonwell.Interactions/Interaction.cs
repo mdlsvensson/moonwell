@@ -409,12 +409,12 @@ namespace Moonwell
         }
 
         /// <summary>
-        /// The check at a tick, in this order. The holder is read; with no place every pair parts and the check ends.
-        /// The things in the cells within Range plus Slack are collected, and those of class TOther, not the holder,
-        /// with a place and within Range are kept. The pairs whose other is not kept part, in meeting order; a stopped
-        /// other that is not kept is forgotten. The kept pairs tick, in meeting order, unless paused or waiting. The
-        /// kept others with no pair, in the grid's order, are asked about unless stopped, and those accepted meet and
-        /// tick. After any reaction that pauses or ends the interaction or ends its holder, the check stops.
+        /// The check at a tick, in this order. The holder is read; with no place every pair parts and the check ends. The
+        /// things within Range plus Slack are collected, and those of class TOther, not the holder, with a place and within
+        /// Range are kept. The pairs whose other is not kept part, in meeting order; a stopped other that is not kept is
+        /// forgotten. The kept pairs tick, in meeting order, unless paused or waiting. The kept others with no pair, in the
+        /// grid's order, are asked about unless stopped, and those accepted meet and tick. After any reaction that pauses or
+        /// ends the interaction or ends its holder, the check stops.
         /// </summary>
         internal sealed override void RunCheck()
         {
@@ -456,7 +456,7 @@ namespace Moonwell
             var walk = Pairing.walk;
             var walkStart = walk.Count;
             var grid = Interactions.grid ?? Interactions.Grid;
-            grid.CollectNear(hx, hy, reach, candidates);
+            grid.Collect(hx - reach, hy - reach, hx + reach, hy + reach, candidates);
             var end = start;
             var count = candidates.Count;
             var kind = otherKind;

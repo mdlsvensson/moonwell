@@ -838,10 +838,9 @@ namespace Moonwell.Testing
         }
 
         /// <summary>
-        /// With no slack the check's reach is its range, 300, so the corner cells of the box around a holder at (0, 0), on a
-        /// cell's corner, are left out when they are farther than 300: things on the diagonals just within range, in those
-        /// corner cells' neighbours and on the cells' edges, meet; things just past range, and things in the corner cells
-        /// beyond reach, do not; and the order is the grid's.
+        /// With no slack the check's reach is its range, 300, and its box the cells within 300 of a holder at (0, 0), on a
+        /// cell's corner: things on the diagonals just within range, on cells' edges and on a cell's corner meet; things just
+        /// past range, and things in the box's corner cells beyond range, do not; and the order is the grid's.
         /// </summary>
         public static void CornerCells(FakeWorld world)
         {
