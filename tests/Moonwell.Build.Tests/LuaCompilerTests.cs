@@ -57,6 +57,53 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void the_lua_has_the_symbols_dotnet_build_defines()
+        {
+            // dotnet build defines TRACE, and DEBUG or RELEASE; CSharp.lua defines __CSharpLua__ itself.
+            var folder = folders.TemporaryCopyOfSample();
+            File.WriteAllText(Path.Combine(folder, "Symbols.cs"), """
+                namespace Sample
+                {
+                    public static class Symbols
+                    {
+                        public static void Show()
+                        {
+                #if RELEASE
+                            Moonwell.Natives.DisplayTextToPlayer(Moonwell.Natives.Player(0), 0f, 0f, "symbols: release");
+                #else
+                            Moonwell.Natives.DisplayTextToPlayer(Moonwell.Natives.Player(0), 0f, 0f, "symbols: not release");
+                #endif
+                #if TRACE
+                            Moonwell.Natives.DisplayTextToPlayer(Moonwell.Natives.Player(0), 0f, 0f, "symbols: trace");
+                #endif
+                #if __CSharpLua__
+                            Moonwell.Natives.DisplayTextToPlayer(Moonwell.Natives.Player(0), 0f, 0f, "symbols: csharplua");
+                #endif
+                        }
+                    }
+                }
+                """);
+
+            foreach (var release in new[] { false, true })
+            {
+                MapBuild.Run(folder, new BuildOptions { Release = release }, TextWriter.Null);
+
+                var script = File.ReadAllText(Path.Combine(folder, "build", "Sample", "war3map.lua"));
+                Assert.Equal(release, script.Contains("\"symbols: release\"", StringComparison.Ordinal));
+                Assert.Equal(!release, script.Contains("\"symbols: not release\"", StringComparison.Ordinal));
+                Assert.Contains("\"symbols: trace\"", script);
+                Assert.Contains("\"symbols: csharplua\"", script);
+
+                // The line marks see the same code: each statement CSharp.lua compiles has its line.
+                var marked = File.ReadAllText(Path.Combine(folder, "build", "marked", "Symbols.cs"));
+                foreach (var text in new[] { release ? "symbols: release" : "symbols: not release", "symbols: trace", "symbols: csharplua" })
+                {
+                    Assert.Matches(@"/\*\[\[--@mw \d+:\d+\]\]\*/ Moonwell\.Natives\.DisplayTextToPlayer\([^\n]*""" + text + @"""", marked);
+                }
+            }
+        }
+
+        [Fact]
         public void development_script_has_line_table()
         {
             AssertLineTable(builds.Development.Script);
