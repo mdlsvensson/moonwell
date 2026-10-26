@@ -13,12 +13,13 @@ namespace Moonwell.Build.Tests
             "       moonwell run [folder] [--release] [--game <exe>]";
 
         private readonly SampleBuilds builds;
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
         private readonly List<string> temporaryFiles = new List<string>();
 
-        public CliTests(SampleBuilds builds)
+        public CliTests(SampleBuilds builds, ITestOutputHelper output)
         {
             this.builds = builds;
+            folders = new TestFolders(output);
         }
 
         [Fact]

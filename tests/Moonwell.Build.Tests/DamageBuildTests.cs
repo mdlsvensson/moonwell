@@ -8,11 +8,12 @@ namespace Moonwell.Build.Tests
     public sealed class DamageBuildTests : IDisposable
     {
         private readonly SampleBuilds builds;
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
 
-        public DamageBuildTests(SampleBuilds builds)
+        public DamageBuildTests(SampleBuilds builds, ITestOutputHelper output)
         {
             this.builds = builds;
+            folders = new TestFolders(output);
         }
 
         public void Dispose()

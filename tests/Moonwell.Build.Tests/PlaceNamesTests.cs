@@ -4,7 +4,12 @@ namespace Moonwell.Build.Tests
     {
         private static readonly string[] Names = { "Bank", "Shop \"A\" \\ B" };
 
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
+
+        public PlaceNamesTests(ITestOutputHelper output)
+        {
+            folders = new TestFolders(output);
+        }
 
         public void Dispose()
         {

@@ -13,11 +13,12 @@ namespace Moonwell.Build.Tests
         private const string RecommendedPlayers = "RecommendedPlayers = \"Any\";";
 
         private readonly SampleBuilds builds;
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
 
-        public ObjectBuildTests(SampleBuilds builds)
+        public ObjectBuildTests(SampleBuilds builds, ITestOutputHelper output)
         {
             this.builds = builds;
+            folders = new TestFolders(output);
         }
 
         public void Dispose()

@@ -8,12 +8,13 @@ namespace Moonwell.Build.Tests
     public sealed class LuaCompilerTests : IDisposable
     {
         private readonly SampleBuilds builds;
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
         private readonly List<string> temporaryFolders = new List<string>();
 
-        public LuaCompilerTests(SampleBuilds builds)
+        public LuaCompilerTests(SampleBuilds builds, ITestOutputHelper output)
         {
             this.builds = builds;
+            folders = new TestFolders(output);
         }
 
         [Fact]

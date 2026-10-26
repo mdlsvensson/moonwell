@@ -13,11 +13,12 @@ namespace Moonwell.Build.Tests
     public sealed class PackageTests : IClassFixture<PackedMoonwell>, IDisposable
     {
         private readonly PackedMoonwell packed;
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
 
-        public PackageTests(PackedMoonwell packed)
+        public PackageTests(PackedMoonwell packed, ITestOutputHelper output)
         {
             this.packed = packed;
+            folders = new TestFolders(output);
         }
 
         public void Dispose()

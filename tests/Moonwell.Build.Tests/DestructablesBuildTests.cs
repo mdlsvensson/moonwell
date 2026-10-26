@@ -18,7 +18,12 @@ namespace Moonwell.Build.Tests
     [Collection("Sample")]
     public sealed class DestructablesBuildTests : IDisposable
     {
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
+
+        public DestructablesBuildTests(ITestOutputHelper output)
+        {
+            folders = new TestFolders(output);
+        }
 
         public void Dispose()
         {

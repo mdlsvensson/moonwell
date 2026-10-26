@@ -7,11 +7,12 @@ namespace Moonwell.Build.Tests
     public sealed class CompiledFilesTests : IDisposable
     {
         private readonly SampleBuilds builds;
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
 
-        public CompiledFilesTests(SampleBuilds builds)
+        public CompiledFilesTests(SampleBuilds builds, ITestOutputHelper output)
         {
             this.builds = builds;
+            folders = new TestFolders(output);
         }
 
         public void Dispose()
