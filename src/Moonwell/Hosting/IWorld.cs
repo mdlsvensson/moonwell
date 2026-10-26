@@ -239,6 +239,9 @@ namespace Moonwell.Hosting
         /// <summary>Deals damage from a unit to another, with the game's attack, damage and weapon numbers; the damage event runs inside the call. Whether the game dealt it.</summary>
         bool DealDamage(unit source, unit target, float amount, bool attack, bool ranged, int attackType, int damageType, int weaponType);
 
+        /// <summary>Deals damage from a unit to a destructable, with the game's attack, damage and weapon numbers (UnitDamageTarget).</summary>
+        void DealDamageTo(unit source, destructable target, float amount, bool attack, bool ranged, int attackType, int damageType, int weaponType);
+
         /// <summary>Whether a unit is alive.</summary>
         bool IsAlive(unit unit);
 
