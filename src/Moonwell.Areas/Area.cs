@@ -11,8 +11,9 @@ namespace Moonwell
     /// traps: the game sees the area in whole 32 by 32 cells, so <c>Contains</c> (the true shape) and the area can
     /// disagree within a cell of an edge; and the game sends no event for a unit hidden, shown, loaded or unloaded, so
     /// the package checks those on its own timer every quarter of a second, and such a unit leaves and enters up to
-    /// 0.25 seconds late. A unit that stays hidden or loaded inside an area keeps the package's timer stepping (about
-    /// 0.3 ms a second) until it leaves or the area ends. Add it in the map's <c>Components</c> or with
+    /// 0.25 seconds late. A unit that stays hidden or loaded inside an area, and a dead one (which leaves when it dies, and
+    /// enters again if something brings it back to life there, a hero's revive or a Resurrection), keeps the package's
+    /// timer stepping (about 0.3 ms a second) until it leaves, decays or is removed, or the area ends. Add it in the map's <c>Components</c> or with
     /// <c>Game.Instance.Add</c>; ending it lets every unit inside leave.
     /// </summary>
     public abstract class Area : GameComponent
@@ -38,7 +39,7 @@ namespace Moonwell
         /// <summary>The game time each unit inside entered; a lookup only, the order is the list's.</summary>
         private readonly Dictionary<Unit, float> since = new Dictionary<Unit, float>();
 
-        /// <summary>The units that left because they have no place (hidden or loaded), in the order they left: the place check enters them again.</summary>
+        /// <summary>The units that left because they have no place (hidden, loaded or dead), in the order they left: the place check enters them again once they have a place and are inside the region.</summary>
         private readonly List<Unit> away = new List<Unit>();
 
         /// <summary>How many package steps a Tick is, worked out when the area is added; 0 for none.</summary>
@@ -112,7 +113,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs once when a unit that entered goes out, dies, is hidden or loaded, ends, or the area ends. The unit is no longer inside here.</summary>
+        /// <summary>Runs once when a unit that entered goes out, dies, is hidden or loaded, ends, or the area ends. A unit that dies and is brought back to life inside enters again (<c>OnUnitEntered</c>). The unit is no longer inside here.</summary>
         /// <param name="leavingUnit">The unit that left.</param>
         public virtual void OnUnitLeft(Unit leavingUnit)
         {
@@ -255,7 +256,7 @@ namespace Moonwell
             var world = tracker!.World;
             var bounds = Shape.Bounds;
             var found = new List<unit>();
-            world.UnitsInRect(
+            world.UnitsIn(
                 MathF.Floor(bounds.Min.X / 32f) * 32f,
                 MathF.Floor(bounds.Min.Y / 32f) * 32f,
                 MathF.Floor(bounds.Max.X / 32f) * 32f + 32f,
@@ -341,6 +342,27 @@ namespace Moonwell
             Refresh();
         }
 
+        /// <summary>The game says a unit died: it leaves if it was inside, and is kept among the units away while it is in the region, for the place check to enter it again if it lives (a Resurrection sends no event).</summary>
+        internal void Die(Unit unit)
+        {
+            if (stopped || unit.HasEnded || unit.ending)
+            {
+                return;
+            }
+
+            if (since.ContainsKey(unit))
+            {
+                if (!away.Contains(unit))
+                {
+                    away.Add(unit);
+                }
+
+                Exit(unit);
+            }
+
+            Refresh();
+        }
+
         /// <summary>A hero came back to life: it enters again if it is in the region and has a place.</summary>
         internal void Revive(Unit unit)
         {
@@ -406,6 +428,11 @@ namespace Moonwell
                     {
                         TryEnter(unit);
                     }
+                }
+                else if (!unit.IsAlive && !world.IsInside(handle!, unit.Handle))
+                {
+                    // A corpse that is no longer in the region is forgotten.
+                    away.Remove(unit);
                 }
             }
 

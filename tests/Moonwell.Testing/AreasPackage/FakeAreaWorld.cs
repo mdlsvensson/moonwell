@@ -48,7 +48,7 @@ namespace Moonwell.Testing
         /// <summary>Every region the package made, in order.</summary>
         public List<Made> Regions = new List<Made>();
 
-        /// <summary>The units UnitsInRect gives, with their points.</summary>
+        /// <summary>The units UnitsIn gives, with their points.</summary>
         private readonly List<Standing> standing = new List<Standing>();
 
         /// <summary>The units HasPlace answers false for.</summary>
@@ -66,7 +66,7 @@ namespace Moonwell.Testing
         /// <summary>What the package runs when a hero is revived.</summary>
         public Action? Revived;
 
-        /// <summary>Puts a unit at a point, for UnitsInRect.</summary>
+        /// <summary>Puts a unit at a point, for UnitsIn.</summary>
         public void Stand(unit target, float x, float y)
         {
             var one = new Standing();
@@ -184,8 +184,13 @@ namespace Moonwell.Testing
         /// <summary>Whether a case has put the unit inside the region.</summary>
         public bool IsInside(region r, unit u) => Of(r).Inside.Contains(u);
 
-        /// <summary>Adds the units standing in the rect, in the order they were put down.</summary>
-        public void UnitsInRect(float minX, float minY, float maxX, float maxY, List<unit> into)
+        /// <summary>
+        /// Adds the units standing in the rect, in the order they were put down, whether they have a place or not: hidden
+        /// ones are found, as the real world finds them (every player slot's units, filtered by point). The game's own
+        /// <c>GroupEnumUnitsInRect</c> would miss them (seen 10-17), so a unit in <c>NoPlace</c> that this left out would
+        /// hide the defect the cases catch: a unit hidden when its area is added never enters once shown.
+        /// </summary>
+        public void UnitsIn(float minX, float minY, float maxX, float maxY, List<unit> into)
         {
             for (var i = 0; i < standing.Count; i++)
             {

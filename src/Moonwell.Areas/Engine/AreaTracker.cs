@@ -189,13 +189,19 @@ namespace Moonwell.Engine
             }
         }
 
-        /// <summary>The game says a unit died: it leaves every area it is in, or is away from, in the order the areas were added.</summary>
+        /// <summary>The game says a unit died: it leaves every area it is in, in the order the areas were added, and stays among the units away of each while it is in the region.</summary>
         private void Died()
         {
             var unit = KnownUnits.Find(World.EventUnit());
-            if (unit != null)
+            if (unit == null)
             {
-                Dropped(unit);
+                return;
+            }
+
+            var inOrder = new List<Area>(areas);
+            for (var i = 0; i < inOrder.Count; i++)
+            {
+                inOrder[i].Die(unit);
             }
         }
 

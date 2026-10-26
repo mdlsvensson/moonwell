@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Moonwell.Hosting
 {
-    /// <summary>The game as the areas package sees it: regions and the events of units entering and leaving them, the units in a rect, and the events that say a unit died or came back. Types are the game's numbers.</summary>
+    /// <summary>The game as the areas package sees it: regions and the events of units entering and leaving them, the units in a rect (hidden ones too), and the events that say a unit died or came back. Types are the game's numbers.</summary>
     public interface IAreaWorld
     {
         /// <summary>Makes an empty region.</summary>
@@ -27,8 +27,8 @@ namespace Moonwell.Hosting
         /// <summary>Whether a unit is inside a region.</summary>
         bool IsInside(region r, unit u);
 
-        /// <summary>Adds the units whose centre is in a rect to a list, in the order the game gives them.</summary>
-        void UnitsInRect(float minX, float minY, float maxX, float maxY, List<unit> into);
+        /// <summary>Adds every unit whose centre is in a rect to a list, in the order the game gives them: hidden and Locust units too, which the game's own rect group (<c>GroupEnumUnitsInRect</c>) misses.</summary>
+        void UnitsIn(float minX, float minY, float maxX, float maxY, List<unit> into);
 
         /// <summary>Starts delivering the game's unit death and hero revive events, for every player slot, once. Inside either call, <c>EventUnit</c> is the unit that died or came back.</summary>
         void ListenDeaths(Action died, Action revived);

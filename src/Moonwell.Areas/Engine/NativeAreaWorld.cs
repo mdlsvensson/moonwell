@@ -21,7 +21,7 @@ namespace Moonwell.Engine
         /// <summary>The unit of the event being delivered; saved and put back around each, as an event can start another.</summary>
         private unit? current;
 
-        /// <summary>The group UnitsInRect fills, made on first use.</summary>
+        /// <summary>The group UnitsIn fills, made on first use.</summary>
         private group? scratch;
 
         /// <summary>The death trigger, made by the first ListenDeaths; null until then.</summary>
@@ -80,24 +80,35 @@ namespace Moonwell.Engine
         /// <summary>Whether a unit is inside a region.</summary>
         public bool IsInside(region r, unit u) => Natives.IsUnitInRegion(r, u);
 
-        /// <summary>Adds the units whose centre is in a rect to a list.</summary>
-        public void UnitsInRect(float minX, float minY, float maxX, float maxY, List<unit> into)
+        /// <summary>
+        /// Adds the units whose centre is in a rect to a list, hidden and Locust units too: it lists every player slot's
+        /// units and keeps the ones inside, as the game's rect group (<c>GroupEnumUnitsInRect</c>) misses hidden and
+        /// Locust units (seen 10-17).
+        /// </summary>
+        public void UnitsIn(float minX, float minY, float maxX, float maxY, List<unit> into)
         {
             if (scratch == null)
             {
                 scratch = Natives.CreateGroup();
             }
 
-            var made = Natives.Rect(minX, minY, maxX, maxY);
-            Natives.GroupEnumUnitsInRect(scratch, made, null);
-            Natives.RemoveRect(made);
-            var count = Natives.BlzGroupGetSize(scratch);
-            for (var i = 0; i < count; i++)
+            for (var slot = 0; slot < Natives.bj_MAX_PLAYER_SLOTS; slot++)
             {
-                into.Add(Natives.BlzGroupUnitAt(scratch, i));
-            }
+                Natives.GroupEnumUnitsOfPlayer(scratch, Natives.Player(slot), null);
+                var count = Natives.BlzGroupGetSize(scratch);
+                for (var i = 0; i < count; i++)
+                {
+                    var found = Natives.BlzGroupUnitAt(scratch, i);
+                    var x = Natives.GetUnitX(found);
+                    var y = Natives.GetUnitY(found);
+                    if (x >= minX && x <= maxX && y >= minY && y <= maxY)
+                    {
+                        into.Add(found);
+                    }
+                }
 
-            Natives.GroupClear(scratch);
+                Natives.GroupClear(scratch);
+            }
         }
 
         /// <summary>Registers the death and the hero revive events for every player slot, with one trigger each. Once: a second call does nothing.</summary>

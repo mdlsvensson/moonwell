@@ -592,6 +592,9 @@ namespace Moonwell.Testing
             fake.NoPlace.Add(hidden.Handle);
             fake.NoPlace.Add(walks.Handle);
             fake.NoPlace.Add(arriving.Handle);
+            var seen = new List<unit>();
+            fake.UnitsIn(0f, 0f, 256f, 256f, seen);
+            Expect.True(seen.Contains(hidden.Handle), "the query finds a hidden unit, as the real one does");
             var area = new LogArea(Square());
             area.Labels[hidden] = "hidden";
             area.Labels[walks] = "walks";
@@ -617,7 +620,7 @@ namespace Moonwell.Testing
             Expect.True(!AreaTracker.Running, "nothing is away or inside: the timer stopped");
         }
 
-        /// <summary>A unit away because it was hidden that dies, or ends, is not entered again, and the timer stops.</summary>
+        /// <summary>A unit away because it was hidden that ends is not entered again, and one that dies stays among the units away while it is in the region (the timer keeps running), until it is forgotten as it is no longer there.</summary>
         public static void HiddenThenGone(FakeWorld world)
         {
             var fake = Fresh();
@@ -633,12 +636,76 @@ namespace Moonwell.Testing
             world.Advance(0.25f);
             Expect.Equal(4, area.Log.Count, "both are away");
             fake.Die(dies.Handle);
+            dies.Kill();
             ends.Remove();
-            fake.NoPlace.Remove(dies.Handle);
             fake.NoPlace.Remove(ends.Handle);
             world.Advance(1f);
             Expect.Equal(4, area.Log.Count, "neither came back");
-            Expect.True(!AreaTracker.Running, "and the timer stopped");
+            Expect.True(AreaTracker.Running, "the corpse in the region keeps the timer running");
+            fake.Regions[0].Inside.Remove(dies.Handle);
+            world.Advance(0.25f);
+            Expect.Equal(4, area.Log.Count, "and still nothing");
+            Expect.True(!AreaTracker.Running, "the corpse is no longer in the region: forgotten, and the timer stopped");
+        }
+
+        /// <summary>A unit that is not a hero and dies inside leaves; brought back to life with no event (a Resurrection), it enters again at the next place check, once.</summary>
+        public static void ResurrectedReenters(FakeWorld world)
+        {
+            var fake = Fresh();
+            var area = Added(world, new LogArea(Square()));
+            var footman = UnitAt(world, 10f, 10f);
+            area.Labels[footman] = "f";
+            fake.Enter(fake.Regions[0], footman.Handle);
+            fake.NoPlace.Add(footman.Handle);
+            fake.Die(footman.Handle);
+            ExpectLog(area, new[] { "entered f", "left f" }, "left when it died");
+            world.Advance(1f);
+            Expect.Equal(2, area.Log.Count, "a corpse does not enter");
+            Expect.True(AreaTracker.Running, "the corpse keeps the timer running");
+            fake.NoPlace.Remove(footman.Handle);
+            world.Advance(0.25f);
+            ExpectLog(area, new[] { "entered f", "left f", "entered f" }, "entered at the next place check");
+            Expect.True(area.Has(footman), "inside again");
+            world.Advance(2f);
+            Expect.Equal(3, area.Log.Count, "once");
+        }
+
+        /// <summary>A hero that dies and is revived inside, with the revive event, enters once, and the place check does not enter it a second time.</summary>
+        public static void ReviveNotTwice(FakeWorld world)
+        {
+            var fake = Fresh();
+            var area = Added(world, new LogArea(Square()));
+            var hero = UnitAt(world, 10f, 10f, true);
+            area.Labels[hero] = "h";
+            fake.Enter(fake.Regions[0], hero.Handle);
+            fake.NoPlace.Add(hero.Handle);
+            fake.Die(hero.Handle);
+            world.Advance(0.25f);
+            fake.NoPlace.Remove(hero.Handle);
+            fake.Revive(hero.Handle);
+            ExpectLog(area, new[] { "entered h", "left h", "entered h" }, "entered by the revive event");
+            world.Advance(2f);
+            Expect.Equal(3, area.Log.Count, "not a second time");
+            Expect.True(area.Has(hero), "inside");
+        }
+
+        /// <summary>A unit that dies inside and then ends does not leave a second time, and the timer stops when nothing is left.</summary>
+        public static void CorpseRemoved(FakeWorld world)
+        {
+            var fake = Fresh();
+            var area = Added(world, new LogArea(Square()));
+            var unit = UnitAt(world, 10f, 10f);
+            area.Labels[unit] = "a";
+            fake.Enter(fake.Regions[0], unit.Handle);
+            fake.NoPlace.Add(unit.Handle);
+            fake.Die(unit.Handle);
+            Expect.True(AreaTracker.Running, "the corpse keeps the timer running");
+            unit.Remove();
+            ExpectLog(area, new[] { "entered a", "left a" }, "left once, when it died");
+            Expect.True(!AreaTracker.Running, "nothing is left: the timer stopped");
+            fake.NoPlace.Remove(unit.Handle);
+            world.Advance(2f);
+            Expect.Equal(2, area.Log.Count, "nothing after");
         }
     }
 }
