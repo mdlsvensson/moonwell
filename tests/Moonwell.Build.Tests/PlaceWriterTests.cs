@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -194,6 +196,45 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void an_old_format_camera_reaches_the_input_package_as_written()
+        {
+            var cameras = Cameras(
+                MapCamerasFormatVersion.v0,
+                false,
+                NewCamera("Intro", 100, -200, zOffset: 10, rotation: 90, angleOfAttack: 304, targetDistance: 1650, roll: 0, fieldOfView: 70, farClippingPlane: 5000),
+                NewCamera("Boss", 0.5f, 64, zOffset: 1, rotation: 2, angleOfAttack: 3, targetDistance: 4, roll: 5, fieldOfView: 6, farClippingPlane: 7));
+
+            var (world, names) = InstallWrittenCameras(cameras);
+
+            Assert.Equal(new[] { "Intro", "Boss" }, names);
+            AssertSetup(world, "Intro", 0, 100, -200, new[] { 6, 5, 2, 0, 4, 3, 1 }, new float[] { 10, 90, 304, 1650, 0, 70, 5000 }, -1);
+            AssertSetup(world, "Boss", 1, 0.5f, 64, new[] { 6, 5, 2, 0, 4, 3, 1 }, new float[] { 1, 2, 3, 4, 5, 6, 7 }, -1);
+        }
+
+        [Fact]
+        public void a_new_format_camera_reaches_the_input_package_as_written()
+        {
+            var cameras = Cameras(MapCamerasFormatVersion.v0, true, NewCamera("A", 1, 2, zOffset: 3, nearClippingPlane: 16, localPitch: 8, localYaw: 9, localRoll: 10));
+
+            var (world, _) = InstallWrittenCameras(cameras);
+
+            AssertSetup(world, "A", 0, 1, 2, new[] { 6, 5, 2, 0, 4, 3, 1, 7, 8, 9, 10 }, new float[] { 3, 0, 0, 0, 0, 0, 0, 16, 8, 9, 10 }, -1);
+        }
+
+        [Fact]
+        public void a_v3_camera_reaches_the_input_package_as_written()
+        {
+            var cameras = Cameras(
+                MapCamerasFormatVersion.v3,
+                true,
+                NewCamera("A", 1, 2, zOffset: 10, nearClippingPlane: 16, localPitch: 8, localYaw: 9, localRoll: 10, dofDistance: 11, dofScale: 12, posAbsoluteZ: 13, cameraType: 2));
+
+            var (world, _) = InstallWrittenCameras(cameras);
+
+            AssertSetup(world, "A", 0, 1, 2, new[] { 6, 5, 2, 0, 4, 3, 1, 7, 8, 9, 10, 11, 12, 13 }, new float[] { 10, 0, 0, 0, 0, 0, 0, 16, 8, 9, 10, 11, 12, 13 }, 2);
+        }
+
+        [Fact]
         public void delete_input_removes_the_file()
         {
             var project = Project();
@@ -203,6 +244,40 @@ namespace Moonwell.Build.Tests
             PlaceWriter.DeleteInput(project);
 
             Assert.False(File.Exists(path));
+        }
+
+        // Writes InputData.g.cs, reads the names and numbers back out of the written text, and gives them to the input package's Install on a
+        // world that records what each setup was made of: the camera writer and the package's reader agree only if this comes out as the camera.
+        private (SetupRecordingWorld World, string[] Names) InstallWrittenCameras(MapCameras cameras)
+        {
+            var text = File.ReadAllText(PlaceWriter.WriteInput(Project(), cameras, false));
+            var names = Syntax(text).GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>()
+                .Single(method => method.Identifier.Text == "CameraNames")
+                .DescendantNodes().OfType<LiteralExpressionSyntax>()
+                .Where(literal => literal.IsKind(SyntaxKind.StringLiteralExpression))
+                .Select(literal => literal.Token.ValueText)
+                .ToArray();
+            var match = Regex.Match(text, @"Cameras\(\) => new\[\] \{ (?<numbers>[^}]*) \};");
+            Assert.True(match.Success, "Cameras() is not a list of numbers: " + text);
+            var numbers = match.Groups["numbers"].Value.Split(", ")
+                .Select(number => float.Parse(number.TrimEnd('f'), CultureInfo.InvariantCulture))
+                .ToArray();
+
+            var world = new SetupRecordingWorld();
+            InputSystem.Install(world, false, names, numbers);
+            return (world, names);
+        }
+
+        private static void AssertSetup(SetupRecordingWorld world, string name, int index, float x, float y, int[] codes, float[] values, int type)
+        {
+            // The setup the package hands out under the name is the one the world made from that camera's numbers.
+            var made = world.Made[index];
+            Assert.Same(made.Handle, CameraSetup.Named(name).Handle);
+            Assert.Equal(x, made.X);
+            Assert.Equal(y, made.Y);
+            Assert.Equal(codes, made.Codes);
+            Assert.Equal(values, made.Values);
+            Assert.Equal(type, made.Type);
         }
 
         private MapProject Project()

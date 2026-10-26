@@ -21,6 +21,8 @@
   <ItemGroup>
     <InternalsVisibleTo Include="Moonwell.Testing" />
     <InternalsVisibleTo Include="Moonwell.Tests" />
+    <!-- Its test of the build's camera numbers reading in, which reads the setup each name made. -->
+    <InternalsVisibleTo Include="Moonwell.Build.Tests" />
   </ItemGroup>
 
 </Project>
