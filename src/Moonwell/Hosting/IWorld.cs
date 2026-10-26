@@ -101,6 +101,9 @@ namespace Moonwell.Hosting
         /// <summary>The player that owns a unit; null a while after the game has removed it.</summary>
         player OwnerOf(unit unit);
 
+        /// <summary>Sets the player that owns a unit, changing the unit's colour to the new player's.</summary>
+        void SetOwner(unit unit, player player);
+
         /// <summary>The slot state of a player, as SlotState counts it (0 empty, 1 playing, 2 left).</summary>
         int SlotStateOf(player player);
 

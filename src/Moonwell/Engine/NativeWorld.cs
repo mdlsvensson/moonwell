@@ -10,11 +10,8 @@ namespace Moonwell.Engine
         /// <summary>How many lines the log keeps; the file holds the last ones.</summary>
         private const int LogLines = 200;
 
-        /// <summary>
-        /// The seconds the clock runs before it starts again: its elapsed time reads exact at 10 s, and steps by 0.0625 s at 604800 s.
-        /// A field, not a const: CSharp.lua writes a const by its value, 10, which Lua reads as an integer (C18).
-        /// </summary>
-        private readonly float lap = 10.0f;
+        /// <summary>The seconds the clock runs before it starts again: its elapsed time reads exact at 10 s, and steps by 0.0625 s at 604800 s.</summary>
+        private const float Lap = 10.0f;
 
         /// <summary>The clock: the game time is the laps it has run plus its elapsed time.</summary>
         private readonly timer clock;
@@ -45,7 +42,7 @@ namespace Moonwell.Engine
         {
             bounds = Natives.GetWorldBounds();
             clock = Natives.CreateTimer();
-            Natives.TimerStart(clock, lap, false, ClockLapped);
+            Natives.TimerStart(clock, Lap, false, ClockLapped);
             wake = Natives.CreateTimer();
 
             var region = Natives.CreateRegion();
@@ -392,6 +389,12 @@ namespace Moonwell.Engine
             return Natives.GetOwningPlayer(unit);
         }
 
+        /// <summary>Sets the owner of a unit and its colour: SetUnitOwner.</summary>
+        public void SetOwner(unit unit, player player)
+        {
+            Natives.SetUnitOwner(unit, player, true);
+        }
+
         /// <summary>The level a player has of an upgrade; 0 when the player has none.</summary>
         public int UpgradeLevel(player p, int upgradeId)
         {
@@ -579,7 +582,7 @@ namespace Moonwell.Engine
         /// <summary>The most life a unit can have, from the game: BlzGetUnitMaxHP (SetUnitState does not change the most, seen 10-21).</summary>
         public float MaxLifeOf(unit unit)
         {
-            return Natives.BlzGetUnitMaxHP(unit) + 0.0f;
+            return Natives.BlzGetUnitMaxHP(unit);
         }
 
         /// <summary>Sets the most life a unit can have in the game: BlzSetUnitMaxHP, which takes a whole number.</summary>
@@ -603,7 +606,7 @@ namespace Moonwell.Engine
         /// <summary>The most mana a unit can have, from the game: BlzGetUnitMaxMana (SetUnitState does not change the most, seen 10-21).</summary>
         public float MaxManaOf(unit unit)
         {
-            return Natives.BlzGetUnitMaxMana(unit) + 0.0f;
+            return Natives.BlzGetUnitMaxMana(unit);
         }
 
         /// <summary>Sets the most mana a unit can have in the game: BlzSetUnitMaxMana, which takes a whole number.</summary>
@@ -936,8 +939,8 @@ namespace Moonwell.Engine
         /// <summary>The clock's callback: counts the lap and starts the clock again.</summary>
         private void ClockLapped()
         {
-            lapStart += lap;
-            Natives.TimerStart(clock, lap, false, ClockLapped);
+            lapStart += Lap;
+            Natives.TimerStart(clock, Lap, false, ClockLapped);
         }
 
         /// <summary>Registers a player unit event for every player slot, with one trigger that runs the action.</summary>
