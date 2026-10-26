@@ -495,6 +495,10 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "damage-package.removed-target-not-killed", Run = LandingCases.RemovedTargetNotKilled });
             list.Add(new Case { Name = "damage-package.outer-found-below-stray", Run = LandingCases.OuterFoundBelowStray });
             list.Add(new Case { Name = "damage-package.deal-stopped-returns-null", Run = DealCases.DealStoppedReturnsNull });
+            list.Add(new Case { Name = "damage-package.raw-deal-chain-cut", Run = DealCases.RawDealChainCut });
+            list.Add(new Case { Name = "damage-package.code-deal-of-zero-runs", Run = DealCases.CodeDealOfZeroRuns });
+            list.Add(new Case { Name = "damage-package.zero-hit-quiet", Run = StageCases.ZeroHitQuiet });
+            list.Add(new Case { Name = "damage-package.sourceless-hit-runs", Run = StageCases.SourcelessHitRuns });
             list.Add(new Case { Name = "damage-package.deal-returns-hit", Run = DealCases.DealReturnsHit });
             list.Add(new Case { Name = "damage-package.deal-attack-type", Run = DealCases.DealAttackType });
             list.Add(new Case { Name = "damage-package.deal-starts-listening", Run = DealCases.DealStartsListening });

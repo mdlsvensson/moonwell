@@ -23,6 +23,44 @@ namespace Moonwell.Testing
             Expect.Near(70f, fake.Body(target.Handle).Life, "the target lost 30");
         }
 
+        /// <summary>Two units that hit back after armor through the raw native, not Unit.Damage: the chain still ends at 8 hits, the ninth is set to 0 and runs no reaction, and one error is reported.</summary>
+        public static void RawDealChainCut(FakeWorld world)
+        {
+            StageCases.Arena(world, out var source, out var target);
+            var fake = StageCases.Fake;
+            var other = Another(world, 0);
+            var taken = 0;
+            target.Taken = hit =>
+            {
+                taken++;
+                if (taken < 40)
+                {
+                    fake.Deal(target.Handle, hit.Source!.Handle, 1f, false, false, 0, 4, 0);
+                }
+            };
+            other.Taken = hit =>
+            {
+                taken++;
+                if (taken < 40)
+                {
+                    fake.Deal(other.Handle, hit.Source!.Handle, 1f, false, false, 0, 4, 0);
+                }
+            };
+            fake.Hit(other.Handle, target.Handle, 1f, damageType: 4);
+            Expect.Equal(8, taken, "eight hits in the chain");
+            Expect.Equal(1, world.Logged.Count, "one error is reported");
+            Expect.Near(192f, fake.Body(target.Handle).Life + fake.Body(other.Handle).Life, "the eight hits took 1 each and the ninth nothing");
+        }
+
+        /// <summary>A hit of 0 from code is what the map asked for: it runs every stage, and Unit.Damage returns it.</summary>
+        public static void CodeDealOfZeroRuns(FakeWorld world)
+        {
+            StageCases.Arena(world, out var source, out var target);
+            var hit = source.Damage(target, 0f);
+            Expect.True(hit != null, "a hit is returned");
+            Expect.True(TestLog.Lines.Contains("target taking") && TestLog.Lines.Contains("target taken"), "the target's reactions ran");
+        }
+
         /// <summary>Magic from code on a spell-immune unit deals nothing, so Unit.Damage returns null, as the guide says.</summary>
         public static void DealStoppedReturnsNull(FakeWorld world)
         {

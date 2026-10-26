@@ -124,6 +124,12 @@ namespace Moonwell
         /// <summary>Whether the hit left its after-armor stage killing a living target; Killed is this and the target dead 0 s later.</summary>
         internal bool WouldKill;
 
+        /// <summary>Whether no package reaction runs for the hit and it does not land: the game started it at 0, or it was cut.</summary>
+        internal bool Quiet;
+
+        /// <summary>Whether the hit was cut as the ninth of a chain: set to 0, and core's reactions do not run for it either.</summary>
+        internal bool Cut;
+
         /// <summary>Whether the package put armor on the target for this hit, to be put back.</summary>
         internal bool ArmorChanged;
 

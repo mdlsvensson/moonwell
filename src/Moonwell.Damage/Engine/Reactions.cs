@@ -24,9 +24,34 @@ namespace Moonwell
             Running.Clear();
         }
 
-        /// <summary>Runs a stage's reactions to a hit.</summary>
+        /// <summary>The chain place of a hit made now: 0, or one more than the hit whose reactions are running.</summary>
+        internal static int NextChain()
+        {
+            return Running.Count == 0 ? 0 : Running[Running.Count - 1].Chain + 1;
+        }
+
+        /// <summary>Runs core's OnDamaged family on a hit, as reactions to it, so damage they deal continues its chain.</summary>
+        internal static void RunCore(Hit hit)
+        {
+            Running.Add(hit);
+            try
+            {
+                Inbound.Dispatch(hit);
+            }
+            finally
+            {
+                Running.RemoveAt(Running.Count - 1);
+            }
+        }
+
+        /// <summary>Runs a stage's reactions to a hit; a quiet hit has none.</summary>
         internal static void Run(Hit hit, Stage stage)
         {
+            if (hit.Quiet)
+            {
+                return;
+            }
+
             var source = hit.Source;
             var target = hit.Target;
             var targetSlot = target.Player.Slot;

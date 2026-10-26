@@ -175,6 +175,33 @@ namespace Moonwell.Testing
             Expect.Equal(0, world.Logged.Count, "nothing is reported");
         }
 
+        /// <summary>A hit the game starts at 0 (Storm Bolt's first, Fireball's extra two) runs no package reaction and does not land; core's reactions still see it.</summary>
+        public static void ZeroHitQuiet(FakeWorld world)
+        {
+            Arena(world, out var source, out var target);
+            var hurt = false;
+            var bursts = 0;
+            target.Hurt = hit => hurt = true;
+            source.Bursted = burst => bursts++;
+            fake.Hit(source.Handle, target.Handle, 0f, damageType: 4);
+            fake.RunZero();
+            ExpectLog(new string[] { "source core dealt", "target core damaged" }, "the log");
+            Expect.True(!hurt, "no landing");
+            Expect.Equal(0, bursts, "no burst");
+        }
+
+        /// <summary>A hit with no source runs the target's stages.</summary>
+        public static void SourcelessHitRuns(FakeWorld world)
+        {
+            Arena(world, out var source, out var target);
+            var hurt = false;
+            target.Hurt = hit => hurt = true;
+            fake.Hit(null, target.Handle, 10f, damageType: 4);
+            fake.RunZero();
+            Expect.True(TestLog.Lines.Contains("target taking") && TestLog.Lines.Contains("target taken"), "the target's reactions ran");
+            Expect.True(hurt, "the hit landed");
+        }
+
         /// <summary>A unit that is both melee and ranged deals a ranged hit when the hit has no sound, a melee one when it has.</summary>
         public static void MeleeOrRanged(FakeWorld world)
         {

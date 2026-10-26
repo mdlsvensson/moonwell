@@ -81,8 +81,7 @@ namespace Moonwell
         /// <summary>Deals damage from code: the hit its before-armor event makes is marked as code's and returned. A deal from a reaction continues the reacting hit's chain; one that would make the chain longer than MaxChain throws, which the reaction reports.</summary>
         internal static Hit? Deal(Unit source, Unit target, float amount, int attackType, DamageKind type, bool isAttack, bool ranged, WeaponSound sound, object? tag)
         {
-            var running = Reactions.Running;
-            var chain = running.Count == 0 ? 0 : running[running.Count - 1].Chain + 1;
+            var chain = Reactions.NextChain();
             if (chain >= MaxChain)
             {
                 throw new MoonwellException(Names.NameOf(source) + " to " + Names.NameOf(target) + ": not dealt, a chain of " + MaxChain + " hits dealt from reactions ends here");
@@ -127,6 +126,19 @@ namespace Moonwell
                 hit.Tag = deal.Tag;
                 hit.Chain = deal.Chain;
             }
+            else
+            {
+                // Damage the game makes while a reaction runs (a raw native, an area hit) belongs to that reaction's hit too.
+                hit.Chain = Reactions.NextChain();
+
+                // The game's 0-damage hits (Storm Bolt's first, Fireball's extra two) are not hits a map reacts to.
+                hit.Quiet = hit.Original == 0.0f;
+            }
+
+            if (hit.Chain >= MaxChain)
+            {
+                Cut(hit);
+            }
 
             hit.AttackTypeCode = World.EventAttackType();
             hit.DefenseTypeCode = World.DefenseType(targetHandle);
@@ -151,6 +163,17 @@ namespace Moonwell
             }
 
             return hit;
+        }
+
+        /// <summary>Ends a chain at a hit the game made: the hit is set to 0, no reaction runs for it, and the cut is reported once.</summary>
+        private static void Cut(Hit hit)
+        {
+            hit.Quiet = true;
+            hit.Cut = true;
+            hit.Amount = 0.0f;
+            World.SetEventAmount(0.0f);
+            var from = hit.Source == null ? "no unit" : Names.NameOf(hit.Source);
+            Errors.Report("Moonwell.Damage", new MoonwellException(from + " to " + Names.NameOf(hit.Target) + ": set to 0, a chain of " + MaxChain + " hits made while reactions ran ends here"));
         }
 
         /// <summary>The game's damaging event: the before-armor stage, then what it changed written back to the game.</summary>
@@ -257,10 +280,12 @@ namespace Moonwell
             var amount = hit.Amount;
             hit.Stage = Stage.AfterArmor;
 
-            // Core's OnDamaged family runs as reactions to this hit too, so damage it deals continues the hit's chain.
-            Reactions.Running.Add(hit);
-            Inbound.Dispatch(hit);
-            Reactions.Running.RemoveAt(Reactions.Running.Count - 1);
+            // Core's OnDamaged family comes first, then the package's; a cut hit runs neither.
+            if (!hit.Cut)
+            {
+                Reactions.RunCore(hit);
+            }
+
             Reactions.Run(hit, Stage.AfterArmor);
 
             // The life is read only now: a hit those reactions dealt has already lowered it (game facts: the life drops
@@ -280,8 +305,11 @@ namespace Moonwell
                 World.SetEventAmount(hit.Amount);
             }
 
-            moment.Add(hit);
-            World.AfterZero(Settle);
+            if (!hit.Quiet)
+            {
+                moment.Add(hit);
+                World.AfterZero(Settle);
+            }
         }
 
         /// <summary>The 0 s timer: hits still waiting for their after-armor event end without it; the moment's hits land, in order; then each source's burst.</summary>
