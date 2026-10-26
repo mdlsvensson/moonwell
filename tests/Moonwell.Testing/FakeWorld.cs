@@ -12,6 +12,13 @@ namespace Moonwell.Testing
         /// <summary>The absolute time of the pending wake request; null when there is none.</summary>
         public float? WakeAt;
 
+        /// <summary>
+        /// How many seconds after the time asked for Advance delivers each wake; 0, the default, delivers it on time. The game wakes a
+        /// timer at a frame, not at the exact time asked for: timers were seen running 0.0001 s off, and the time of slow frames is
+        /// made up later in bursts.
+        /// </summary>
+        public float WakeLate;
+
         /// <summary>The slot of the player at this machine.</summary>
         public int LocalSlot;
 
@@ -395,14 +402,14 @@ namespace Moonwell.Testing
             return null;
         }
 
-        /// <summary>Moves time forward by the seconds, calling Runtime.Wake at each wake request on the way.</summary>
+        /// <summary>Moves time forward by the seconds, calling Runtime.Wake at each wake request on the way, WakeLate after the time it asked for.</summary>
         public void Advance(float seconds)
         {
             var target = Time + seconds;
             DeliverPendingDrops();
-            while (WakeAt.HasValue && WakeAt.Value <= target + 0.001f)
+            while (WakeAt.HasValue && WakeAt.Value + WakeLate <= target + 0.001f)
             {
-                Time = WakeAt.Value;
+                Time = WakeAt.Value + WakeLate;
                 WakeAt = null;
                 Runtime.Wake();
             }
@@ -623,11 +630,14 @@ namespace Moonwell.Testing
             return new List<destructable>(PlacedDestructables);
         }
 
-        /// <summary>Makes a unit owned by the owner's slot, and keeps the facing in LastFacing; the place is not kept.</summary>
+        /// <summary>Makes a unit owned by the owner's slot at the place, and keeps the facing in LastFacing.</summary>
         public unit SpawnUnit(player owner, int typeId, float x, float y, float facing)
         {
             LastFacing = facing;
-            return NewUnit(typeId, SlotOf(owner));
+            var created = NewUnit(typeId, SlotOf(owner));
+            unitXs[created] = x;
+            unitYs[created] = y;
+            return created;
         }
 
         /// <summary>Makes an item; the place is not kept.</summary>

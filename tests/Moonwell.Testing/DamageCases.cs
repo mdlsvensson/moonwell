@@ -142,6 +142,31 @@ namespace Moonwell.Testing
             Expect.Near(100f, amount, "the amount");
         }
 
+        /// <summary>Damage between two units of one player runs that player's reactions once.</summary>
+        public static void SamePlayer(FakeWorld world)
+        {
+            Arena();
+            var striker = Unit.Of(world.NewUnit(ObjectTypes.FourCC("H001"), slot: 0))!;
+            var dummy = Unit.Of(world.NewUnit(ObjectTypes.FourCC("h000"), slot: 0))!;
+            TestLog.Lines.Clear();
+            Inbound.Damaged(dummy.Handle, striker.Handle, 100f, true);
+            ExpectLog(new string[] { "striker dealt", "striker comp dealt", "dummy damaged", "dummy comp damaged", "game damaged", "p0 damaged" }, "the log");
+        }
+
+        /// <summary>The tag given to Unit.Damage is the damage's Tag inside the reactions, as well as on the damage it returns.</summary>
+        public static void DealTagInReactions(FakeWorld world)
+        {
+            var watch = new TagWatch();
+            Game.Instance.Add(watch);
+            var source = Unit.Of(world.NewUnit(ObjectTypes.FourCC("ofoo"), slot: 0))!;
+            var target = Unit.Of(world.NewUnit(ObjectTypes.FourCC("ofoo"), slot: 1))!;
+            var tag = new object();
+            var damage = source.Damage(target, 5f, tag: tag);
+            Expect.Equal(1, watch.Seen.Count, "the damages the reaction saw");
+            Expect.Same(tag, watch.Seen[0], "the Tag inside OnUnitDamaged");
+            Expect.Same(tag, damage!.Tag, "the Tag of the returned damage");
+        }
+
         /// <summary>A reaction that throws is reported, and the reactions after it still run.</summary>
         public static void ErrorIsolated(FakeWorld world)
         {
@@ -154,6 +179,19 @@ namespace Moonwell.Testing
             ExpectLog(new string[] { "dummy damaged", "dummy comp damaged", "b damaged" }, "the log");
             Expect.Equal(1, world.Logged.Count, "the lines logged");
             Expect.Equal("Moonwell: A.OnDamaged failed: boom", world.Logged[0], "the error line");
+        }
+    }
+
+    /// <summary>A game component that records the Tag of each damage it sees.</summary>
+    public class TagWatch : GameComponent
+    {
+        /// <summary>The Tag of each damage, in order.</summary>
+        public readonly System.Collections.Generic.List<object?> Seen = new System.Collections.Generic.List<object?>();
+
+        /// <summary>Records the damage's Tag.</summary>
+        public override void OnUnitDamaged(Damage damage)
+        {
+            Seen.Add(damage.Tag);
         }
     }
 

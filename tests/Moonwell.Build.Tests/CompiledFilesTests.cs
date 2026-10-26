@@ -7,11 +7,12 @@ namespace Moonwell.Build.Tests
     public sealed class CompiledFilesTests : IDisposable
     {
         private readonly SampleBuilds builds;
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
 
-        public CompiledFilesTests(SampleBuilds builds)
+        public CompiledFilesTests(SampleBuilds builds, ITestOutputHelper output)
         {
             this.builds = builds;
+            folders = new TestFolders(output);
         }
 
         public void Dispose()
@@ -62,7 +63,7 @@ namespace Moonwell.Build.Tests
 
             // The Sample's own output, which the collection's build makes.
             Assert.Equal(0, builds.Development.ExitCode);
-            var assembly = Path.Combine(TestFolders.Fixture("Sample"), "bin", "Debug", "net10.0", "Sample.dll");
+            var assembly = Path.Combine(builds.Folder, "bin", "Debug", "net10.0", "Sample.dll");
             var found = NamedChoices.Read(MapProject.Find(copy), assembly, new HashSet<string> { "Targets", "ArmorType" });
 
             Assert.Equal(new[] { "Targets" }, found);

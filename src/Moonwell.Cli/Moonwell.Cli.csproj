@@ -9,6 +9,8 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>moonwell</ToolCommandName>
     <Description>The moonwell command: builds a Moonwell map project into a Warcraft III map and starts the game with it.</Description>
+    <!-- The machine's regional format never reaches the map: numbers are written as the game reads them (MapBuild.Run sets the same culture). -->
+    <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
 </Project>

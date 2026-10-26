@@ -23,7 +23,12 @@ namespace Moonwell.Build.Tests
                 return (project, map);
             });
 
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
+
+        public StageTests(ITestOutputHelper output)
+        {
+            folders = new TestFolders(output);
+        }
 
         [Fact]
         public void source_map_is_untouched()
@@ -122,6 +127,24 @@ namespace Moonwell.Build.Tests
 
             Assert.Equal("STRING 1 { replaced }", File.ReadAllText(Path.Combine(project.StagedFolder, "war3map.wts")));
             Assert.Contains(@"note: assets\war3map.wts replaces the map's file", log.ToString());
+        }
+
+        [Theory]
+        [InlineData("assets", @"Ljud\Hälsning.txt", "ä")]
+        [InlineData("assets", "Pris€.txt", "€")]
+        [InlineData("map", @"war3mapImported\Öga.mdx", "Ö")]
+        public void a_file_named_past_ascii_is_refused_naming_it(string folder, string file, string letter)
+        {
+            // War3Net hashes a name's UTF-16 letters, the game its bytes; from U+0200 War3Net cannot pack the name at all.
+            var project = MapProject.Find(folders.TemporaryCopyOfSample());
+            var map = OpenWithPlaceholderScript(project);
+            var path = Path.Combine(folder == "map" ? project.MapFolder : project.AssetsFolder, file);
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.WriteAllText(path, "x");
+
+            var error = Assert.Throws<BuildException>(() => Stage.WriteWithoutObjects(project, map, TextWriter.Null));
+
+            Assert.Equal($@"{folder}\{file} has ""{letter}"" in its name; a file in the map must be named with ASCII characters only, so rename it", error.Message);
         }
 
         [Fact]

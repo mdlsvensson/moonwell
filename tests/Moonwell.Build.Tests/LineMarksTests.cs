@@ -4,7 +4,12 @@ namespace Moonwell.Build.Tests
     {
         private static readonly string[] Debug = { "DEBUG" };
 
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
+
+        public LineMarksTests(ITestOutputHelper output)
+        {
+            folders = new TestFolders(output);
+        }
 
         [Fact]
         public void marks_each_statement()

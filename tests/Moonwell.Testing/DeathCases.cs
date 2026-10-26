@@ -34,6 +34,17 @@ namespace Moonwell.Testing
             ExpectLog(new string[] { "dummy died", "dummy comp died", "striker killed", "striker comp killed", "game died", "p1 died", "p0 died" }, "the log");
         }
 
+        /// <summary>A death of a unit killed by another unit of its player runs that player's reactions once.</summary>
+        public static void SamePlayer(FakeWorld world)
+        {
+            Arena();
+            var striker = Unit.Of(world.NewUnit(ObjectTypes.FourCC("H001"), slot: 1))!;
+            var dummy = Unit.Of(world.NewUnit(ObjectTypes.FourCC("h000"), slot: 1))!;
+            TestLog.Lines.Clear();
+            Inbound.Died(dummy.Handle, striker.Handle);
+            ExpectLog(new string[] { "dummy died", "dummy comp died", "striker killed", "striker comp killed", "game died", "p1 died" }, "the log");
+        }
+
         /// <summary>A unit that kills itself gives its OnDeath no killer, and runs no OnKill.</summary>
         public static void Self(FakeWorld world)
         {

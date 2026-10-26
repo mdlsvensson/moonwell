@@ -4,7 +4,12 @@ namespace Moonwell.Build.Tests
     {
         private static readonly HeroBonus Standard = new HeroBonus(25f, 15f);
 
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
+
+        public MapMiscTests(ITestOutputHelper output)
+        {
+            folders = new TestFolders(output);
+        }
 
         [Fact]
         public void a_maps_misc_file_overrides_the_hero_bonus()

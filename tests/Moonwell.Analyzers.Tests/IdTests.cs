@@ -162,6 +162,37 @@ public class IdTests
     }
 
     [Fact]
+    public void an_id_with_a_character_outside_ascii_is_an_error()
+    {
+        // The object file would hold "?001", and the Lua another id still.
+        Assert.Equal(new[]
+        {
+            "Arthas has the id \"Å001\", with a character that is not an ASCII letter, digit or sign",
+            "Burn has the id \"A 01\", with a character that is not an ASCII letter, digit or sign",
+        }, MapCode.MessagesOfIds("""
+            using Moonwell.Objects;
+
+            namespace Map
+            {
+                [ObjectId("Å001")]
+                public sealed class Arthas : Human.Units.Paladin
+                {
+                }
+
+                [ObjectId("B001", Carrier = "A 01")]
+                public sealed class Burn : Human.Buffs.FlameStrike
+                {
+                }
+
+                [ObjectId("h!~0")]
+                public sealed class Signs : Human.Units.Footman
+                {
+                }
+            }
+            """));
+    }
+
+    [Fact]
     public void a_wrong_case_message_says_why()
     {
         Assert.Equal(new[]
