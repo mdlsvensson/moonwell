@@ -112,6 +112,23 @@ namespace Moonwell.Testing
             Expect.Same(first, area.Units[0], "the first entered is first");
         }
 
+        /// <summary>
+        /// A unit inside when the area is added enters although it stands in the area's top-right cell, beyond the last whole
+        /// cell of the area's bounds: the first sweep looks at every cell the area touches.
+        /// </summary>
+        public static void AlreadyInsideEdge(FakeWorld world)
+        {
+            var fake = Fresh();
+            var corner = UnitAt(world, 98f, 98f);
+            fake.Stand(corner.Handle, 98f, 98f);
+            var area = new LogArea(AreaShape.Rect(new Bounds(new Vector2(0f, 0f), new Vector2(100f, 100f))));
+            area.Labels[corner] = "corner";
+            Game.Instance.Add(area);
+            fake.Regions[0].Inside.Add(corner.Handle);
+            world.Advance(0f);
+            ExpectLog(area, new[] { "entered corner" }, "the unit in the top-right cell");
+        }
+
         /// <summary>A unit the sweep and an enter event both find enters once, whichever comes first.</summary>
         public static void SweepAndEvent(FakeWorld world)
         {

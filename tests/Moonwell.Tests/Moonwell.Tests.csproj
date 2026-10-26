@@ -1,5 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!--
+    The cases run here on .NET as a development build (Debug). A map's release build leaves out every Dev.Check and the cases'
+    own #if DEBUG checks; to run the cases that way too: dotnet test tests/Moonwell.Tests -c Release
+  -->
   <PropertyGroup>
     <IsPackable>false</IsPackable>
   </PropertyGroup>

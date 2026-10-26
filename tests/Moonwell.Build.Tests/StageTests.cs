@@ -23,7 +23,12 @@ namespace Moonwell.Build.Tests
                 return (project, map);
             });
 
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
+
+        public StageTests(ITestOutputHelper output)
+        {
+            folders = new TestFolders(output);
+        }
 
         [Fact]
         public void source_map_is_untouched()

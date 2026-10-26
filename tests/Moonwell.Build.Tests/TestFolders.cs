@@ -5,6 +5,14 @@ namespace Moonwell.Build.Tests
     {
         private readonly List<string> folders = new List<string>();
 
+        private readonly ITestOutputHelper? output;
+
+        /// <summary>Keeps a test's temporary copies; a copy that cannot be deleted is named on the test's output, when given one.</summary>
+        public TestFolders(ITestOutputHelper? output = null)
+        {
+            this.output = output;
+        }
+
         /// <summary>The full path of a fixture folder; <c>.</c> is the folder of all fixtures.</summary>
         public static string Fixture(string name)
         {
@@ -49,16 +57,17 @@ namespace Moonwell.Build.Tests
         {
             foreach (var folder in folders)
             {
-                Delete(folder);
+                Delete(folder, output: output);
             }
         }
 
         /// <summary>
         /// Deletes a temporary folder of a test's own, and what is in it, if it is there. On Windows a process the test started
         /// (a build server, an MSBuild node) may still hold a file in it for a moment: the delete is tried again for two seconds,
-        /// then the folder is left, since a leftover temporary folder is not a test's failure.
+        /// then the folder is left, since a leftover temporary folder is not a test's failure; a line on the test's output, when
+        /// given one, names the folder left and why.
         /// </summary>
-        public static void Delete(string folder, bool recursive = true)
+        public static void Delete(string folder, bool recursive = true, ITestOutputHelper? output = null)
         {
             for (var attempt = 1; Directory.Exists(folder); attempt++)
             {
@@ -71,6 +80,7 @@ namespace Moonwell.Build.Tests
                 {
                     if (attempt == 20)
                     {
+                        output?.WriteLine($"Left the temporary folder {folder}: still in use after {attempt} tries to delete it ({error.Message})");
                         return;
                     }
 

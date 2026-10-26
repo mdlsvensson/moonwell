@@ -131,19 +131,20 @@ namespace Moonwell.Testing
             Expect.Equal("((0, 5), (-1, 0), 0.5)", hit.ToString(), "hit text");
         }
 
-        // Lua's memory in KB; the game's Lua has no collectgarbage, but these cases run in the Lua host and on .NET only.
-        /// @CSharpLua.Template = "collectgarbage('count')"
+        // Lua's memory in KB; the game's Lua has no collectgarbage, but these cases run in the Lua host and on .NET only. The
+        // Lua host takes collectgarbage out, as the game has none, and keeps it for these cases as LuaHostCollectGarbage.
+        /// @CSharpLua.Template = "LuaHostCollectGarbage('count')"
         private static float MemoryKb()
         {
             return 0f;
         }
 
-        /// @CSharpLua.Template = "collectgarbage('stop')"
+        /// @CSharpLua.Template = "LuaHostCollectGarbage('stop')"
         private static void StopCollector()
         {
         }
 
-        /// @CSharpLua.Template = "collectgarbage('restart')"
+        /// @CSharpLua.Template = "LuaHostCollectGarbage('restart')"
         private static void RestartCollector()
         {
         }

@@ -13,11 +13,12 @@ namespace Moonwell.Build.Tests
         private const string RecommendedPlayers = "RecommendedPlayers = \"Any\";";
 
         private readonly SampleBuilds builds;
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
 
-        public ObjectBuildTests(SampleBuilds builds)
+        public ObjectBuildTests(SampleBuilds builds, ITestOutputHelper output)
         {
             this.builds = builds;
+            folders = new TestFolders(output);
         }
 
         public void Dispose()
@@ -180,7 +181,7 @@ namespace Moonwell.Build.Tests
         {
             // Read from the Sample's own copy of Moonwell, from bytes so that no file stays locked.
             Assert.Equal(0, builds.Development.ExitCode);
-            var dll = Path.Combine(TestFolders.Fixture("Sample"), "bin", "Debug", "net10.0", "Moonwell.dll");
+            var dll = Path.Combine(builds.Folder, "bin", "Debug", "net10.0", "Moonwell.dll");
             var runtime = Assembly.Load(File.ReadAllBytes(dll));
             var dataSet = runtime.GetType("Moonwell.DataSet", true)!;
             var dataVersion = runtime.GetType("Moonwell.DataVersion", true)!;
@@ -818,7 +819,7 @@ namespace Moonwell.Build.Tests
             // The library an earlier build of the project, when it still used Moonwell.Objects, left in its output.
             var output = Path.Combine(copy, "bin", "Debug", "net10.0");
             Directory.CreateDirectory(output);
-            File.Copy(Path.Combine(TestFolders.Fixture("Sample"), "bin", "Debug", "net10.0", "Moonwell.Objects.dll"), Path.Combine(output, "Moonwell.Objects.dll"));
+            File.Copy(Path.Combine(builds.Folder, "bin", "Debug", "net10.0", "Moonwell.Objects.dll"), Path.Combine(output, "Moonwell.Objects.dll"));
 
             var log = new StringWriter();
             var archive = MapBuild.Run(copy, new BuildOptions(), log);
