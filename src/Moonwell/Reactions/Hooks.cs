@@ -13,6 +13,12 @@ namespace Moonwell
         /// <summary>Set by a damage package: given the first object of each class whose mask is worked out; null without one.</summary>
         internal static Action<object>? Seen;
 
+        /// <summary>Set by an interactions package: given each unit, item and destructable the runtime takes in, after its OnCreated; null without one.</summary>
+        internal static Action<Widget>? TakenIn;
+
+        /// <summary>Set by an interactions package: given each unit, item and destructable as it ends, before its OnLeave runs and while its place can still be read, so it has left the package's grid by its OnLeave (a gizmo, the package's own, leaves after); null without one.</summary>
+        internal static Action<Widget>? Ending;
+
         /// <summary>
         /// Whether obj's class, below declaringBase, defines name itself. In Lua MoonwellOverrides (moonwell.lua) walks
         /// the class chain; .NET asks reflection.
@@ -51,11 +57,45 @@ namespace Moonwell
             return mask;
         }
 
-        /// <summary>Forgets every class's mask; Runtime.Reset calls it.</summary>
+        /// <summary>Tells the interactions package that a widget was taken in; an error in it is reported and goes no further.</summary>
+        internal static void CallTakenIn(Widget widget)
+        {
+            if (TakenIn != null)
+            {
+                try
+                {
+                    TakenIn(widget);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report("Moonwell.Hooks", error);
+                }
+            }
+        }
+
+        /// <summary>Tells the interactions package that a widget is ending; an error in it is reported and goes no further.</summary>
+        internal static void CallEnding(Widget widget)
+        {
+            if (Ending != null)
+            {
+                try
+                {
+                    Ending(widget);
+                }
+                catch (Exception error)
+                {
+                    Errors.Report("Moonwell.Hooks", error);
+                }
+            }
+        }
+
+        /// <summary>Forgets every class's mask and the hooks a package set; Runtime.Reset calls it.</summary>
         internal static void Reset()
         {
             masks.Clear();
             Seen = null;
+            TakenIn = null;
+            Ending = null;
         }
     }
 }

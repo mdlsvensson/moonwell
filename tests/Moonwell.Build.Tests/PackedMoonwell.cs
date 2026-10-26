@@ -2,12 +2,12 @@ using System.Diagnostics;
 
 namespace Moonwell.Build.Tests
 {
-    /// <summary>Moonwell, Moonwell.Natives, Moonwell.Objects, Moonwell.Damage, Moonwell.Maths, Moonwell.Terrain and Moonwell.Templates packed with a version of their own into a feed in the temporary folder; removes everything it made, including what a restore left in the NuGet folder.</summary>
+    /// <summary>Moonwell, Moonwell.Natives, Moonwell.Objects, Moonwell.Damage, Moonwell.Maths, Moonwell.Interactions, Moonwell.Terrain and Moonwell.Templates packed with a version of their own into a feed in the temporary folder; removes everything it made, including what a restore left in the NuGet folder.</summary>
     public sealed class PackedMoonwell : IDisposable
     {
         private readonly string root = Path.Combine(Path.GetTempPath(), "moonwell-feed-" + Guid.NewGuid().ToString("N"));
 
-        /// <summary>Packs the six runtime projects and the template.</summary>
+        /// <summary>Packs the seven runtime projects and the template.</summary>
         public PackedMoonwell()
         {
             Version = "0.1.0-test." + DateTime.UtcNow.Ticks;
@@ -20,14 +20,15 @@ namespace Moonwell.Build.Tests
             Dotnet(repository, "pack", Path.Combine("src", "Moonwell.Objects", "Moonwell.Objects.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
             Dotnet(repository, "pack", Path.Combine("src", "Moonwell.Damage", "Moonwell.Damage.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
             Dotnet(repository, "pack", Path.Combine("src", "Moonwell.Maths", "Moonwell.Maths.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
+            Dotnet(repository, "pack", Path.Combine("src", "Moonwell.Interactions", "Moonwell.Interactions.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
             Dotnet(repository, "pack", Path.Combine("src", "Moonwell.Terrain", "Moonwell.Terrain.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
             Dotnet(repository, "pack", Path.Combine("template", "Moonwell.Templates.csproj"), "-c", "Release", "-o", Feed, "-p:Version=" + Version, "--disable-build-servers");
         }
 
-        /// <summary>The version all seven packages were packed with, <c>0.1.0-test.</c> and a number nothing else uses.</summary>
+        /// <summary>The version all eight packages were packed with, <c>0.1.0-test.</c> and a number nothing else uses.</summary>
         public string Version { get; }
 
-        /// <summary>The folder holding the seven <c>.nupkg</c> files.</summary>
+        /// <summary>The folder holding the eight <c>.nupkg</c> files.</summary>
         public string Feed { get; }
 
         /// <summary>The path of the Moonwell package.</summary>
@@ -42,6 +43,9 @@ namespace Moonwell.Build.Tests
         /// <summary>The path of the Moonwell.Maths package.</summary>
         public string MathsPackage => Path.Combine(Feed, "Moonwell.Maths." + Version + ".nupkg");
 
+        /// <summary>The path of the Moonwell.Interactions package.</summary>
+        public string InteractionsPackage => Path.Combine(Feed, "Moonwell.Interactions." + Version + ".nupkg");
+
         /// <summary>The path of the Moonwell.Terrain package.</summary>
         public string TerrainPackage => Path.Combine(Feed, "Moonwell.Terrain." + Version + ".nupkg");
 
@@ -52,7 +56,7 @@ namespace Moonwell.Build.Tests
         public void Dispose()
         {
             var packages = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
-            foreach (var id in new[] { "moonwell", "moonwell.natives", "moonwell.objects", "moonwell.damage", "moonwell.maths", "moonwell.terrain" })
+            foreach (var id in new[] { "moonwell", "moonwell.natives", "moonwell.objects", "moonwell.damage", "moonwell.maths", "moonwell.interactions", "moonwell.terrain" })
             {
                 TestFolders.Delete(Path.Combine(packages, id, Version.ToLowerInvariant()));
 

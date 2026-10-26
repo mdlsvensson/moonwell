@@ -3,13 +3,13 @@ using War3Net.Build.Script;
 
 namespace Moonwell.Build
 {
-    /// <summary>The unit, hero and item types the source map's object files make or change in World Editor.</summary>
+    /// <summary>The unit, hero, item and destructable types the source map's object files make or change in World Editor.</summary>
     internal static class MapTypes
     {
         private const string TriggerStringPrefix = "TRIGSTR_";
 
         /// <summary>
-        /// Every object of the source map's unit and item files, main and skin: a changed standard object (the original table)
+        /// Every object of the source map's unit, item and destructable files, main and skin: a changed standard object (the original table)
         /// with its own id as its root, a new one with its base as its root, each with the values its files change. A unit whose
         /// id starts with a capital letter is a hero, as the generator has it. A text World Editor keeps in the trigger strings
         /// (<c>TRIGSTR_012</c>) is the string's text, as the game reads it.
@@ -17,7 +17,7 @@ namespace Moonwell.Build
         /// <param name="mapFolder">The map folder, which holds the object files.</param>
         /// <param name="strings">The map's trigger strings (<c>war3map.wts</c>); null when it has none.</param>
         /// <param name="standard">The standard data, whose fields give each stored value its type.</param>
-        /// <returns>The types, in the files' order; empty when the map has no unit or item file.</returns>
+        /// <returns>The types, in the files' order; empty when the map has no unit, item or destructable file.</returns>
         /// <exception cref="BuildException">An object file cannot be read.</exception>
         public static IReadOnlyList<MapType> Read(string mapFolder, TriggerStrings? strings, StandardData standard)
         {
@@ -28,7 +28,7 @@ namespace Moonwell.Build
             }
 
             var types = new List<MapType>();
-            foreach (var (kind, extension) in ObjectKinds.All.Where(one => one.Kind is "unit" or "item"))
+            foreach (var (kind, extension) in ObjectKinds.All.Where(one => one.Kind is "unit" or "item" or "destructable"))
             {
                 var fields = new Dictionary<string, StandardData.ObjectField>(StringComparer.Ordinal);
                 foreach (var field in standard.Fields(kind))
@@ -50,7 +50,7 @@ namespace Moonwell.Build
                             order.Add(entry.Id);
                         }
 
-                        // A unit's or an item's fields have no levels: the files hold level 0 for each (ObjectTable).
+                        // A unit's, an item's or a destructable's fields have no levels: the files hold level 0 for each (ObjectTable).
                         foreach (var modification in entry.Modifications)
                         {
                             one.Changed[modification.Field] = ValueOf(fields.GetValueOrDefault(modification.Field), modification.Value, texts);

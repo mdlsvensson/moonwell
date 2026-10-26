@@ -80,6 +80,12 @@ namespace Moonwell.Hosting
         /// <summary>The type id of a destructable; 0 once the game has removed it.</summary>
         int DestructableTypeId(destructable destructable);
 
+        /// <summary>The x of a destructable.</summary>
+        float DestructableX(destructable destructable);
+
+        /// <summary>The y of a destructable.</summary>
+        float DestructableY(destructable destructable);
+
         /// <summary>Removes a unit from the world.</summary>
         void DeleteUnit(unit unit);
 

@@ -237,6 +237,102 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void trees_are_written_with_the_package()
+        {
+            var trees = TreesOf(ObjectLua.Values(compiled.Script, compiled.Declarations, NamedIds(), compiled.Standard, null, Array.Empty<MapType>(), true));
+
+            // Lordaeron Summer Tree Wall is targeted as a tree; the barrel is targeted as debris.
+            Assert.Contains($"[{ObjectLua.FourCC("LTlt")}] = true,", trees);
+            Assert.DoesNotContain($"[{ObjectLua.FourCC("LTbr")}]", trees);
+        }
+
+        [Fact]
+        public void no_trees_without_the_package()
+        {
+            var script = ObjectLua.Values(compiled.Script, compiled.Declarations, NamedIds(), compiled.Standard, null, Array.Empty<MapType>());
+
+            Assert.DoesNotContain("MoonwellTrees", script);
+            Assert.DoesNotContain("MoonwellTrees", compiled.Script);
+        }
+
+        [Fact]
+        public void trees_follow_the_destructable_types_the_map_makes_or_changes()
+        {
+            // World Editor made the barrel a tree and the tree wall a debris, and made a new tree on the barrel and a new barrel on it.
+            using var folders = new TestFolders();
+            var map = folders.TemporaryFolderOutsideRepository();
+            var main = new DestructableObjectData(ObjectDataFormatVersion.v3);
+            main.BaseDestructables.Add(WorldEditorObject("LTbr", string.Empty, Mod("btar", "tree")));
+            main.BaseDestructables.Add(WorldEditorObject("LTlt", string.Empty, Mod("btar", "debris")));
+            main.NewDestructables.Add(WorldEditorObject("LTbr", "B000", Mod("btar", "tree,debris")));
+            main.NewDestructables.Add(WorldEditorObject("LTlt", "B001", Mod("btar", "debris")));
+            main.NewDestructables.Add(WorldEditorObject("LTlt", "B002"));
+            using (var stream = File.Create(Path.Combine(map, "war3map.w3b")))
+            using (var writer = new BinaryWriter(stream, Encoding.UTF8))
+            {
+                writer.Write(main);
+            }
+
+            var trees = TreesOf(ObjectLua.Values(compiled.Script, compiled.Declarations, NamedIds(), compiled.Standard, null, MapTypes.Read(map, null, compiled.Standard), true));
+
+            Assert.Contains($"[{ObjectLua.FourCC("LTbr")}] = true,", trees);
+            Assert.DoesNotContain($"[{ObjectLua.FourCC("LTlt")}]", trees);
+            Assert.Contains($"[{ObjectLua.FourCC("B000")}] = true,", trees);
+            Assert.DoesNotContain($"[{ObjectLua.FourCC("B001")}]", trees);
+            // A new type reads its base's standard "Targeted As" where it changes none: the standard tree wall's, not the map's change to it.
+            Assert.Contains($"[{ObjectLua.FourCC("B002")}] = true,", trees);
+        }
+
+        [Fact]
+        public void a_declared_destructable_class_wins_over_the_types_of_its_id_for_trees()
+        {
+            // Gate (B001) is based on the Demonic Gate, which is targeted as debris.
+            var gate = compiled.Declarations.Objects.Single(one => one.ClassName == "Objects.Gate");
+            var id = ObjectLua.FourCC(NamedIds()["Objects.Gate"]);
+
+            string TreesWith(int targets, IReadOnlyList<MapType> types)
+            {
+                var changed = new Dictionary<string, object?>(gate.Changed, StringComparer.Ordinal) { ["btar"] = targets };
+                var declarations = compiled.Declarations with
+                {
+                    Objects = compiled.Declarations.Objects.Select(one => one == gate ? gate with { Changed = changed } : one).ToList(),
+                };
+                return TreesOf(ObjectLua.Values(compiled.Script, declarations, NamedIds(), compiled.Standard, null, types, true));
+            }
+
+            // The class adds Tree to the standard targets; the standard Demonic Gate itself stays what it is.
+            var added = TreesWith(Targeted("tree") | Targeted("debris"), Array.Empty<MapType>());
+            Assert.Contains($"[{id}] = true,", added);
+            Assert.DoesNotContain($"[{ObjectLua.FourCC("ATg1")}]", added);
+            // It takes Tree away from a World Editor type of its id, which the class replaces in the object files.
+            var worldEditor = new[] { new MapType("B001", "destructable", "ATg1", new Dictionary<string, object?> { ["btar"] = "tree" }) };
+            Assert.DoesNotContain($"[{id}]", TreesWith(Targeted("debris"), worldEditor));
+            Assert.Contains($"[{id}] = true,", TreesWith(Targeted("tree"), worldEditor));
+        }
+
+        [Fact]
+        public void a_standard_destructable_class_reads_its_type_as_world_editor_changed_it()
+        {
+            // Gate's chain reads TargetedAs, so the Demonic Gate it is based on gets a value; World Editor made the Demonic Gate a tree.
+            using var folders = new TestFolders();
+            var map = folders.TemporaryFolderOutsideRepository();
+            var main = new DestructableObjectData(ObjectDataFormatVersion.v3);
+            main.BaseDestructables.Add(WorldEditorObject("ATg1", string.Empty, Mod("btar", "tree")));
+            using (var stream = File.Create(Path.Combine(map, "war3map.w3b")))
+            using (var writer = new BinaryWriter(stream, Encoding.UTF8))
+            {
+                writer.Write(main);
+            }
+
+            string Of(string values) => Regex.Match(values, Regex.Escape("[\"Moonwell.Objects.Destructables.DemonicGate\"] = {") + "[^\n]*").Value;
+            var standard = CompiledObjects.ValuesOf(compiled.Script);
+            var edited = CompiledObjects.ValuesOf(ObjectLua.Values(compiled.Script, compiled.Declarations, NamedIds(), compiled.Standard, null, MapTypes.Read(map, null, compiled.Standard)));
+
+            Assert.Contains($"[\"btar\"] = {Targeted("debris")} }}", Of(standard));
+            Assert.Contains($"[\"btar\"] = {Targeted("tree")} }}", Of(edited));
+        }
+
+        [Fact]
         public void standard_class_used_in_code_is_defined()
         {
             // Footman is also the base of declared classes; Rifleman is used only inside a reaction.
@@ -693,6 +789,20 @@ namespace Moonwell.Build.Tests
         {
             var at = script.LastIndexOf("MoonwellTypeValues = {", StringComparison.Ordinal);
             Assert.True(at >= 0, "the script has no table of the types' values");
+            return script.Substring(at);
+        }
+
+        // The number of a text of the destructable "Targeted As" field's choice (Targets): "tree", "debris".
+        private int Targeted(string text)
+        {
+            return compiled.Standard.Fields("destructable").Single(field => field.Id == "btar").Choice!.Number(text);
+        }
+
+        // The table of the tree types appended to a script.
+        private static string TreesOf(string script)
+        {
+            var at = script.LastIndexOf("MoonwellTrees = {", StringComparison.Ordinal);
+            Assert.True(at >= 0, "the script has no table of the tree types");
             return script.Substring(at);
         }
 

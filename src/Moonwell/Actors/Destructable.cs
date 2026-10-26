@@ -40,6 +40,14 @@ namespace Moonwell
         [LocalSafe]
         public int TypeId { get; internal set; }
 
+        /// <summary>The x of the destructable, as the game read it when it was taken in; a destructable does not move, and the value stays once it is gone.</summary>
+        [LocalSafe]
+        public float X { get; internal set; }
+
+        /// <summary>The y of the destructable, as the game read it when it was taken in; a destructable does not move, and the value stays once it is gone.</summary>
+        [LocalSafe]
+        public float Y { get; internal set; }
+
         /// <summary>The starting components, which the runtime adds in order when the destructable is taken in.</summary>
         internal List<DestructableComponent> StartComponents => Components;
 
@@ -97,9 +105,10 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Runs OnLeave first; the components then end, and the destructable leaves the game.</summary>
+        /// <summary>Tells the interactions package, if there is one; runs OnLeave; the components then end, and the destructable leaves the game.</summary>
         protected sealed override void OnEnd()
         {
+            Hooks.CallEnding(this);
             var previous = Owner.current;
             Owner.current = this;
             try

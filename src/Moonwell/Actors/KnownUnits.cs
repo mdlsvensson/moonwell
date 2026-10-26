@@ -79,6 +79,11 @@ namespace Moonwell
                 }
             }
 
+            if (!made.HasEnded)
+            {
+                Hooks.CallTakenIn(made);
+            }
+
             return made;
         }
 

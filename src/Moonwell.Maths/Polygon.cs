@@ -88,7 +88,14 @@ namespace Moonwell
         [LocalSafe]
         public bool Contains(Vector2 point)
         {
-            if (!Bounds.Contains(point))
+            return Contains(point.X, point.Y);
+        }
+
+        /// <summary>Whether a point is inside, given as floats so that no vector is made; a point on an edge counts as inside.</summary>
+        [LocalSafe]
+        public bool Contains(float x, float y)
+        {
+            if (x < Bounds.Min.X || x > Bounds.Max.X || y < Bounds.Min.Y || y > Bounds.Max.Y)
             {
                 return false;
             }
@@ -97,15 +104,17 @@ namespace Moonwell
             var count = points.Length;
             for (int i = 0, j = count - 1; i < count; j = i++)
             {
-                var a = points[i];
-                var b = points[j];
-                if (IsOnSegment(point, a, b))
+                var ax = points[i].X;
+                var ay = points[i].Y;
+                var bx = points[j].X;
+                var by = points[j].Y;
+                if (IsOnSegment(x, y, ax, ay, bx, by))
                 {
                     return true;
                 }
 
-                if ((a.Y > point.Y) != (b.Y > point.Y)
-                    && point.X < (b.X - a.X) * (point.Y - a.Y) / (b.Y - a.Y) + a.X)
+                if ((ay > y) != (by > y)
+                    && x < (bx - ax) * (y - ay) / (by - ay) + ax)
                 {
                     inside = !inside;
                 }
@@ -114,21 +123,21 @@ namespace Moonwell
             return inside;
         }
 
-        /// <summary>Whether a point lies on the segment from a to b, within OnEdge.</summary>
-        private static bool IsOnSegment(Vector2 point, Vector2 a, Vector2 b)
+        /// <summary>Whether the point (x, y) lies on the segment from (ax, ay) to (bx, by), within OnEdge.</summary>
+        private static bool IsOnSegment(float x, float y, float ax, float ay, float bx, float by)
         {
-            var abx = b.X - a.X;
-            var aby = b.Y - a.Y;
+            var abx = bx - ax;
+            var aby = by - ay;
             var lengthSquared = abx * abx + aby * aby;
             if (lengthSquared == 0f)
             {
-                return point.DistanceSquaredTo(a) <= OnEdge * OnEdge;
+                return Maths.DistanceSquared(x, y, ax, ay) <= OnEdge * OnEdge;
             }
 
-            var t = Maths.Clamp01(((point.X - a.X) * abx + (point.Y - a.Y) * aby) / lengthSquared);
-            var nearestX = a.X + abx * t;
-            var nearestY = a.Y + aby * t;
-            return Maths.DistanceSquared(point.X, point.Y, nearestX, nearestY) <= OnEdge * OnEdge;
+            var t = Maths.Clamp01(((x - ax) * abx + (y - ay) * aby) / lengthSquared);
+            var nearestX = ax + abx * t;
+            var nearestY = ay + aby * t;
+            return Maths.DistanceSquared(x, y, nearestX, nearestY) <= OnEdge * OnEdge;
         }
     }
 }

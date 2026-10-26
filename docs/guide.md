@@ -320,6 +320,34 @@ if (Terrain.Raycast(from, to, out var hit)) { /* the missile meets the ground at
 - A `Height` read costs about 9 microseconds in the game, so code that runs every tick on many objects should read it
   sparingly.
 
+## Interactions and finding
+
+Add the `Moonwell.Interactions` package (the template's `.csproj` has the line, commented) for things that react to what
+comes near them, gizmos, and finding. A map that does not reference it carries none of its code.
+
+```csharp
+public sealed class FireAura : Interaction<Unit, Unit> // held by a unit, pairs with units
+{
+    public FireAura() { Range = 300f; Tick = 0.5f; }
+    public override bool Accepts(Unit other) => Holder.Player.IsEnemy(other.Player);
+    public override void OnTick(Pair pair) { pair.Other.Life -= 10f; }
+}
+
+unit.Interact(new FireAura()); // made inside a buff, it ends with the buff
+var well = Gizmo.Create(new Well(), x, y, caster.Player); // a gizmo is a map's own object with a place
+var near = Find.InRange<Unit>(x, y, 500f);                // a new list; or Find.InRange(x, y, 500f, list)
+```
+
+- `Range` is centre to centre and flat. A pair is found at the next tick after they come within range, so a 1 s tick
+  may start up to 1 s late (interactions started together take turns over its steps). Only a unit in the game (alive,
+  not hidden, not loaded), a visible item on the ground, a live destructable and a gizmo have a place; `OnPart` runs
+  once, when a pair ends.
+- `Find` has `InRange`, `InRect`, `InPolygon`, `AlongLine` and `Closest`. Each gives a new list, or fills a list the
+  map keeps (which makes none; use it every tick); `Closest` gives the nearest one, or the nearest few into a list.
+- `Interactions.CellSize` (128), `CellCheck` (0.1), `Slack` (64) and `Step` (1/32) are set in the map's constructor.
+- `Find` is fine inside `Local.For`: it reads and changes nothing there (a kind nothing outside has asked for yet is
+  searched through the objects Moonwell knows, slower). `IsTree()` needs `Moonwell.Objects`; the build warns if missing.
+
 ## Players
 
 `Player.One` to `Player.TwentyFour` are the player slots, as the lobby numbers them; `Player.Get(slot)` takes the
