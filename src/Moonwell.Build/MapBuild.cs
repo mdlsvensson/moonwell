@@ -12,6 +12,9 @@ namespace Moonwell.Build
         /// <summary>The terrain package's assembly: a map that references it gets its grid written from <c>war3map.w3e</c> and installed by its Main.</summary>
         private const string TerrainAssemblyName = "Moonwell.Terrain";
 
+        /// <summary>The areas package's assembly: a map that references it gets its World Editor regions written from <c>war3map.w3r</c>, their names in its code checked, and the package installed by its Main.</summary>
+        private const string AreasAssemblyName = "Moonwell.Areas";
+
         /// <summary>Runs every step of the build, in order.</summary>
         /// <param name="path">A project folder, or the path of its <c>.csproj</c> file.</param>
         /// <param name="options">What kind of build to make.</param>
@@ -100,8 +103,8 @@ namespace Moonwell.Build
             StageWith(project, () => Stage.WriteWithoutObjects(project, map, log));
         }
 
-        // What the map's Main installs before anything registers: each package the map references, in this order. The terrain's grid is
-        // written here too, from the map's ground, and a grid an earlier build wrote is removed when the map no longer uses the package.
+        // What the map's Main installs before anything registers: each package the map references, in this order. The terrain's grid and the
+        // areas' regions are written here too, from the map's ground and regions, and a file an earlier build wrote is removed when the map no longer uses the package.
         private static List<string> Installs(MapProject project, War3Net.Build.Map map, string targetPath)
         {
             var installs = new List<string>();
@@ -120,6 +123,18 @@ namespace Moonwell.Build
             else
             {
                 TerrainWriter.Delete(project);
+            }
+
+            if (Declarations.References(targetPath, AreasAssemblyName))
+            {
+                // A map with no war3map.w3r has no regions: Regions is null, and the arrays are empty.
+                PlaceWriter.WriteAreas(project, map.Regions);
+                PlaceNames.Check(project, "AreaShape.Region", map.Regions?.Regions.Select(region => region.Name).ToList() ?? new List<string>(), "region");
+                installs.Add("global::Moonwell.AreaSystem.Install(global::Moonwell.Generated.AreaData.Names(), global::Moonwell.Generated.AreaData.Rects());");
+            }
+            else
+            {
+                PlaceWriter.DeleteAreas(project);
             }
 
             return installs;
