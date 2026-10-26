@@ -64,7 +64,7 @@ namespace Moonwell.Engine
         public void ListenChat(Action<int, string> heard)
         {
             var trigger = Natives.CreateTrigger();
-            for (var slot = 0; slot < Natives.bj_MAX_PLAYERS; slot++)
+            for (var slot = 0; slot < Player.PlayableSlots; slot++)
             {
                 Natives.TriggerRegisterPlayerChatEvent(trigger, Natives.Player(slot), "-", false);
             }
@@ -96,7 +96,7 @@ namespace Moonwell.Engine
         {
             var keys = Natives.CreateTrigger();
             var mouse = Natives.CreateTrigger();
-            for (var slot = 0; slot < Natives.bj_MAX_PLAYERS; slot++)
+            for (var slot = 0; slot < Player.PlayableSlots; slot++)
             {
                 var p = Natives.Player(slot);
                 for (var meta = 2; meta <= 3; meta++)
