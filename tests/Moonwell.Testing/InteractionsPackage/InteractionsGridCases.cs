@@ -230,8 +230,8 @@ namespace Moonwell.Testing
         public static void SettingsChecked(FakeWorld world)
         {
             Interactions.Install(new FakeInteractionWorld());
-            var nan = float.NaN;
 #if DEBUG
+            var nan = float.NaN;
             Expect.Throws<MoonwellException>(() => Interactions.CellSize = 0.0f, "a CellSize of 0");
             Expect.Throws<MoonwellException>(() => Interactions.CellSize = -128.0f, "a CellSize below 0");
             Expect.Throws<MoonwellException>(() => Interactions.CellSize = nan, "a CellSize that is not a number");
