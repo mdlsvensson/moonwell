@@ -61,7 +61,8 @@ namespace Moonwell.Build
 
         /// <summary>
         /// Leaves out of a linked script each group of <see cref="TrimmedGroups"/> that nothing else in the script names a
-        /// name of, and takes the marker lines out of the groups it keeps.
+        /// name of (a name a file of the group defines, or the group's namespace, <c>System.Numerics</c> or
+        /// <c>System.Threading</c>), and takes the marker lines out of the groups it keeps.
         /// </summary>
         /// <param name="script">The script CSharp.lua linked, each library file in its own <c>do ... end</c> block.</param>
         /// <returns>The script without the groups nothing uses.</returns>
@@ -77,8 +78,11 @@ namespace Moonwell.Build
                     continue;
                 }
 
+                // CSharp.lua names what the code uses through an alias of its namespace at the top of the file
+                // (local SystemNumerics = System.Numerics), so the group's namespace is one of its names too.
                 var rest = blocks.Replace(script, string.Empty);
-                var used = found.SelectMany(block => DefinedNames(block.Groups[1].Value)).Distinct().Any(name => Names(rest, name));
+                var names = found.SelectMany(block => DefinedNames(block.Groups[1].Value)).Append("System." + group).Distinct();
+                var used = names.Any(name => Names(rest, name));
                 script = used
                     ? script.Replace(Begin(group) + "\n", string.Empty, StringComparison.Ordinal).Replace(End(group) + "\n", string.Empty, StringComparison.Ordinal)
                     : rest;

@@ -2,13 +2,21 @@ using System.Globalization;
 
 namespace Moonwell.Build
 {
-    /// <summary>The map's own gameplay constants, <c>war3mapMisc.txt</c> in the map's folder.</summary>
+    /// <summary>The map's own gameplay constants, <c>war3mapMisc.txt</c> in the map's folder or in its assets.</summary>
     public static class MapMisc
     {
         private const string FileName = "war3mapMisc.txt";
         private const string Section = "Misc";
         private const string StrengthKey = "StrHitPointBonus";
         private const string IntelligenceKey = "IntManaBonus";
+
+        /// <summary>The folder whose <c>war3mapMisc.txt</c> the built map holds: the assets' when they have one, as it replaces the map's.</summary>
+        /// <param name="project">The map project.</param>
+        /// <returns>The assets folder or the map's folder.</returns>
+        public static string FolderOf(MapProject project)
+        {
+            return File.Exists(Path.Combine(project.AssetsFolder, FileName)) ? project.AssetsFolder : project.MapFolder;
+        }
 
         /// <summary>Reads the hero bonuses the map's file sets over the standard ones.</summary>
         /// <param name="mapFolder">The map's folder.</param>

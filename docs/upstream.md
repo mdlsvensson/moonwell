@@ -1,5 +1,9 @@
 # Upstream workarounds
 
+The released Moonwell 0.2.5 builds with `Moonwell.CSharpLua` 2.0.4-moonwell.9 and `Moonwell.CSharpLua.CoreSystem`
+2.0.3-moonwell.2, so the fork's fixes from 2.0.4-moonwell.10 and 2.0.3-moonwell.3 on (part of C25, C28 to C32, C34) are
+on main only.
+
 What Moonwell does because War3Net or CSharp.lua (War3Net.CSharpLua 2.0.4) behaves in a way it has to work around.
 Moonwell builds with its own fork of CSharp.lua, `mdlsvensson/CSharp.lua` (decision 33), through its packages on nuget.org,
 `Moonwell.CSharpLua` and `Moonwell.CSharpLua.CoreSystem` (published by the fork's `publish.yml`); a row marked "fixed in the

@@ -1,5 +1,8 @@
 # Making a map with Moonwell
 
+This guide describes Moonwell 0.3, which is not released yet; the guide for 0.2.5, the released version, is at the
+[`v0.2.5` tag](https://github.com/mdlsvensson/moonwell/blob/v0.2.5/docs/guide.md).
+
 ## Start a map
 
 Moonwell needs the .NET 10 SDK, Warcraft III 3.0, and `common.j` and `Blizzard.j` in
@@ -30,7 +33,7 @@ three footmen to fight. Learn Smite and cast it: the screen names the target. Ea
 | `Start.cs` | The game's start: makes the Champion and the footmen |
 | `Heroes/` | One feature: the Champion, its spell and its kill counter |
 | `map/` | The World Editor map, saved as a folder |
-| `assets/` | Files copied into the map at the same paths (models, icons, sounds); make it when you need it |
+| `assets/` | Files copied into the map at the same paths (models, icons, sounds), named with ASCII characters only; make it when you need it |
 | `build/` | What the build writes: the staged map and `MyMap.w3x`; do not commit it |
 
 Code can sit in any folder and any namespace: the build finds objects and the map class by what they inherit. The
@@ -116,7 +119,7 @@ public sealed class Champion : Human.Units.Paladin
   starts with full life, so set `MaxLife`.
 - A class with no `[ObjectId]` is error MW0013, and the build names a free id to use. A buff also names its carrier,
   the hidden ability that shows its icon: `[ObjectId("B001", Carrier = "A002")]`, or `[ObjectId(Carrier = "A002")]`
-  with `[Replaces]`. An id is four characters, and only a hero's starts with an upper-case letter (MW0014).
+  with `[Replaces]`. An id is four ASCII characters, and only a hero's starts with an upper-case letter (MW0014).
 - `[Replaces]` makes the class the game's object itself: every unit of that type is made as the class.
 - `Unit.Create<Champion>(player, x, y)` makes one in the game, facing 270 degrees unless a facing follows;
   `Item.Create<EmberBlade>(x, y)` makes an item.

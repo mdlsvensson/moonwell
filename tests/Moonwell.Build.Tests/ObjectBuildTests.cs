@@ -465,6 +465,35 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_heros_total_takes_the_gameplay_constants_of_the_misc_file_in_assets()
+        {
+            // The map holds assets\war3mapMisc.txt in place of the map's own, so its 10 life a strength point are the game's.
+            var copy = folders.TemporaryCopyOfSample();
+            File.WriteAllText(Path.Combine(copy, "Objects.cs"), """
+                namespace Sample
+                {
+                    [Moonwell.Objects.ObjectId("H001")]
+                    public sealed class Arthas : Moonwell.Objects.Human.Units.Paladin
+                    {
+                        public Arthas()
+                        {
+                            MaxLife = 800;
+                        }
+                    }
+                }
+                """);
+            File.WriteAllText(Path.Combine(copy, "map", "war3mapMisc.txt"), "[Misc]\nStrHitPointBonus=30\n");
+            File.WriteAllText(Path.Combine(copy, "assets", "war3mapMisc.txt"), "[Misc]\nStrHitPointBonus=10\n");
+
+            MapBuild.Run(copy, new BuildOptions(), new StringWriter());
+
+            // 800 less the Paladin's 22 strength at 10 a point.
+            var arthas = Assert.Single(ReadUnits(copy).NewUnits);
+            Assert.Equal(580, Assert.Single(arthas.Modifications, one => one.Id == IdOf("uhpm")).Value);
+            Assert.Equal("[Misc]\nStrHitPointBonus=10\n", File.ReadAllText(Path.Combine(copy, "build", "Sample", "war3mapMisc.txt")));
+        }
+
+        [Fact]
         public void a_float_on_an_int_field_is_truncated()
         {
             // MaxLife is a float, as the game gives it; the field is a whole number, and the setter drops the fraction.
