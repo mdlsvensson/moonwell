@@ -503,9 +503,14 @@ outlines (one colour), its ticking pairs (another) and its waiting or paused pai
 | Ctrl + left click | selects the nearest object within 150; again near the same spot, the next nearest; on empty ground, nothing |
 | Ctrl + H | halts Moonwell and holds every unit; again, resumes |
 | Ctrl + Shift + H | halts Moonwell only; units go on walking; again, resumes |
-| Ctrl + N | while halted, one step (`Interactions.Step`, else 1/32 s); held down, the key's repeat |
+| Ctrl + N | while halted, one step (`Interactions.Step`, else 1/32 s); held down, it repeats |
 | Ctrl + `-` / Ctrl + `=` | slower / faster: ¼, ½, 1, 2, 4, 8 times |
-| `-step 10`, `-speed 4`, `-stats` | in chat: that many steps (1 to 320), a speed, the statistics shown or hidden |
+| `-step 10`, `-speed 4`, `-stats` | in chat: while halted, that many steps (1 to 320; `-step` alone, one), a speed (`-speed` alone lists them), the statistics shown or hidden |
+
+Either Ctrl works. A halt and the speed change Moonwell's time only: its timers, interactions and areas. The game's
+own attacks, buffs, cooldowns and timers made with the raw natives do not halt (Ctrl + H holds units, nothing more),
+and the speed does not make units faster or slower. Units are always selectable; items, destructables and gizmos only
+once the interactions grid tracks their kind. `-debug` off resumes at speed 1 and clears the selection.
 
 A map writes nothing to have it. Two optional things: its own lines in the panel for a class or component that
 implements `IDebugShown`, and `DebugMode` for code that speaks only about the selected object, or halts like a breakpoint.
@@ -525,8 +530,10 @@ public override void OnTick(Pair pair) // in an interaction
 ```
 
 - `DebugMode.Halt()` turns the mode on if it is off, then halts as Ctrl + H does; the code after the call still runs and
-  what is due after it waits for a step or a resume. `IsOn`, `Selected` and `IsSelected(actor)` read it, and
-  `Select(actor)` selects, as a click does.
+  what is due after it waits for a step or a resume. A breakpoint whose condition still holds halts again after a
+  resume; `-debug` off escapes it, and `Halt()` does nothing until `-debug` turns the mode on again.
+- `IsOn`, `Selected` and `IsSelected(actor)` read the mode; an object that has ended reads as not selected.
+  `Select(actor)` selects as a click does while the mode is on, and does nothing while it is off.
 - Development builds only. A release build leaves the mode out: `IsOn` and `IsSelected` read false, `Selected` is
   null, and the compiler takes out the calls to `Select` and `Halt`. An error in a `ShowDebug` shows as
   `Class.ShowDebug` and the panel goes on.
