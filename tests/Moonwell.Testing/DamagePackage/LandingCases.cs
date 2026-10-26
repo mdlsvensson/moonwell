@@ -94,6 +94,25 @@ namespace Moonwell.Testing
             Expect.Equal(0, world.Logged.Count, "nothing was reported");
         }
 
+        /// <summary>A hit inside another whose after-armor event never comes does not hide the outer hit: the outer finds itself after armor, with its own amount and its armor back.</summary>
+        public static void OuterFoundBelowStray(FakeWorld world)
+        {
+            StageCases.Arena(world, out var source, out var target);
+            var fake = StageCases.Fake;
+            var other = Another(world);
+            fake.Body(target.Handle).Life = 1000f;
+            fake.Body(target.Handle).Armor = 2f;
+            var taken = new System.Collections.Generic.List<string>();
+            target.Taking = hit => hit.Armor = 10f;
+            target.Taken = hit => taken.Add("original " + hit.Original + ", armor " + fake.Armor(target.Handle));
+            fake.Hit(source.Handle, target.Handle, 100f, damageType: 4, inside: () =>
+            {
+                fake.WithholdNextDamaged = true;
+                fake.Hit(source.Handle, other.Handle, 5f, damageType: 4);
+            });
+            Expect.Equal("original 100, armor 2", string.Join("|", taken), "the outer hit after armor");
+        }
+
         /// <summary>A lethal hit runs OnLethal; Spare keeps the target at 1 life; without it the target dies, and OnHurt says so.</summary>
         public static void LethalSpare(FakeWorld world)
         {

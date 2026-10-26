@@ -23,6 +23,17 @@ namespace Moonwell.Testing
             Expect.Near(70f, fake.Body(target.Handle).Life, "the target lost 30");
         }
 
+        /// <summary>Magic from code on a spell-immune unit deals nothing, so Unit.Damage returns null, as the guide says.</summary>
+        public static void DealStoppedReturnsNull(FakeWorld world)
+        {
+            StageCases.Arena(world, out var source, out var target);
+            var fake = StageCases.Fake;
+            fake.Body(target.Handle).Immune = true;
+            var hit = source.Damage(target, 10f);
+            Expect.True(hit == null, "Unit.Damage returned null");
+            Expect.Near(100f, fake.Body(target.Handle).Life, "the immune target lost nothing");
+        }
+
         /// <summary>The attack type given to Unit.Damage reaches the game in its number, and a hit with none is a spell's.</summary>
         public static void DealAttackType(FakeWorld world)
         {

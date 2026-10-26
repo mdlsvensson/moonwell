@@ -101,7 +101,9 @@ namespace Moonwell
                 pending = previous;
             }
 
-            return deal.Hit;
+            // A hit that never reached its after-armor stage dealt nothing (spell immunity stopped it, or the game sent no after-armor event).
+            var hit = deal.Hit;
+            return hit != null && (hit.Stage == Stage.AfterArmor || hit.Stage == Stage.Lethal) ? hit : null;
         }
 
         /// <summary>Makes the hit of the current event, read from the game.</summary>
@@ -213,6 +215,7 @@ namespace Moonwell
             // Spell immunity: the game will not send this hit's after-armor event, so it ends here.
             if (Immunity.Stops(World.IsMagicImmune(target), hit.AttackTypeCode, (int)hit.DamageKind))
             {
+                hit.Stage = Stage.Stopped;
                 PutBack(hit);
                 return;
             }
@@ -226,10 +229,18 @@ namespace Moonwell
         {
             var targetHandle = World.EventTarget();
             Hit? hit = null;
-            if (open.Count > 0 && open[open.Count - 1].Target.Handle == targetHandle)
+
+            // The newest open hit on this target: a hit inside it whose after-armor event never comes stays above it until the 0 s timer.
+            var index = open.Count - 1;
+            while (index >= 0 && open[index].Target.Handle != targetHandle)
             {
-                hit = open[open.Count - 1];
-                open.RemoveAt(open.Count - 1);
+                index--;
+            }
+
+            if (index >= 0)
+            {
+                hit = open[index];
+                open.RemoveAt(index);
                 PutBack(hit);
                 hit.Amount = World.EventAmount();
             }
@@ -278,7 +289,9 @@ namespace Moonwell
         {
             while (open.Count > 0)
             {
-                PutBack(open[open.Count - 1]);
+                var stray = open[open.Count - 1];
+                stray.Stage = Stage.Stopped;
+                PutBack(stray);
                 open.RemoveAt(open.Count - 1);
             }
 
