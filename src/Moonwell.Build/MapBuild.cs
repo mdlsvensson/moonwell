@@ -58,7 +58,7 @@ namespace Moonwell.Build
             log.WriteLine($"moonwell: {project.Name} ({(options.Release ? "release" : "development")} build)");
 
             var targetPath = DotnetBuild.Run(project, options.Release, log);
-            PackageSources.Check(project);
+            PackageSources.Check(project, options.PackageVersion ?? PackageSources.ToolVersion);
             var settings = MapSettingsReader.Read(targetPath, project);
             var map = SourceMap.Open(project, settings, log);
 
