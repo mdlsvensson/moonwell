@@ -184,6 +184,12 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "input.mouse.local", Run = MouseCases.Local });
             list.Add(new Case { Name = "input.mouse.local-unknown-focus", Run = MouseCases.LocalUnknownFocus });
             list.Add(new Case { Name = "input.mouse.setters", Run = MouseCases.Setters });
+            list.Add(new Case { Name = "input.camera.reads", Run = CameraCases.Reads });
+            list.Add(new Case { Name = "input.camera.changes", Run = CameraCases.Changes });
+            list.Add(new Case { Name = "input.camera.named", Run = CameraCases.Named });
+            list.Add(new Case { Name = "input.camera.unknown-camera", Run = CameraCases.UnknownCamera });
+            list.Add(new Case { Name = "input.camera.wrong-data", Run = CameraCases.WrongData });
+            list.Add(new Case { Name = "input.camera.not-installed", Run = CameraCases.NotInstalled });
         }
 
         /// <summary>Adds the terrain package's cases.</summary>

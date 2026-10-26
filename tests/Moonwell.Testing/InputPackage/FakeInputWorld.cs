@@ -50,6 +50,89 @@ namespace Moonwell.Testing
         /// <summary>The changes for a screen, as "screen slot x y" and "cursor slot show" or "cursor slot hide", in order.</summary>
         public List<string> Calls = new List<string>();
 
+        /// <summary>One change the package made to a player's camera: its kind ("field", "pan", "follow", "stop", "reset", "bounds" or "apply"), the slot, and what the kind uses of the rest.</summary>
+        public sealed class CameraCall
+        {
+            /// <summary>What changed.</summary>
+            public string Kind = "";
+
+            /// <summary>The slot of the player whose camera changed.</summary>
+            public int Slot;
+
+            /// <summary>The field code of a "field" change.</summary>
+            public int Field;
+
+            /// <summary>A field's value; a pan's x; a bounds' minimum x.</summary>
+            public float A;
+
+            /// <summary>A pan's y; a bounds' minimum y.</summary>
+            public float B;
+
+            /// <summary>A bounds' maximum x.</summary>
+            public float C;
+
+            /// <summary>A bounds' maximum y.</summary>
+            public float D;
+
+            /// <summary>The seconds a change takes, where it has them.</summary>
+            public float Seconds;
+
+            /// <summary>The unit a "follow" change tracks.</summary>
+            public unit? Unit;
+
+            /// <summary>The setup an "apply" change used.</summary>
+            public camerasetup? Setup;
+        }
+
+        /// <summary>One setup the package made: what the game's own script would have set on it.</summary>
+        public sealed class MadeSetup
+        {
+            /// <summary>The handle the package got back.</summary>
+            public camerasetup Setup = new camerasetup();
+
+            /// <summary>The destination x.</summary>
+            public float X;
+
+            /// <summary>The destination y.</summary>
+            public float Y;
+
+            /// <summary>The field codes set, in order.</summary>
+            public List<int> Codes = new List<int>();
+
+            /// <summary>The values set, in the codes' order.</summary>
+            public List<float> Values = new List<float>();
+
+            /// <summary>The camera type set, or -1 when none was.</summary>
+            public int Type = -1;
+        }
+
+        /// <summary>This machine's camera fields by Moonwell's code (0 to 13), in the game's units: radians for the angles.</summary>
+        public float[] Fields = new float[14];
+
+        /// <summary>This machine's camera target.</summary>
+        public float TargetX;
+
+        /// <summary>This machine's camera target y.</summary>
+        public float TargetY;
+
+        /// <summary>This machine's camera target z.</summary>
+        public float TargetZ;
+
+        /// <summary>This machine's camera eye x.</summary>
+        public float EyeX;
+
+        /// <summary>This machine's camera eye y.</summary>
+        public float EyeY;
+
+        /// <summary>This machine's camera eye z.</summary>
+        public float EyeZ;
+
+        /// <summary>Every change to a player's camera, in order.</summary>
+        public List<CameraCall> CameraCalls = new List<CameraCall>();
+
+        /// <summary>Every setup the package made, in order.</summary>
+        public List<MadeSetup> Made = new List<MadeSetup>();
+
         /// <summary>The player of the event being delivered.</summary>
         private player? eventPlayer;
 
@@ -175,6 +258,111 @@ namespace Moonwell.Testing
         public void ShowCursor(player p, bool show)
         {
             Calls.Add("cursor " + Player.Of(p)!.Slot + " " + (show ? "show" : "hide"));
+        }
+
+        /// <summary>The field a case set.</summary>
+        public float CameraField(int field) => Fields[field];
+
+        /// <summary>The target x a case set.</summary>
+        public float CameraTargetX() => TargetX;
+
+        /// <summary>The target y a case set.</summary>
+        public float CameraTargetY() => TargetY;
+
+        /// <summary>The target z a case set.</summary>
+        public float CameraTargetZ() => TargetZ;
+
+        /// <summary>The eye x a case set.</summary>
+        public float CameraEyeX() => EyeX;
+
+        /// <summary>The eye y a case set.</summary>
+        public float CameraEyeY() => EyeY;
+
+        /// <summary>The eye z a case set.</summary>
+        public float CameraEyeZ() => EyeZ;
+
+        /// <summary>Remembers a camera change and returns its record.</summary>
+        private CameraCall Record(string kind, player p)
+        {
+            var call = new CameraCall();
+            call.Kind = kind;
+            call.Slot = Player.Of(p)!.Slot;
+            CameraCalls.Add(call);
+            return call;
+        }
+
+        /// <summary>Remembers the field change.</summary>
+        public void SetCameraField(player p, int field, float value, float seconds)
+        {
+            var call = Record("field", p);
+            call.Field = field;
+            call.A = value;
+            call.Seconds = seconds;
+        }
+
+        /// <summary>Remembers the pan.</summary>
+        public void PanCamera(player p, float x, float y, float seconds)
+        {
+            var call = Record("pan", p);
+            call.A = x;
+            call.B = y;
+            call.Seconds = seconds;
+        }
+
+        /// <summary>Remembers the follow.</summary>
+        public void FollowUnit(player p, unit u)
+        {
+            Record("follow", p).Unit = u;
+        }
+
+        /// <summary>Remembers the end of the follow.</summary>
+        public void StopFollowing(player p)
+        {
+            Record("stop", p);
+        }
+
+        /// <summary>Remembers the reset.</summary>
+        public void ResetCamera(player p, float seconds)
+        {
+            Record("reset", p).Seconds = seconds;
+        }
+
+        /// <summary>Remembers the bounds.</summary>
+        public void SetCameraBounds(player p, float minX, float minY, float maxX, float maxY)
+        {
+            var call = Record("bounds", p);
+            call.A = minX;
+            call.B = minY;
+            call.C = maxX;
+            call.D = maxY;
+        }
+
+        /// <summary>Reads one camera from the data as the game's own script does: its target, the pairs, and the type, and remembers what it set.</summary>
+        public camerasetup MakeSetup(float[] values, int offset)
+        {
+            var made = new MadeSetup();
+            made.X = values[offset];
+            made.Y = values[offset + 1];
+            var count = (int)values[offset + 2];
+            var at = offset + 3;
+            for (var i = 0; i < count; i++)
+            {
+                made.Codes.Add((int)values[at]);
+                made.Values.Add(values[at + 1]);
+                at += 2;
+            }
+
+            made.Type = (int)values[at];
+            Made.Add(made);
+            return made.Setup;
+        }
+
+        /// <summary>Remembers the apply.</summary>
+        public void ApplySetup(player p, camerasetup setup, float seconds)
+        {
+            var call = Record("apply", p);
+            call.Setup = setup;
+            call.Seconds = seconds;
         }
     }
 }

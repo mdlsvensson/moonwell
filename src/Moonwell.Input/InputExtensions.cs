@@ -9,5 +9,12 @@ namespace Moonwell
         {
             return InputSystem.MouseOf(player.Slot);
         }
+
+        /// <summary>The player's camera: one for each slot, from 0 to 27, made when the package starts. Throws InvalidOperationException before that.</summary>
+        [LocalSafe]
+        public static Camera Camera(this Player player)
+        {
+            return InputSystem.CameraOf(player.Slot);
+        }
     }
 }

@@ -44,5 +44,57 @@ namespace Moonwell.Hosting
 
         /// <summary>Shows or hides a player's cursor, on that player's machine only.</summary>
         void ShowCursor(player p, bool show);
+
+        /// <summary>One field of this machine's camera, by Moonwell's code: 0 distance, 1 far Z, 2 angle of attack, 3 field of view, 4 roll, 5 rotation, 6 Z offset, 7 near Z, 8 local pitch, 9 local yaw, 10 local roll, 11 depth-of-field distance, 12 depth-of-field scale, 13 Z absolute. The game gives the angles in radians and the rest in game units.</summary>
+        [MachineLocal]
+        float CameraField(int field);
+
+        /// <summary>The x this machine's camera looks at. After a move it reads the old place for the rest of the instant.</summary>
+        [MachineLocal]
+        float CameraTargetX();
+
+        /// <summary>The y this machine's camera looks at.</summary>
+        [MachineLocal]
+        float CameraTargetY();
+
+        /// <summary>The z this machine's camera looks at.</summary>
+        [MachineLocal]
+        float CameraTargetZ();
+
+        /// <summary>The x of this machine's camera eye.</summary>
+        [MachineLocal]
+        float CameraEyeX();
+
+        /// <summary>The y of this machine's camera eye.</summary>
+        [MachineLocal]
+        float CameraEyeY();
+
+        /// <summary>The z of this machine's camera eye.</summary>
+        [MachineLocal]
+        float CameraEyeZ();
+
+        /// <summary>Changes a field of a player's camera over some seconds, on that player's machine only. The code is as in CameraField; angles are in degrees.</summary>
+        void SetCameraField(player p, int field, float value, float seconds);
+
+        /// <summary>Pans a player's camera to a place over some seconds, on that player's machine only.</summary>
+        void PanCamera(player p, float x, float y, float seconds);
+
+        /// <summary>Locks a player's camera on a unit, on that player's machine only.</summary>
+        void FollowUnit(player p, unit u);
+
+        /// <summary>Ends a player's lock on a unit by setting the camera's position to its target, on that player's machine only.</summary>
+        void StopFollowing(player p);
+
+        /// <summary>Puts a player's camera back to the game camera over some seconds, on that player's machine only.</summary>
+        void ResetCamera(player p, float seconds);
+
+        /// <summary>Limits where a player's camera can go to a rectangle, on that player's machine only.</summary>
+        void SetCameraBounds(player p, float minX, float minY, float maxX, float maxY);
+
+        /// <summary>Makes a camera setup from one camera's numbers, starting at an offset: target x, target y, the count n, n pairs of field code and value, and the camera type (-1 for none), as the build writes them.</summary>
+        camerasetup MakeSetup(float[] values, int offset);
+
+        /// <summary>Applies a camera setup to a player's camera over some seconds, on that player's machine only.</summary>
+        void ApplySetup(player p, camerasetup setup, float seconds);
     }
 }
