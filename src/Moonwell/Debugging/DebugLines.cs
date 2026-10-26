@@ -33,6 +33,12 @@ namespace Moonwell
                 return text;
             }
         }
+
+        /// <summary>The line at a place, in the order added.</summary>
+        internal string At(int index)
+        {
+            return lines[index];
+        }
 #endif
         /// <summary>Lines are made by the debug mode only.</summary>
         internal DebugLines()

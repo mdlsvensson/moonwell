@@ -51,12 +51,15 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Runs every timer that is due, then asks the world to wake for the next one; in a development build, a timer that halts Moonwell's clock ends the run, and the timers due after it wait for the next step.</summary>
+        /// <summary>Runs every timer that is due, then asks the world to wake for the next one; in a development build, a timer that halts Moonwell's clock ends the run, and the timers due after it wait for the next step, and while the debug mode is on the run is timed for its statistics.</summary>
         internal void Wake()
         {
             var now = Runtime.World.Now();
 #if DEBUG
             var wasHalted = Runtime.Clock.IsHalted;
+            // While the debug mode is on, the wake is timed with os.clock for its statistics.
+            var timed = DebugSession.IsOn;
+            var started = timed ? DebugSession.Clock() : 0.0f;
 #endif
             while (heap.Count > 0 && heap[0].due <= now + 0.001f)
             {
@@ -85,6 +88,12 @@ namespace Moonwell
                 }
             }
 
+#if DEBUG
+            if (timed)
+            {
+                DebugStats.TimersRan(DebugSession.Clock() - started);
+            }
+#endif
             Rearm();
         }
 

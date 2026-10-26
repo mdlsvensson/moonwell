@@ -78,6 +78,24 @@ namespace Moonwell
         /// <summary>Whether a held step is running: the units are let go for one step of game time, and another step waits for it.</summary>
         internal static bool StepRunning { get; private set; }
 
+        /// <summary>Whether the halt holds the units (Ctrl + H) rather than leaving them running (Ctrl + Shift + H).</summary>
+        internal static bool HoldsUnits
+        {
+            get
+            {
+                return holdsUnits;
+            }
+        }
+
+        /// <summary>The speed as the panel names it: "1/4", "1/2", "1", "2", "4" or "8".</summary>
+        internal static string SpeedName
+        {
+            get
+            {
+                return SpeedNames[speedIndex];
+            }
+        }
+
         /// <summary>Makes a debug world the session's, and listens to the chat for -debug; Runtime.Start calls it after Reset.</summary>
         internal static void Install(IDebugWorld debugWorld)
         {
@@ -129,6 +147,7 @@ namespace Moonwell
                 }
 
                 Game.Print("Debug mode on: Ctrl + click selects, Ctrl + H halts, Ctrl + N steps, Ctrl + - and = change the speed.");
+                DebugPanel.TurnedOn(world);
                 return;
             }
 
@@ -136,10 +155,11 @@ namespace Moonwell
             ChangeSpeed(NormalSpeed);
             Selected = null;
             IsOn = false;
+            DebugPanel.TurnedOff();
             Game.Print("Debug mode off.");
         }
 
-        /// <summary>Selects an object, or nothing with null; nothing while the mode is off.</summary>
+        /// <summary>Selects an object, or nothing with null, and refreshes the panel; nothing while the mode is off.</summary>
         internal static void Select(Actor? actor)
         {
             if (!IsOn)
@@ -148,6 +168,13 @@ namespace Moonwell
             }
 
             Selected = actor;
+            DebugPanel.SelectionChanged();
+        }
+
+        /// <summary>Lets go of the selected object once it has ended; the panel calls it, and shows the object's line instead.</summary>
+        internal static void SelectedEnded()
+        {
+            Selected = null;
         }
 
         /// <summary>Halts Moonwell's clock, holding every unit when asked; nothing while the mode is off or already halted.</summary>
@@ -171,6 +198,8 @@ namespace Moonwell
             {
                 Game.Print("Halted, units running: Ctrl + N steps, Ctrl + Shift + H resumes.");
             }
+
+            DebugPanel.Refresh();
         }
 
         /// <summary>A halt from code (DebugMode.Halt), like a breakpoint: turns the mode on first when it is off, as -debug does, then halts with every unit held; nothing when already halted.</summary>
@@ -199,6 +228,7 @@ namespace Moonwell
 
             ResumeClock();
             Game.Print("Resumed.");
+            DebugPanel.Refresh();
         }
 
         /// <summary>
@@ -215,8 +245,8 @@ namespace Moonwell
 
             if (!holdsUnits)
             {
-                Runtime.Clock.Advance(DebugViews.StepLength);
-                Runtime.Wake();
+                FreeStep();
+                DebugPanel.Refresh();
                 return;
             }
 
@@ -242,6 +272,7 @@ namespace Moonwell
                 {
                     ChangeSpeed(i);
                     Game.Print("Speed " + SpeedNames[i] + ".");
+                    DebugPanel.Refresh();
                     return;
                 }
             }
@@ -258,6 +289,13 @@ namespace Moonwell
             }
         }
 
+        /// <summary>One step with units running: Moonwell's time moves one step at once, and what is due runs.</summary>
+        private static void FreeStep()
+        {
+            Runtime.Clock.Advance(DebugViews.StepLength);
+            Runtime.Wake();
+        }
+
         /// <summary>The end of a held step: Moonwell's time moves one step, what is due runs, the units are held again, and a -step goes on. A step a resume or -debug ended does nothing.</summary>
         private static void StepEnded(int number)
         {
@@ -271,6 +309,7 @@ namespace Moonwell
             held!.Hold();
             holding = true;
             StepRunning = false;
+            DebugPanel.Refresh();
             if (stepsLeft > 0)
             {
                 stepsLeft--;
@@ -304,7 +343,7 @@ namespace Moonwell
             Runtime.Scheduler.Rearm();
         }
 
-        /// <summary>A chat line with "-" in it from a slot: -debug always; -step and -speed while on. Anything else is left alone.</summary>
+        /// <summary>A chat line with "-" in it from a slot: -debug always; -step, -speed and -stats while on. Anything else is left alone.</summary>
         private static void Heard(int slot, string text)
         {
             var line = text.Trim().ToLower();
@@ -319,7 +358,11 @@ namespace Moonwell
                 return;
             }
 
-            if (line.StartsWith("-step "))
+            if (line == "-stats")
+            {
+                DebugPanel.ToggleStats();
+            }
+            else if (line.StartsWith("-step "))
             {
                 StepCommand(line.Substring(6));
             }
@@ -360,11 +403,13 @@ namespace Moonwell
             Game.Print(whole == 1 ? "1 step." : whole + " steps.");
             if (!holdsUnits)
             {
+                // The steps run at once, so the panel is refreshed once, after the last.
                 for (var i = 0; i < whole; i++)
                 {
-                    Step();
+                    FreeStep();
                 }
 
+                DebugPanel.Refresh();
                 return;
             }
 
@@ -449,6 +494,7 @@ namespace Moonwell
             if (found.Count == 0)
             {
                 Selected = null;
+                DebugPanel.SelectionChanged();
                 return;
             }
 
@@ -463,6 +509,7 @@ namespace Moonwell
             }
 
             Selected = found[pick];
+            DebugPanel.SelectionChanged();
         }
 
         /// <summary>The objects within the click radius of a point, nearest first, ties in the order found: the live units, then each view's, with their squared distances beside them.</summary>
@@ -514,7 +561,7 @@ namespace Moonwell
         }
 
         /// <summary>Where an object stands: a unit's, item's or destructable's place, or the place a view gives; false when none knows it.</summary>
-        private static bool PlaceOf(Actor actor, out float x, out float y)
+        internal static bool PlaceOf(Actor actor, out float x, out float y)
         {
             if (actor is Unit unit)
             {

@@ -54,6 +54,16 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "debug.session.halt-from-code-turns-on", Run = SessionCases.HaltFromCodeTurnsOn });
             list.Add(new Case { Name = "debug.session.held-h-toggles-once", Run = SessionCases.HeldHTogglesOnce });
             list.Add(new Case { Name = "debug.session.held-unit-removed", Run = SessionCases.HeldUnitRemoved });
+            list.Add(new Case { Name = "debug.panel.status", Run = PanelCases.Status });
+            list.Add(new Case { Name = "debug.panel.unit", Run = PanelCases.SelectedUnit });
+            list.Add(new Case { Name = "debug.panel.numbers", Run = PanelCases.Numbers });
+            list.Add(new Case { Name = "debug.panel.cap", Run = PanelCases.Cap });
+            list.Add(new Case { Name = "debug.panel.throwing-shown", Run = PanelCases.ThrowingShown });
+            list.Add(new Case { Name = "debug.panel.refresh", Run = PanelCases.Refresh });
+            list.Add(new Case { Name = "debug.panel.ended", Run = PanelCases.Ended });
+            list.Add(new Case { Name = "debug.panel.off", Run = PanelCases.Off });
+            list.Add(new Case { Name = "debug.panel.reuse", Run = PanelCases.Reuse });
+            list.Add(new Case { Name = "debug.panel.stats", Run = PanelCases.Stats });
 #endif
         }
 

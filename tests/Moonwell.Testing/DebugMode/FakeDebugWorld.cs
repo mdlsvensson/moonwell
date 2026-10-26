@@ -26,6 +26,54 @@ namespace Moonwell.Testing
         /// <summary>What Clock reads: os.clock's seconds in the game.</summary>
         public float ClockSeconds;
 
+        /// <summary>The numbers of the lines drawn and not removed, in the order they were drawn.</summary>
+        public List<int> Lines = new List<int>();
+
+        /// <summary>The style of each line in Lines.</summary>
+        public List<int> LineStyles = new List<int>();
+
+        /// <summary>How many lines have been drawn.</summary>
+        public int LinesAdded;
+
+        /// <summary>How many times a line has been moved.</summary>
+        public int LinesMoved;
+
+        /// <summary>How many lines have been removed.</summary>
+        public int LinesRemoved;
+
+        /// <summary>The numbers of the markers put and not removed, in the order they were put.</summary>
+        public List<int> Markers = new List<int>();
+
+        /// <summary>The x of each marker in Markers.</summary>
+        public List<float> MarkerXs = new List<float>();
+
+        /// <summary>The y of each marker in Markers.</summary>
+        public List<float> MarkerYs = new List<float>();
+
+        /// <summary>How many markers have been put.</summary>
+        public int MarkersAdded;
+
+        /// <summary>How many markers have been removed.</summary>
+        public int MarkersRemoved;
+
+        /// <summary>Whether the panel is shown.</summary>
+        public bool PanelShown;
+
+        /// <summary>How many times the panel was asked to show or hide; the native world makes its frames on the first.</summary>
+        public int PanelShows;
+
+        /// <summary>The panel's text, as last set.</summary>
+        public string PanelText = "";
+
+        /// <summary>How many times the panel's text was set.</summary>
+        public int PanelTextSets;
+
+        /// <summary>The lines written to the log, in order.</summary>
+        public List<string> Logged = new List<string>();
+
+        /// <summary>The number the next line or marker gets.</summary>
+        private int nextNumber = 1;
+
         /// <summary>The chat listener, once the session has asked.</summary>
         private Action<int, string>? heard;
 
@@ -101,6 +149,105 @@ namespace Moonwell.Testing
         public float GameNow()
         {
             return world.Time;
+        }
+
+        /// <summary>Records a line drawn, and gives it a number no other line or marker has had.</summary>
+        public int AddLine(int style, float x1, float y1, float x2, float y2)
+        {
+            var line = nextNumber;
+            nextNumber++;
+            Lines.Add(line);
+            LineStyles.Add(style);
+            LinesAdded++;
+            return line;
+        }
+
+        /// <summary>Records a line moved; a line not drawn fails the case.</summary>
+        public void MoveLine(int line, float x1, float y1, float x2, float y2)
+        {
+            Expect.True(Lines.Contains(line), "a line moved is drawn");
+            LinesMoved++;
+        }
+
+        /// <summary>Records a line removed; a line not drawn fails the case.</summary>
+        public void RemoveLine(int line)
+        {
+            var at = Lines.IndexOf(line);
+            Expect.True(at >= 0, "a line removed is drawn");
+            Lines.RemoveAt(at);
+            LineStyles.RemoveAt(at);
+            LinesRemoved++;
+        }
+
+        /// <summary>Records a marker put, and gives it a number no other line or marker has had.</summary>
+        public int AddMarker(float x, float y)
+        {
+            var marker = nextNumber;
+            nextNumber++;
+            Markers.Add(marker);
+            MarkerXs.Add(x);
+            MarkerYs.Add(y);
+            MarkersAdded++;
+            return marker;
+        }
+
+        /// <summary>Records a marker's new place; a marker not put fails the case.</summary>
+        public void MoveMarker(int marker, float x, float y)
+        {
+            var at = Markers.IndexOf(marker);
+            Expect.True(at >= 0, "a marker moved is put");
+            MarkerXs[at] = x;
+            MarkerYs[at] = y;
+        }
+
+        /// <summary>Records a marker removed; a marker not put fails the case.</summary>
+        public void RemoveMarker(int marker)
+        {
+            var at = Markers.IndexOf(marker);
+            Expect.True(at >= 0, "a marker removed is put");
+            Markers.RemoveAt(at);
+            MarkerXs.RemoveAt(at);
+            MarkerYs.RemoveAt(at);
+            MarkersRemoved++;
+        }
+
+        /// <summary>Records whether the panel is shown.</summary>
+        public void ShowPanel(bool shown)
+        {
+            PanelShows++;
+            PanelShown = shown;
+        }
+
+        /// <summary>Records the panel's text.</summary>
+        public void SetPanelText(string text)
+        {
+            PanelText = text;
+            PanelTextSets++;
+        }
+
+        /// <summary>Records a line written to the log.</summary>
+        public void Log(string text)
+        {
+            Logged.Add(text);
+        }
+
+        /// <summary>The panel's text split into its lines.</summary>
+        public List<string> PanelLines()
+        {
+            var lines = new List<string>();
+            var rest = PanelText;
+            while (true)
+            {
+                var newline = rest.IndexOf('\n');
+                if (newline < 0)
+                {
+                    lines.Add(rest);
+                    return lines;
+                }
+
+                lines.Add(rest.Substring(0, newline));
+                rest = rest.Substring(newline + 1);
+            }
         }
 
         /// <summary>A player's chat line: heard once the session listens, when the text starts with "-", untrimmed, as the native world passes on.</summary>

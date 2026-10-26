@@ -43,6 +43,8 @@ namespace Moonwell
 #if DEBUG
             DebugSession.Reset();
             DebugViews.Reset();
+            DebugPanel.Reset();
+            DebugStats.Reset();
 #endif
             Timer.Every(0.25f, Sweep.Run, Game.Instance);
         }
