@@ -198,6 +198,18 @@ namespace Moonwell
         /// <summary>The interaction that checks it against items; null while ItemContact has been None since Create.</summary>
         internal Interaction? itemChecks;
 
+        /// <summary>The interaction that checks it against other missiles; null while MissileContact has been None since Create.</summary>
+        internal Interaction? missileChecks;
+
+        /// <summary>What the package keeps of each wall its ball is touching or near, in the order first met; null until the first. A wall left behind is taken out.</summary>
+        internal List<Touch>? wallTouches;
+
+        /// <summary>Its number in the order missiles were made since the install, from 1: of two missiles, the one made first meets the other.</summary>
+        internal int made;
+
+        /// <summary>Its radius plus how far it moved along the ground this step, for the range of the checks against other missiles.</summary>
+        internal float meetReach;
+
         /// <summary>Where the step's move began, x: the contact checks sweep its ball from there to where it is.</summary>
         internal float lastX;
 
@@ -424,20 +436,28 @@ namespace Moonwell
             }
         }
 
-        /// <summary>What it does on meeting another missile: None, the default, does not check missiles at all; Stop, Bounce and Pass as UnitContact.</summary>
+        /// <summary>What it does on meeting another missile whose MissileContact is not None: None, the default, does not check missiles at all, and other missiles do not meet it; Stop, Bounce and Pass as UnitContact (Slide is Bounce). Two missiles meet once, through the one made first; each takes its own outcome, and a bounce keeps the two Bouncinesses multiplied and square-rooted, shared by Mass. Set to another than None after Create, the checks start then.</summary>
         [LocalSafe]
         public Contact MissileContact
         {
             get { return missileContact; }
-            set { missileContact = value; }
+            set
+            {
+                missileContact = value;
+                Contacts.Changed(this);
+            }
         }
 
-        /// <summary>What it does on meeting a wall: None, the default, does not check walls at all; Stop, Bounce, Pass, and Slide, which bounces until slow and then slides along the wall.</summary>
+        /// <summary>What it does on meeting a wall: None, the default, does not check walls at all; Stop and Pass as UnitContact; Bounce bounces off, keeping its Bounciness times the wall's; Slide loses the speed into the wall and slides along it, keeping the rest.</summary>
         [LocalSafe]
         public Contact WallContact
         {
             get { return wallContact; }
-            set { wallContact = value; }
+            set
+            {
+                wallContact = value;
+                Contacts.Changed(this);
+            }
         }
 
         /// <summary>The seconds it flies, counted from Create; then OnExpire runs and it ends. 0, the default, for no end.</summary>
@@ -633,7 +653,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Whether it can hit a thing it touches: asked before a contact with a unit, destructable, item or missile, with the missile as the current owner; false and they pass through each other, and it is not asked again until they part. By default everything but its own Source.</summary>
+        /// <summary>Whether it can hit a thing it touches: asked before a contact with a unit, destructable, item, missile (each of the two is asked about the other) or wall, with the missile as the current owner; false and they pass through each other, and it is not asked again until they part. By default everything but its own Source.</summary>
         public virtual bool CanHit(Actor other)
         {
             return other != source;

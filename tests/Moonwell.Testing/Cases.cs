@@ -231,6 +231,14 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "contact.dead-source", Run = ContactCases.DeadSource });
             list.Add(new Case { Name = "contact.settles-on-top", Run = ContactCases.SettlesOnTop });
             list.Add(new Case { Name = "contact.teleport", Run = ContactCases.Teleport });
+            list.Add(new Case { Name = "missiles.meet-once", Run = MissileContactCases.MeetOnce });
+            list.Add(new Case { Name = "missiles.own-outcomes", Run = MissileContactCases.OwnOutcomes });
+            list.Add(new Case { Name = "missiles.mass", Run = MissileContactCases.Mass });
+            list.Add(new Case { Name = "wall.bounce", Run = WallCases.Bounce });
+            list.Add(new Case { Name = "wall.slide", Run = WallCases.Slide });
+            list.Add(new Case { Name = "wall.height", Run = WallCases.Height });
+            list.Add(new Case { Name = "wall.fast", Run = WallCases.Fast });
+            list.Add(new Case { Name = "wall.push", Run = WallCases.Push });
         }
 
         /// <summary>Adds the areas package's cases.</summary>

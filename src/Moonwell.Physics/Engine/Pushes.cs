@@ -6,8 +6,9 @@ namespace Moonwell.Engine
     /// <summary>
     /// The pushed units: each step of the physics pass, before the missiles, each is moved along its push with SetUnitX/Y
     /// (which keeps its order) and put in its cell at once, kept on ground it can stand on, slowed, and lifted or brought
-    /// down. The point its collision size ahead is checked with the terrain's pathing (flyable for a flyer) and then, for
-    /// a unit that does not fly, the item trick, which also sees trees and buildings; blocked, it slides along the edge
+    /// down. The point its collision size ahead is checked against the map's walls (the line from the unit to it crossing
+    /// one it is not lifted over), with the terrain's pathing (flyable for a flyer) and then, for a unit that does not
+    /// fly, the item trick, which also sees trees and buildings; blocked, it slides along the edge
     /// on the free axis, losing the speed into it, or stops, and OnSlammed runs. The reactions run on the unit's class,
     /// then its components and buffs in the order they were added, each guarded, with the unit as the current owner; a
     /// method a class does not write is not called (in Lua an interface's empty defaults are not there).
@@ -420,7 +421,7 @@ namespace Moonwell.Engine
             var size = push.size;
             var toX = x + ux * distance;
             var toY = y + uy * distance;
-            if (Free(push, toX + ux * size, toY + uy * size))
+            if (Free(push, x, y, toX + ux * size, toY + uy * size))
             {
                 Place(unit, toX, toY);
                 push.vx = ux * after;
@@ -440,7 +441,7 @@ namespace Moonwell.Engine
 
                 if (alongX)
                 {
-                    if (Free(push, toX + (ux > 0.0f ? size : -size), y))
+                    if (Free(push, x, y, toX + (ux > 0.0f ? size : -size), y))
                     {
                         Place(unit, toX, y);
                         push.vx = ux * after;
@@ -449,7 +450,7 @@ namespace Moonwell.Engine
                         return;
                     }
                 }
-                else if (Free(push, x, toY + (uy > 0.0f ? size : -size)))
+                else if (Free(push, x, y, x, toY + (uy > 0.0f ? size : -size)))
                 {
                     Place(unit, x, toY);
                     push.vx = 0.0f;
@@ -472,10 +473,15 @@ namespace Moonwell.Engine
             return body != null && !body.HasEnded ? body.Friction : Body.DefaultFriction;
         }
 
-        /// <summary>Whether a pushed unit may stand at a point: inside the world's bounds, and flyable for a flyer; walkable and where an item lands, for a unit that does not fly.</summary>
-        private static bool Free(Pushed push, float x, float y)
+        /// <summary>Whether a pushed unit at (fromX, fromY) may stand at a point: inside the world's bounds, with no wall it is not lifted over across the way there, and flyable for a flyer; walkable and where an item lands, for a unit that does not fly.</summary>
+        private static bool Free(Pushed push, float fromX, float fromY, float x, float y)
         {
             if (x < Pass.minX || x > Pass.maxX || y < Pass.minY || y > Pass.maxY)
+            {
+                return false;
+            }
+
+            if (Walls.Blocks(push, fromX, fromY, x, y))
             {
                 return false;
             }

@@ -1,0 +1,205 @@
+using System;
+using System.Collections.Generic;
+
+namespace Moonwell.Testing
+{
+    /// <summary>Cases for walls: missiles bouncing off, sliding along, flying over and caught fast at a wall, and a pushed unit stopped by one; on flat ground 2,048 across with the default step of 1/32 second.</summary>
+    public static class WallCases
+    {
+        /// <summary>The type id the Pushee class is registered with.</summary>
+        private const string PusheeId = "h0P1";
+
+        /// <summary>Installs the interactions, physics and terrain packages on fakes, the terrain flat at 0 over 16 by 16 tiles from (0, 0), and registers Pushee.</summary>
+        private static void Fresh()
+        {
+            Interactions.Install(new FakeInteractionWorld());
+            Physics.Install(new FakePhysicsWorld());
+            var corner = GridText.Corner(0.0f, 2);
+            var row = "";
+            for (var i = 0; i < 17; i++)
+            {
+                row = row + corner;
+            }
+
+            var text = "";
+            for (var i = 0; i < 17; i++)
+            {
+                text = text + row;
+            }
+
+            Terrain.Install(new FakeTerrainWorld(), 17, 17, 0.0f, 0.0f, text);
+            ObjectTypes.Unit(ObjectTypes.FourCC(PusheeId), () => new Pushee());
+            TestLog.Lines.Clear();
+        }
+
+        /// <summary>Places a shot with a WallContact at a place with a velocity, and gives it back.</summary>
+        private static Shot ShotAt(Contact contact, float x, float y, float z, float vx, float vy)
+        {
+            var shot = new Shot();
+            shot.WallContact = contact;
+            Missile.Create(shot, x, y, z);
+            shot.VX = vx;
+            shot.VY = vy;
+            return shot;
+        }
+
+        /// <summary>Moves the game on by a number of steps, one step at a time.</summary>
+        private static void Steps(FakeWorld world, int count)
+        {
+            for (var i = 0; i < count; i++)
+            {
+                world.Advance(Interactions.Step);
+            }
+        }
+
+        /// <summary>Moves the game on a step at a time, at most a number of steps, until a shot has had a number of impacts.</summary>
+        private static void UntilImpacts(FakeWorld world, Shot shot, int impacts, int most)
+        {
+            for (var i = 0; i < most && shot.Impacts.Count < impacts; i++)
+            {
+                world.Advance(Interactions.Step);
+            }
+        }
+
+        /// <summary>Fails unless two floats are within a tolerance.</summary>
+        private static void Within(float expected, float actual, float tolerance, string what)
+        {
+            Expect.True(Math.Abs(expected - actual) <= tolerance, what + ": expected " + expected + " within " + tolerance + ", was " + actual);
+        }
+
+        /// <summary>What an impact read inside OnImpact: index 0 kind, 1 to 3 the point, 4 to 6 the normal, 7 the speed.</summary>
+        private static float Read(Shot shot, int impact, int index)
+        {
+            return shot.Reads[impact * 8 + index];
+        }
+
+        /// <summary>
+        /// A ball at 45 degrees into an endless wall along y with WallContact Bounce: it meets it once, at the wall, with the
+        /// normal out of the side it came from and the speed into it; the speed into it is reversed and halved (its
+        /// Bounciness 0.5 times the wall's 1) and the speed along it kept. One whose CanHit refuses the wall flies through it,
+        /// asked once. A wall of Bounciness 0.5 keeps a quarter. The wall
+        /// belongs to the owner current at Create, or the one given, and ends with it; a ball then flies through where it was.
+        /// </summary>
+        public static void Bounce(FakeWorld world)
+        {
+            Fresh();
+            var maker = Owner.Current;
+            var wall = Wall.Create(600.0f, 200.0f, 600.0f, 800.0f);
+            Expect.Same(maker, wall.Owner, "it belongs to its maker");
+            Within(600.0f, wall.X1, 0.0f, "its ends: x1");
+            Within(800.0f, wall.Y2, 0.0f, "y2");
+            Within(0.0f, wall.Height, 0.0f, "endless");
+            var ball = ShotAt(Contact.Bounce, 400.0f, 500.0f, 100.0f, 600.0f, 600.0f);
+            UntilImpacts(world, ball, 1, 64);
+            Expect.Equal(1, ball.Impacts.Count, "it met the wall");
+            Expect.Same(wall, ball.Met[0], "the wall is the impact's Other");
+            Within((float)(int)ImpactKind.Wall, Read(ball, 0, 0), 0.0f, "of a wall");
+            Within(600.0f, Read(ball, 0, 1), 0.01f, "at the wall: x");
+            Within(684.0f, Read(ball, 0, 2), 0.01f, "y");
+            Within(100.0f, Read(ball, 0, 3), 0.01f, "z");
+            Within(-1.0f, Read(ball, 0, 4), 0.0001f, "the normal out of the side it came from: x");
+            Within(0.0f, Read(ball, 0, 5), 0.0001f, "y");
+            Within(0.0f, Read(ball, 0, 6), 0.0001f, "level");
+            Within(600.0f, Read(ball, 0, 7), 0.01f, "the speed into it");
+            Within(-300.0f, ball.VX, 0.01f, "the speed into it reversed and halved");
+            Within(600.0f, ball.VY, 0.01f, "the speed along it kept");
+            Within(584.0f, ball.X, 0.01f, "put where it touched");
+            Steps(world, 16);
+            Expect.Equal(1, ball.Impacts.Count, "it flies off and does not meet it again");
+
+            var ghost = new Shot();
+            ghost.WallContact = Contact.Stop;
+            ghost.Hit = other => !(other is Wall);
+            Missile.Create(ghost, 400.0f, 300.0f, 100.0f);
+            ghost.VX = 600.0f;
+            Steps(world, 24);
+            Expect.Equal(0, ghost.Impacts.Count, "one whose CanHit refuses the wall flies through it");
+            Expect.True(ghost.Asked.Count == 1 && ghost.Asked[0] == wall, "asked once, though inside it for steps");
+
+            var log = new List<string>();
+            var keeper = new TestOwner("keeper", log);
+            var soft = Wall.Create(600.0f, 1200.0f, 600.0f, 1800.0f, 0.0f, 0.5f, keeper);
+            Expect.Same(keeper, soft.Owner, "a wall given an owner belongs to it");
+            Within(0.5f, soft.Bounciness, 0.0f, "its Bounciness");
+            var dull = ShotAt(Contact.Bounce, 400.0f, 1500.0f, 100.0f, 600.0f, 0.0f);
+            UntilImpacts(world, dull, 1, 64);
+            Expect.Equal(1, dull.Impacts.Count, "it met the soft wall");
+            Within(-150.0f, dull.VX, 0.01f, "the two bouncinesses multiplied: a quarter kept");
+
+            keeper.End();
+            Expect.True(soft.HasEnded, "the wall ended with its owner");
+            var through = ShotAt(Contact.Bounce, 400.0f, 1500.0f, 100.0f, 600.0f, 0.0f);
+            Steps(world, 24);
+            Expect.Equal(0, through.Impacts.Count, "nothing is met where it was");
+            Expect.True(through.X > 700.0f, "it flew on; at " + through.X);
+        }
+
+        /// <summary>A ball at 45 degrees into a wall with WallContact Slide: it meets it once, loses the speed into it and slides along it, keeping the rest, with no more impacts.</summary>
+        public static void Slide(FakeWorld world)
+        {
+            Fresh();
+            Wall.Create(600.0f, 200.0f, 600.0f, 1800.0f);
+            var ball = ShotAt(Contact.Slide, 400.0f, 500.0f, 100.0f, 600.0f, 600.0f);
+            UntilImpacts(world, ball, 1, 64);
+            Expect.Equal(1, ball.Impacts.Count, "it met the wall");
+            Within(0.0f, ball.VX, 0.01f, "the speed into it is gone");
+            Within(600.0f, ball.VY, 0.01f, "the speed along it kept");
+            var y = ball.Y;
+            Steps(world, 16);
+            Expect.Equal(1, ball.Impacts.Count, "it slides on with no more impacts");
+            Within(584.0f, ball.X, 0.01f, "along the wall");
+            Within(y + 300.0f, ball.Y, 0.5f, "at 600 a second");
+        }
+
+        /// <summary>A wall 100 high: a ball 200 up flies over it with no contact; one 50 up stops at it.</summary>
+        public static void Height(FakeWorld world)
+        {
+            Fresh();
+            var wall = Wall.Create(600.0f, 200.0f, 600.0f, 800.0f, 100.0f);
+            Within(100.0f, wall.Height, 0.0f, "its height");
+            var high = ShotAt(Contact.Stop, 400.0f, 500.0f, 200.0f, 600.0f, 0.0f);
+            var low = ShotAt(Contact.Stop, 400.0f, 600.0f, 50.0f, 600.0f, 0.0f);
+            Steps(world, 24);
+            Expect.Equal(0, high.Impacts.Count, "the high ball met nothing");
+            Expect.True(!high.HasEnded && high.X > 700.0f, "and flew over; at " + high.X);
+            Expect.Equal(1, low.Impacts.Count, "the low ball met the wall");
+            Expect.True(low.HasEnded, "and stopped");
+        }
+
+        /// <summary>At 3,000 a second, more than a ball's width a step, a ball is caught by a wall's end, flying along its line, and by its side, at the point it touched.</summary>
+        public static void Fast(FakeWorld world)
+        {
+            Fresh();
+            Wall.Create(600.0f, 300.0f, 600.0f, 700.0f);
+            var along = ShotAt(Contact.Stop, 600.0f, 100.0f, 100.0f, 0.0f, 3000.0f);
+            var across = ShotAt(Contact.Stop, 100.0f, 520.0f, 100.0f, 3000.0f, 0.0f);
+            Steps(world, 16);
+            Expect.Equal(1, along.Impacts.Count, "the ball along its line met its end");
+            Expect.True(along.HasEnded, "and stopped");
+            Within(300.0f, Read(along, 0, 2), 0.01f, "at the end: y");
+            Within(600.0f, Read(along, 0, 1), 0.01f, "x");
+            Within(-1.0f, Read(along, 0, 5), 0.0001f, "the normal out of the end, back along its line");
+            Expect.Equal(1, across.Impacts.Count, "the ball across it met its side");
+            Expect.True(across.HasEnded, "and stopped");
+            Within(600.0f, Read(across, 0, 1), 0.01f, "at the wall: x");
+            Within(520.0f, Read(across, 0, 2), 0.01f, "y");
+        }
+
+        /// <summary>A footman pushed at 600 into a wall across its way stops short of it, its collision size off, and OnSlammed runs once with the normal out of the wall.</summary>
+        public static void Push(FakeWorld world)
+        {
+            Fresh();
+            Wall.Create(650.0f, 100.0f, 650.0f, 1000.0f);
+            var handle = world.NewUnit(ObjectTypes.FourCC(PusheeId));
+            world.MoveUnit(handle, 512.0f, 512.0f);
+            var unit = (Pushee)Unit.Of(handle)!;
+            unit.Push(600.0f, 0.0f);
+            Steps(world, 64);
+            Expect.Equal(1, unit.Slams.Count, "OnSlammed once");
+            Within(-1.0f, unit.Slams[0].Normal.X, 0.001f, "the normal out of the wall: x");
+            Expect.True(!unit.IsPushed(), "it has stopped");
+            Expect.True(unit.X + 16.0f <= 650.0f, "short of the wall, its collision size off; at " + unit.X);
+            Expect.True(unit.X > 580.0f, "after moving some way; at " + unit.X);
+        }
+    }
+}
