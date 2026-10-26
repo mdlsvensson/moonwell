@@ -76,14 +76,14 @@ namespace Moonwell
             return new AreaShape(ShapeKind.Rect, bounds, null, bounds.Center, 0f, new AreaShape[0]);
         }
 
-        /// <summary>A polygon. The game gives the area the 32 cells whose centre is inside the polygon; <c>Contains</c> tests the true polygon.</summary>
+        /// <summary>A polygon. The game gives the area the 32 cells whose centre is inside the polygon; <c>Contains</c> tests the true polygon. The game is given one cell for each 32 by 32 square inside it, so a very large polygon makes a very large region.</summary>
         [LocalSafe]
         public static AreaShape Polygon(Polygon polygon)
         {
             return new AreaShape(ShapeKind.Polygon, polygon.Bounds, polygon, polygon.Center, 0f, new AreaShape[0]);
         }
 
-        /// <summary>A circle. The game gives the area the 32 cells whose centre is inside the circle; <c>Contains</c> tests the true circle. A radius that is not above 0 throws ArgumentException.</summary>
+        /// <summary>A circle. The game gives the area the 32 cells whose centre is inside the circle; <c>Contains</c> tests the true circle. A radius that is not above 0 throws ArgumentException. The game is given one cell for each 32 by 32 square inside it, so a radius of 4,096 makes about 51,000 cells.</summary>
         [LocalSafe]
         public static AreaShape Circle(Vector2 center, float radius)
         {

@@ -69,6 +69,7 @@ namespace Moonwell
         {
             world = null;
             regions.Clear();
+            AreaTracker.Forget();
         }
 
         /// <summary>The error of a read before Install.</summary>

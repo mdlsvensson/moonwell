@@ -144,6 +144,25 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "areas.shapes.of", Run = AreaShapeCases.Of });
             list.Add(new Case { Name = "areas.shapes.not-installed", Run = AreaShapeCases.NotInstalled });
             list.Add(new Case { Name = "areas.shapes.wrong-length", Run = AreaShapeCases.WrongLength });
+            list.Add(new Case { Name = "areas.area.enter-stay-leave", Run = AreaCases.EnterStayLeave });
+            list.Add(new Case { Name = "areas.area.accepts", Run = AreaCases.Accepts });
+            list.Add(new Case { Name = "areas.area.already-inside", Run = AreaCases.AlreadyInside });
+            list.Add(new Case { Name = "areas.area.sweep-and-event", Run = AreaCases.SweepAndEvent });
+            list.Add(new Case { Name = "areas.area.death", Run = AreaCases.Death });
+            list.Add(new Case { Name = "areas.area.removed", Run = AreaCases.Removed });
+            list.Add(new Case { Name = "areas.area.area-ends", Run = AreaCases.AreaEnds });
+            list.Add(new Case { Name = "areas.area.end-inside-enter", Run = AreaCases.EndInsideEnter });
+            list.Add(new Case { Name = "areas.area.remove-inside-left", Run = AreaCases.RemoveInsideLeft });
+            list.Add(new Case { Name = "areas.area.throwing", Run = AreaCases.Throwing });
+            list.Add(new Case { Name = "areas.area.reaction-owner", Run = AreaCases.ReactionOwner });
+            list.Add(new Case { Name = "areas.area.cells", Run = AreaCases.Cells });
+            list.Add(new Case { Name = "areas.area.no-shape", Run = AreaCases.NoShape });
+            list.Add(new Case { Name = "areas.area.fixed-once-added", Run = AreaCases.FixedOnceAdded });
+            list.Add(new Case { Name = "areas.area.reads", Run = AreaCases.Reads });
+            list.Add(new Case { Name = "areas.area.shared-timer", Run = AreaCases.SharedTimer });
+            list.Add(new Case { Name = "areas.area.counts-from-first-unit", Run = AreaCases.CountsFromFirstUnit });
+            list.Add(new Case { Name = "areas.area.hidden", Run = AreaCases.Hidden });
+            list.Add(new Case { Name = "areas.area.hidden-then-gone", Run = AreaCases.HiddenThenGone });
         }
 
         /// <summary>Adds the terrain package's cases.</summary>

@@ -24,6 +24,9 @@ namespace Moonwell.Engine
         /// <summary>The group UnitsInRect fills, made on first use.</summary>
         private group? scratch;
 
+        /// <summary>The death trigger, made by the first ListenDeaths; null until then.</summary>
+        private trigger? deaths;
+
         /// <summary>Makes an empty region.</summary>
         public region CreateRegion() => Natives.CreateRegion();
 
@@ -38,9 +41,14 @@ namespace Moonwell.Engine
         /// <summary>Adds the cell that holds a point to a region.</summary>
         public void AddCell(region r, float x, float y) => Natives.RegionAddCell(r, x, y);
 
-        /// <summary>Makes the enter and leave triggers of a region.</summary>
+        /// <summary>Makes the enter and leave triggers of a region. Once for a region: a second call for it does nothing.</summary>
         public void Listen(region r, Action entered, Action left)
         {
+            if (listened.ContainsKey(r))
+            {
+                return;
+            }
+
             var triggers = new Triggers();
             var enter = Natives.CreateTrigger();
             Natives.TriggerRegisterEnterRegion(enter, r, null);
@@ -92,9 +100,14 @@ namespace Moonwell.Engine
             Natives.GroupClear(scratch);
         }
 
-        /// <summary>Registers the death and the hero revive events for every player slot, with one trigger each.</summary>
+        /// <summary>Registers the death and the hero revive events for every player slot, with one trigger each. Once: a second call does nothing.</summary>
         public void ListenDeaths(Action died, Action revived)
         {
+            if (deaths != null)
+            {
+                return;
+            }
+
             var death = Natives.CreateTrigger();
             var revive = Natives.CreateTrigger();
             for (var slot = 0; slot < Natives.bj_MAX_PLAYER_SLOTS; slot++)
@@ -103,6 +116,7 @@ namespace Moonwell.Engine
                 Natives.TriggerRegisterPlayerUnitEvent(revive, Natives.Player(slot), Natives.EVENT_PLAYER_HERO_REVIVE_FINISH, null);
             }
 
+            deaths = death;
             Natives.TriggerAddAction(death, () => Deliver(Natives.GetDyingUnit(), died));
             Natives.TriggerAddAction(revive, () => Deliver(Natives.GetRevivingUnit(), revived));
         }
