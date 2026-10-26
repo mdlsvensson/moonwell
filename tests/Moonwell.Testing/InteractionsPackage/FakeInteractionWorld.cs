@@ -36,6 +36,9 @@ namespace Moonwell.Testing
         /// <summary>The destructables IsAlive answers false for.</summary>
         public List<destructable> Dead = new List<destructable>();
 
+        /// <summary>The destructables IsAlive throws for, as a world whose call fails.</summary>
+        public List<destructable> Failing = new List<destructable>();
+
         /// <summary>The destructable types IsTreeType answers true for.</summary>
         public List<int> TreeTypes = new List<int>();
 
@@ -60,6 +63,11 @@ namespace Moonwell.Testing
         public bool IsAlive(destructable target)
         {
             Reads++;
+            if (Failing.Contains(target))
+            {
+                throw new System.InvalidOperationException("the call failed");
+            }
+
             return !Dead.Contains(target);
         }
 

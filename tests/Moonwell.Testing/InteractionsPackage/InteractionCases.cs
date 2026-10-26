@@ -655,5 +655,93 @@ namespace Moonwell.Testing
             Expect.Equal(0, Find.Pending, "no candidate is left at the end");
             Expect.Equal(0, Pairing.Walk.Count, "and no pair on the walk");
         }
+
+        /// <summary>
+        /// Each reaction runs guarded, in Lua through one xpcall each with no closure: an Accepts that throws is reported as
+        /// FireAura.Accepts and refuses, and the other is asked again at the next tick; an OnMeet that fails on a null (a Lua
+        /// error in Lua) is reported as FireAura.OnMeet and the pair still ticks, with the pair as the current owner; an
+        /// OnPart that throws is reported as FireAura.OnPart and the pair still parts; the current owner is the root again
+        /// after the step, and the check goes on to the next other each time.
+        /// </summary>
+        public static void GuardedReactions(FakeWorld world)
+        {
+            Fresh();
+            var a = UnitAt(world, 0.0f, 0.0f);
+            var b = UnitAt(world, 100.0f, 0.0f);
+            var c = UnitAt(world, 200.0f, 0.0f);
+            var aura = new FireAura();
+            aura.Tag = unit => unit == b ? "b" : unit == c ? "c" : "?";
+            var refuseC = true;
+            aura.Accepting = unit =>
+            {
+                if (unit == c && refuseC)
+                {
+                    throw new System.InvalidOperationException("no");
+                }
+
+                return true;
+            };
+            Unit? none = null;
+            aura.Meeting = pair =>
+            {
+                if (pair.Other == b)
+                {
+                    TestLog.Lines.Add("x " + none!.X);
+                }
+            };
+            Owner? tickOwner = null;
+            Owner? metB = null;
+            aura.Ticking = pair =>
+            {
+                if (pair.Other == b && tickOwner == null)
+                {
+                    tickOwner = Owner.Current;
+                    metB = pair;
+                }
+            };
+            aura.Parting = pair => { throw new System.InvalidOperationException("part"); };
+            a.Interact(aura);
+            Steps(world, 16);
+            ExpectLog(new string[] { "meet b", "tick b" }, "b meets though its OnMeet failed, and c's Accepts threw");
+            Expect.True(Logged(world, "FireAura.Accepts failed"), "the Accepts that threw is reported");
+            Expect.True(Logged(world, "FireAura.OnMeet failed"), "the OnMeet that failed on a null is reported");
+            Expect.True(metB != null, "b ticked");
+            Expect.Same(metB, tickOwner, "OnTick ran with the pair as the current owner");
+            Expect.Same(Runtime.Root, Owner.Current, "the root is the current owner after the step");
+            Expect.Equal(2, aura.Asked, "both were asked");
+            refuseC = false;
+            Steps(world, 16);
+            ExpectLog(new string[] { "meet b", "tick b", "tick b", "meet c", "tick c" }, "c is asked again and meets");
+            world.MoveUnit(b.Handle, 900.0f, 0.0f);
+            Steps(world, 16);
+            ExpectLog(new string[] { "meet b", "tick b", "tick b", "meet c", "tick c", "part b", "tick c" }, "b parts though its OnPart threw, and c ticks after");
+            Expect.True(Logged(world, "FireAura.OnPart failed"), "the OnPart that threw is reported");
+            Expect.Equal(1, aura.Pairs.Count, "b's pair is gone");
+            Expect.Same(Runtime.Root, Owner.Current, "and the root is the current owner");
+        }
+
+        /// <summary>A check that fails outside a reaction, here the world's read of a destructable, takes what it added off the shared candidates and walk, and its error goes on up to the cycle's timer, which reports it; nothing parts, and the interaction, which the cycle took off its list before the check, is not put on again.</summary>
+        public static void CheckFails(FakeWorld world)
+        {
+            var fake = Fresh();
+            var handle = world.NewDestructable(ObjectTypes.FourCC("dfoo"));
+            world.PlaceDestructable(handle, 100.0f, 0.0f);
+            world.PlacedDestructables.Add(handle);
+            var a = UnitAt(world, 0.0f, 0.0f);
+            var scorch = new Scorch();
+            a.Interact(scorch);
+            Steps(world, 1);
+            ExpectLog(new string[] { "meet", "tick" }, "the scorch meets the destructable");
+            fake.Failing.Add(handle);
+            Steps(world, 1);
+            ExpectLog(new string[] { "meet", "tick" }, "the failed check ran no reaction");
+            Expect.True(Logged(world, ".Timer failed"), "its error went on up to the cycle's timer");
+            Expect.Equal(0, Find.Pending, "no candidate is left");
+            Expect.Equal(0, Pairing.Walk.Count, "no pair is left on the walk");
+            Expect.Equal(1, scorch.Pairs.Count, "the pair is kept");
+            fake.Failing.Clear();
+            Steps(world, 2);
+            ExpectLog(new string[] { "meet", "tick" }, "the error left the interaction off the cycle, so it checks no more");
+        }
     }
 }

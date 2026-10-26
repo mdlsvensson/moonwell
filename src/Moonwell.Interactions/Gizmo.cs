@@ -165,13 +165,10 @@ namespace Moonwell
         {
             var previous = Owner.current;
             Owner.current = this;
-            try
+            var failure = Guard.Tick(this);
+            if (failure != null)
             {
-                OnTick();
-            }
-            catch (Exception error)
-            {
-                Errors.Report(Names.NameOf(this) + ".OnTick", error);
+                Errors.Report(Names.NameOf(this) + ".OnTick", failure);
             }
 
             Owner.current = previous;

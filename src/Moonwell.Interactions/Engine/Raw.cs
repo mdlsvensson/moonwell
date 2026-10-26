@@ -61,9 +61,10 @@ namespace Moonwell.Engine
         }
 
         // Raw: math.floor in place of CSharp.lua's System.ToInt32, which truncates through two calls; Lua 5.3 gives an
-        // integer for a float that has one. Safe: the value is 0 or more, where floor and truncation agree.
+        // integer for a float that has one. Safe: the value is 0 or more, where floor and truncation agree, or NaN (a place
+        // a map set to 0/0), which gives what System.ToInt32 gives, so a NaN place fails as it did. The value is a local.
         /// <summary>The whole part of a float of 0 or more.</summary>
-        /// @CSharpLua.Template = "math.floor({0})"
+        /// @CSharpLua.Template = "({0} == {0} and math.floor({0}) or -2147483648)"
         public static int Whole(float value)
         {
             return (int)value;

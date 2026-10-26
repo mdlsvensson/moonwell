@@ -116,6 +116,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.interaction.pause-in-reaction", Run = InteractionCases.PauseInReaction });
             list.Add(new Case { Name = "interactions.interaction.shadowed-fields", Run = InteractionCases.ShadowedFields });
             list.Add(new Case { Name = "interactions.interaction.inner-loops", Run = InteractionCases.InnerLoops });
+            list.Add(new Case { Name = "interactions.interaction.guarded-reactions", Run = InteractionCases.GuardedReactions });
+            list.Add(new Case { Name = "interactions.interaction.check-fails", Run = InteractionCases.CheckFails });
+            list.Add(new Case { Name = "interactions.guard.turn", Run = GuardCases.Turn });
             list.Add(new Case { Name = "interactions.pair.wait", Run = PairCases.Wait });
             list.Add(new Case { Name = "interactions.pair.try-cooldown", Run = PairCases.TryCooldown });
             list.Add(new Case { Name = "interactions.pair.pause-resume", Run = PairCases.PauseResume });

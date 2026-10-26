@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Moonwell.Engine;
 
@@ -122,6 +121,9 @@ namespace Moonwell
 
         /// <summary>The check at a tick: what is near now meets, ticks or parts.</summary>
         internal abstract void RunCheck();
+
+        /// <summary>The part of the check after the holder's read, for a holder with a place; RunCheck runs it guarded, and takes what it added off the shared lists after, as a finally would.</summary>
+        internal abstract void CheckNear();
 
         /// <summary>Runs OnPart for a pair that is parting, guarded.</summary>
         internal abstract void RunPart(Owner pair);
@@ -418,6 +420,23 @@ namespace Moonwell
                 return;
             }
 
+            // A try and finally here would make two closures a check in Lua; Guard runs CheckNear with none. What it added
+            // to the shared lists comes off after, then an error it raised goes on up, as with the finally.
+            var start = Find.Candidates.Count;
+            var walkStart = Pairing.Walk.Count;
+            var failure = Guard.Check(this);
+            Pairing.Release(walkStart);
+            Find.Release(start);
+            if (failure != null)
+            {
+                Guard.Raise(failure);
+            }
+        }
+
+        /// <summary>The check from the holder's place on: the things near are collected, kept, parted, ticked and met, as RunCheck says. It leaves on the shared lists what it added, for RunCheck to take off.</summary>
+        internal sealed override void CheckNear()
+        {
+            var home = holderEntry!;
             var hx = home.X;
             var hy = home.Y;
             var reach = Range + Interactions.Slack;
@@ -426,133 +445,125 @@ namespace Moonwell
             var start = candidates.Count;
             var walk = Pairing.Walk;
             var walkStart = walk.Count;
-            try
+            Interactions.Grid.Collect(hx - reach, hy - reach, hx + reach, hy + reach, candidates);
+            var end = start;
+            var count = candidates.Count;
+            for (var i = start; i < count; i++)
             {
-                Interactions.Grid.Collect(hx - reach, hy - reach, hx + reach, hy + reach, candidates);
-                var end = start;
-                var count = candidates.Count;
-                for (var i = start; i < count; i++)
+                var entry = Raw.At(candidates, i);
+                if (entry == home || !(entry.Thing is TOther))
                 {
-                    var entry = Raw.At(candidates, i);
-                    if (entry == home || !(entry.Thing is TOther))
-                    {
-                        continue;
-                    }
-
-                    Tracking.ReadNow(entry);
-                    if (!entry.HasPlace)
-                    {
-                        continue;
-                    }
-
-                    var dx = entry.X - hx;
-                    var dy = entry.Y - hy;
-                    if (dx * dx + dy * dy > limit)
-                    {
-                        continue;
-                    }
-
-                    Raw.Put(candidates, end, entry);
-                    end++;
+                    continue;
                 }
 
-                Find.Release(end);
-                for (var i = start; i < end; i++)
+                Tracking.ReadNow(entry);
+                if (!entry.HasPlace)
                 {
-                    var entry = Raw.At(candidates, i);
-                    Owner? found;
-                    if (byOther.TryGetValue(entry.Id, out found))
-                    {
-                        Pair kept = Pairing.As<THolder, TOther>(found);
-                        kept.Keep(checks, hx, hy, entry.X, entry.Y);
-                    }
-                    else
-                    {
-                        SeeStopped(entry);
-                    }
+                    continue;
                 }
 
-                WalkPairs();
-                var walkEnd = walk.Count;
-                for (var i = walkStart; i < walkEnd; i++)
+                var dx = entry.X - hx;
+                var dy = entry.Y - hy;
+                if (dx * dx + dy * dy > limit)
                 {
-                    Pair pair = Pairing.As<THolder, TOther>(Raw.At(walk, i));
-                    if (Gone(pair) || pair.kept == checks)
-                    {
-                        continue;
-                    }
-
-                    pair.End();
-                    if (Over)
-                    {
-                        return;
-                    }
+                    continue;
                 }
 
-                ForgetStopped(false);
-                Pairing.Release(walkStart);
-                WalkPairs();
-                walkEnd = walk.Count;
-                for (var i = walkStart; i < walkEnd; i++)
-                {
-                    Pair pair = Pairing.As<THolder, TOther>(Raw.At(walk, i));
-                    if (Gone(pair) || !pair.Ready)
-                    {
-                        continue;
-                    }
+                Raw.Put(candidates, end, entry);
+                end++;
+            }
 
-                    CallTick(pair);
-                    if (Over)
-                    {
-                        return;
-                    }
+            Find.Release(end);
+            for (var i = start; i < end; i++)
+            {
+                var entry = Raw.At(candidates, i);
+                Owner? found;
+                if (byOther.TryGetValue(entry.Id, out found))
+                {
+                    Pair kept = Pairing.As<THolder, TOther>(found);
+                    kept.Keep(checks, hx, hy, entry.X, entry.Y);
                 }
-
-                Pairing.Release(walkStart);
-                for (var i = start; i < end; i++)
+                else
                 {
-                    var entry = Raw.At(candidates, i);
-                    if (entry.Ended || byOther.ContainsKey(entry.Id) || IsStopped(entry))
-                    {
-                        continue;
-                    }
-
-                    var accepted = CallAccepts((TOther)entry.Thing);
-                    if (Over)
-                    {
-                        return;
-                    }
-
-                    if (!accepted || entry.Ended || byOther.ContainsKey(entry.Id))
-                    {
-                        continue;
-                    }
-
-                    Pair pair = Pairing.Make<THolder, TOther>();
-                    pair.Begin(this, holder, (TOther)entry.Thing, entry, checks, hx, hy);
-                    Join(pair, entry);
-                    CallMeet(pair);
-                    if (Over)
-                    {
-                        return;
-                    }
-
-                    if (Gone(pair) || !pair.Ready)
-                    {
-                        continue;
-                    }
-
-                    CallTick(pair);
-                    if (Over)
-                    {
-                        return;
-                    }
+                    SeeStopped(entry);
                 }
             }
-            finally
+
+            WalkPairs();
+            var walkEnd = walk.Count;
+            for (var i = walkStart; i < walkEnd; i++)
             {
-                Pairing.Release(walkStart);
-                Find.Release(start);
+                Pair pair = Pairing.As<THolder, TOther>(Raw.At(walk, i));
+                if (Gone(pair) || pair.kept == checks)
+                {
+                    continue;
+                }
+
+                pair.End();
+                if (Over)
+                {
+                    return;
+                }
+            }
+
+            ForgetStopped(false);
+            Pairing.Release(walkStart);
+            WalkPairs();
+            walkEnd = walk.Count;
+            for (var i = walkStart; i < walkEnd; i++)
+            {
+                Pair pair = Pairing.As<THolder, TOther>(Raw.At(walk, i));
+                if (Gone(pair) || !pair.Ready)
+                {
+                    continue;
+                }
+
+                CallTick(pair);
+                if (Over)
+                {
+                    return;
+                }
+            }
+
+            Pairing.Release(walkStart);
+            for (var i = start; i < end; i++)
+            {
+                var entry = Raw.At(candidates, i);
+                if (entry.Ended || byOther.ContainsKey(entry.Id) || IsStopped(entry))
+                {
+                    continue;
+                }
+
+                var accepted = CallAccepts((TOther)entry.Thing);
+                if (Over)
+                {
+                    return;
+                }
+
+                if (!accepted || entry.Ended || byOther.ContainsKey(entry.Id))
+                {
+                    continue;
+                }
+
+                Pair pair = Pairing.Make<THolder, TOther>();
+                pair.Begin(this, holder, (TOther)entry.Thing, entry, checks, hx, hy);
+                Join(pair, entry);
+                CallMeet(pair);
+                if (Over)
+                {
+                    return;
+                }
+
+                if (Gone(pair) || !pair.Ready)
+                {
+                    continue;
+                }
+
+                CallTick(pair);
+                if (Over)
+                {
+                    return;
+                }
             }
         }
 
@@ -561,14 +572,11 @@ namespace Moonwell
         {
             var previous = Owner.current;
             Owner.current = this;
-            var accepted = false;
-            try
+            var failure = Guard.Accept(this, other);
+            var accepted = Guard.answer;
+            if (failure != null)
             {
-                accepted = Accepts(other);
-            }
-            catch (Exception error)
-            {
-                Errors.Report(Names.NameOf(this) + ".Accepts", error);
+                Errors.Report(Names.NameOf(this) + ".Accepts", failure);
             }
 
             Owner.current = previous;
@@ -580,13 +588,10 @@ namespace Moonwell
         {
             var previous = Owner.current;
             Owner.current = pair;
-            try
+            var failure = Guard.Meet(this, pair);
+            if (failure != null)
             {
-                OnMeet(pair);
-            }
-            catch (Exception error)
-            {
-                Errors.Report(Names.NameOf(this) + ".OnMeet", error);
+                Errors.Report(Names.NameOf(this) + ".OnMeet", failure);
             }
 
             Owner.current = previous;
@@ -597,13 +602,10 @@ namespace Moonwell
         {
             var previous = Owner.current;
             Owner.current = pair;
-            try
+            var failure = Guard.Tick(this, pair);
+            if (failure != null)
             {
-                OnTick(pair);
-            }
-            catch (Exception error)
-            {
-                Errors.Report(Names.NameOf(this) + ".OnTick", error);
+                Errors.Report(Names.NameOf(this) + ".OnTick", failure);
             }
 
             Owner.current = previous;
@@ -614,13 +616,10 @@ namespace Moonwell
         {
             var previous = Owner.current;
             Owner.current = pair;
-            try
+            var failure = Guard.Part(this, pair);
+            if (failure != null)
             {
-                OnPart(pair);
-            }
-            catch (Exception error)
-            {
-                Errors.Report(Names.NameOf(this) + ".OnPart", error);
+                Errors.Report(Names.NameOf(this) + ".OnPart", failure);
             }
 
             Owner.current = previous;
