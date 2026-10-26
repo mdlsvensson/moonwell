@@ -286,11 +286,22 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Enters a unit that is alive, has a place, is not inside yet and that Accepts takes; false when it did not.</summary>
+        /// <summary>Enters a unit that is alive, has a place, is not inside yet and that Accepts takes; false when it did not. A living unit without a place (hidden or loaded) is put among the units away instead, for the place check to enter once it has a place and is inside.</summary>
         internal bool TryEnter(Unit unit)
         {
-            if (stopped || since.ContainsKey(unit) || unit.HasEnded || unit.ending || !tracker!.World.HasPlace(unit.Handle))
+            if (stopped || since.ContainsKey(unit) || unit.HasEnded || unit.ending)
             {
+                return false;
+            }
+
+            if (!tracker!.World.HasPlace(unit.Handle))
+            {
+                if (unit.IsAlive && !away.Contains(unit))
+                {
+                    away.Add(unit);
+                    Refresh();
+                }
+
                 return false;
             }
 

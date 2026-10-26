@@ -441,6 +441,43 @@ namespace Moonwell.Testing
             Expect.Equal(10, area.Log.Count, "no more");
         }
 
+        /// <summary>A unit hidden inside the area when it first meets it (at the sweep, or at an enter event) does not enter then; shown, it enters at the next place check; one that has walked out meanwhile is forgotten without OnUnitLeft.</summary>
+        public static void HiddenAtStart(FakeWorld world)
+        {
+            var fake = Fresh();
+            var hidden = UnitAt(world, 10f, 10f);
+            var walks = UnitAt(world, 20f, 20f);
+            var arriving = UnitAt(world, 30f, 30f);
+            fake.Stand(hidden.Handle, 10f, 10f);
+            fake.Stand(walks.Handle, 20f, 20f);
+            fake.NoPlace.Add(hidden.Handle);
+            fake.NoPlace.Add(walks.Handle);
+            fake.NoPlace.Add(arriving.Handle);
+            var area = new LogArea(Square());
+            area.Labels[hidden] = "hidden";
+            area.Labels[walks] = "walks";
+            area.Labels[arriving] = "event";
+            Game.Instance.Add(area);
+            var made = fake.Regions[0];
+            made.Inside.Add(hidden.Handle);
+            made.Inside.Add(walks.Handle);
+            world.Advance(0f);
+            fake.Enter(made, arriving.Handle);
+            Expect.Equal(0, area.Log.Count, "none enters while hidden");
+            Expect.True(AreaTracker.Running, "the timer runs for the units away");
+            made.Inside.Remove(walks.Handle);
+            fake.NoPlace.Remove(hidden.Handle);
+            fake.NoPlace.Remove(walks.Handle);
+            world.Advance(0.25f);
+            ExpectLog(area, new[] { "entered hidden" }, "the shown one enters at the check; the one that walked out is forgotten; the one still hidden waits");
+            fake.NoPlace.Remove(arriving.Handle);
+            world.Advance(0.25f);
+            ExpectLog(area, new[] { "entered hidden", "entered event" }, "the one hidden at its enter event enters when shown");
+            fake.Leave(made, hidden.Handle);
+            fake.Leave(made, arriving.Handle);
+            Expect.True(!AreaTracker.Running, "nothing is away or inside: the timer stopped");
+        }
+
         /// <summary>A unit away because it was hidden that dies, or ends, is not entered again, and the timer stops.</summary>
         public static void HiddenThenGone(FakeWorld world)
         {

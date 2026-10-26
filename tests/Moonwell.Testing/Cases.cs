@@ -163,6 +163,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "areas.area.counts-from-first-unit", Run = AreaCases.CountsFromFirstUnit });
             list.Add(new Case { Name = "areas.area.hidden", Run = AreaCases.Hidden });
             list.Add(new Case { Name = "areas.area.hidden-then-gone", Run = AreaCases.HiddenThenGone });
+            list.Add(new Case { Name = "areas.area.hidden-at-start", Run = AreaCases.HiddenAtStart });
         }
 
         /// <summary>Adds the terrain package's cases.</summary>
