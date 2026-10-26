@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Moonwell.Engine;
 using Moonwell.Hosting;
 
@@ -39,6 +40,32 @@ namespace Moonwell
         public static float GroundHeight(float x, float y, float z)
         {
             return Ground.Height(x, y, z);
+        }
+
+        /// <summary>
+        /// Sizes the destructables of a type for what missiles meet: an upright cylinder of this radius around its place and
+        /// this height from the ground. A type not sized is 64 around and 250 tall. Set in the map's constructor, so a
+        /// standard destructable (a barrel, a tree) can be sized too; both must be more than 0.
+        /// </summary>
+        /// <param name="typeId">The destructable type, a four-character code as an integer.</param>
+        /// <param name="radius">The radius, in game units.</param>
+        /// <param name="height">The height, in game units.</param>
+        public static void DestructableSize(int typeId, float radius, float height)
+        {
+            Dev.Check(radius > 0.0f && height > 0.0f, "Physics.DestructableSize: the radius and the height must be more than 0");
+            var current = Current();
+            if (current.DestructableRadii == null || current.DestructableHeights == null)
+            {
+                current.DestructableRadii = new Dictionary<int, float>();
+                current.DestructableHeights = new Dictionary<int, float>();
+            }
+
+            current.DestructableRadii[typeId] = radius;
+            current.DestructableHeights[typeId] = height;
+            if (radius > current.LargestDestructable)
+            {
+                current.LargestDestructable = radius;
+            }
         }
 
         /// <summary>Whether the package is installed on a world.</summary>

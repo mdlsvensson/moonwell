@@ -33,6 +33,7 @@ namespace Moonwell.Engine
             dropped = false;
             boundsRead = false;
             Pushes.Reset(trackingKept);
+            Contacts.Reset();
         }
 
         /// <summary>Adds a missile at the end of the list, as it is created; it moves from the next step.</summary>
@@ -86,6 +87,10 @@ namespace Moonwell.Engine
                 if (!missile.ending)
                 {
                     Flight.Step(missile, step, grid, world);
+                    if (!missile.ending)
+                    {
+                        Contacts.Reach(missile);
+                    }
                 }
             }
 

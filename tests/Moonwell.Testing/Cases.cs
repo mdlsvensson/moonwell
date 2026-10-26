@@ -211,6 +211,24 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "push.reentrant", Run = PushCases.Reentrant });
             list.Add(new Case { Name = "push.hover", Run = PushCases.Hover });
             list.Add(new Case { Name = "push.grounded-names", Run = PushCases.GroundedNames });
+            list.Add(new Case { Name = "contact.stop", Run = ContactCases.Stop });
+            list.Add(new Case { Name = "contact.can-hit", Run = ContactCases.CanHit });
+            list.Add(new Case { Name = "contact.order", Run = ContactCases.Order });
+            list.Add(new Case { Name = "contact.bounce", Run = ContactCases.Bounce });
+            list.Add(new Case { Name = "contact.pass", Run = ContactCases.Pass });
+            list.Add(new Case { Name = "contact.fast", Run = ContactCases.Fast });
+            list.Add(new Case { Name = "contact.inside", Run = ContactCases.Inside });
+            list.Add(new Case { Name = "contact.top", Run = ContactCases.Top });
+            list.Add(new Case { Name = "contact.resting", Run = ContactCases.Resting });
+            list.Add(new Case { Name = "contact.sized", Run = ContactCases.Sized });
+            list.Add(new Case { Name = "contact.mass", Run = ContactCases.Mass });
+            list.Add(new Case { Name = "contact.destructable", Run = ContactCases.DestructableHit });
+            list.Add(new Case { Name = "contact.item", Run = ContactCases.ItemHit });
+            list.Add(new Case { Name = "contact.no-source", Run = ContactCases.NoSource });
+            list.Add(new Case { Name = "contact.end-in-reaction", Run = ContactCases.EndInReaction });
+            list.Add(new Case { Name = "contact.owner", Run = ContactCases.Ownership });
+            list.Add(new Case { Name = "contact.none-costs-nothing", Run = ContactCases.NoneCostsNothing });
+            list.Add(new Case { Name = "contact.dead-source", Run = ContactCases.DeadSource });
         }
 
         /// <summary>Adds the areas package's cases.</summary>

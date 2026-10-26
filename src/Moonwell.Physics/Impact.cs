@@ -30,10 +30,18 @@ namespace Moonwell
         /// <summary>The outcome.</summary>
         internal Contact contact;
 
-        /// <summary>Made by the package at a contact only: what was met, the point, the normal out of the surface (of length 1), the closing speed and the outcome the missile's setting gives.</summary>
-        internal Impact(ImpactKind kind, float x, float y, float z, float nx, float ny, float nz, float speed, Contact contact)
+        /// <summary>The thing met; null for the ground.</summary>
+        internal Actor? other;
+
+        /// <summary>The damage dealt at the contact.</summary>
+        internal float damage;
+
+        /// <summary>Made by the package at a contact only: what was met (null for the ground), the point, the normal out of the surface (of length 1), the closing speed, the outcome the missile's setting gives and the damage its ImpactDamage gives.</summary>
+        internal Impact(ImpactKind kind, Actor? other, float x, float y, float z, float nx, float ny, float nz, float speed, Contact contact, float damage)
         {
             this.kind = kind;
+            this.other = other;
+            this.damage = damage;
             this.x = x;
             this.y = y;
             this.z = z;
@@ -49,6 +57,41 @@ namespace Moonwell
         public ImpactKind Kind
         {
             get { return kind; }
+        }
+
+        /// <summary>The thing the missile met: a unit, a destructable, an item, a missile or a wall; null for the ground.</summary>
+        [LocalSafe]
+        public Actor? Other
+        {
+            get { return other; }
+        }
+
+        /// <summary>The unit the missile met; null when it met something else.</summary>
+        [LocalSafe]
+        public Unit? Unit
+        {
+            get { return other as Unit; }
+        }
+
+        /// <summary>The destructable the missile met; null when it met something else.</summary>
+        [LocalSafe]
+        public Destructable? Destructable
+        {
+            get { return other as Destructable; }
+        }
+
+        /// <summary>The item the missile met; null when it met something else.</summary>
+        [LocalSafe]
+        public Item? Item
+        {
+            get { return other as Item; }
+        }
+
+        /// <summary>The other missile the missile met; null when it met something else.</summary>
+        [LocalSafe]
+        public Missile? Missile
+        {
+            get { return other as Missile; }
         }
 
         /// <summary>The point of contact's left-to-right place.</summary>
@@ -86,12 +129,20 @@ namespace Moonwell
             get { return speed; }
         }
 
-        /// <summary>The outcome: the missile's setting for the kind met. A reaction may change it, and the outcome changes with it.</summary>
+        /// <summary>The outcome: the missile's setting for the kind met. A reaction may change it, and the outcome changes with it: Stop ends the missile at the point, Bounce bounces it off, Pass and None let it fly on, not meeting the thing again until they part. Slide is Bounce on anything but the ground and walls.</summary>
         [LocalSafe]
         public Contact Contact
         {
             get { return contact; }
             set { contact = value; }
+        }
+
+        /// <summary>The damage the missile's Source deals at the contact: its ImpactDamage unless a reaction changes it, dealt after the reactions to a unit or a destructable (none at 0 or under, and none to an item, a missile, a wall or the ground). A missile with no Source deals none.</summary>
+        [LocalSafe]
+        public float Damage
+        {
+            get { return damage; }
+            set { damage = value; }
         }
     }
 }

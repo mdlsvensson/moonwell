@@ -8,8 +8,8 @@ namespace Moonwell
     /// changes by its Acceleration, gravity pulls it down, and it moves by its velocity. Its settings are declared in the
     /// constructor and are live after. A unit fires one with <c>unit.Fire(missile, target)</c>; <c>Missile.Create</c> places
     /// one for code that sets its velocity itself. It belongs to the game unless it is given an owner, and ends when it
-    /// stops on the ground (its GroundContact), when its Duration or MaxDistance runs out, when it leaves the world, by End,
-    /// or with its owner.
+    /// stops on the ground or on a thing it meets (its GroundContact, UnitContact and the rest), when its Duration or
+    /// MaxDistance runs out, when it leaves the world, by End, or with its owner.
     /// </summary>
     public abstract class Missile : Gizmo
     {
@@ -173,6 +173,42 @@ namespace Moonwell
 
         /// <summary>What it does on meeting the ground.</summary>
         internal Contact groundContact = Contact.Stop;
+
+        /// <summary>What it does on meeting a unit.</summary>
+        internal Contact unitContact = Contact.Stop;
+
+        /// <summary>What it does on meeting a destructable.</summary>
+        internal Contact destructableContact;
+
+        /// <summary>What it does on meeting an item.</summary>
+        internal Contact itemContact;
+
+        /// <summary>What it does on meeting another missile.</summary>
+        internal Contact missileContact;
+
+        /// <summary>What it does on meeting a wall.</summary>
+        internal Contact wallContact;
+
+        /// <summary>The interaction that checks it against units; null while UnitContact has been None since Create.</summary>
+        internal Interaction? unitChecks;
+
+        /// <summary>The interaction that checks it against destructables; null while DestructableContact has been None since Create.</summary>
+        internal Interaction? destructableChecks;
+
+        /// <summary>The interaction that checks it against items; null while ItemContact has been None since Create.</summary>
+        internal Interaction? itemChecks;
+
+        /// <summary>Where the step's move began, x: the contact checks sweep its ball from there to where it is.</summary>
+        internal float lastX;
+
+        /// <summary>Where the step's move began, y.</summary>
+        internal float lastY;
+
+        /// <summary>Where the step's move began, its height.</summary>
+        internal float lastZ;
+
+        /// <summary>Whether the next step keeps the place its move began from: a missile woken from rest, whose checks resume a step late, so the next check sweeps both steps.</summary>
+        internal bool keepLast;
 
         /// <summary>Whether it rolls along the ground: a Slide that has slowed.</summary>
         internal bool rolling;
@@ -341,6 +377,58 @@ namespace Moonwell
         {
             get { return groundContact; }
             set { groundContact = value; }
+        }
+
+        /// <summary>What it does on meeting a unit: Stop, the default, ends it there; Bounce bounces it off (Slide too); Pass reacts once and flies on, not again until they part; None does not check units at all. Set to another than None after Create, the checks start then.</summary>
+        [LocalSafe]
+        public Contact UnitContact
+        {
+            get { return unitContact; }
+            set
+            {
+                unitContact = value;
+                Contacts.Changed(this);
+            }
+        }
+
+        /// <summary>What it does on meeting a destructable: None, the default, does not check destructables at all; Stop, Bounce and Pass as UnitContact. Set to another than None after Create, the checks start then.</summary>
+        [LocalSafe]
+        public Contact DestructableContact
+        {
+            get { return destructableContact; }
+            set
+            {
+                destructableContact = value;
+                Contacts.Changed(this);
+            }
+        }
+
+        /// <summary>What it does on meeting an item on the ground: None, the default, does not check items at all; Stop, Bounce and Pass as UnitContact. An item takes no damage. Set to another than None after Create, the checks start then.</summary>
+        [LocalSafe]
+        public Contact ItemContact
+        {
+            get { return itemContact; }
+            set
+            {
+                itemContact = value;
+                Contacts.Changed(this);
+            }
+        }
+
+        /// <summary>What it does on meeting another missile: None, the default, does not check missiles at all; Stop, Bounce and Pass as UnitContact.</summary>
+        [LocalSafe]
+        public Contact MissileContact
+        {
+            get { return missileContact; }
+            set { missileContact = value; }
+        }
+
+        /// <summary>What it does on meeting a wall: None, the default, does not check walls at all; Stop, Bounce, Pass, and Slide, which bounces until slow and then slides along the wall.</summary>
+        [LocalSafe]
+        public Contact WallContact
+        {
+            get { return wallContact; }
+            set { wallContact = value; }
         }
 
         /// <summary>The seconds it flies, counted from Create; then OnExpire runs and it ends. 0, the default, for no end.</summary>
@@ -536,7 +624,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Whether it can hit a thing it touches; false and they pass through each other. Asked before each contact with a unit, destructable, item or missile. By default everything but its own Source.</summary>
+        /// <summary>Whether it can hit a thing it touches: asked before a contact with a unit, destructable, item or missile, with the missile as the current owner; false and they pass through each other, and it is not asked again until they part. By default everything but its own Source.</summary>
         public virtual bool CanHit(Actor other)
         {
             return other != source;
@@ -569,7 +657,7 @@ namespace Moonwell
             return Game.Instance;
         }
 
-        /// <summary>Joins the physics pass and makes its effects, as Gizmo.Create places it: at the height Missile.Create gave, else at its LaunchHeight above the ground.</summary>
+        /// <summary>Joins the physics pass, makes its effects and starts its contact checks, as Gizmo.Create places it: at the height Missile.Create gave, else at its LaunchHeight above the ground.</summary>
         internal override void Placed()
         {
             Physics.EnsureInstalled();
@@ -580,8 +668,12 @@ namespace Moonwell
                 z = Ground.Height(x, y) + launchHeight;
             }
 
+            lastX = x;
+            lastY = y;
+            lastZ = z;
             Flight.Show(this, x, y);
             Pass.Add(this);
+            Contacts.Begin(this);
         }
 
         /// <summary>Destroys its effects once it and its components have ended, and tells the pass it is gone.</summary>

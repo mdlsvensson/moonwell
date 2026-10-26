@@ -49,9 +49,22 @@ namespace Moonwell.Engine
         public static void Step(Missile missile, float step, Grid grid, IPhysicsWorld world)
         {
             stepping = step;
+            var start = missile.entry!;
+            if (missile.keepLast)
+            {
+                missile.keepLast = false;
+            }
+            else
+            {
+                // Where the move begins: the contact checks later in the step sweep its ball from here.
+                missile.lastX = start.X;
+                missile.lastY = start.Y;
+                missile.lastZ = missile.z;
+            }
+
             if (missile.resting)
             {
-                var place = missile.entry!;
+                var place = start;
                 if (place.X != missile.restX || place.Y != missile.restY || missile.z != missile.restZ)
                 {
                     // Moved by its X, Y or Z: it flies from where it was put, and the ground there is read again.
@@ -70,10 +83,13 @@ namespace Moonwell.Engine
                     return;
                 }
 
+                // Its contact checks resume from the next step, so that check sweeps from here, over both steps.
                 missile.resting = false;
+                missile.keepLast = true;
+                Contacts.Resume(missile);
             }
 
-            var entry = missile.entry!;
+            var entry = start;
             var fromX = entry.X;
             var fromY = entry.Y;
             var fromZ = missile.z;
@@ -348,7 +364,7 @@ namespace Moonwell.Engine
             missile.vx = vx;
             missile.vy = vy;
             missile.vz = vz;
-            var impact = new Impact(ImpactKind.Ground, hitX, hitY, hitZ, nx, ny, nz, into < 0.0f ? -into : 0.0f, setting);
+            var impact = new Impact(ImpactKind.Ground, null, hitX, hitY, hitZ, nx, ny, nz, into < 0.0f ? -into : 0.0f, setting, missile.impactDamage);
             Impacted(missile, impact);
             if (missile.ending || missile.HasEnded)
             {
@@ -540,7 +556,7 @@ namespace Moonwell.Engine
         }
 
         /// <summary>Runs OnImpact on a missile, then on its components in the order they were added, each with the missile's owner as the current owner and each reporting an error it throws; none runs once the missile has ended.</summary>
-        private static void Impacted(Missile missile, Impact impact)
+        internal static void Impacted(Missile missile, Impact impact)
         {
             var previous = Owner.current;
             Owner.current = missile.Owner ?? Game.Instance;
@@ -586,6 +602,7 @@ namespace Moonwell.Engine
             missile.restX = missile.entry!.X;
             missile.restY = missile.entry.Y;
             missile.restZ = missile.z;
+            Contacts.Pause(missile);
             var previous = Owner.current;
             Owner.current = missile;
             try
@@ -621,7 +638,7 @@ namespace Moonwell.Engine
         }
 
         /// <summary>Plays a missile's ImpactModel once (an effect made and destroyed at once, which plays its death) and its ImpactSound at a point; nothing for an empty one.</summary>
-        private static void Burst(Missile missile, IPhysicsWorld world, float x, float y, float z)
+        internal static void Burst(Missile missile, IPhysicsWorld world, float x, float y, float z)
         {
             var model = missile.impactModel;
             if (model.Length > 0)
@@ -817,7 +834,7 @@ namespace Moonwell.Engine
         }
 
         /// <summary>Puts a missile's effects at its place, each at its height above it, and turns them to the velocity when it faces its flight; its shadows and sounds follow.</summary>
-        private static void Place(Missile missile, IPhysicsWorld world, float x, float y, float z)
+        internal static void Place(Missile missile, IPhysicsWorld world, float x, float y, float z)
         {
             var look = missile.look;
             if (look != null)
