@@ -498,6 +498,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "units.add-in-onleave", Run = UnitCases.AddInOnLeave });
             list.Add(new Case { Name = "units.enter", Run = UnitCases.Enter });
             list.Add(new Case { Name = "units.player-after-removal", Run = UnitCases.PlayerAfterRemoval });
+            list.Add(new Case { Name = "units.player-set", Run = UnitCases.PlayerSet });
             list.Add(new Case { Name = "units.dictionary-key", Run = UnitCases.DictionaryKey });
             list.Add(new Case { Name = "units.life-and-mana", Run = UnitCases.LifeAndMana });
             list.Add(new Case { Name = "units.position", Run = UnitCases.Position });
@@ -679,6 +680,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "floats.ints-stay", Run = FloatCases.IntsStay });
             list.Add(new Case { Name = "floats.ints-start-as-integers", Run = FloatCases.IntsStart });
             list.Add(new Case { Name = "floats.made-floats-in-calls", Run = FloatCases.MadeFloatsInCalls });
+            list.Add(new Case { Name = "floats.unit-whole-values", Run = FloatCases.UnitWholeValues });
             list.Add(new Case { Name = "text.nullable-concat", Run = TextCases.NullableConcat });
             list.Add(new Case { Name = "text.conditional-access-concat", Run = TextCases.ConditionalAccessConcat });
             list.Add(new Case { Name = "text.nullable-interpolation", Run = TextCases.NullableInterpolation });

@@ -17,7 +17,8 @@ namespace Moonwell.Analyzers;
 /// The class's own default object (<c>Default</c>, or <c>Unit.Default&lt;T&gt;()</c> of the class or a class under it) is
 /// what the constructor is making, and is reported too. Code in a lambda or a local function may run later in the game,
 /// and is left alone. Also MW0015: a unit's <c>Level</c>, which has no setter in the game, is set only in the constructor
-/// of its declared class.
+/// of its declared class. And MW0037: <c>Default&lt;T&gt;()</c>, declared on <c>Widget</c>, of a class that is not of the
+/// kind the call is written on, or of a destructable class, which has no default object.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
@@ -39,7 +40,61 @@ public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
         context.EnableConcurrentExecution();
         context.RegisterSyntaxNodeAction(Constructor, SyntaxKind.ConstructorDeclaration);
         context.RegisterOperationAction(LevelSet, OperationKind.PropertyReference);
+        context.RegisterSyntaxNodeAction(DefaultOfKind, SyntaxKind.InvocationExpression);
     }
+
+    // MW0037: Item.Default<Guard>() for a unit class, or Default<T>() of a destructable class through any type.
+    private static void DefaultOfKind(SyntaxNodeAnalysisContext context)
+    {
+        var invocation = (InvocationExpressionSyntax)context.Node;
+        if (context.SemanticModel.GetSymbolInfo(invocation, context.CancellationToken).Symbol is not IMethodSymbol { Name: "Default", IsStatic: true, TypeArguments.Length: 1 } method
+            || !IsNamed(method.ContainingType, "Widget") || method.TypeArguments[0] is not INamedTypeSymbol type)
+        {
+            return;
+        }
+
+        var kind = KindOf(type);
+        if (kind is null or "Destructable")
+        {
+            var what = kind == null ? "not a unit or item class" : "a destructable class";
+            context.ReportDiagnostic(Diagnostic.Create(Rules.DefaultKind, invocation.GetLocation(),
+                type.Name + " is " + what + ", which has no default object: only unit and item classes have one"));
+            return;
+        }
+
+        var written = invocation.Expression is MemberAccessExpressionSyntax access
+            ? context.SemanticModel.GetSymbolInfo(access.Expression, context.CancellationToken).Symbol as INamedTypeSymbol
+            : null;
+        var writtenKind = written == null ? null : KindOf(written);
+        if (writtenKind is null or "Destructable" || writtenKind == kind || (writtenKind == "Unit" && kind == "Hero"))
+        {
+            return;
+        }
+
+        context.ReportDiagnostic(Diagnostic.Create(Rules.DefaultKind, invocation.GetLocation(),
+            type.Name + " is " + KindWord(kind) + " class, not " + KindWord(writtenKind) + " class: write " + kind + ".Default<" + type.Name + ">()"));
+    }
+
+    // The runtime kind a class belongs to: Hero, Unit, Item or Destructable; null for none of them.
+    private static string? KindOf(INamedTypeSymbol type)
+    {
+        for (var at = type; at != null; at = at.BaseType)
+        {
+            if (IsNamed(at, "Hero") || IsNamed(at, "Unit") || IsNamed(at, "Item") || IsNamed(at, "Destructable"))
+            {
+                return at.Name;
+            }
+        }
+
+        return null;
+    }
+
+    private static string KindWord(string kind) => kind switch
+    {
+        "Item" => "an item",
+        "Hero" => "a hero",
+        _ => "a unit",
+    };
 
     private static void Constructor(SyntaxNodeAnalysisContext context)
     {

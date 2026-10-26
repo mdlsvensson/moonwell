@@ -1168,6 +1168,14 @@ namespace Moonwell.Testing
             return Kept(unitYs, unit);
         }
 
+        /// <summary>Sets the player of a unit and records "owner" with the slot and True, since the unit's colour changes too.</summary>
+        public void SetOwner(unit unit, player player)
+        {
+            NoteGone(unit);
+            unitSlots[unit] = SlotOf(player);
+            UnitCalls.Add("owner " + SlotOf(player) + " True");
+        }
+
         /// <summary>Puts a unit at the place, and records a "move".</summary>
         public void MoveUnit(unit unit, float x, float y)
         {
