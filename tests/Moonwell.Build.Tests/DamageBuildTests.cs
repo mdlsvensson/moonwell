@@ -54,7 +54,7 @@ namespace Moonwell.Build.Tests
             Assert.DoesNotContain("DamageSystem", script);
             Assert.DoesNotContain("Moonwell.Hit", script);
             Assert.DoesNotContain("EVENT_PLAYER_UNIT_DAMAGING", script);
-            var main = File.ReadAllText(Path.Combine(TestFolders.Fixture("Sample"), "build", "generated", "MapMain.g.cs"));
+            var main = File.ReadAllText(Path.Combine(builds.Folder, "build", "generated", "MapMain.g.cs"));
             Assert.DoesNotContain("DamageSystem", main);
         }
     }

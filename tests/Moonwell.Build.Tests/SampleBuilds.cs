@@ -9,18 +9,26 @@ namespace Moonwell.Build.Tests
     {
     }
 
-    /// <summary>The Sample built through the command, as a development and as a release build, copied out of the Sample's build folder.</summary>
+    /// <summary>
+    /// A temporary copy of the Sample built through the command, as a development and as a release build, each build folder copied
+    /// out after its build. The copy, not the fixture, is built, so no run starts from another run's build, bin and obj.
+    /// </summary>
     public sealed class SampleBuilds : IDisposable
     {
         private readonly string root = Path.Combine(Path.GetTempPath(), "moonwell-samplebuilds-" + Guid.NewGuid().ToString("N"));
 
-        /// <summary>Builds the Sample both ways.</summary>
+        private readonly TestFolders folders = new TestFolders();
+
+        /// <summary>Builds a copy of the Sample both ways.</summary>
         public SampleBuilds()
         {
-            var sample = TestFolders.Fixture("Sample");
-            Development = Build(sample, "Development", false);
-            Release = Build(sample, "Release", true);
+            Folder = folders.TemporaryCopyOfSample();
+            Development = Build(Folder, "Development", false);
+            Release = Build(Folder, "Release", true);
         }
+
+        /// <summary>The copy of the Sample that was built: its bin holds the development build's assembly and libraries, its build folder what the release build left.</summary>
+        public string Folder { get; }
 
         /// <summary>The development build.</summary>
         public BuiltSample Development { get; }
@@ -35,6 +43,8 @@ namespace Moonwell.Build.Tests
             {
                 Directory.Delete(root, true);
             }
+
+            folders.Dispose();
         }
 
         private BuiltSample Build(string sample, string name, bool release)
