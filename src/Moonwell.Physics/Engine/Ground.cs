@@ -96,14 +96,16 @@ namespace Moonwell.Engine
         /// with the decks not above the segment's start: sampled every 32 along its length in XY and at its end, the span
         /// of the first sample at or under the ground halved five times, then crossed by a straight line. A segment that
         /// starts under the ground hits at fraction 0, on the ground above its start. One that stays above it, or has a NaN
-        /// or an infinite end, gives false. Gives the point and the fraction along the segment.
+        /// or an infinite end, gives false. Gives the point, the fraction along the segment, and how far the start is above
+        /// the ground (0 when it was not read).
         /// </summary>
-        internal static bool Cast(float x0, float y0, float z0, float x1, float y1, float z1, out float hitX, out float hitY, out float hitZ, out float fraction)
+        internal static bool Cast(float x0, float y0, float z0, float x1, float y1, float z1, out float hitX, out float hitY, out float hitZ, out float fraction, out float startGap)
         {
             hitX = 0.0f;
             hitY = 0.0f;
             hitZ = 0.0f;
             fraction = 0.0f;
+            startGap = 0.0f;
             var dx = x1 - x0;
             var dy = y1 - y0;
             var dz = z1 - z0;
@@ -112,7 +114,7 @@ namespace Moonwell.Engine
                 return false;
             }
 
-            var startGap = z0 - Height(x0, y0, z0);
+            startGap = z0 - Height(x0, y0, z0);
             if (startGap < 0.0f)
             {
                 hitX = x0;

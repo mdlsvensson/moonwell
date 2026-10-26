@@ -148,6 +148,117 @@ namespace Moonwell.Testing
             Expect.Equal(1, ball.Impacts, "and meets nothing more");
         }
 
+        /// <summary>With Bounce and Gravity 800, dropped on a slope of 10 degrees, it bounces lower and lower, then goes along the ground down the slope: no impact is slower than 5, and once it has settled there are no more.</summary>
+        public static void BounceSettles(FakeWorld world)
+        {
+            var heights = new float[12];
+            for (var i = 0; i < heights.Length; i++)
+            {
+                heights[i] = i * SlopeRise;
+            }
+
+            Along(heights);
+            var ball = new Ball();
+            ball.GroundContact = Contact.Bounce;
+            ball.Gravity = 800.0f;
+            ball.VZ = -400.0f;
+            Missile.Create(ball, 700.0f, 64.0f, Physics.GroundHeight(700.0f, 64.0f) + 100.0f);
+            Steps(world, 64);
+            var settled = ball.Impacts;
+            Expect.True(settled >= 3, "it bounced; " + settled + " impacts");
+            Steps(world, 32);
+            Expect.Equal(settled, ball.Impacts, "no impact once it has settled");
+            Expect.True(ball.Slowest >= 5.0f, "no impact slower than 5; the slowest was " + ball.Slowest);
+            Within(Physics.GroundHeight(ball.X, ball.Y) + 16.0f, ball.Z, 0.5f, "it goes along the ground");
+            Expect.True(ball.X < 600.0f, "down the slope; at " + ball.X);
+            Expect.True(!ball.HasEnded, "a bounce does not end it");
+        }
+
+        /// <summary>Before OnImpact runs, VX, VY and VZ read the velocity where it met the ground; the outcome works from the velocity OnImpact leaves, so a Bounce whose reaction sets VZ to 0 does not bounce up.</summary>
+        public static void ImpactVelocity(FakeWorld world)
+        {
+            Flat(0.0f);
+            var ball = new Ball();
+            ball.GroundContact = Contact.Bounce;
+            ball.Gravity = 800.0f;
+            ball.VX = 100.0f;
+            ball.VZ = -300.0f;
+            var seenVX = 0.0f;
+            var seenVZ = 0.0f;
+            var seenSpeed = 0.0f;
+            ball.Impacting = impact =>
+            {
+                seenVX = ball.VX;
+                seenVZ = ball.VZ;
+                seenSpeed = impact.Speed;
+                ball.VZ = 0.0f;
+            };
+            Missile.Create(ball, 64.0f, 64.0f, 200.0f);
+            for (var i = 0; i < 64 && ball.Impacts == 0; i++)
+            {
+                Steps(world, 1);
+            }
+
+            Expect.Equal(1, ball.Impacts, "it met the ground");
+            Within(100.0f, seenVX, 0.01f, "OnImpact reads VX at the point of contact");
+            Within(-seenSpeed, seenVZ, 0.01f, "OnImpact reads VZ at the point of contact, the speed it closed at, down");
+            Within(0.0f, ball.VZ, 0.01f, "the reaction's VZ of 0 is kept: no bounce up");
+            Within(100.0f, ball.VX, 0.01f, "its VX kept");
+            Steps(world, 8);
+            Within(16.0f, ball.Z, 0.5f, "it goes along the ground");
+            Expect.Equal(1, ball.Impacts, "and meets nothing more");
+        }
+
+        /// <summary>Moved up by its Z while resting, a ball wakes: it falls, lands, and rests again.</summary>
+        public static void WakeMoved(FakeWorld world)
+        {
+            Flat(0.0f);
+            var ball = new Ball();
+            ball.GroundContact = Contact.Slide;
+            ball.Gravity = 800.0f;
+            ball.Friction = 1000.0f;
+            Missile.Create(ball, 64.0f, 64.0f, 100.0f);
+            for (var i = 0; i < 320 && ball.Rested == 0; i++)
+            {
+                Steps(world, 1);
+            }
+
+            Expect.Equal(1, ball.Rested, "it rests");
+            var impacts = ball.Impacts;
+            ball.Z = 300.0f;
+            Steps(world, 4);
+            Expect.True(ball.Z < 300.0f && ball.Z > 200.0f, "it wakes and falls; at " + ball.Z);
+            for (var i = 0; i < 320 && ball.Rested == 1; i++)
+            {
+                Steps(world, 1);
+            }
+
+            Expect.True(ball.Impacts > impacts, "it lands");
+            Expect.Equal(2, ball.Rested, "and rests again");
+            Within(16.0f, ball.Z, 0.5f, "on the ground");
+        }
+
+        /// <summary>A missile at 1,500 a second, 60 above flat ground, flying into a ridge 200 high meets the ridge's face, where its lowest point is level with the face, not on top of it.</summary>
+        public static void FastRidge(FakeWorld world)
+        {
+            var heights = new float[14];
+            for (var i = 0; i < heights.Length; i++)
+            {
+                heights[i] = i >= 9 && i <= 11 ? 200.0f : 0.0f;
+            }
+
+            Along(heights);
+            var ball = new Ball();
+            ball.VX = 1500.0f;
+            Missile.Create(ball, 124.4f, 64.0f, 60.0f);
+            UntilEnded(world, ball, 64);
+            Expect.True(ball.HasEnded, "it stopped");
+            Expect.Equal(1, ball.Impacts, "OnImpact once");
+            var face = 1024.0f + 44.0f / 200.0f * 128.0f;
+            Within(face, ball.Read[1], 32.0f, "it met the face");
+            Expect.True(ball.Read[3] < 150.0f, "not on top of the ridge; at " + ball.Read[3]);
+        }
+
         /// <summary>
         /// A ball dropped on a slope of 10 degrees with Slide: with Friction 1,000 the slope cannot move it, so it rests on
         /// the ground and OnRest runs once, with the missile current, then its component's; moved, it wakes, and rests
@@ -267,6 +378,45 @@ namespace Moonwell.Testing
             Steps(world, 4);
             Expect.True(ball.X < x - 30.0f, "and flies back");
             Within(50.0f, ball.Z, 0.01f, "at its height");
+        }
+
+        /// <summary>Rolling into a cliff's face with Slide, a ball bounces back off it as off a wall, and that step still counts toward its Duration: a twin whose Duration runs out on that step expires on it.</summary>
+        public static void CliffRoll(FakeWorld world)
+        {
+            var low0 = GridText.Corner(0.0f, 2);
+            var high = GridText.Corner(128.0f, 3);
+            var row = low0 + low0 + high + high;
+            Fresh(4, 2, row + row);
+            var ball = new Ball();
+            ball.GroundContact = Contact.Slide;
+            ball.Gravity = 800.0f;
+            ball.VX = 300.0f;
+            Missile.Create(ball, 32.0f, 64.0f, 16.0f);
+            var wall = 0;
+            for (var i = 1; i <= 64 && wall == 0; i++)
+            {
+                Steps(world, 1);
+                if (ball.VX < 0.0f)
+                {
+                    wall = i;
+                }
+            }
+
+            Expect.True(wall > 1, "it rolled into the cliff and back; at step " + wall);
+            Expect.Equal(1, ball.Impacts, "it met the cliff's face");
+            Within(0.0f, ball.Read[6], 0.001f, "as a wall");
+            ball.End();
+            var twin = new Ball();
+            twin.GroundContact = Contact.Slide;
+            twin.Gravity = 800.0f;
+            twin.VX = 300.0f;
+            twin.Duration = wall * Interactions.Step;
+            Missile.Create(twin, 32.0f, 64.0f, 16.0f);
+            Steps(world, wall - 1);
+            Expect.True(!twin.HasEnded, "the twin flies until the wall's step");
+            Steps(world, 1);
+            Expect.Equal(1, twin.Impacts, "the twin met the wall");
+            Expect.True(twin.HasEnded, "and expired on that step");
         }
 
         /// <summary>With GroundContact None a missile is not checked against the ground: it falls through it, reads nothing, and ends below -2,000.</summary>

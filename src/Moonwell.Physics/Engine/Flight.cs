@@ -20,11 +20,16 @@ namespace Moonwell.Engine
         private const float Forgiven = 0.001f;
 
         /// <summary>
-        /// How fast, in game units a second, the ground under a missile may rise toward it as it moves, between two reads:
-        /// the ground is read again once a missile's height above the last read is no more than this times the seconds
-        /// since (ALICE's slow case). Its own fall is in its height, so a change of its velocity is seen at once.
+        /// The least speed, in game units a second, at which the ground under a missile is taken to close on it between two
+        /// reads (ALICE's slow case); a fast missile's is SlackShare times its speed along the ground plus its speed down.
         /// </summary>
         private const float Slack = 600.0f;
+
+        /// <summary>How many times a missile's speed along the ground plus its speed down the ground is taken to close on it between two reads, when that is more than Slack (ALICE's form).</summary>
+        private const float SlackShare = 3.0f;
+
+        /// <summary>How near the ground, under its lowest point, a missile that begins a step counts as on it already.</summary>
+        private const float OnGround = 0.5f;
 
         /// <summary>A Slide slower than this into the ground rolls instead of bouncing; a rolling missile moving out of the ground faster than this flies.</summary>
         private const float SlideSpeed = 5.0f;
@@ -42,7 +47,14 @@ namespace Moonwell.Engine
         {
             if (missile.resting)
             {
-                if (missile.vx == 0.0f && missile.vy == 0.0f && missile.vz == 0.0f)
+                var place = missile.entry!;
+                if (place.X != missile.restX || place.Y != missile.restY || missile.z != missile.restZ)
+                {
+                    // Moved by its X, Y or Z: it flies from where it was put, and the ground there is read again.
+                    missile.rolling = false;
+                    missile.groundRead = false;
+                }
+                else if (missile.vx == 0.0f && missile.vy == 0.0f && missile.vz == 0.0f)
                 {
                     missile.flown += step;
                     var lasts = missile.duration;
@@ -158,9 +170,10 @@ namespace Moonwell.Engine
 
         /// <summary>
         /// The ground's contact after a flying missile's move, its ball's lowest point against the ground. The ground is read
-        /// only when the missile may have reached it: when its height above the ground last read is no more than the Slack
-        /// times the seconds since: after (z - radius - lastGround) / (fallSpeed + Slack) seconds at a steady fall, worked out
-        /// a step at a time from where it is, so a change of its velocity is seen at once; one that follows the ground was read this step.
+        /// only when the missile may have reached it: once its height above the ground last read is no more than a slack
+        /// times the seconds since, the slack the more of Slack and SlackShare times its speed along the ground plus its
+        /// speed down. That is checked a step at a time from where it is, so a change of its velocity is seen at once; one
+        /// that follows the ground was read this step.
         /// Below the ground, its move is cast against it for the point of contact. Whether it placed or ended the missile.
         /// </summary>
         private static bool Land(Missile missile, float step, Grid grid, IPhysicsWorld world, Entry entry, float fromX, float fromY, float fromZ, float x, float y, float z, float rise)
@@ -187,9 +200,22 @@ namespace Moonwell.Engine
             else
             {
                 missile.groundSince += step;
-                if (missile.groundRead && bottom - missile.groundZ > Slack * missile.groundSince)
+                if (missile.groundRead)
                 {
-                    return false;
+                    var high = bottom - missile.groundZ;
+                    var since = missile.groundSince;
+                    if (high > Slack * since)
+                    {
+                        // Its speed is worked out only when the least slack does not bring it to a read.
+                        var alongX = missile.vx;
+                        var alongY = missile.vy;
+                        var down = missile.vz < 0.0f ? -missile.vz : 0.0f;
+                        var fast = SlackShare * (Trig.Sqrt(alongX * alongX + alongY * alongY) + down);
+                        if (fast <= Slack || high > fast * since)
+                        {
+                            return false;
+                        }
+                    }
                 }
 
                 var ground = Ground.Height(x, y, fromZ);
@@ -209,12 +235,18 @@ namespace Moonwell.Engine
                     return false;
                 }
 
-                if (!Ground.Cast(fromX, fromY, fromZ - radius, x, y, bottom, out hitX, out hitY, out hitZ, out fraction))
+                float startGap;
+                if (!Ground.Cast(fromX, fromY, fromZ - radius, x, y, bottom, out hitX, out hitY, out hitZ, out fraction, out startGap))
                 {
                     hitX = x;
                     hitY = y;
                     hitZ = ground;
                     fraction = 1.0f;
+                }
+                else if (startGap <= OnGround)
+                {
+                    // It began the step on the ground, near enough.
+                    fraction = 0.0f;
                 }
             }
 
@@ -295,12 +327,21 @@ namespace Moonwell.Engine
                 return;
             }
 
+            // OnImpact reads the velocity at the point of contact, and the outcome works from the velocity it leaves.
+            missile.vx = vx;
+            missile.vy = vy;
+            missile.vz = vz;
             var impact = new Impact(ImpactKind.Ground, hitX, hitY, hitZ, nx, ny, nz, into < 0.0f ? -into : 0.0f, setting);
             Impacted(missile, impact);
             if (missile.ending || missile.HasEnded)
             {
                 return;
             }
+
+            vx = missile.vx;
+            vy = missile.vy;
+            vz = missile.vz;
+            into = vx * nx + vy * ny + vz * nz;
 
             var outcome = impact.contact;
             if (outcome == Contact.Stop)
@@ -322,7 +363,15 @@ namespace Moonwell.Engine
                 return;
             }
 
-            if (outcome == Contact.Slide && -into < SlideSpeed)
+            if (into >= 0.0f)
+            {
+                // The reaction left it moving out of the ground, or along it: it goes on so; a Slide along the ground rolls.
+                if (outcome == Contact.Slide && nz > 0.0f && into < SlideSpeed)
+                {
+                    missile.rolling = true;
+                }
+            }
+            else if (outcome == Contact.Slide && -into < SlideSpeed)
             {
                 // Slow: it goes on along the surface, rolling on the ground, or along a cliff's face.
                 vx -= into * nx;
@@ -423,6 +472,11 @@ namespace Moonwell.Engine
                         missile.vy = vy;
                         missile.vz = vz;
                         Meet(missile, grid, world, entry, fromX, fromY, bottom, wx, wy, wz, vx, vy, vz, x, y, ground + radius, true);
+                        if (!missile.ending && !missile.HasEnded)
+                        {
+                            Ends(missile, world, fromX, fromY, fromZ, entry.X, entry.Y, missile.z, step);
+                        }
+
                         return true;
                     }
                 }
@@ -512,6 +566,9 @@ namespace Moonwell.Engine
             missile.vx = 0.0f;
             missile.vy = 0.0f;
             missile.vz = 0.0f;
+            missile.restX = missile.entry!.X;
+            missile.restY = missile.entry.Y;
+            missile.restZ = missile.z;
             var previous = Owner.current;
             Owner.current = missile;
             try

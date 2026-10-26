@@ -15,6 +15,9 @@ namespace Moonwell.Testing
         /// <summary>The kind, place, normal, speed and contact of the impact OnImpact last had, read inside OnImpact: kind, x, y, z, nx, ny, nz, speed.</summary>
         public float[] Read = new float[8];
 
+        /// <summary>The slowest closing speed of its impacts; a billion before one.</summary>
+        public float Slowest = 1000000000.0f;
+
         /// <summary>The owner that was current when OnImpact last ran.</summary>
         public Owner? ImpactedWith;
 
@@ -47,6 +50,10 @@ namespace Moonwell.Testing
             Read[5] = normal.Y;
             Read[6] = normal.Z;
             Read[7] = impact.Speed;
+            if (impact.Speed < Slowest)
+            {
+                Slowest = impact.Speed;
+            }
             ImpactedWith = Owner.Current;
             EndedInImpact = HasEnded;
             if (Log != null)

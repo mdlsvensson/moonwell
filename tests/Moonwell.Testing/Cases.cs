@@ -179,6 +179,11 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "ground.none", Run = GroundCases.None });
             list.Add(new Case { Name = "ground.reads", Run = GroundCases.Reads });
             list.Add(new Case { Name = "ground.water", Run = GroundCases.Water });
+            list.Add(new Case { Name = "ground.bounce-settles", Run = GroundCases.BounceSettles });
+            list.Add(new Case { Name = "ground.impact-velocity", Run = GroundCases.ImpactVelocity });
+            list.Add(new Case { Name = "ground.wake-moved", Run = GroundCases.WakeMoved });
+            list.Add(new Case { Name = "ground.fast-ridge", Run = GroundCases.FastRidge });
+            list.Add(new Case { Name = "ground.cliff-roll", Run = GroundCases.CliffRoll });
         }
 
         /// <summary>Adds the areas package's cases.</summary>

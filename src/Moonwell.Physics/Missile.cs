@@ -180,6 +180,15 @@ namespace Moonwell
         /// <summary>Whether it lies still on the ground; it moves again when something gives it a velocity.</summary>
         internal bool resting;
 
+        /// <summary>Where it came to rest: x. Moved from its rest place, it wakes.</summary>
+        internal float restX;
+
+        /// <summary>Where it came to rest: y.</summary>
+        internal float restY;
+
+        /// <summary>Where it came to rest: its height.</summary>
+        internal float restZ;
+
         /// <summary>Whether a reaction let it through the ground: it is not met again until it is above the ground.</summary>
         internal bool throughGround;
 
