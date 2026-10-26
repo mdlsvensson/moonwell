@@ -70,6 +70,7 @@ namespace Moonwell.Engine
             return current;
         }
 
+#if DEBUG
         /// <summary>The tracker of the installed world and this game when one has been made; null otherwise. Asking makes none.</summary>
         internal static AreaTracker? Existing()
         {
@@ -92,6 +93,7 @@ namespace Moonwell.Engine
         {
             return areas[index];
         }
+#endif
 
         /// <summary>Forgets the tracker, so that the next area starts a new one; for the cases.</summary>
         internal static void Forget()

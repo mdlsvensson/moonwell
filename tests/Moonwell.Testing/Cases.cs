@@ -75,6 +75,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "debug.areas.lines", Run = AreasViewCases.Lines });
             list.Add(new Case { Name = "debug.areas.outlines", Run = AreasViewCases.Outlines });
             list.Add(new Case { Name = "debug.areas.not-in-any", Run = AreasViewCases.NotInAny });
+            list.Add(new Case { Name = "debug.areas.region", Run = AreasViewCases.Region });
+            list.Add(new Case { Name = "debug.areas.no-tracker", Run = AreasViewCases.NoTracker });
             list.Add(new Case { Name = "debug.areas.registered", Run = AreasViewCases.Registered });
 #endif
         }

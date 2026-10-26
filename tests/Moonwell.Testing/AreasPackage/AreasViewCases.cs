@@ -156,6 +156,39 @@ namespace Moonwell.Testing
             Expect.Equal(0, debug.Lines.Count, "lines once it left");
         }
 
+        /// <summary>A unit in an area of a World Editor region: its line shows and the region's rect is drawn as 4 edges.</summary>
+        public static void Region(FakeWorld world)
+        {
+            var areas = new FakeAreaWorld();
+            AreaSystem.Install(areas, new[] { "Shop" }, new[] { 0f, 0f, 256f, 128f });
+            TestLog.Lines.Clear();
+            var debug = FakeDebugWorld.Install(world);
+            debug.Chat(0, "-debug");
+            Added(world, new Arena(AreaShape.Region("Shop")));
+            var unit = UnitAt(world, 10.0f, 10.0f);
+            areas.Enter(areas.Regions[0], unit.Handle);
+            DebugMode.Select(unit);
+            var lines = debug.PanelLines();
+            Expect.Equal(3, lines.Count, "the panel's lines");
+            Expect.Equal("in Arena since 0.0 s", lines[2], "the area's line");
+            Expect.Equal(4, debug.Lines.Count, "the region's edges");
+            Expect.Near(0.0f, debug.LineX1s[0], "the first edge starts at the region's left");
+            Expect.Near(256.0f, debug.LineX2s[0], "the first edge ends at the region's right");
+            Expect.Near(128.0f, debug.LineY2s[1], "the second edge ends at the region's top");
+            Expect.Equal(0, TestLog.Lines.Count, "errors logged");
+        }
+
+        /// <summary>The package installed and no area added: selecting a unit gives no area lines, and makes no tracker.</summary>
+        public static void NoTracker(FakeWorld world)
+        {
+            var debug = On(world, out _);
+            var unit = UnitAt(world, 10.0f, 10.0f);
+            DebugMode.Select(unit);
+            Expect.Equal(2, debug.PanelLines().Count, "the panel's lines");
+            Expect.Equal(0, debug.Lines.Count, "lines drawn");
+            Expect.True(AreaTracker.Existing() == null, "no tracker was made");
+        }
+
         /// <summary>The view is added once, when the package makes its tracker, however many areas are added, and again after a reset.</summary>
         public static void Registered(FakeWorld world)
         {
