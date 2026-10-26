@@ -184,6 +184,14 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "ground.wake-moved", Run = GroundCases.WakeMoved });
             list.Add(new Case { Name = "ground.fast-ridge", Run = GroundCases.FastRidge });
             list.Add(new Case { Name = "ground.cliff-roll", Run = GroundCases.CliffRoll });
+            list.Add(new Case { Name = "homing.turn-rate", Run = ComponentCases.TurnRate });
+            list.Add(new Case { Name = "homing.circle", Run = ComponentCases.Circle });
+            list.Add(new Case { Name = "homing.lost", Run = ComponentCases.Lost });
+            list.Add(new Case { Name = "homing.fire-sets-target", Run = ComponentCases.FireSetsTarget });
+            list.Add(new Case { Name = "homing.arc", Run = ComponentCases.Arc });
+            list.Add(new Case { Name = "homing.at-target", Run = ComponentCases.AtTarget });
+            list.Add(new Case { Name = "shadow.follows", Run = ComponentCases.ShadowFollows });
+            list.Add(new Case { Name = "sound.follows", Run = ComponentCases.SoundFollows });
             list.Add(new Case { Name = "push.knockback", Run = PushCases.Knockback });
             list.Add(new Case { Name = "push.blocked", Run = PushCases.Blocked });
             list.Add(new Case { Name = "push.slide-along", Run = PushCases.SlideAlong });

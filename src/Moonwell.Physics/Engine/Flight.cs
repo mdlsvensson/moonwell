@@ -37,14 +37,18 @@ namespace Moonwell.Engine
         /// <summary>How far above the ground it would roll on, a rolling missile's free fall must be to leave the ground over a crest.</summary>
         private const float LiftOff = 0.5f;
 
+        /// <summary>The step the pass is moving missiles by, for the shadows' count of time when the effects are placed.</summary>
+        private static float stepping;
+
         /// <summary>
-        /// Moves a missile one step: the speed change, gravity, then the move, added exactly for the step; a missile that
-        /// follows the ground keeps its height above it. Then its Duration and MaxDistance, which end it after OnExpire, and
-        /// the world's bounds, which end it. Then the ground, and its effects are placed and turned. A rolling missile rolls
-        /// instead, and a resting one lies still until something gives it a velocity.
+        /// Moves a missile one step: the speed change, gravity, its Homing's turn when one is due, then the move, added
+        /// exactly for the step; a missile that follows the ground keeps its height above it. Then its Duration and
+        /// MaxDistance, which end it after OnExpire, and the world's bounds, which end it. Then the ground, and its effects are
+        /// placed and turned. A rolling missile rolls instead, and a resting one lies still until something gives it a velocity.
         /// </summary>
         public static void Step(Missile missile, float step, Grid grid, IPhysicsWorld world)
         {
+            stepping = step;
             if (missile.resting)
             {
                 var place = missile.entry!;
@@ -99,10 +103,23 @@ namespace Moonwell.Engine
             var rise = vz * step - gravity * step * step * 0.5f;
             vz -= gravity * step;
 
-            // The components' turns (Homing) come here.
             missile.vx = vx;
             missile.vy = vy;
             missile.vz = vz;
+            var homing = missile.homing;
+            if (homing != null && homing.Turn(missile, step, fromX, fromY, fromZ))
+            {
+                if (missile.ending || missile.HasEnded)
+                {
+                    return;
+                }
+
+                // Turned: the move is worked out again from the new velocity, which is the one after this step's gravity.
+                vx = missile.vx;
+                vy = missile.vy;
+                vz = missile.vz;
+                rise = vz * step + gravity * step * step * 0.5f;
+            }
 
             var x = fromX + vx * step;
             var y = fromY + vy * step;
@@ -799,7 +816,7 @@ namespace Moonwell.Engine
             world.SetEffectAlpha(target, missile.tintAlpha);
         }
 
-        /// <summary>Puts a missile's effects at its place, each at its height above it, and turns them to the velocity when it faces its flight.</summary>
+        /// <summary>Puts a missile's effects at its place, each at its height above it, and turns them to the velocity when it faces its flight; its shadows and sounds follow.</summary>
         private static void Place(Missile missile, IPhysicsWorld world, float x, float y, float z)
         {
             var look = missile.look;
@@ -822,6 +839,16 @@ namespace Moonwell.Engine
             if (missile.facesFlight)
             {
                 Face(missile, world);
+            }
+
+            if (missile.shadows != null)
+            {
+                Shadow.Follow(missile, world, x, y, z, stepping);
+            }
+
+            if (missile.sounds != null)
+            {
+                LoopingSound.Follow(missile, world, x, y, z);
             }
         }
 

@@ -10,10 +10,20 @@ namespace Moonwell
     /// </summary>
     public static class FireExtensions
     {
-        /// <summary>Fires a missile at a unit where it is now: at its middle, half its height above the ground and its fly height, and returns the missile.</summary>
+        /// <summary>Fires a missile at a unit where it is now: at its middle, half its height above the ground and its fly height, and returns the missile. Each Homing its class lists with no target is given the unit, before OnCreated runs.</summary>
         public static T Fire<T>(this Unit source, T missile, Unit target, Owner? owner = null)
             where T : Missile
         {
+            var starting = missile.StartingComponents();
+            for (var i = 0; i < starting.Count; i++)
+            {
+                var homing = starting[i] as Homing;
+                if (homing != null && homing.Target == null)
+                {
+                    homing.Target = target;
+                }
+            }
+
             var above = target.FlyHeight + Shapes.UnitHeight(target) * 0.5f;
             Flight.Launch(source, missile, target.X, target.Y, above, false, owner);
             return missile;

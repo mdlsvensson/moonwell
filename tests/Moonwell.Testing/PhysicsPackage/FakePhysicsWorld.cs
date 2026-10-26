@@ -27,6 +27,36 @@ namespace Moonwell.Testing
         /// <summary>The looping sounds made and not yet stopped, in the order they were made.</summary>
         public List<sound> Loops = new List<sound>();
 
+        /// <summary>The file each image was made of.</summary>
+        public Dictionary<image, string> ImageFiles = new Dictionary<image, string>();
+
+        /// <summary>The size each image was made with.</summary>
+        public Dictionary<image, float> ImageSizes = new Dictionary<image, float>();
+
+        /// <summary>The x and y each image was last centred on.</summary>
+        public Dictionary<image, float[]> ImagePlaces = new Dictionary<image, float[]>();
+
+        /// <summary>The opacity each image was last given; one never given one has none.</summary>
+        public Dictionary<image, int> ImageAlphas = new Dictionary<image, int>();
+
+        /// <summary>The images removed, in the order they were removed.</summary>
+        public List<image> RemovedImages = new List<image>();
+
+        /// <summary>The path each looping sound was made of.</summary>
+        public Dictionary<sound, string> SoundPaths = new Dictionary<sound, string>();
+
+        /// <summary>The x, y and z each looping sound was last put at.</summary>
+        public Dictionary<sound, float[]> SoundPlaces = new Dictionary<sound, float[]>();
+
+        /// <summary>The volume, 0 to 127, each looping sound was last given; one never given one has none.</summary>
+        public Dictionary<sound, int> Volumes = new Dictionary<sound, int>();
+
+        /// <summary>How many times a looping sound was moved.</summary>
+        public int SoundMoves;
+
+        /// <summary>The looping sounds stopped, in the order they were stopped.</summary>
+        public List<sound> Stopped = new List<sound>();
+
         /// <summary>The paths of the sounds played once, in the order they were played.</summary>
         public List<string> Played = new List<string>();
 
@@ -124,52 +154,64 @@ namespace Moonwell.Testing
             Removed.Add(target);
         }
 
-        /// <summary>Makes an image.</summary>
+        /// <summary>Makes an image, and keeps its file, size and place.</summary>
         public image CreateShadow(string file, float size, float x, float y)
         {
             var made = new image();
             Images.Add(made);
+            ImageFiles[made] = file;
+            ImageSizes[made] = size;
+            ImagePlaces[made] = new float[] { x, y };
             return made;
         }
 
-        /// <summary>Moves an image; nothing is kept.</summary>
+        /// <summary>Keeps the place an image was centred on.</summary>
         public void MoveImage(image target, float size, float x, float y)
         {
+            ImagePlaces[target] = new float[] { x, y };
         }
 
-        /// <summary>Sets an image's opacity; nothing is kept.</summary>
+        /// <summary>Keeps the opacity an image was given.</summary>
         public void SetImageAlpha(image target, int alpha)
         {
+            ImageAlphas[target] = alpha;
         }
 
-        /// <summary>Removes an image.</summary>
+        /// <summary>Removes an image, and records it.</summary>
         public void RemoveImage(image target)
         {
             Images.Remove(target);
+            RemovedImages.Add(target);
         }
 
-        /// <summary>Makes a looping sound.</summary>
+        /// <summary>Makes a looping sound, and keeps its path and place.</summary>
         public sound CreateLoopingSound(string path, float x, float y, float z)
         {
             var made = new sound();
             Loops.Add(made);
+            SoundPaths[made] = path;
+            SoundPlaces[made] = new float[] { x, y, z };
             return made;
         }
 
-        /// <summary>Moves a sound; nothing is kept.</summary>
+        /// <summary>Keeps the place a sound was put at, and counts the move.</summary>
         public void MoveSound(sound target, float x, float y, float z)
         {
+            SoundMoves++;
+            SoundPlaces[target] = new float[] { x, y, z };
         }
 
-        /// <summary>Sets a looping sound's volume; nothing is kept.</summary>
+        /// <summary>Keeps the volume a looping sound was given.</summary>
         public void SetLoopVolume(sound target, int volume)
         {
+            Volumes[target] = volume;
         }
 
-        /// <summary>Stops a looping sound.</summary>
+        /// <summary>Stops a looping sound, and records it.</summary>
         public void StopLoop(sound target)
         {
             Loops.Remove(target);
+            Stopped.Add(target);
         }
 
         /// <summary>Records the path of a sound played once.</summary>

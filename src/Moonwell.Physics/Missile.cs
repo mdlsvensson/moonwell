@@ -192,6 +192,15 @@ namespace Moonwell
         /// <summary>Whether a reaction let it through the ground: it is not met again until it is above the ground.</summary>
         internal bool throughGround;
 
+        /// <summary>The Homing that turns it: the first added that is still on it; null for none.</summary>
+        internal Homing? homing;
+
+        /// <summary>The shadows on it, in the order added; null until the first. Moved with its effects.</summary>
+        internal List<Shadow>? shadows;
+
+        /// <summary>The looping sounds on it, in the order added; null until the first. Moved with its effects.</summary>
+        internal List<LoopingSound>? sounds;
+
         /// <summary>The velocity along x, in game units a second.</summary>
         [LocalSafe]
         public float VX
@@ -546,6 +555,12 @@ namespace Moonwell
         /// <summary>Runs when its Duration or MaxDistance has run out, just before it ends, with the missile as the current owner.</summary>
         public virtual void OnExpire()
         {
+        }
+
+        /// <summary>The components the class starts with, for Fire to give a Homing its target before Create adds them.</summary>
+        internal List<GizmoComponent> StartingComponents()
+        {
+            return Components;
         }
 
         /// <summary>A missile given no owner belongs to the game, not to the current owner, so one made in a spell's reaction outlives the cast (decision 59).</summary>
