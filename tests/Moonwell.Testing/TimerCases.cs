@@ -36,6 +36,28 @@ namespace Moonwell.Testing
             Expect.Equal(100, ran, "runs after 10 seconds at 0.1 seconds each");
         }
 
+        /// <summary>
+        /// A repeating timer keeps its schedule when every wake comes late, as the game's do at a frame: woken 0.01 seconds after
+        /// each due time, 0.1 seconds for 10 seconds still runs 100 times, the 100th at 10.01 seconds and not 100 late wakes behind.
+        /// </summary>
+        public static void NoDriftWokenLate(FakeWorld world)
+        {
+            world.WakeLate = 0.01f;
+            var ran = 0;
+            var hundredth = 0.0f;
+            Timer.Every(0.1f, () =>
+            {
+                ran++;
+                if (ran == 100)
+                {
+                    hundredth = world.Now();
+                }
+            });
+            world.Advance(10.05f);
+            Expect.Equal(100, ran, "runs after 10.05 seconds at 0.1 seconds each, each woken 0.01 seconds late");
+            Expect.Near(10.01f, hundredth, "the time of the 100th run");
+        }
+
         /// <summary>Timers due at the same time run in the order they were made.</summary>
         public static void SameTimeInCreationOrder(FakeWorld world)
         {
