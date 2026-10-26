@@ -72,6 +72,10 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "debug.interactions.gizmo-ends", Run = DebugViewCases.GizmoEnds });
             list.Add(new Case { Name = "debug.interactions.stats", Run = DebugViewCases.Stats });
             list.Add(new Case { Name = "debug.interactions.step-length", Run = DebugViewCases.StepLength });
+            list.Add(new Case { Name = "debug.areas.lines", Run = AreasViewCases.Lines });
+            list.Add(new Case { Name = "debug.areas.outlines", Run = AreasViewCases.Outlines });
+            list.Add(new Case { Name = "debug.areas.not-in-any", Run = AreasViewCases.NotInAny });
+            list.Add(new Case { Name = "debug.areas.registered", Run = AreasViewCases.Registered });
 #endif
         }
 

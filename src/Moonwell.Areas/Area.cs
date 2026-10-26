@@ -75,6 +75,14 @@ namespace Moonwell
             }
         }
 
+#if DEBUG
+        /// <summary>The shape, for the debug mode's drawing of the area's outline.</summary>
+        internal AreaShape ShapeOfArea()
+        {
+            return Shape;
+        }
+
+#endif
         /// <summary>The seconds between <c>OnUnitStays</c> for each unit inside, rounded up to whole steps of the package's timer (1/32 second, so 1 is 32 steps and 0.04 is 2); 0, the default, and <c>OnUnitStays</c> never runs. Set it in the constructor; it is fixed once the area is added.</summary>
         protected float Tick
         {
