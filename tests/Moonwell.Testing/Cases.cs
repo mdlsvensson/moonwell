@@ -148,6 +148,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "areas.area.enter-stay-leave", Run = AreaCases.EnterStayLeave });
             list.Add(new Case { Name = "areas.area.accepts", Run = AreaCases.Accepts });
             list.Add(new Case { Name = "areas.area.already-inside", Run = AreaCases.AlreadyInside });
+            list.Add(new Case { Name = "areas.area.already-inside-edge", Run = AreaCases.AlreadyInsideEdge });
             list.Add(new Case { Name = "areas.area.sweep-and-event", Run = AreaCases.SweepAndEvent });
             list.Add(new Case { Name = "areas.area.death", Run = AreaCases.Death });
             list.Add(new Case { Name = "areas.area.removed", Run = AreaCases.Removed });
