@@ -191,6 +191,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "homing.arc", Run = ComponentCases.Arc });
             list.Add(new Case { Name = "homing.at-target", Run = ComponentCases.AtTarget });
             list.Add(new Case { Name = "shadow.follows", Run = ComponentCases.ShadowFollows });
+            list.Add(new Case { Name = "shadow.zero-size", Run = ComponentCases.ShadowZeroSize });
             list.Add(new Case { Name = "sound.follows", Run = ComponentCases.SoundFollows });
             list.Add(new Case { Name = "push.knockback", Run = PushCases.Knockback });
             list.Add(new Case { Name = "push.blocked", Run = PushCases.Blocked });

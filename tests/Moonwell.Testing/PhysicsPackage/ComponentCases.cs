@@ -227,40 +227,45 @@ namespace Moonwell.Testing
             Within(0.0f, aimless.VY, 0.001f, "straight");
         }
 
-        /// <summary>An arc fired with Homing at a unit walking 120 a second across it re-aims the arc's rest at the unit: it comes down to the unit's middle within 16 of where the unit is then, well away from where it was at launch.</summary>
+        /// <summary>Arcs fired with Homing at a unit 600 to 1,000 away walking 270 a second across them (a footman's speed) re-aim the arc's rest, leading the unit: each comes down to the unit's middle within 16 of where the unit is then, well away from where it was at launch.</summary>
         public static void Arc(FakeWorld world)
+        {
+            for (var distance = 600.0f; distance <= 1000.0f; distance += 50.0f)
+            {
+                var off = ArcMiss(world, distance);
+                Expect.True(off <= 16.0f, "fired " + distance + " away, it comes down within 16 of the unit; was " + off);
+            }
+        }
+
+        /// <summary>Fires an arc with Homing at Speed 700 and Arc 0.35 at a unit a distance away along x walking 270 a second along y, and gives how far from the unit it comes down to the unit's middle height.</summary>
+        private static float ArcMiss(FakeWorld world, float distance)
         {
             Fresh();
             var source = UnitAt(world, 0.0f, 0.0f, 0.0f);
-            var walker = UnitAt(world, 800.0f, 0.0f, 90.0f);
+            var walker = UnitAt(world, distance, 0.0f, 90.0f);
             var shell = new HomingDart(0.0f);
             shell.Speed = 700.0f;
             shell.Arc = 0.35f;
             source.Fire(shell, walker);
-            var walk = 120.0f * Interactions.Step;
+            var walk = 270.0f * Interactions.Step;
             var walkerY = 0.0f;
             var previousX = shell.X;
             var previousY = shell.Y;
             var previousZ = shell.Z;
-            var landed = false;
-            for (var step = 1; step <= 96; step++)
+            for (var step = 1; step <= 128; step++)
             {
                 walkerY += walk;
-                world.MoveUnit(walker.Handle, 800.0f, walkerY);
+                world.MoveUnit(walker.Handle, distance, walkerY);
                 Steps(world, 1);
                 Numbers(shell, "the shell at step " + step);
                 if (step > 4 && shell.Z <= Middle && previousZ > Middle)
                 {
                     var share = (previousZ - Middle) / (previousZ - shell.Z);
-                    var landX = previousX + (shell.X - previousX) * share;
-                    var landY = previousY + (shell.Y - previousY) * share;
-                    var dx = landX - 800.0f;
-                    var dy = landY - walkerY;
-                    var off = MathF.Sqrt(dx * dx + dy * dy);
-                    Expect.True(off <= 16.0f, "it comes down within 16 of the unit; was " + off + " at step " + step);
-                    Expect.True(walkerY > 100.0f, "the unit has walked away from where it was at launch");
-                    landed = true;
-                    break;
+                    var dx = previousX + (shell.X - previousX) * share - distance;
+                    var dy = previousY + (shell.Y - previousY) * share - walkerY;
+                    Expect.True(walkerY > 200.0f, "the unit has walked away from where it was at launch");
+                    shell.End();
+                    return MathF.Sqrt(dx * dx + dy * dy);
                 }
 
                 previousX = shell.X;
@@ -268,10 +273,11 @@ namespace Moonwell.Testing
                 previousZ = shell.Z;
             }
 
-            Expect.True(landed, "it came down");
+            Expect.True(false, "it came down, fired " + distance + " away");
+            return 0.0f;
         }
 
-        /// <summary>A target at the missile's own place: no turn makes a number that is not one, and the speed is kept; the same for an arc, and for a still missile.</summary>
+        /// <summary>A target at the missile's own place: no turn makes a number that is not one, and the speed is kept; the same for an arc, and for a still missile. An arc two steps from a target 300 above is not re-aimed.</summary>
         public static void AtTarget(FakeWorld world)
         {
             Fresh();
@@ -302,6 +308,18 @@ namespace Moonwell.Testing
             Steps(world, 9);
             Numbers(still, "a still missile");
             Within(0.0f, still.Speed, 0.0f, "a still missile is not turned into motion");
+
+            var high = new Dart();
+            Missile.Create(high, 1540.0f, 1000.0f, 332.0f);
+            var late = new Dart();
+            late.VX = 700.0f;
+            late.Arc = 0.35f;
+            late.Gravity = 800.0f;
+            Missile.Create(late, 1500.0f, 1000.0f, Middle);
+            late.Add(new Homing { Target = high });
+            Steps(world, 1);
+            Numbers(late, "an arc two steps from a target 300 above");
+            Expect.True(Math.Abs(late.VZ) < 1000.0f, "within 3 steps of coming down an arc is not re-aimed into a speed up of thousands; was " + late.VZ);
         }
 
         /// <summary>A shadow is the game's unit shadow, twice the radius across, centred under the missile as it moves, at full alpha on the ground and fainter as it climbs, and destroyed when the missile ends. Its settings are used; one removed mid-flight takes its image away.</summary>
@@ -346,6 +364,26 @@ namespace Moonwell.Testing
             Expect.Equal(0, fake.Images.Count, "removed from the missile, its image is destroyed");
             Steps(world, 4);
             Expect.True(!second.HasEnded && second.X > 0.0f, "the missile flies on");
+        }
+
+        /// <summary>A shadow of size 0, on a missile of Radius 0 with no Size set, divides by nothing: its alpha stays as set as the missile climbs.</summary>
+        public static void ShadowZeroSize(FakeWorld world)
+        {
+            var fake = Fresh();
+            var dart = new Dart();
+            dart.Radius = 0.0f;
+            dart.VZ = 320.0f;
+            Missile.Create(dart, 0.0f, 0.0f, 0.0f);
+            var shadow = dart.Add(new Shadow());
+            Within(0.0f, shadow.Size, 0.0f, "twice a radius of 0");
+            var image = fake.Images[0];
+            Within(0.0f, fake.ImageSizes[image], 0.0f, "an image of size 0");
+            Expect.Equal(255, fake.ImageAlphas[image], "its alpha as set");
+            Steps(world, 16);
+            Expect.Equal(255, fake.ImageAlphas[image], "no fade with no size");
+            Within(dart.X, fake.ImagePlaces[image][0], 0.001f, "still under it");
+            dart.End();
+            Expect.Equal(0, fake.Images.Count, "destroyed at the end");
         }
 
         /// <summary>A looping sound starts at the missile at full volume, is moved with it each step, and fades out over its FadeOut after the missile ends, then stops; the fade outlives the missile and its owner. With FadeOut 0 it stops at once.</summary>

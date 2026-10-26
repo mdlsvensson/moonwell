@@ -60,7 +60,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>How wide the image is: twice the missile's Radius unless set (0 on no missile). Set after it is added, the image is made again.</summary>
+        /// <summary>How wide the image is: twice the missile's Radius unless set (0 on no missile). Set after it is added, the image is made again. A shadow of size 0 does not fade.</summary>
         [LocalSafe]
         public float Size
         {
@@ -162,7 +162,7 @@ namespace Moonwell
 
             var high = z - missile.radius - groundZ;
             var opacity = alpha;
-            if (high > 0.0f)
+            if (high > 0.0f && across > 0.0f)
             {
                 opacity = alpha - (int)(Fade * alpha / across * high);
                 if (opacity < 0)

@@ -7,10 +7,11 @@ namespace Moonwell
     /// <c>unit.Fire(missile, target)</c> gives it its target. Every 0.1 second it turns the missile's velocity toward the
     /// target's middle by at most TurnRate a second, keeping its speed. While the target is inside the circle the missile
     /// cannot turn tight enough to reach, it flies straight on to gain room instead of circling it (ALICE's way). With an
-    /// Arc it re-aims the arc's rest at the target each time instead, keeping its speed along the ground and its Gravity,
-    /// so that it comes down on a target that walks. When the target dies or leaves the game, or a gizmo target ends, it is
-    /// let go at the next turn: the missile flies on straight and Target reads null, or it ends with EndsWithTarget. A
-    /// missile is turned by the first Homing on it.
+    /// Arc it re-aims the arc's rest each time instead, keeping its speed along the ground and its Gravity, at where the
+    /// target will be when it comes down (its velocity from its places at the last two turns), so it lands on a target
+    /// that walks. When the target dies or leaves the game, or a gizmo target ends, it is let go at the next turn: the
+    /// missile flies on straight and Target reads null, or it ends with EndsWithTarget. A missile is turned by the first
+    /// Homing on it.
     /// </summary>
     public sealed class Homing : MissileComponent
     {
@@ -28,6 +29,9 @@ namespace Moonwell
 
         /// <summary>The share of a step a turn's interval is forgiven, as a sum of steps can come out a little under in a float.</summary>
         private const float Forgiven = 0.001f;
+
+        /// <summary>The fewest steps before it comes down an arc is re-aimed in, so a target a few steps off and far above or below does not give it a speed up of thousands.</summary>
+        private const float FewestSteps = 3.0f;
 
         /// <summary>Radians in a degree.</summary>
         private const float RadiansPerDegree = 0.017453292f;
@@ -47,7 +51,19 @@ namespace Moonwell
         /// <summary>Whether it turned at its last turn with the target near: it then turns on while the target is outside the hold.</summary>
         internal bool turning;
 
-        /// <summary>The unit or gizmo it turns toward; null for none. Fire at a unit sets it. It reads null once the target has died, left the game or ended.</summary>
+        /// <summary>Whether the target's place was seen at a turn, in seenX and seenY, for an arc's lead.</summary>
+        internal bool seen;
+
+        /// <summary>The target's x at the last turn.</summary>
+        internal float seenX;
+
+        /// <summary>The target's y at the last turn.</summary>
+        internal float seenY;
+
+        /// <summary>The seconds since the target's place was last seen.</summary>
+        internal float seenFor;
+
+        /// <summary>The unit or gizmo it turns toward; null for none. Fire at a unit sets it. It reads null from the next turn after the target died, left the game or ended.</summary>
         [LocalSafe]
         public Actor? Target
         {
@@ -57,6 +73,7 @@ namespace Moonwell
                 Dev.Check(value == null || value is Unit || value is Gizmo, "Homing.Target: a unit or a gizmo");
                 target = value;
                 turning = false;
+                seen = false;
             }
         }
 
@@ -119,6 +136,7 @@ namespace Moonwell
         /// </summary>
         internal bool Turn(Missile missile, float step, float x, float y, float z)
         {
+            seenFor += step;
             var counted = since + step;
             if (counted < Interval - step * Forgiven)
             {
@@ -141,6 +159,7 @@ namespace Moonwell
             {
                 target = null;
                 turning = false;
+                seen = false;
                 if (endsWithTarget)
                 {
                     missile.End();
@@ -150,9 +169,23 @@ namespace Moonwell
                 return false;
             }
 
+            // The target's velocity along the ground from its places at the last two turns; none at the first.
+            var leadX = 0.0f;
+            var leadY = 0.0f;
+            var elapsed = seenFor;
+            if (seen && elapsed > 0.0f)
+            {
+                leadX = (tx - seenX) / elapsed;
+                leadY = (ty - seenY) / elapsed;
+            }
+
+            seen = true;
+            seenX = tx;
+            seenY = ty;
+            seenFor = 0.0f;
             if (missile.arc > 0.0f)
             {
-                return Reaim(missile, step, tx - x, ty - y, tz - z);
+                return Reaim(missile, step, tx - x, ty - y, tz - z, leadX, leadY);
             }
 
             return Steer(missile, tx - x, ty - y, tz - z);
@@ -293,18 +326,42 @@ namespace Moonwell
         }
 
         /// <summary>
-        /// Re-aims an arc at a target: its heading along the ground turns toward the target by at most TurnRate times
-        /// Interval (at once with 0), at the same speed along the ground, and its speed up is set so that, with its Gravity,
-        /// it comes down to the target's middle when it has crossed the distance there. A target nearer than a step's flight
-        /// along the ground leaves it as it is.
+        /// Re-aims an arc at a target, leading it: at where the target, going on at its velocity along the ground
+        /// (<paramref name="leadX"/>, <paramref name="leadY"/>), will be when the arc comes down, unless it is as fast as the
+        /// missile along the ground. Its heading along the ground turns toward that point by at most TurnRate times Interval
+        /// (at once with 0), at the same speed along the ground, and its speed up is set so that, with its Gravity, it comes
+        /// down to the target's middle height when it has crossed the distance there. Fewer than FewestSteps steps from
+        /// there, it keeps its arc.
         /// </summary>
-        private bool Reaim(Missile missile, float step, float dx, float dy, float dz)
+        private bool Reaim(Missile missile, float step, float dx, float dy, float dz, float leadX, float leadY)
         {
             var vx = missile.vx;
             var vy = missile.vy;
             var along = Trig.Sqrt(vx * vx + vy * vy);
+            if (along <= 0.0f)
+            {
+                return false;
+            }
+
+            if (leadX != 0.0f || leadY != 0.0f)
+            {
+                // The time when the missile, at its speed along the ground, meets the target going on at its velocity:
+                // |d + lead * t| = along * t, a quadratic with one positive root when the target is the slower.
+                var a = leadX * leadX + leadY * leadY - along * along;
+                if (a < 0.0f)
+                {
+                    var b = 2.0f * (dx * leadX + dy * leadY);
+                    var c = dx * dx + dy * dy;
+                    var meet = (-b - Trig.Sqrt(b * b - 4.0f * a * c)) / (2.0f * a);
+                    dx += leadX * meet;
+                    dy += leadY * meet;
+                }
+            }
+
+            // Within FewestSteps of coming down it keeps its arc: a re-aim there would ask for a speed up of thousands of a
+            // target a little above or below.
             var distance = Trig.Sqrt(dx * dx + dy * dy);
-            if (along <= 0.0f || distance < Near || distance < along * step)
+            if (distance < Near || distance < FewestSteps * step * along)
             {
                 return false;
             }
