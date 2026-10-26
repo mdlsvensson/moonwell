@@ -134,21 +134,48 @@ namespace Moonwell.Testing
             Expect.True(through.X > 700.0f, "it flew on; at " + through.X);
         }
 
-        /// <summary>A ball at 45 degrees into a wall with WallContact Slide: it meets it once, loses the speed into it and slides along it, keeping the rest, with no more impacts.</summary>
+        /// <summary>
+        /// WallContact Slide: a ball at 45 degrees, 600 into the wall, bounces off it as Bounce does; one meeting it at 4 a
+        /// second, slower than 5, loses the speed into it and slides along it, keeping the rest, with no more impacts.
+        /// </summary>
         public static void Slide(FakeWorld world)
         {
             Fresh();
             Wall.Create(600.0f, 200.0f, 600.0f, 1800.0f);
-            var ball = ShotAt(Contact.Slide, 400.0f, 500.0f, 100.0f, 600.0f, 600.0f);
-            UntilImpacts(world, ball, 1, 64);
-            Expect.Equal(1, ball.Impacts.Count, "it met the wall");
-            Within(0.0f, ball.VX, 0.01f, "the speed into it is gone");
-            Within(600.0f, ball.VY, 0.01f, "the speed along it kept");
-            var y = ball.Y;
+            var fast = ShotAt(Contact.Slide, 400.0f, 300.0f, 100.0f, 600.0f, 600.0f);
+            UntilImpacts(world, fast, 1, 64);
+            Expect.Equal(1, fast.Impacts.Count, "the fast ball met the wall");
+            Within(-300.0f, fast.VX, 0.01f, "and bounced off it, the speed into it reversed and halved");
+            Within(600.0f, fast.VY, 0.01f, "the speed along it kept");
+
+            var slow = ShotAt(Contact.Slide, 580.0f, 900.0f, 100.0f, 4.0f, 600.0f);
+            UntilImpacts(world, slow, 1, 64);
+            Expect.Equal(1, slow.Impacts.Count, "the slow ball met the wall");
+            Within(0.0f, slow.VX, 0.0001f, "the speed into it is gone");
+            Within(600.0f, slow.VY, 0.01f, "the speed along it kept");
+            var y = slow.Y;
             Steps(world, 16);
-            Expect.Equal(1, ball.Impacts.Count, "it slides on with no more impacts");
-            Within(584.0f, ball.X, 0.01f, "along the wall");
-            Within(y + 300.0f, ball.Y, 0.5f, "at 600 a second");
+            Expect.Equal(1, slow.Impacts.Count, "it slides on with no more impacts");
+            Within(584.0f, slow.X, 0.01f, "along the wall");
+            Within(y + 300.0f, slow.Y, 0.5f, "at 600 a second");
+        }
+
+        /// <summary>A wall's Height and Bounciness below 0 fail in a development build, at Create and when set, and leave it as it was (the checks are left out of a release build, and of the Lua cases); a Height of 0, endless, is allowed.</summary>
+        public static void Checks(FakeWorld world)
+        {
+            Fresh();
+            var wall = Wall.Create(0.0f, 0.0f, 100.0f, 0.0f, 50.0f);
+#if DEBUG
+            Expect.Throws<MoonwellException>(() => Wall.Create(0.0f, 0.0f, 100.0f, 0.0f, -1.0f), "a negative height at Create");
+            Expect.Throws<MoonwellException>(() => Wall.Create(0.0f, 0.0f, 100.0f, 0.0f, 0.0f, -0.5f), "a negative bounciness at Create");
+            Expect.Throws<MoonwellException>(() => Wall.Create(50.0f, 50.0f, 50.0f, 50.0f), "two ends the same");
+            Expect.Throws<MoonwellException>(() => wall.Height = -10.0f, "a negative height set");
+            Within(50.0f, wall.Height, 0.0f, "the height kept");
+            Expect.Throws<MoonwellException>(() => wall.Bounciness = -1.0f, "a negative bounciness set");
+            Within(1.0f, wall.Bounciness, 0.0f, "the bounciness kept");
+#endif
+            wall.Height = 0.0f;
+            Within(0.0f, wall.Height, 0.0f, "0, endless, is allowed");
         }
 
         /// <summary>A wall 100 high: a ball 200 up flies over it with no contact; one 50 up stops at it.</summary>

@@ -152,6 +152,88 @@ namespace Moonwell.Testing
             Expect.True(shield.X > 600.0f, "the shield moved on; at " + shield.X);
         }
 
+        /// <summary>
+        /// A Bounce ball lying at rest, its checks paused, hit by a Pass bolt made after it at 300 a second: the bolt's side
+        /// checks the pair while the ball rests, and the ball, woken by the hit, checks it after, from the one state the two
+        /// share, so each meets the other once while they overlap. Then a bolt whose CanHit refuses the ball: the ball is woken
+        /// while they overlap, and the refusal holds, each asked once.
+        /// </summary>
+        public static void RestThenPass(FakeWorld world)
+        {
+            Fresh();
+            var ball = Resting(world, 500.0f, 500.0f);
+            var bolt = new Shot();
+            bolt.MissileContact = Contact.Pass;
+            bolt.GroundContact = Contact.None;
+            Missile.Create(bolt, 300.0f, 500.0f, 24.0f);
+            bolt.VX = 300.0f;
+            Steps(world, 64);
+            Expect.Equal(1, bolt.Impacts.Count, "the bolt met the ball once");
+            Expect.Equal(1, ball.Impacts.Count, "the ball met the bolt once");
+            Expect.Equal(1, ball.Asked.Count, "the ball was asked once");
+            Expect.True(bolt.X > 600.0f, "the bolt flew through; at " + bolt.X);
+            Expect.True(ball.X > 500.0f, "the ball was knocked along; at " + ball.X);
+
+            var other = Resting(world, 500.0f, 1000.0f);
+            var refused = new Shot();
+            refused.MissileContact = Contact.Pass;
+            refused.Hit = thing => false;
+            refused.GroundContact = Contact.None;
+            Missile.Create(refused, 300.0f, 1000.0f, 24.0f);
+            refused.VX = 300.0f;
+            for (var i = 0; i < 40 && refused.Asked.Count == 0; i++)
+            {
+                Steps(world, 1);
+            }
+
+            Expect.Equal(1, refused.Asked.Count, "the bolt refused the ball");
+            other.VX = 100.0f;
+            Steps(world, 48);
+            Expect.Equal(0, refused.Impacts.Count, "it met nothing");
+            Expect.Equal(0, other.Impacts.Count, "nor the ball");
+            Expect.Equal(1, refused.Asked.Count, "the refusal held after the ball woke");
+            Expect.Equal(1, other.Asked.Count, "and the ball was asked once");
+        }
+
+        /// <summary>
+        /// Two Stop bolts 100 apart, one creeping at 10 a second: once a fast bolt elsewhere has widened the missile checks'
+        /// range, they are paired, and the pair waits for seconds, from the slow speed. Set to 3,000 a second, the creeping
+        /// one is met at the other's surface, not flown through, as a velocity set faster ends the waits on it.
+        /// </summary>
+        public static void SpedUp(FakeWorld world)
+        {
+            Fresh();
+            ShotAt("racer", Contact.Stop, 100.0f, 1500.0f, 3000.0f);
+            Steps(world, 2);
+            var creeping = ShotAt("creeping", Contact.Stop, 200.0f, 500.0f, 10.0f);
+            var still = ShotAt("still", Contact.Stop, 300.0f, 500.0f, 0.0f);
+            Steps(world, 4);
+            Expect.Equal(0, creeping.Impacts.Count, "nothing met yet");
+            creeping.VX = 3000.0f;
+            Steps(world, 4);
+            Expect.Equal(1, creeping.Impacts.Count, "the sped-up bolt met the other");
+            Expect.True(creeping.HasEnded && still.HasEnded, "both stopped");
+            Within(284.0f, Read(creeping, 0, 1), 0.01f, "at the other's surface");
+        }
+
+        /// <summary>Places a Bounce ball on the ground that slides to rest, and steps until it rests.</summary>
+        private static Shot Resting(FakeWorld world, float x, float y)
+        {
+            var ball = new Shot();
+            ball.MissileContact = Contact.Bounce;
+            ball.GroundContact = Contact.Slide;
+            Missile.Create(ball, x, y, 16.0f);
+            ball.VZ = -1.0f;
+            for (var i = 0; i < 16 && !ball.resting; i++)
+            {
+                Steps(world, 1);
+            }
+
+            Expect.True(ball.resting, "the ball rests");
+            Expect.True(ball.missileChecks != null && ball.missileChecks.IsPaused, "its missile checks are paused");
+            return ball;
+        }
+
         /// <summary>Two Bounce balls of equal Mass and Bounciness 1, one rolling at 600 into the other, still: their velocities swap. Then the same with one of Mass 0 against one of Mass 3: the one with none takes all the change, bouncing back at 600 and leaving the other still.</summary>
         public static void Mass(FakeWorld world)
         {

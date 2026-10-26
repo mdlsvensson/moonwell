@@ -35,6 +35,15 @@ namespace Moonwell.Engine
         /// <summary>The farthest a missile's ball reaches in a step, its radius plus its move, taken before a farther one is seen.</summary>
         private const float FirstMissile = 16.0f;
 
+        /// <summary>A wall's box, widened by the ball's radius and the Skin, does not hold the ball's move: passed over.</summary>
+        private const int Far = 0;
+
+        /// <summary>The move is in the wall's box, but the ball does not meet the wall along it.</summary>
+        private const int Off = 1;
+
+        /// <summary>The ball meets the wall along its move.</summary>
+        private const int Met = 2;
+
         /// <summary>How far beyond its radius from a wall a ball is still taken to be at it, so one sliding along it, which float rounding may carry just out and back in, does not meet it again.</summary>
         private const float Skin = 1.0f;
 
@@ -559,7 +568,8 @@ namespace Moonwell.Engine
         /// normal out of the thing there, the thing's top (for a ball settling on it) and the thing's flat velocity. The ball
         /// is put where it met the thing, at the velocity it met it at; then CanHit, OnImpact on the missile and its
         /// components, OnStruck on a unit, the damage and the outcome. Bounce keeps the missile's Bounciness times the
-        /// surface's share (a wall's Bounciness, else 1); Slide on a wall loses the speed into it and keeps the rest. What the
+        /// surface's share (a wall's Bounciness, else 1); Slide on a wall bounces so too, and once it meets it slower than
+        /// Settle loses the speed into it and slides along it, keeping the rest. What the
         /// pair does next: Hold when refused, Through when no contact came of it or it passed, else Go.
         /// </summary>
         private static int Hit(Missile missile, Touch touch, ImpactKind kind, Actor other, Unit? unit, float t, bool inside, float nx, float ny, float nz, float top, float otherVX, float otherVY, Contact setting, float surface)
@@ -680,10 +690,12 @@ namespace Moonwell.Engine
                 return Through;
             }
 
-            // Bounce, and Slide, which is Bounce off anything but the ground and walls; Slide on a wall slides along it.
+            // Bounce, and Slide, which is Bounce off anything but the ground and walls; Slide on a wall bounces until it meets
+            // it slower than Settle, then slides along it. A bounce that leaves it faster ends the waits on it.
             if (into < 0.0f)
             {
-                if (kind == ImpactKind.Wall && outcome == Contact.Slide)
+                var before = vx * vx + vy * vy + vz * vz;
+                if (kind == ImpactKind.Wall && outcome == Contact.Slide && -into < Settle)
                 {
                     missile.vx = vx - into * nx;
                     missile.vy = vy - into * ny;
@@ -705,6 +717,8 @@ namespace Moonwell.Engine
                 {
                     return Go;
                 }
+
+                Quicker(missile, before);
             }
 
             Stay(missile, entry, moved, hitX, hitY, hitZ);
@@ -762,6 +776,7 @@ namespace Moonwell.Engine
                 missile.lastX = x;
                 missile.lastY = y;
                 missile.lastZ = z;
+                missile.lastStep = Tracking.StepNow;
                 Placed(missile, x, y, z);
             }
         }
@@ -775,14 +790,16 @@ namespace Moonwell.Engine
             missile.lastX = x;
             missile.lastY = y;
             missile.lastZ = z;
+            missile.lastStep = Tracking.StepNow;
             Placed(missile, x, y, z);
         }
 
-        /// <summary>The ball is not touching the thing: a Pass that reacted to it may react again when it next enters.</summary>
+        /// <summary>The ball is not touching the thing: a Pass that reacted to it may react again when it next enters, and a refusal is asked again.</summary>
         private static void Leave(Touch touch)
         {
             touch.touching = false;
             touch.passed = false;
+            touch.held = false;
         }
 
         /// <summary>The two are apart along the move: not touching, and the pair waits until they could touch, from their distance now and how fast they could close.</summary>
@@ -1025,16 +1042,180 @@ namespace Moonwell.Engine
             }
         }
 
-        /// <summary>A missile has met another missile's checks: what the pair keeps.</summary>
-        internal static Touch MetMissile()
+        /// <summary>
+        /// A pair of two missiles has met at one of the two's checks: the one state the two keep of each other, which both
+        /// sides' pairs share, so it holds whichever side checks the pair. It is found in the holder's list of what it keeps
+        /// with other missiles, or made and put in both missiles' lists; the pair is noted on it as the earlier's or the
+        /// later's.
+        /// </summary>
+        internal static Touch MetMissile(Missile holder, Missile other, Owner pair)
         {
-            return new Touch();
+            var early = holder.made < other.made ? holder : other;
+            var late = holder.made < other.made ? other : holder;
+            var touch = Shared(holder, early, late);
+            if (touch == null)
+            {
+                touch = new Touch();
+                touch.early = early;
+                touch.late = late;
+                Keep(holder, touch);
+                Keep(other, touch);
+            }
+
+            if (holder == early)
+            {
+                touch.earlyPair = pair;
+            }
+            else
+            {
+                touch.latePair = pair;
+            }
+
+            return touch;
+        }
+
+        /// <summary>A pair of two missiles has parted: it is no longer noted on their shared state, and once neither side's pair is left, the state is taken out of both missiles' lists.</summary>
+        internal static void PartedMissile(Missile holder, Touch touch)
+        {
+            if (holder == touch.early)
+            {
+                touch.earlyPair = null;
+            }
+            else
+            {
+                touch.latePair = null;
+            }
+
+            if (touch.earlyPair == null && touch.latePair == null)
+            {
+                Drop(touch.early!, touch);
+                Drop(touch.late!, touch);
+            }
+        }
+
+        /// <summary>What a missile keeps with an earlier and a later missile, from its list; null for none.</summary>
+        private static Touch? Shared(Missile holder, Missile early, Missile late)
+        {
+            var touches = holder.meetTouches;
+            if (touches == null)
+            {
+                return null;
+            }
+
+            var count = touches.Count;
+            for (var i = 0; i < count; i++)
+            {
+                var touch = Raw.At(touches, i);
+                if (touch.early == early && touch.late == late)
+                {
+                    return touch;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>Adds what two missiles keep of each other to the end of one's list.</summary>
+        private static void Keep(Missile missile, Touch touch)
+        {
+            if (missile.meetTouches == null)
+            {
+                missile.meetTouches = new List<Touch>();
+            }
+
+            Raw.Append(missile.meetTouches, touch);
+        }
+
+        /// <summary>Takes what two missiles kept of each other out of one's list, keeping the order of the rest.</summary>
+        private static void Drop(Missile missile, Touch touch)
+        {
+            var touches = missile.meetTouches;
+            if (touches != null)
+            {
+                Remove(touches, touch);
+            }
+        }
+
+        /// <summary>Takes a touch out of a list, keeping the order of the rest; nothing when it is not there.</summary>
+        private static void Remove(List<Touch> touches, Touch touch)
+        {
+            var kept = 0;
+            var count = touches.Count;
+            for (var i = 0; i < count; i++)
+            {
+                var item = Raw.At(touches, i);
+                if (item != touch)
+                {
+                    Raw.Put(touches, kept, item);
+                    kept++;
+                }
+            }
+
+            Raw.Truncate(touches, kept);
+        }
+
+        /// <summary>
+        /// A missile's velocity was set from outside its own flight, or changed by a contact, from a speed whose square is
+        /// given: when it is faster now, the pairs that wait on it (its own checks', and both sides of each missile pair it is
+        /// in) check again from their next tick, as the wait was worked out from the slower speed.
+        /// </summary>
+        internal static void Quicker(Missile missile, float before)
+        {
+            var vx = missile.vx;
+            var vy = missile.vy;
+            var vz = missile.vz;
+            if (missile.entry == null || vx * vx + vy * vy + vz * vz <= before)
+            {
+                return;
+            }
+
+            Unwait<Unit>(missile.unitChecks);
+            Unwait<Destructable>(missile.destructableChecks);
+            Unwait<Item>(missile.itemChecks);
+            var touches = missile.meetTouches;
+            if (touches == null)
+            {
+                return;
+            }
+
+            var count = touches.Count;
+            for (var i = 0; i < count; i++)
+            {
+                var touch = Raw.At(touches, i);
+                if (touch.earlyPair != null)
+                {
+                    Pairing.As<Missile, Missile>(touch.earlyPair).Wait(0.0f);
+                }
+
+                if (touch.latePair != null)
+                {
+                    Pairing.As<Missile, Missile>(touch.latePair).Wait(0.0f);
+                }
+            }
+        }
+
+        /// <summary>Ends the waits of the pairs of a missile's checks of a kind; nothing when they have not started.</summary>
+        private static void Unwait<TOther>(Interaction? checks)
+            where TOther : Actor
+        {
+            if (checks == null)
+            {
+                return;
+            }
+
+            var pairs = checks.pairs;
+            var count = pairs.Count;
+            for (var i = 0; i < count; i++)
+            {
+                Pairing.As<Missile, TOther>(Raw.At(pairs, i)).Wait(0.0f);
+            }
         }
 
         /// <summary>
         /// A check of a missile and another missile. The one made first checks the pair: the later one's check passes it over
-        /// while the earlier one's checks run, and checks it itself only while those are paused as the earlier one rests. A
-        /// missile whose MissileContact is None meets no missile. What the pair does next; the seconds to wait for Later.
+        /// while the earlier one's checks run, waiting as long as the two could not touch, and checks it itself only while
+        /// those are paused as the earlier one rests. Both sides keep the one state. A missile whose MissileContact is None
+        /// meets no missile. What the pair does next; the seconds to wait for Later.
         /// </summary>
         internal static int MissileTick(Missile holder, Missile other, Touch touch, out float wait)
         {
@@ -1050,8 +1231,11 @@ namespace Moonwell.Engine
                 var theirs = other.missileChecks;
                 if (theirs != null && !theirs.IsPaused)
                 {
-                    // The earlier one checks the pair.
-                    return Go;
+                    // The earlier one checks the pair; this side waits as long as they could not touch.
+                    var holderEntry = holder.entry!;
+                    var otherEntry = other.entry!;
+                    wait = Closing(holder, other, holderEntry.X - otherEntry.X, holderEntry.Y - otherEntry.Y, holder.radius + other.radius);
+                    return wait > 0.0f ? Later : Go;
                 }
 
                 return Meet(other, holder, touch, out wait);
@@ -1061,13 +1245,14 @@ namespace Moonwell.Engine
         }
 
         /// <summary>
-        /// Two missiles, the one made first and the other: their balls are swept against each other along both moves this
-        /// step (the second's move taken from the first's, so they meet when the gap between their middles, moving, is the
-        /// two radii). At a contact, in order: each one's CanHit about the other (either refusing, nothing, and the pair is not
-        /// checked again until it parts); each is put where they met, at the velocity it met at; OnImpact on the first and its
-        /// components, then on the second, each Impact with the normal out of the other and the speed they closed at, and the
-        /// outcome the missile's own MissileContact gives; then each takes its own outcome. Missiles take no damage. What the
-        /// pair does next; the seconds to wait for Later.
+        /// Two missiles, the one made first and the other: their balls are swept against each other along both moves (the
+        /// second's move taken from the first's, so they meet when the gap between their middles, moving, is the two radii),
+        /// over one time frame: a missile whose move began a step earlier than the other's, as one woken from rest, has the
+        /// other's move drawn back along its line to the same start. At a contact, in order: each one's CanHit about the
+        /// other (either refusing, nothing, and it is not asked again until they part); each is put where they met, at the
+        /// velocity it met at; OnImpact on the first and its components, then on the second, each Impact with the normal out
+        /// of the other and the speed they closed at, and the outcome the missile's own MissileContact gives; then each takes
+        /// its own outcome. Missiles take no damage. What the pair does next; the seconds to wait for Later.
         /// </summary>
         private static int Meet(Missile first, Missile second, Touch touch, out float wait)
         {
@@ -1090,9 +1275,38 @@ namespace Moonwell.Engine
             var bX1 = entryB.X;
             var bY1 = entryB.Y;
             var bZ1 = second.z;
+            var movedA = aX1 != aX0 || aY1 != aY0 || aZ1 != aZ0;
+            var movedB = bX1 != bX0 || bY1 != bY0 || bZ1 != bZ0;
+
+            // One time frame for both: the steps since the earlier start, and the later start drawn back to it.
+            var now = Tracking.StepNow;
+            var spanA = now - first.lastStep;
+            var spanB = now - second.lastStep;
+            var frame = spanA > spanB ? spanA : spanB;
+            if (frame < 1)
+            {
+                frame = 1;
+            }
+
+            if (movedA && spanA > 0 && spanA < frame)
+            {
+                var back = (float)frame / (float)spanA;
+                aX0 = aX1 - (aX1 - aX0) * back;
+                aY0 = aY1 - (aY1 - aY0) * back;
+                aZ0 = aZ1 - (aZ1 - aZ0) * back;
+            }
+
+            if (movedB && spanB > 0 && spanB < frame)
+            {
+                var back = (float)frame / (float)spanB;
+                bX0 = bX1 - (bX1 - bX0) * back;
+                bY0 = bY1 - (bY1 - bY0) * back;
+                bZ0 = bZ1 - (bZ1 - bZ0) * back;
+            }
+
             var reach = radiusA + radiusB;
 
-            // The first's middle from the second's, at the step's start and along the step: they touch when its length is reach.
+            // The first's middle from the second's, at the frame's start and along it: they touch when its length is reach.
             var px = aX0 - bX0;
             var py = aY0 - bY0;
             var pz = aZ0 - bZ0;
@@ -1129,9 +1343,9 @@ namespace Moonwell.Engine
                 }
             }
 
-            if (touch.passed)
+            if (touch.passed || touch.held)
             {
-                // A Pass reacted on meeting and they have not parted since.
+                // A Pass reacted on meeting, or CanHit refused, and they have not parted since.
                 touch.touching = true;
                 return Go;
             }
@@ -1170,10 +1384,10 @@ namespace Moonwell.Engine
                 }
             }
 
-            // The velocities where they met: gravity has acted only for the part of the step before.
-            var step = Interactions.Current().Step;
-            var lateA = aX1 != aX0 || aY1 != aY0 || aZ1 != aZ0 ? first.gravity * step * (1.0f - t) : 0.0f;
-            var lateB = bX1 != bX0 || bY1 != bY0 || bZ1 != bZ0 ? second.gravity * step * (1.0f - t) : 0.0f;
+            // The velocities where they met: gravity has acted only for the part of the frame before.
+            var rest = Interactions.Current().Step * frame * (1.0f - t);
+            var lateA = movedA ? first.gravity * rest : 0.0f;
+            var lateB = movedB ? second.gravity * rest : 0.0f;
             var avx = first.vx;
             var avy = first.vy;
             var avz = first.vz + lateA;
@@ -1189,10 +1403,11 @@ namespace Moonwell.Engine
 
             touch.touching = true;
             touch.contacted = true;
-            touch.lastTouch = Tracking.StepNow;
+            touch.lastTouch = now;
             if (!Asks(first, second) || !Asks(second, first))
             {
-                return Hold;
+                touch.held = true;
+                return Go;
             }
 
             // Each is put where they met for the reactions, at the velocity it met at.
@@ -1266,8 +1481,8 @@ namespace Moonwell.Engine
         /// <summary>
         /// One of two missiles takes its own outcome where they met: Stop ends it at the point of contact; Pass and None let it
         /// fly on from where its move took it (true); Bounce, and Slide, add its share of the change along the normal out of the
-        /// other, and it stays where they met. Nothing for one that has begun to end; a reaction that moved it leaves it where
-        /// it was put.
+        /// other, and it stays where they met, the pairs waiting on it checking again if it is faster. Nothing for one that has
+        /// begun to end; a reaction that moved it leaves it where it was put.
         /// </summary>
         private static bool Take(Missile missile, Entry entry, Contact outcome, float hitX, float hitY, float hitZ, float pointX, float pointY, float pointZ, float nx, float ny, float nz, float change, float late, float endX, float endY, float endZ)
         {
@@ -1289,30 +1504,42 @@ namespace Moonwell.Engine
                 return true;
             }
 
-            missile.vx += change * nx;
-            missile.vy += change * ny;
-            missile.vz += change * nz;
+            var vx = missile.vx;
+            var vy = missile.vy;
+            var vz = missile.vz;
+            missile.vx = vx + change * nx;
+            missile.vy = vy + change * ny;
+            missile.vz = vz + change * nz;
+            Quicker(missile, vx * vx + vy * vy + vz * vz);
             Stay(missile, entry, moved, hitX, hitY, hitZ);
             return false;
         }
 
-        /// <summary>Two missiles apart along their moves: not touching, and the pair waits until they could touch, from their flat distance now, both speeds, and how fast the second may speed up.</summary>
+        /// <summary>Two missiles apart along their moves: not touching, and the pair waits until they could touch.</summary>
         private static int Parted(Missile first, Missile second, Touch touch, float ox, float oy, float reach, out float wait)
+        {
+            Leave(touch);
+            wait = Closing(first, second, ox, oy, reach);
+            return wait > 0.0f ? Later : Go;
+        }
+
+        /// <summary>The earliest seconds from now two missiles (ox, oy) apart, flat, could touch: from both speeds, and how fast each may speed up.</summary>
+        private static float Closing(Missile first, Missile second, float ox, float oy, float reach)
         {
             var vx = second.vx;
             var vy = second.vy;
             var vz = second.vz;
             var gravity = second.gravity;
             var quicker = (gravity < 0.0f ? -gravity : gravity) + (second.acceleration > 0.0f ? second.acceleration : 0.0f);
-            return Apart(first, touch, ox, oy, reach, Trig.Sqrt(vx * vx + vy * vy + vz * vz), quicker, out wait);
+            return Until(first, ox, oy, reach, Trig.Sqrt(vx * vx + vy * vy + vz * vz), quicker);
         }
 
         /// <summary>
         /// A missile's walk down the walls, right after its move in the pass: its ball is swept along its move against each
         /// wall's upright strip, as tall as the wall above the ground (or endless), a wall whose box does not hold the move
-        /// passed over in a few compares. The wall met first along the move is met; after a Pass, or nothing, the walk goes on
-        /// for the walls further along, each met at most once in it; after a Stop or a bounce, which leave the ball where it
-        /// met the wall, it ends. A wall the ball has left is forgotten.
+        /// passed over in a few compares, before anything kept of it is looked up. The wall met first along the move is met;
+        /// after a Pass, or nothing, the walk goes on for the walls further along, each met at most once in it; after a Stop
+        /// or a bounce, which leave the ball where it met the wall, it ends. A wall the ball has left is forgotten.
         /// </summary>
         internal static void AgainstWalls(Missile missile)
         {
@@ -1355,9 +1582,26 @@ namespace Moonwell.Engine
                     float ny;
                     float nz;
                     float top;
-                    var touch = TouchOf(missile, wall);
-                    if (!Sweep(missile, wall, touch != null, out enter, out inside, out nx, out ny, out nz, out top))
+                    var found = Sweep(missile, wall, out enter, out inside, out nx, out ny, out nz, out top);
+                    if (found == Far)
                     {
+                        var known = missile.wallTouches;
+                        if (known != null && known.Count > 0)
+                        {
+                            Forget(missile, wall);
+                        }
+
+                        continue;
+                    }
+
+                    var touch = TouchOf(missile, wall);
+                    if (found == Off)
+                    {
+                        if (touch != null && Beyond(missile, wall))
+                        {
+                            Forget(missile, wall);
+                        }
+
                         continue;
                     }
 
@@ -1417,11 +1661,11 @@ namespace Moonwell.Engine
         /// <summary>
         /// Sweeps a missile's ball along its move this step against a wall: a strip from end to end, the ball's radius either
         /// side and round at the ends (flat), from below the ground to the wall's height above the ground under it plus the
-        /// radius (or endless). True when they meet within the move, with the share of the move they met at (below 0 when it
-        /// began inside), the normal out of the wall there (for one that began inside, out of the nearest face) and the top.
-        /// False when apart; the ball's touch is then forgotten, unless the ball has one and is still within the Skin of it.
+        /// radius (or endless). Far when the wall's box does not hold the move, Off when they do not meet, Met when they meet
+        /// within the move, with the share of the move they met at (below 0 when it began inside), the normal out of the
+        /// wall there (for one that began inside, out of the nearest face) and the top.
         /// </summary>
-        private static bool Sweep(Missile missile, Wall wall, bool known, out float enter, out bool inside, out float nx, out float ny, out float nz, out float top)
+        private static int Sweep(Missile missile, Wall wall, out float enter, out bool inside, out float nx, out float ny, out float nz, out float top)
         {
             enter = 0.0f;
             inside = false;
@@ -1437,13 +1681,11 @@ namespace Moonwell.Engine
             var bx = entry.X;
             var by = entry.Y;
             var bz = missile.z;
-            var place = wall.entry!;
-            var shiftX = place.X - wall.madeX;
-            var shiftY = place.Y - wall.madeY;
-            var x1 = wall.x1 + shiftX;
-            var y1 = wall.y1 + shiftY;
-            var x2 = wall.x2 + shiftX;
-            var y2 = wall.y2 + shiftY;
+            float x1;
+            float y1;
+            float x2;
+            float y2;
+            Ends(wall, out x1, out y1, out x2, out y2);
             var near = radius + Skin;
             var lowX = (ax < bx ? ax : bx) - near;
             var highX = (ax < bx ? bx : ax) + near;
@@ -1451,12 +1693,7 @@ namespace Moonwell.Engine
             var highY = (ay < by ? by : ay) + near;
             if ((x1 < lowX && x2 < lowX) || (x1 > highX && x2 > highX) || (y1 < lowY && y2 < lowY) || (y1 > highY && y2 > highY))
             {
-                if (known)
-                {
-                    Forget(missile, wall);
-                }
-
-                return false;
+                return Far;
             }
 
             var dx = bx - ax;
@@ -1497,8 +1734,7 @@ namespace Moonwell.Engine
             End(ax - x2, ay - y2, dx, dy, radius, ref t0, ref t1);
             if (t0 > t1 || t1 < 0.0f || t0 > 1.0f)
             {
-                Away(missile, wall, known, bx, by, x1, y1, ex, ey, length, near);
-                return false;
+                return Off;
             }
 
             // The height, read only now: the ground under the nearest point of the wall to where the ball is along the move.
@@ -1516,8 +1752,7 @@ namespace Moonwell.Engine
                 {
                     if (az > top)
                     {
-                        Away(missile, wall, known, bx, by, x1, y1, ex, ey, length, near);
-                        return false;
+                        return Off;
                     }
                 }
                 else if (dz < 0.0f)
@@ -1534,8 +1769,7 @@ namespace Moonwell.Engine
             var last = t1 < z1 ? t1 : z1;
             if (first > last || last < 0.0f || first > 1.0f)
             {
-                Away(missile, wall, known, bx, by, x1, y1, ex, ey, length, near);
-                return false;
+                return Off;
             }
 
             enter = first;
@@ -1553,14 +1787,14 @@ namespace Moonwell.Engine
             {
                 // Onto its top: from above, or, for a ball that began inside, nearer the top than the face.
                 nz = 1.0f;
-                return true;
+                return Met;
             }
 
             if (off > Tiny)
             {
                 nx = ox / off;
                 ny = oy / off;
-                return true;
+                return Met;
             }
 
             // Its middle on the wall's line: out of the side it is moving from, else the wall's left.
@@ -1574,7 +1808,19 @@ namespace Moonwell.Engine
 
             nx = lx;
             ny = ly;
-            return true;
+            return Met;
+        }
+
+        /// <summary>A wall's two ends where it is now: as made, moved by how far its place has moved since.</summary>
+        private static void Ends(Wall wall, out float x1, out float y1, out float x2, out float y2)
+        {
+            var place = wall.entry!;
+            var shiftX = place.X - wall.madeX;
+            var shiftY = place.Y - wall.madeY;
+            x1 = wall.x1 + shiftX;
+            y1 = wall.y1 + shiftY;
+            x2 = wall.x2 + shiftX;
+            y2 = wall.y2 + shiftY;
         }
 
         /// <summary>When along a move a value starting at start and changing by change is between low and high: the shares of the move, from and to; false for never. A value that does not change is between them always or never.</summary>
@@ -1660,23 +1906,26 @@ namespace Moonwell.Engine
             qy = y1 + along * ey;
         }
 
-        /// <summary>A ball apart from a wall along its move: its touch is forgotten unless it is still within near of the wall where its move ended.</summary>
-        private static void Away(Missile missile, Wall wall, bool known, float bx, float by, float x1, float y1, float ex, float ey, float length, float near)
+        /// <summary>Whether a ball apart from a wall along its move ended it farther than its radius and the Skin from the wall, so what it kept of the wall is forgotten.</summary>
+        private static bool Beyond(Missile missile, Wall wall)
         {
-            if (!known)
-            {
-                return;
-            }
-
+            float x1;
+            float y1;
+            float x2;
+            float y2;
+            Ends(wall, out x1, out y1, out x2, out y2);
+            var ex = x2 - x1;
+            var ey = y2 - y1;
+            var entry = missile.entry!;
+            var bx = entry.X;
+            var by = entry.Y;
             float qx;
             float qy;
-            Nearest(bx, by, x1, y1, ex, ey, length, out qx, out qy);
+            Nearest(bx, by, x1, y1, ex, ey, Trig.Sqrt(ex * ex + ey * ey), out qx, out qy);
             var ox = bx - qx;
             var oy = by - qy;
-            if (ox * ox + oy * oy > near * near)
-            {
-                Forget(missile, wall);
-            }
+            var near = missile.radius + Skin;
+            return ox * ox + oy * oy > near * near;
         }
 
         /// <summary>What a missile keeps of a wall its ball is at; null for none.</summary>
@@ -1701,18 +1950,13 @@ namespace Moonwell.Engine
             return null;
         }
 
-        /// <summary>Forgets a wall a missile's ball has left: a Pass or a refusal may meet it again when it next comes to it.</summary>
+        /// <summary>Forgets a wall a missile's ball has left, keeping the order of the rest: a Pass or a refusal may meet it again when it next comes to it.</summary>
         private static void Forget(Missile missile, Wall wall)
         {
-            var touches = missile.wallTouches!;
-            var count = touches.Count;
-            for (var i = 0; i < count; i++)
+            var touch = TouchOf(missile, wall);
+            if (touch != null)
             {
-                if (Raw.At(touches, i).wall == wall)
-                {
-                    touches.RemoveAt(i);
-                    return;
-                }
+                Remove(missile.wallTouches!, touch);
             }
         }
 
@@ -1741,7 +1985,7 @@ namespace Moonwell.Engine
         }
     }
 
-    /// <summary>What the package keeps of a pair of a missile and a thing it checks: whether the ball touched the thing at the last check, whether a Pass is inside it, when it last met it, the thing's size, and, for a unit, its place at the last check for its velocity. Made when they meet; the pair's Data, or for a wall, kept in the missile's list while the ball is at it.</summary>
+    /// <summary>What the package keeps of a pair of a missile and a thing it checks: whether the ball touched the thing at the last check, whether a Pass is inside it, when it last met it, the thing's size, and, for a unit, its place at the last check for its velocity. Made when they meet; the pair's Data, or for a wall, kept in the missile's list while the ball is at it. Two missiles keep one, which both sides' pairs share and both missiles list, until both pairs have parted.</summary>
     internal sealed class Touch
     {
         /// <summary>Whether the ball touched the thing at the last check.</summary>
@@ -1782,6 +2026,18 @@ namespace Moonwell.Engine
 
         /// <summary>For a wall: the walk down the walls that last met it, so it is met at most once a walk.</summary>
         public int round;
+
+        /// <summary>For two missiles: the one made first.</summary>
+        public Missile? early;
+
+        /// <summary>For two missiles: the one made after.</summary>
+        public Missile? late;
+
+        /// <summary>For two missiles: the earlier one's pair with the later, while it has one; an Interaction&lt;Missile, Missile&gt;.Pair kept as an Owner (see Pairing).</summary>
+        public Owner? earlyPair;
+
+        /// <summary>For two missiles: the later one's pair with the earlier, while it has one.</summary>
+        public Owner? latePair;
     }
 
     /// <summary>A missile's checks against units: the package starts it on a missile whose UnitContact is not None.</summary>
@@ -1862,10 +2118,20 @@ namespace Moonwell.Engine
     /// <summary>A missile's checks against other missiles: the package starts it on a missile whose MissileContact is not None. Of two missiles, the one made first checks the pair.</summary>
     internal sealed class MissileContacts : Interaction<Missile, Missile>
     {
-        /// <summary>Keeps what the pair needs.</summary>
+        /// <summary>Keeps what the pair needs: the one state the two missiles keep of each other, shared with the other side's pair.</summary>
         public override void OnMeet(Pair pair)
         {
-            pair.Data = Contacts.MetMissile();
+            pair.Data = Contacts.MetMissile(pair.Holder, pair.Other, pair);
+        }
+
+        /// <summary>Lets go of the shared state; once neither side holds it, it is dropped.</summary>
+        public override void OnPart(Pair pair)
+        {
+            var touch = pair.Data as Touch;
+            if (touch != null)
+            {
+                Contacts.PartedMissile(pair.Holder, touch);
+            }
         }
 
         /// <summary>Sweeps the two missiles' moves against each other, through the one made first; pauses or waits the pair as the check says.</summary>

@@ -60,6 +60,7 @@ namespace Moonwell.Engine
                 missile.lastX = start.X;
                 missile.lastY = start.Y;
                 missile.lastZ = missile.z;
+                missile.lastStep = Tracking.StepNow;
             }
 
             if (missile.resting)

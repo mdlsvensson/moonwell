@@ -204,6 +204,9 @@ namespace Moonwell
         /// <summary>What the package keeps of each wall its ball is touching or near, in the order first met; null until the first. A wall left behind is taken out.</summary>
         internal List<Touch>? wallTouches;
 
+        /// <summary>What it keeps with each other missile it is paired with, either side's, in the order they met; null until the first. Taken out once both sides have parted.</summary>
+        internal List<Touch>? meetTouches;
+
         /// <summary>Its number in the order missiles were made since the install, from 1: of two missiles, the one made first meets the other.</summary>
         internal int made;
 
@@ -218,6 +221,9 @@ namespace Moonwell
 
         /// <summary>Where the step's move began, its height.</summary>
         internal float lastZ;
+
+        /// <summary>The step of the cycle its move began at: one woken from rest keeps the step before, so two missiles' moves can be put in one time frame.</summary>
+        internal int lastStep;
 
         /// <summary>Where its flight or its contacts last put it, x: a check that finds it elsewhere knows its X, Y or Z was set from outside, and starts its sweep there instead of sweeping along the jump.</summary>
         internal float placedX;
@@ -258,12 +264,17 @@ namespace Moonwell
         /// <summary>The looping sounds on it, in the order added; null until the first. Moved with its effects.</summary>
         internal List<LoopingSound>? sounds;
 
-        /// <summary>The velocity along x, in game units a second.</summary>
+        /// <summary>The velocity along x, in game units a second. Set faster, the checks waiting on it look again at their next tick.</summary>
         [LocalSafe]
         public float VX
         {
             get { return vx; }
-            set { vx = value; }
+            set
+            {
+                var before = vx * vx + vy * vy + vz * vz;
+                vx = value;
+                Contacts.Quicker(this, before);
+            }
         }
 
         /// <summary>The velocity along y, in game units a second.</summary>
@@ -271,7 +282,12 @@ namespace Moonwell
         public float VY
         {
             get { return vy; }
-            set { vy = value; }
+            set
+            {
+                var before = vx * vx + vy * vy + vz * vz;
+                vy = value;
+                Contacts.Quicker(this, before);
+            }
         }
 
         /// <summary>The velocity along z, in game units a second; up is positive.</summary>
@@ -279,7 +295,12 @@ namespace Moonwell
         public float VZ
         {
             get { return vz; }
-            set { vz = value; }
+            set
+            {
+                var before = vx * vx + vy * vy + vz * vz;
+                vz = value;
+                Contacts.Quicker(this, before);
+            }
         }
 
         /// <summary>The velocity as a vector; a vector is a table, so code that runs every step on many missiles reads VX, VY and VZ. Setting it sets all three.</summary>
@@ -289,9 +310,11 @@ namespace Moonwell
             get { return new Vector3(vx, vy, vz); }
             set
             {
+                var before = vx * vx + vy * vy + vz * vz;
                 vx = value.X;
                 vy = value.Y;
                 vz = value.Z;
+                Contacts.Quicker(this, before);
             }
         }
 
@@ -303,7 +326,8 @@ namespace Moonwell
             set
             {
                 Dev.Check(value >= 0.0f, Names.NameOf(this) + ".Speed: must be 0 or more");
-                var now = Trig.Sqrt(vx * vx + vy * vy + vz * vz);
+                var before = vx * vx + vy * vy + vz * vz;
+                var now = Trig.Sqrt(before);
                 if (now > 0.0f)
                 {
                     var share = value / now;
@@ -317,6 +341,8 @@ namespace Moonwell
                     vy = 0.0f;
                     vz = 0.0f;
                 }
+
+                Contacts.Quicker(this, before);
             }
         }
 
@@ -448,7 +474,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>What it does on meeting a wall: None, the default, does not check walls at all; Stop and Pass as UnitContact; Bounce bounces off, keeping its Bounciness times the wall's; Slide loses the speed into the wall and slides along it, keeping the rest.</summary>
+        /// <summary>What it does on meeting a wall: None, the default, does not check walls at all; Stop and Pass as UnitContact; Bounce bounces off, keeping its Bounciness times the wall's; Slide bounces so until it meets the wall slower than 5, then loses the speed into it and slides along it, keeping the rest.</summary>
         [LocalSafe]
         public Contact WallContact
         {
@@ -700,6 +726,7 @@ namespace Moonwell
             lastX = x;
             lastY = y;
             lastZ = z;
+            lastStep = Tracking.StepNow;
             placedX = x;
             placedY = y;
             placedZ = z;

@@ -70,31 +70,41 @@ namespace Moonwell
             get { return y2 + Shift(false); }
         }
 
-        /// <summary>How tall it is above the ground under it; 0 for endless. A missile above it, or a pushed unit lifted above it, goes over.</summary>
+        /// <summary>How tall it is above the ground under it; 0 for endless. A missile above it, or a pushed unit lifted above it, goes over. It must be 0 or more.</summary>
         [LocalSafe]
         public float Height
         {
             get { return height; }
-            set { height = value; }
+            set
+            {
+                CheckHeight(value);
+                height = value;
+            }
         }
 
-        /// <summary>The share of a missile's own Bounciness a bounce off it keeps: the two multiplied. 1, the default, leaves the missile's as it is.</summary>
+        /// <summary>The share of a missile's own Bounciness a bounce off it keeps: the two multiplied. 1, the default, leaves the missile's as it is. It must be 0 or more.</summary>
         [LocalSafe]
         public float Bounciness
         {
             get { return bounciness; }
-            set { bounciness = value; }
+            set
+            {
+                CheckBounciness(value);
+                bounciness = value;
+            }
         }
 
         /// <summary>
         /// Makes a straight upright wall from (x1, y1) to (x2, y2), as tall as the height above the ground (0, the default,
         /// for endless), with the bounciness a bounce off it keeps of a missile's own (1 by default). It belongs to the owner
-        /// given, else to the current owner, and ends with it. The ends must differ, and the height must be 0 or more.
+        /// given, else to the current owner, and ends with it. The ends must differ, and the height and the bounciness must be
+        /// 0 or more.
         /// </summary>
         public static Wall Create(float x1, float y1, float x2, float y2, float height = 0f, float bounciness = 1f, Owner? owner = null)
         {
             Dev.Check(x1 != x2 || y1 != y2, "Wall.Create: the two ends must differ");
-            Dev.Check(height >= 0.0f, "Wall.Create: the height must be 0 or more");
+            CheckHeight(height);
+            CheckBounciness(bounciness);
             Physics.EnsureInstalled();
             var wall = new Wall();
             wall.x1 = x1;
@@ -105,6 +115,18 @@ namespace Moonwell
             wall.bounciness = bounciness;
             Gizmo.Create(wall, (x1 + x2) * 0.5f, (y1 + y2) * 0.5f, null, owner);
             return wall;
+        }
+
+        /// <summary>Fails in a development build for a height below 0, which would read as endless.</summary>
+        private static void CheckHeight(float value)
+        {
+            Dev.Check(value >= 0.0f, "Wall.Height: must be 0 or more");
+        }
+
+        /// <summary>Fails in a development build for a bounciness below 0.</summary>
+        private static void CheckBounciness(float value)
+        {
+            Dev.Check(value >= 0.0f, "Wall.Bounciness: must be 0 or more");
         }
 
         /// <summary>How far its place has moved since it was made, along x or along y.</summary>
