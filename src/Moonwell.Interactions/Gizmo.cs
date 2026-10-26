@@ -85,7 +85,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Places a gizmo of the map at a place for a player, and returns it. It belongs to the owner, or else the current owner, and ends with it; the player is Neutral Passive unless given. OnCreated runs with the gizmo as the current owner.</summary>
+        /// <summary>Places a gizmo of the map at a place for a player, and returns it. It belongs to the owner, or else the current owner (a missile: the game), and ends with it; the player is Neutral Passive unless given. OnCreated runs with the gizmo as the current owner.</summary>
         public static T Create<T>(T gizmo, float x, float y, Player? player = null, Owner? owner = null)
             where T : Gizmo
         {
@@ -93,7 +93,12 @@ namespace Moonwell
             Interactions.EnsureInstalled();
             gizmo.player = player ?? Player.NeutralPassive;
             gizmo.entry = Tracking.Begin(gizmo, Tracking.GizmoKind, x, y);
-            (owner ?? Owner.Current).Adopt(gizmo);
+            (owner ?? gizmo.DefaultOwner()).Adopt(gizmo);
+            if (!gizmo.HasEnded)
+            {
+                gizmo.Placed();
+            }
+
             if (!gizmo.HasEnded)
             {
                 var starting = gizmo.Components;
@@ -129,6 +134,17 @@ namespace Moonwell
         public void Remove()
         {
             End();
+        }
+
+        /// <summary>The owner Create adopts the gizmo into when it is given none: the current owner. A package's kind of gizmo may choose another, as a missile belongs to the game.</summary>
+        internal virtual Owner DefaultOwner()
+        {
+            return Owner.Current;
+        }
+
+        /// <summary>Runs in Create once the gizmo has its entry and its owner, before its components are added and OnCreated runs; nothing for a plain gizmo. A package's kind of gizmo starts its own part here, as a missile joins the physics pass.</summary>
+        internal virtual void Placed()
+        {
         }
 
         /// <summary>Runs on its own at every Tick, in the cycle's first pass, before the interactions check what is near.</summary>

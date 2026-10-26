@@ -88,12 +88,14 @@ namespace Moonwell.Engine
             var maxDistance = missile.maxDistance;
             if ((duration > 0.0f && missile.flown >= duration - step * Forgiven) || (maxDistance > 0.0f && missile.travelled >= maxDistance - Trig.Sqrt(vx * vx + vy * vy + vz * vz) * step * Forgiven))
             {
+                Place(missile, world, x, y, z);
                 Expire(missile);
                 return;
             }
 
             if (x < Pass.minX || x > Pass.maxX || y < Pass.minY || y > Pass.maxY || z < Lowest || z > Highest)
             {
+                Place(missile, world, x, y, z);
                 missile.End();
                 return;
             }
@@ -169,12 +171,17 @@ namespace Moonwell.Engine
         /// <summary>
         /// Sets a missile's velocity at its Speed toward a mark a way off. With an Arc it flies along the ground at its Speed
         /// and is given the Gravity and lift that peak at Arc times the distance above the line to the mark and land on it,
-        /// as the game's Missile Arc; without one it flies straight at the mark. A mark at its own place sends it level along
+        /// as the game's Missile Arc (an Arc with no Speed fails in a development build); without one it flies straight at
+        /// the mark. A mark at its own place sends it level along
         /// the facing, in degrees.
         /// </summary>
         private static void Aim(Missile missile, float dx, float dy, float dz, float facing)
         {
             var speed = missile.Speed;
+            if (missile.arc > 0.0f && speed <= 0.0f)
+            {
+                Dev.Check(false, Names.NameOf(missile) + ".Fire: an Arc needs a Speed above 0, the speed it flies along the ground at");
+            }
             var distance = Trig.Sqrt(dx * dx + dy * dy);
             if (distance < SamePlace)
             {

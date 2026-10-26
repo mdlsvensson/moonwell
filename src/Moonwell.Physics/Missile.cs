@@ -104,6 +104,9 @@ namespace Moonwell
         /// <summary>Whether the effects have been made: from Create until the end.</summary>
         internal bool shown;
 
+        /// <summary>Whether Missile.Create gave the height; a missile placed through Gizmo.Create starts at its LaunchHeight above the ground.</summary>
+        internal bool heightGiven;
+
         /// <summary>The models of the effects added by AddEffect, in the order added.</summary>
         internal List<string>? extraModels;
 
@@ -447,16 +450,15 @@ namespace Moonwell
             get { return look; }
         }
 
-        /// <summary>Places a missile of the map at a place and height, still unless its velocity is set, for a player, and returns it. It belongs to the owner given, else to the game, not to the current owner, so a missile made in a spell's reaction outlives the cast. The player is Neutral Passive unless given. OnCreated runs with the missile as the current owner.</summary>
+        /// <summary>Places a missile of the map at a place and height, still unless its velocity is set, for a player, and returns it. It belongs to the owner given, else to the game, not to the current owner, so a missile made in a spell's reaction outlives the cast. The player is Neutral Passive unless given. OnCreated runs with the missile as the current owner. Placed with Gizmo.Create, or with no height, a missile is the same, at its LaunchHeight above the ground.</summary>
         public static T Create<T>(T missile, float x, float y, float z, Player? player = null, Owner? owner = null)
             where T : Missile
         {
             Dev.Check(missile.entry == null, Names.NameOf(missile) + ".Create: the missile has been created already");
             Physics.EnsureInstalled();
             missile.z = z;
-            Flight.Show(missile, x, y);
-            Pass.Add(missile);
-            Gizmo.Create(missile, x, y, player, owner ?? Game.Instance);
+            missile.heightGiven = true;
+            Gizmo.Create(missile, x, y, player, owner);
             return missile;
         }
 
@@ -511,6 +513,27 @@ namespace Moonwell
         /// <summary>Runs when its Duration or MaxDistance has run out, just before it ends, with the missile as the current owner.</summary>
         public virtual void OnExpire()
         {
+        }
+
+        /// <summary>A missile given no owner belongs to the game, not to the current owner, so one made in a spell's reaction outlives the cast (decision 59).</summary>
+        internal override Owner DefaultOwner()
+        {
+            return Game.Instance;
+        }
+
+        /// <summary>Joins the physics pass and makes its effects, as Gizmo.Create places it: at the height Missile.Create gave, else at its LaunchHeight above the ground.</summary>
+        internal override void Placed()
+        {
+            Physics.EnsureInstalled();
+            var x = entry!.X;
+            var y = entry.Y;
+            if (!heightGiven)
+            {
+                z = Flight.Ground(x, y) + launchHeight;
+            }
+
+            Flight.Show(this, x, y);
+            Pass.Add(this);
         }
 
         /// <summary>Destroys its effects once it and its components have ended, and tells the pass it is gone.</summary>

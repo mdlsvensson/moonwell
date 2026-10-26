@@ -184,6 +184,11 @@ namespace Moonwell.Testing
             Within(280.0f, peak, 2.0f, "the peak");
             Within(800.0f, landX, 2.0f, "where it lands: x");
             Within(0.0f, landY, 2.0f, "where it lands: y");
+#if DEBUG
+            var still = new Dart();
+            still.Arc = 0.35f;
+            Expect.Throws<MoonwellException>(() => source.Fire(still, 800.0f, 0.0f), "an Arc with no Speed fails in a development build");
+#endif
         }
 
         /// <summary>Fired with no arc at a unit, it aims at the unit's middle, half its height of 4 times its collision size above the ground plus its fly height, and flies on past it.</summary>
@@ -266,15 +271,21 @@ namespace Moonwell.Testing
             Within(260.0f, top, 0.01f, "it went over the hilltop at 200");
         }
 
-        /// <summary>With Duration 1 it expires after 32 steps: OnExpire once, with the missile as the current owner, then it ends.</summary>
+        /// <summary>With Duration 1 it expires after 32 steps: OnExpire once, with the missile as the current owner and its effect drawn at its last place, then it ends.</summary>
         public static void Duration(FakeWorld world)
         {
-            Fresh();
+            var fake = Fresh();
             var dart = new Dart();
+            dart.Model = "dart.mdl";
             dart.Speed = 100.0f;
             dart.Duration = 1.0f;
             var endedInExpire = true;
-            dart.Expiring = () => { endedInExpire = dart.HasEnded; };
+            var drawnX = -1.0f;
+            dart.Expiring = () =>
+            {
+                endedInExpire = dart.HasEnded;
+                drawnX = fake.Places[dart.Effect!][0];
+            };
             Missile.Create(dart, 0.0f, 0.0f, 100.0f);
             Steps(world, 31);
             Expect.Equal(0, dart.Expired, "no expiry before a second");
@@ -282,6 +293,8 @@ namespace Moonwell.Testing
             Steps(world, 1);
             Expect.Equal(1, dart.Expired, "OnExpire after a second");
             Expect.True(!endedInExpire, "it has not ended inside OnExpire");
+            Within(100.0f, dart.X, 0.01f, "it moved this step before it expired");
+            Within(dart.X, drawnX, 0.001f, "inside OnExpire its effect is drawn where it is");
             Expect.Same(dart, dart.ExpiredWith, "OnExpire runs with the missile");
             Expect.True(dart.HasEnded, "then it ends");
             Steps(world, 4);
@@ -313,6 +326,7 @@ namespace Moonwell.Testing
             var fake = Fresh();
             fake.MaxX = 1000.0f;
             var east = new Dart();
+            east.Model = "dart.mdl";
             east.Speed = 900.0f;
             Missile.Create(east, 900.0f, 0.0f, 100.0f);
             var up = new Dart();
@@ -332,6 +346,7 @@ namespace Moonwell.Testing
             Expect.True(!east.HasEnded, "inside the edge after 3 steps, at 984");
             Steps(world, 1);
             Expect.True(east.HasEnded, "past the edge at 1,012 it ends");
+            Within(1012.5f, fake.Places[fake.Removed[0]][0], 0.001f, "its effect was drawn at its last place before it was destroyed");
             Expect.Equal(0, east.Expired + up.Expired + down.Expired, "no OnExpire");
             Expect.True(!inside.HasEnded, "the one inside flies on");
             Expect.Equal(1, fake.BoundsReads, "the bounds are read once");
@@ -507,6 +522,74 @@ namespace Moonwell.Testing
             Missile.Create(plain, 0.0f, 0.0f, 0.0f);
             Expect.True(plain.Effect == null, "no model, no effect");
             Expect.Equal(0, fake.Effects.Count, "none made");
+        }
+
+        /// <summary>A missile placed through Gizmo.Create, or Missile.Create with no height, is a missile all the same: it belongs to the game, starts at its LaunchHeight above the ground, has its effect, and moves.</summary>
+        public static void GizmoCreate(FakeWorld world)
+        {
+            var fake = Fresh();
+            var log = new List<string>();
+            var owner = new TestOwner("owner", log);
+            var dart = new Dart();
+            dart.Model = "dart.mdl";
+            dart.Speed = 320.0f;
+            owner.Run(() => Gizmo.Create(dart, 0.0f, 0.0f));
+            Expect.Same(Game.Instance, dart.Owner, "it belongs to the game, not the current owner");
+            Within(60.0f, dart.Z, 0.001f, "its LaunchHeight above the ground");
+            Expect.True(dart.Effect != null, "it has its effect");
+            Within(60.0f, fake.Places[dart.Effect!][2], 0.001f, "drawn at its height");
+            Steps(world, 1);
+            Within(10.0f, dart.X, 0.001f, "it moves");
+            Within(10.0f, fake.Places[dart.Effect!][0], 0.001f, "and its effect with it");
+            var low = new Dart();
+            low.Speed = 320.0f;
+            low.LaunchHeight = 20.0f;
+            Missile.Create(low, 5.0f, 5.0f);
+            Expect.Same(Game.Instance, low.Owner, "with no height: the game's");
+            Within(20.0f, low.Z, 0.001f, "with no height: its LaunchHeight above the ground");
+            Steps(world, 1);
+            Within(15.0f, low.X, 0.001f, "with no height: it moves");
+            owner.End();
+            Expect.True(!dart.HasEnded, "the owner ending does not end it");
+        }
+
+        /// <summary>Missile A's OnExpire ends missile B, made after it and expiring in the same step: B gets no OnExpire and no move after, and its effect is destroyed once.</summary>
+        public static void EndMidPass(FakeWorld world)
+        {
+            var fake = Fresh();
+            var first = new Dart();
+            first.Speed = 100.0f;
+            first.Duration = 1.0f;
+            var second = new Dart();
+            second.Model = "dart.mdl";
+            second.VY = 100.0f;
+            second.Duration = 1.0f;
+            first.Expiring = () => second.End();
+            Missile.Create(first, 0.0f, 0.0f, 100.0f);
+            Missile.Create(second, 0.0f, 0.0f, 100.0f);
+            var look = second.Effect!;
+            Steps(world, 31);
+            var lastY = second.Y;
+            var placed = fake.Places[look][1];
+            Steps(world, 1);
+            Expect.Equal(1, first.Expired, "A expired");
+            Expect.True(first.HasEnded && second.HasEnded, "both ended");
+            Expect.Equal(0, second.Expired, "B gets no OnExpire");
+            Within(lastY, second.Y, 0.001f, "B did not move after it ended");
+            Within(placed, fake.Places[look][1], 0.001f, "nor did its effect");
+            var removed = 0;
+            for (var i = 0; i < fake.Removed.Count; i++)
+            {
+                if (fake.Removed[i] == look)
+                {
+                    removed++;
+                }
+            }
+
+            Expect.Equal(1, removed, "B's effect destroyed once");
+            Steps(world, 4);
+            Expect.Equal(0, second.Expired, "no OnExpire after");
+            Expect.Equal(1, first.Expired, "A's OnExpire once");
         }
     }
 }

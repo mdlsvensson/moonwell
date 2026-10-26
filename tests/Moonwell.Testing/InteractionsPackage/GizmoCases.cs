@@ -51,6 +51,22 @@ namespace Moonwell.Testing
             Expect.Equal(1, inside.Created, "and for the one made inside Run");
         }
 
+        /// <summary>A plain gizmo given no owner is adopted by the current owner: the one running code, else the root.</summary>
+        public static void DefaultOwner(FakeWorld world)
+        {
+            Fresh();
+            var log = new List<string>();
+            var owner = new TestOwner("owner", log);
+            var inside = new Well();
+            owner.Run(() => Gizmo.Create(inside, 0.0f, 0.0f));
+            Expect.Same(owner, inside.Owner, "inside Run: the owner running the code");
+            var outside = Gizmo.Create(new Well(), 0.0f, 0.0f);
+            Expect.Same(Runtime.Root, outside.Owner, "outside Run: the root");
+            owner.End();
+            Expect.True(inside.HasEnded, "it ends with that owner");
+            Expect.True(!outside.HasEnded, "the root's is left");
+        }
+
         /// <summary>OnCreated and OnLeave run with the gizmo as the current owner.</summary>
         public static void ReactionOwner(FakeWorld world)
         {

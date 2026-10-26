@@ -37,6 +37,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.grid.settings-checked", Run = InteractionsGridCases.SettingsChecked });
             list.Add(new Case { Name = "interactions.gizmo.create", Run = GizmoCases.Create });
             list.Add(new Case { Name = "interactions.gizmo.reaction-owner", Run = GizmoCases.ReactionOwner });
+            list.Add(new Case { Name = "interactions.gizmo.default-owner", Run = GizmoCases.DefaultOwner });
             list.Add(new Case { Name = "interactions.gizmo.tick", Run = GizmoCases.Tick });
             list.Add(new Case { Name = "interactions.gizmo.tick-rounding", Run = GizmoCases.TickRounding });
             list.Add(new Case { Name = "interactions.gizmo.no-tick", Run = GizmoCases.NoTick });
@@ -168,6 +169,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "flight.facing", Run = FlightCases.Facing });
             list.Add(new Case { Name = "flight.fire-at-self", Run = FlightCases.FireAtSelf });
             list.Add(new Case { Name = "flight.effect", Run = FlightCases.Effects });
+            list.Add(new Case { Name = "flight.gizmo-create", Run = FlightCases.GizmoCreate });
+            list.Add(new Case { Name = "flight.end-mid-pass", Run = FlightCases.EndMidPass });
         }
 
         /// <summary>Adds the areas package's cases.</summary>
