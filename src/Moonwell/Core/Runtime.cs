@@ -40,6 +40,10 @@ namespace Moonwell
             KnownDestructables.Reset();
             ObjectTypes.Reset();
             Owner.current = null;
+#if DEBUG
+            DebugSession.Reset();
+            DebugViews.Reset();
+#endif
             Timer.Every(0.25f, Sweep.Run, Game.Instance);
         }
 
@@ -53,6 +57,9 @@ namespace Moonwell
         public static void Start(Action setup)
         {
             Reset(new NativeWorld());
+#if DEBUG
+            DebugSession.Install(new NativeDebugWorld((NativeWorld)World));
+#endif
             NativeWorld.Later(() => Begin(setup));
         }
 

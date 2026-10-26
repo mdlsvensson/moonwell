@@ -25,6 +25,7 @@ namespace Moonwell.Testing
         /// <summary>Adds the debug mode's cases; they exist only in a development build, as the debug mode does.</summary>
         private static void AddDebug(List<Case> list)
         {
+            // Every case here must be named debug.*: the release Lua test leaves those out of its count by that prefix.
 #if DEBUG
             list.Add(new Case { Name = "debug.clock.halt", Run = ClockCases.Halt });
             list.Add(new Case { Name = "debug.clock.step-advances", Run = ClockCases.StepAdvances });
@@ -33,6 +34,23 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "debug.clock.timer-while-halted", Run = ClockCases.TimerWhileHalted });
             list.Add(new Case { Name = "debug.clock.halt-inside-timer", Run = ClockCases.HaltInsideTimer });
             list.Add(new Case { Name = "debug.clock.catchup", Run = ClockCases.Catchup });
+            list.Add(new Case { Name = "debug.session.off-at-start", Run = SessionCases.OffAtStart });
+            list.Add(new Case { Name = "debug.session.toggle", Run = SessionCases.Toggle });
+            list.Add(new Case { Name = "debug.session.halt-holds", Run = SessionCases.HaltHolds });
+            list.Add(new Case { Name = "debug.session.halt-free", Run = SessionCases.HaltFree });
+            list.Add(new Case { Name = "debug.session.map-paused-stays", Run = SessionCases.MapPausedStays });
+            list.Add(new Case { Name = "debug.session.new-unit-held", Run = SessionCases.NewUnitHeld });
+            list.Add(new Case { Name = "debug.session.step-free", Run = SessionCases.StepFree });
+            list.Add(new Case { Name = "debug.session.step-held", Run = SessionCases.StepHeld });
+            list.Add(new Case { Name = "debug.session.step-dropped", Run = SessionCases.StepDropped });
+            list.Add(new Case { Name = "debug.session.resume-mid-step", Run = SessionCases.ResumeMidStep });
+            list.Add(new Case { Name = "debug.session.speeds", Run = SessionCases.Speeds });
+            list.Add(new Case { Name = "debug.session.step-count", Run = SessionCases.StepCount });
+            list.Add(new Case { Name = "debug.session.off-restores", Run = SessionCases.OffRestores });
+            list.Add(new Case { Name = "debug.session.select", Run = SessionCases.Select });
+            list.Add(new Case { Name = "debug.session.select-next", Run = SessionCases.SelectNext });
+            list.Add(new Case { Name = "debug.session.select-nothing", Run = SessionCases.SelectNothing });
+            list.Add(new Case { Name = "debug.session.facade", Run = SessionCases.Facade });
 #endif
         }
 

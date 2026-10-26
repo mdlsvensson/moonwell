@@ -32,7 +32,8 @@ namespace Moonwell
 
         /// <summary>
         /// The game wait for a wake the seconds of Moonwell's time from now. False while halted: no wake is armed, and the
-        /// caller of Resume, SetSpeed or Advance re-arms the request (Scheduler.Rearm).
+        /// caller of Halt, Resume, SetSpeed or Advance re-arms the request (Scheduler.Rearm); after Halt that cancels the game
+        /// wake armed before it.
         /// </summary>
         internal bool Arm(float seconds, out float gameSeconds)
         {
