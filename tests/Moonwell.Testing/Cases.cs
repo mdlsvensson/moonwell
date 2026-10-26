@@ -17,6 +17,7 @@ namespace Moonwell.Testing
             AddInteractions(list);
             AddTerrain(list);
             AddAreas(list);
+            AddInput(list);
             return list;
         }
 
@@ -164,6 +165,24 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "areas.area.hidden", Run = AreaCases.Hidden });
             list.Add(new Case { Name = "areas.area.hidden-then-gone", Run = AreaCases.HiddenThenGone });
             list.Add(new Case { Name = "areas.area.hidden-at-start", Run = AreaCases.HiddenAtStart });
+        }
+
+        /// <summary>Adds the input package's cases.</summary>
+        private static void AddInput(List<Case> list)
+        {
+            list.Add(new Case { Name = "input.mouse.moved", Run = MouseCases.Moved });
+            list.Add(new Case { Name = "input.mouse.not-a-place", Run = MouseCases.NotAPlace });
+            list.Add(new Case { Name = "input.mouse.corner-of-the-world", Run = MouseCases.CornerOfTheWorld });
+            list.Add(new Case { Name = "input.mouse.first-not-a-place", Run = MouseCases.FirstNotAPlace });
+            list.Add(new Case { Name = "input.mouse.buttons", Run = MouseCases.Buttons });
+            list.Add(new Case { Name = "input.mouse.order", Run = MouseCases.Order });
+            list.Add(new Case { Name = "input.mouse.only-written", Run = MouseCases.OnlyWritten });
+            list.Add(new Case { Name = "input.mouse.throwing", Run = MouseCases.Throwing });
+            list.Add(new Case { Name = "input.mouse.computer-and-left", Run = MouseCases.ComputerAndLeft });
+            list.Add(new Case { Name = "input.mouse.no-mouse", Run = MouseCases.NoMouse });
+            list.Add(new Case { Name = "input.mouse.per-slot", Run = MouseCases.PerSlot });
+            list.Add(new Case { Name = "input.mouse.local", Run = MouseCases.Local });
+            list.Add(new Case { Name = "input.mouse.setters", Run = MouseCases.Setters });
         }
 
         /// <summary>Adds the terrain package's cases.</summary>

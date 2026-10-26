@@ -8,6 +8,7 @@
     <Project Path="src/Moonwell.Build/Moonwell.Build.csproj" />
     <Project Path="src/Moonwell.Cli/Moonwell.Cli.csproj" />
     <Project Path="src/Moonwell.Damage/Moonwell.Damage.csproj" />
+    <Project Path="src/Moonwell.Input/Moonwell.Input.csproj" />
     <Project Path="src/Moonwell.Interactions/Moonwell.Interactions.csproj" />
     <Project Path="src/Moonwell.Maths/Moonwell.Maths.csproj" />
     <Project Path="src/Moonwell.Natives/Moonwell.Natives.csproj" />
