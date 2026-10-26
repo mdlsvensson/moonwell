@@ -1,6 +1,9 @@
+using System;
+using System.Collections.Generic;
+
 namespace Moonwell.Testing
 {
-    /// <summary>Cases that check the map class: its components start in list order, they are not added before the start, and its settings default to empty.</summary>
+    /// <summary>Cases that check the map class: its components start in list order, they are not added before the start, and its settings default to empty; and the runtime's begin, which takes in what the map placed.</summary>
     public static class MapCases
     {
         /// <summary>Install adds the map's components to the game in list order, and each one's OnAdded runs once.</summary>
@@ -69,6 +72,63 @@ namespace Moonwell.Testing
             world.LastFacing = 0f;
             Unit.Create(ObjectTypes.FourCC("h0df"), Player.One, 0f, 0f, owner: Game.Instance);
             Expect.True(world.LastFacing == 270f, "the facing of Create with an owner");
+        }
+
+        /// <summary>
+        /// Runtime.Begin, which Start runs on the game's first timer: after the setup has registered the types, every unit already
+        /// in the world is taken in, and each item and destructable of a registered type, and only then does the game start.
+        /// </summary>
+        public static void BeginTakesInPlaced(FakeWorld world)
+        {
+            var striker = world.NewUnit(ObjectTypes.FourCC("H001"), slot: 0);
+            var footman = world.NewUnit(ObjectTypes.FourCC("hfoo"), slot: 1);
+            var orb = world.NewItem(ObjectTypes.FourCC("I000"));
+            var claws = world.NewItem(ObjectTypes.FourCC("ratc"));
+            var gate = world.NewDestructable(ObjectTypes.FourCC("B000"));
+            var tree = world.NewDestructable(ObjectTypes.FourCC("LTlt"));
+            world.PlacedUnits.Add(striker);
+            world.PlacedUnits.Add(footman);
+            world.PlacedItems.Add(orb);
+            world.PlacedItems.Add(claws);
+            world.PlacedDestructables.Add(gate);
+            world.PlacedDestructables.Add(tree);
+            var atStart = new List<string>();
+            Runtime.Begin(() =>
+            {
+                ObjectTypes.Unit(ObjectTypes.FourCC("H001"), () => new Striker());
+                ObjectTypes.Item(ObjectTypes.FourCC("I000"), () => new TestOrb());
+                ObjectTypes.Destructable(ObjectTypes.FourCC("B000"), () => new TestGate());
+                Game.Instance.Add(new StartRunner(() =>
+                {
+                    atStart.Add((KnownUnits.Find(striker) != null) + " " + (KnownItems.Find(orb) != null) + " " + (KnownDestructables.Find(gate) != null));
+                }));
+            });
+            Expect.True(KnownUnits.Find(striker) is Striker, "the placed unit of a registered type is taken in as its class");
+            Expect.True(KnownUnits.Find(footman) != null, "a placed unit of no registered type is taken in too");
+            Expect.True(KnownItems.Find(orb) is TestOrb, "the placed item of a registered type is taken in as its class");
+            Expect.True(KnownItems.Find(claws) == null, "a placed item of no registered type is not");
+            Expect.True(KnownDestructables.Find(gate) is TestGate, "the placed destructable of a registered type is taken in as its class");
+            Expect.True(KnownDestructables.Find(tree) == null, "a placed destructable of no registered type is not");
+            Expect.Equal(1, atStart.Count, "the runs of OnGameStart");
+            Expect.Equal("True True True", atStart[0], "what OnGameStart found taken in: the unit, the item, the destructable");
+        }
+
+        /// <summary>A game component that runs an action at the game's start.</summary>
+        private sealed class StartRunner : GameComponent
+        {
+            private readonly Action run;
+
+            /// <summary>Makes a component that runs the action at the game's start.</summary>
+            public StartRunner(Action run)
+            {
+                this.run = run;
+            }
+
+            /// <summary>Runs the action.</summary>
+            public override void OnGameStart()
+            {
+                run();
+            }
         }
 
         /// <summary>Right after a map is constructed, the game has no components and no component's OnAdded has run.</summary>

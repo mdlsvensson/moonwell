@@ -413,6 +413,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "map.components-not-added-early", Run = MapCases.ComponentsNotAddedEarly });
             list.Add(new Case { Name = "map.components-assigned", Run = MapCases.ComponentsAssigned });
             list.Add(new Case { Name = "map.components-add-many", Run = MapCases.ComponentsAddMany });
+            list.Add(new Case { Name = "map.begin-takes-in-placed", Run = MapCases.BeginTakesInPlaced });
             list.Add(new Case { Name = "units.subclass-assigning-drops-parent", Run = MapCases.SubclassAssigningDropsParent });
             list.Add(new Case { Name = "units.subclass-add-many-keeps-parent", Run = MapCases.SubclassAddManyKeepsParent });
             list.Add(new Case { Name = "units.create-default-facing", Run = MapCases.CreateDefaultFacing });

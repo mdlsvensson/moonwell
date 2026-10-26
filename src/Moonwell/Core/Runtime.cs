@@ -77,8 +77,8 @@ namespace Moonwell
             Events.Need(Hook.OnPickedUp | Hook.OnDropped);
         }
 
-        /// <summary>Runs the setup, then takes in what is already in the world and starts the game's components.</summary>
-        private static void Begin(Action setup)
+        /// <summary>Runs the setup, then takes in what is already in the world and starts the game's components; internal for the cases.</summary>
+        internal static void Begin(Action setup)
         {
             ListenForCarriers();
             var previous = Owner.current;
