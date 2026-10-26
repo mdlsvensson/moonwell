@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using CSharpLua;
-using Microsoft.CodeAnalysis;
 using Moonwell.Build;
 using War3Net.Build;
-using War3Net.Build.Extensions;
 
 namespace Moonwell.Lua.Tests;
 
@@ -17,46 +14,38 @@ internal static class LuaScript
 
     public static string RepoRoot => Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
 
-    public static string Compile(string csproj)
+    /// <summary>
+    /// Compiles a project as a map build compiles a map without Moonwell.Objects (LuaCompiler.Compile, as MapBuild calls it): a
+    /// copy of the project with the test map is a map project, whose files are marked for the line table (MarkedProject,
+    /// LineMarks) and compiled by CSharp.lua with DEBUG and MOONWELL_LUA for a development build, MOONWELL_LUA alone and no
+    /// comments for a release build; the script is linked with CSharp.lua's core and the Lua that Moonwell.Natives.dll and
+    /// Moonwell.dll carry (ScriptLibraries), trimmed, and given its line table. What a map build adds besides (the map's entry,
+    /// its objects, the placed things) is no part of the cases.
+    /// </summary>
+    public static string Compile(string csproj, bool release)
     {
-        var map = War3Net.Build.Map.Open(Path.Combine(RepoRoot, "tests", "Moonwell.Lua.Tests", "map"), MapFiles.All & ~MapFiles.Triggers & ~MapFiles.CustomTextTriggers);
         var outputFolder = Path.Combine(Path.GetTempPath(), "moonwell-lua", Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(outputFolder);
-        var copy = Rewritten(csproj, Path.Combine(outputFolder, "project"));
-        var compiler = new Compiler(copy, outputFolder, string.Empty, null, null, string.Empty, string.Empty, false, null, string.Empty)
+        var folder = Path.Combine(outputFolder, "project");
+        Rewritten(csproj, folder);
+        var mapFolder = Path.Combine(folder, "map");
+        Directory.CreateDirectory(mapFolder);
+        foreach (var file in Directory.EnumerateFiles(Path.Combine(RepoRoot, "tests", "Moonwell.Lua.Tests", "map")))
         {
-            IsExportMetadata = false,
-            IsModule = false,
-            IsInlineSimpleProperty = false,
-            IsPreventDebugObject = true,
-            IsCommentsDisabled = false,
-        };
-
-        var coreSystem = CSharpLua.CoreSystem.CoreSystemProvider.GetCoreSystemFiles()
-            .Select(f => Path.Combine(AppContext.BaseDirectory, f))
-            .ToList();
-        coreSystem.Add(Path.Combine(RepoRoot, "src", "Moonwell.Natives", "Generated", "types.lua"));
-        var moonwell = Path.Combine(RepoRoot, "src", "Moonwell", "moonwell.lua");
-        if (File.Exists(moonwell))
-        {
-            coreSystem.Add(moonwell);
+            File.Copy(file, Path.Combine(mapFolder, Path.GetFileName(file)));
         }
 
-        var scriptBuilder = new MapScriptBuilder(triggerData: null);
-        scriptBuilder.SetDefaultOptionsForCSharpLua();
-        var result = map.CompileScript(compiler, scriptBuilder, coreSystem);
-        if (!result.Success)
-        {
-            var errors = result.Diagnostics
-                .Where(d => d.Severity == DiagnosticSeverity.Error)
-                .Select(d => d.ToString());
-            throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
-        }
+        var project = MapProject.Find(folder);
+        var map = War3Net.Build.Map.Open(project.MapFolder, MapFiles.All & ~MapFiles.Triggers & ~MapFiles.CustomTextTriggers);
+
+        // The libraries the script is linked with are read from beside the project's assembly, as a map build reads them from
+        // beside the map's: here the ones this test was built with.
+        var assembly = Path.Combine(AppContext.BaseDirectory, Path.GetFileNameWithoutExtension(csproj) + ".dll");
+        var script = LuaCompiler.Compile(project, map, assembly, release);
 
         // Kept next to the project copy, so a Lua error naming a line of the script can be looked up.
-        File.WriteAllText(Path.Combine(outputFolder, "script.lua"), map.Script);
+        File.WriteAllText(Path.Combine(outputFolder, "script.lua"), script);
 
-        return map.Script;
+        return script;
     }
 
     // A copy of the project with its project references made absolute; the projects it references are compiled as they are,
@@ -102,6 +91,10 @@ internal static class LuaScript
         lua.DoString("GetCameraMargin = function() return 0.0 end");
         lua.DoString("setmetatable(_G, { __index = function(_, name) if name ~= 'debug' then return function() return nil end end end })");
         lua.DoString(script);
+
+        // The cases' logged errors are compared with .NET's, which have no C# location: the line table is emptied, so an error's
+        // location is still looked for and none is found. ErrorLinesTests (Moonwell.Build.Tests) checks the locations in a built map.
+        lua.DoString("MoonwellLines = { files = {}, map = \"\" }");
         lua.DoString("main()");
         return output;
     }
