@@ -15,7 +15,7 @@ namespace Moonwell
     /// </summary>
     public static class Find
     {
-        /// <summary>The entries of the cells a search looks in. One list is shared: a search adds its own candidates at the end and takes them off again when it is done, so a Find from inside a filter or a reaction, while an outer search walks its candidates, never changes what the outer one walks. An interaction's check reads it here rather than through Candidates.</summary>
+        /// <summary>The entries of the cells a search looks in. One list is shared: a search adds its own candidates at the end and takes them off again when it is done, so a Find from inside a filter or a reaction, while an outer search walks its candidates, never changes what the outer one walks. An interaction's check adds its own at the end too, and takes them off with Release as a search does.</summary>
         internal static readonly List<Entry> candidates = new List<Entry>();
 
         /// <summary>The squared distances of the results a Closest search has kept, in step with its results. Shared in the same way as the candidates.</summary>
@@ -458,12 +458,6 @@ namespace Moonwell
             where T : Actor
         {
             return Closest<T>(center.X, center.Y, count, maxRange, results, where);
-        }
-
-        /// <summary>The shared list of candidates, for an interaction's check, which adds its own at the end and takes them off with Release as a search does.</summary>
-        internal static List<Entry> Candidates
-        {
-            get { return candidates; }
         }
 
         /// <summary>What a search is looking at now: how many candidates and squared distances the searches that are running hold. It is 0 whenever no search is running, however the searches ended.</summary>
