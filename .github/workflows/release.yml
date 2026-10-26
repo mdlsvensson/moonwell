@@ -46,7 +46,7 @@ jobs:
         run: |
           dotnet pack Moonwell.slnx -c Release -o feed
           $packages = @(Get-ChildItem feed -Filter *.nupkg)
-          if ($packages.Count -ne 9) { throw "Pack made $($packages.Count) packages, not 9" }
+          if ($packages.Count -ne 11) { throw "Pack made $($packages.Count) packages, not 11" }
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:

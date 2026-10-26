@@ -53,6 +53,30 @@ namespace Moonwell.Build
         }
 
         /// <summary>
+        /// Whether a built assembly has a type reference to a type, read from its metadata without loading it. The compiler keeps a
+        /// reference for each type the code names, calls a member of, implements or has in a signature it calls.
+        /// </summary>
+        /// <param name="assemblyPath">The map's built assembly.</param>
+        /// <param name="ns">The namespace of the type, such as <c>Moonwell</c>.</param>
+        /// <param name="name">The name of the type, such as <c>Mouse</c>.</param>
+        public static bool ReferencesType(string assemblyPath, string ns, string name)
+        {
+            using var stream = File.OpenRead(assemblyPath);
+            using var pe = new PEReader(stream);
+            var metadata = pe.GetMetadataReader();
+            foreach (var handle in metadata.TypeReferences)
+            {
+                var reference = metadata.GetTypeReference(handle);
+                if (metadata.GetString(reference.Name) == name && metadata.GetString(reference.Namespace) == ns)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Checks the setters a map without <c>Moonwell.Objects</c> calls: a unit's Level has no live setter, and such a map has no
         /// class whose constructor may set it (<see cref="Read"/> checks a map that uses the library).
         /// </summary>

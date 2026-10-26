@@ -264,6 +264,83 @@ public class LocalTests
     }
 
     [Fact]
+    public void mouse_position_is_allowed_outside()
+    {
+        Assert.Empty(MapCode.Check("""
+            var at = p.Mouse().Position;
+            var down = p.Mouse().IsDown(MouseButton.Left);
+            """));
+    }
+
+    [Fact]
+    public void mouse_focus_is_rejected_outside()
+    {
+        var found = MapCode.Check("""
+            var focus = p.Mouse().FocusUnit;
+            """);
+
+        Assert.Equal(new[] { "MW0002: p.Mouse().FocusUnit" }, found);
+    }
+
+    [Fact]
+    public void camera_read_is_rejected_outside()
+    {
+        var found = MapCode.Check("""
+            var far = p.Camera().Distance;
+            """);
+
+        Assert.Equal(new[] { "MW0002: p.Camera().Distance" }, found);
+    }
+
+    [Fact]
+    public void camera_read_is_allowed_inside()
+    {
+        Assert.Empty(MapCode.Check("""
+            Local.For(p, () =>
+            {
+                var far = p.Camera().Distance;
+            });
+            """));
+    }
+
+    [Fact]
+    public void camera_change_is_allowed_anywhere()
+    {
+        Assert.Empty(MapCode.Check("""
+            p.Camera().PanTo(Vector2.Zero);
+            Local.For(p, () =>
+            {
+                p.Camera().PanTo(Vector2.One, 1f);
+            });
+            """));
+    }
+
+    [Fact]
+    public void area_reaction_is_rejected_inside()
+    {
+        var found = MapCode.Check("""
+            Local.For(p, () =>
+            {
+                new Zone().OnUnitLeft(null!);
+            });
+            """, "private sealed class Zone : Area { }");
+
+        Assert.Equal(new[] { "MW0001: new Zone().OnUnitLeft(null!)" }, found);
+    }
+
+    [Fact]
+    public void area_reads_are_allowed_inside()
+    {
+        Assert.Empty(MapCode.Check("""
+            Local.For(p, () =>
+            {
+                var b = new Bounds(Vector2.Zero, Vector2.One);
+                var inside = AreaShape.Rect(b).Contains(0f, 0f);
+            });
+            """));
+    }
+
+    [Fact]
     public void player_reads_are_local_safe()
     {
         Assert.Empty(MapCode.Check("""

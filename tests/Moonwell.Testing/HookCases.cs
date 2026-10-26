@@ -98,7 +98,7 @@ namespace Moonwell.Testing
                 seen.Add(widget);
                 TestLog.Lines.Add("in " + Kind(widget));
             };
-            Hooks.Ending = widget => TestLog.Lines.Add("ending " + Kind(widget));
+            Hooks.AddEnding(widget => TestLog.Lines.Add("ending " + Kind(widget)));
             ObjectTypes.Unit(ObjectTypes.FourCC("h004"), () => new LeaveLogger());
             var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("h004")))!;
             var item = Item.Of(world.NewItem(ObjectTypes.FourCC("ratc")))!;
@@ -117,12 +117,12 @@ namespace Moonwell.Testing
             destructable.Remove();
             ExpectLog(new string[] { "ending unit", "leave", "ending item", "ending destructable" }, "the endings");
 
-            Hooks.Ending = widget => { throw new System.InvalidOperationException("boom"); };
+            Hooks.AddEnding(widget => { throw new System.InvalidOperationException("boom"); });
             TestLog.Lines.Clear();
             var second = Unit.Of(world.NewUnit(ObjectTypes.FourCC("h004")))!;
             second.Remove();
             Expect.True(second.HasEnded, "the unit ended");
-            ExpectLog(new string[] { "in unit", "leave" }, "OnLeave still ran");
+            ExpectLog(new string[] { "in unit", "ending unit", "leave" }, "the first listener and OnLeave still ran");
             Expect.True(world.Logged.Contains("Moonwell: Moonwell.Hooks failed: boom"), "the logged error");
 
             Hooks.TakenIn = widget => { throw new System.InvalidOperationException("bang"); };
@@ -131,14 +131,61 @@ namespace Moonwell.Testing
             Expect.True(world.Logged.Contains("Moonwell: Moonwell.Hooks failed: bang"), "the logged error of the take-in");
         }
 
-        /// <summary>A fresh runtime has neither widget hook set.</summary>
+        /// <summary>A fresh runtime has no taken-in hook set (the ending hooks are checked by hooks.ending-reset).</summary>
         public static void WidgetHooksReset(FakeWorld world)
         {
             Hooks.TakenIn = _ => { };
-            Hooks.Ending = _ => { };
             FakeWorld.Install();
             Expect.True(Hooks.TakenIn == null, "the taken-in hook is cleared");
-            Expect.True(Hooks.Ending == null, "the ending hook is cleared");
+        }
+
+        /// <summary>Two ending listeners are both called for a removed unit, once each, in the order they were added.</summary>
+        public static void EndingTwo(FakeWorld world)
+        {
+            TestLog.Lines.Clear();
+            Hooks.AddEnding(widget => TestLog.Lines.Add("first " + Kind(widget)));
+            Hooks.AddEnding(widget => TestLog.Lines.Add("second " + Kind(widget)));
+            ObjectTypes.Unit(ObjectTypes.FourCC("h004"), () => new LeaveLogger());
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("h004")))!;
+            unit.Remove();
+            ExpectLog(new string[] { "first unit", "second unit", "leave" }, "both listeners, then OnLeave");
+        }
+
+        /// <summary>A listener that throws is reported, the next one still runs, and the unit still ends.</summary>
+        public static void EndingThrowing(FakeWorld world)
+        {
+            TestLog.Lines.Clear();
+            Hooks.AddEnding(widget => { throw new System.InvalidOperationException("boom"); });
+            Hooks.AddEnding(widget => TestLog.Lines.Add("second " + Kind(widget)));
+            ObjectTypes.Unit(ObjectTypes.FourCC("h004"), () => new LeaveLogger());
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("h004")))!;
+            unit.Remove();
+            Expect.True(unit.HasEnded, "the unit ended");
+            ExpectLog(new string[] { "second unit", "leave" }, "the second listener and OnLeave ran");
+            Expect.True(world.Logged.Contains("Moonwell: Moonwell.Hooks failed: boom"), "the logged error");
+        }
+
+        /// <summary>With no ending listener, a removed unit ends without an error.</summary>
+        public static void EndingNone(FakeWorld world)
+        {
+            TestLog.Lines.Clear();
+            ObjectTypes.Unit(ObjectTypes.FourCC("h004"), () => new LeaveLogger());
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("h004")))!;
+            unit.Remove();
+            Expect.True(unit.HasEnded, "the unit ended");
+            ExpectLog(new string[] { "leave" }, "only OnLeave ran");
+        }
+
+        /// <summary>After a runtime reset, a listener added before is not called.</summary>
+        public static void EndingReset(FakeWorld world)
+        {
+            TestLog.Lines.Clear();
+            Hooks.AddEnding(widget => TestLog.Lines.Add("ending " + Kind(widget)));
+            var fresh = FakeWorld.Install();
+            ObjectTypes.Unit(ObjectTypes.FourCC("h004"), () => new LeaveLogger());
+            var unit = Unit.Of(fresh.NewUnit(ObjectTypes.FourCC("h004")))!;
+            unit.Remove();
+            ExpectLog(new string[] { "leave" }, "the listener added before the reset is gone");
         }
 
         /// <summary>The name of a widget's kind, for the log.</summary>

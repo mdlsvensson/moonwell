@@ -16,6 +16,8 @@ namespace Moonwell.Testing
             AddMaths(list);
             AddInteractions(list);
             AddTerrain(list);
+            AddAreas(list);
+            AddInput(list);
             return list;
         }
 
@@ -131,6 +133,72 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.pair.data-and-since", Run = PairCases.DataAndSince });
             list.Add(new Case { Name = "interactions.pair.pair-owns", Run = PairCases.PairOwns });
             list.Add(new Case { Name = "interactions.tree", Run = TreeCases.Tree });
+        }
+
+        /// <summary>Adds the areas package's cases.</summary>
+        private static void AddAreas(List<Case> list)
+        {
+            list.Add(new Case { Name = "areas.shapes.named", Run = AreaShapeCases.Named });
+            list.Add(new Case { Name = "areas.shapes.unknown-name", Run = AreaShapeCases.UnknownName });
+            list.Add(new Case { Name = "areas.shapes.circle", Run = AreaShapeCases.Circle });
+            list.Add(new Case { Name = "areas.shapes.polygon", Run = AreaShapeCases.Polygon });
+            list.Add(new Case { Name = "areas.shapes.of", Run = AreaShapeCases.Of });
+            list.Add(new Case { Name = "areas.shapes.not-installed", Run = AreaShapeCases.NotInstalled });
+            list.Add(new Case { Name = "areas.shapes.wrong-length", Run = AreaShapeCases.WrongLength });
+            list.Add(new Case { Name = "areas.area.enter-stay-leave", Run = AreaCases.EnterStayLeave });
+            list.Add(new Case { Name = "areas.area.accepts", Run = AreaCases.Accepts });
+            list.Add(new Case { Name = "areas.area.already-inside", Run = AreaCases.AlreadyInside });
+            list.Add(new Case { Name = "areas.area.sweep-and-event", Run = AreaCases.SweepAndEvent });
+            list.Add(new Case { Name = "areas.area.death", Run = AreaCases.Death });
+            list.Add(new Case { Name = "areas.area.removed", Run = AreaCases.Removed });
+            list.Add(new Case { Name = "areas.area.area-ends", Run = AreaCases.AreaEnds });
+            list.Add(new Case { Name = "areas.area.end-inside-enter", Run = AreaCases.EndInsideEnter });
+            list.Add(new Case { Name = "areas.area.remove-inside-left", Run = AreaCases.RemoveInsideLeft });
+            list.Add(new Case { Name = "areas.area.throwing", Run = AreaCases.Throwing });
+            list.Add(new Case { Name = "areas.area.reaction-owner", Run = AreaCases.ReactionOwner });
+            list.Add(new Case { Name = "areas.area.cells", Run = AreaCases.Cells });
+            list.Add(new Case { Name = "areas.area.no-shape", Run = AreaCases.NoShape });
+            list.Add(new Case { Name = "areas.area.region-before-install", Run = AreaCases.RegionBeforeInstall });
+            list.Add(new Case { Name = "areas.area.fixed-once-added", Run = AreaCases.FixedOnceAdded });
+            list.Add(new Case { Name = "areas.area.reads", Run = AreaCases.Reads });
+            list.Add(new Case { Name = "areas.area.shared-timer", Run = AreaCases.SharedTimer });
+            list.Add(new Case { Name = "areas.area.counts-from-first-unit", Run = AreaCases.CountsFromFirstUnit });
+            list.Add(new Case { Name = "areas.area.hidden", Run = AreaCases.Hidden });
+            list.Add(new Case { Name = "areas.area.hidden-then-gone", Run = AreaCases.HiddenThenGone });
+            list.Add(new Case { Name = "areas.area.hidden-at-start", Run = AreaCases.HiddenAtStart });
+            list.Add(new Case { Name = "areas.area.resurrected-reenters", Run = AreaCases.ResurrectedReenters });
+            list.Add(new Case { Name = "areas.area.revive-not-twice", Run = AreaCases.ReviveNotTwice });
+            list.Add(new Case { Name = "areas.area.corpse-removed", Run = AreaCases.CorpseRemoved });
+            list.Add(new Case { Name = "areas.area.step-ends-both-areas", Run = AreaCases.StepEndsBothAreas });
+            list.Add(new Case { Name = "areas.area.step-hands-over-and-restarts", Run = AreaCases.StepHandsOverAndRestarts });
+            list.Add(new Case { Name = "areas.area.step-hands-over-and-keeps-running", Run = AreaCases.StepHandsOverAndKeepsRunning });
+            list.Add(new Case { Name = "areas.area.step-leaves-and-reenters", Run = AreaCases.StepLeavesAndReenters });
+        }
+
+        /// <summary>Adds the input package's cases.</summary>
+        private static void AddInput(List<Case> list)
+        {
+            list.Add(new Case { Name = "input.mouse.moved", Run = MouseCases.Moved });
+            list.Add(new Case { Name = "input.mouse.not-a-place", Run = MouseCases.NotAPlace });
+            list.Add(new Case { Name = "input.mouse.corner-of-the-world", Run = MouseCases.CornerOfTheWorld });
+            list.Add(new Case { Name = "input.mouse.first-not-a-place", Run = MouseCases.FirstNotAPlace });
+            list.Add(new Case { Name = "input.mouse.buttons", Run = MouseCases.Buttons });
+            list.Add(new Case { Name = "input.mouse.unknown-button", Run = MouseCases.UnknownButton });
+            list.Add(new Case { Name = "input.mouse.order", Run = MouseCases.Order });
+            list.Add(new Case { Name = "input.mouse.only-written", Run = MouseCases.OnlyWritten });
+            list.Add(new Case { Name = "input.mouse.throwing", Run = MouseCases.Throwing });
+            list.Add(new Case { Name = "input.mouse.computer-and-left", Run = MouseCases.ComputerAndLeft });
+            list.Add(new Case { Name = "input.mouse.no-mouse", Run = MouseCases.NoMouse });
+            list.Add(new Case { Name = "input.mouse.per-slot", Run = MouseCases.PerSlot });
+            list.Add(new Case { Name = "input.mouse.local", Run = MouseCases.Local });
+            list.Add(new Case { Name = "input.mouse.local-unknown-focus", Run = MouseCases.LocalUnknownFocus });
+            list.Add(new Case { Name = "input.mouse.setters", Run = MouseCases.Setters });
+            list.Add(new Case { Name = "input.camera.reads", Run = CameraCases.Reads });
+            list.Add(new Case { Name = "input.camera.changes", Run = CameraCases.Changes });
+            list.Add(new Case { Name = "input.camera.named", Run = CameraCases.Named });
+            list.Add(new Case { Name = "input.camera.unknown-camera", Run = CameraCases.UnknownCamera });
+            list.Add(new Case { Name = "input.camera.wrong-data", Run = CameraCases.WrongData });
+            list.Add(new Case { Name = "input.camera.not-installed", Run = CameraCases.NotInstalled });
         }
 
         /// <summary>Adds the terrain package's cases.</summary>
@@ -290,6 +358,10 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "hooks.reset-clears", Run = HookCases.ResetClears });
             list.Add(new Case { Name = "hooks.taken-in-and-ending", Run = HookCases.TakenInAndEnding });
             list.Add(new Case { Name = "hooks.reset", Run = HookCases.WidgetHooksReset });
+            list.Add(new Case { Name = "hooks.ending-two", Run = HookCases.EndingTwo });
+            list.Add(new Case { Name = "hooks.ending-throwing", Run = HookCases.EndingThrowing });
+            list.Add(new Case { Name = "hooks.ending-none", Run = HookCases.EndingNone });
+            list.Add(new Case { Name = "hooks.ending-reset", Run = HookCases.EndingReset });
             list.Add(new Case { Name = "events.need-listens-once", Run = HookCases.NeedListensOnce });
             list.Add(new Case { Name = "actors.add-and-get", Run = ActorCases.AddAndGet });
             list.Add(new Case { Name = "actors.remove", Run = ActorCases.RemoveOne });

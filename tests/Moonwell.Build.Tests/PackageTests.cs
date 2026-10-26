@@ -61,6 +61,8 @@ namespace Moonwell.Build.Tests
         [InlineData("Moonwell.Maths")]
         [InlineData("Moonwell.Interactions")]
         [InlineData("Moonwell.Terrain")]
+        [InlineData("Moonwell.Areas")]
+        [InlineData("Moonwell.Input")]
         public void package_ships_xml_docs_beside_its_library(string id)
         {
             using var archive = ZipFile.OpenRead(Path.Combine(packed.Feed, id + "." + packed.Version + ".nupkg"));
@@ -230,6 +232,42 @@ namespace Moonwell.Build.Tests
             var nuspec = XDocument.Parse(reader.ReadToEnd());
             var dependency = Assert.Single(nuspec.Descendants(), element => element.Name.LocalName == "dependency" && element.Attribute("id")!.Value == "Moonwell");
             Assert.Equal(packed.Version, dependency.Attribute("version")!.Value);
+        }
+
+        [Fact]
+        public void areas_package_carries_its_source()
+        {
+            using var archive = ZipFile.OpenRead(packed.AreasPackage);
+            var names = archive.Entries.Select(entry => entry.FullName).ToList();
+            Assert.Contains("contentFiles/cs/net10.0/Moonwell.Areas/Area.cs", names);
+            Assert.Contains(names, name => name.StartsWith("lib/", StringComparison.Ordinal) && name.EndsWith("/Moonwell.Areas.dll", StringComparison.Ordinal));
+            Assert.DoesNotContain(names, name => name.Contains("/obj/") || name.Contains("/bin/"));
+
+            using var reader = new StreamReader(archive.Entries.Single(entry => entry.FullName == "Moonwell.Areas.nuspec").Open());
+            var nuspec = XDocument.Parse(reader.ReadToEnd());
+            var dependencies = nuspec.Descendants().Where(element => element.Name.LocalName == "dependency").ToList();
+            var moonwell = Assert.Single(dependencies, element => element.Attribute("id")!.Value == "Moonwell");
+            Assert.Equal(packed.Version, moonwell.Attribute("version")!.Value);
+            var maths = Assert.Single(dependencies, element => element.Attribute("id")!.Value == "Moonwell.Maths");
+            Assert.Equal(packed.Version, maths.Attribute("version")!.Value);
+        }
+
+        [Fact]
+        public void input_package_carries_its_source()
+        {
+            using var archive = ZipFile.OpenRead(packed.InputPackage);
+            var names = archive.Entries.Select(entry => entry.FullName).ToList();
+            Assert.Contains("contentFiles/cs/net10.0/Moonwell.Input/Mouse.cs", names);
+            Assert.Contains(names, name => name.StartsWith("lib/", StringComparison.Ordinal) && name.EndsWith("/Moonwell.Input.dll", StringComparison.Ordinal));
+            Assert.DoesNotContain(names, name => name.Contains("/obj/") || name.Contains("/bin/"));
+
+            using var reader = new StreamReader(archive.Entries.Single(entry => entry.FullName == "Moonwell.Input.nuspec").Open());
+            var nuspec = XDocument.Parse(reader.ReadToEnd());
+            var dependencies = nuspec.Descendants().Where(element => element.Name.LocalName == "dependency").ToList();
+            var moonwell = Assert.Single(dependencies, element => element.Attribute("id")!.Value == "Moonwell");
+            Assert.Equal(packed.Version, moonwell.Attribute("version")!.Value);
+            var maths = Assert.Single(dependencies, element => element.Attribute("id")!.Value == "Moonwell.Maths");
+            Assert.Equal(packed.Version, maths.Attribute("version")!.Value);
         }
 
         [Fact]
