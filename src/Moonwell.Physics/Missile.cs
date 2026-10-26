@@ -222,7 +222,7 @@ namespace Moonwell
         /// <summary>Where the step's move began, its height.</summary>
         internal float lastZ;
 
-        /// <summary>The step of the cycle its move began at: one woken from rest keeps the step before, so two missiles' moves can be put in one time frame.</summary>
+        /// <summary>The step of the cycle its move began at (the pass's step, so the move covers that step); one woken from rest keeps the step before, covering two, so two missiles' moves can be put in one time frame.</summary>
         internal int lastStep;
 
         /// <summary>Where its flight or its contacts last put it, x: a check that finds it elsewhere knows its X, Y or Z was set from outside, and starts its sweep there instead of sweeping along the jump.</summary>
@@ -462,7 +462,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>What it does on meeting another missile whose MissileContact is not None: None, the default, does not check missiles at all, and other missiles do not meet it; Stop, Bounce and Pass as UnitContact (Slide is Bounce). Two missiles meet once, through the one made first; each takes its own outcome, and a bounce keeps the two Bouncinesses multiplied and square-rooted, shared by Mass. Set to another than None after Create, the checks start then.</summary>
+        /// <summary>What it does on meeting another missile: None, the default, does not check missiles at all and reacts to none (a missile that checks missiles still meets it, and it flies on as it was); Stop, Bounce and Pass as UnitContact (Slide is Bounce). Two missiles meet once, through the one made first; each takes its own outcome, and a bounce keeps the two Bouncinesses multiplied and square-rooted, shared by Mass. Set to another than None after Create, the checks start then.</summary>
         [LocalSafe]
         public Contact MissileContact
         {

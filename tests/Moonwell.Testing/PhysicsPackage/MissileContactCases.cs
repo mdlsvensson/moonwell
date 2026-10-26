@@ -216,6 +216,71 @@ namespace Moonwell.Testing
             Within(284.0f, Read(creeping, 0, 1), 0.01f, "at the other's surface");
         }
 
+        /// <summary>
+        /// A ball woken from rest sweeps its two steps (its checks resume a step late) against the other missile's same two
+        /// steps, not its last one. A Bounce ball paired with a still Stop bolt rests at (500, 500); it is rolled off at 600
+        /// along x as the bolt, 30 behind it and 37.5 above, is sent down at 1,200. In true motion they never come nearer
+        /// than about 44, more than their 32: no contact. Swept against the bolt's last step only, the ball would start 30
+        /// from it and meet it.
+        /// </summary>
+        public static void WokenFrame(FakeWorld world)
+        {
+            Fresh();
+            ShotAt("racer", Contact.Stop, 100.0f, 1500.0f, 3000.0f);
+            Steps(world, 1);
+            var ball = new Shot();
+            ball.MissileContact = Contact.Bounce;
+            ball.GroundContact = Contact.Slide;
+            Missile.Create(ball, 500.0f, 500.0f, 17.0f);
+            ball.VZ = -4.0f;
+            var bolt = new Shot();
+            bolt.MissileContact = Contact.Stop;
+            bolt.GroundContact = Contact.None;
+            Missile.Create(bolt, 470.0f, 537.5f, 16.0f);
+            for (var i = 0; i < 32 && !ball.resting; i++)
+            {
+                Steps(world, 1);
+            }
+
+            Expect.True(ball.resting, "the ball rests");
+            Expect.True(ball.meetTouches != null && ball.meetTouches.Count == 1 && ball.meetTouches[0].earlyPair != null, "its pair with the bolt is kept while it rests");
+            Within(500.0f, ball.X, 0.0f, "at its place: x");
+            ball.VX = 600.0f;
+            bolt.VY = -1200.0f;
+            Steps(world, 8);
+            Expect.Equal(0, ball.Impacts.Count, "the ball met nothing");
+            Expect.Equal(0, bolt.Impacts.Count, "nor the bolt");
+            Expect.True(!bolt.HasEnded && bolt.Y < 300.0f, "the bolt flew past; at " + bolt.Y);
+        }
+
+        /// <summary>A bolt whose MissileContact is None, made first, and a Stop bolt made after it, head-on: the Stop bolt's checks meet it once and it ends; the None bolt reacts to nothing and flies on as it was. Then the same with the Stop bolt made first.</summary>
+        public static void NoneSide(FakeWorld world)
+        {
+            Fresh();
+            var quiet = ShotAt("quiet", Contact.None, 400.0f, 500.0f, 600.0f);
+            var bolt = ShotAt("bolt", Contact.Stop, 700.0f, 500.0f, -600.0f);
+            UntilImpacts(world, bolt, 1, 64);
+            Steps(world, 4);
+            Expect.Equal(1, bolt.Impacts.Count, "the later Stop bolt met the earlier None bolt once");
+            Expect.Same(quiet, bolt.Met[0], "the None bolt");
+            Expect.True(bolt.HasEnded, "and stopped");
+            Expect.Equal(0, quiet.Impacts.Count, "the None bolt reacted to nothing");
+            Expect.Equal(0, quiet.Asked.Count, "and was asked nothing");
+            Expect.True(!quiet.HasEnded, "it flies on");
+            Within(600.0f, quiet.VX, 0.0f, "as it was");
+
+            var first = ShotAt("first", Contact.Stop, 400.0f, 900.0f, 600.0f);
+            var later = ShotAt("later", Contact.None, 700.0f, 900.0f, -600.0f);
+            UntilImpacts(world, first, 1, 64);
+            Steps(world, 4);
+            Expect.Equal(1, first.Impacts.Count, "the earlier Stop bolt met the later None bolt once");
+            Expect.Same(later, first.Met[0], "the None bolt");
+            Expect.True(first.HasEnded, "and stopped");
+            Expect.Equal(0, later.Impacts.Count, "the None bolt reacted to nothing");
+            Expect.True(!later.HasEnded, "it flies on");
+            Within(-600.0f, later.VX, 0.0f, "as it was");
+        }
+
         /// <summary>Places a Bounce ball on the ground that slides to rest, and steps until it rests.</summary>
         private static Shot Resting(FakeWorld world, float x, float y)
         {

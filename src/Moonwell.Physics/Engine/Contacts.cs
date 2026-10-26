@@ -77,10 +77,10 @@ namespace Moonwell.Engine
         /// <summary>The largest radius of an item: they are all the same.</summary>
         private static float largestItem;
 
-        /// <summary>The farthest any missile with missile checks has reached in a step, its radius plus its move, at least FirstMissile; the missile checks' range covers it.</summary>
+        /// <summary>The farthest any missile has reached in a step since a missile first started missile checks, its radius plus its move, at least FirstMissile; the missile checks' range covers it.</summary>
         private static float largestMissile;
 
-        /// <summary>Whether any missile has started checks against other missiles since the install, so the pass sets their range each step.</summary>
+        /// <summary>Whether any missile has started checks against other missiles since the install, so the pass sets their range each step and every missile's reach counts toward the farthest.</summary>
         internal static bool meeting;
 
         /// <summary>A count of the walks down the walls for a missile, so a wall met in this walk is not met again in it.</summary>
@@ -213,7 +213,8 @@ namespace Moonwell.Engine
             var destructables = missile.destructableChecks;
             var items = missile.itemChecks;
             var missiles = missile.missileChecks;
-            if (units == null && destructables == null && items == null && missiles == null)
+            var none = units == null && destructables == null && items == null && missiles == null;
+            if (none && !meeting)
             {
                 return;
             }
@@ -221,14 +222,20 @@ namespace Moonwell.Engine
             var dx = entry.X - missile.lastX;
             var dy = entry.Y - missile.lastY;
             var reach = missile.radius + Trig.Sqrt(dx * dx + dy * dy);
-            if (missiles != null)
+            if (meeting)
             {
-                // Its range is set once every missile has moved, as it covers the farthest any moved this step.
+                // Every missile counts toward the farthest, as one with no missile checks is still met by those that have
+                // them; a missile's own range is set once every missile has moved.
                 missile.meetReach = reach;
                 if (reach > largestMissile)
                 {
                     largestMissile = reach;
                 }
+            }
+
+            if (none)
+            {
+                return;
             }
 
             if (units != null)
@@ -777,6 +784,13 @@ namespace Moonwell.Engine
                 missile.lastY = y;
                 missile.lastZ = z;
                 missile.lastStep = Tracking.StepNow;
+                var walls = missile.wallTouches;
+                if (walls != null)
+                {
+                    // It is no longer at the walls it was at.
+                    Raw.Truncate(walls, 0);
+                }
+
                 Placed(missile, x, y, z);
             }
         }
@@ -1212,15 +1226,15 @@ namespace Moonwell.Engine
         }
 
         /// <summary>
-        /// A check of a missile and another missile. The one made first checks the pair: the later one's check passes it over
-        /// while the earlier one's checks run, waiting as long as the two could not touch, and checks it itself only while
-        /// those are paused as the earlier one rests. Both sides keep the one state. A missile whose MissileContact is None
-        /// meets no missile. What the pair does next; the seconds to wait for Later.
+        /// A check of a missile and another missile. The one made first checks the pair when it can: the later one's check
+        /// passes it over, waiting as long as the two could not touch, only while the earlier one's checks run and hold a
+        /// pair with it; otherwise (the earlier one rests, its MissileContact is None, or it has not met the later one yet)
+        /// the later one checks it. Both sides keep the one state. What the pair does next; the seconds to wait for Later.
         /// </summary>
         internal static int MissileTick(Missile holder, Missile other, Touch touch, out float wait)
         {
             wait = 0.0f;
-            if (holder.ending || other.ending || holder.missileContact == Contact.None || other.missileContact == Contact.None)
+            if (holder.ending || other.ending || holder.missileContact == Contact.None)
             {
                 Leave(touch);
                 return Go;
@@ -1229,7 +1243,7 @@ namespace Moonwell.Engine
             if (other.made < holder.made)
             {
                 var theirs = other.missileChecks;
-                if (theirs != null && !theirs.IsPaused)
+                if (theirs != null && !theirs.IsPaused && other.missileContact != Contact.None && touch.earlyPair != null)
                 {
                     // The earlier one checks the pair; this side waits as long as they could not touch.
                     var holderEntry = holder.entry!;
@@ -1280,8 +1294,9 @@ namespace Moonwell.Engine
 
             // One time frame for both: the steps since the earlier start, and the later start drawn back to it.
             var now = Tracking.StepNow;
-            var spanA = now - first.lastStep;
-            var spanB = now - second.lastStep;
+            // A move begun in this step's pass covers one step; one kept from the step before (woken from rest), two.
+            var spanA = now - first.lastStep + 1;
+            var spanB = now - second.lastStep + 1;
             var frame = spanA > spanB ? spanA : spanB;
             if (frame < 1)
             {
@@ -1404,7 +1419,10 @@ namespace Moonwell.Engine
             touch.touching = true;
             touch.contacted = true;
             touch.lastTouch = now;
-            if (!Asks(first, second) || !Asks(second, first))
+            // A missile whose MissileContact is None checks no missile: it is met by one that does, and reacts to nothing.
+            var reactsA = first.missileContact != Contact.None;
+            var reactsB = second.missileContact != Contact.None;
+            if ((reactsA && !Asks(first, second)) || (reactsB && !Asks(second, first)))
             {
                 touch.held = true;
                 return Go;
@@ -1434,8 +1452,12 @@ namespace Moonwell.Engine
             var speed = into < 0.0f ? -into : 0.0f;
             var impactA = new Impact(ImpactKind.Missile, second, pointX, pointY, pointZ, nx, ny, nz, speed, first.missileContact, first.impactDamage);
             var impactB = new Impact(ImpactKind.Missile, first, pointX, pointY, pointZ, -nx, -ny, -nz, speed, second.missileContact, second.impactDamage);
-            Flight.Impacted(first, impactA);
-            if (!Ended(second))
+            if (reactsA)
+            {
+                Flight.Impacted(first, impactA);
+            }
+
+            if (reactsB && !Ended(second))
             {
                 Flight.Impacted(second, impactB);
             }
@@ -1585,12 +1607,8 @@ namespace Moonwell.Engine
                     var found = Sweep(missile, wall, out enter, out inside, out nx, out ny, out nz, out top);
                     if (found == Far)
                     {
-                        var known = missile.wallTouches;
-                        if (known != null && known.Count > 0)
-                        {
-                            Forget(missile, wall);
-                        }
-
+                        // Nothing kept to forget: a wall the ball was at last step is in its move's box, its start being
+                        // there, and a missile moved from outside forgets its walls.
                         continue;
                     }
 
