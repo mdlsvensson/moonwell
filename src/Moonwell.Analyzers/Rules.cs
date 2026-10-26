@@ -128,6 +128,18 @@ public static class Rules
     /// <summary>The rules for names that moved between Moonwell's namespaces.</summary>
     public static ImmutableArray<DiagnosticDescriptor> Moved { get; } = ImmutableArray.Create(MovedChoice);
 
+    public static readonly DiagnosticDescriptor UnseenReaction = new(
+        "MW0036",
+        "Damage reaction the package never calls",
+        "'{0}' {1}",
+        "Damage",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "The damage package's interfaces give every reaction an empty body, so the compiler accepts a class that only seems to write one. The package calls a reaction that is a public, non-static method of the interface's name and parameter, on a unit's class or its components (buffs too) for IDamageSource and IDamageTarget, and on the game's and players' components for IDamageWatch. The rule rejects a method named like a reaction that is not one (not public, static, another parameter, an explicit implementation, or a reaction of an interface the class does not implement), a name renamed in Moonwell 0.3, a public method taking a Hit or a Burst whose name is a letter off a reaction (one added, removed, changed, or two swapped) in a class with reactions, a reaction in a unit or component that lacks its interface (an abstract class is left alone: its subclasses may list the interface), and an interface on a class the package never calls. #pragma warning disable MW0036 keeps a helper's name.");
+
+    /// <summary>The rules for the damage package's reactions.</summary>
+    public static ImmutableArray<DiagnosticDescriptor> Reactions { get; } = ImmutableArray.Create(UnseenReaction);
+
     public static readonly DiagnosticDescriptor LiveInDeclaration = new(
         "MW0012",
         "The game in a declared class's constructor",

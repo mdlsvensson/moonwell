@@ -4,10 +4,24 @@ using Moonwell.Hosting;
 namespace Moonwell
 {
     /// <summary>Runs each hit through its stages: the package's state, and its actions on the game's damage events.</summary>
+    /// <remarks>
+    /// A hit's path, one step a method:
+    /// Deal (code damage only) leaves a pending deal for the hit its call makes.
+    /// Damaging, the game's before-armor event, makes the Hit, runs the before-armor stage, writes its changes to the
+    /// game and pushes the hit on the open stack; it then waits for the after-armor event.
+    /// Damaged, the game's after-armor event, takes the hit off the stack, runs core's reactions and the after-armor
+    /// stage, then the lethal stage when the hit would kill, and adds it to the moment.
+    /// Settle, a 0 s timer later, ends the hits still waiting, lands the moment's hits in order, then runs each source's
+    /// burst.
+    /// Hits a reaction deals run this whole path inside the reaction, as the game deals them inside the call.
+    /// </remarks>
     internal static class Pipeline
     {
         /// <summary>How long a chain of hits dealt from reactions may be.</summary>
         internal const int MaxChain = 8;
+
+        /// <summary>A unit dies when a hit leaves it at this life or below (the damage probe of 2026-10-20 on 3.0.1).</summary>
+        internal const float DeathLife = 0.405f;
 
         /// <summary>The world the package talks to; set by Install.</summary>
         internal static IDamageWorld World = null!;
@@ -55,7 +69,7 @@ namespace Moonwell
             World.Listen(Damaging, Damaged);
         }
 
-        /// <summary>A class seen for the first time: one implementing a damage interface makes the package listen.</summary>
+        /// <summary>A class seen for the first time: one implementing a damage interface has its reactions learned and makes the package listen.</summary>
         private static void Saw(object obj)
         {
             if (obj is IDamageWatch)
@@ -65,6 +79,7 @@ namespace Moonwell
 
             if (obj is IDamageSource || obj is IDamageTarget || obj is IDamageWatch)
             {
+                Reactions.Learn(obj);
                 Listen();
             }
         }
@@ -78,8 +93,7 @@ namespace Moonwell
         /// <summary>Deals damage from code: the hit its before-armor event makes is marked as code's and returned. A deal from a reaction continues the reacting hit's chain; one that would make the chain longer than MaxChain throws, which the reaction reports.</summary>
         internal static Hit? Deal(Unit source, Unit target, float amount, int attackType, DamageKind type, bool isAttack, bool ranged, WeaponSound sound, object? tag)
         {
-            var running = Reactions.Running;
-            var chain = running.Count == 0 ? 0 : running[running.Count - 1].Chain + 1;
+            var chain = Reactions.NextChain();
             if (chain >= MaxChain)
             {
                 throw new MoonwellException(Names.NameOf(source) + " to " + Names.NameOf(target) + ": not dealt, a chain of " + MaxChain + " hits dealt from reactions ends here");
@@ -98,7 +112,9 @@ namespace Moonwell
                 pending = previous;
             }
 
-            return deal.Hit;
+            // A hit that never reached its after-armor stage dealt nothing (spell immunity stopped it, or the game sent no after-armor event).
+            var hit = deal.Hit;
+            return hit != null && (hit.Stage == Stage.AfterArmor || hit.Stage == Stage.Lethal) ? hit : null;
         }
 
         /// <summary>Makes the hit of the current event, read from the game.</summary>
@@ -121,6 +137,20 @@ namespace Moonwell
                 hit.IsCode = true;
                 hit.Tag = deal.Tag;
                 hit.Chain = deal.Chain;
+            }
+            else
+            {
+                // Damage the game makes while a reaction runs (a raw native, an area hit) belongs to that reaction's hit too.
+                hit.Chain = Reactions.NextChain();
+
+                // The game's 0-damage hits that are no attack (Storm Bolt's first, Fireball's extra two) are not hits a map
+                // reacts to; an attack of 0 is one, as a map may set its amount before armor.
+                hit.Quiet = hit.Original == 0.0f && !hit.IsAttack;
+            }
+
+            if (hit.Chain >= MaxChain)
+            {
+                Cut(hit);
             }
 
             hit.AttackTypeCode = World.EventAttackType();
@@ -148,6 +178,17 @@ namespace Moonwell
             return hit;
         }
 
+        /// <summary>Ends a chain at a hit the game made: the hit is set to 0, no reaction runs for it, and the cut is reported (once for each hit cut).</summary>
+        private static void Cut(Hit hit)
+        {
+            hit.Quiet = true;
+            hit.Cut = true;
+            hit.Amount = 0.0f;
+            World.SetEventAmount(0.0f);
+            var from = hit.Source == null ? "no unit" : Names.NameOf(hit.Source);
+            Errors.Report("Moonwell.Damage", new MoonwellException(from + " to " + Names.NameOf(hit.Target) + ": set to 0, a chain of " + MaxChain + " hits made while reactions ran ends here"));
+        }
+
         /// <summary>The game's damaging event: the before-armor stage, then what it changed written back to the game.</summary>
         private static void Damaging()
         {
@@ -170,7 +211,9 @@ namespace Moonwell
             var defense = hit.DefenseTypeCode;
             hit.Stage = Stage.BeforeArmor;
             Reactions.Run(hit, Stage.BeforeArmor);
-            hit.Stage = Stage.AfterArmor;
+
+            // The game takes no more changes to the types or the armor, so the hit's setters refuse them from here.
+            hit.Stage = Stage.Waiting;
 
             if (hit.Amount != amount)
             {
@@ -206,8 +249,9 @@ namespace Moonwell
             }
 
             // Spell immunity: the game will not send this hit's after-armor event, so it ends here.
-            if (Immunity.Stops(World.IsMagicImmune(target), hit.AttackTypeCode, (int)hit.DamageKind))
+            if (Immunity.Stops(World.IsMagicImmune(target), hit.AttackTypeCode, hit.DamageKind))
             {
+                hit.Stage = Stage.Stopped;
                 PutBack(hit);
                 return;
             }
@@ -221,10 +265,18 @@ namespace Moonwell
         {
             var targetHandle = World.EventTarget();
             Hit? hit = null;
-            if (open.Count > 0 && open[open.Count - 1].Target.Handle == targetHandle)
+
+            // The newest open hit on this target: a hit inside it whose after-armor event never comes stays above it until the 0 s timer.
+            var index = open.Count - 1;
+            while (index >= 0 && open[index].Target.Handle != targetHandle)
             {
-                hit = open[open.Count - 1];
-                open.RemoveAt(open.Count - 1);
+                index--;
+            }
+
+            if (index >= 0)
+            {
+                hit = open[index];
+                open.RemoveAt(index);
                 PutBack(hit);
                 hit.Amount = World.EventAmount();
             }
@@ -240,26 +292,37 @@ namespace Moonwell
 
             var amount = hit.Amount;
             hit.Stage = Stage.AfterArmor;
-            hit.LifeBefore = World.Life(targetHandle);
 
-            // Core's OnDamaged family runs as reactions to this hit too, so damage it deals continues the hit's chain.
-            Reactions.Running.Add(hit);
-            Inbound.Dispatch(hit);
-            Reactions.Running.RemoveAt(Reactions.Running.Count - 1);
+            // Core's OnDamaged family comes first, then the package's; a cut hit runs neither.
+            if (!hit.Cut)
+            {
+                Reactions.RunCore(hit);
+            }
+
             Reactions.Run(hit, Stage.AfterArmor);
-            if (hit.LifeBefore - hit.Amount <= 0.405f)
+
+            // The life is read only now: a hit those reactions dealt has already lowered it (game facts: the life drops
+            // before UnitDamageTarget returns). A target such a hit killed is not this hit's to kill.
+            hit.TargetLife = World.Life(targetHandle);
+            if (hit.Kills && !World.IsDead(targetHandle))
             {
                 hit.Stage = Stage.Lethal;
                 Reactions.Run(hit, Stage.Lethal);
             }
+
+            // Read again after the lethal stage: a hit a lethal reaction dealt may have killed the target first.
+            hit.WouldKill = hit.Kills && !World.IsDead(targetHandle);
 
             if (hit.Amount != amount)
             {
                 World.SetEventAmount(hit.Amount);
             }
 
-            moment.Add(hit);
-            World.AfterZero(Settle);
+            if (!hit.Quiet)
+            {
+                moment.Add(hit);
+                World.AfterZero(Settle);
+            }
         }
 
         /// <summary>The 0 s timer: hits still waiting for their after-armor event end without it; the moment's hits land, in order; then each source's burst.</summary>
@@ -267,23 +330,32 @@ namespace Moonwell
         {
             while (open.Count > 0)
             {
-                PutBack(open[open.Count - 1]);
+                var stray = open[open.Count - 1];
+                stray.Stage = Stage.Stopped;
+                PutBack(stray);
                 open.RemoveAt(open.Count - 1);
             }
 
             var landed = moment;
             moment = new List<Hit>();
-            var bursts = new List<Burst>();
+
+            // Bursts are made only when some class reacts to one.
+            var bursts = Reactions.Wants(Stage.Burst) ? new List<Burst>() : null;
             for (var i = 0; i < landed.Count; i++)
             {
                 var hit = landed[i];
                 hit.Stage = Stage.Landed;
-                hit.Killed = World.IsDead(hit.Target.Handle);
+                hit.Killed = hit.WouldKill && World.IsDead(hit.Target.Handle);
                 Reactions.Run(hit, Stage.Landed);
-                if (hit.Source != null)
+                if (bursts != null && hit.Source != null)
                 {
                     AddToBurst(bursts, hit);
                 }
+            }
+
+            if (bursts == null)
+            {
+                return;
             }
 
             for (var i = 0; i < bursts.Count; i++)

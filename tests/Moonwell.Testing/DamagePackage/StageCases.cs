@@ -22,7 +22,7 @@ namespace Moonwell.Testing
         /// <summary>Installs the package on a fake, registers SourceUnit (H001) and TargetUnit (h001), and makes one of each: the source for player 0, the target for player 1.</summary>
         internal static void Arena(FakeWorld world, out SourceUnit source, out TargetUnit target)
         {
-            fake = new FakeDamageWorld();
+            fake = new FakeDamageWorld(world);
             DamageSystem.Install(fake);
             ObjectTypes.Unit(ObjectTypes.FourCC("H001"), () => new SourceUnit());
             ObjectTypes.Unit(ObjectTypes.FourCC("h001"), () => new TargetUnit());
@@ -173,6 +173,61 @@ namespace Moonwell.Testing
             fake.Hit(source.Handle, plain.Handle, 10f);
             ExpectLog(new string[] { "source dealing", "source comp dealing", "game before", "source core dealt", "source dealt", "source comp dealt", "game after" }, "the log");
             Expect.Equal(0, world.Logged.Count, "nothing is reported");
+        }
+
+        /// <summary>A hit the game starts at 0 (Storm Bolt's first, Fireball's extra two) runs no package reaction and does not land; core's reactions still see it.</summary>
+        public static void ZeroHitQuiet(FakeWorld world)
+        {
+            Arena(world, out var source, out var target);
+            var hurt = false;
+            var bursts = 0;
+            target.Hurt = hit => hurt = true;
+            source.Bursted = burst => bursts++;
+            fake.Hit(source.Handle, target.Handle, 0f, damageType: 4);
+            fake.RunZero();
+            ExpectLog(new string[] { "source core dealt", "target core damaged" }, "the log");
+            Expect.True(!hurt, "no landing");
+            Expect.Equal(0, bursts, "no burst");
+        }
+
+        /// <summary>An attack of 0 is not quiet: a map whose units attack for 0 and set the amount before armor gets its reactions.</summary>
+        public static void ZeroAttackRuns(FakeWorld world)
+        {
+            Arena(world, out var source, out var target);
+            target.Taking = hit => hit.Amount = 25f;
+            fake.Hit(source.Handle, target.Handle, 0f, damageType: 4, isAttack: true);
+            Expect.True(TestLog.Lines.Contains("target taking") && TestLog.Lines.Contains("target taken"), "the target's reactions ran");
+            Expect.Near(75f, fake.Body(target.Handle).Life, "the amount set before armor was dealt");
+        }
+
+        /// <summary>A hit with no source runs the target's stages.</summary>
+        public static void SourcelessHitRuns(FakeWorld world)
+        {
+            Arena(world, out var source, out var target);
+            var hurt = false;
+            target.Hurt = hit => hurt = true;
+            fake.Hit(null, target.Handle, 10f, damageType: 4);
+            fake.RunZero();
+            Expect.True(TestLog.Lines.Contains("target taking") && TestLog.Lines.Contains("target taken"), "the target's reactions ran");
+            Expect.True(hurt, "the hit landed");
+        }
+
+        /// <summary>A landed reaction that first appears after hits have landed still runs for the next hit: a stage nobody reacted to is not skipped for good.</summary>
+        public static void LateReactionRuns(FakeWorld world)
+        {
+            fake = new FakeDamageWorld(world);
+            DamageSystem.Install(fake);
+            Game.Instance.Add(new TakingWatch());
+            ObjectTypes.Unit(ObjectTypes.FourCC("h002"), () => new Unit());
+            var first = Unit.Of(world.NewUnit(ObjectTypes.FourCC("h002"), slot: 0))!;
+            var second = Unit.Of(world.NewUnit(ObjectTypes.FourCC("h002"), slot: 1))!;
+            fake.Hit(first.Handle, second.Handle, 10f, damageType: 4);
+            fake.RunZero();
+            var counter = new HurtCounter();
+            second.Add(counter);
+            fake.Hit(first.Handle, second.Handle, 10f, damageType: 4);
+            fake.RunZero();
+            Expect.Equal(1, counter.Count, "the second hit's landing reached the new reaction");
         }
 
         /// <summary>A unit that is both melee and ranged deals a ranged hit when the hit has no sound, a melee one when it has.</summary>

@@ -452,7 +452,7 @@ namespace Moonwell.Testing
             }
         }
 
-        /// <summary>Records the damage; unless refused, delivers it to Inbound as the game does, inside the call, when the runtime listens for damage.</summary>
+        /// <summary>Records the damage; unless refused, delivers it to Inbound as the game does, inside the call, when the runtime listens for damage. The game's event says no attack even for one dealt as an attack.</summary>
         public bool DealDamage(unit source, unit target, float amount, bool attack, bool ranged, int attackType, int damageType, int weaponType)
         {
             Dealt.Add((int)amount + " attack:" + attack + " ranged:" + ranged + " " + attackType + " " + damageType + " " + weaponType);
@@ -463,7 +463,7 @@ namespace Moonwell.Testing
 
             if (Listening.Contains(GameEvent.Damage))
             {
-                Inbound.Damaged(target, source, amount, attack);
+                Inbound.Damaged(target, source, amount, false);
             }
 
             return true;

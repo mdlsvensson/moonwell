@@ -9,7 +9,133 @@ namespace Moonwell.Testing
             return (TargetUnit)Unit.Of(world.NewUnit(ObjectTypes.FourCC("h001"), slot: 1))!;
         }
 
-        /// <summary>A lethal hit runs OnLethal; Spare keeps the target at 1 life; without it the target dies, and OnHurt says so.</summary>
+        /// <summary>Makes a Bonuser (H00A) for player 0, whose hits add 20 from code after armor.</summary>
+        private static Unit Bonus(FakeWorld world)
+        {
+            ObjectTypes.Unit(ObjectTypes.FourCC("H00A"), () => new Bonuser());
+            return Unit.Of(world.NewUnit(ObjectTypes.FourCC("H00A"), slot: 0))!;
+        }
+
+        /// <summary>A bonus hit dealt after armor lowers the life before the outer hit's lethal check: a 95 hit after a 20 bonus on 100 life is lethal, and Spare keeps the target at 1.</summary>
+        public static void LethalAfterBonus(FakeWorld world)
+        {
+            StageCases.Arena(world, out var source, out var target);
+            var fake = StageCases.Fake;
+            var bonuser = Bonus(world);
+            var lethal = 0;
+            target.Lethal = hit =>
+            {
+                lethal++;
+                hit.Spare();
+            };
+            fake.Hit(bonuser.Handle, target.Handle, 95f, damageType: 4);
+            Expect.Equal(1, lethal, "the lethal reaction ran for the hit that would kill");
+            Expect.Near(1f, fake.Body(target.Handle).Life, "the spared target keeps 1 life");
+        }
+
+        /// <summary>Two hits on one target in one moment, the second killing: only the second says Killed.</summary>
+        public static void KilledOnlyKillingHit(FakeWorld world)
+        {
+            StageCases.Arena(world, out var source, out var target);
+            var fake = StageCases.Fake;
+            fake.Body(target.Handle).Life = 50f;
+            var killed = new System.Collections.Generic.List<bool>();
+            target.Hurt = hit => killed.Add(hit.Killed);
+            fake.Hit(source.Handle, target.Handle, 30f, damageType: 4);
+            fake.Hit(source.Handle, target.Handle, 30f, damageType: 4);
+            fake.RunZero();
+            Expect.Equal(2, killed.Count, "two hits landed");
+            Expect.True(!killed[0], "the first hit, which left 20 life, did not kill");
+            Expect.True(killed[1], "the second hit killed");
+        }
+
+        /// <summary>A bonus hit that kills before the outer hit lands gets the kill: the outer hit runs no lethal stage and does not say Killed.</summary>
+        public static void BonusKillCreditsTheBonus(FakeWorld world)
+        {
+            StageCases.Arena(world, out var source, out var target);
+            var fake = StageCases.Fake;
+            var bonuser = Bonus(world);
+            fake.Body(target.Handle).Life = 15f;
+            var lethal = new System.Collections.Generic.List<string>();
+            var landed = new System.Collections.Generic.List<string>();
+            target.Lethal = hit => lethal.Add(hit.IsCode ? "bonus" : "outer");
+            target.Hurt = hit => landed.Add((hit.IsCode ? "bonus " : "outer ") + (hit.Killed ? "killed" : "alive"));
+            fake.Hit(bonuser.Handle, target.Handle, 10f, damageType: 4);
+            fake.RunZero();
+            Expect.Equal("bonus", string.Join("|", lethal), "only the bonus hit's lethal stage ran");
+            Expect.Equal("bonus killed|outer alive", string.Join("|", landed), "the bonus hit got the kill");
+        }
+
+        /// <summary>A lethal reaction that kills the target with a hit of its own gets the kill: that hit says Killed, the lethal hit does not.</summary>
+        public static void LethalReactionKillCreditsItsHit(FakeWorld world)
+        {
+            StageCases.Arena(world, out var source, out var target);
+            var fake = StageCases.Fake;
+            fake.Body(target.Handle).Life = 50f;
+            var landed = new System.Collections.Generic.List<string>();
+            var dealt = false;
+            target.Lethal = hit =>
+            {
+                if (!dealt)
+                {
+                    dealt = true;
+                    source.Damage(target, 1000f, DamageKind.Normal);
+                }
+            };
+            target.Hurt = hit => landed.Add((hit.IsCode ? "finisher " : "lethal ") + (hit.Killed ? "killed" : "alive"));
+            fake.Hit(source.Handle, target.Handle, 60f, damageType: 4);
+            fake.RunZero();
+            Expect.Equal("finisher killed|lethal alive", string.Join("|", landed), "the finishing hit got the kill");
+        }
+
+        /// <summary>Once a lethal reaction spares the target, the later lethal reactions do not run: the hit no longer kills.</summary>
+        public static void LethalStopsWhenSpared(FakeWorld world)
+        {
+            StageCases.Arena(world, out var source, out var target);
+            var fake = StageCases.Fake;
+            var watch = new StageWatch();
+            Game.Instance.Add(watch);
+            fake.Body(target.Handle).Life = 50f;
+            target.Lethal = hit => hit.Spare();
+            fake.Hit(source.Handle, target.Handle, 100f, damageType: 4);
+            Expect.Equal("", string.Join("|", watch.Seen), "the game's lethal reaction did not run");
+            Expect.Near(1f, fake.Body(target.Handle).Life, "the target was spared");
+        }
+
+        /// <summary>A target removed by a reaction before the 0 s timer is not killed by the hit, and nothing throws.</summary>
+        public static void RemovedTargetNotKilled(FakeWorld world)
+        {
+            StageCases.Arena(world, out var source, out var target);
+            var fake = StageCases.Fake;
+            var watch = new StageWatch();
+            Game.Instance.Add(watch);
+            target.Taken = hit => target.Remove();
+            fake.Hit(source.Handle, target.Handle, 10f, damageType: 4);
+            fake.RunZero();
+            Expect.Equal("landed alive", string.Join("|", watch.Seen), "the hit landed without killing");
+            Expect.Equal(0, world.Logged.Count, "nothing was reported");
+        }
+
+        /// <summary>A hit inside another whose after-armor event never comes does not hide the outer hit: the outer finds itself after armor, with its own amount and its armor back.</summary>
+        public static void OuterFoundBelowStray(FakeWorld world)
+        {
+            StageCases.Arena(world, out var source, out var target);
+            var fake = StageCases.Fake;
+            var other = Another(world);
+            fake.Body(target.Handle).Life = 1000f;
+            fake.Body(target.Handle).Armor = 2f;
+            var taken = new System.Collections.Generic.List<string>();
+            target.Taking = hit => hit.Armor = 10f;
+            target.Taken = hit => taken.Add("original " + hit.Original + ", armor " + fake.Armor(target.Handle));
+            fake.Hit(source.Handle, target.Handle, 100f, damageType: 4, inside: () =>
+            {
+                fake.WithholdNextDamaged = true;
+                fake.Hit(source.Handle, other.Handle, 5f, damageType: 4);
+            });
+            Expect.Equal("original 100, armor 2", string.Join("|", taken), "the outer hit after armor");
+        }
+
+        /// <summary>A lethal hit runs OnDying; Spare keeps the target at 1 life; without it the target dies, and OnHurt says so.</summary>
         public static void LethalSpare(FakeWorld world)
         {
             StageCases.Arena(world, out var source, out var target);

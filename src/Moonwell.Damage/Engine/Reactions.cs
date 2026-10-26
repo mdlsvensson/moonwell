@@ -6,42 +6,90 @@ namespace Moonwell
     /// <summary>Runs a stage's reactions on everything a hit involves, in decision 12's order: the source and its components, the target and its components, the game's components, the target's player's, then the source's player's.</summary>
     internal static class Reactions
     {
-        /// <summary>The reaction methods, one bit each: a class's mask holds the ones it has.</summary>
-        private const int Dealing = 1, Dealt = 2, Killing = 4, Landed = 8, Burst = 16,
-            Taking = 32, Taken = 64, Lethal = 128, Hurt = 256,
-            BeforeArmor = 512, AfterArmor = 1024, WatchLethal = 2048, WatchLanded = 4096, WatchBurst = 8192;
+        /// <summary>Where each interface's methods start among the slots: a method's slot is this plus its stage.</summary>
+        private const int SourceSlots = 0, TargetSlots = 5, WatchSlots = 10;
+
+        /// <summary>The reaction methods by slot, five to an interface in stage order (before armor, after armor, lethal, landed, burst); the target has no burst. A slot's bit is 1 shifted by the slot, and a class's mask holds the bits of the methods it writes.</summary>
+        private static readonly string?[] names =
+        {
+            "OnDealing", "OnDealt", "OnKilling", "OnLanded", "OnBurst",
+            "OnTaking", "OnTaken", "OnDying", "OnHurt", null,
+            "OnUnitTaking", "OnUnitTaken", "OnUnitDying", "OnUnitHurt", "OnUnitBurst",
+        };
 
         /// <summary>The mask of each class seen, keyed by the class.</summary>
         private static readonly Dictionary<object, int> masks = new Dictionary<object, int>();
 
-        /// <summary>The hits whose reactions are running, innermost last; a hit dealt from a reaction belongs to the chain of the last.</summary>
+        /// <summary>The bits of every class seen, together: a stage none of them reacts to is skipped.</summary>
+        private static int seen;
+
+        /// <summary>The hits whose reactions are running, innermost last; a hit made while they run belongs to the chain of the last.</summary>
         internal static readonly List<Hit> Running = new List<Hit>();
 
         /// <summary>Forgets every class's mask and the running hits; Install calls it.</summary>
         internal static void Reset()
         {
             masks.Clear();
+            seen = 0;
             Running.Clear();
         }
 
-        /// <summary>Runs a stage's reactions to a hit.</summary>
+        /// <summary>Works out the reactions of a class the runtime sees for the first time, so the stages it reacts to are run.</summary>
+        internal static void Learn(object obj)
+        {
+            MaskOf(obj);
+        }
+
+        /// <summary>Whether any class seen reacts to a stage.</summary>
+        internal static bool Wants(Stage stage)
+        {
+            var bits = (1 << (SourceSlots + (int)stage)) | (1 << (TargetSlots + (int)stage)) | (1 << (WatchSlots + (int)stage));
+            return (seen & bits) != 0;
+        }
+
+        /// <summary>The chain place of a hit made now: 0, or one more than the hit whose reactions are running.</summary>
+        internal static int NextChain()
+        {
+            return Running.Count == 0 ? 0 : Running[Running.Count - 1].Chain + 1;
+        }
+
+        /// <summary>Runs core's OnDamaged family on a hit, as reactions to it, so damage they deal continues its chain.</summary>
+        internal static void RunCore(Hit hit)
+        {
+            Running.Add(hit);
+            try
+            {
+                Inbound.Dispatch(hit);
+            }
+            finally
+            {
+                Running.RemoveAt(Running.Count - 1);
+            }
+        }
+
+        /// <summary>Runs a stage's reactions to a hit; a quiet hit has none.</summary>
         internal static void Run(Hit hit, Stage stage)
         {
+            if (hit.Quiet || !Wants(stage))
+            {
+                return;
+            }
+
             var source = hit.Source;
             var target = hit.Target;
             var targetSlot = target.Player.Slot;
             var sourceSlot = source == null ? -1 : source.Player.Slot;
             if (source != null)
             {
-                RunUnit(source, hit, null, stage, true);
+                RunUnit(source, hit, null, SourceSlots + (int)stage);
             }
 
-            RunUnit(target, hit, null, stage, false);
-            RunMap(Game.Instance, hit, null, stage);
+            RunUnit(target, hit, null, TargetSlots + (int)stage);
+            RunMap(Game.Instance, hit, null, WatchSlots + (int)stage);
             var first = Player.Existing(targetSlot);
             if (first != null)
             {
-                RunMap(first, hit, null, stage);
+                RunMap(first, hit, null, WatchSlots + (int)stage);
             }
 
             if (source != null && sourceSlot != targetSlot)
@@ -49,7 +97,7 @@ namespace Moonwell
                 var second = Player.Existing(sourceSlot);
                 if (second != null)
                 {
-                    RunMap(second, hit, null, stage);
+                    RunMap(second, hit, null, WatchSlots + (int)stage);
                 }
             }
         }
@@ -58,56 +106,62 @@ namespace Moonwell
         internal static void RunBurst(Burst burst)
         {
             var slot = burst.Source.Player.Slot;
-            RunUnit(burst.Source, null, burst, Stage.Landed, true);
-            RunMap(Game.Instance, null, burst, Stage.Landed);
+            RunUnit(burst.Source, null, burst, SourceSlots + (int)Stage.Burst);
+            RunMap(Game.Instance, null, burst, WatchSlots + (int)Stage.Burst);
             var player = Player.Existing(slot);
             if (player != null)
             {
-                RunMap(player, null, burst, Stage.Landed);
+                RunMap(player, null, burst, WatchSlots + (int)Stage.Burst);
             }
         }
 
-        /// <summary>Runs a unit's reactions, then its components', in add order; a unit or component that has ended is skipped.</summary>
-        private static void RunUnit(Unit unit, Hit? hit, Burst? burst, Stage stage, bool isSource)
+        /// <summary>Runs a unit's reaction in a slot, then its components', in add order; a unit or component that has ended is skipped.</summary>
+        private static void RunUnit(Unit unit, Hit? hit, Burst? burst, int slot)
         {
-            var bit = burst != null ? Burst : isSource ? SourceBit(stage) : TargetBit(stage);
-            if (!unit.HasEnded && (MaskOf(unit) & bit) != 0)
+            var bit = 1 << slot;
+            if (!unit.HasEnded && (MaskOf(unit) & bit) != 0 && !Spared(hit))
             {
-                Call(unit, hit, burst, bit);
+                Call(unit, hit, burst, slot);
             }
 
             var count = unit.BeginDispatch();
             for (var i = 0; i < count; i++)
             {
                 var component = unit.ComponentAt(i) as UnitComponent;
-                if (component != null && !component.HasEnded && (MaskOf(component) & bit) != 0)
+                if (component != null && !component.HasEnded && (MaskOf(component) & bit) != 0 && !Spared(hit))
                 {
-                    Call(component, hit, burst, bit);
+                    Call(component, hit, burst, slot);
                 }
             }
 
             unit.EndDispatch();
         }
 
-        /// <summary>Runs the map-wide reactions on an actor's components, in add order.</summary>
-        private static void RunMap(Actor actor, Hit? hit, Burst? burst, Stage stage)
+        /// <summary>Runs the map-wide reaction in a slot on an actor's components, in add order.</summary>
+        private static void RunMap(Actor actor, Hit? hit, Burst? burst, int slot)
         {
-            var bit = burst != null ? WatchBurst : WatchBit(stage);
+            var bit = 1 << slot;
             var count = actor.BeginDispatch();
             for (var i = 0; i < count; i++)
             {
                 var component = actor.ComponentAt(i) as MapComponent;
-                if (component != null && !component.HasEnded && (MaskOf(component) & bit) != 0)
+                if (component != null && !component.HasEnded && (MaskOf(component) & bit) != 0 && !Spared(hit))
                 {
-                    Call(component, hit, burst, bit);
+                    Call(component, hit, burst, slot);
                 }
             }
 
             actor.EndDispatch();
         }
 
-        /// <summary>Calls one reaction with the object as the current owner; a failing reaction is reported.</summary>
-        private static void Call(Owner obj, Hit? hit, Burst? burst, int bit)
+        /// <summary>Whether a hit in its lethal stage no longer kills, as an earlier reaction lowered it: the later lethal reactions do not run.</summary>
+        private static bool Spared(Hit? hit)
+        {
+            return hit != null && hit.Stage == Stage.Lethal && !hit.Kills;
+        }
+
+        /// <summary>Calls the reaction in a slot with the object as the current owner; a failing reaction is reported.</summary>
+        private static void Call(Owner obj, Hit? hit, Burst? burst, int slot)
         {
             var previous = Owner.current;
             Owner.current = obj;
@@ -115,43 +169,34 @@ namespace Moonwell
             Running.Add(running);
             try
             {
-                switch (bit)
+                switch (slot)
                 {
-                    case Dealing: ((IDamageSource)obj).OnDealing(hit!); break;
-                    case Dealt: ((IDamageSource)obj).OnDealt(hit!); break;
-                    case Killing: ((IDamageSource)obj).OnKilling(hit!); break;
-                    case Landed: ((IDamageSource)obj).OnLanded(hit!); break;
-                    case Burst: ((IDamageSource)obj).OnBurst(burst!); break;
-                    case Taking: ((IDamageTarget)obj).OnTaking(hit!); break;
-                    case Taken: ((IDamageTarget)obj).OnTaken(hit!); break;
-                    case Lethal: ((IDamageTarget)obj).OnLethal(hit!); break;
-                    case Hurt: ((IDamageTarget)obj).OnHurt(hit!); break;
-                    case BeforeArmor: ((IDamageWatch)obj).OnBeforeArmor(hit!); break;
-                    case AfterArmor: ((IDamageWatch)obj).OnAfterArmor(hit!); break;
-                    case WatchLethal: ((IDamageWatch)obj).OnLethal(hit!); break;
-                    case WatchLanded: ((IDamageWatch)obj).OnLanded(hit!); break;
-                    case WatchBurst: ((IDamageWatch)obj).OnBurst(burst!); break;
+                    case SourceSlots + (int)Stage.BeforeArmor: ((IDamageSource)obj).OnDealing(hit!); break;
+                    case SourceSlots + (int)Stage.AfterArmor: ((IDamageSource)obj).OnDealt(hit!); break;
+                    case SourceSlots + (int)Stage.Lethal: ((IDamageSource)obj).OnKilling(hit!); break;
+                    case SourceSlots + (int)Stage.Landed: ((IDamageSource)obj).OnLanded(hit!); break;
+                    case SourceSlots + (int)Stage.Burst: ((IDamageSource)obj).OnBurst(burst!); break;
+                    case TargetSlots + (int)Stage.BeforeArmor: ((IDamageTarget)obj).OnTaking(hit!); break;
+                    case TargetSlots + (int)Stage.AfterArmor: ((IDamageTarget)obj).OnTaken(hit!); break;
+                    case TargetSlots + (int)Stage.Lethal: ((IDamageTarget)obj).OnDying(hit!); break;
+                    case TargetSlots + (int)Stage.Landed: ((IDamageTarget)obj).OnHurt(hit!); break;
+                    case WatchSlots + (int)Stage.BeforeArmor: ((IDamageWatch)obj).OnUnitTaking(hit!); break;
+                    case WatchSlots + (int)Stage.AfterArmor: ((IDamageWatch)obj).OnUnitTaken(hit!); break;
+                    case WatchSlots + (int)Stage.Lethal: ((IDamageWatch)obj).OnUnitDying(hit!); break;
+                    case WatchSlots + (int)Stage.Landed: ((IDamageWatch)obj).OnUnitHurt(hit!); break;
+                    case WatchSlots + (int)Stage.Burst: ((IDamageWatch)obj).OnUnitBurst(burst!); break;
                 }
             }
             catch (Exception error)
             {
-                Errors.Report(Names.NameOf(obj) + "." + MethodName(bit), error);
+                Errors.Report(Names.NameOf(obj) + "." + names[slot], error);
             }
 
             Running.RemoveAt(Running.Count - 1);
             Owner.current = previous;
         }
 
-        /// <summary>The source's method of a stage.</summary>
-        private static int SourceBit(Stage stage) => stage == Stage.BeforeArmor ? Dealing : stage == Stage.AfterArmor ? Dealt : stage == Stage.Lethal ? Killing : Landed;
-
-        /// <summary>The target's method of a stage.</summary>
-        private static int TargetBit(Stage stage) => stage == Stage.BeforeArmor ? Taking : stage == Stage.AfterArmor ? Taken : stage == Stage.Lethal ? Lethal : Hurt;
-
-        /// <summary>The map-wide method of a stage.</summary>
-        private static int WatchBit(Stage stage) => stage == Stage.BeforeArmor ? BeforeArmor : stage == Stage.AfterArmor ? AfterArmor : stage == Stage.Lethal ? WatchLethal : WatchLanded;
-
-        /// <summary>The bits of the reaction methods an object's class has, worked out once per class. Only methods the class writes count: in Lua an interface's empty defaults are not there.</summary>
+        /// <summary>The bits of the reaction methods an object's class writes, worked out once per class. Only methods the class writes count: in Lua an interface's empty defaults are not there.</summary>
         private static int MaskOf(object obj)
         {
             var key = Names.ClassOf(obj);
@@ -161,51 +206,29 @@ namespace Moonwell
             }
 
             mask = 0;
-            if (obj is IDamageSource)
+            for (var slot = 0; slot < names.Length; slot++)
             {
-                mask |= Has(obj, "OnDealing", Dealing) | Has(obj, "OnDealt", Dealt) | Has(obj, "OnKilling", Killing) | Has(obj, "OnLanded", Landed) | Has(obj, "OnBurst", Burst);
-            }
-
-            if (obj is IDamageTarget)
-            {
-                mask |= Has(obj, "OnTaking", Taking) | Has(obj, "OnTaken", Taken) | Has(obj, "OnLethal", Lethal) | Has(obj, "OnHurt", Hurt);
-            }
-
-            if (obj is IDamageWatch)
-            {
-                mask |= Has(obj, "OnBeforeArmor", BeforeArmor) | Has(obj, "OnAfterArmor", AfterArmor) | Has(obj, "OnLethal", WatchLethal) | Has(obj, "OnLanded", WatchLanded) | Has(obj, "OnBurst", WatchBurst);
+                var name = names[slot];
+                if (name != null && Implements(obj, slot) && Hooks.Overrides(obj, name, typeof(object)))
+                {
+                    mask |= 1 << slot;
+                }
             }
 
             masks[key] = mask;
+            seen |= mask;
             return mask;
         }
 
-        /// <summary>The bit when the object's class writes the method, else 0.</summary>
-        private static int Has(object obj, string name, int bit)
+        /// <summary>Whether an object implements the interface a slot belongs to.</summary>
+        private static bool Implements(object obj, int slot)
         {
-            return Hooks.Overrides(obj, name, typeof(object)) ? bit : 0;
-        }
-
-        /// <summary>The method name of a bit, for an error line.</summary>
-        private static string MethodName(int bit)
-        {
-            switch (bit)
+            if (slot < TargetSlots)
             {
-                case Dealing: return "OnDealing";
-                case Dealt: return "OnDealt";
-                case Killing: return "OnKilling";
-                case Landed: return "OnLanded";
-                case Burst: return "OnBurst";
-                case Taking: return "OnTaking";
-                case Taken: return "OnTaken";
-                case Lethal: return "OnLethal";
-                case Hurt: return "OnHurt";
-                case BeforeArmor: return "OnBeforeArmor";
-                case AfterArmor: return "OnAfterArmor";
-                case WatchLethal: return "OnLethal";
-                case WatchLanded: return "OnLanded";
-                default: return "OnBurst";
+                return obj is IDamageSource;
             }
+
+            return slot < WatchSlots ? obj is IDamageTarget : obj is IDamageWatch;
         }
     }
 }

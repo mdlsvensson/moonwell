@@ -84,6 +84,18 @@ namespace Moonwell.Testing
             Expect.Near(50f, damage.Amount, "the amount after the reactions");
         }
 
+        /// <summary>Damage dealt from code as an attack reads as one in the reactions, although the game's event says it is not.</summary>
+        public static void DealIsAttack(FakeWorld world)
+        {
+            var watch = new AttackWatch();
+            Game.Instance.Add(watch);
+            var source = Unit.Of(world.NewUnit(ObjectTypes.FourCC("ofoo"), slot: 0))!;
+            var target = Unit.Of(world.NewUnit(ObjectTypes.FourCC("ofoo"), slot: 1))!;
+            source.Damage(target, 5f, isAttack: true);
+            source.Damage(target, 5f);
+            Expect.Equal("attack|no attack", string.Join("|", watch.Seen), "what the reactions saw");
+        }
+
         /// <summary>When the game deals nothing, Unit.Damage returns null.</summary>
         public static void DealRefused(FakeWorld world)
         {
@@ -142,6 +154,19 @@ namespace Moonwell.Testing
             ExpectLog(new string[] { "dummy damaged", "dummy comp damaged", "b damaged" }, "the log");
             Expect.Equal(1, world.Logged.Count, "the lines logged");
             Expect.Equal("Moonwell: A.OnDamaged failed: boom", world.Logged[0], "the error line");
+        }
+    }
+
+    /// <summary>A game component that records whether each damage it sees is an attack.</summary>
+    public class AttackWatch : GameComponent
+    {
+        /// <summary>"attack" or "no attack" for each damage, in order.</summary>
+        public readonly System.Collections.Generic.List<string> Seen = new System.Collections.Generic.List<string>();
+
+        /// <summary>Records the damage.</summary>
+        public override void OnUnitDamaged(Damage damage)
+        {
+            Seen.Add(damage.IsAttack ? "attack" : "no attack");
         }
     }
 }

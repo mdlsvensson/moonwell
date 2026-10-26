@@ -140,11 +140,14 @@ namespace Moonwell
             }
 
             Unit? from = source == null ? null : Unit.Of(source);
-            var damage = new Damage(hit, from, amount, isAttack);
-            if (dealing != null && dealing.Damage == null && dealing.Target == target && dealing.Source == source)
+
+            // The game's event says no attack for damage from code even when dealt as one, so Unit.Damage's own flag counts.
+            var deal = dealing != null && dealing.Damage == null && dealing.Target == target && dealing.Source == source ? dealing : null;
+            var damage = new Damage(hit, from, amount, deal != null ? deal.IsAttack : isAttack);
+            if (deal != null)
             {
-                dealing.Damage = damage;
-                damage.Tag = dealing.Tag;
+                deal.Damage = damage;
+                damage.Tag = deal.Tag;
             }
 
             Dispatch(damage);
@@ -155,7 +158,7 @@ namespace Moonwell
         internal static Damage? Deal(Unit source, Unit target, float amount, DamageKind kind, AttackType attackType, bool isAttack, bool ranged, WeaponSound sound, object? tag)
         {
             var previous = dealing;
-            var deal = new Dealing(source.Handle, target.Handle, tag);
+            var deal = new Dealing(source.Handle, target.Handle, isAttack, tag);
             dealing = deal;
             bool dealt;
             try
@@ -180,12 +183,15 @@ namespace Moonwell
         /// <summary>A damage Unit.Damage deals: its handles, and the damage its event made.</summary>
         private sealed class Dealing
         {
-            internal Dealing(unit source, unit target, object? tag)
+            internal Dealing(unit source, unit target, bool isAttack, object? tag)
             {
                 Source = source;
                 Target = target;
+                IsAttack = isAttack;
                 Tag = tag;
             }
+
+            internal bool IsAttack { get; }
 
             internal object? Tag { get; }
 
