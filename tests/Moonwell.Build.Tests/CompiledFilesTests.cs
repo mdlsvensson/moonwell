@@ -3,9 +3,16 @@ using Xunit;
 namespace Moonwell.Build.Tests
 {
     /// <summary>The files the build reads as the map's code: the stage and the stubs' look at the source agree.</summary>
+    [Collection("Sample")]
     public sealed class CompiledFilesTests : IDisposable
     {
+        private readonly SampleBuilds builds;
         private readonly TestFolders folders = new TestFolders();
+
+        public CompiledFilesTests(SampleBuilds builds)
+        {
+            this.builds = builds;
+        }
 
         public void Dispose()
         {
@@ -53,6 +60,8 @@ namespace Moonwell.Build.Tests
                 Write(copy, junk, "namespace Sample { public static class " + junk.Substring(0, junk.IndexOf('/')) + "Names { public const int Magic = (int)Moonwell.Objects.ArmorType.Metal; } }");
             }
 
+            // The Sample's own output, which the collection's build makes.
+            Assert.Equal(0, builds.Development.ExitCode);
             var assembly = Path.Combine(TestFolders.Fixture("Sample"), "bin", "Debug", "net10.0", "Sample.dll");
             var found = NamedChoices.Read(MapProject.Find(copy), assembly, new HashSet<string> { "Targets", "ArmorType" });
 
