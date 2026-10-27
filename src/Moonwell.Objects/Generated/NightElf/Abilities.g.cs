@@ -255,7 +255,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Blink (ANbl).</summary>
+            /// <summary>Blink (Neutral), ANbl.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ANbl")]
             public class BlinkANbl : global::Moonwell.Objects.StandardAbility
@@ -420,7 +420,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Cyclone()
                 {
-                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.CycloneBcyc, global::Moonwell.Objects.NightElf.Buffs.Cyclone>();
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.Cyclone, global::Moonwell.Objects.NightElf.Buffs.CycloneBcy2>();
                     ButtonPositionNormalX = 1;
                     ButtonPositionNormalY = 2;
                     CanBeDispelled = Levels(true);
@@ -961,13 +961,75 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Faerie Fire (Afa2).</summary>
+            /// <summary>Faerie Fire (Afae).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Afa2")]
+            [global::Moonwell.Objects.Standard("Afae")]
             public class FaerieFire : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public FaerieFire()
+                {
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.FaerieFire>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionTurnOffX = 0;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(1f);
+                    DefenseReduction = Levels(4);
+                    Duration = Levels(70f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(40f);
+                    Hotkey = "R";
+                    HotkeyTurnOff = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFaerieFireOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNFaerieFireOff.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(45);
+                    Name = "Faerie Fire";
+                    Order = "faeriefire";
+                    OrderStringActivate = "faeriefireon";
+                    OrderStringDeactivate = "faeriefireoff";
+                    PriorityForSpellSteal = 2;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Range = Levels(700f);
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Faerie Fire");
+                    TooltipExtended = Levels("Reduces a target enemy unit's armor by <Afae,DataA1> and gives vision of that unit. |nLasts <Afae,Dur1> seconds.");
+                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
+                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Fae1</c>.</summary>
+                [global::Moonwell.Objects.Field("Fae1", Label = "Defense Reduction")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<int> DefenseReduction
+                {
+                    get { return Fields.GetLevels<int>(this, "Fae1"); }
+                    protected set { Fields.Put("Fae1", value); }
+                }
+
+                /// <summary>The field <c>Fae2</c>.</summary>
+                [global::Moonwell.Objects.Field("Fae2", Label = "Always Autocast")]
+                public global::Moonwell.Objects.Levels<bool> AlwaysAutocast
+                {
+                    get { return Fields.GetLevels<bool>(this, "Fae2"); }
+                    protected set { Fields.Put("Fae2", value); }
+                }
+            }
+
+            /// <summary>Faerie Fire (Morph), Afa2.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("Afa2")]
+            public class FaerieFireAfa2 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FaerieFireAfa2()
                 {
                     AlwaysAutocast = Levels(true);
                     Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.FaerieFire>();
@@ -1000,68 +1062,6 @@ namespace Moonwell.Objects
                     Range = Levels(700f);
                     RequiredLevel = 0;
                     Requires.Set<global::Moonwell.Objects.NightElf.Upgrades.MarkOfTheTalon>();
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
-                    Tooltip = Levels("Faerie Fire");
-                    TooltipExtended = Levels("Reduces a target enemy unit's armor by <Afae,DataA1> and gives vision of that unit. |nLasts <Afae,Dur1> seconds.");
-                    TooltipTurnOff = Levels("|cffc3dbffRight-click to activate auto-casting.|r");
-                    TooltipTurnOffExtended = Levels("|cffc3dbffRight-click to deactivate auto-casting.|r");
-                    UseNewDefaultLevelCap = false;
-                }
-
-                /// <summary>The field <c>Fae1</c>.</summary>
-                [global::Moonwell.Objects.Field("Fae1", Label = "Defense Reduction")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<int> DefenseReduction
-                {
-                    get { return Fields.GetLevels<int>(this, "Fae1"); }
-                    protected set { Fields.Put("Fae1", value); }
-                }
-
-                /// <summary>The field <c>Fae2</c>.</summary>
-                [global::Moonwell.Objects.Field("Fae2", Label = "Always Autocast")]
-                public global::Moonwell.Objects.Levels<bool> AlwaysAutocast
-                {
-                    get { return Fields.GetLevels<bool>(this, "Fae2"); }
-                    protected set { Fields.Put("Fae2", value); }
-                }
-            }
-
-            /// <summary>Faerie Fire (Afae).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Afae")]
-            public class FaerieFireAfae : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public FaerieFireAfae()
-                {
-                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.FaerieFire>();
-                    ButtonPositionNormalX = 0;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionTurnOffX = 0;
-                    ButtonPositionTurnOffY = 2;
-                    CastTime = Levels(0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(1f);
-                    DefenseReduction = Levels(4);
-                    Duration = Levels(70f);
-                    HeroAbility = false;
-                    HeroDuration = Levels(40f);
-                    Hotkey = "R";
-                    HotkeyTurnOff = "R";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNFaerieFireOn.blp";
-                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNFaerieFireOff.blp";
-                    ItemAbility = false;
-                    LevelCount = 1;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(45);
-                    Name = "Faerie Fire";
-                    Order = "faeriefire";
-                    OrderStringActivate = "faeriefireon";
-                    OrderStringDeactivate = "faeriefireoff";
-                    PriorityForSpellSteal = 2;
-                    Race = global::Moonwell.Objects.UnitRace.NightElf;
-                    Range = Levels(700f);
-                    RequiredLevel = 0;
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
                     Tooltip = Levels("Faerie Fire");
                     TooltipExtended = Levels("Reduces a target enemy unit's armor by <Afae,DataA1> and gives vision of that unit. |nLasts <Afae,Dur1> seconds.");
@@ -1236,7 +1236,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Gather (Awha).</summary>
+            /// <summary>Gather (Wisp Gold and Lumber), Awha.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Awha")]
             public class Gather : global::Moonwell.Objects.StandardAbility
@@ -1468,7 +1468,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Improved Bows (Aeib).</summary>
+            /// <summary>Improved Bows (Icon), Aeib.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aeib")]
             public class ImprovedBows : global::Moonwell.Objects.StandardAbility
@@ -1552,7 +1552,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Load (Aenc).</summary>
+            /// <summary>Load (Entangled Gold Mine), Aenc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aenc")]
             public class Load : global::Moonwell.Objects.StandardAbility
@@ -1731,7 +1731,7 @@ namespace Moonwell.Objects
                 public ManaFlare()
                 {
                     Area = Levels(750f);
-                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.ManaFlareBmfl, global::Moonwell.Objects.NightElf.Buffs.ManaFlare>();
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.ManaFlare, global::Moonwell.Objects.NightElf.Buffs.ManaFlareBmfa>();
                     ButtonPositionNormalX = 1;
                     ButtonPositionNormalY = 2;
                     ButtonPositionTurnOffX = 1;
@@ -1825,7 +1825,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Marksmanship (Aemk).</summary>
+            /// <summary>Marksmanship (Icon), Aemk.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aemk")]
             public class Marksmanship : global::Moonwell.Objects.StandardAbility
@@ -1987,7 +1987,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Moon Glaive (Amgr).</summary>
+            /// <summary>Moon Glaive (Naisha), Amgr.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Amgr")]
             public class MoonGlaiveAmgr : global::Moonwell.Objects.StandardAbility
@@ -2044,22 +2044,47 @@ namespace Moonwell.Objects
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
+                    MoveToPartner = Levels(false);
                     Name = "Mount Hippogryph";
                     Order = "coupletarget";
+                    PartnerUnitType.Set<global::Moonwell.Objects.NightElf.Units.Hippogryph>();
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.NightElf;
                     Range = Levels(99999f);
                     RequiredLevel = 0;
                     Requires.Set<global::Moonwell.Objects.NightElf.Units.Hippogryph>();
+                    ResultingUnitType.Set<global::Moonwell.Objects.NightElf.Units.HippogryphRider>();
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Vulnerable);
                     Tooltip = Levels("Mount Hippogryph");
                     TooltipExtended = Levels("Mounts a Hippogryph so that the Archer can attack from the air. |n|n|cffffcc00Attacks land and air units.|r");
                     UnitSkinList = "ehpr";
                     UseNewDefaultLevelCap = false;
                 }
+
+                /// <summary>The field <c>coa1</c>.</summary>
+                [global::Moonwell.Objects.Field("coa1", Label = "Partner Unit Type")]
+                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> PartnerUnitType
+                {
+                    get { return Fields.GetRef<global::Moonwell.Unit>("coa1"); }
+                }
+
+                /// <summary>The field <c>coa2</c>.</summary>
+                [global::Moonwell.Objects.Field("coa2", Label = "Move To Partner")]
+                public global::Moonwell.Objects.Levels<bool> MoveToPartner
+                {
+                    get { return Fields.GetLevels<bool>(this, "coa2"); }
+                    protected set { Fields.Put("coa2", value); }
+                }
+
+                /// <summary>The field <c>coau</c>.</summary>
+                [global::Moonwell.Objects.Field("coau", Label = "Resulting Unit Type")]
+                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> ResultingUnitType
+                {
+                    get { return Fields.GetRef<global::Moonwell.Unit>("coau"); }
+                }
             }
 
-            /// <summary>Mount Hippogryph (Acoa).</summary>
+            /// <summary>Mount Hippogryph (Old), Acoa.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Acoa")]
             public class MountHippogryphAcoa : global::Moonwell.Objects.StandardAbility
@@ -2222,22 +2247,47 @@ namespace Moonwell.Objects
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
+                    MoveToPartner = Levels(true);
                     Name = "Pick up Archer";
                     Order = "coupletarget";
+                    PartnerUnitType.Set<global::Moonwell.Objects.NightElf.Units.Archer>();
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.NightElf;
                     Range = Levels(0f);
                     RequiredLevel = 0;
                     Requires.Set<global::Moonwell.Objects.NightElf.Units.Hippogryph>();
+                    ResultingUnitType.Set<global::Moonwell.Objects.NightElf.Units.HippogryphRider>();
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Vulnerable);
                     Tooltip = Levels("Pick up Archer");
                     TooltipExtended = Levels("Picks up an Archer so that the Archer can attack from the air. |n|n|cffffcc00Attacks land and air units.|r");
                     UnitSkinList = "ehpr";
                     UseNewDefaultLevelCap = false;
                 }
+
+                /// <summary>The field <c>coa1</c>.</summary>
+                [global::Moonwell.Objects.Field("coa1", Label = "Partner Unit Type")]
+                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> PartnerUnitType
+                {
+                    get { return Fields.GetRef<global::Moonwell.Unit>("coa1"); }
+                }
+
+                /// <summary>The field <c>coa2</c>.</summary>
+                [global::Moonwell.Objects.Field("coa2", Label = "Move To Partner")]
+                public global::Moonwell.Objects.Levels<bool> MoveToPartner
+                {
+                    get { return Fields.GetLevels<bool>(this, "coa2"); }
+                    protected set { Fields.Put("coa2", value); }
+                }
+
+                /// <summary>The field <c>coau</c>.</summary>
+                [global::Moonwell.Objects.Field("coau", Label = "Resulting Unit Type")]
+                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> ResultingUnitType
+                {
+                    get { return Fields.GetRef<global::Moonwell.Unit>("coau"); }
+                }
             }
 
-            /// <summary>Pick up Archer (Acoh).</summary>
+            /// <summary>Pick up Archer (Old), Acoh.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Acoh")]
             public class PickUpArcherAcoh : global::Moonwell.Objects.StandardAbility
@@ -2587,13 +2637,119 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Roar (Ara2).</summary>
+            /// <summary>Roar (Aroa).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Ara2")]
+            [global::Moonwell.Objects.Standard("Aroa")]
             public class Roar : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Roar()
+                {
+                    AnimationNames = "spell,slam";
+                    Area = Levels(500f);
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.Roar>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    Caster = "Abilities\\Spells\\NightElf\\BattleRoar\\RoarCaster.mdl";
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    DamageIncrease = Levels(0.25f);
+                    DefenseIncrease = Levels(0);
+                    Duration = Levels(45f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(45f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBattleRoar.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LifeRegenerationRate = Levels(0f);
+                    ManaCost = Levels(100);
+                    ManaRegen = Levels(0f);
+                    MaxUnits = Levels(0);
+                    Name = "Roar";
+                    Order = "roar";
+                    PreferFriendlies = Levels(false);
+                    PreferHostiles = Levels(false);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Roar");
+                    TooltipExtended = Levels("Gives friendly nearby units a <Aroa,DataA1,%>% bonus to damage. |nLasts <Aroa,Dur1> seconds.");
+                    UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Roa1</c>.</summary>
+                [global::Moonwell.Objects.Field("Roa1", Label = "Damage Increase (%)")]
+                [global::Moonwell.Objects.Limits(0, 10)]
+                public global::Moonwell.Objects.Levels<float> DamageIncrease
+                {
+                    get { return Fields.GetLevels<float>(this, "Roa1"); }
+                    protected set { Fields.Put("Roa1", value); }
+                }
+
+                /// <summary>The field <c>Roa2</c>.</summary>
+                [global::Moonwell.Objects.Field("Roa2", Label = "Defense Increase")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<int> DefenseIncrease
+                {
+                    get { return Fields.GetLevels<int>(this, "Roa2"); }
+                    protected set { Fields.Put("Roa2", value); }
+                }
+
+                /// <summary>The field <c>Roa3</c>.</summary>
+                [global::Moonwell.Objects.Field("Roa3", Label = "Life Regeneration Rate")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> LifeRegenerationRate
+                {
+                    get { return Fields.GetLevels<float>(this, "Roa3"); }
+                    protected set { Fields.Put("Roa3", value); }
+                }
+
+                /// <summary>The field <c>Roa4</c>.</summary>
+                [global::Moonwell.Objects.Field("Roa4", Label = "Mana Regen")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ManaRegen
+                {
+                    get { return Fields.GetLevels<float>(this, "Roa4"); }
+                    protected set { Fields.Put("Roa4", value); }
+                }
+
+                /// <summary>The field <c>Roa5</c>.</summary>
+                [global::Moonwell.Objects.Field("Roa5", Label = "Prefer Hostiles")]
+                public global::Moonwell.Objects.Levels<bool> PreferHostiles
+                {
+                    get { return Fields.GetLevels<bool>(this, "Roa5"); }
+                    protected set { Fields.Put("Roa5", value); }
+                }
+
+                /// <summary>The field <c>Roa6</c>.</summary>
+                [global::Moonwell.Objects.Field("Roa6", Label = "Prefer Friendlies")]
+                public global::Moonwell.Objects.Levels<bool> PreferFriendlies
+                {
+                    get { return Fields.GetLevels<bool>(this, "Roa6"); }
+                    protected set { Fields.Put("Roa6", value); }
+                }
+
+                /// <summary>The field <c>Roa7</c>.</summary>
+                [global::Moonwell.Objects.Field("Roa7", Label = "Max Units")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<int> MaxUnits
+                {
+                    get { return Fields.GetLevels<int>(this, "Roa7"); }
+                    protected set { Fields.Put("Roa7", value); }
+                }
+            }
+
+            /// <summary>Roar (Morph), Ara2.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("Ara2")]
+            public class RoarAra2 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public RoarAra2()
                 {
                     AnimationNames = "spell,slam";
                     Area = Levels(500f);
@@ -2695,113 +2851,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Roar (Aroa).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Aroa")]
-            public class RoarAroa : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public RoarAroa()
-                {
-                    AnimationNames = "spell,slam";
-                    Area = Levels(500f);
-                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.Roar>();
-                    ButtonPositionNormalX = 0;
-                    ButtonPositionNormalY = 2;
-                    CastTime = Levels(0f);
-                    Caster = "Abilities\\Spells\\NightElf\\BattleRoar\\RoarCaster.mdl";
-                    CheckDependencies = true;
-                    Cooldown = Levels(0f);
-                    DamageIncrease = Levels(0.25f);
-                    DefenseIncrease = Levels(0);
-                    Duration = Levels(45f);
-                    HeroAbility = false;
-                    HeroDuration = Levels(45f);
-                    Hotkey = "R";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBattleRoar.blp";
-                    ItemAbility = false;
-                    LevelCount = 1;
-                    LevelSkipRequirement = 0;
-                    LifeRegenerationRate = Levels(0f);
-                    ManaCost = Levels(100);
-                    ManaRegen = Levels(0f);
-                    MaxUnits = Levels(0);
-                    Name = "Roar";
-                    Order = "roar";
-                    PreferFriendlies = Levels(false);
-                    PreferHostiles = Levels(false);
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.NightElf;
-                    RequiredLevel = 0;
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend);
-                    Tooltip = Levels("Roar");
-                    TooltipExtended = Levels("Gives friendly nearby units a <Aroa,DataA1,%>% bonus to damage. |nLasts <Aroa,Dur1> seconds.");
-                    UseNewDefaultLevelCap = false;
-                }
-
-                /// <summary>The field <c>Roa1</c>.</summary>
-                [global::Moonwell.Objects.Field("Roa1", Label = "Damage Increase (%)")]
-                [global::Moonwell.Objects.Limits(0, 10)]
-                public global::Moonwell.Objects.Levels<float> DamageIncrease
-                {
-                    get { return Fields.GetLevels<float>(this, "Roa1"); }
-                    protected set { Fields.Put("Roa1", value); }
-                }
-
-                /// <summary>The field <c>Roa2</c>.</summary>
-                [global::Moonwell.Objects.Field("Roa2", Label = "Defense Increase")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<int> DefenseIncrease
-                {
-                    get { return Fields.GetLevels<int>(this, "Roa2"); }
-                    protected set { Fields.Put("Roa2", value); }
-                }
-
-                /// <summary>The field <c>Roa3</c>.</summary>
-                [global::Moonwell.Objects.Field("Roa3", Label = "Life Regeneration Rate")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> LifeRegenerationRate
-                {
-                    get { return Fields.GetLevels<float>(this, "Roa3"); }
-                    protected set { Fields.Put("Roa3", value); }
-                }
-
-                /// <summary>The field <c>Roa4</c>.</summary>
-                [global::Moonwell.Objects.Field("Roa4", Label = "Mana Regen")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> ManaRegen
-                {
-                    get { return Fields.GetLevels<float>(this, "Roa4"); }
-                    protected set { Fields.Put("Roa4", value); }
-                }
-
-                /// <summary>The field <c>Roa5</c>.</summary>
-                [global::Moonwell.Objects.Field("Roa5", Label = "Prefer Hostiles")]
-                public global::Moonwell.Objects.Levels<bool> PreferHostiles
-                {
-                    get { return Fields.GetLevels<bool>(this, "Roa5"); }
-                    protected set { Fields.Put("Roa5", value); }
-                }
-
-                /// <summary>The field <c>Roa6</c>.</summary>
-                [global::Moonwell.Objects.Field("Roa6", Label = "Prefer Friendlies")]
-                public global::Moonwell.Objects.Levels<bool> PreferFriendlies
-                {
-                    get { return Fields.GetLevels<bool>(this, "Roa6"); }
-                    protected set { Fields.Put("Roa6", value); }
-                }
-
-                /// <summary>The field <c>Roa7</c>.</summary>
-                [global::Moonwell.Objects.Field("Roa7", Label = "Max Units")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> MaxUnits
-                {
-                    get { return Fields.GetLevels<int>(this, "Roa7"); }
-                    protected set { Fields.Put("Roa7", value); }
-                }
-            }
-
-            /// <summary>Root (Aro1).</summary>
+            /// <summary>Root (Ancients), Aro1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aro1")]
             public class Root : global::Moonwell.Objects.StandardAbility
@@ -2878,7 +2928,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Root (Aro2).</summary>
+            /// <summary>Root (Ancient Protector), Aro2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aro2")]
             public class RootAro2 : global::Moonwell.Objects.StandardAbility
@@ -3168,7 +3218,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sentinel (Aesr).</summary>
+            /// <summary>Sentinel (Naisha), Aesr.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aesr")]
             public class SentinelAesr : global::Moonwell.Objects.StandardAbility
@@ -3330,7 +3380,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Shadow Meld (Sshm).</summary>
+            /// <summary>Shadow Meld (Instant), Sshm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Sshm")]
             public class ShadowMeldSshm : global::Moonwell.Objects.StandardAbility
@@ -3613,7 +3663,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sphere (Asp1).</summary>
+            /// <summary>Sphere (Vengeance - Level 1), Asp1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Asp1")]
             public class Sphere : global::Moonwell.Objects.StandardAbility
@@ -3646,7 +3696,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sphere (Asp2).</summary>
+            /// <summary>Sphere (Vengeance - Level 2), Asp2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Asp2")]
             public class SphereAsp2 : global::Moonwell.Objects.StandardAbility
@@ -3680,7 +3730,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sphere (Asp3).</summary>
+            /// <summary>Sphere (Vengeance - Level 3), Asp3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Asp3")]
             public class SphereAsp3 : global::Moonwell.Objects.StandardAbility
@@ -3715,7 +3765,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sphere (Asp4).</summary>
+            /// <summary>Sphere (Vengeance - Level 4), Asp4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Asp4")]
             public class SphereAsp4 : global::Moonwell.Objects.StandardAbility
@@ -3751,7 +3801,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sphere (Asp5).</summary>
+            /// <summary>Sphere (Vengeance - Level 5), Asp5.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Asp5")]
             public class SphereAsp5 : global::Moonwell.Objects.StandardAbility
@@ -3788,7 +3838,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sphere (Asp6).</summary>
+            /// <summary>Sphere (Vengeance - Level 6), Asp6.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Asp6")]
             public class SphereAsp6 : global::Moonwell.Objects.StandardAbility
@@ -4613,7 +4663,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Well Spring (Aews).</summary>
+            /// <summary>Well Spring (Icon), Aews.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aews")]
             public class WellSpring : global::Moonwell.Objects.StandardAbility

@@ -125,13 +125,32 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Cyclone (Bcy2).</summary>
+            /// <summary>Cyclone (Bcyc).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Bcy2")]
+            [global::Moonwell.Objects.Standard("Bcyc")]
             public class Cyclone : global::Moonwell.Objects.StandardBuff
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Cyclone()
+                {
+                    Effect = "Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdl";
+                    EffectSoundLooping = "CycloneLoop";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCyclone.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    TargetAttachmentPoint1 = "sprite,first";
+                    Tooltip = "Cyclone";
+                    TooltipExtended = "This unit is in a Cyclone; it cannot move, attack or cast spells.";
+                }
+            }
+
+            /// <summary>Cyclone (Extra), Bcy2.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("Bcy2")]
+            public class CycloneBcy2 : global::Moonwell.Objects.StandardBuff
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CycloneBcy2()
                 {
                     EditorSuffix = "(Extra)";
                     Effect = "Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdl";
@@ -140,25 +159,6 @@ namespace Moonwell.Objects
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNCyclone.blp";
                     IsAnEffect = false;
                     Race = global::Moonwell.Objects.UnitRace.NightElf;
-                    Tooltip = "Cyclone";
-                    TooltipExtended = "This unit is in a Cyclone; it cannot move, attack or cast spells.";
-                }
-            }
-
-            /// <summary>Cyclone (Bcyc).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Bcyc")]
-            public class CycloneBcyc : global::Moonwell.Objects.StandardBuff
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public CycloneBcyc()
-                {
-                    Effect = "Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdl";
-                    EffectSoundLooping = "CycloneLoop";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNCyclone.blp";
-                    IsAnEffect = false;
-                    Race = global::Moonwell.Objects.UnitRace.NightElf;
-                    TargetAttachmentPoint1 = "sprite,first";
                     Tooltip = "Cyclone";
                     TooltipExtended = "This unit is in a Cyclone; it cannot move, attack or cast spells.";
                 }
@@ -264,13 +264,33 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mana Flare (Bmfa).</summary>
+            /// <summary>Mana Flare (Bmfl).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Bmfa")]
+            [global::Moonwell.Objects.Standard("Bmfl")]
             public class ManaFlare : global::Moonwell.Objects.StandardBuff
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public ManaFlare()
+                {
+                    EffectSoundLooping = "ManaFlareLoop";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNManaFlare.blp";
+                    IsAnEffect = false;
+                    Lightning = global::Moonwell.Objects.LightningEffect.MFPB;
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Target = "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareBase.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    Tooltip = "Mana Flare";
+                    TooltipExtended = "This unit has Mana Flare on it; nearby enemy units that cast spells will take damage.";
+                }
+            }
+
+            /// <summary>Mana Flare (Extra), Bmfa.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("Bmfa")]
+            public class ManaFlareBmfa : global::Moonwell.Objects.StandardBuff
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ManaFlareBmfa()
                 {
                     EditorSuffix = "(Extra)";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNManaFlare.blp";
@@ -281,26 +301,6 @@ namespace Moonwell.Objects
                     Race = global::Moonwell.Objects.UnitRace.NightElf;
                     Special = "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareBoltImpact.mdl";
                     Target = "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareTarget.mdl";
-                    TargetAttachmentPoint1 = "overhead";
-                    Tooltip = "Mana Flare";
-                    TooltipExtended = "This unit has Mana Flare on it; nearby enemy units that cast spells will take damage.";
-                }
-            }
-
-            /// <summary>Mana Flare (Bmfl).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Bmfl")]
-            public class ManaFlareBmfl : global::Moonwell.Objects.StandardBuff
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public ManaFlareBmfl()
-                {
-                    EffectSoundLooping = "ManaFlareLoop";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNManaFlare.blp";
-                    IsAnEffect = false;
-                    Lightning = global::Moonwell.Objects.LightningEffect.MFPB;
-                    Race = global::Moonwell.Objects.UnitRace.NightElf;
-                    Target = "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareBase.mdl";
                     TargetAttachmentPoint1 = "overhead";
                     Tooltip = "Mana Flare";
                     TooltipExtended = "This unit has Mana Flare on it; nearby enemy units that cast spells will take damage.";
@@ -410,7 +410,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Slow Poison (Bspo).</summary>
+            /// <summary>Slow Poison (Non-stacking), Bspo.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Bspo")]
             public class SlowPoison : global::Moonwell.Objects.StandardBuff
@@ -429,7 +429,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Slow Poison (Bssd).</summary>
+            /// <summary>Slow Poison (Stacking), Bssd.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Bssd")]
             public class SlowPoisonBssd : global::Moonwell.Objects.StandardBuff

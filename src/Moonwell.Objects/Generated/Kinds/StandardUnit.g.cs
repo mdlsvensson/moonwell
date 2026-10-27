@@ -169,8 +169,8 @@ namespace Moonwell.Objects
                 ["uocc"] = typeof(float),
                 ["uoct"] = typeof(global::Moonwell.Objects.OcclusionType),
                 ["uori"] = typeof(int),
-                ["upap"] = typeof(global::Moonwell.Objects.PathingListPrevent),
-                ["upar"] = typeof(global::Moonwell.Objects.PathingListRequire),
+                ["upap"] = typeof(global::Moonwell.Objects.PathingRequire),
+                ["upar"] = typeof(global::Moonwell.Objects.PathingPrevent),
                 ["upat"] = typeof(string),
                 ["upaw"] = typeof(float),
                 ["upgr"] = typeof(global::Moonwell.Objects.ObjectList<global::Moonwell.Upgrade>),
@@ -1514,17 +1514,17 @@ namespace Moonwell.Objects
 
         /// <summary>The field <c>upap</c>.</summary>
         [global::Moonwell.Objects.Field("upap", Label = "Placement Requires")]
-        public global::Moonwell.Objects.PathingListPrevent PlacementRequires
+        public global::Moonwell.Objects.PathingRequire PlacementRequires
         {
-            get { return Fields.Get<global::Moonwell.Objects.PathingListPrevent>(this, "upap"); }
+            get { return Fields.Get<global::Moonwell.Objects.PathingRequire>(this, "upap"); }
             protected set { Fields.Put("upap", value); }
         }
 
         /// <summary>The field <c>upar</c>.</summary>
         [global::Moonwell.Objects.Field("upar", Label = "Placement Prevented By")]
-        public global::Moonwell.Objects.PathingListRequire PlacementPreventedBy
+        public global::Moonwell.Objects.PathingPrevent PlacementPreventedBy
         {
-            get { return Fields.Get<global::Moonwell.Objects.PathingListRequire>(this, "upar"); }
+            get { return Fields.Get<global::Moonwell.Objects.PathingPrevent>(this, "upar"); }
             protected set { Fields.Put("upar", value); }
         }
 

@@ -97,9 +97,9 @@ namespace Moonwell.Objects
                     Race = global::Moonwell.Objects.UnitRace.Orc;
                     RequiredLevel = 0;
                     Requires.Add("icon only");
-                    Requires.Add(" orc");
-                    Requires.Add(" Aeth");
-                    Requires.Add(" unused");
+                    Requires.Add("orc");
+                    Requires.Add<global::Moonwell.Objects.Undead.Abilities.GhostAeth>();
+                    Requires.Add("unused");
                     UseNewDefaultLevelCap = false;
                 }
             }
@@ -206,7 +206,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Battle Stations (Sbtl).</summary>
+            /// <summary>Battle Stations (Fel Orc Burrow), Sbtl.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Sbtl")]
             public class BattleStationsSbtl : global::Moonwell.Objects.StandardAbility
@@ -326,46 +326,13 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Berserker Upgrade (Aobk).</summary>
+            /// <summary>Berserker Upgrade (Sbsk).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Aobk")]
+            [global::Moonwell.Objects.Standard("Sbsk")]
             public class BerserkerUpgrade : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public BerserkerUpgrade()
-                {
-                    ButtonPositionNormalX = 1;
-                    ButtonPositionNormalY = 2;
-                    CastTime = Levels(0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(0f);
-                    Duration = Levels(0f);
-                    EditorSuffix = "(Icon)";
-                    HeroAbility = false;
-                    HeroDuration = Levels(0f);
-                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNHeadHunterBerserker.blp";
-                    ItemAbility = false;
-                    LevelCount = 1;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(0);
-                    Name = "Berserker Upgrade";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Orc;
-                    RequiredLevel = 0;
-                    Requires.Set<global::Moonwell.Objects.Orc.Upgrades.BerserkerUpgrade>();
-                    Tooltip = Levels("Berserker Upgrade");
-                    TooltipExtended = Levels("Transforms Headhunters into Berserkers, giving them increased hit points and the Berserk ability.");
-                    UseNewDefaultLevelCap = false;
-                }
-            }
-
-            /// <summary>Berserker Upgrade (Sbsk).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Sbsk")]
-            public class BerserkerUpgradeSbsk : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public BerserkerUpgradeSbsk()
                 {
                     CastTime = Levels(0f);
                     CheckDependencies = true;
@@ -392,6 +359,39 @@ namespace Moonwell.Objects
                 public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> NewUnitType
                 {
                     get { return Fields.GetRef<global::Moonwell.Unit>("Cha1"); }
+                }
+            }
+
+            /// <summary>Berserker Upgrade (Icon), Aobk.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("Aobk")]
+            public class BerserkerUpgradeAobk : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BerserkerUpgradeAobk()
+                {
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Icon)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNHeadHunterBerserker.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Berserker Upgrade";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    RequiredLevel = 0;
+                    Requires.Set<global::Moonwell.Objects.Orc.Upgrades.BerserkerUpgrade>();
+                    Tooltip = Levels("Berserker Upgrade");
+                    TooltipExtended = Levels("Transforms Headhunters into Berserkers, giving them increased hit points and the Berserk ability.");
+                    UseNewDefaultLevelCap = false;
                 }
             }
 
@@ -576,7 +576,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Brute Strength (Aobs).</summary>
+            /// <summary>Brute Strength (Icon), Aobs.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aobs")]
             public class BruteStrength : global::Moonwell.Objects.StandardAbility
@@ -894,7 +894,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public CorporealForm()
                 {
-                    AlternateFormUnit.Set<global::Moonwell.Objects.Orc.Units.SpiritWalkerOspw>();
+                    AlternateFormUnit.Set<global::Moonwell.Objects.Orc.Units.SpiritWalker>();
                     AltitudeAdjustmentDuration = Levels(0f);
                     ButtonPositionNormalX = 3;
                     ButtonPositionNormalY = 2;
@@ -919,7 +919,7 @@ namespace Moonwell.Objects
                     ManaCost = Levels(0);
                     MorphingFlags = Levels(global::Moonwell.Objects.MorphFlags.Uninterruptable);
                     Name = "Corporeal Form";
-                    NormalFormUnit.Set<global::Moonwell.Objects.Orc.Units.SpiritWalker>();
+                    NormalFormUnit.Set<global::Moonwell.Objects.Orc.Units.SpiritWalkerOspm>();
                     Order = "corporealform";
                     OrderStringTurnOff = "uncorporealform";
                     PriorityForSpellSteal = 0;
@@ -1070,7 +1070,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Detector (Adt1).</summary>
+            /// <summary>Detector (Sentry Ward), Adt1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Adt1")]
             public class Detector : global::Moonwell.Objects.StandardAbility
@@ -1217,13 +1217,73 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Disenchant (Adch).</summary>
+            /// <summary>Disenchant (Adcn).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Adch")]
+            [global::Moonwell.Objects.Standard("Adcn")]
             public class Disenchant : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Disenchant()
+                {
+                    Area = Levels(250f);
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EffectSound = "Disenchant";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDisenchant.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100);
+                    ManaLoss = Levels(0f);
+                    Name = "Disenchant";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Range = Levels(650f);
+                    RequiredLevel = 0;
+                    RequirementsLevels = "1";
+                    Requires.Set<global::Moonwell.Objects.Orc.Upgrades.SpiritWalkerAdeptTraining>();
+                    SummonedUnitDamage = Levels(250f);
+                    Target = "Abilities\\Spells\\Orc\\Disenchant\\DisenchantSpecialArt.mdl";
+                    TargetAttachmentPoint1 = "head";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Tree | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Ward);
+                    Tooltip = Levels("Disenchant");
+                    TooltipExtended = Levels("Removes all buffs from units in a target area. |n|cffffcc00Deals <Adcn,DataB1> damage to hostile summoned units.|r");
+                    UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Adm1</c>.</summary>
+                [global::Moonwell.Objects.Field("Adm1", Label = "Mana Loss")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ManaLoss
+                {
+                    get { return Fields.GetLevels<float>(this, "Adm1"); }
+                    protected set { Fields.Put("Adm1", value); }
+                }
+
+                /// <summary>The field <c>Adm2</c>.</summary>
+                [global::Moonwell.Objects.Field("Adm2", Label = "Summoned Unit Damage")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> SummonedUnitDamage
+                {
+                    get { return Fields.GetLevels<float>(this, "Adm2"); }
+                    protected set { Fields.Put("Adm2", value); }
+                }
+            }
+
+            /// <summary>Disenchant (Old), Adch.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("Adch")]
+            public class DisenchantAdch : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DisenchantAdch()
                 {
                     Area = Levels(200f);
                     ButtonPositionNormalX = 1;
@@ -1256,66 +1316,6 @@ namespace Moonwell.Objects
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Ward);
                     Tooltip = Levels("Disenchant");
                     TooltipExtended = Levels("Removes all buffs from units in a target area. |n|cffffcc00Deals <Adch,DataB1> damage to summoned units.|r");
-                    UseNewDefaultLevelCap = false;
-                }
-
-                /// <summary>The field <c>Adm1</c>.</summary>
-                [global::Moonwell.Objects.Field("Adm1", Label = "Mana Loss")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> ManaLoss
-                {
-                    get { return Fields.GetLevels<float>(this, "Adm1"); }
-                    protected set { Fields.Put("Adm1", value); }
-                }
-
-                /// <summary>The field <c>Adm2</c>.</summary>
-                [global::Moonwell.Objects.Field("Adm2", Label = "Summoned Unit Damage")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> SummonedUnitDamage
-                {
-                    get { return Fields.GetLevels<float>(this, "Adm2"); }
-                    protected set { Fields.Put("Adm2", value); }
-                }
-            }
-
-            /// <summary>Disenchant (Adcn).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Adcn")]
-            public class DisenchantAdcn : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public DisenchantAdcn()
-                {
-                    Area = Levels(250f);
-                    ButtonPositionNormalX = 1;
-                    ButtonPositionNormalY = 2;
-                    CastTime = Levels(0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(0f);
-                    Duration = Levels(0f);
-                    EffectSound = "Disenchant";
-                    HeroAbility = false;
-                    HeroDuration = Levels(0f);
-                    Hotkey = "D";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDisenchant.blp";
-                    ItemAbility = false;
-                    LevelCount = 1;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(100);
-                    ManaLoss = Levels(0f);
-                    Name = "Disenchant";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Orc;
-                    Range = Levels(650f);
-                    RequiredLevel = 0;
-                    RequirementsLevels = "1";
-                    Requires.Set<global::Moonwell.Objects.Orc.Upgrades.SpiritWalkerAdeptTraining>();
-                    SummonedUnitDamage = Levels(250f);
-                    Target = "Abilities\\Spells\\Orc\\Disenchant\\DisenchantSpecialArt.mdl";
-                    TargetAttachmentPoint1 = "head";
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Tree | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Ward);
-                    Tooltip = Levels("Disenchant");
-                    TooltipExtended = Levels("Removes all buffs from units in a target area. |n|cffffcc00Deals <Adcn,DataB1> damage to hostile summoned units.|r");
                     UseNewDefaultLevelCap = false;
                 }
 
@@ -1484,7 +1484,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Endurance Aura (AOr2).</summary>
+            /// <summary>Endurance Aura (Cairne), AOr2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AOr2")]
             public class EnduranceAuraAOr2 : global::Moonwell.Objects.StandardAbility
@@ -1732,7 +1732,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public EtherealForm()
                 {
-                    AlternateFormUnit.Set<global::Moonwell.Objects.Orc.Units.SpiritWalker>();
+                    AlternateFormUnit.Set<global::Moonwell.Objects.Orc.Units.SpiritWalkerOspm>();
                     AltitudeAdjustmentDuration = Levels(0f);
                     ButtonPositionNormalX = 3;
                     ButtonPositionNormalY = 2;
@@ -1757,7 +1757,7 @@ namespace Moonwell.Objects
                     ManaCost = Levels(0);
                     MorphingFlags = Levels(global::Moonwell.Objects.MorphFlags.Uninterruptable);
                     Name = "Ethereal Form";
-                    NormalFormUnit.Set<global::Moonwell.Objects.Orc.Units.SpiritWalkerOspw>();
+                    NormalFormUnit.Set<global::Moonwell.Objects.Orc.Units.SpiritWalker>();
                     Order = "etherealform";
                     OrderStringTurnOff = "unetherealform";
                     PriorityForSpellSteal = 0;
@@ -1925,7 +1925,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Healing Ward (Ahwd).</summary>
+            /// <summary>Healing Ward (Witch Doctor), Ahwd.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Ahwd")]
             public class HealingWard : global::Moonwell.Objects.StandardAbility
@@ -1972,7 +1972,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Healing Ward Aura (Aoar).</summary>
+            /// <summary>Healing Ward Aura (Healing Ward), Aoar.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aoar")]
             public class HealingWardAura : global::Moonwell.Objects.StandardAbility
@@ -2022,13 +2022,88 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Healing Wave (ANhw).</summary>
+            /// <summary>Healing Wave (AOhw).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("ANhw")]
+            [global::Moonwell.Objects.Standard("AOhw")]
             public class HealingWave : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public HealingWave()
+                {
+                    AnimationNames = "spell,throw";
+                    Area = Levels(500f, 500f, 500f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(9f, 9f, 9f);
+                    DamagePerTarget = Levels(130f, 215f, 300f);
+                    DamageReductionPerTarget = Levels(0.25f, 0.25f, 0.25f);
+                    Duration = Levels(0f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHealingWave.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNHealingWave.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "E";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    LightningEffects = "HWPB,HWSB";
+                    ManaCost = Levels(90, 90, 90);
+                    Name = "Healing Wave";
+                    NumberOfTargetsHit = Levels(3, 4, 5);
+                    Order = "healingwave";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Range = Levels(700f, 700f, 700f);
+                    RequiredLevel = 1;
+                    Target = "Abilities\\Spells\\Orc\\HealingWave\\HealingWaveTarget.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Healing Wave - [|cffffcc00Level 1|r]", "Healing Wave - [|cffffcc00Level 2|r]", "Healing Wave - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Calls forth a wave of healing energy that bounces up to <AOhw,DataB1> times, healing <AOhw,DataA1> damage on the primary target. Each bounce restores fewer hit points.", "Calls forth a wave of healing energy that bounces up to <AOhw,DataB2> times, healing <AOhw,DataA2> damage on the primary target. Each bounce restores fewer hit points.", "Calls forth a wave of healing energy that bounces up to <AOhw,DataB3> times, healing <AOhw,DataA3> damage on the primary target. Each bounce restores fewer hit points.");
+                    TooltipLearn = "Learn Healing Wave - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Calls forth a wave of energy that heals a target and bounces to nearby friendlies. Each bounce restores fewer hit points. |n|n|cffffcc00Level 1|r - Heals <AOhw,DataA1> damage, jumps <AOhw,DataB1> times. |n|cffffcc00Level 2|r - Heals <AOhw,DataA2> damage, jumps <AOhw,DataB2> times. |n|cffffcc00Level 3|r - Heals <AOhw,DataA3> damage, jumps <AOhw,DataB3> times.";
+                    UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Ocl1</c>.</summary>
+                [global::Moonwell.Objects.Field("Ocl1", Label = "Damage per Target")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> DamagePerTarget
+                {
+                    get { return Fields.GetLevels<float>(this, "Ocl1"); }
+                    protected set { Fields.Put("Ocl1", value); }
+                }
+
+                /// <summary>The field <c>Ocl2</c>.</summary>
+                [global::Moonwell.Objects.Field("Ocl2", Label = "Number of Targets Hit")]
+                [global::Moonwell.Objects.Limits(1, 16)]
+                public global::Moonwell.Objects.Levels<int> NumberOfTargetsHit
+                {
+                    get { return Fields.GetLevels<int>(this, "Ocl2"); }
+                    protected set { Fields.Put("Ocl2", value); }
+                }
+
+                /// <summary>The field <c>Ocl3</c>.</summary>
+                [global::Moonwell.Objects.Field("Ocl3", Label = "Damage Reduction per Target")]
+                [global::Moonwell.Objects.Limits(0, 1)]
+                public global::Moonwell.Objects.Levels<float> DamageReductionPerTarget
+                {
+                    get { return Fields.GetLevels<float>(this, "Ocl3"); }
+                    protected set { Fields.Put("Ocl3", value); }
+                }
+            }
+
+            /// <summary>Healing Wave (Rokhan), ANhw.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("ANhw")]
+            public class HealingWaveANhw : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public HealingWaveANhw()
                 {
                     AnimationNames = "spell,throw";
                     Area = Levels(500f, 500f, 500f, 500f);
@@ -2098,84 +2173,9 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Healing Wave (AOhw).</summary>
+            /// <summary>Hex (AOhx).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AOhw")]
-            public class HealingWaveAOhw : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public HealingWaveAOhw()
-                {
-                    AnimationNames = "spell,throw";
-                    Area = Levels(500f, 500f, 500f);
-                    ButtonPositionNormalX = 0;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 0;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(9f, 9f, 9f);
-                    DamagePerTarget = Levels(130f, 215f, 300f);
-                    DamageReductionPerTarget = Levels(0.25f, 0.25f, 0.25f);
-                    Duration = Levels(0f);
-                    HeroAbility = true;
-                    HeroDuration = Levels(0f);
-                    Hotkey = "E";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHealingWave.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNHealingWave.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "E";
-                    LevelCount = 3;
-                    LevelSkipRequirement = 0;
-                    LightningEffects = "HWPB,HWSB";
-                    ManaCost = Levels(90, 90, 90);
-                    Name = "Healing Wave";
-                    NumberOfTargetsHit = Levels(3, 4, 5);
-                    Order = "healingwave";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Orc;
-                    Range = Levels(700f, 700f, 700f);
-                    RequiredLevel = 1;
-                    Target = "Abilities\\Spells\\Orc\\HealingWave\\HealingWaveTarget.mdl";
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
-                    Tooltip = Levels("Healing Wave - [|cffffcc00Level 1|r]", "Healing Wave - [|cffffcc00Level 2|r]", "Healing Wave - [|cffffcc00Level 3|r]");
-                    TooltipExtended = Levels("Calls forth a wave of healing energy that bounces up to <AOhw,DataB1> times, healing <AOhw,DataA1> damage on the primary target. Each bounce restores fewer hit points.", "Calls forth a wave of healing energy that bounces up to <AOhw,DataB2> times, healing <AOhw,DataA2> damage on the primary target. Each bounce restores fewer hit points.", "Calls forth a wave of healing energy that bounces up to <AOhw,DataB3> times, healing <AOhw,DataA3> damage on the primary target. Each bounce restores fewer hit points.");
-                    TooltipLearn = "Learn Healing Wave - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Calls forth a wave of energy that heals a target and bounces to nearby friendlies. Each bounce restores fewer hit points. |n|n|cffffcc00Level 1|r - Heals <AOhw,DataA1> damage, jumps <AOhw,DataB1> times. |n|cffffcc00Level 2|r - Heals <AOhw,DataA2> damage, jumps <AOhw,DataB2> times. |n|cffffcc00Level 3|r - Heals <AOhw,DataA3> damage, jumps <AOhw,DataB3> times.";
-                    UseNewDefaultLevelCap = false;
-                }
-
-                /// <summary>The field <c>Ocl1</c>.</summary>
-                [global::Moonwell.Objects.Field("Ocl1", Label = "Damage per Target")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> DamagePerTarget
-                {
-                    get { return Fields.GetLevels<float>(this, "Ocl1"); }
-                    protected set { Fields.Put("Ocl1", value); }
-                }
-
-                /// <summary>The field <c>Ocl2</c>.</summary>
-                [global::Moonwell.Objects.Field("Ocl2", Label = "Number of Targets Hit")]
-                [global::Moonwell.Objects.Limits(1, 16)]
-                public global::Moonwell.Objects.Levels<int> NumberOfTargetsHit
-                {
-                    get { return Fields.GetLevels<int>(this, "Ocl2"); }
-                    protected set { Fields.Put("Ocl2", value); }
-                }
-
-                /// <summary>The field <c>Ocl3</c>.</summary>
-                [global::Moonwell.Objects.Field("Ocl3", Label = "Damage Reduction per Target")]
-                [global::Moonwell.Objects.Limits(0, 1)]
-                public global::Moonwell.Objects.Levels<float> DamageReductionPerTarget
-                {
-                    get { return Fields.GetLevels<float>(this, "Ocl3"); }
-                    protected set { Fields.Put("Ocl3", value); }
-                }
-            }
-
-            /// <summary>Hex (ANhx).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("ANhx")]
+            [global::Moonwell.Objects.Standard("AOhx")]
             public class Hex : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
@@ -2186,24 +2186,23 @@ namespace Moonwell.Objects
                     ButtonPositionNormalY = 2;
                     ButtonPositionResearchX = 1;
                     ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f, 0f, 0f, 0f);
+                    CastTime = Levels(0f, 0f, 0f);
                     CheckDependencies = true;
-                    Cooldown = Levels(7f, 7f, 7f, 7f);
-                    Duration = Levels(15f, 30f, 45f, 45f);
-                    EditorSuffix = "(Rokhan)";
+                    Cooldown = Levels(7f, 7f, 7f);
+                    Duration = Levels(15f, 30f, 45f);
                     HeroAbility = true;
-                    HeroDuration = Levels(4f, 5f, 6f, 6f);
+                    HeroDuration = Levels(4f, 5f, 6f);
                     Hotkey = "X";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNHex.blp";
                     IconResearch = "ReplaceableTextures\\CommandButtons\\BTNHex.blp";
                     ItemAbility = false;
                     LearnHotkey = "X";
-                    LevelCount = 4;
+                    LevelCount = 3;
                     LevelSkipRequirement = 0;
-                    ManaCost = Levels(70, 70, 70, 25);
-                    MaximumCreepLevel = Levels(99, 99, 99, 99);
+                    ManaCost = Levels(70, 70, 70);
+                    MaximumCreepLevel = Levels(99, 99, 99);
                     MorphUnitsAir.Set<global::Moonwell.Objects.Critters.Units.Albatross, global::Moonwell.Objects.Critters.Units.Vulture, global::Moonwell.Objects.Critters.Units.SnowyOwl>();
-                    MorphUnitsAmphibious.Set<global::Moonwell.Objects.Critters.Units.Sheep, global::Moonwell.Objects.Critters.Units.Penguin>();
+                    MorphUnitsAmphibious.Set<global::Moonwell.Objects.Critters.Units.SheepNsha, global::Moonwell.Objects.Critters.Units.Penguin>();
                     MorphUnitsGround.Set<global::Moonwell.Objects.Critters.Units.Pig, global::Moonwell.Objects.Critters.Units.Seal, global::Moonwell.Objects.Critters.Units.Crab, global::Moonwell.Objects.Critters.Units.HermitCrab, global::Moonwell.Objects.Critters.Units.Rat, global::Moonwell.Objects.Critters.Units.Frog, global::Moonwell.Objects.Critters.Units.Chicken, global::Moonwell.Objects.Critters.Units.Rabbit>();
                     MorphUnitsGround.Add<global::Moonwell.Objects.Critters.Units.Raccoon>();
                     MorphUnitsWater.Set<global::Moonwell.Objects.Critters.Units.SheepNshw, global::Moonwell.Objects.Critters.Units.PenguinNpnw>();
@@ -2211,14 +2210,14 @@ namespace Moonwell.Objects
                     Order = "hex";
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Orc;
-                    Range = Levels(800f, 800f, 800f, 800f);
+                    Range = Levels(800f, 800f, 800f);
                     RequiredLevel = 1;
                     Special = "Abilities\\Spells\\Human\\Polymorph\\PolyMorphDoneGround.mdl";
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
-                    Tooltip = Levels("Hex - [|cffffcc00Level 1|r]", "Hex - [|cffffcc00Level 2|r]", "Hex - [|cffffcc00Level 3|r]", "Hex - [|cffffcc00Level 4|r]");
-                    TooltipExtended = Levels("Transforms an enemy unit into a random critter for <ANhx,Dur1> seconds.", "Transforms an enemy unit into a random critter for <ANhx,Dur2> seconds.", "Transforms an enemy unit into a random critter for <ANhx,Dur3> seconds.", "Transforms an enemy unit into a random critter for <ANhx,Dur4> seconds.");
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Hex - [|cffffcc00Level 1|r]", "Hex - [|cffffcc00Level 2|r]", "Hex - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Transforms an enemy unit into a random critter for <AOhx,Dur1> seconds. Hex disables a unit’s abilities, item usage, ability to attack, and slows the unit to minimum movement speed.", "Transforms an enemy unit into a random critter for <AOhx,Dur2> seconds. Hex disables a unit’s abilities, item usage, ability to attack, and slows the unit to minimum movement speed.", "Transforms an enemy unit into a random critter for <AOhx,Dur3> seconds. Hex disables a unit’s abilities, item usage, ability to attack, and slows the unit to minimum movement speed.");
                     TooltipLearn = "Learn Hex - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Transforms an enemy unit into a random critter, disabling special abilities. |n|n|cffffcc00Level 1|r - <ANhx,Cost1> mana, lasts <ANhx,Dur1> seconds. |n|cffffcc00Level 2|r - <ANhx,Cost2> mana, lasts <ANhx,Dur2> seconds. |n|cffffcc00Level 3|r - <ANhx,Cost3> mana, lasts <ANhx,Dur3> seconds. |n|cffffcc00Level 4|r - <ANhx,Cost4> mana, lasts <ANhx,Dur4> seconds.";
+                    TooltipLearnExtended = "Transforms an enemy unit into a random critter, disabling special abilities. Hex disables a unit’s abilities, item usage, ability to attack, and slows the unit to minimum movement speed. |n|n|cffffcc00Level 1|r - Lasts <AOhx,Dur1> seconds. |n|cffffcc00Level 2|r - Lasts <AOhx,Dur2> seconds. |n|cffffcc00Level 3|r - Lasts <AOhx,Dur3> seconds.";
                     UseNewDefaultLevelCap = false;
                 }
 
@@ -2260,36 +2259,37 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Hex (AOhx).</summary>
+            /// <summary>Hex (Rokhan), ANhx.</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AOhx")]
-            public class HexAOhx : global::Moonwell.Objects.StandardAbility
+            [global::Moonwell.Objects.Standard("ANhx")]
+            public class HexANhx : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public HexAOhx()
+                public HexANhx()
                 {
                     Buffs.Set<global::Moonwell.Objects.Orc.Buffs.Hex>();
                     ButtonPositionNormalX = 1;
                     ButtonPositionNormalY = 2;
                     ButtonPositionResearchX = 1;
                     ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f, 0f, 0f);
+                    CastTime = Levels(0f, 0f, 0f, 0f);
                     CheckDependencies = true;
-                    Cooldown = Levels(7f, 7f, 7f);
-                    Duration = Levels(15f, 30f, 45f);
+                    Cooldown = Levels(7f, 7f, 7f, 7f);
+                    Duration = Levels(15f, 30f, 45f, 45f);
+                    EditorSuffix = "(Rokhan)";
                     HeroAbility = true;
-                    HeroDuration = Levels(4f, 5f, 6f);
+                    HeroDuration = Levels(4f, 5f, 6f, 6f);
                     Hotkey = "X";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNHex.blp";
                     IconResearch = "ReplaceableTextures\\CommandButtons\\BTNHex.blp";
                     ItemAbility = false;
                     LearnHotkey = "X";
-                    LevelCount = 3;
+                    LevelCount = 4;
                     LevelSkipRequirement = 0;
-                    ManaCost = Levels(70, 70, 70);
-                    MaximumCreepLevel = Levels(99, 99, 99);
+                    ManaCost = Levels(70, 70, 70, 25);
+                    MaximumCreepLevel = Levels(99, 99, 99, 99);
                     MorphUnitsAir.Set<global::Moonwell.Objects.Critters.Units.Albatross, global::Moonwell.Objects.Critters.Units.Vulture, global::Moonwell.Objects.Critters.Units.SnowyOwl>();
-                    MorphUnitsAmphibious.Set<global::Moonwell.Objects.Critters.Units.Sheep, global::Moonwell.Objects.Critters.Units.Penguin>();
+                    MorphUnitsAmphibious.Set<global::Moonwell.Objects.Critters.Units.SheepNsha, global::Moonwell.Objects.Critters.Units.Penguin>();
                     MorphUnitsGround.Set<global::Moonwell.Objects.Critters.Units.Pig, global::Moonwell.Objects.Critters.Units.Seal, global::Moonwell.Objects.Critters.Units.Crab, global::Moonwell.Objects.Critters.Units.HermitCrab, global::Moonwell.Objects.Critters.Units.Rat, global::Moonwell.Objects.Critters.Units.Frog, global::Moonwell.Objects.Critters.Units.Chicken, global::Moonwell.Objects.Critters.Units.Rabbit>();
                     MorphUnitsGround.Add<global::Moonwell.Objects.Critters.Units.Raccoon>();
                     MorphUnitsWater.Set<global::Moonwell.Objects.Critters.Units.SheepNshw, global::Moonwell.Objects.Critters.Units.PenguinNpnw>();
@@ -2297,14 +2297,14 @@ namespace Moonwell.Objects
                     Order = "hex";
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Orc;
-                    Range = Levels(800f, 800f, 800f);
+                    Range = Levels(800f, 800f, 800f, 800f);
                     RequiredLevel = 1;
                     Special = "Abilities\\Spells\\Human\\Polymorph\\PolyMorphDoneGround.mdl";
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
-                    Tooltip = Levels("Hex - [|cffffcc00Level 1|r]", "Hex - [|cffffcc00Level 2|r]", "Hex - [|cffffcc00Level 3|r]");
-                    TooltipExtended = Levels("Transforms an enemy unit into a random critter for <AOhx,Dur1> seconds. Hex disables a unit’s abilities, item usage, ability to attack, and slows the unit to minimum movement speed.", "Transforms an enemy unit into a random critter for <AOhx,Dur2> seconds. Hex disables a unit’s abilities, item usage, ability to attack, and slows the unit to minimum movement speed.", "Transforms an enemy unit into a random critter for <AOhx,Dur3> seconds. Hex disables a unit’s abilities, item usage, ability to attack, and slows the unit to minimum movement speed.");
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Hex - [|cffffcc00Level 1|r]", "Hex - [|cffffcc00Level 2|r]", "Hex - [|cffffcc00Level 3|r]", "Hex - [|cffffcc00Level 4|r]");
+                    TooltipExtended = Levels("Transforms an enemy unit into a random critter for <ANhx,Dur1> seconds.", "Transforms an enemy unit into a random critter for <ANhx,Dur2> seconds.", "Transforms an enemy unit into a random critter for <ANhx,Dur3> seconds.", "Transforms an enemy unit into a random critter for <ANhx,Dur4> seconds.");
                     TooltipLearn = "Learn Hex - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Transforms an enemy unit into a random critter, disabling special abilities. Hex disables a unit’s abilities, item usage, ability to attack, and slows the unit to minimum movement speed. |n|n|cffffcc00Level 1|r - Lasts <AOhx,Dur1> seconds. |n|cffffcc00Level 2|r - Lasts <AOhx,Dur2> seconds. |n|cffffcc00Level 3|r - Lasts <AOhx,Dur3> seconds.";
+                    TooltipLearnExtended = "Transforms an enemy unit into a random critter, disabling special abilities. |n|n|cffffcc00Level 1|r - <ANhx,Cost1> mana, lasts <ANhx,Dur1> seconds. |n|cffffcc00Level 2|r - <ANhx,Cost2> mana, lasts <ANhx,Dur2> seconds. |n|cffffcc00Level 3|r - <ANhx,Cost3> mana, lasts <ANhx,Dur3> seconds. |n|cffffcc00Level 4|r - <ANhx,Cost4> mana, lasts <ANhx,Dur4> seconds.";
                     UseNewDefaultLevelCap = false;
                 }
 
@@ -2468,7 +2468,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Load (Sloa).</summary>
+            /// <summary>Load (Orc Burrow), Sloa.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Sloa")]
             public class Load : global::Moonwell.Objects.StandardAbility
@@ -2749,13 +2749,13 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Pulverize,Pulverize (Awar).</summary>
+            /// <summary>Pulverize (Awar).</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Awar")]
-            public class PulverizePulverize : global::Moonwell.Objects.StandardAbility
+            public class Pulverize : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public PulverizePulverize()
+                public Pulverize()
                 {
                     AnimationNames = "slam";
                     ButtonPositionNormalX = 0;
@@ -2775,7 +2775,7 @@ namespace Moonwell.Objects
                     LevelCount = 2;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0, 0);
-                    Name = "Pulverize,Pulverize";
+                    Name = "Pulverize";
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Orc;
                     RequiredLevel = 0;
@@ -3018,13 +3018,61 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Reincarnation (AOr3).</summary>
+            /// <summary>Reincarnation (AOre).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AOr3")]
+            [global::Moonwell.Objects.Standard("AOre")]
             public class Reincarnation : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Reincarnation()
+                {
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(3f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(240f);
+                    Duration = Levels(0f);
+                    Effect = "Abilities\\Spells\\Orc\\Reincarnation\\ReincarnationTarget.mdl";
+                    Effects = Levels("XOre");
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNReincarnation.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNReincarnation.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    Name = "Reincarnation";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    ReincarnationDelay = Levels(5f);
+                    RequiredLevel = 6;
+                    Tooltip = Levels("Reincarnation");
+                    TooltipExtended = Levels("When killed, the Tauren Chieftain will come back to life. Reincarnation has a <AOre,Cool1> second cooldown.");
+                    TooltipLearn = "Learn Reincarnation";
+                    TooltipLearnExtended = "When killed, the Tauren Chieftain will come back to life. Reincarnation has a <AOre,Cool1> second cooldown.";
+                    UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Ore1</c>.</summary>
+                [global::Moonwell.Objects.Field("Ore1", Label = "Reincarnation Delay")]
+                [global::Moonwell.Objects.Limits(0.001, 300)]
+                public global::Moonwell.Objects.Levels<float> ReincarnationDelay
+                {
+                    get { return Fields.GetLevels<float>(this, "Ore1"); }
+                    protected set { Fields.Put("Ore1", value); }
+                }
+            }
+
+            /// <summary>Reincarnation (Cairne), AOr3.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AOr3")]
+            public class ReincarnationAOr3 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ReincarnationAOr3()
                 {
                     ButtonPositionNormalX = 3;
                     ButtonPositionNormalY = 2;
@@ -3067,54 +3115,6 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Reincarnation (AOre).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AOre")]
-            public class ReincarnationAOre : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public ReincarnationAOre()
-                {
-                    ButtonPositionNormalX = 3;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 3;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(3f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(240f);
-                    Duration = Levels(0f);
-                    Effect = "Abilities\\Spells\\Orc\\Reincarnation\\ReincarnationTarget.mdl";
-                    Effects = Levels("XOre");
-                    HeroAbility = true;
-                    HeroDuration = Levels(0f);
-                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNReincarnation.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNReincarnation.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "R";
-                    LevelCount = 1;
-                    LevelSkipRequirement = 0;
-                    Name = "Reincarnation";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Orc;
-                    ReincarnationDelay = Levels(5f);
-                    RequiredLevel = 6;
-                    Tooltip = Levels("Reincarnation");
-                    TooltipExtended = Levels("When killed, the Tauren Chieftain will come back to life. Reincarnation has a <AOre,Cool1> second cooldown.");
-                    TooltipLearn = "Learn Reincarnation";
-                    TooltipLearnExtended = "When killed, the Tauren Chieftain will come back to life. Reincarnation has a <AOre,Cool1> second cooldown.";
-                    UseNewDefaultLevelCap = false;
-                }
-
-                /// <summary>The field <c>Ore1</c>.</summary>
-                [global::Moonwell.Objects.Field("Ore1", Label = "Reincarnation Delay")]
-                [global::Moonwell.Objects.Limits(0.001, 300)]
-                public global::Moonwell.Objects.Levels<float> ReincarnationDelay
-                {
-                    get { return Fields.GetLevels<float>(this, "Ore1"); }
-                    protected set { Fields.Put("Ore1", value); }
-                }
-            }
-
             /// <summary>Reinforced Burrows Upgrade (Arbr).</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Arbr")]
@@ -3144,7 +3144,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Reinforced Defenses (Aorb).</summary>
+            /// <summary>Reinforced Defenses (Icon), Aorb.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aorb")]
             public class ReinforcedDefenses : global::Moonwell.Objects.StandardAbility
@@ -3271,7 +3271,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sca1.</summary>
+            /// <summary>(Grunt), Sca1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Sca1")]
             public class Sca1 : global::Moonwell.Objects.StandardAbility
@@ -3307,7 +3307,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sca2.</summary>
+            /// <summary>(Raider), Sca2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Sca2")]
             public class Sca2 : global::Moonwell.Objects.StandardAbility
@@ -3343,7 +3343,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sca3.</summary>
+            /// <summary>(Shaman), Sca3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Sca3")]
             public class Sca3 : global::Moonwell.Objects.StandardAbility
@@ -3379,7 +3379,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sca4.</summary>
+            /// <summary>(Kodo Beast), Sca4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Sca4")]
             public class Sca4 : global::Moonwell.Objects.StandardAbility
@@ -3415,7 +3415,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sca5.</summary>
+            /// <summary>(Peon), Sca5.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Sca5")]
             public class Sca5 : global::Moonwell.Objects.StandardAbility
@@ -3451,7 +3451,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sca6.</summary>
+            /// <summary>(Grommash), Sca6.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Sca6")]
             public class Sca6 : global::Moonwell.Objects.StandardAbility
@@ -3591,7 +3591,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Serpent Ward (Arsw).</summary>
+            /// <summary>Serpent Ward (Rokhan), Arsw.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Arsw")]
             public class SerpentWardArsw : global::Moonwell.Objects.StandardAbility
@@ -3652,13 +3652,99 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Shockwave (AOs2).</summary>
+            /// <summary>Shockwave (AOsh).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AOs2")]
+            [global::Moonwell.Objects.Standard("AOsh")]
             public class Shockwave : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Shockwave()
+                {
+                    AnimationNames = "attack,slam";
+                    Area = Levels(125f, 125f, 125f);
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.ShockwaveCaster>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(8f, 8f, 8f);
+                    Damage = Levels(75f, 130f, 200f);
+                    Distance = Levels(800f, 800f, 800f);
+                    Duration = Levels(0f);
+                    FinalArea = Levels(125f, 125f, 125f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNShockWave.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNShockWave.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "W";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(90, 90, 90);
+                    MaximumDamage = Levels(900f, 1560f, 2400f);
+                    MissileArt = "Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdl";
+                    MissileSpeed = 1050;
+                    Name = "Shockwave";
+                    Order = "shockwave";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    Range = Levels(700f, 700f, 700f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure);
+                    Tooltip = Levels("Shockwave - [|cffffcc00Level 1|r]", "Shockwave - [|cffffcc00Level 2|r]", "Shockwave - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("A wave of force that ripples outward, causing <AOsh,DataA1> damage to land units in a line.", "A wave of force that ripples outward, causing <AOsh,DataA2> damage to land units in a line.", "A wave of force that ripples outward, causing <AOsh,DataA3> damage to land units in a line.");
+                    TooltipLearn = "Learn Shockwave - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "A wave of force that ripples out from the Hero, causing damage to land units in a line. |n|n|cffffcc00Level 1|r - <AOsh,DataA1> damage. |n|cffffcc00Level 2|r - <AOsh,DataA2> damage. |n|cffffcc00Level 3|r - <AOsh,DataA3> damage.";
+                    UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Osh1</c>.</summary>
+                [global::Moonwell.Objects.Field("Osh1", Label = "Damage")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> Damage
+                {
+                    get { return Fields.GetLevels<float>(this, "Osh1"); }
+                    protected set { Fields.Put("Osh1", value); }
+                }
+
+                /// <summary>The field <c>Osh2</c>.</summary>
+                [global::Moonwell.Objects.Field("Osh2", Label = "Maximum Damage")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> MaximumDamage
+                {
+                    get { return Fields.GetLevels<float>(this, "Osh2"); }
+                    protected set { Fields.Put("Osh2", value); }
+                }
+
+                /// <summary>The field <c>Osh3</c>.</summary>
+                [global::Moonwell.Objects.Field("Osh3", Label = "Distance")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> Distance
+                {
+                    get { return Fields.GetLevels<float>(this, "Osh3"); }
+                    protected set { Fields.Put("Osh3", value); }
+                }
+
+                /// <summary>The field <c>Osh4</c>.</summary>
+                [global::Moonwell.Objects.Field("Osh4", Label = "Final Area")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> FinalArea
+                {
+                    get { return Fields.GetLevels<float>(this, "Osh4"); }
+                    protected set { Fields.Put("Osh4", value); }
+                }
+            }
+
+            /// <summary>Shockwave (Cairne), AOs2.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AOs2")]
+            public class ShockwaveAOs2 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ShockwaveAOs2()
                 {
                     AnimationNames = "attack,slam";
                     Area = Levels(150f, 150f, 150f, 150f);
@@ -3739,92 +3825,6 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Shockwave (AOsh).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AOsh")]
-            public class ShockwaveAOsh : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public ShockwaveAOsh()
-                {
-                    AnimationNames = "attack,slam";
-                    Area = Levels(125f, 125f, 125f);
-                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.ShockwaveCaster>();
-                    ButtonPositionNormalX = 0;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 0;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(8f, 8f, 8f);
-                    Damage = Levels(75f, 130f, 200f);
-                    Distance = Levels(800f, 800f, 800f);
-                    Duration = Levels(0f);
-                    FinalArea = Levels(125f, 125f, 125f);
-                    HeroAbility = true;
-                    HeroDuration = Levels(0f);
-                    Hotkey = "W";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNShockWave.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNShockWave.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "W";
-                    LevelCount = 3;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(90, 90, 90);
-                    MaximumDamage = Levels(900f, 1560f, 2400f);
-                    MissileArt = "Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdl";
-                    MissileSpeed = 1050;
-                    Name = "Shockwave";
-                    Order = "shockwave";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Orc;
-                    Range = Levels(700f, 700f, 700f);
-                    RequiredLevel = 1;
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure);
-                    Tooltip = Levels("Shockwave - [|cffffcc00Level 1|r]", "Shockwave - [|cffffcc00Level 2|r]", "Shockwave - [|cffffcc00Level 3|r]");
-                    TooltipExtended = Levels("A wave of force that ripples outward, causing <AOsh,DataA1> damage to land units in a line.", "A wave of force that ripples outward, causing <AOsh,DataA2> damage to land units in a line.", "A wave of force that ripples outward, causing <AOsh,DataA3> damage to land units in a line.");
-                    TooltipLearn = "Learn Shockwave - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "A wave of force that ripples out from the Hero, causing damage to land units in a line. |n|n|cffffcc00Level 1|r - <AOsh,DataA1> damage. |n|cffffcc00Level 2|r - <AOsh,DataA2> damage. |n|cffffcc00Level 3|r - <AOsh,DataA3> damage.";
-                    UseNewDefaultLevelCap = false;
-                }
-
-                /// <summary>The field <c>Osh1</c>.</summary>
-                [global::Moonwell.Objects.Field("Osh1", Label = "Damage")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> Damage
-                {
-                    get { return Fields.GetLevels<float>(this, "Osh1"); }
-                    protected set { Fields.Put("Osh1", value); }
-                }
-
-                /// <summary>The field <c>Osh2</c>.</summary>
-                [global::Moonwell.Objects.Field("Osh2", Label = "Maximum Damage")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> MaximumDamage
-                {
-                    get { return Fields.GetLevels<float>(this, "Osh2"); }
-                    protected set { Fields.Put("Osh2", value); }
-                }
-
-                /// <summary>The field <c>Osh3</c>.</summary>
-                [global::Moonwell.Objects.Field("Osh3", Label = "Distance")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> Distance
-                {
-                    get { return Fields.GetLevels<float>(this, "Osh3"); }
-                    protected set { Fields.Put("Osh3", value); }
-                }
-
-                /// <summary>The field <c>Osh4</c>.</summary>
-                [global::Moonwell.Objects.Field("Osh4", Label = "Final Area")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> FinalArea
-                {
-                    get { return Fields.GetLevels<float>(this, "Osh4"); }
-                    protected set { Fields.Put("Osh4", value); }
-                }
-            }
-
             /// <summary>Spiked Barricades (Aspi).</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aspi")]
@@ -3853,13 +3853,13 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Spiked Barricades,Spiked Barricades,Improved Spiked Barricades (Aosp).</summary>
+            /// <summary>Spiked Barricades (Icon), Aosp.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aosp")]
-            public class SpikedBarricadesSpikedBarricadesImprovedSpikedBarricades : global::Moonwell.Objects.StandardAbility
+            public class SpikedBarricadesAosp : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public SpikedBarricadesSpikedBarricadesImprovedSpikedBarricades()
+                public SpikedBarricadesAosp()
                 {
                     ButtonPositionNormalX = 3;
                     ButtonPositionNormalY = 2;
@@ -3870,12 +3870,12 @@ namespace Moonwell.Objects
                     EditorSuffix = "(Icon)";
                     HeroAbility = false;
                     HeroDuration = Levels(0f);
-                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNSpikedBarricades.blp,ReplaceableTextures\\PassiveButtons\\PASBTNImprovedSpikedBarricades.blp,ReplaceableTextures\\PassiveButtons\\PASBTNAdvancedSpikedBarricades.blp";
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNSpikedBarricades.blp";
                     ItemAbility = false;
                     LevelCount = 2;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
-                    Name = "Spiked Barricades,Spiked Barricades,Improved Spiked Barricades";
+                    Name = "Spiked Barricades";
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Orc;
                     RequiredLevel = 0;
@@ -4077,7 +4077,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Troll Regeneration (Aotr).</summary>
+            /// <summary>Troll Regeneration (Icon), Aotr.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aotr")]
             public class TrollRegeneration : global::Moonwell.Objects.StandardAbility
@@ -4406,7 +4406,7 @@ namespace Moonwell.Objects
                 {
                     AnimationNames = "spell,slam";
                     Area = Levels(250f, 300f, 350f, 350f);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stunned>();
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.StunnedBPSE>();
                     ButtonPositionNormalX = 1;
                     ButtonPositionNormalY = 2;
                     ButtonPositionResearchX = 1;
@@ -4460,7 +4460,7 @@ namespace Moonwell.Objects
                 {
                     AnimationNames = "spell,slam";
                     Area = Levels(250f, 300f, 350f);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stunned>();
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.StunnedBPSE>();
                     ButtonPositionNormalX = 1;
                     ButtonPositionNormalY = 2;
                     ButtonPositionResearchX = 1;

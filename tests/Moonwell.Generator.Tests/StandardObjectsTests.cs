@@ -186,7 +186,6 @@ public class StandardObjectsTests
         Assert.Equal("100", stormBolt.Values["Htb1:1"]);
         Assert.Equal("200", stormBolt.Values["Htb1:2"]);
         Assert.Equal("310", stormBolt.Values["Htb1:3"]);
-        Assert.DoesNotContain("Htb1:4", stormBolt.Values.Keys);
         Assert.DoesNotContain("Htb1", stormBolt.Values.Keys);
         Assert.DoesNotContain(stormBolt.Values.Keys, key => key.StartsWith("Hhb1", StringComparison.Ordinal));
         var holyLight = Find(abilities, "AHhb");
@@ -205,6 +204,27 @@ public class StandardObjectsTests
         Assert.Equal("BPSE", stormBolt.Values["abuf:2"]);
         Assert.DoesNotContain("aare:1", stormBolt.Values.Keys);
         Assert.DoesNotContain("aare:2", stormBolt.Values.Keys);
+    }
+
+    [Fact]
+    public void an_abilitys_columns_past_its_level_count_are_values_and_a_level_past_the_fourth_takes_the_one_before()
+    {
+        // Storm Bolt has 3 levels; its table holds DataA4 325, Cool4 9 and Cost4 75, and "-" in the columns of levels 5 and 6.
+        // The game gives a Storm Bolt of 6 levels 325 damage, 9 cooldown and 75 mana at levels 4 to 6 (game-facts, 3.0.1).
+        var stormBolt = Find(Of(Kind.Ability), "AHtb");
+
+        Assert.Equal("325", stormBolt.Values["Htb1:4"]);
+        Assert.Equal("325", stormBolt.Values["Htb1:5"]);
+        Assert.Equal("325", stormBolt.Values["Htb1:6"]);
+        Assert.Equal("75", stormBolt.Values["amcs:6"]);
+        Assert.Equal("9", stormBolt.Values["acdn:5"]);
+        Assert.DoesNotContain("Htb1:7", stormBolt.Values.Keys);
+
+        // Cast4 is "-": level 4 has no value, and so neither do 5 and 6.
+        Assert.DoesNotContain(stormBolt.Values.Keys, key => key is "acas:4" or "acas:5" or "acas:6");
+
+        // A text list per level is not a column of each level: it has values for the levels only.
+        Assert.DoesNotContain("atp1:4", stormBolt.Values.Keys);
     }
 
     [Fact]
@@ -234,6 +254,21 @@ public class StandardObjectsTests
 
         Assert.Equal("Storm Bolt, again", stormBolt.Values["atp1:1"]);
         Assert.DoesNotContain("atp1:2", stormBolt.Values.Keys);
+    }
+
+    [Fact]
+    public void a_text_field_with_an_index_alone_on_its_key_is_that_entry_of_the_list()
+    {
+        // Spell Immunity's standard name is "Spell Immunity, Spell Immunity"; the metadata gives anam index 0.
+        using var copy = new Copy();
+        copy.Replace("_locales/enus.w3mod/units/humanabilitystrings.txt", "[AHtb]", "Name=Storm Bolt", "Name=Storm Bolt, Storm Bolt Again");
+        copy.Replace("_locales/enus.w3mod/units/humanabilitystrings.txt", "[AHhb]", "Name=Holy Light", "Name=\"Holy Light, Again\"");
+
+        var abilities = Of(copy.Tables(), Kind.Ability);
+
+        Assert.Equal("Storm Bolt", Find(abilities, "AHtb").Values["anam"]);
+        Assert.Equal("Storm Bolt", Find(abilities, "AHtb").Name);
+        Assert.Equal("Holy Light, Again", Find(abilities, "AHhb").Values["anam"]);
     }
 
     [Fact]
@@ -404,8 +439,56 @@ public class StandardObjectsTests
         Assert.Equal("Arpb", holyLight.Code);
         Assert.DoesNotContain("acas:1", holyLight.Values.Keys);
         Assert.Contains("acdn:1", holyLight.Values.Keys);
-        Assert.DoesNotContain("Hhb1:1", holyLight.Values.Keys);
+
+        // Hhb1 lists AHhb, which is the ability's id: it applies whatever the code.
+        Assert.Contains("Hhb1:1", holyLight.Values.Keys);
         Assert.Equal("0", Find(abilities, "AHtb").Values["acas:1"]);
+    }
+
+    [Fact]
+    public void an_object_has_its_editor_suffix_trimmed()
+    {
+        using var copy = new Copy();
+        copy.Replace("_locales/enus.w3mod/units/humanunitstrings.txt", "[hfoo]", "Name=Footman", "Name=Footman\r\nEditorSuffix= (Campaign) ");
+
+        var units = Of(copy.Tables(), Kind.Unit);
+
+        Assert.Equal("(Campaign)", Find(units, "hfoo").EditorSuffix);
+        Assert.Equal("", Find(units, "Hpal").EditorSuffix);
+    }
+
+    [Fact]
+    public void an_editor_suffix_marked_as_the_first_entry_of_a_list_is_found()
+    {
+        // The game's metadata gives unsf and ansf index 0, so their column is EditorSuffix[0].
+        using var copy = new Copy();
+        copy.Replace("units/unitmetadata.slk", "K\"unsf\"", "C;X4;K-1", "C;X4;K0");
+        copy.Replace("_locales/enus.w3mod/units/humanunitstrings.txt", "[hfoo]", "Name=Footman", "Name=Footman\r\nEditorSuffix=(Campaign), (Other)");
+
+        Assert.Equal("(Campaign)", Find(Of(copy.Tables(), Kind.Unit), "hfoo").EditorSuffix);
+    }
+
+    [Fact]
+    public void an_upgrade_has_the_editor_suffix_of_its_first_level()
+    {
+        using var copy = new Copy();
+        copy.Replace("_locales/enus.w3mod/units/humanupgradestrings.txt", "[Rhme]", "Name=", "EditorSuffix=(First),(Second)\r\nName=");
+
+        Assert.Equal("(First)", Find(Of(copy.Tables(), Kind.Upgrade), "Rhme").EditorSuffix);
+    }
+
+    [Fact]
+    public void a_field_listed_by_the_abilitys_own_id_applies_and_takes_its_column_from_one_listed_by_the_code()
+    {
+        // As Cargo Capacity lists Sch2 to Sch5, not their code Amtc; and as AIls has Idps (by id), not Lsh1 (by code), on DataA.
+        using var copy = new Copy();
+        copy.Replace("units/abilitydata.slk", "C;X1;Y3;K\"AHhb\"", "C;X2;K\"AHhb\"", "C;X2;K\"AHtb\"");
+
+        var holyLight = Find(Of(copy.Tables(), Kind.Ability), "AHhb");
+
+        Assert.Equal("AHtb", holyLight.Code);
+        Assert.Equal("200", holyLight.Values["Hhb1:1"]);
+        Assert.DoesNotContain(holyLight.Values.Keys, key => key.StartsWith("Htb1", StringComparison.Ordinal));
     }
 
     [Fact]

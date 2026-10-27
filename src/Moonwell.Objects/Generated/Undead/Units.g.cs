@@ -397,8 +397,8 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\10x10Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementPreventedBy = global::Moonwell.Objects.PathingListRequire.Blighted;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementPreventedBy = global::Moonwell.Objects.PathingPrevent.Unblighted;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\undead\\AltarOfDarkness\\AltarOfDarkness_portrait";
@@ -453,7 +453,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Banshee()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.AntiMagicShell, global::Moonwell.Objects.Undead.Abilities.Curse, global::Moonwell.Objects.Undead.Abilities.PossessionAps2, global::Moonwell.Objects.Other.Abilities.UnitInventoryAiun>();
+                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.AntiMagicShellAam2, global::Moonwell.Objects.Undead.Abilities.Curse, global::Moonwell.Objects.Undead.Abilities.PossessionAps2, global::Moonwell.Objects.Other.Abilities.UnitInventoryAiun>();
                     AcquisitionRange = 700f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -700,7 +700,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\UndeadNecropolis.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\undead\\Necropolis\\Necropolis_portrait";
@@ -832,8 +832,8 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementPreventedBy = global::Moonwell.Objects.PathingListRequire.Blighted;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementPreventedBy = global::Moonwell.Objects.PathingPrevent.Unblighted;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\undead\\BoneYard\\BoneYard_portrait";
@@ -881,7 +881,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Burrowed Carrion Beetle (ucsB).</summary>
+            /// <summary>Burrowed Carrion Beetle (Level 2), ucsB.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ucsB")]
             public class BurrowedCarrionBeetle : global::Moonwell.Objects.StandardUnit
@@ -1006,7 +1006,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Burrowed Carrion Beetle (ucsC).</summary>
+            /// <summary>Burrowed Carrion Beetle (Level 3), ucsC.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ucsC")]
             public class BurrowedCarrionBeetleUcsC : global::Moonwell.Objects.StandardUnit
@@ -1270,7 +1270,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Carrion Beetle (ucs1).</summary>
+            /// <summary>Carrion Beetle (Level 1), ucs1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ucs1")]
             public class CarrionBeetle : global::Moonwell.Objects.StandardUnit
@@ -1408,7 +1408,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Carrion Beetle (ucs2).</summary>
+            /// <summary>Carrion Beetle (Level 2), ucs2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ucs2")]
             public class CarrionBeetleUcs2 : global::Moonwell.Objects.StandardUnit
@@ -1550,7 +1550,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Carrion Beetle (ucs3).</summary>
+            /// <summary>Carrion Beetle (Level 3), ucs3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ucs3")]
             public class CarrionBeetleUcs3 : global::Moonwell.Objects.StandardUnit
@@ -1774,8 +1774,8 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementPreventedBy = global::Moonwell.Objects.PathingListRequire.Blighted;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementPreventedBy = global::Moonwell.Objects.PathingPrevent.Unblighted;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\undead\\Crypt\\Crypt_portrait";
@@ -2235,7 +2235,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Undead.Abilities.DeathCoil, global::Moonwell.Objects.Undead.Abilities.DeathPact, global::Moonwell.Objects.Undead.Abilities.UnholyAura, global::Moonwell.Objects.Undead.Abilities.AnimateDead>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Undead.Abilities.DeathCoil, global::Moonwell.Objects.Undead.Abilities.DeathPact, global::Moonwell.Objects.Undead.Abilities.UnholyAura, global::Moonwell.Objects.Undead.Abilities.AnimateDeadAUa2>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -2341,7 +2341,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Destroyer()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.DevourMagic, global::Moonwell.Objects.Undead.Abilities.OrbOfAnnihilation, global::Moonwell.Objects.Undead.Abilities.DestroyerForm, global::Moonwell.Objects.Undead.Abilities.AbsorbMana, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.DevourMagic, global::Moonwell.Objects.Undead.Abilities.OrbOfAnnihilation, global::Moonwell.Objects.Undead.Abilities.DestroyerForm, global::Moonwell.Objects.Undead.Abilities.AbsorbMana, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -3358,8 +3358,8 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementPreventedBy = global::Moonwell.Objects.PathingListRequire.Blighted;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementPreventedBy = global::Moonwell.Objects.PathingPrevent.Unblighted;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\undead\\Graveyard\\Graveyard_portrait";
@@ -3504,7 +3504,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\UndeadNecropolis.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\undead\\Necropolis\\Necropolis_portrait";
@@ -3636,7 +3636,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\16x16Goldmine.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\undead\\HauntedMine\\HauntedMine_portrait";
@@ -4408,7 +4408,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\UndeadNecropolis.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\undead\\Necropolis\\Necropolis_portrait";
@@ -4555,8 +4555,8 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\6x6SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementPreventedBy = global::Moonwell.Objects.PathingListRequire.Blighted;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementPreventedBy = global::Moonwell.Objects.PathingPrevent.Unblighted;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\undead\\Ziggurat\\Ziggurat_portrait";
@@ -4837,8 +4837,8 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementPreventedBy = global::Moonwell.Objects.PathingListRequire.Blighted;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementPreventedBy = global::Moonwell.Objects.PathingPrevent.Unblighted;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\undead\\SacrificialPit\\SacrificialPit_portrait";
@@ -4892,7 +4892,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Shade()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.TrueSight, global::Moonwell.Objects.Undead.Abilities.GhostAgho, global::Moonwell.Objects.Undead.Abilities.Shade>();
+                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.TrueSight, global::Moonwell.Objects.Undead.Abilities.Ghost, global::Moonwell.Objects.Undead.Abilities.Shade>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 1.5f;
@@ -5377,8 +5377,8 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementPreventedBy = global::Moonwell.Objects.PathingListRequire.Blighted;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementPreventedBy = global::Moonwell.Objects.PathingPrevent.Unblighted;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\undead\\Slaughterhouse\\Slaughterhouse_portrait";
@@ -5524,8 +5524,8 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\6x6SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementPreventedBy = global::Moonwell.Objects.PathingListRequire.Blighted;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementPreventedBy = global::Moonwell.Objects.PathingPrevent.Unblighted;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\undead\\Ziggurat\\Ziggurat_portrait";
@@ -5580,7 +5580,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public StoneFormGargoyle()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.StoneForm, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.StoneForm, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -5794,8 +5794,8 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementPreventedBy = global::Moonwell.Objects.PathingListRequire.Blighted;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementPreventedBy = global::Moonwell.Objects.PathingPrevent.Unblighted;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\undead\\TempleOfTheDamned\\TempleOfTheDamned_portrait";
@@ -5924,8 +5924,8 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementPreventedBy = global::Moonwell.Objects.PathingListRequire.Blighted;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementPreventedBy = global::Moonwell.Objects.PathingPrevent.Unblighted;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\undead\\TombOfRelics\\TombOfRelics_portrait";
@@ -6053,8 +6053,8 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\6x6SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementPreventedBy = global::Moonwell.Objects.PathingListRequire.Blighted;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementPreventedBy = global::Moonwell.Objects.PathingPrevent.Unblighted;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\undead\\Ziggurat\\Ziggurat_portrait";

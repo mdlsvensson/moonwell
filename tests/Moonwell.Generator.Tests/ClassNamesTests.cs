@@ -10,7 +10,8 @@ public class ClassNamesTests
         string name,
         string race = "",
         bool campaign = false,
-        string? properNames = null)
+        string? properNames = null,
+        string suffix = "")
     {
         return new StandardObject(
             kind,
@@ -22,7 +23,8 @@ public class ClassNamesTests
             null,
             properNames == null ? new Dictionary<string, string>() : new Dictionary<string, string> { ["upro"] = properNames },
             new Dictionary<string, IReadOnlyDictionary<string, string>>(),
-            new List<string>());
+            new List<string>(),
+            suffix);
     }
 
     private static string FullName(StandardObject o)
@@ -74,6 +76,61 @@ public class ClassNamesTests
     }
 
     [Fact]
+    public void in_a_clash_the_object_without_an_editor_suffix_keeps_the_plain_name()
+    {
+        // Cairne's Shockwave has the first id; the Tauren Chieftain's has no editor suffix (decision 71).
+        var names = ClassNames.Assign(new[]
+        {
+            Object(Kind.Ability, "AOs2", "Shockwave", "orc", suffix: "(Cairne)"),
+            Object(Kind.Ability, "AOsh", "Shockwave", "orc"),
+        });
+
+        Assert.Equal("Shockwave", names[(Kind.Ability, "AOsh")].Name);
+        Assert.Equal("ShockwaveAOs2", names[(Kind.Ability, "AOs2")].Name);
+    }
+
+    [Fact]
+    public void in_a_clash_of_objects_without_an_editor_suffix_the_first_id_keeps_the_plain_name()
+    {
+        var names = ClassNames.Assign(new[]
+        {
+            Object(Kind.Unit, "Nal2", "Alchemist", "creeps", suffix: "(Morph level 2)"),
+            Object(Kind.Unit, "Nalm", "Alchemist", "creeps"),
+            Object(Kind.Unit, "Nalc", "Alchemist", "creeps"),
+        });
+
+        Assert.Equal("Alchemist", names[(Kind.Unit, "Nalc")].Name);
+        Assert.Equal("AlchemistNalm", names[(Kind.Unit, "Nalm")].Name);
+        Assert.Equal("AlchemistNal2", names[(Kind.Unit, "Nal2")].Name);
+    }
+
+    [Fact]
+    public void in_a_clash_where_every_object_has_an_editor_suffix_the_first_id_keeps_the_plain_name()
+    {
+        var names = ClassNames.Assign(new[]
+        {
+            Object(Kind.Ability, "Ahr3", "Reincarnation", "orc", suffix: "(Neutral)"),
+            Object(Kind.Ability, "Ahr2", "Reincarnation", "orc", suffix: "(Item)"),
+        });
+
+        Assert.Equal("Reincarnation", names[(Kind.Ability, "Ahr2")].Name);
+        Assert.Equal("ReincarnationAhr3", names[(Kind.Ability, "Ahr3")].Name);
+    }
+
+    [Fact]
+    public void an_editor_suffix_of_spaces_is_none()
+    {
+        var names = ClassNames.Assign(new[]
+        {
+            Object(Kind.Unit, "hfoa", "Footman", "human", suffix: "(Old)"),
+            Object(Kind.Unit, "hfoo", "Footman", "human", suffix: "  "),
+        });
+
+        Assert.Equal("Footman", names[(Kind.Unit, "hfoo")].Name);
+        Assert.Equal("FootmanHfoa", names[(Kind.Unit, "hfoa")].Name);
+    }
+
+    [Fact]
     public void collision_in_two_namespaces_is_none()
     {
         var names = ClassNames.Assign(new[]
@@ -102,6 +159,19 @@ public class ClassNamesTests
     }
 
     [Fact]
+    public void a_campaign_object_without_an_editor_suffix_still_gets_its_id_in_a_clash()
+    {
+        var names = ClassNames.Assign(new[]
+        {
+            Object(Kind.Unit, "Hart", "Paladin", campaign: true, properNames: "Arthas", suffix: "(Evil)"),
+            Object(Kind.Unit, "Harf", "Paladin", campaign: true, properNames: "Arthas"),
+        });
+
+        Assert.Equal("ArthasHarf", names[(Kind.Unit, "Harf")].Name);
+        Assert.Equal("ArthasHart", names[(Kind.Unit, "Hart")].Name);
+    }
+
+    [Fact]
     public void campaign_namespace()
     {
         var arthas = Object(Kind.Unit, "Hart", "Paladin", "human", campaign: true, properNames: "Arthas");
@@ -123,9 +193,18 @@ public class ClassNamesTests
         Assert.Equal(
             "Moonwell.Objects.Campaign.Units.KelThuzad",
             FullName(Object(Kind.Unit, "Uktl", "Lich", "undead", true, " Kel'Thuzad ")));
-        Assert.Equal("Moonwell.Objects.Human.Units.Paladin", FullName(Object(Kind.Unit, "Hxxx", "Paladin", "human", properNames: " ")));
-        Assert.Equal("Moonwell.Objects.Human.Units.Paladin", FullName(Object(Kind.Unit, "Hyyy", "Paladin", "human", properNames: "'")));
-        Assert.Equal("Moonwell.Objects.Human.Units.Paladin", FullName(Object(Kind.Unit, "Hzzz", "Paladin", "human", properNames: "Arthas,")));
+        Assert.Equal("Moonwell.Objects.Campaign.Units.Paladin", FullName(Object(Kind.Unit, "Hxxx", "Paladin", "human", true, " ")));
+        Assert.Equal("Moonwell.Objects.Campaign.Units.Paladin", FullName(Object(Kind.Unit, "Hyyy", "Paladin", "human", true, "'")));
+        Assert.Equal("Moonwell.Objects.Campaign.Units.Paladin", FullName(Object(Kind.Unit, "Hzzz", "Paladin", "human", true, "Arthas,")));
+    }
+
+    [Fact]
+    public void a_melee_hero_with_one_proper_name_keeps_its_type_name()
+    {
+        // The High Elf Archmage (Haah) has one proper name, Kelen the Seeker; World Editor lists it by its type.
+        var archmage = Object(Kind.Unit, "Haah", "High Elf Archmage", "human", properNames: "Kelen the Seeker");
+
+        Assert.Equal("Moonwell.Objects.Human.Units.HighElfArchmage", FullName(archmage));
     }
 
     [Fact]
@@ -141,11 +220,11 @@ public class ClassNamesTests
     {
         var names = ClassNames.Assign(new[]
         {
-            Object(Kind.Unit, "Hct1", "Guard Lieutenant", "human", properNames: "Garek"),
-            Object(Kind.Unit, "Hctl", "Guard Captain", "human", properNames: "Garek"),
+            Object(Kind.Unit, "Hct1", "Guard Lieutenant", "human", true, "Garek"),
+            Object(Kind.Unit, "Hctl", "Guard Captain", "human", true, "Garek"),
         });
 
-        Assert.Equal("Garek", names[(Kind.Unit, "Hct1")].Name);
+        Assert.Equal("GarekHct1", names[(Kind.Unit, "Hct1")].Name);
         Assert.Equal("GarekHctl", names[(Kind.Unit, "Hctl")].Name);
     }
 

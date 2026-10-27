@@ -45,7 +45,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Backpack (Rhpm).</summary>
+            /// <summary>Backpack (Human), Rhpm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Rhpm")]
             public class Backpack : global::Moonwell.Objects.StandardUpgrade

@@ -72,13 +72,86 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Animate Dead (AUa2).</summary>
+            /// <summary>Animate Dead (AUan).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AUa2")]
+            [global::Moonwell.Objects.Standard("AUan")]
             public class AnimateDead : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public AnimateDead()
+                {
+                    Area = Levels(900f);
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.AnimateDead>();
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(180f);
+                    Duration = Levels(40f);
+                    Effects = Levels("Aap5");
+                    HeroAbility = true;
+                    HeroDuration = Levels(40f);
+                    Hotkey = "D";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp";
+                    InheritUpgrades = Levels(false);
+                    ItemAbility = false;
+                    LearnHotkey = "D";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(125);
+                    Name = "Animate Dead";
+                    NumberOfCorpsesRaised = Levels(6);
+                    Order = "animatedead";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    RaisedUnitsAreInvulnerable = Levels(false);
+                    Range = Levels(400f);
+                    RequiredLevel = 6;
+                    Special = "Abilities\\Spells\\Undead\\AnimateDead\\AnimateDeadTarget.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Dead | global::Moonwell.Objects.Targets.Ground);
+                    Tooltip = Levels("Animate Dead");
+                    TooltipExtended = Levels("Raises <AUan,DataA1> dead units in an area to fight for the Death Knight for <AUan,Dur1> seconds.");
+                    TooltipLearn = "Learn Animate Dead";
+                    TooltipLearnExtended = "Raises <AUan,DataA1> dead units in an area to fight for the Death Knight for <AUan,Dur1> seconds.";
+                    UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Hre2</c>.</summary>
+                [global::Moonwell.Objects.Field("Hre2", Label = "Raised Units Are Invulnerable")]
+                public global::Moonwell.Objects.Levels<bool> RaisedUnitsAreInvulnerable
+                {
+                    get { return Fields.GetLevels<bool>(this, "Hre2"); }
+                    protected set { Fields.Put("Hre2", value); }
+                }
+
+                /// <summary>The field <c>Uan1</c>.</summary>
+                [global::Moonwell.Objects.Field("Uan1", Label = "Number of Corpses Raised")]
+                [global::Moonwell.Objects.Limits(1, 999)]
+                public global::Moonwell.Objects.Levels<int> NumberOfCorpsesRaised
+                {
+                    get { return Fields.GetLevels<int>(this, "Uan1"); }
+                    protected set { Fields.Put("Uan1", value); }
+                }
+
+                /// <summary>The field <c>Uan3</c>.</summary>
+                [global::Moonwell.Objects.Field("Uan3", Label = "Inherit Upgrades")]
+                public global::Moonwell.Objects.Levels<bool> InheritUpgrades
+                {
+                    get { return Fields.GetLevels<bool>(this, "Uan3"); }
+                    protected set { Fields.Put("Uan3", value); }
+                }
+            }
+
+            /// <summary>Animate Dead (New), AUa2.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AUa2")]
+            public class AnimateDeadAUa2 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public AnimateDeadAUa2()
                 {
                     Area = Levels(900f);
                     Buffs.Set<global::Moonwell.Objects.Undead.Buffs.AnimateDead>();
@@ -146,95 +219,21 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Animate Dead (AUan).</summary>
+            /// <summary>Anti-magic Shell (Aams).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AUan")]
-            public class AnimateDeadAUan : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public AnimateDeadAUan()
-                {
-                    Area = Levels(900f);
-                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.AnimateDead>();
-                    ButtonPositionNormalX = 3;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 3;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(180f);
-                    Duration = Levels(40f);
-                    Effects = Levels("Aap5");
-                    HeroAbility = true;
-                    HeroDuration = Levels(40f);
-                    Hotkey = "D";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNAnimateDead.blp";
-                    InheritUpgrades = Levels(false);
-                    ItemAbility = false;
-                    LearnHotkey = "D";
-                    LevelCount = 1;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(125);
-                    Name = "Animate Dead";
-                    NumberOfCorpsesRaised = Levels(6);
-                    Order = "animatedead";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Undead;
-                    RaisedUnitsAreInvulnerable = Levels(false);
-                    Range = Levels(400f);
-                    RequiredLevel = 6;
-                    Special = "Abilities\\Spells\\Undead\\AnimateDead\\AnimateDeadTarget.mdl";
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Dead | global::Moonwell.Objects.Targets.Ground);
-                    Tooltip = Levels("Animate Dead");
-                    TooltipExtended = Levels("Raises <AUan,DataA1> dead units in an area to fight for the Death Knight for <AUan,Dur1> seconds.");
-                    TooltipLearn = "Learn Animate Dead";
-                    TooltipLearnExtended = "Raises <AUan,DataA1> dead units in an area to fight for the Death Knight for <AUan,Dur1> seconds.";
-                    UseNewDefaultLevelCap = false;
-                }
-
-                /// <summary>The field <c>Hre2</c>.</summary>
-                [global::Moonwell.Objects.Field("Hre2", Label = "Raised Units Are Invulnerable")]
-                public global::Moonwell.Objects.Levels<bool> RaisedUnitsAreInvulnerable
-                {
-                    get { return Fields.GetLevels<bool>(this, "Hre2"); }
-                    protected set { Fields.Put("Hre2", value); }
-                }
-
-                /// <summary>The field <c>Uan1</c>.</summary>
-                [global::Moonwell.Objects.Field("Uan1", Label = "Number of Corpses Raised")]
-                [global::Moonwell.Objects.Limits(1, 999)]
-                public global::Moonwell.Objects.Levels<int> NumberOfCorpsesRaised
-                {
-                    get { return Fields.GetLevels<int>(this, "Uan1"); }
-                    protected set { Fields.Put("Uan1", value); }
-                }
-
-                /// <summary>The field <c>Uan3</c>.</summary>
-                [global::Moonwell.Objects.Field("Uan3", Label = "Inherit Upgrades")]
-                public global::Moonwell.Objects.Levels<bool> InheritUpgrades
-                {
-                    get { return Fields.GetLevels<bool>(this, "Uan3"); }
-                    protected set { Fields.Put("Uan3", value); }
-                }
-            }
-
-            /// <summary>Anti-magic Shell (Aam2).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Aam2")]
+            [global::Moonwell.Objects.Standard("Aams")]
             public class AntiMagicShell : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public AntiMagicShell()
                 {
-                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.AntiMagicShellBams, global::Moonwell.Objects.Undead.Buffs.AntiMagicShell>();
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.AntiMagicShell, global::Moonwell.Objects.Undead.Buffs.AntiMagicShellBam2>();
                     ButtonPositionNormalX = 1;
                     ButtonPositionNormalY = 2;
                     CastTime = Levels(0f);
                     CheckDependencies = true;
                     Cooldown = Levels(0f);
                     Duration = Levels(90f);
-                    EditorSuffix = "(Magic Resistance)";
                     HeroAbility = false;
                     HeroDuration = Levels(90f);
                     Hotkey = "N";
@@ -243,7 +242,7 @@ namespace Moonwell.Objects
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
                     MagicDamageReduction = Levels(0f);
-                    ManaCost = Levels(75);
+                    ManaCost = Levels(50);
                     ManaLoss = Levels(0);
                     Name = "Anti-magic Shell";
                     Order = "antimagicshell";
@@ -252,11 +251,11 @@ namespace Moonwell.Objects
                     Range = Levels(500f);
                     RequiredLevel = 0;
                     Requires.Set<global::Moonwell.Objects.Undead.Upgrades.BansheeAdeptTraining>();
-                    ShieldLife = Levels(300);
+                    ShieldLife = Levels(0);
                     SummonedUnitDamage = Levels(0f);
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Vulnerable);
                     Tooltip = Levels("Anti-magic Shell");
-                    TooltipExtended = Levels("Creates a barrier that stops <Aam2,DataC1> points of spell, summon, or magic damage from affecting a target unit. |nLasts <Aam2,Dur1> seconds.");
+                    TooltipExtended = Levels("Creates a barrier that stops spells from affecting a target unit. |nLasts <Aams,Dur1> seconds.");
                     UseNewDefaultLevelCap = false;
                 }
 
@@ -297,21 +296,22 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Anti-magic Shell (Aams).</summary>
+            /// <summary>Anti-magic Shell (Magic Resistance), Aam2.</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Aams")]
-            public class AntiMagicShellAams : global::Moonwell.Objects.StandardAbility
+            [global::Moonwell.Objects.Standard("Aam2")]
+            public class AntiMagicShellAam2 : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public AntiMagicShellAams()
+                public AntiMagicShellAam2()
                 {
-                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.AntiMagicShellBams, global::Moonwell.Objects.Undead.Buffs.AntiMagicShell>();
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.AntiMagicShell, global::Moonwell.Objects.Undead.Buffs.AntiMagicShellBam2>();
                     ButtonPositionNormalX = 1;
                     ButtonPositionNormalY = 2;
                     CastTime = Levels(0f);
                     CheckDependencies = true;
                     Cooldown = Levels(0f);
                     Duration = Levels(90f);
+                    EditorSuffix = "(Magic Resistance)";
                     HeroAbility = false;
                     HeroDuration = Levels(90f);
                     Hotkey = "N";
@@ -320,7 +320,7 @@ namespace Moonwell.Objects
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
                     MagicDamageReduction = Levels(0f);
-                    ManaCost = Levels(50);
+                    ManaCost = Levels(75);
                     ManaLoss = Levels(0);
                     Name = "Anti-magic Shell";
                     Order = "antimagicshell";
@@ -329,11 +329,11 @@ namespace Moonwell.Objects
                     Range = Levels(500f);
                     RequiredLevel = 0;
                     Requires.Set<global::Moonwell.Objects.Undead.Upgrades.BansheeAdeptTraining>();
-                    ShieldLife = Levels(0);
+                    ShieldLife = Levels(300);
                     SummonedUnitDamage = Levels(0f);
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Vulnerable);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
                     Tooltip = Levels("Anti-magic Shell");
-                    TooltipExtended = Levels("Creates a barrier that stops spells from affecting a target unit. |nLasts <Aams,Dur1> seconds.");
+                    TooltipExtended = Levels("Creates a barrier that stops <Aam2,DataC1> points of spell, summon, or magic damage from affecting a target unit. |nLasts <Aam2,Dur1> seconds.");
                     UseNewDefaultLevelCap = false;
                 }
 
@@ -441,7 +441,9 @@ namespace Moonwell.Objects
                     CastTime = Levels(0f);
                     CheckDependencies = true;
                     Cooldown = Levels(0f);
+                    CreatesBlight = Levels(true);
                     Duration = Levels(0.08f);
+                    ExpansionAmount = Levels(64f);
                     HeroAbility = false;
                     HeroDuration = Levels(0.08f);
                     ItemAbility = false;
@@ -453,6 +455,23 @@ namespace Moonwell.Objects
                     Race = global::Moonwell.Objects.UnitRace.Undead;
                     RequiredLevel = 0;
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Bli1</c>.</summary>
+                [global::Moonwell.Objects.Field("Bli1", Label = "Expansion Amount")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ExpansionAmount
+                {
+                    get { return Fields.GetLevels<float>(this, "Bli1"); }
+                    protected set { Fields.Put("Bli1", value); }
+                }
+
+                /// <summary>The field <c>Bli2</c>.</summary>
+                [global::Moonwell.Objects.Field("Bli2", Label = "Creates Blight")]
+                public global::Moonwell.Objects.Levels<bool> CreatesBlight
+                {
+                    get { return Fields.GetLevels<bool>(this, "Bli2"); }
+                    protected set { Fields.Put("Bli2", value); }
                 }
             }
 
@@ -468,7 +487,9 @@ namespace Moonwell.Objects
                     CastTime = Levels(0f);
                     CheckDependencies = true;
                     Cooldown = Levels(0f);
+                    CreatesBlight = Levels(true);
                     Duration = Levels(0.08f);
+                    ExpansionAmount = Levels(64f);
                     HeroAbility = false;
                     HeroDuration = Levels(0.08f);
                     ItemAbility = false;
@@ -480,6 +501,23 @@ namespace Moonwell.Objects
                     Race = global::Moonwell.Objects.UnitRace.Undead;
                     RequiredLevel = 0;
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Bli1</c>.</summary>
+                [global::Moonwell.Objects.Field("Bli1", Label = "Expansion Amount")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ExpansionAmount
+                {
+                    get { return Fields.GetLevels<float>(this, "Bli1"); }
+                    protected set { Fields.Put("Bli1", value); }
+                }
+
+                /// <summary>The field <c>Bli2</c>.</summary>
+                [global::Moonwell.Objects.Field("Bli2", Label = "Creates Blight")]
+                public global::Moonwell.Objects.Levels<bool> CreatesBlight
+                {
+                    get { return Fields.GetLevels<bool>(this, "Bli2"); }
+                    protected set { Fields.Put("Bli2", value); }
                 }
             }
 
@@ -576,7 +614,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Burrow (Abu2).</summary>
+            /// <summary>Burrow (Scarab lvl 2), Abu2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Abu2")]
             public class Burrow : global::Moonwell.Objects.StandardAbility
@@ -662,7 +700,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Burrow (Abu3).</summary>
+            /// <summary>Burrow (Scarab lvl 3), Abu3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Abu3")]
             public class BurrowAbu3 : global::Moonwell.Objects.StandardAbility
@@ -748,7 +786,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Burrow (Abur).</summary>
+            /// <summary>Burrow (Crypt Fiend), Abur.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Abur")]
             public class BurrowAbur : global::Moonwell.Objects.StandardAbility
@@ -948,7 +986,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Cargo Hold (Sch2).</summary>
+            /// <summary>Cargo Hold (Meat Wagon), Sch2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Sch2")]
             public class CargoHold : global::Moonwell.Objects.StandardAbility
@@ -957,6 +995,7 @@ namespace Moonwell.Objects
                 public CargoHold()
                 {
                     Area = Levels(250f);
+                    CargoCapacity = Levels(8);
                     CastTime = Levels(0f);
                     CheckDependencies = true;
                     Cooldown = Levels(0f);
@@ -976,6 +1015,15 @@ namespace Moonwell.Objects
                     RequiredLevel = 0;
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Dead);
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Car1</c>.</summary>
+                [global::Moonwell.Objects.Field("Car1", Label = "Cargo Capacity")]
+                [global::Moonwell.Objects.Limits(0, 8)]
+                public global::Moonwell.Objects.Levels<int> CargoCapacity
+                {
+                    get { return Fields.GetLevels<int>(this, "Car1"); }
+                    protected set { Fields.Put("Car1", value); }
                 }
             }
 
@@ -1302,7 +1350,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Cripple (Scri).</summary>
+            /// <summary>Cripple (Warlock), Scri.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Scri")]
             public class CrippleScri : global::Moonwell.Objects.StandardAbility
@@ -1914,7 +1962,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Disease Cloud (Aap1).</summary>
+            /// <summary>Disease Cloud (Abomination), Aap1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aap1")]
             public class DiseaseCloud : global::Moonwell.Objects.StandardAbility
@@ -1989,7 +2037,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Disease Cloud (Aap2).</summary>
+            /// <summary>Disease Cloud (Plague Ward), Aap2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aap2")]
             public class DiseaseCloudAap2 : global::Moonwell.Objects.StandardAbility
@@ -2061,7 +2109,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Disease Cloud (Aap5).</summary>
+            /// <summary>Disease Cloud (Animate Dead), Aap5.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aap5")]
             public class DiseaseCloudAap5 : global::Moonwell.Objects.StandardAbility
@@ -2136,7 +2184,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Disease Cloud (Apbw).</summary>
+            /// <summary>Disease Cloud (Blight Weaver), Apbw.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Apbw")]
             public class DiseaseCloudApbw : global::Moonwell.Objects.StandardAbility
@@ -2177,7 +2225,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Disease Cloud (Apts).</summary>
+            /// <summary>Disease Cloud (Meat Wagon), Apts.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Apts")]
             public class DiseaseCloudApts : global::Moonwell.Objects.StandardAbility
@@ -2493,7 +2541,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Frost Armor (AUfu).</summary>
+            /// <summary>Frost Armor (Autocast), AUfu.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUfu")]
             public class FrostArmorAUfu : global::Moonwell.Objects.StandardAbility
@@ -2631,7 +2679,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Frost Attack (Afrc).</summary>
+            /// <summary>Frost Attack (New, Afrc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Afrc")]
             public class FrostAttackAfrc : global::Moonwell.Objects.StandardAbility
@@ -2646,7 +2694,7 @@ namespace Moonwell.Objects
                     CheckDependencies = true;
                     Cooldown = Levels(0f);
                     Duration = Levels(10f);
-                    EditorSuffix = "(New, Has Icon)";
+                    EditorSuffix = "(New";
                     HeroAbility = false;
                     HeroDuration = Levels(4f);
                     Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNFrost.blp";
@@ -2767,7 +2815,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Gather (Aaha).</summary>
+            /// <summary>Gather (Acolyte Gold), Aaha.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aaha")]
             public class Gather : global::Moonwell.Objects.StandardAbility
@@ -2851,58 +2899,13 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Ghost (Aeth).</summary>
+            /// <summary>Ghost (Agho).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Aeth")]
+            [global::Moonwell.Objects.Standard("Agho")]
             public class Ghost : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Ghost()
-                {
-                    CastTime = Levels(0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(0f);
-                    DoesNotBlockBuildings = Levels(true);
-                    Duration = Levels(0f);
-                    EditorSuffix = "(Visible)";
-                    HeroAbility = false;
-                    HeroDuration = Levels(0f);
-                    ImmuneToMorphEffects = Levels(true);
-                    ItemAbility = false;
-                    LevelCount = 1;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(0);
-                    Name = "Ghost";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Undead;
-                    RequiredLevel = 0;
-                    UseNewDefaultLevelCap = false;
-                }
-
-                /// <summary>The field <c>Eth1</c>.</summary>
-                [global::Moonwell.Objects.Field("Eth1", Label = "Immune to Morph Effects")]
-                public global::Moonwell.Objects.Levels<bool> ImmuneToMorphEffects
-                {
-                    get { return Fields.GetLevels<bool>(this, "Eth1"); }
-                    protected set { Fields.Put("Eth1", value); }
-                }
-
-                /// <summary>The field <c>Eth2</c>.</summary>
-                [global::Moonwell.Objects.Field("Eth2", Label = "Does Not Block Buildings")]
-                public global::Moonwell.Objects.Levels<bool> DoesNotBlockBuildings
-                {
-                    get { return Fields.GetLevels<bool>(this, "Eth2"); }
-                    protected set { Fields.Put("Eth2", value); }
-                }
-            }
-
-            /// <summary>Ghost (Agho).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Agho")]
-            public class GhostAgho : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public GhostAgho()
                 {
                     AutoAcquireAttackTargets = Levels(true);
                     CastTime = Levels(0f);
@@ -2949,7 +2952,52 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Ghoul Frenzy (Augf).</summary>
+            /// <summary>Ghost (Visible), Aeth.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("Aeth")]
+            public class GhostAeth : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public GhostAeth()
+                {
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    DoesNotBlockBuildings = Levels(true);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Visible)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    ImmuneToMorphEffects = Levels(true);
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Ghost";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    RequiredLevel = 0;
+                    UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Eth1</c>.</summary>
+                [global::Moonwell.Objects.Field("Eth1", Label = "Immune to Morph Effects")]
+                public global::Moonwell.Objects.Levels<bool> ImmuneToMorphEffects
+                {
+                    get { return Fields.GetLevels<bool>(this, "Eth1"); }
+                    protected set { Fields.Put("Eth1", value); }
+                }
+
+                /// <summary>The field <c>Eth2</c>.</summary>
+                [global::Moonwell.Objects.Field("Eth2", Label = "Does Not Block Buildings")]
+                public global::Moonwell.Objects.Levels<bool> DoesNotBlockBuildings
+                {
+                    get { return Fields.GetLevels<bool>(this, "Eth2"); }
+                    protected set { Fields.Put("Eth2", value); }
+                }
+            }
+
+            /// <summary>Ghoul Frenzy (Icon), Augf.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Augf")]
             public class GhoulFrenzy : global::Moonwell.Objects.StandardAbility
@@ -2982,7 +3030,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Harvest (Ahrl).</summary>
+            /// <summary>Harvest (Ghouls Lumber), Ahrl.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Ahrl")]
             public class Harvest : global::Moonwell.Objects.StandardAbility
@@ -3590,7 +3638,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Possession (Aps2).</summary>
+            /// <summary>Possession (Channeling), Aps2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aps2")]
             public class PossessionAps2 : global::Moonwell.Objects.StandardAbility
@@ -4103,7 +4151,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sacrifice (Alam).</summary>
+            /// <summary>Sacrifice (Acolyte), Alam.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Alam")]
             public class Sacrifice : global::Moonwell.Objects.StandardAbility
@@ -4139,7 +4187,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sacrifice (Asac).</summary>
+            /// <summary>Sacrifice (Sacrificial Pit), Asac.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Asac")]
             public class SacrificeAsac : global::Moonwell.Objects.StandardAbility
@@ -4175,7 +4223,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Shade (Augh).</summary>
+            /// <summary>Shade (Icon), Augh.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Augh")]
             public class Shade : global::Moonwell.Objects.StandardAbility
@@ -4207,7 +4255,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Skeletal Mastery (Ausm).</summary>
+            /// <summary>Skeletal Mastery (Icon), Ausm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Ausm")]
             public class SkeletalMastery : global::Moonwell.Objects.StandardAbility
@@ -4587,7 +4635,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>True Sight (Atru).</summary>
+            /// <summary>True Sight (Shade), Atru.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Atru")]
             public class TrueSight : global::Moonwell.Objects.StandardAbility

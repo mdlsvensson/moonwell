@@ -286,6 +286,21 @@ public class StandardConstructorsTests
     }
 
     [Fact]
+    public void a_list_entry_is_trimmed_and_an_empty_one_dropped()
+    {
+        // The Hydra's abilities are "Aspo, Aspt", with a space after the comma.
+        var lines = UnitLines(new Dictionary<string, string> { ["uabi"] = "A001, A002,,  zzzz" });
+
+        Assert.Equal(
+            new[]
+            {
+                "Abilities.Set<global::Moonwell.Objects.Human.Abilities.Ability1, global::Moonwell.Objects.Human.Abilities.Ability2>();",
+                "Abilities.Add(\"zzzz\");",
+            },
+            lines);
+    }
+
+    [Fact]
     public void a_reference_is_set_to_its_class_or_its_id()
     {
         Assert.Equal(

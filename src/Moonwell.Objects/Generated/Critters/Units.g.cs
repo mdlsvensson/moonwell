@@ -1399,7 +1399,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Penguin (npnw).</summary>
+            /// <summary>Penguin (Waterborne), npnw.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("npnw")]
             public class PenguinNpnw : global::Moonwell.Objects.StandardUnit
@@ -2158,13 +2158,139 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sheep (nsha).</summary>
+            /// <summary>Sheep (nshe).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("nsha")]
+            [global::Moonwell.Objects.Standard("nshe")]
             public class Sheep : global::Moonwell.Objects.StandardUnit
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Sheep()
+                {
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Wander>();
+                    AcquisitionRange = 500f;
+                    AllowCustomTeamColor = false;
+                    AnimationBlendTimeSeconds = 0.15f;
+                    AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 100f;
+                    AnimationWalkSpeed = 100f;
+                    Armor = 0;
+                    ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
+                    Attack1DamageLossFactor = 0f;
+                    Attack1DamageSpillDistance = 0f;
+                    Attack1DamageSpillRadius = 0f;
+                    Attack1MaximumNumberOfTargets = 1;
+                    Attack1ShowUI = true;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
+                    Attack2DamageLossFactor = 0f;
+                    Attack2DamageSpillDistance = 0f;
+                    Attack2DamageSpillRadius = 0f;
+                    Attack2MaximumNumberOfTargets = 1;
+                    Attack2ShowUI = true;
+                    AttackCooldown = 0f;
+                    AttackType = global::Moonwell.AttackType.Normal;
+                    AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
+                    BuildTime = 1;
+                    CanDropItemsOnDeath = true;
+                    CanFlee = true;
+                    CategorizationCampaign = false;
+                    CategorizationSpecial = false;
+                    CollisionSize = 16f;
+                    DeathTimeSeconds = 3f;
+                    DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
+                    DefenseType = global::Moonwell.DefenseType.Medium;
+                    DefenseUpgradeBonus = 2;
+                    DisplayAsNeutralHostile = false;
+                    ElevationSampleRadius = 20f;
+                    FlyHeight = 0f;
+                    FogOfWarSampleRadius = 0f;
+                    FormationRank = 4;
+                    GoldBountyAwardedBase = 0;
+                    GoldBountyAwardedNumberOfDice = 0;
+                    GoldBountyAwardedSidesPerDie = 0;
+                    GoldCost = 0;
+                    GroupSeparationEnabled = false;
+                    GroupSeparationGroupNumber = 0;
+                    GroupSeparationParameter = 0;
+                    GroupSeparationPriority = 0;
+                    HasTilesetSpecificData = false;
+                    HasWaterShadow = true;
+                    HeightMinimum = 0f;
+                    HideMinimapDisplay = false;
+                    HitPointRegen = 0.5f;
+                    HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSheep.blp";
+                    IsABuilding = false;
+                    LumberBountyAwardedBase = 0;
+                    LumberBountyAwardedNumberOfDice = 0;
+                    LumberBountyAwardedSidesPerDie = 0;
+                    LumberCost = 0;
+                    MaxLife = 15;
+                    MaximumPitchAngleDegrees = 45f;
+                    MaximumRollAngleDegrees = 10f;
+                    Model = "units\\critters\\Sheep\\Sheep";
+                    ModelFileExtraVersions = 0;
+                    Name = "Sheep";
+                    NormalSkin = "Awan";
+                    OccluderHeight = 0f;
+                    OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
+                    OrientationInterpolation = 0;
+                    PlaceableInEditor = true;
+                    PointValue = 100;
+                    Priority = 1;
+                    ProjectileImpactZ = 25f;
+                    ProjectileImpactZSwimming = 0f;
+                    ProjectileLaunchX = 0f;
+                    ProjectileLaunchY = 0f;
+                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZSwimming = 0f;
+                    PropulsionWindowDegrees = 60f;
+                    Race = global::Moonwell.Objects.UnitRace.Critters;
+                    Random = "SheepRandomSounds";
+                    RepairGoldCost = 0;
+                    RepairLumberCost = 0;
+                    RepairTime = 1;
+                    Scale = 0.8f;
+                    ScaleProjectiles = true;
+                    SelectionCircleHeight = 0f;
+                    SelectionCircleOnWater = false;
+                    SelectionScale = 0.9f;
+                    ShadowImageCenterX = 30f;
+                    ShadowImageCenterY = 30f;
+                    ShadowImageHeight = 60f;
+                    ShadowImageUnit = global::Moonwell.Objects.ShadowImage.Shadow;
+                    ShadowImageWidth = 60f;
+                    ShowAirToGroundIndicators = false;
+                    SightRadiusNight = 500;
+                    SightRange = 500;
+                    Sleeps = false;
+                    Special = "Objects\\Spawnmodels\\Orc\\OrcSmallDeathExplode\\OrcSmallDeathExplode.mdl";
+                    Speed = 100;
+                    SpeedMaximum = 0;
+                    SpeedMinimum = 100;
+                    TargetedAs = global::Moonwell.Objects.Targets.Ground;
+                    TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
+                    Tilesets = "L,F,W,Y,X,V,Q,J";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
+                    Tooltip = "Invoke Sheep";
+                    TooltipExtended = "Call upon the spirit of Sheep to save you.";
+                    TransportedSize = 1;
+                    TurnRate = 0.5f;
+                    Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitSoundSet = "Sheep";
+                    UseClickHelper = false;
+                    UseExtendedLineOfSight = false;
+                }
+            }
+
+            /// <summary>Sheep (Amphibious), nsha.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("nsha")]
+            public class SheepNsha : global::Moonwell.Objects.StandardUnit
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SheepNsha()
                 {
                     Abilities.Set<global::Moonwell.Objects.Other.Abilities.Wander>();
                     AcquisitionRange = 500f;
@@ -2285,133 +2411,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sheep (nshe).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("nshe")]
-            public class SheepNshe : global::Moonwell.Objects.StandardUnit
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public SheepNshe()
-                {
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Wander>();
-                    AcquisitionRange = 500f;
-                    AllowCustomTeamColor = false;
-                    AnimationBlendTimeSeconds = 0.15f;
-                    AnimationCastBackswing = 0.51f;
-                    AnimationRunSpeed = 100f;
-                    AnimationWalkSpeed = 100f;
-                    Armor = 0;
-                    ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
-                    Attack1DamageLossFactor = 0f;
-                    Attack1DamageSpillDistance = 0f;
-                    Attack1DamageSpillRadius = 0f;
-                    Attack1MaximumNumberOfTargets = 1;
-                    Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.AttackType.Normal;
-                    Attack2DamageLossFactor = 0f;
-                    Attack2DamageSpillDistance = 0f;
-                    Attack2DamageSpillRadius = 0f;
-                    Attack2MaximumNumberOfTargets = 1;
-                    Attack2ShowUI = true;
-                    AttackCooldown = 0f;
-                    AttackType = global::Moonwell.AttackType.Normal;
-                    AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
-                    BuildTime = 1;
-                    CanDropItemsOnDeath = true;
-                    CanFlee = true;
-                    CategorizationCampaign = false;
-                    CategorizationSpecial = false;
-                    CollisionSize = 16f;
-                    DeathTimeSeconds = 3f;
-                    DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
-                    DefenseType = global::Moonwell.DefenseType.Medium;
-                    DefenseUpgradeBonus = 2;
-                    DisplayAsNeutralHostile = false;
-                    ElevationSampleRadius = 20f;
-                    FlyHeight = 0f;
-                    FogOfWarSampleRadius = 0f;
-                    FormationRank = 4;
-                    GoldBountyAwardedBase = 0;
-                    GoldBountyAwardedNumberOfDice = 0;
-                    GoldBountyAwardedSidesPerDie = 0;
-                    GoldCost = 0;
-                    GroupSeparationEnabled = false;
-                    GroupSeparationGroupNumber = 0;
-                    GroupSeparationParameter = 0;
-                    GroupSeparationPriority = 0;
-                    HasTilesetSpecificData = false;
-                    HasWaterShadow = true;
-                    HeightMinimum = 0f;
-                    HideMinimapDisplay = false;
-                    HitPointRegen = 0.5f;
-                    HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSheep.blp";
-                    IsABuilding = false;
-                    LumberBountyAwardedBase = 0;
-                    LumberBountyAwardedNumberOfDice = 0;
-                    LumberBountyAwardedSidesPerDie = 0;
-                    LumberCost = 0;
-                    MaxLife = 15;
-                    MaximumPitchAngleDegrees = 45f;
-                    MaximumRollAngleDegrees = 10f;
-                    Model = "units\\critters\\Sheep\\Sheep";
-                    ModelFileExtraVersions = 0;
-                    Name = "Sheep";
-                    NormalSkin = "Awan";
-                    OccluderHeight = 0f;
-                    OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
-                    OrientationInterpolation = 0;
-                    PlaceableInEditor = true;
-                    PointValue = 100;
-                    Priority = 1;
-                    ProjectileImpactZ = 25f;
-                    ProjectileImpactZSwimming = 0f;
-                    ProjectileLaunchX = 0f;
-                    ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
-                    ProjectileLaunchZSwimming = 0f;
-                    PropulsionWindowDegrees = 60f;
-                    Race = global::Moonwell.Objects.UnitRace.Critters;
-                    Random = "SheepRandomSounds";
-                    RepairGoldCost = 0;
-                    RepairLumberCost = 0;
-                    RepairTime = 1;
-                    Scale = 0.8f;
-                    ScaleProjectiles = true;
-                    SelectionCircleHeight = 0f;
-                    SelectionCircleOnWater = false;
-                    SelectionScale = 0.9f;
-                    ShadowImageCenterX = 30f;
-                    ShadowImageCenterY = 30f;
-                    ShadowImageHeight = 60f;
-                    ShadowImageUnit = global::Moonwell.Objects.ShadowImage.Shadow;
-                    ShadowImageWidth = 60f;
-                    ShowAirToGroundIndicators = false;
-                    SightRadiusNight = 500;
-                    SightRange = 500;
-                    Sleeps = false;
-                    Special = "Objects\\Spawnmodels\\Orc\\OrcSmallDeathExplode\\OrcSmallDeathExplode.mdl";
-                    Speed = 100;
-                    SpeedMaximum = 0;
-                    SpeedMinimum = 100;
-                    TargetedAs = global::Moonwell.Objects.Targets.Ground;
-                    TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
-                    Tilesets = "L,F,W,Y,X,V,Q,J";
-                    TintingColor1Red = 255;
-                    TintingColor2Green = 255;
-                    TintingColor3Blue = 255;
-                    Tooltip = "Invoke Sheep";
-                    TooltipExtended = "Call upon the spirit of Sheep to save you.";
-                    TransportedSize = 1;
-                    TurnRate = 0.5f;
-                    Type = global::Moonwell.Objects.MoveType.Foot;
-                    UnitSoundSet = "Sheep";
-                    UseClickHelper = false;
-                    UseExtendedLineOfSight = false;
-                }
-            }
-
-            /// <summary>Sheep (nshw).</summary>
+            /// <summary>Sheep (Waterborne), nshw.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nshw")]
             public class SheepNshw : global::Moonwell.Objects.StandardUnit

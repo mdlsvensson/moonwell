@@ -5,6 +5,11 @@ using System.Linq;
 namespace Moonwell.Objects
 {
     /// <summary>A list of declared classes a field holds, in order, each once; it starts as the standard object's list.</summary>
+    /// <remarks>
+    /// The list remembers what was done to it, in order (<see cref="Changes"/>): where the standard object has a list for each
+    /// level (an upgrade's requirements), the build does the same to each level's own list (decision 72), while the list read
+    /// here starts as level 1's.
+    /// </remarks>
     /// @CSharpLua.Ignore
     public sealed class ObjectList<T>
 #if !MOONWELL_LUA
@@ -14,6 +19,10 @@ namespace Moonwell.Objects
         // Each entry is a Type, or the id text of a standard object that has no standard class.
         private readonly List<object> entries;
         private readonly object[] standard;
+
+        // What was done to the list, in order: { "add", entry }, { "remove", entry }, { "set", entries... } or
+        // { "replace", old, new }, each entry a Type or the id text of a standard object with no class.
+        private readonly List<object[]> changes = new List<object[]>();
 
         /// <summary>Called with the number of entries after the list grew, to check it against its field's rules; null for none.</summary>
         internal Action<int>? Grew { get; set; }
@@ -55,10 +64,21 @@ namespace Moonwell.Objects
             get { return standard; }
         }
 
+        /// <summary>
+        /// What was done to the list since it started, in order, for the build to do again on another level's list: each an
+        /// array of the change's name and its entries (<c>add</c>, <c>remove</c>, <c>set</c>, <c>replace</c> old and new), an
+        /// entry a <see cref="Type"/> or the id text of a standard object with no class.
+        /// </summary>
+        internal IReadOnlyList<object[]> Changes
+        {
+            get { return changes; }
+        }
+
         /// <summary>Adds a class to the end of the list; one already there stays where it is.</summary>
         public void Add<TObject>()
             where TObject : T
         {
+            changes.Add(new object[] { "add", typeof(TObject) });
             if (!entries.Contains(typeof(TObject)))
             {
                 entries.Add(typeof(TObject));
@@ -72,6 +92,7 @@ namespace Moonwell.Objects
         /// </summary>
         internal void Add(string id)
         {
+            changes.Add(new object[] { "add", id });
             if (!entries.Contains(id))
             {
                 entries.Add(id);
@@ -83,6 +104,7 @@ namespace Moonwell.Objects
         public void Remove<TObject>()
             where TObject : T
         {
+            changes.Add(new object[] { "remove", typeof(TObject) });
             entries.Remove(typeof(TObject));
         }
 
@@ -175,6 +197,7 @@ namespace Moonwell.Objects
             where TOld : T
             where TNew : T
         {
+            changes.Add(new object[] { "replace", typeof(TOld), typeof(TNew) });
             var at = entries.IndexOf(typeof(TOld));
             if (at < 0)
             {
@@ -192,6 +215,10 @@ namespace Moonwell.Objects
 
         private void SetTo(params Type[] types)
         {
+            var change = new object[types.Length + 1];
+            change[0] = "set";
+            Array.Copy(types, 0, change, 1, types.Length);
+            changes.Add(change);
             entries.Clear();
             foreach (var type in types)
             {

@@ -509,7 +509,7 @@ namespace Moonwell.Build.Tests
 
         [Theory]
         [InlineData("ua1t", 42, "Objects.Odd: ua1t is 42, which is no value of AttackType")]
-        [InlineData("upap", 64, "Objects.Odd: upap is 64, whose bit 64 is no value of PathingListPrevent")]
+        [InlineData("upap", 64, "Objects.Odd: upap is 64, whose bit 64 is no value of PathingRequire")]
         [InlineData("ua1t", "sharp", "Objects.Odd: ua1t holds an AttackType, and \"sharp\" is none of its values")]
         public void a_choice_that_is_no_value_fails(string field, object value, string message)
         {

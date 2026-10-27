@@ -55,9 +55,13 @@ replaces the list.
 
 A unit, hero, item, ability, buff, destructable, doodad or upgrade is a class that inherits one of the game's own,
 from `Moonwell.Objects`, by race and kind: `Human.Units.Paladin`, `Human.Abilities.Defend`, `Human.Upgrades.Defend`,
-`Campaign.Units.Arthas`, and `Items.ClawsOfAttack15`, `Destructables.X` and `Doodads.X` for the kinds with no race.
+`Campaign.Units.ArthasHart`, and `Items.ClawsOfAttack15`, `Destructables.X` and `Doodads.X` for the kinds with no race.
 `using Moonwell.Objects;` reaches all of them; `using static Moonwell.Objects.Human;` lets a file write
-`Abilities.Defend`. Its constructor changes fields; a field it does not change keeps its base's value. Every new object
+`Abilities.Defend`. A class takes the object's in-game name. Where objects of one race and kind share a name, the one
+World Editor lists without an editor suffix keeps it and the others get their id added: `Orc.Abilities.Shockwave` is
+the Tauren Chieftain's, `Orc.Abilities.ShockwaveAOs2` Cairne's. Campaign units that share a name all get their id
+(`ArthasHart`, `ArthasUear`). A class's hover shows its name, editor suffix and id: "Shockwave (Cairne), AOs2."
+Its constructor changes fields; a field it does not change keeps its base's value. Every new object
 has its id on the class, as World Editor shows it: a hero's starts with an upper-case letter, another unit's with a
 lower-case one.
 
@@ -75,13 +79,19 @@ public sealed class Champion : Human.Units.Paladin
 }
 ```
 
-- A field with levels takes `Levels(75f, 150f, 225f)`, `PerLevel(level => ...)` to compute each level, or one value
-  for every level: an upgrade's `Name = "Sharpened Blades"`.
+- A field with levels takes `Levels(75f, 150f, 225f)`, one value for each level (another count fails the build),
+  `PerLevel(level => ...)` to compute each level, or one value for every level: an upgrade's
+  `Name = "Sharpened Blades"`. Raising an ability's `LevelCount` past the game's writes every level you give; a field
+  you leave keeps the game's own data there (a Storm Bolt of 6 levels deals 325 at levels 4 to 6, its table's 4th
+  level), and reads so.
 - A field World Editor offers a list of values for holds an enum of them, named as the game's data spells them:
   `AttackType = AttackType.Magic`. One that takes several, such as the targets, holds flags:
   `Attack1TargetsAllowed = Targets.Air | Targets.Ground`. A flags field of 0 has none of them; `Targets.None` is
   World Editor's target "none", a value of its own. The numbers are Moonwell's, in World Editor's order, not the
   natives' (JASS's `ATTACK_TYPE_MAGIC` is 4, `AttackType.Magic` is 6): never cast one to or from a native's value.
+  The placement fields are the exception, named as World Editor shows them: `PlacementRequires =
+  PathingRequire.Buildable`, `PlacementPreventedBy = PathingPrevent.Unblighted`. The game stores each as its opposite
+  ("unbuildable", "blighted"), and the build writes that.
   In the game an enum of `Moonwell.Objects` has its numbers only, no names: `ToString` (also `choice?.ToString()`), a
   string made with one (`+`, `+=`, interpolation, or a call that takes an `object`: `string.Format`,
   `StringBuilder.Append`, a method of your own) and `Enum.GetValues` are rejected as error MW0010, a nullable choice
@@ -110,7 +120,9 @@ public sealed class Champion : Human.Units.Paladin
   in the game. A unit's `Level` is set only in its declared class's constructor, since the game has no setter: anywhere
   else it is error MW0015, and a build error too.
 - A list takes `Set<A, B, C>()` (the whole list, in order), `Replace<Old, New>()` (in the old one's place), `Add<T>()`
-  and `Remove<T>()`.
+  and `Remove<T>()`. Where the game's list differs by level, as a tiered upgrade's requirements do, the build makes the
+  same changes to each level's own list: `Requires.Add<Blacksmith>()` on a copy of Iron Forged Swords keeps the Keep and
+  Castle its later levels need. Read in C#, such a list is level 1's with the changes.
 - The tooltips are World Editor's four: `Tooltip` (Tooltip - Normal), `TooltipExtended` (Tooltip - Normal - Extended),
   `TooltipLearn` (Tooltip - Learn) and `TooltipLearnExtended` (Tooltip - Learn - Extended).
 - A field with no name of its own is set by its id: `Set("Htb1", 2, 250f)`.

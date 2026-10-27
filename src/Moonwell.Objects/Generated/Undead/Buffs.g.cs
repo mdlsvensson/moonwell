@@ -45,13 +45,31 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Anti-magic Shell (Bam2).</summary>
+            /// <summary>Anti-magic Shell (Bams).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Bam2")]
+            [global::Moonwell.Objects.Standard("Bams")]
             public class AntiMagicShell : global::Moonwell.Objects.StandardBuff
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public AntiMagicShell()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAntiMagicShell.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Undead;
+                    Target = "Abilities\\Spells\\Undead\\AntiMagicShell\\AntiMagicShell.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    Tooltip = "Anti-magic Shell";
+                    TooltipExtended = "This unit has Anti-magic Shell; it cannot be targeted by spells. It can be dispelled.";
+                }
+            }
+
+            /// <summary>Anti-magic Shell (Extra), Bam2.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("Bam2")]
+            public class AntiMagicShellBam2 : global::Moonwell.Objects.StandardBuff
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public AntiMagicShellBam2()
                 {
                     EditorSuffix = "(Extra)";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNAntiMagicShell.blp";
@@ -61,24 +79,6 @@ namespace Moonwell.Objects
                     TargetAttachmentPoint1 = "overhead";
                     Tooltip = "Anti-magic Shell";
                     TooltipExtended = "This unit has Anti-magic Shell; damage spells must destroy the shell to affect the unit.";
-                }
-            }
-
-            /// <summary>Anti-magic Shell (Bams).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Bams")]
-            public class AntiMagicShellBams : global::Moonwell.Objects.StandardBuff
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public AntiMagicShellBams()
-                {
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNAntiMagicShell.blp";
-                    IsAnEffect = false;
-                    Race = global::Moonwell.Objects.UnitRace.Undead;
-                    Target = "Abilities\\Spells\\Undead\\AntiMagicShell\\AntiMagicShell.mdl";
-                    TargetAttachmentPoint1 = "overhead";
-                    Tooltip = "Anti-magic Shell";
-                    TooltipExtended = "This unit has Anti-magic Shell; it cannot be targeted by spells. It can be dispelled.";
                 }
             }
 
@@ -635,7 +635,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Web (Bwea).</summary>
+            /// <summary>Web (Air), Bwea.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Bwea")]
             public class Web : global::Moonwell.Objects.StandardBuff
@@ -654,7 +654,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Web (Bweb).</summary>
+            /// <summary>Web (Ground), Bweb.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Bweb")]
             public class WebBweb : global::Moonwell.Objects.StandardBuff

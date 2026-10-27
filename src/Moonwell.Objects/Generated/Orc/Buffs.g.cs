@@ -312,7 +312,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Ensnare (Bena).</summary>
+            /// <summary>Ensnare (Air), Bena.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Bena")]
             public class Ensnare : global::Moonwell.Objects.StandardBuff
@@ -331,7 +331,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Ensnare (Beng).</summary>
+            /// <summary>Ensnare (Ground), Beng.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Beng")]
             public class EnsnareBeng : global::Moonwell.Objects.StandardBuff

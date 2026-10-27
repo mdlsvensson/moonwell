@@ -17,8 +17,9 @@ namespace Moonwell.Generator.Objects;
 /// <param name="Code">An ability's <c>code</c> column, the ability it behaves as; null for every other kind.</param>
 /// <param name="Values">
 /// The field values under the base tables, as the tables write them (a placeholder <c>-</c> or <c>_</c> of a table
-/// cell is no value and is left out), keyed by field id, or <c>id:level</c> for a field of each level (level 1 first).
-/// For an object the base tables lack, the values under the first set that has it.
+/// cell is no value and is left out), keyed by field id, or <c>id:level</c> for a field of each level (level 1 first;
+/// an ability's past its level count too, see <see cref="StandardObjects"/>). For an object the base tables lack, the
+/// values under the first set that has it.
 /// </param>
 /// <param name="Sets">
 /// For each balance set the object exists in, the keys whose value differs from <paramref name="Values"/>; the empty
@@ -27,6 +28,11 @@ namespace Moonwell.Generator.Objects;
 /// <param name="MissingFrom">
 /// The balance sets the object does not exist under (<c>melee_v0</c>, <c>custom_v0</c>, <c>custom_v1</c>), and
 /// <c>base</c> when the base tables lack it.
+/// </param>
+/// <param name="EditorSuffix">
+/// The editor suffix World Editor shows after the name (<c>(Cairne)</c>): the value of the kind's <c>EditorSuffix</c>
+/// field (an upgrade's at level 1), trimmed, a <c>WESTRING_</c> key replaced as for <paramref name="Name"/>; the empty
+/// string for none, and for a doodad, which has no such field.
 /// </param>
 public sealed record StandardObject(
     Kind Kind,
@@ -38,22 +44,30 @@ public sealed record StandardObject(
     string? Code,
     IReadOnlyDictionary<string, string> Values,
     IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Sets,
-    IReadOnlyList<string> MissingFrom);
+    IReadOnlyList<string> MissingFrom,
+    string EditorSuffix = "");
 
 /// <summary>The game's standard objects of a kind, with the value of each field that applies to them.</summary>
 /// <remarks>
 /// <para>
 /// A field applies to a unit by its use flags (a building by <c>useBuilding</c>, a hero by <c>useHero</c>, any other
-/// unit by <c>useUnit</c>; a unit is a building when its <c>isbldg</c> is 1); to an ability when the ability's
-/// <c>code</c> is in the field's <c>Specific</c>, or, for a common field, is not in the metadata's
-/// <c>notSpecific</c>; and to every object of another kind. Two fields of one ability that share a column, such as a
-/// common <c>Area</c> and a specific one, both get the value.
+/// unit by <c>useUnit</c>; a unit is a building when its <c>isbldg</c> is 1); to an ability when it is one of
+/// <see cref="Fields.SpecificOf"/> the ability (its id or its <c>code</c> is in the field's <c>Specific</c>), or, for a
+/// common field, when its <c>code</c> is not in the metadata's <c>notSpecific</c>; and to every object of another kind.
+/// Two fields of one ability that share a column, such as a common <c>Area</c> and a specific one, both get the value.
 /// </para>
 /// <para>
 /// An object exists under a balance set when <see cref="ExportTables.Present"/> says so. Its level count is the
 /// ability's <c>levels</c> and the upgrade's <c>maxlevel</c> (the field named <c>LevelCount</c>); a per-level field
 /// then has a value for each level from 1 to the count. A kind without a level count (a doodad's tinting colours)
 /// has a value for each entry of its comma list.
+/// </para>
+/// <para>
+/// An ability's table holds columns past its level count too, which the game reads when a map raises the count: on
+/// 3.0.1 a Storm Bolt of six levels deals 325 at levels 4 to 6, its fourth column, and costs 75 mana there (game-facts,
+/// seen 2026-10-19; the patch notes of 3.0.1: "Ability data beyond the 4th level now properly retain their default
+/// values"). So a field held in a column of each level also has the values of the columns past the count, up to the
+/// table's last; a level past the 4th with no value of its own takes the level before's.
 /// </para>
 /// <para>
 /// Keys are looked up as the tables spell them and, failing that, without regard to case when one key matches
@@ -68,6 +82,7 @@ public static class StandardObjects
     private const string LevelCountName = "LevelCount";
     private const string NameName = "Name";
     private const string TooltipName = "Tooltip";
+    private const string SuffixColumn = "EditorSuffix";
     private const string KeyPrefix = "WESTRING_";
 
     /// <summary>The standard objects of <paramref name="kind"/> ordered by id (ordinal), with the values of <paramref name="fields"/>.</summary>
@@ -85,7 +100,6 @@ public static class StandardObjects
             plans.Add(new FieldPlan(field, meta[field.Id]));
         }
 
-        var evaluator = new Evaluator(kind, plans);
         var baseRows = Index(tables.Objects(kind, null));
         var setNames = tables.Sets;
         var setRows = new Dictionary<string, Dictionary<string, ObjectRows>>(StringComparer.Ordinal);
@@ -97,6 +111,25 @@ public static class StandardObjects
             present[set] = tables.Present(kind, set);
             ids.UnionWith(present[set]);
         }
+
+        if (kind == Kind.Ability)
+        {
+            var keys = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var rows in new[] { baseRows }.Concat(setRows.Values))
+            {
+                foreach (var row in rows.Values)
+                {
+                    keys.UnionWith(row.Values.Keys);
+                }
+            }
+
+            foreach (var plan in plans)
+            {
+                plan.FindLastLevel(keys);
+            }
+        }
+
+        var evaluator = new Evaluator(kind, plans);
 
         var objects = new List<StandardObject>(ids.Count);
         foreach (var id in ids)
@@ -164,7 +197,8 @@ public static class StandardObjects
             kind == Kind.Ability ? Clean(row.Get("code")) : null,
             values,
             sets,
-            missing);
+            missing,
+            Resolved(tables, evaluator.SuffixOf(values)).Trim());
     }
 
     /// <summary>The label of a <c>WESTRING_</c> key; the empty string for a key the export has no label for; any other name as it is.</summary>
@@ -341,6 +375,12 @@ public static class StandardObjects
         private readonly bool _unit;
         private readonly bool _building;
 
+        // The last level whose column the tables hold, for an ability field held in a column of each level; 0 otherwise.
+        private int _lastLevel;
+
+        // The last level whose value has no carry from the level before: the game keeps level 4's data for the levels past it.
+        private const int LastLevelOfItsOwn = 4;
+
         public FieldPlan(Field field, MetaRow meta)
         {
             Field = field;
@@ -369,14 +409,29 @@ public static class StandardObjects
 
         public Field Field { get; }
 
-        public bool Applies(Kind kind, string? code, bool hero, bool building)
+        /// <summary>Finds the last level whose column <paramref name="keys"/> (every key of the kind's rows) holds: <c>DataA6</c> gives 6.</summary>
+        public void FindLastLevel(IReadOnlySet<string> keys)
+        {
+            if (!_perLevelColumn)
+            {
+                return;
+            }
+
+            while (keys.Contains(KeyOf(_lastLevel + 1)))
+            {
+                _lastLevel++;
+            }
+        }
+
+        /// <param name="own">For an ability, the ids of the fields specific to it (<see cref="Fields.SpecificOf"/>).</param>
+        public bool Applies(Kind kind, string? code, bool hero, bool building, IReadOnlySet<string>? own)
         {
             switch (kind)
             {
                 case Kind.Unit:
                     return building ? _building : hero ? _hero : _unit;
                 case Kind.Ability:
-                    return _specific.Count > 0 ? _specific.Contains(code ?? "") : !_notSpecific.Contains(code ?? "");
+                    return _specific.Count > 0 ? own != null && own.Contains(Field.Id) : !_notSpecific.Contains(code ?? "");
                 default:
                     return true;
             }
@@ -387,10 +442,18 @@ public static class StandardObjects
         {
             if (_perLevelColumn)
             {
+                string? previous = null;
                 for (var level = 1; level <= (levels ?? 0); level++)
                 {
-                    var key = _column.Replace("{level}", level.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
-                    Add(values, level, Clean(row.Get(key)));
+                    previous = Clean(row.Get(KeyOf(level)));
+                    Add(values, level, previous);
+                }
+
+                // Past the level count, up to the table's last column: a level past the 4th with no value takes the level before's.
+                for (var level = (levels ?? _lastLevel) + 1; level <= _lastLevel; level++)
+                {
+                    previous = Clean(row.Get(KeyOf(level))) ?? (level > LastLevelOfItsOwn ? previous : null);
+                    Add(values, level, previous);
                 }
             }
             else if (_list && _appended)
@@ -421,6 +484,11 @@ public static class StandardObjects
             {
                 Add(values, 0, Clean(row.Get(_column)));
             }
+        }
+
+        private string KeyOf(int level)
+        {
+            return _column.Replace("{level}", level.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
         }
 
         private void Add(Dictionary<string, string> values, int level, string? value)
@@ -454,13 +522,16 @@ public static class StandardObjects
     {
         private readonly Kind _kind;
         private readonly List<FieldPlan> _plans;
+        private readonly List<Field> _fields;
         private readonly FieldPlan? _levels;
         private readonly List<string> _nameIds = new();
+        private readonly string? _suffixId;
 
         public Evaluator(Kind kind, List<FieldPlan> plans)
         {
             _kind = kind;
             _plans = plans;
+            _fields = plans.Select(plan => plan.Field).ToList();
             string? name = null;
             string? tooltip = null;
             foreach (var plan in plans)
@@ -476,6 +547,11 @@ public static class StandardObjects
                 else if (plan.Field.Name == TooltipName)
                 {
                     tooltip = plan.Field.Id;
+                }
+
+                if (plan.Field.Column == SuffixColumn || plan.Field.Column.StartsWith(SuffixColumn + "[", StringComparison.Ordinal))
+                {
+                    _suffixId = plan.Field.Id;
                 }
             }
 
@@ -497,10 +573,13 @@ public static class StandardObjects
             var hero = IsHero(_kind, id);
             var building = _kind == Kind.Unit && Clean(row.Get("isbldg")) == "1";
             var levels = LevelCount(row);
+            var own = _kind == Kind.Ability
+                ? new HashSet<string>(Fields.SpecificOf(_fields, id, code).Select(field => field.Id), StringComparer.Ordinal)
+                : null;
             var values = new Dictionary<string, string>(StringComparer.Ordinal);
             foreach (var plan in _plans)
             {
-                if (plan.Applies(_kind, code, hero, building))
+                if (plan.Applies(_kind, code, hero, building, own))
                 {
                     plan.Read(row, levels, values);
                 }
@@ -518,6 +597,17 @@ public static class StandardObjects
                 {
                     return name;
                 }
+            }
+
+            return "";
+        }
+
+        /// <summary>The editor suffix in <paramref name="values"/> (an upgrade's at level 1); the empty string for none.</summary>
+        public string SuffixOf(Dictionary<string, string> values)
+        {
+            if (_suffixId != null && (values.TryGetValue(_suffixId, out var suffix) || values.TryGetValue(_suffixId + ":1", out suffix)))
+            {
+                return suffix;
             }
 
             return "";
