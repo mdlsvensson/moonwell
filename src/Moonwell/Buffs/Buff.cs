@@ -9,7 +9,7 @@ namespace Moonwell
         /// <summary>The timer that ends the buff; a refresh ends it and starts a new one. Null when the buff has no expiry.</summary>
         internal Timer? expiry;
 
-        /// <summary>The seconds the buff lasts; 0 until it is removed. A refresh gives the buff there the duration of the new apply, from the refresh on.</summary>
+        /// <summary>The seconds the buff lasts; 0, the default, lasts until it is removed. A refresh gives the buff there the duration of the new apply, from the refresh on.</summary>
         [LocalSafe]
         public float Duration { get; protected set; } = 0.0f;
 
