@@ -17,8 +17,9 @@ namespace Moonwell.Generator.Objects;
 /// <param name="Code">An ability's <c>code</c> column, the ability it behaves as; null for every other kind.</param>
 /// <param name="Values">
 /// The field values under the base tables, as the tables write them (a placeholder <c>-</c> or <c>_</c> of a table
-/// cell is no value and is left out), keyed by field id, or <c>id:level</c> for a field of each level (level 1 first).
-/// For an object the base tables lack, the values under the first set that has it.
+/// cell is no value and is left out), keyed by field id, or <c>id:level</c> for a field of each level (level 1 first;
+/// an ability's past its level count too, see <see cref="StandardObjects"/>). For an object the base tables lack, the
+/// values under the first set that has it.
 /// </param>
 /// <param name="Sets">
 /// For each balance set the object exists in, the keys whose value differs from <paramref name="Values"/>; the empty
@@ -62,6 +63,13 @@ public sealed record StandardObject(
 /// has a value for each entry of its comma list.
 /// </para>
 /// <para>
+/// An ability's table holds columns past its level count too, which the game reads when a map raises the count: on
+/// 3.0.1 a Storm Bolt of six levels deals 325 at levels 4 to 6, its fourth column, and costs 75 mana there (game-facts,
+/// seen 2026-10-19; the patch notes of 3.0.1: "Ability data beyond the 4th level now properly retain their default
+/// values"). So a field held in a column of each level also has the values of the columns past the count, up to the
+/// table's last; a level past the 4th with no value of its own takes the level before's.
+/// </para>
+/// <para>
 /// Keys are looked up as the tables spell them and, failing that, without regard to case when one key matches
 /// (<c>Ubertip</c> is <c>UberTip</c> in the text files). A per-level text value held in the text files is a comma
 /// list, level 1 first, unless it was wrapped in quotes (<see cref="ObjectRows.Wrapped"/>), when it is one entry; a
@@ -92,7 +100,6 @@ public static class StandardObjects
             plans.Add(new FieldPlan(field, meta[field.Id]));
         }
 
-        var evaluator = new Evaluator(kind, plans);
         var baseRows = Index(tables.Objects(kind, null));
         var setNames = tables.Sets;
         var setRows = new Dictionary<string, Dictionary<string, ObjectRows>>(StringComparer.Ordinal);
@@ -104,6 +111,25 @@ public static class StandardObjects
             present[set] = tables.Present(kind, set);
             ids.UnionWith(present[set]);
         }
+
+        if (kind == Kind.Ability)
+        {
+            var keys = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var rows in new[] { baseRows }.Concat(setRows.Values))
+            {
+                foreach (var row in rows.Values)
+                {
+                    keys.UnionWith(row.Values.Keys);
+                }
+            }
+
+            foreach (var plan in plans)
+            {
+                plan.FindLastLevel(keys);
+            }
+        }
+
+        var evaluator = new Evaluator(kind, plans);
 
         var objects = new List<StandardObject>(ids.Count);
         foreach (var id in ids)
@@ -349,6 +375,12 @@ public static class StandardObjects
         private readonly bool _unit;
         private readonly bool _building;
 
+        // The last level whose column the tables hold, for an ability field held in a column of each level; 0 otherwise.
+        private int _lastLevel;
+
+        // The last level whose value has no carry from the level before: the game keeps level 4's data for the levels past it.
+        private const int LastLevelOfItsOwn = 4;
+
         public FieldPlan(Field field, MetaRow meta)
         {
             Field = field;
@@ -377,6 +409,20 @@ public static class StandardObjects
 
         public Field Field { get; }
 
+        /// <summary>Finds the last level whose column <paramref name="keys"/> (every key of the kind's rows) holds: <c>DataA6</c> gives 6.</summary>
+        public void FindLastLevel(IReadOnlySet<string> keys)
+        {
+            if (!_perLevelColumn)
+            {
+                return;
+            }
+
+            while (keys.Contains(KeyOf(_lastLevel + 1)))
+            {
+                _lastLevel++;
+            }
+        }
+
         /// <param name="own">For an ability, the ids of the fields specific to it (<see cref="Fields.SpecificOf"/>).</param>
         public bool Applies(Kind kind, string? code, bool hero, bool building, IReadOnlySet<string>? own)
         {
@@ -396,10 +442,18 @@ public static class StandardObjects
         {
             if (_perLevelColumn)
             {
+                string? previous = null;
                 for (var level = 1; level <= (levels ?? 0); level++)
                 {
-                    var key = _column.Replace("{level}", level.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
-                    Add(values, level, Clean(row.Get(key)));
+                    previous = Clean(row.Get(KeyOf(level)));
+                    Add(values, level, previous);
+                }
+
+                // Past the level count, up to the table's last column: a level past the 4th with no value takes the level before's.
+                for (var level = (levels ?? _lastLevel) + 1; level <= _lastLevel; level++)
+                {
+                    previous = Clean(row.Get(KeyOf(level))) ?? (level > LastLevelOfItsOwn ? previous : null);
+                    Add(values, level, previous);
                 }
             }
             else if (_list && _appended)
@@ -430,6 +484,11 @@ public static class StandardObjects
             {
                 Add(values, 0, Clean(row.Get(_column)));
             }
+        }
+
+        private string KeyOf(int level)
+        {
+            return _column.Replace("{level}", level.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
         }
 
         private void Add(Dictionary<string, string> values, int level, string? value)

@@ -186,7 +186,6 @@ public class StandardObjectsTests
         Assert.Equal("100", stormBolt.Values["Htb1:1"]);
         Assert.Equal("200", stormBolt.Values["Htb1:2"]);
         Assert.Equal("310", stormBolt.Values["Htb1:3"]);
-        Assert.DoesNotContain("Htb1:4", stormBolt.Values.Keys);
         Assert.DoesNotContain("Htb1", stormBolt.Values.Keys);
         Assert.DoesNotContain(stormBolt.Values.Keys, key => key.StartsWith("Hhb1", StringComparison.Ordinal));
         var holyLight = Find(abilities, "AHhb");
@@ -205,6 +204,27 @@ public class StandardObjectsTests
         Assert.Equal("BPSE", stormBolt.Values["abuf:2"]);
         Assert.DoesNotContain("aare:1", stormBolt.Values.Keys);
         Assert.DoesNotContain("aare:2", stormBolt.Values.Keys);
+    }
+
+    [Fact]
+    public void an_abilitys_columns_past_its_level_count_are_values_and_a_level_past_the_fourth_takes_the_one_before()
+    {
+        // Storm Bolt has 3 levels; its table holds DataA4 325, Cool4 9 and Cost4 75, and "-" in the columns of levels 5 and 6.
+        // The game gives a Storm Bolt of 6 levels 325 damage, 9 cooldown and 75 mana at levels 4 to 6 (game-facts, 3.0.1).
+        var stormBolt = Find(Of(Kind.Ability), "AHtb");
+
+        Assert.Equal("325", stormBolt.Values["Htb1:4"]);
+        Assert.Equal("325", stormBolt.Values["Htb1:5"]);
+        Assert.Equal("325", stormBolt.Values["Htb1:6"]);
+        Assert.Equal("75", stormBolt.Values["amcs:6"]);
+        Assert.Equal("9", stormBolt.Values["acdn:5"]);
+        Assert.DoesNotContain("Htb1:7", stormBolt.Values.Keys);
+
+        // Cast4 is "-": level 4 has no value, and so neither do 5 and 6.
+        Assert.DoesNotContain(stormBolt.Values.Keys, key => key is "acas:4" or "acas:5" or "acas:6");
+
+        // A text list per level is not a column of each level: it has values for the levels only.
+        Assert.DoesNotContain("atp1:4", stormBolt.Values.Keys);
     }
 
     [Fact]
