@@ -715,6 +715,12 @@ namespace Moonwell.Objects.Tests
                     }
                     else if (generic == typeof(Levels<>))
                     {
+                        // The constructor sets an ability's levels up to its count; the values past it are the build's to read.
+                        if (Values.Value[id].TryGetProperty("alev", out var count) && level > int.Parse(count.GetString()!))
+                        {
+                            continue;
+                        }
+
                         var element = property.PropertyType.GetGenericArguments()[0];
                         var expected = parse.MakeGenericMethod(element).Invoke(null, new object?[] { text });
                         var one = property.PropertyType.GetProperty("Item")!.GetValue(read, new object[] { level });

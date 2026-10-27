@@ -62,6 +62,38 @@ namespace Moonwell.Objects.Tests
             Assert.Equal(2, abilities.Count);
         }
 
+        /// <summary>A Storm Bolt of a map's own with six levels and nothing else set.</summary>
+        public class SixBolt : Human.Abilities.StormBolt
+        {
+            public SixBolt()
+            {
+                LevelCount = 6;
+            }
+        }
+
+        [Fact]
+        public void a_level_past_the_standard_level_count_reads_the_games_value()
+        {
+            // The game gives a Storm Bolt of six levels 325 damage, 9 cooldown and 75 mana at levels 4 to 6 (game-facts, 3.0.1).
+            StandardValues.Read = (id, field, level) => ValueOf(id, level == 0 ? field : field + ":" + level);
+            var bolt = new SixBolt();
+
+            Assert.Equal(310f, bolt.Damage[3]);
+            Assert.Equal(325f, bolt.Damage[4]);
+            Assert.Equal(325f, bolt.Damage[6]);
+            Assert.Equal(75, bolt.ManaCost[5]);
+            Assert.Equal(9f, bolt.Cooldown[6]);
+        }
+
+        // A standard value of the generated values, as the build reads it; null for none.
+        private static string? ValueOf(string id, string key)
+        {
+            using var stream = typeof(StandardAttribute).Assembly.GetManifestResourceStream("Moonwell.Objects.Values.ability.json")!;
+            using var document = System.Text.Json.JsonDocument.Parse(stream);
+            return document.RootElement.GetProperty("objects").TryGetProperty(id, out var one)
+                && one.GetProperty("values").TryGetProperty(key, out var value) ? value.GetString() : null;
+        }
+
         private static IEnumerable<string> FieldsOf(Type type)
         {
             return type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
