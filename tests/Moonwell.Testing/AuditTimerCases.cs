@@ -123,6 +123,45 @@ namespace Moonwell.Testing
             world.Advance(3.0f);
             Expect.Equal("10 10", earlyBuff.Ticks + " " + lateBuff.Ticks, "ticks of the buff applied at 0 s and at 5000 s");
         }
+
+        /// <summary>
+        /// Timers made out of due order within a few milliseconds run in due order: a at 0.0016 s, b at 0.0008 s, two fillers,
+        /// then c at 0 s. The wake at 0 s runs c, and b, which is within the scheduler's 0.001 s; a runs at its own time.
+        /// </summary>
+        public static void NearTimesOrder(FakeWorld world)
+        {
+            var log = new List<string>();
+            Timer.After(0.0016f, () => { log.Add("a"); });
+            Timer.After(0.0008f, () => { log.Add("b"); });
+            Timer.After(0.3f, () => { });
+            Timer.After(0.3f, () => { });
+            Timer.After(0.0f, () => { log.Add("c"); });
+            world.Advance(0.0005f);
+            var early = log.Count;
+            world.Advance(0.01f);
+            Expect.Equal("2 c b a", early + " " + string.Join(" ", log), "runs by 0.0005 s, then the order of the runs");
+        }
+
+        /// <summary>
+        /// Twenty one-shot timers due 0.0004 s apart, made latest first, never run more than the scheduler's 0.001 s out of due
+        /// order.
+        /// </summary>
+        public static void NearTimesMany(FakeWorld world)
+        {
+            var dues = new List<float>();
+            for (var i = 19; i >= 0; i--)
+            {
+                var due = 0.0004f * i;
+                Timer.After(due, () => { dues.Add(due); });
+            }
+
+            world.Advance(0.1f);
+            Expect.Equal(20, dues.Count, "the timers that ran");
+            for (var i = 1; i < dues.Count; i++)
+            {
+                Expect.True(dues[i] >= dues[i - 1] - 0.001f, "run " + i + " (due " + dues[i] + ") is not more than 0.001 s before the run before it (due " + dues[i - 1] + ")");
+            }
+        }
 #if DEBUG
 
         /// <summary>

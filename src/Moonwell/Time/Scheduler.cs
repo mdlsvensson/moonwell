@@ -9,6 +9,9 @@ namespace Moonwell
         /// <summary>The game time the timer is due.</summary>
         internal readonly float due = 0.0f;
 
+        /// <summary>The due time in whole milliseconds, rounded: the heap's order before the sequence.</summary>
+        internal readonly float millisecond = 0.0f;
+
         /// <summary>The order the timer was made in; a repeating timer keeps it across repeats.</summary>
         internal readonly int sequence;
 
@@ -19,6 +22,7 @@ namespace Moonwell
         internal TimerEntry(float due, int sequence, Timer timer)
         {
             this.due = due;
+            millisecond = MathF.Floor(due * 1000.0f + 0.5f);
             this.sequence = sequence;
             this.timer = timer;
         }
@@ -27,7 +31,7 @@ namespace Moonwell
     /// <summary>Runs the timers in due order, on one wake request to the world.</summary>
     internal sealed class Scheduler
     {
-        /// <summary>The binary min-heap of timers, ordered by due time and then by creation.</summary>
+        /// <summary>The binary min-heap of timers, ordered by due time in whole milliseconds and then by creation.</summary>
         private readonly List<TimerEntry> heap = new List<TimerEntry>();
 
         /// <summary>The sequence the next timer added gets.</summary>
@@ -144,17 +148,17 @@ namespace Moonwell
             Owner.current = previous;
         }
 
-        /// <summary>Whether the first entry is due before the second: by due time, then by creation.</summary>
+        /// <summary>
+        /// Whether the first entry comes before the second: by due time in whole milliseconds, then by creation, so timers due in
+        /// the same millisecond run in the order they were made (a buff's tick before an expiry due with it). Milliseconds are a
+        /// fixed grid, so the order is transitive, which a tolerance between two due times is not; the tolerance is only in what
+        /// is due (Wake).
+        /// </summary>
         private static bool Before(TimerEntry first, TimerEntry second)
         {
-            if (first.due < second.due - 0.001f)
+            if (first.millisecond != second.millisecond)
             {
-                return true;
-            }
-
-            if (second.due < first.due - 0.001f)
-            {
-                return false;
+                return first.millisecond < second.millisecond;
             }
 
             return first.sequence < second.sequence;
