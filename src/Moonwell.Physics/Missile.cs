@@ -252,6 +252,9 @@ namespace Moonwell
         /// <summary>Where it came to rest: its height.</summary>
         internal float restZ;
 
+        /// <summary>Whether the deck it rests on has gone since it came to rest (its bridge died): it wakes, to fall.</summary>
+        internal bool groundGone;
+
         /// <summary>Whether a reaction let it through the ground: it is not met again until it is above the ground.</summary>
         internal bool throughGround;
 

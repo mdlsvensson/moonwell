@@ -116,6 +116,30 @@ namespace Moonwell.Engine
             }
         }
 
+        /// <summary>Wakes each resting missile in a box, as the deck there has gone: it falls from its next step.</summary>
+        public static void GroundGone(float minX, float minY, float maxX, float maxY)
+        {
+            var list = missiles;
+            if (list == null)
+            {
+                return;
+            }
+
+            var count = list.Count;
+            for (var i = 0; i < count; i++)
+            {
+                var missile = Raw.At(list, i);
+                if (missile.resting && !missile.ending)
+                {
+                    var entry = missile.entry!;
+                    if (entry.X >= minX && entry.X <= maxX && entry.Y >= minY && entry.Y <= maxY)
+                    {
+                        missile.groundGone = true;
+                    }
+                }
+            }
+        }
+
         /// <summary>Takes the ended missiles out of the list, keeping the order of the rest.</summary>
         private static void Pack(List<Missile> list)
         {

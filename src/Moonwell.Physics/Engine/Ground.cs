@@ -17,20 +17,21 @@ namespace Moonwell.Engine
         /// <summary>How many times the height has been read; the cases read it to see how often the ground is read.</summary>
         internal static int reads;
 
-        /// <summary>The ground's height at a point for a ground unit: the deck where one stands, else the terrain.</summary>
+        /// <summary>The ground's height at a point for a ground unit: the deck where one stands, else the terrain; where the terrain is higher than the deck (its end, in a bank), the terrain.</summary>
         internal static float Height(float x, float y)
         {
             reads++;
+            var height = Terrain.Height(x, y);
             if (Decks.count > 0)
             {
                 float deck;
-                if (Decks.Under(x, y, out deck))
+                if (Decks.Under(x, y, out deck) && deck > height)
                 {
                     return deck;
                 }
             }
 
-            return Terrain.Height(x, y);
+            return height;
         }
 
         /// <summary>The ground's height at a point for something at a height: the highest of the terrain and any deck there that is not above that height, so a deck is met from above only.</summary>

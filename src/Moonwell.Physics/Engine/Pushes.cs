@@ -8,7 +8,8 @@ namespace Moonwell.Engine
     /// (which keeps its order) and put in its cell at once, kept on ground it can stand on, slowed, and lifted or brought
     /// down. The point its collision size ahead is checked against the map's walls (the line from the unit to it crossing
     /// one it is not lifted over), with the terrain's pathing (flyable for a flyer) and then, for a unit that does not
-    /// fly, the item trick, which also sees trees and buildings; blocked, it slides along the edge
+    /// fly, the item trick, which also sees trees and buildings; on a bridge's deck, the deck's area instead, its edge a
+    /// rail; blocked, it slides along the edge
     /// on the free axis, losing the speed into it, or stops, and OnSlammed runs. The reactions run on the unit's class,
     /// then its components and buffs in the order they were added, each guarded, with the unit as the current owner; a
     /// method a class does not write is not called (in Lua an interface's empty defaults are not there).
@@ -26,6 +27,9 @@ namespace Moonwell.Engine
 
         /// <summary>Degrees to radians.</summary>
         private const float Radians = 0.0174532925f;
+
+        /// <summary>The most the ground beside a bridge's deck may differ from it for a pushed unit to cross between them; more, and the deck's edge is a rail.</summary>
+        private const float DeckStep = 64.0f;
 
         /// <summary>The pushes, in the order they began; an ended one stays until the step packs the list. Made on first use after an install. It holds no null, so the pass reads it raw.</summary>
         private static List<Pushed>? pushes;
@@ -473,7 +477,12 @@ namespace Moonwell.Engine
             return body != null && !body.HasEnded ? body.Friction : Body.DefaultFriction;
         }
 
-        /// <summary>Whether a pushed unit at (fromX, fromY) may stand at a point: inside the world's bounds, with no wall it is not lifted over across the way there, and flyable for a flyer; walkable and where an item lands, for a unit that does not fly.</summary>
+        /// <summary>
+        /// Whether a pushed unit at (fromX, fromY) may stand at a point: inside the world's bounds, with no wall it is not
+        /// lifted over across the way there, and flyable for a flyer; for a unit that does not fly, walkable and where an
+        /// item lands, or on a bridge's deck. A deck is walkable inside its area (the terrain's pathing reads the water
+        /// beneath it), and its edge is a rail, except where the ground beyond is within DeckStep of it (its ends, on the banks).
+        /// </summary>
         private static bool Free(Pushed push, float fromX, float fromY, float x, float y)
         {
             if (x < Pass.minX || x > Pass.maxX || y < Pass.minY || y > Pass.maxY)
@@ -491,7 +500,44 @@ namespace Moonwell.Engine
                 return Terrain.IsFlyable(x, y);
             }
 
+            if (Decks.count > 0)
+            {
+                float to;
+                float from;
+                var onTo = OnDeck(x, y, out to);
+                var onFrom = OnDeck(fromX, fromY, out from);
+                if (onTo && onFrom)
+                {
+                    return true;
+                }
+
+                if (onFrom)
+                {
+                    // Off the deck's edge: onto the ground only near the deck's height, else it is the rail.
+                    return Near(Terrain.Height(x, y), from) && Terrain.IsWalkable(x, y) && Terrain.ItemLands(x, y);
+                }
+
+                if (onTo)
+                {
+                    // Onto a deck from the ground: only where the deck is near the ground's height.
+                    return Near(to, Terrain.Height(fromX, fromY));
+                }
+            }
+
             return Terrain.IsWalkable(x, y) && Terrain.ItemLands(x, y);
+        }
+
+        /// <summary>Whether a point is on a deck, which is above the terrain there, and the deck's height; false off every deck, or where the terrain is higher (a deck's end, in a bank).</summary>
+        private static bool OnDeck(float x, float y, out float height)
+        {
+            return Decks.Under(x, y, out height) && height >= Terrain.Height(x, y);
+        }
+
+        /// <summary>Whether two heights are within DeckStep.</summary>
+        private static bool Near(float a, float b)
+        {
+            var apart = a - b;
+            return apart <= DeckStep && apart >= -DeckStep;
         }
 
         /// <summary>Puts a unit at a place with SetUnitX/Y, keeping its order, and in its cell of the grid at once.</summary>

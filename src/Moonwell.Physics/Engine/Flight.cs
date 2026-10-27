@@ -66,11 +66,12 @@ namespace Moonwell.Engine
             if (missile.resting)
             {
                 var place = start;
-                if (place.X != missile.restX || place.Y != missile.restY || missile.z != missile.restZ)
+                if (place.X != missile.restX || place.Y != missile.restY || missile.z != missile.restZ || missile.groundGone)
                 {
-                    // Moved by its X, Y or Z: it flies from where it was put, and the ground there is read again.
+                    // Moved by its X, Y or Z, or the deck under it is gone: it flies from where it is, and the ground there is read again.
                     missile.rolling = false;
                     missile.groundRead = false;
+                    missile.groundGone = false;
                 }
                 else if (missile.vx == 0.0f && missile.vy == 0.0f && missile.vz == 0.0f)
                 {
@@ -234,7 +235,9 @@ namespace Moonwell.Engine
             else
             {
                 missile.groundSince += step;
-                if (missile.groundRead)
+                // Over a bridge the ground is read every step: a deck rises from the water as steeply as a cliff, and a
+                // missile let fall past its top between two reads would be under it, where it is not met.
+                if (missile.groundRead && (Decks.count == 0 || !Decks.Near(x, y)))
                 {
                     var high = bottom - missile.groundZ;
                     var since = missile.groundSince;
@@ -603,6 +606,7 @@ namespace Moonwell.Engine
             missile.restX = missile.entry!.X;
             missile.restY = missile.entry.Y;
             missile.restZ = missile.z;
+            missile.groundGone = false;
             Contacts.Pause(missile);
             var previous = Owner.current;
             Owner.current = missile;

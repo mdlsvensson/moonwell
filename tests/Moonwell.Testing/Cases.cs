@@ -244,6 +244,12 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "wall.fast", Run = WallCases.Fast });
             list.Add(new Case { Name = "wall.push", Run = WallCases.Push });
             list.Add(new Case { Name = "wall.checks", Run = WallCases.Checks });
+            list.Add(new Case { Name = "deck.height", Run = DeckCases.Height });
+            list.Add(new Case { Name = "deck.turned-scaled", Run = DeckCases.TurnedScaled });
+            list.Add(new Case { Name = "deck.under", Run = DeckCases.Under });
+            list.Add(new Case { Name = "deck.unit-on", Run = DeckCases.UnitOn });
+            list.Add(new Case { Name = "deck.push-rail", Run = DeckCases.PushRail });
+            list.Add(new Case { Name = "deck.dies", Run = DeckCases.Dies });
         }
 
         /// <summary>Adds the areas package's cases.</summary>

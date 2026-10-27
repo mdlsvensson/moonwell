@@ -18,6 +18,9 @@ namespace Moonwell.Build
         /// <summary>The input package's assembly: a map that references it gets World Editor's cameras written from <c>war3map.w3c</c>, their names in its code checked, and the package installed by its Main, listening for the mouse only when the code names <c>Mouse</c> or <c>IMouseWatch</c>.</summary>
         private const string InputAssemblyName = "Moonwell.Input";
 
+        /// <summary>The physics package's assembly: a map that references it gets its placed bridges written from <c>war3map.doo</c> and installed by its Main.</summary>
+        private const string PhysicsAssemblyName = "Moonwell.Physics";
+
         /// <summary>Runs every step of the build, in order.</summary>
         /// <param name="path">A project folder, or the path of its <c>.csproj</c> file.</param>
         /// <param name="options">What kind of build to make.</param>
@@ -74,7 +77,7 @@ namespace Moonwell.Build
             BalanceCheck.Run(declarations, standard, data);
 
             var ids = ObjectIds.Assign(declarations.Objects, standard.AllIds(), MapObjectIds.Defined(project));
-            EntryWriter.Write(project, settings, true, Installs(project, map, targetPath));
+            EntryWriter.Write(project, settings, true, Installs(project, map, targetPath, log));
             RegistryWriter.Write(project, declarations.Used, declarations.Objects, ids);
             LuaCompiler.Compile(project, map, targetPath, options.Release, declarations, ids, standard, data.ValueSet, Declarations.References(targetPath, InteractionsAssemblyName));
             StageWith(project, () => Stage.Write(project, map, declarations.Objects, ids, declarations.StandardClassIds, standard, log));
@@ -101,14 +104,15 @@ namespace Moonwell.Build
             // The build reads no declarations, but a unit's Level is still set only in a declared class's constructor.
             Declarations.CheckSetters(targetPath);
 
-            EntryWriter.Write(project, settings, false, Installs(project, map, targetPath));
+            EntryWriter.Write(project, settings, false, Installs(project, map, targetPath, log));
             LuaCompiler.Compile(project, map, targetPath, options.Release);
             StageWith(project, () => Stage.WriteWithoutObjects(project, map, log));
         }
 
-        // What the map's Main installs before anything registers: each package the map references, in this order. The terrain's grid and the
-        // areas' regions and the input's cameras are written here too, from the map's ground, regions and cameras, and a file an earlier build wrote is removed when the map no longer uses the package.
-        private static List<string> Installs(MapProject project, War3Net.Build.Map map, string targetPath)
+        // What the map's Main installs before anything registers: each package the map references, in this order. The terrain's grid, the
+        // areas' regions, the input's cameras and the physics' bridges are written here too, from the map's ground, regions, cameras and
+        // placed destructables, and a file an earlier build wrote is removed when the map no longer uses the package.
+        private static List<string> Installs(MapProject project, War3Net.Build.Map map, string targetPath, TextWriter log)
         {
             var installs = new List<string>();
             if (Declarations.References(targetPath, DamageAssemblyName))
@@ -116,7 +120,10 @@ namespace Moonwell.Build
                 installs.Add("global::Moonwell.DamageSystem.Install();");
             }
 
-            if (Declarations.References(targetPath, TerrainAssemblyName))
+            // The physics package reads the ground through the terrain package, so a map that uses physics but never names Terrain
+            // (its assembly then has no reference to it) needs the grid too.
+            var physics = Declarations.References(targetPath, PhysicsAssemblyName);
+            if (Declarations.References(targetPath, TerrainAssemblyName) || physics)
             {
                 // The fork's W2 fix refuses a map without a war3map.w3e, so there is always one here.
                 TerrainWriter.Write(project, map.Environment!);
@@ -152,6 +159,17 @@ namespace Moonwell.Build
             else
             {
                 PlaceWriter.DeleteInput(project);
+            }
+
+            if (physics)
+            {
+                // After the terrain: a deck stands on the ground at its bridge's place.
+                BridgeWriter.Write(project, map.Doodads, log);
+                installs.Add("global::Moonwell.Physics.Install(global::Moonwell.Generated.PhysicsData.Bridges(), global::Moonwell.Generated.PhysicsData.Decks());");
+            }
+            else
+            {
+                BridgeWriter.Delete(project);
             }
 
             return installs;

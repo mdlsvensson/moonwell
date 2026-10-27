@@ -426,7 +426,9 @@ target.Knockback(caster.AngleTo(target), 300f, 0.5f); // 300 away over half a se
 - **Knockback** keeps the unit's order. It stops at trees, cliffs, walls (`Wall.Create`) and a bridge's rail; a stopped
   push stops a little short of the edge. `IPushTarget` has `OnPushed`, `OnSlammed` and `OnGrounded`; an `OnPushed`
   that pushes its own unit again loops.
-- **Bridges**: placed bridges are ground, for missiles landing and units standing; a bridge made by code is not.
+- **Bridges**: placed bridges are ground, for missiles landing (from above: one below a deck flies under it) and units
+  standing, until the bridge dies. A bridge made by code is not, nor a type with no deck Moonwell knows (an ice floe, or
+  the map's own type with its model changed): the build warns of it.
 - Everything runs on every machine. Reads are safe in `Local.For`; firing, pushing and every set are not.
 
 ## Areas

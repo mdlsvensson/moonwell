@@ -110,6 +110,23 @@ namespace Moonwell
             Tracking.BeforeGizmos = hook;
         }
 
+        /// <summary>
+        /// Makes the placed bridges ground: the map's generated Main calls it at the start with what the build wrote from
+        /// war3map.doo, when the map uses the package. Each bridge's handle is found near its place, and its deck counts
+        /// until it dies. The package installs itself on the game first if it is not installed; with no bridges it does nothing.
+        /// </summary>
+        /// <param name="bridges">The placed bridges, as the build writes them.</param>
+        /// <param name="decks">The deck shapes of their types, as the build writes them.</param>
+        public static void Install(string bridges, string decks)
+        {
+            if (bridges.Length == 0)
+            {
+                return;
+            }
+
+            Decks.Load(World, bridges, decks);
+        }
+
         /// <summary>Forgets the settings and the world, so the next use starts from the defaults; the tests call it between cases.</summary>
         internal static void ResetSettings()
         {
@@ -119,6 +136,7 @@ namespace Moonwell
             host = null;
             hook = null;
             Pass.Reset(kept);
+            Decks.Reset();
         }
 
         /// <summary>Whether the package is installed: the interactions package is, and its hook before the gizmos is the package's own. Interactions' Install and Runtime.Reset clear the hook, so the next use starts afresh.</summary>
