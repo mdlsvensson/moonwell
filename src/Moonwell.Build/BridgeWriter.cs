@@ -135,7 +135,9 @@ namespace Moonwell.Build
         /// <summary>
         /// The place the game makes a placed bridge at, from its place in <c>war3map.doo</c>: x on the grid of 64 toward 0,
         /// plus 32, and y on it toward 0. A Long Stone Bridge written at x 0 is made at x 32, and <c>CreateDestructable</c>
-        /// moves one so: (2600, 1200) to (2592, 1152), and (2600, -1200) to (2592, -1152) (game facts, 10-27).
+        /// moves one so: (2600, 1200) to (2592, 1152), and (2600, -1200) to (2592, -1152) (game facts, 10-27). A negative
+        /// x is not measured: it is taken toward 0 as y is, so every x from -64 to 64 is made at 32; only which tile's bed is
+        /// read for a bridge over water depends on it.
         /// </summary>
         /// <param name="x">The doo place's x.</param>
         /// <param name="y">The doo place's y.</param>
