@@ -403,6 +403,13 @@ var near = Find.InRange<Unit>(x, y, 500f);                // a new list; or Find
   up) is found at its new place within `CellCheck` (0.1 s). A pair whose holder and other moved together stays paired.
 - From the first interaction or `Find` that asks for units, Moonwell takes in every unit in the game, and each one
   that comes in after, also those the game makes with no code of the map (trained, summoned, made by a native).
+- The first interaction or `Find` that asks for destructables takes in every destructable on the map at once: 0.3 s
+  and 18 MB on a map of 18,600 (measured). Asking for items starts a look for new ground items once a second. `Actor`
+  and `Widget` ask for every kind (`Find.InRange<Actor>`, `Interaction<Gizmo, Actor>`), so ask for `Unit` or a gizmo
+  class when that is what is meant. The holder of an interaction is tracked on its own: a tree that holds one takes
+  in no other destructable.
+- A check or `Find` reads every cell of its box, empty or not: a `Range` of 5,000 is about 6,400 cells, near 2.6 ms a
+  check (estimated). Keep a range to what the interaction needs, and a search of the whole map for a rare moment.
 - `Find` has `InRange`, `InRect`, `InPolygon`, `AlongLine` and `Closest`. Each gives a new list, or fills a list the
   map keeps (which makes none; use it every tick); `Closest` gives the nearest one, or the nearest few into a list.
 - `Interactions.CellSize` (128), `CellCheck` (0.1), `Slack` (64) and `Step` (1/32) are set in the map's constructor.
