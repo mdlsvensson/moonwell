@@ -59,6 +59,9 @@ namespace Moonwell.Engine
         /// <summary>A length shorter than this gives no direction, for a normal.</summary>
         private const float Tiny = 0.0001f;
 
+        /// <summary>The least a ball's middle on or past a wall's line is put back out from it, so a ball of radius 0 is on its own side, clear of a float's last bit at a map's widest.</summary>
+        private const float Clear = 0.01f;
+
         /// <summary>A time past either end of every step, for a sweep that stays inside the round part or the heights.</summary>
         private const float Always = 1000000.0f;
 
@@ -748,6 +751,14 @@ namespace Moonwell.Engine
                 }
 
                 Quicker(missile, before);
+            }
+
+            if (wall != null && !moved && radius < Clear)
+            {
+                // A ball thinner than Clear met the wall with its middle on the wall's line, or a float's last bit past it:
+                // it stays just off it on the side it came from, so the next step's sweep knows its side.
+                Beside(wall, radius, nx, ny, ref hitX, ref hitY);
+                grid.Move(entry, hitX, hitY);
             }
 
             Stay(missile, entry, moved, hitX, hitY, hitZ);
@@ -1932,7 +1943,12 @@ namespace Moonwell.Engine
             }
         }
 
-        /// <summary>Puts a ball's middle at (x, y) back out at a wall's side, its radius from the wall, when it is nearer: away from the nearest point of the wall, or along the normal (nx, ny) when it is on the wall's line or past it.</summary>
+        /// <summary>
+        /// Puts a ball's middle at (x, y) back out at a wall's side, its radius from the wall: when it is nearer on its own
+        /// side (the side of the normal (nx, ny)), away from the nearest point of the wall; and whenever it is on the wall's
+        /// line or past it, whatever its radius, along the normal, its radius out and at least Clear, so a ball of radius 0
+        /// is on its own side too.
+        /// </summary>
         private static void Beside(Wall wall, float radius, float nx, float ny, ref float x, ref float y)
         {
             float x1;
@@ -1948,20 +1964,22 @@ namespace Moonwell.Engine
             var ox = x - qx;
             var oy = y - qy;
             var off = Trig.Sqrt(ox * ox + oy * oy);
-            if (off >= radius)
+            var own = ox * nx + oy * ny > 0.0f;
+            if (own && off >= radius)
             {
                 return;
             }
 
-            if (off > Tiny && ox * nx + oy * ny > 0.0f)
+            if (own && off > Tiny)
             {
                 x = qx + ox / off * radius;
                 y = qy + oy / off * radius;
                 return;
             }
 
-            x = qx + nx * radius;
-            y = qy + ny * radius;
+            var back = radius > Clear ? radius : Clear;
+            x = qx + nx * back;
+            y = qy + ny * back;
         }
 
         /// <summary>The nearest point of a wall from (x1, y1) along (ex, ey) to a point. It divides by the wall's length squared as it is, not by a square root squared: the game's square root, off by up to 2 parts in 100,000, put the point off along the wall by as much, which tilted a bounce's normal.</summary>

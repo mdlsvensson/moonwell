@@ -351,6 +351,48 @@ namespace Moonwell.Testing
             Expect.True(ball.X < 360.0f && ball.Y < 240.0f, what + "in the corner at the end; at (" + ball.X + ", " + ball.Y + ")");
         }
 
+        /// <summary>
+        /// A ball of radius 0, rolling or a Bounce, laid 1 off the slope's wall on the side the ground falls toward it from,
+        /// is pulled into the wall at every step and goes on down along it for 3 seconds on its own side: put back out at
+        /// the wall's side whenever its middle is on or past the wall's line, whatever its radius, and left just off the
+        /// line after a bounce off it. With radius 0 nothing was put back, and it went through the wall.
+        /// </summary>
+        public static void SlideRadiusZero(FakeWorld world)
+        {
+            AlongWallThin(world, Contact.Slide, Contact.Slide, "rolling: ");
+            AlongWallThin(world, Contact.Bounce, Contact.Bounce, "Bounce: ");
+        }
+
+        /// <summary>Lays a ball of radius 0 with the given contacts 1 off the slope's wall, and checks it stays on its own side for 3 seconds.</summary>
+        private static void AlongWallThin(FakeWorld world, Contact ground, Contact side, string what)
+        {
+            SlopeWithWall();
+            var ball = new Ball();
+            ball.GroundContact = ground;
+            ball.WallContact = side;
+            ball.Gravity = 800.0f;
+            ball.Friction = 20.0f;
+            ball.Radius = 0.0f;
+            var x = 1000.0f + 0.70710678f;
+            var y = 900.0f - 0.70710678f;
+            Missile.Create(ball, x, y, Physics.GroundHeight(x, y));
+            var least = 1.0f;
+            for (var i = 0; i < 96; i++)
+            {
+                Steps(world, 1);
+                // Across the wall, from the wall's line: not past it, nor on it.
+                var off = ball.X - ball.Y - 100.0f;
+                if (off < least)
+                {
+                    least = off;
+                }
+            }
+
+            Expect.True(least > 0.0f, what + "on its own side of the wall throughout; at least " + least);
+            var along = (x - ball.X + y - ball.Y) * 0.70710678f;
+            Expect.True(along > 400.0f, what + "went on down along the wall: " + along);
+        }
+
         /// <summary>A footman pushed at 600 into a wall across its way stops short of it, its collision size off, and OnSlammed runs once with the normal out of the wall.</summary>
         public static void Push(FakeWorld world)
         {
