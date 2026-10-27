@@ -94,8 +94,9 @@ public sealed class Champion : Human.Units.Paladin
   ("unbuildable", "blighted"), and the build writes that.
   In the game an enum of `Moonwell.Objects` has its numbers only, no names: `ToString` (also `choice?.ToString()`), a
   string made with one (`+`, `+=`, interpolation, or a call that takes an `object`: `string.Format`,
-  `StringBuilder.Append`, a method of your own) and `Enum.GetValues` are rejected as error MW0010, a nullable choice
-  too; compare with its members, `|`, `&` and `HasFlag`.
+  `StringBuilder.Append`, a method of your own), a list of them given to `string.Join`, and `Enum.GetValues` and the
+  other `Enum` methods are rejected as error MW0010, a nullable choice too; compare with its members, `|`, `&` and
+  `HasFlag`.
 - `AttackType` and `DefenseType` are core Moonwell's (`Moonwell.AttackType`), shared with the damage package, and keep
   their names in the game. A file writes them with `using Moonwell;`; a name of the old `Moonwell.Objects.AttackType`
   is error MW0011.
@@ -110,7 +111,8 @@ public sealed class Champion : Human.Units.Paladin
   named apart: `Inferno.InfernalDuration`, `Taunt.PreferHostiles` and `PreferFriendlies`, `WindWalk.BackstabDamage` and
   `Backstab`, `HealingModifier.HealingPercent`.
 - A field with no live value (`Model`, `Tooltip`, `GoldCost`) keeps World Editor's name, is set only in the constructor,
-  and reads the declared value anywhere.
+  and reads the declared value anywhere. A set anywhere else fails the build, which names the class and method but no
+  line: `MyMap.Heroes.Champion.OnKill sets GoldCost; declared fields are set only in the constructor`.
 - A hero's `MaxLife`, `MaxMana` and `Mana` in its constructor are the totals it starts with: `MaxLife = 800` starts a
   Paladin at 800 life. The build takes off what its starting strength and intelligence give (25 life per strength and
   15 mana per intelligence, or the map's own in `war3mapMisc.txt`) and writes the rest as the base field. A total the
@@ -129,9 +131,10 @@ public sealed class Champion : Human.Units.Paladin
 - A constructor may compute, but must not call the game: the build fails at such a line. A live member with no declared
   field there (`Life = 300`, `Kill()`, `X`) is error MW0012, which says what to set instead where there is one: a unit
   starts with full life, so set `MaxLife`.
-- A class with no `[ObjectId]` is error MW0013, and the build names a free id to use. A buff also names its carrier,
-  the hidden ability that shows its icon: `[ObjectId("B001", Carrier = "A002")]`, or `[ObjectId(Carrier = "A002")]`
-  with `[Replaces]`. An id is four ASCII characters, and only a hero's starts with an upper-case letter (MW0014).
+- A class with no `[ObjectId]` is error MW0013, and the build names a free id to use. A buff also gives the id of its
+  carrier, the hidden ability the build makes to show its icon, so no class of the map declares that id:
+  `[ObjectId("B001", Carrier = "A002")]`, or `[ObjectId(Carrier = "A002")]` with `[Replaces]`. An id is four ASCII
+  characters, and only a hero's starts with an upper-case letter (MW0014).
 - `[Replaces]` makes the class the game's object itself: every unit of that type is made as the class.
 - `Unit.Create<Champion>(player, x, y)` makes one in the game, facing 270 degrees unless a facing follows;
   `Item.Create<EmberBlade>(x, y)` makes an item.
@@ -155,7 +158,7 @@ Default. A map on another data set plays that set's values for the fields it lea
 ### The default object and the name
 
 `Default` is the class's declared values as an object, which never changes when the unit does. Every unit, hero and
-item has it, a plain standard unit too: `unit.Default.MaxMana` is 300 whatever this Champion's is now. From the class
+item has it, a plain standard unit too: `unit.Default.MaxMana` is 255 whatever this Champion's is now. From the class
 alone it is `Unit.Default<Champion>().MaxMana`: `Unit.Default<T>()` takes a unit class (`Hero.Default<T>()` works too),
 `Item.Default<T>()` an item class; a class of another kind (`Item.Default<Guard>()`) or a destructable class, which has
 no default object, is error MW0037. On a declared class `Default` is typed as its kind base (`StandardUnit`,
@@ -202,6 +205,8 @@ public sealed class KillCounter : UnitComponent
 - Reactions to the whole map (`OnGameStart`, `OnUnitCreated`, `OnUnitDied`, `OnUnitCast`, `OnLeave`) go on a game or
   player component. `OnUnitCreated` runs once for each unit, when it comes into the game (one that came in before
   anything wanted it runs none); a unit's own is `OnCreated`.
+- A reaction is a method the class overrides: one written without `override`, or with `new`, never runs, and is error
+  MW0041, as is a method named like a reaction (`On...`) with other parameters.
 - A reaction's parameters say the role: `OnPickedUp(Unit carrierUnit)`, `OnUnitDied(Unit dyingUnit, Unit? killerUnit)`,
   `OnKill(Unit killedUnit)`. The killer is null when no unit's damage killed: `Kill()` or `Life = 0` from code, timed
   life running out, or a unit's own damage.
@@ -233,7 +238,7 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 
 | Unit | |
 |---|---|
-| `Life`, `MaxLife`, `Mana`, `MaxMana` | read and set; a `Life` under 0.405 kills, above the most it clamps; the most are whole numbers |
+| `Life`, `MaxLife`, `Mana`, `MaxMana` | read and set; a `Life` of 0.405 or less kills, above the most it clamps; the most are whole numbers |
 | `Player` | read and set; setting gives the unit the new owner's colour |
 | `X`, `Y` | read; `MoveTo(x, y)` through the game's pathing, `PlaceAt(x, y)` with none, not even the map's edge |
 | `Facing` | read and set (the unit turns, so a read at once gives the old one); `FaceNow(degrees)` turns at once, a walking unit turns back |
@@ -461,7 +466,7 @@ screen, `seconds: 10f`. `Package.Version` is the version of Moonwell the map is 
 
 `Player.Playing` is every player in the game, people and computers, and `Player.Users` the people:
 `foreach (var player in Player.Users)`. `player.SlotState` is `Empty`, `Playing` or `Left`, and `player.Controller`
-says who plays it. `OnLeave(Player player)` runs on the game's components, then the leaving player's.
+says who plays it. `OnLeave(Player leavingPlayer)` runs on the game's components, then the leaving player's.
 
 `Name`, `Color` and `Team` are read and set, and `Race` read; setting `Color` also recolours the player's units.
 `a.SetAlliance(b, Alliance.Allied | Alliance.SharedVision)` sets what `a` gives `b`, one way as the game keeps it, and
@@ -490,12 +495,14 @@ which is in each player's language. The build rejects, as compile errors:
 - `GetHandleId` (MW0003), looping over a `Dictionary` or `HashSet`, or one held as `IDictionary`, `ISet` or an
   `ICollection` (MW0004; use `OrderedMap` and `OrderedSet`), and `long`, `ulong`, `uint`, `double` and `decimal`
   (MW0005).
+- A blizzard.j function that changes the game inside its own `GetLocalPlayer()` block, such as
+  `SelectGroupForPlayerBJ`, which desyncs wherever it runs (MW0006).
 
-`OrderedMap` and `OrderedSet` keep the order things were added in, the same on every machine. `foreach (var pair in map)`
-gives each key and its value in that order (`pair.Key` and `pair.Value`, or `foreach (var (key, value) in map)`), and
-LINQ works on both. A loop that adds or removes a key or an item throws: to change one as you go, loop over
-`set.Snapshot()`, or over a map by index from the end. In the game each pair is a small table, so code that runs every
-tick over many keys loops by index with `KeyAt` and `ValueAt`, which makes none.
+`OrderedMap` and `OrderedSet` keep the order things were added in, the same on every machine.
+`foreach (var pair in map)` gives each key and its value in that order (`pair.Key` and `pair.Value`, or
+`foreach (var (key, value) in map)`), and LINQ works on both. A loop that adds or removes a key or an item throws: to
+change one as you go, loop over `set.Snapshot()`, or over a map by index from the end. In the game each pair is a small
+table, so code that runs every tick over many keys loops by index with `KeyAt` and `ValueAt`, which makes none.
 
 `[MachineLocal]` on a method of your own makes it code of one machine: its body is checked as a `Local.For` block, and
 calling it outside one is MW0002. Where the code runs on every machine anyway, on an override of Moonwell's
@@ -509,9 +516,10 @@ every machine.
 
 Moonwell turns your C# into Lua with CSharp.lua, and the game runs the Lua. A few C# forms stop the compiler, write
 Lua that does something else, or call a library function the Lua core does not have. The analyzer rejects most of them
-as errors with their line, so the map does not build and then fail on the screen. Nothing silences them (`[SyncUnchecked]`
-does not), because the Lua cannot run them anywhere. The list comes from running about 770 small programs on .NET and
-in Lua and comparing what they printed.
+as errors with their line, so the map does not build and then fail on the screen. `[SyncUnchecked]` does not silence
+them, `decimal` included, because the Lua cannot run them anywhere; a `#pragma warning disable` does, and the map then
+fails in the game. The list comes from about 770 checks in 60 programs, run on .NET and in Lua with what they printed
+compared, and from later checks of the compiler Moonwell builds with.
 
 | Rule | Rejects | Write instead |
 |---|---|---|
@@ -521,13 +529,13 @@ in Lua and comparing what they printed.
 | MW0020 | `var c = arr[0];` on a struct, then `c.X = 6`, `c.Inner.X = 6`, `c.Move()` or `Bump(ref c)` (it changes `arr[0]`) | make a new struct, or write `c` back with `arr[0] = c` |
 | MW0022 | `var (a, b) = (1, 2)`, `(x[0], x[1]) = (x[1], x[0])`, a tuple turned into text | `(int a, int b) = (1, 2)`, a temporary, its items |
 | MW0023 | a user-defined `++`, `--`, `operator true/false`; `static abstract`; a record deriving from a record; one class implementing `IG<int>` and `IG<string>`; `with` on an anonymous type | a method; an ordinary class |
-| MW0024 | `a[1..3]`, `s[1..]`, `list[^1]`, `Index`, `Range` (`array[^1]` is fine) | `Substring`, `Skip`/`Take`, `list[list.Count - 1]` |
+| MW0024 | `a[1..3]`, `s[1..]`, `list[^1]` (`array[^1]` is fine) | `Substring`, `Skip`/`Take`, `list[list.Count - 1]` |
 | MW0025 | a `ref` return, `ref int r = ref First(a)`, `ref int r = ref a[i]` | index the array each time |
 | MW0026 | `params List<int>`, `params` in a lambda | `params int[]` |
 | MW0027 | `s.Split("--")` (runs out of memory), `s.Split(new[] { ", " }, options)` (never ends), `StartsWith('a')`, `EndsWith('a')`, ignore-case `IndexOf`/`StartsWith`/`EndsWith`, `"abc".Reverse()` | split on a char, a string argument, lower-case both |
-| MW0028 | a `char` or an enum given to `string.Format`, `Console.WriteLine(object)`, `StringBuilder.Append(object)`, `string.Join` (shown as its number) | `.ToString()` |
+| MW0028 | a `char` or an enum given to `string.Format`, `Console.WriteLine(object)`, `StringBuilder.Append(object)`, `string.Join`, `string.Concat` (shown as its number) | `.ToString()` |
 | MW0029 | `catch (NullReferenceException)`, `catch (IndexOutOfRangeException)`, a pattern variable in a `catch ... when` | `catch (Exception)`, test first |
-| MW0030 | a library member the Lua core lacks: `StringComparer`, `Guid`, `Task`/`await`, `Range`, LINQ `Append`/`Prepend`/`Zip`/`TakeLast`/`ToHashSet`/`Chunk`, `List.ConvertAll`, `StringBuilder.Replace`/`Insert`, `Dictionary.GetValueOrDefault`, `TryPeek`/`TryPop`, `Environment.NewLine`, `Random.Shared`, and more (the rule's description lists them); also `SetEquals` (of a `HashSet`, an `ISet` or an `IReadOnlySet`), `Math.DivRem`, `d.Remove(k, out v)` and `ToList()` of a `Dictionary`, which give wrong answers | `TryGetValue`, `"\n"`, a loop |
+| MW0030 | a library member the Lua core lacks: `StringComparer`, `Guid`, `Task`/`await`, `Index`/`Range`, LINQ `Append`/`Prepend`/`Zip`/`TakeLast`/`ToHashSet`/`Chunk`, `List.ConvertAll`, `StringBuilder.Replace`/`Insert`, `Dictionary.GetValueOrDefault`, `TryPeek`/`TryPop`, `Environment.NewLine`, `Random.Shared`, and more (the rule's description lists them); also `SetEquals` (of a `HashSet`, an `ISet` or an `IReadOnlySet`), `Math.DivRem`, `d.Remove(k, out v)` and `ToList()` of a `Dictionary`, which give wrong answers | `TryGetValue`, `"\n"`, a loop |
 | MW0031 | `checked(a + b)`, `checked { }` (an overflow is never detected) | test the range yourself |
 | MW0032 | `Enum.Parse`, `Enum.GetValues`/`GetNames`, `ToString("D")` on an enum, a `[Flags]` combination turned into text, `(Color)5 + "x"` | a `switch` on the value, `HasFlag` |
 | MW0034 | two `using var` in one block (disposed in the wrong order) | nested `using ( ) { }` |
@@ -560,7 +568,7 @@ most of LINQ. `float` and `int` arithmetic is the game's, see MW0005.
 game with it. Both make a development build: it checks the values Moonwell receives and keeps the Lua readable.
 `--release` makes the release build. `moonwell run --game <exe>` names the game when it is not in its usual place.
 
-The build also rejects `using static Moonwell.Natives` (write `Natives.X`), which hides `Player` behind
+The build also rejects `using static Moonwell.Natives` (MW0008; write `Natives.X`), which hides `Player` behind
 `Natives.Player`. The build does not catch a
 `Dictionary` keyed by a map's own class that has a static field with a value: the map can stop while it loads, with
 nothing on the screen. Key by the handle, or set the field on first use. Moonwell's classes, `Unit` and the rest, are
@@ -568,7 +576,9 @@ safe keys.
 
 An error in a reaction shows on the screen with its C# file and line, and is written in full to
 `Documents\Warcraft III\CustomMapData\Moonwell\log.txt`. A release build leaves the message off the screen and keeps
-the file and line.
+the file and line. An error that repeats shows and goes to the log at its 1st, 10th, 100th time and so on, with its
+count ("failed 10 times"); past a hundred different errors, the new ones share one count. The log keeps its last 200
+lines.
 
 To place objects declared in code in World Editor, save `build\MyMap.w3x` from World Editor as the `map/` folder. The
 next build keeps the placed units; code wins over any object it also declares.
