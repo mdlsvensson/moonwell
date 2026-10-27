@@ -424,8 +424,10 @@ public sealed class ShopFloor : Area // a game component: Components.Add(new Sho
   polygon, a circle, or `AreaShape.Of(a, b)` for several. `OnUnitStays` runs every `Tick` seconds; 0 never runs it.
 - Only units count, alive and with a place: a dead, hidden or loaded unit leaves, and one hidden at the start enters
   once shown (the game sends no event for hiding, so that is up to 0.25 s late). `End()` lets every unit inside leave.
-- The game sees an area in whole 32 cells: a rect is rounded out, a polygon or circle is the cells whose centre is inside.
-  `Contains` is the true shape, so the two can disagree within a cell of an edge.
+- The game sees an area in whole 32 cells: a rect is rounded out, a polygon or circle is the cells whose centre is inside,
+  and always the cell its own centre is in (a polygon's centroid). So a small circle (a landmine) or a band thinner than
+  a cell is never left without cells, but it may be only that one. `Contains` is the true shape, so the two can disagree
+  within a cell of an edge.
 
 ## Mouse and camera
 
