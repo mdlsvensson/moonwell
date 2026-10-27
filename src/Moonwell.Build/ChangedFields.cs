@@ -84,6 +84,7 @@ namespace Moonwell.Build
             }
 
             var levels = LevelCount(kind, root, declared);
+            var standardLevels = StandardLevelCount(kind, root);
             var changed = new SortedDictionary<string, object?>(StringComparer.Ordinal);
 
             // A whole field first; a level put by itself afterwards, so that it wins over the whole field's.
@@ -91,10 +92,12 @@ namespace Moonwell.Build
             {
                 if (!entry.Key.Contains(':') && entry.Value != null)
                 {
-                    Whole(className, fields[entry.Key], entry.Value, root, levels, changed, references);
+                    Whole(className, fields[entry.Key], entry.Value, root, levels, standardLevels, changed, references);
                 }
             }
 
+            // A level past the standard object's level count is written whatever its value: the game's own value there is
+            // not what the standard data says for every ability (it keeps level 4's past the 4th, game-facts 10-19).
             foreach (var entry in declared)
             {
                 var colon = entry.Key.LastIndexOf(':');
@@ -102,7 +105,7 @@ namespace Moonwell.Build
                 {
                     var field = fields[entry.Key.Substring(0, colon)];
                     var level = int.Parse(entry.Key.Substring(colon + 1), CultureInfo.InvariantCulture);
-                    if (Same(field, entry.Value, standard.Value(root, field.Id, level, set)))
+                    if (level <= standardLevels && Same(field, entry.Value, standard.Value(root, field.Id, level, set)))
                     {
                         changed.Remove(entry.Key);
                     }
@@ -240,27 +243,29 @@ namespace Moonwell.Build
         private int LevelCount(string kind, string root, IReadOnlyDictionary<string, object?> declared)
         {
             var field = FieldOfLevelCount(kind);
-            if (field.Length == 0)
-            {
-                return 0;
-            }
-
-            if (declared.TryGetValue(field, out var put) && put is int count)
+            if (field.Length > 0 && declared.TryGetValue(field, out var put) && put is int count)
             {
                 return count;
             }
 
-            return int.TryParse(standard.Value(root, field, 0, set), NumberStyles.Integer, CultureInfo.InvariantCulture, out var standardCount) ? standardCount : 0;
+            return StandardLevelCount(kind, root);
         }
 
-        private void Whole(string className, StandardData.ObjectField field, object value, string root, int levels, SortedDictionary<string, object?> changed, ISet<string> references)
+        // The number of levels the standard object has; 0 for a kind without levels, or none given.
+        private int StandardLevelCount(string kind, string root)
+        {
+            var field = FieldOfLevelCount(kind);
+            return field.Length > 0 && int.TryParse(standard.Value(root, field, 0, set), NumberStyles.Integer, CultureInfo.InvariantCulture, out var count) ? count : 0;
+        }
+
+        private void Whole(string className, StandardData.ObjectField field, object value, string root, int levels, int standardLevels, SortedDictionary<string, object?> changed, ISet<string> references)
         {
             var type = value.GetType();
             var generic = type.IsGenericType ? type.GetGenericTypeDefinition().FullName : null;
             switch (generic)
             {
                 case "Moonwell.Objects.Levels`1":
-                    WholeLevels(className, field, value, type, root, levels, changed);
+                    WholeLevels(className, field, value, type, root, levels, standardLevels, changed);
                     break;
                 case "Moonwell.Objects.ObjectList`1":
                     WholeList(
@@ -287,8 +292,9 @@ namespace Moonwell.Build
             }
         }
 
-        // A field with a value for each level is written with every level when any one differs.
-        private void WholeLevels(string className, StandardData.ObjectField field, object value, Type type, string root, int levels, SortedDictionary<string, object?> changed)
+        // A field with a value for each level is written with every level when any one differs, or when it has a level past
+        // the standard object's level count (see Compute).
+        private void WholeLevels(string className, StandardData.ObjectField field, object value, Type type, string root, int levels, int standardLevels, SortedDictionary<string, object?> changed)
         {
             try
             {
@@ -304,7 +310,7 @@ namespace Moonwell.Build
             var differs = false;
             for (var i = 0; i < values.Length; i++)
             {
-                differs |= !Same(field, values.GetValue(i), standard.Value(root, field.Id, i + 1, set));
+                differs |= i + 1 > standardLevels || !Same(field, values.GetValue(i), standard.Value(root, field.Id, i + 1, set));
             }
 
             if (differs)

@@ -126,6 +126,43 @@ namespace Moonwell.Build.Tests
             Assert.Equal(new[] { "1=6" }, LevelsOf(ReadAbilities(staged), "A001", "Car1"));
         }
 
+        [Fact]
+        public void a_level_past_the_standard_level_count_is_written_whatever_its_value()
+        {
+            // Storm Bolt has 3 levels; the game gives levels 4 to 6 of a 6-level copy 75 mana unless the map writes them.
+            var staged = Build("""
+                namespace Sample
+                {
+                    [Moonwell.Objects.ObjectId("A002")]
+                    public sealed class SixBolt : Moonwell.Objects.Human.Abilities.StormBolt
+                    {
+                        public SixBolt()
+                        {
+                            LevelCount = 6;
+                            ManaCost = Levels(75, 75, 75, 0, 0, 0);
+                            Damage = Levels(100f, 200f, 310f, 325f, 325f, 325f);
+                        }
+                    }
+
+                    [Moonwell.Objects.ObjectId("A003")]
+                    public sealed class FiveBolt : Moonwell.Objects.Human.Abilities.StormBolt
+                    {
+                        public FiveBolt()
+                        {
+                            LevelCount = 5;
+                            Set("Htb1", 5, 325f);
+                            Set("Htb1", 2, 200f);
+                        }
+                    }
+                }
+                """);
+
+            var abilities = ReadAbilities(staged);
+            Assert.Equal(new[] { "1=75", "2=75", "3=75", "4=0", "5=0", "6=0" }, LevelsOf(abilities, "A002", "amcs"));
+            Assert.Equal(new[] { "1=100", "2=200", "3=310", "4=325", "5=325", "6=325" }, LevelsOf(abilities, "A002", "Htb1"));
+            Assert.Equal(new[] { "5=325" }, LevelsOf(abilities, "A003", "Htb1"));
+        }
+
         private string Build(string objects)
         {
             var copy = folders.TemporaryCopyOfSample();
