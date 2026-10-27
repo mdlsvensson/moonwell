@@ -30,8 +30,14 @@ namespace Moonwell
                 this.points[i] = points[i];
             }
 
-            var min = points[0];
-            var max = points[0];
+            // The sums are worked out from the first point, not from (0, 0): far out, the cross products of whole
+            // coordinates are in the hundreds of millions, and a float's rounding of them is more than a small polygon's area.
+            var originX = points[0].X;
+            var originY = points[0].Y;
+            var minX = originX;
+            var minY = originY;
+            var maxX = originX;
+            var maxY = originY;
             var twiceArea = 0f;
             var cx = 0f;
             var cy = 0f;
@@ -39,15 +45,21 @@ namespace Moonwell
             {
                 var a = points[i];
                 var b = points[(i + 1) % points.Length];
-                min = new Vector2(MathF.Min(min.X, a.X), MathF.Min(min.Y, a.Y));
-                max = new Vector2(MathF.Max(max.X, a.X), MathF.Max(max.Y, a.Y));
-                var cross = a.Cross(b);
+                minX = MathF.Min(minX, a.X);
+                minY = MathF.Min(minY, a.Y);
+                maxX = MathF.Max(maxX, a.X);
+                maxY = MathF.Max(maxY, a.Y);
+                var ax = a.X - originX;
+                var ay = a.Y - originY;
+                var bx = b.X - originX;
+                var by = b.Y - originY;
+                var cross = ax * by - ay * bx;
                 twiceArea += cross;
-                cx += (a.X + b.X) * cross;
-                cy += (a.Y + b.Y) * cross;
+                cx += (ax + bx) * cross;
+                cy += (ay + by) * cross;
             }
 
-            Bounds = new Bounds(min, max);
+            Bounds = new Bounds(new Vector2(minX, minY), new Vector2(maxX, maxY));
             Area = MathF.Abs(twiceArea) / 2f;
             if (twiceArea == 0f)
             {
@@ -56,15 +68,15 @@ namespace Moonwell
                 var sy = 0f;
                 for (var i = 0; i < points.Length; i++)
                 {
-                    sx += points[i].X;
-                    sy += points[i].Y;
+                    sx += points[i].X - originX;
+                    sy += points[i].Y - originY;
                 }
 
-                Center = new Vector2(sx / points.Length, sy / points.Length);
+                Center = new Vector2(originX + sx / points.Length, originY + sy / points.Length);
             }
             else
             {
-                Center = new Vector2(cx / (3f * twiceArea), cy / (3f * twiceArea));
+                Center = new Vector2(originX + cx / (3f * twiceArea), originY + cy / (3f * twiceArea));
             }
         }
 
