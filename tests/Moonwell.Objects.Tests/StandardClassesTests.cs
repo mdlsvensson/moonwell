@@ -697,11 +697,12 @@ namespace Moonwell.Objects.Tests
                     var generic = property.PropertyType.IsGenericType ? property.PropertyType.GetGenericTypeDefinition() : null;
                     if (generic == typeof(ObjectList<>))
                     {
-                        // The property reads level 1's list of a field with levels.
+                        // The property reads level 1's list of a field with levels, each entry trimmed ("Aspo, Aspt").
                         if (level <= 1)
                         {
                             var entries = (IReadOnlyList<object>)property.PropertyType.GetProperty("Entries", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(read)!;
-                            Assert.True(text.Split(',').Distinct().SequenceEqual(entries.Select(Id)), where);
+                            var ids = text.Split(',').Select(id => id.Trim()).Where(id => id.Length > 0).Distinct();
+                            Assert.True(ids.SequenceEqual(entries.Select(Id)), where);
                         }
                     }
                     else if (generic == typeof(ObjectRef<>))

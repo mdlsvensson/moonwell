@@ -45,6 +45,23 @@ namespace Moonwell.Objects.Tests
             }
         }
 
+        /// <summary>A Hydra of a map's own that sets nothing.</summary>
+        public class PlainHydra : Creeps.Units.Hydra
+        {
+        }
+
+        [Fact]
+        public void a_standard_list_entry_after_a_space_is_its_class()
+        {
+            // The Hydra's abilities are "Aspo, Aspt": with no build the constructor's list, with one the build's text.
+            Assert.True(new PlainHydra().Abilities.Contains<Creeps.Abilities.SpawnHydraHatchling>());
+
+            StandardValues.Read = (id, field, level) => id == "nhyd" && field == "uabi" && level == 0 ? "Aspo, Aspt,," : null;
+            var abilities = new PlainHydra().Abilities;
+            Assert.True(abilities.Contains<Creeps.Abilities.SpawnHydraHatchling>());
+            Assert.Equal(2, abilities.Count);
+        }
+
         private static IEnumerable<string> FieldsOf(Type type)
         {
             return type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)

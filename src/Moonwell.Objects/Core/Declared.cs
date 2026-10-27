@@ -268,14 +268,19 @@ namespace Moonwell.Objects
             return field + ":" + level;
         }
 
+        // A standard list's entries, each trimmed and an empty one left out: the Hydra's abilities are "Aspo, Aspt".
         private static List<object> StandardEntries(string? text)
         {
             var entries = new List<object>();
             if (!string.IsNullOrEmpty(text))
             {
-                foreach (var id in text.Split(','))
+                foreach (var part in text.Split(','))
                 {
-                    entries.Add(StandardClasses.Value.TryGetValue(id, out var type) ? type : id);
+                    var id = part.Trim();
+                    if (id.Length > 0)
+                    {
+                        entries.Add(StandardClasses.Value.TryGetValue(id, out var type) ? type : id);
+                    }
                 }
             }
 

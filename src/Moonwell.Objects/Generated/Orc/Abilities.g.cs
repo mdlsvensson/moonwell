@@ -97,9 +97,9 @@ namespace Moonwell.Objects
                     Race = global::Moonwell.Objects.UnitRace.Orc;
                     RequiredLevel = 0;
                     Requires.Add("icon only");
-                    Requires.Add(" orc");
-                    Requires.Add(" Aeth");
-                    Requires.Add(" unused");
+                    Requires.Add("orc");
+                    Requires.Add<global::Moonwell.Objects.Undead.Abilities.GhostAeth>();
+                    Requires.Add("unused");
                     UseNewDefaultLevelCap = false;
                 }
             }

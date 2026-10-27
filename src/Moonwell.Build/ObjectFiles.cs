@@ -182,8 +182,9 @@ namespace Moonwell.Build
                     return standard;
                 }
 
-                // An id no standard class has stays as its id text.
-                if (standardIds.Contains(name))
+                // An id no standard class has stays as its id text, and so does an id of the standard data that names no
+                // object (a tavern hero requires TALT), as FieldValues.IdOf lets it through: four characters, no class name.
+                if (standardIds.Contains(name) || (name.Length == 4 && !name.Contains('.')))
                 {
                     return name;
                 }

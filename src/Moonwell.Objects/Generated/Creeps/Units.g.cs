@@ -21679,8 +21679,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Hydra()
                 {
-                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.SlowPoison>();
-                    Abilities.Add(" Aspt");
+                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.SlowPoison, global::Moonwell.Objects.Creeps.Abilities.SpawnHydraHatchling>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;

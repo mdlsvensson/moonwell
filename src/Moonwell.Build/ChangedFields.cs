@@ -457,15 +457,20 @@ namespace Moonwell.Build
             references.Add(name);
         }
 
-        // The class names of a standard list's ids; an id with no standard class stays as it is.
+        // The class names of a standard list's ids, each trimmed and an empty one left out (the Hydra's abilities are
+        // "Aspo, Aspt"); an id with no standard class stays as it is.
         private List<string> NamesOf(string? text)
         {
             var names = new List<string>();
             if (!string.IsNullOrEmpty(text))
             {
-                foreach (var id in text.Split(','))
+                foreach (var part in text.Split(','))
                 {
-                    names.Add(classNames.TryGetValue(id, out var name) ? name : id);
+                    var id = part.Trim();
+                    if (id.Length > 0)
+                    {
+                        names.Add(classNames.TryGetValue(id, out var name) ? name : id);
+                    }
                 }
             }
 

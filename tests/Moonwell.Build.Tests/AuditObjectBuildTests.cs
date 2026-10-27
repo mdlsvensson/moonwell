@@ -74,6 +74,38 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_standard_list_entry_with_a_space_or_no_object_passes_through_a_changed_list()
+        {
+            // The Hydra's abilities are "Aspo, Aspt", with a space; a tavern hero requires TALT, which is no object.
+            var staged = Build("""
+                namespace Sample
+                {
+                    [Moonwell.Objects.ObjectId("n001")]
+                    public sealed class BigHydra : Moonwell.Objects.Creeps.Units.Hydra
+                    {
+                        public BigHydra()
+                        {
+                            Abilities.Add<Moonwell.Objects.Human.Abilities.Defend>();
+                        }
+                    }
+
+                    [Moonwell.Objects.ObjectId("N002")]
+                    public sealed class Brewer : Moonwell.Objects.Creeps.Units.Alchemist
+                    {
+                        public Brewer()
+                        {
+                            Requires.Add<Moonwell.Objects.Human.Units.Footman>();
+                        }
+                    }
+                }
+                """);
+
+            var units = ReadUnits(staged);
+            Assert.Equal(new[] { "0=Aspo,Aspt,Adef" }, LevelsOf(units, "n001", "uabi"));
+            Assert.Equal(new[] { "0=TALT,hfoo" }, LevelsOf(units, "N002", "ureq"));
+        }
+
+        [Fact]
         public void a_field_the_metadata_lists_by_the_abilitys_own_id_is_written()
         {
             // Cargo Capacity (Car1) lists Sch2 to Sch5, not their code; a Goblin Zeppelin's hold of a map's own seats six.
@@ -110,6 +142,22 @@ namespace Moonwell.Build.Tests
                 .Where(modification => modification.Id == ObjectTable.IdOf(field))
                 .OrderBy(modification => modification.Level)
                 .Select(modification => $"{modification.Level}={modification.Value}")
+                .ToArray();
+        }
+
+        private static IReadOnlyList<SimpleObjectModification> ReadUnits(string staged)
+        {
+            using var reader = new BinaryReader(File.OpenRead(Path.Combine(staged, "war3map.w3u")), Encoding.UTF8);
+            return reader.ReadUnitObjectData().NewUnits;
+        }
+
+        // A field of an object without levels, as "0=value".
+        private static string[] LevelsOf(IEnumerable<SimpleObjectModification> objects, string id, string field)
+        {
+            var one = Assert.Single(objects, candidate => candidate.NewId == ObjectTable.IdOf(id));
+            return one.Modifications
+                .Where(modification => modification.Id == ObjectTable.IdOf(field))
+                .Select(modification => $"0={modification.Value}")
                 .ToArray();
         }
 
