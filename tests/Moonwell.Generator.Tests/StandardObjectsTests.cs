@@ -257,6 +257,21 @@ public class StandardObjectsTests
     }
 
     [Fact]
+    public void a_text_field_with_an_index_alone_on_its_key_is_that_entry_of_the_list()
+    {
+        // Spell Immunity's standard name is "Spell Immunity, Spell Immunity"; the metadata gives anam index 0.
+        using var copy = new Copy();
+        copy.Replace("_locales/enus.w3mod/units/humanabilitystrings.txt", "[AHtb]", "Name=Storm Bolt", "Name=Storm Bolt, Storm Bolt Again");
+        copy.Replace("_locales/enus.w3mod/units/humanabilitystrings.txt", "[AHhb]", "Name=Holy Light", "Name=\"Holy Light, Again\"");
+
+        var abilities = Of(copy.Tables(), Kind.Ability);
+
+        Assert.Equal("Storm Bolt", Find(abilities, "AHtb").Values["anam"]);
+        Assert.Equal("Storm Bolt", Find(abilities, "AHtb").Name);
+        Assert.Equal("Holy Light, Again", Find(abilities, "AHhb").Values["anam"]);
+    }
+
+    [Fact]
     public void an_unquoted_list_splits_at_every_comma()
     {
         using var copy = new Copy();
@@ -440,6 +455,17 @@ public class StandardObjectsTests
 
         Assert.Equal("(Campaign)", Find(units, "hfoo").EditorSuffix);
         Assert.Equal("", Find(units, "Hpal").EditorSuffix);
+    }
+
+    [Fact]
+    public void an_editor_suffix_marked_as_the_first_entry_of_a_list_is_found()
+    {
+        // The game's metadata gives unsf and ansf index 0, so their column is EditorSuffix[0].
+        using var copy = new Copy();
+        copy.Replace("units/unitmetadata.slk", "K\"unsf\"", "C;X4;K-1", "C;X4;K0");
+        copy.Replace("_locales/enus.w3mod/units/humanunitstrings.txt", "[hfoo]", "Name=Footman", "Name=Footman\r\nEditorSuffix=(Campaign), (Other)");
+
+        Assert.Equal("(Campaign)", Find(Of(copy.Tables(), Kind.Unit), "hfoo").EditorSuffix);
     }
 
     [Fact]

@@ -549,7 +549,7 @@ public static class StandardObjects
                     tooltip = plan.Field.Id;
                 }
 
-                if (plan.Field.Column == SuffixColumn)
+                if (plan.Field.Column == SuffixColumn || plan.Field.Column.StartsWith(SuffixColumn + "[", StringComparison.Ordinal))
                 {
                     _suffixId = plan.Field.Id;
                 }

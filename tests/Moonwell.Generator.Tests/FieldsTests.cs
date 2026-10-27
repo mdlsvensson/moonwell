@@ -262,7 +262,7 @@ public class FieldsTests
         Assert.Equal("Buttonpos[0]", Find(Fields.Of(tables, Kind.Unit), "ubpx").Column);
         Assert.Equal("Buttonpos[1]", Find(Fields.Of(tables, Kind.Unit), "ubpy").Column);
         Assert.Equal("Buttonpos[1]", Find(Fields.Of(tables, Kind.Ability), "abpy").Column);
-        Assert.Equal("Name", Find(Fields.Of(tables, Kind.Unit), "unam").Column);
+        Assert.Equal("Name[0]", Find(Fields.Of(tables, Kind.Unit), "unam").Column);
         Assert.Equal("Requires", Find(Fields.Of(tables, Kind.Upgrade), "greq").Column);
         Assert.Equal("Name", Find(Fields.Of(tables, Kind.Destructable), "bnam").Column);
     }

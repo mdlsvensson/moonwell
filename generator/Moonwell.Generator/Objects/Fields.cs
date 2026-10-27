@@ -121,7 +121,10 @@ public sealed record Field(
 /// level 1 is the bare column (<c>Requires</c>) and whose level n is the column with n - 1 appended
 /// (<c>Requires1</c>).</item>
 /// <item>A field that shares its metadata <c>field</c> with other fields of the kind is one element of a comma
-/// list, and its column ends with the element's position (<c>Buttonpos[0]</c> is the X of <c>Buttonpos=2,3</c>).</item>
+/// list, and its column ends with the element's position (<c>Buttonpos[0]</c> is the X of <c>Buttonpos=2,3</c>). So is
+/// a field of the text files with an <c>index</c> of 0 or more alone on its key: an ability's <c>Name[0]</c> is the
+/// first entry of <c>Name=Spell Immunity, Spell Immunity</c>, as World Editor reads it. A value in quotes is one
+/// entry, commas and all.</item>
 /// <item>Any other field's column is its metadata <c>field</c>.</item>
 /// </list>
 /// <para>
@@ -549,7 +552,7 @@ public static class Fields
         }
 
         var index = Number(row, "index");
-        if (perField[field] > 1 && Value(row, "index").Length > 0 && index >= 0)
+        if ((perField[field] > 1 || (repeat == 0 && Value(row, "slk") == Text)) && Value(row, "index").Length > 0 && index >= 0)
         {
             return column + "[" + index.ToString(CultureInfo.InvariantCulture) + "]";
         }
