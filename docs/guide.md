@@ -114,7 +114,9 @@ public sealed class Champion : Human.Units.Paladin
   in the game. A unit's `Level` is set only in its declared class's constructor, since the game has no setter: anywhere
   else it is error MW0015, and a build error too.
 - A list takes `Set<A, B, C>()` (the whole list, in order), `Replace<Old, New>()` (in the old one's place), `Add<T>()`
-  and `Remove<T>()`.
+  and `Remove<T>()`. Where the game's list differs by level, as a tiered upgrade's requirements do, the build makes the
+  same changes to each level's own list: `Requires.Add<Blacksmith>()` on a copy of Iron Forged Swords keeps the Keep and
+  Castle its later levels need. Read in C#, such a list is level 1's with the changes.
 - The tooltips are World Editor's four: `Tooltip` (Tooltip - Normal), `TooltipExtended` (Tooltip - Normal - Extended),
   `TooltipLearn` (Tooltip - Learn) and `TooltipLearnExtended` (Tooltip - Learn - Extended).
 - A field with no name of its own is set by its id: `Set("Htb1", 2, 250f)`.
