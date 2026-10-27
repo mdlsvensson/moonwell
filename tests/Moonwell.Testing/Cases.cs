@@ -468,6 +468,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "timers.after-zero-runaway", Run = AuditTimerCases.AfterZeroRunaway });
             list.Add(new Case { Name = "timers.runaway-many-timers", Run = AuditTimerCases.RunawayManyTimers });
             list.Add(new Case { Name = "timers.catch-up-not-runaway", Run = AuditTimerCases.CatchUpNotRunaway });
+            list.Add(new Case { Name = "timers.every-zero-refused", Run = AuditTimerCases.EveryZeroRefused });
 #if DEBUG
             list.Add(new Case { Name = "debug.timers.no-drift-at-speed", Run = AuditTimerCases.NoDriftAtSpeed });
 #endif

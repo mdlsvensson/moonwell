@@ -61,4 +61,12 @@ namespace Fails
             Natives.DisplayTextToPlayer(Natives.Player(0), 0f, 0f, "value " + value);
         }
     }
+
+    public sealed class EveryZero : GameComponent
+    {
+        public override void OnGameStart()
+        {
+            Timer.Every(0f, () => { });
+        }
+    }
 }

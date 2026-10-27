@@ -259,6 +259,43 @@ namespace Moonwell.Testing
             Runtime.Wake();
             Expect.Equal("5000 0", runs + " " + world.Logged.Count, "runs in the wake after a frame of 5 s, and the lines reported");
         }
+
+        /// <summary>
+        /// Every with 0, a negative period or NaN is reported and refused in every build: each gives an ended timer that never
+        /// runs, and the log names Timer.Every. The case ends each after 10000 runs, which it reaches in one instant when it runs.
+        /// </summary>
+        public static void EveryZeroRefused(FakeWorld world)
+        {
+            var runs = 0;
+            var timers = new List<Timer>();
+            var periods = new float[] { 0.0f, -1.0f, float.NaN };
+            for (var i = 0; i < periods.Length; i++)
+            {
+                Timer? timer = null;
+                timer = Timer.Every(periods[i], () =>
+                {
+                    runs++;
+                    if (runs % 10000 == 0)
+                    {
+                        timer!.End();
+                    }
+                });
+                timers.Add(timer);
+            }
+
+            world.Advance(1.0f);
+            var ended = 0;
+            foreach (var timer in timers)
+            {
+                if (timer.HasEnded)
+                {
+                    ended++;
+                }
+            }
+
+            var reported = LoggedWith(world, "Timer.Every failed: seconds must be more than 0");
+            Expect.Equal("0 3 3", runs + " " + ended + " " + reported, "runs of Every(0), Every(-1) and Every(NaN) in 1 s, the timers ended, and the lines reported");
+        }
 #if DEBUG
 
         /// <summary>

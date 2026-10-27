@@ -55,11 +55,41 @@ namespace Moonwell
             return Start(new Timer(Runtime.World.Now(), seconds, false, action), owner);
         }
 
-        /// <summary>Runs an action at every interval of the seconds, for the owner or else the current owner.</summary>
+        /// <summary>
+        /// Runs an action at every interval of the seconds, for the owner or else the current owner. Seconds of 0 or less are
+        /// reported and refused in every build, since such a timer would freeze the game: the timer given back has ended and
+        /// never runs (decision 74).
+        /// </summary>
         public static Timer Every(float seconds, Action action, Owner? owner = null)
         {
-            Dev.Check(seconds > 0.0f, "Timer.Every: seconds must be more than 0");
+            // Not more than 0, so NaN is refused too.
+            if (!(seconds > 0.0f))
+            {
+                return Refuse(seconds, action);
+            }
+
             return Start(new Timer(Runtime.World.Now(), seconds, true, action), owner);
+        }
+
+        /// <summary>
+        /// Reports seconds of 0 or less given to Every, and gives back a timer that has ended without being adopted or scheduled.
+        /// The error is thrown and caught here so that in Lua it records where it was thrown, which names the C# line that called
+        /// Every.
+        /// </summary>
+        private static Timer Refuse(float seconds, Action action)
+        {
+            try
+            {
+                throw new MoonwellException("seconds must be more than 0, not " + seconds);
+            }
+            catch (MoonwellException error)
+            {
+                Errors.Report("Timer.Every", error);
+            }
+
+            var timer = new Timer(Runtime.World.Now(), seconds, true, action);
+            timer.End();
+            return timer;
         }
 
         /// <summary>Adopts a new timer under its owner, and schedules it unless its owner has already ended.</summary>
