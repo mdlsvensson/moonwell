@@ -73,6 +73,27 @@ namespace Moonwell.Build.Tests
             Assert.Equal(new[] { "1=hbla", "2=hbla", "3=hbla" }, LevelsOf(upgrades, "R004", "greq"));
         }
 
+        [Fact]
+        public void a_field_the_metadata_lists_by_the_abilitys_own_id_is_written()
+        {
+            // Cargo Capacity (Car1) lists Sch2 to Sch5, not their code; a Goblin Zeppelin's hold of a map's own seats six.
+            var staged = Build("""
+                namespace Sample
+                {
+                    [Moonwell.Objects.ObjectId("A001")]
+                    public sealed class SixSeats : Moonwell.Objects.Other.Abilities.CargoHold
+                    {
+                        public SixSeats()
+                        {
+                            CargoCapacity = 6;
+                        }
+                    }
+                }
+                """);
+
+            Assert.Equal(new[] { "1=6" }, LevelsOf(ReadAbilities(staged), "A001", "Car1"));
+        }
+
         private string Build(string objects)
         {
             var copy = folders.TemporaryCopyOfSample();
@@ -90,6 +111,12 @@ namespace Moonwell.Build.Tests
                 .OrderBy(modification => modification.Level)
                 .Select(modification => $"{modification.Level}={modification.Value}")
                 .ToArray();
+        }
+
+        private static IReadOnlyList<LevelObjectModification> ReadAbilities(string staged)
+        {
+            using var reader = new BinaryReader(File.OpenRead(Path.Combine(staged, "war3map.w3a")), Encoding.UTF8);
+            return reader.ReadAbilityObjectData().NewAbilities;
         }
 
         private static IReadOnlyList<LevelObjectModification> ReadUpgrades(string staged)
