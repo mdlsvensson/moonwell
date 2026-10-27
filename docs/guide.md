@@ -196,6 +196,9 @@ public sealed class KillCounter : UnitComponent
   `OnApply`, `OnTick` and `OnExpire` are its reactions, and `unit.Apply(new Burn())` puts it on a unit.
 - `Timer.After(seconds, action)` and `Timer.Every(seconds, action)` run code later. A timer, buff or component
   belongs to whatever made it, and ends with it.
+- `Timer.After(0, action)` inside a timer runs in the same instant, as the game's own 0 s timer does. More than 10000
+  timer runs in one instant (a timer that keeps starting itself, say) are reported, and the rest wait 1/32 s.
+  `Timer.Every` needs seconds above 0: 0 or less is reported, and that timer never runs.
 - Game work starts in a reaction. Top-level code and static fields make nothing in the game.
 
 ## Units, heroes and items
