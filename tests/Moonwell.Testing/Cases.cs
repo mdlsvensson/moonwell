@@ -27,6 +27,7 @@ namespace Moonwell.Testing
         private static void AddLifecycle(List<Case> list)
         {
             list.Add(new Case { Name = "lifecycle.units-the-game-makes-are-met", Run = LifecycleCases.UnitsTheGameMakesAreMet });
+            list.Add(new Case { Name = "lifecycle.local-throw-keeps-sync", Run = LifecycleCases.LocalThrowKeepsSync });
         }
 
         /// <summary>Adds the debug mode's cases; they exist only in a development build, as the debug mode does.</summary>

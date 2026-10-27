@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Moonwell.Testing
@@ -42,6 +43,37 @@ namespace Moonwell.Testing
             var found = Find.InRange<Unit>(0.0f, 0.0f, 300.0f);
             Expect.Equal(3, found.Count, "the units Find finds: the holder, the one from before and the trained one");
             Expect.True(TestLog.Lines.Contains("meet before") && TestLog.Lines.Contains("meet trained"), "the aura met both: " + string.Join(", ", TestLog.Lines));
+        }
+
+        /// <summary>Code inside Local.For throws on one machine only: the error is reported there, and the synced code after the block runs on every machine, so the game stays the same on each.</summary>
+        public static void LocalThrowKeepsSync(FakeWorld world)
+        {
+            var gold = new int[2];
+            for (var machine = 0; machine < 2; machine++)
+            {
+                world.LocalSlot = machine;
+                var player = Player.Get(1);
+                player.Gold = 0;
+                Timer.After(1.0f, () =>
+                {
+                    Local.For(Player.Get(0), () => { throw new InvalidOperationException("only on player 1's machine"); });
+                    player.Gold += 10;
+                });
+                world.Advance(1.0f);
+                gold[machine] = player.Gold;
+            }
+
+            Expect.Equal("10 10", gold[0] + " " + gold[1], "player 2's gold on player 1's machine and on player 2's");
+            var reported = 0;
+            foreach (var line in world.Logged)
+            {
+                if (line.Contains("Local.For failed: only on player 1's machine"))
+                {
+                    reported++;
+                }
+            }
+
+            Expect.Equal(1, reported, "the error's reports, on player 1's machine only: " + string.Join(" | ", world.Logged));
         }
     }
 }
