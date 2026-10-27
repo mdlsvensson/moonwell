@@ -386,7 +386,7 @@ namespace Moonwell.Testing
             Expect.Near(2f, area.Since(a), "Since counts game seconds");
         }
 
-        /// <summary>The package has one timer: none while no area has a unit, one when any has, the first area's OnUnitStays twice for the second's once, a Tick of 0.04 every 2 steps, and a Tick of 0 never.</summary>
+        /// <summary>The package has one step and one check: none while no area has a unit, both when an area with a Tick has, the first area's OnUnitStays twice for the second's once, a Tick of 0.04 every 2 steps, and a Tick of 0 never.</summary>
         public static void SharedTimer(FakeWorld world)
         {
             var fake = Fresh();
@@ -402,11 +402,11 @@ namespace Moonwell.Testing
             var owned = Game.Instance.OwnedCount;
             fake.Enter(fake.Regions[0], a.Handle);
             Expect.True(AreaTracker.Running, "a timer once an area has a unit");
-            Expect.Equal(owned + 1, Game.Instance.OwnedCount, "one timer more");
+            Expect.Equal(owned + 2, Game.Instance.OwnedCount, "two timers more, the step and the check");
             fake.Enter(fake.Regions[1], b.Handle);
             fake.Enter(fake.Regions[2], c.Handle);
             fake.Enter(fake.Regions[3], d.Handle);
-            Expect.Equal(owned + 1, Game.Instance.OwnedCount, "still one timer for four areas");
+            Expect.Equal(owned + 2, Game.Instance.OwnedCount, "still two timers for four areas");
             world.Advance(2f);
             Expect.Equal(4, half.SinceAtStay.Count, "Tick 0.5 over 2 seconds");
             Expect.Equal(2, one.SinceAtStay.Count, "Tick 1 over 2 seconds");

@@ -286,6 +286,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "audit.areas.recheck-off", Run = AuditAreaCases.RecheckOff });
             list.Add(new Case { Name = "audit.areas.recheck-forgets-leavers", Run = AuditAreaCases.RecheckForgetsLeavers });
             list.Add(new Case { Name = "audit.areas.recheck-ends-area", Run = AuditAreaCases.RecheckEndsArea });
+            list.Add(new Case { Name = "audit.areas.corpse-checks-without-steps", Run = AuditAreaCases.CorpseChecksWithoutSteps });
+            list.Add(new Case { Name = "audit.areas.no-tick-no-steps", Run = AuditAreaCases.NoTickNoSteps });
+            list.Add(new Case { Name = "audit.areas.many-corpses", Run = AuditAreaCases.ManyCorpses });
             list.Add(new Case { Name = "audit.input.no-moves", Run = AuditInputCases.NoMoves });
             list.Add(new Case { Name = "audit.input.moves", Run = AuditInputCases.Moves });
             list.Add(new Case { Name = "audit.input.watchers-kept", Run = AuditInputCases.WatchersKept });

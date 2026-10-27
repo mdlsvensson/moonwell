@@ -13,10 +13,13 @@ namespace Moonwell
     /// the package checks those on its own timer every quarter of a second, and such a unit leaves and enters up to
     /// 0.25 seconds late. At the same check the area asks <c>Accepts</c> again for each unit inside and each unit in it
     /// that was refused, unless <c>RecheckAccepts</c> is off: a no makes a unit leave, a yes lets one enter (decision 75).
-    /// A unit that stays hidden or loaded inside an area, a dead one (which leaves when it dies, and enters again if
-    /// something brings it back to life there, a hero's revive or a Resurrection), and a refused one, keeps the package's
-    /// timer stepping (about 0.3 ms a second) until it leaves, decays or is removed, or the area ends. Add it in the map's <c>Components</c> or with
-    /// <c>Game.Instance.Add</c>; ending it lets every unit inside leave.
+    /// A unit inside, one that stays hidden or loaded inside, a dead one (which leaves when it dies, and enters again if
+    /// something brings it back to life there, a hero's revive or a Resurrection) and a refused one keep that check running
+    /// until they leave, decay or are removed, or the area ends; the package's 1/32 second step, for
+    /// <c>OnUnitStays</c>, runs only while an area with a <c>Tick</c> has a unit inside. Adding an area lists every unit of
+    /// every player once, three natives each, to find those already inside: on a map of thousands of units, an area made
+    /// at each cast pays that at each cast. Add it in the map's <c>Components</c> or with <c>Game.Instance.Add</c>; ending it
+    /// lets every unit inside leave.
     /// </summary>
     public abstract class Area : GameComponent
     {
@@ -41,8 +44,8 @@ namespace Moonwell
         /// <summary>The game time each unit inside entered; a lookup only, the order is the list's.</summary>
         private readonly Dictionary<Unit, float> since = new Dictionary<Unit, float>();
 
-        /// <summary>The units that left because they have no place (hidden, loaded or dead), in the order they left: the place check enters them again once they have a place and are inside the region.</summary>
-        private readonly List<Unit> away = new List<Unit>();
+        /// <summary>The units that left because they have no place (hidden, loaded or dead), in the order they left: the place check enters them again once they have a place and are inside the region. A set, so that the check of many corpses is not a search of the list for each.</summary>
+        private readonly OrderedSet<Unit> away = new OrderedSet<Unit>();
 
         /// <summary>The units in the region that Accepts refused, in the order refused: while RecheckAccepts, the place check asks again for each that has a place, and a yes enters it. A unit that leaves the region, or ends, is forgotten.</summary>
         private readonly OrderedSet<Unit> refused = new OrderedSet<Unit>();
@@ -53,8 +56,11 @@ namespace Moonwell
         /// <summary>The package step the area's first unit entered at; its OnUnitStays are due a Tick of steps after it, and again at every Tick.</summary>
         internal int startStep;
 
-        /// <summary>Whether the area counts for the package timer: it has a unit inside, one away, or one refused.</summary>
+        /// <summary>Whether the area counts for the package's check: it has a unit inside, one away, or one refused.</summary>
         private bool active;
+
+        /// <summary>Whether the area counts for the package's step: it has a Tick and a unit inside.</summary>
+        private bool staying;
 
         /// <summary>The shape of the area. Set it in the constructor; it is fixed once the area is added, and an area added without one is reported as an error and watches nothing.</summary>
         protected AreaShape Shape
@@ -464,7 +470,7 @@ namespace Moonwell
                 }
             }
 
-            var back = new List<Unit>(away);
+            var back = away.Snapshot();
             for (var i = 0; i < back.Count; i++)
             {
                 if (stopped)
@@ -566,7 +572,7 @@ namespace Moonwell
             CallLeft(unit);
         }
 
-        /// <summary>Tells the tracker when the area starts or stops counting for the package timer: it has a unit inside or away.</summary>
+        /// <summary>Tells the tracker when the area starts or stops counting for the package's check (it has a unit inside, away or refused) and for its step (it has a Tick and a unit inside).</summary>
         private void Refresh()
         {
             var now = inside.Count > 0 || away.Count > 0 || refused.Count > 0;
@@ -574,6 +580,13 @@ namespace Moonwell
             {
                 active = now;
                 tracker!.Activity(now);
+            }
+
+            var stays = tickSteps > 0 && inside.Count > 0;
+            if (stays != staying)
+            {
+                staying = stays;
+                tracker!.Staying(stays);
             }
         }
 

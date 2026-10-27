@@ -304,6 +304,91 @@ namespace Moonwell.Testing
             Expect.Equal(0, world.Logged.Count, "no error");
         }
 
+        /// <summary>
+        /// A corpse in an area with a Tick keeps only the quarter-second check running, not the 1/32 s step: the step runs while
+        /// an area with a Tick has a unit inside. Brought back to life with no event (a Resurrection), the unit enters at the
+        /// next check and the step runs again.
+        /// </summary>
+        public static void CorpseChecksWithoutSteps(FakeWorld world)
+        {
+            var fake = Fresh();
+            var area = Added(world, new LogArea(Square(), 1f));
+            var unit = Labelled(world, area, "a");
+            fake.Walk(unit.Handle, 10f, 10f);
+            Expect.True(AreaTracker.Running && AreaTracker.Stepping, "a unit inside an area with a Tick: the check and the step");
+            fake.NoPlace.Add(unit.Handle);
+            fake.Die(unit.Handle);
+            ExpectLog(area, new[] { "entered a", "left a" }, "it left when it died");
+            Expect.True(AreaTracker.Running, "the corpse keeps the check running");
+            Expect.True(!AreaTracker.Stepping, "but not the step");
+            world.Advance(1f);
+            fake.NoPlace.Remove(unit.Handle);
+            world.Advance(0.25f);
+            ExpectLog(area, new[] { "entered a", "left a", "entered a" }, "brought back, it enters at the next check");
+            Expect.True(AreaTracker.Stepping, "and the step runs again");
+            world.Advance(1f);
+            ExpectLog(area, new[] { "entered a", "left a", "entered a", "stays a" }, "its stay a Tick after it entered");
+        }
+
+        /// <summary>An area without a Tick never runs the step: a unit inside keeps only the check running, which still takes out a unit hidden inside.</summary>
+        public static void NoTickNoSteps(FakeWorld world)
+        {
+            var fake = Fresh();
+            var area = Added(world, new LogArea(Square()));
+            var unit = Labelled(world, area, "a");
+            fake.Walk(unit.Handle, 10f, 10f);
+            Expect.True(AreaTracker.Running && !AreaTracker.Stepping, "the check only");
+            var owned = Game.Instance.OwnedCount;
+            fake.NoPlace.Add(unit.Handle);
+            world.Advance(0.25f);
+            ExpectLog(area, new[] { "entered a", "left a" }, "the hidden unit left at the check");
+            fake.NoPlace.Remove(unit.Handle);
+            world.Advance(0.25f);
+            ExpectLog(area, new[] { "entered a", "left a", "entered a" }, "and entered when shown");
+            Expect.Equal(owned, Game.Instance.OwnedCount, "one timer all along");
+        }
+
+        /// <summary>Many corpses in an area are checked in the order they died, each found again when brought back, and forgotten once out of the region.</summary>
+        public static void ManyCorpses(FakeWorld world)
+        {
+            var fake = Fresh();
+            var area = Added(world, new LogArea(Square()));
+            var units = new List<Unit>();
+            for (var i = 0; i < 60; i++)
+            {
+                var unit = Labelled(world, area, "u" + i);
+                units.Add(unit);
+                fake.Walk(unit.Handle, 10f + i, 10f);
+            }
+
+            for (var i = 0; i < units.Count; i++)
+            {
+                fake.NoPlace.Add(units[i].Handle);
+                fake.Die(units[i].Handle);
+            }
+
+            Expect.Equal(120, area.Log.Count, "each entered and left");
+            world.Advance(1f);
+            fake.NoPlace.Remove(units[59].Handle);
+            fake.NoPlace.Remove(units[3].Handle);
+            world.Advance(0.25f);
+            Expect.Equal("entered u3, entered u59", area.Log[120] + ", " + area.Log[121], "the two brought back enter, in the order they died");
+            fake.Walk(units[3].Handle, 900f, 900f);
+            fake.Walk(units[59].Handle, 900f, 900f);
+            Expect.True(AreaTracker.Running, "the other corpses keep the check running");
+            for (var i = 0; i < units.Count; i++)
+            {
+                if (i != 3 && i != 59)
+                {
+                    units[i].Kill();
+                    fake.Regions[0].Inside.Remove(units[i].Handle);
+                }
+            }
+
+            world.Advance(0.25f);
+            Expect.True(!AreaTracker.Running, "the corpses out of the region are forgotten, and the timer stopped");
+        }
+
         /// <summary>A map's area with fields of its own named as Area's keeps them apart from the base's: the area enters, stays and leaves its unit, and its own fields keep their values. CSharp.lua gives the subclass's fields names of their own (inside1), as it sees Area's private ones in the same compile.</summary>
         public static void ShadowedFields(FakeWorld world)
         {
