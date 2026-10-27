@@ -37,6 +37,21 @@ namespace Moonwell.Testing
             Runtime.ListenForCarriers();
         }
 
+        /// <summary>How many logged lines hold the text.</summary>
+        private static int LoggedWith(FakeWorld world, string text)
+        {
+            var found = 0;
+            foreach (var line in world.Logged)
+            {
+                if (line.Contains(text))
+                {
+                    found++;
+                }
+            }
+
+            return found;
+        }
+
         /// <summary>The runs of a repeating timer over the seconds, with the runtime started again at a game time.</summary>
         private static int RunsFrom(FakeWorld world, float time, float interval, float seconds)
         {
@@ -161,6 +176,88 @@ namespace Moonwell.Testing
             {
                 Expect.True(dues[i] >= dues[i - 1] - 0.001f, "run " + i + " (due " + dues[i] + ") is not more than 0.001 s before the run before it (due " + dues[i - 1] + ")");
             }
+        }
+
+        /// <summary>After(0) made inside a timer runs in the same instant, as the game's own 0 s timer does: a chain of five links made at 1.1 s all run at 1.1 s.</summary>
+        public static void AfterZeroSameInstant(FakeWorld world)
+        {
+            var times = new List<float>();
+            Action? link = null;
+            link = () =>
+            {
+                times.Add(Runtime.World.Now());
+                if (times.Count < 5)
+                {
+                    Timer.After(0.0f, link!);
+                }
+            };
+            Timer.After(1.1f, link);
+            world.Advance(1.1f);
+            Expect.Equal(5, times.Count, "links run by 1.1 s");
+            for (var i = 0; i < times.Count; i++)
+            {
+                Expect.Near(1.1f, times[i], "Moonwell's time of link " + i);
+            }
+        }
+
+        /// <summary>
+        /// A timer that restarts itself with After(0) is a runaway: 10000 runs at 1.1 s, then it is reported once, naming its
+        /// owner, and the rest wait 1/32 s; 10000 more at 1.13125 s; it stops when its owner ends. The case's chain stops by itself
+        /// at 30000 links.
+        /// </summary>
+        public static void AfterZeroRunaway(FakeWorld world)
+        {
+            var owner = new TestOwner("owner", new List<string>());
+            var runs = 0;
+            Action? link = null;
+            link = () =>
+            {
+                runs++;
+                if (runs < 30000)
+                {
+                    Timer.After(0.0f, link!);
+                }
+            };
+            owner.Run(() => { Timer.After(1.1f, link); });
+            world.Advance(1.1f);
+            var first = runs;
+            world.Advance(0.03f);
+            var waited = runs;
+            world.Advance(0.002f);
+            var second = runs;
+            owner.End();
+            world.Advance(1.0f);
+            var reported = LoggedWith(world, "TestOwner.Timer failed: more than 10000 timer runs in one instant");
+            Expect.Equal("10000 10000 20000 20000 1", first + " " + waited + " " + second + " " + runs + " " + reported, "runs at 1.1 s, at 1.13 s, at 1.132 s and after its owner ended, and the lines reported");
+        }
+
+        /// <summary>
+        /// More than 10000 timers due in one instant is a runaway too: of 12000 one-shot timers due at 1.1 s, 10000 run then, one
+        /// line is reported, and the other 2000 run 1/32 s later.
+        /// </summary>
+        public static void RunawayManyTimers(FakeWorld world)
+        {
+            var runs = 0;
+            for (var i = 0; i < 12000; i++)
+            {
+                Timer.After(1.1f, () => { runs++; });
+            }
+
+            world.Advance(1.1f);
+            var first = runs;
+            world.Advance(0.032f);
+            var reported = LoggedWith(world, "Game.Timer failed: more than 10000 timer runs in one instant");
+            Expect.Equal("10000 12000 1", first + " " + runs + " " + reported, "runs at 1.1 s and at 1.132 s, and the lines reported");
+        }
+
+        /// <summary>A repeating timer catching up after a slow frame is no runaway: Every(0.001) runs 5000 times in the wake after a frame of 5 s, and nothing is reported.</summary>
+        public static void CatchUpNotRunaway(FakeWorld world)
+        {
+            var runs = 0;
+            Timer.Every(0.001f, () => { runs++; });
+            world.Time = 5.0f;
+            Runtime.Wake();
+            Expect.Equal("5000 0", runs + " " + world.Logged.Count, "runs in the wake after a frame of 5 s, and the lines reported");
         }
 #if DEBUG
 

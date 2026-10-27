@@ -31,6 +31,12 @@ namespace Moonwell
     /// <summary>Runs the timers in due order, on one wake request to the world.</summary>
     internal sealed class Scheduler
     {
+        /// <summary>How many timer runs one instant (one wake) may have; the next is a runaway, reported, and the rest wait (decision 76).</summary>
+        private const int RunawayRuns = 10000;
+
+        /// <summary>The seconds the timers still due after a runaway wait, so the game goes on: 1/32 s.</summary>
+        private const float RunawayWait = 1.0f / 32.0f;
+
         /// <summary>The binary min-heap of timers, ordered by due time in whole milliseconds and then by creation.</summary>
         private readonly List<TimerEntry> heap = new List<TimerEntry>();
 
@@ -55,10 +61,19 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Runs every timer that is due, then asks the world to wake for the next one; in a development build, a timer that halts Moonwell's clock ends the run, and the timers due after it wait for the next step, and while the debug mode is on the run is timed for its statistics.</summary>
+        /// <summary>
+        /// Runs every timer that is due, those made by the runs included (After(0) inside a timer runs in the same instant, as the
+        /// game's own 0 s timer does), then asks the world to wake for the next one. More than RunawayRuns runs in one wake is a
+        /// runaway, a timer that keeps starting itself, say: it is reported, naming the owner of the timer that would have run
+        /// next, and the timers still due wait RunawayWait, so the game never freezes. In a development build, a timer that halts
+        /// Moonwell's clock ends the run, and the timers due after it wait for the next step, and while the debug mode is on the
+        /// run is timed for its statistics.
+        /// </summary>
         internal void Wake()
         {
             var now = Runtime.World.Now();
+            var runs = 0;
+            var runaway = false;
 #if DEBUG
             var wasHalted = Runtime.Clock.IsHalted;
             // While the debug mode is on, the wake is timed with os.clock for its statistics.
@@ -73,13 +88,23 @@ namespace Moonwell
                     break;
                 }
 #endif
-                var entry = Pop();
+                var entry = heap[0];
                 var timer = entry.timer;
                 if (timer.HasEnded)
                 {
+                    Pop();
                     continue;
                 }
 
+                if (runs == RunawayRuns)
+                {
+                    runaway = true;
+                    Errors.Report(Names.NameOf(timer.Owner!) + ".Timer", new MoonwellException("more than 10000 timer runs in one instant; the rest wait 1/32 s"));
+                    break;
+                }
+
+                Pop();
+                runs++;
                 Run(timer);
                 if (!timer.IsPeriodic)
                 {
@@ -98,7 +123,14 @@ namespace Moonwell
                 DebugStats.TimersRan(DebugSession.Clock() - started);
             }
 #endif
-            Rearm();
+            if (runaway)
+            {
+                Runtime.World.WakeIn(RunawayWait);
+            }
+            else
+            {
+                Rearm();
+            }
         }
 
         /// <summary>Drops the ended timers from the top, and asks the world to wake for the next one, if any is left.</summary>

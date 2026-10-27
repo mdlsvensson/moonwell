@@ -464,6 +464,10 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "timers.buff-ticks-late", Run = AuditTimerCases.BuffTicksLate });
             list.Add(new Case { Name = "timers.near-times-order", Run = AuditTimerCases.NearTimesOrder });
             list.Add(new Case { Name = "timers.near-times-many", Run = AuditTimerCases.NearTimesMany });
+            list.Add(new Case { Name = "timers.after-zero-same-instant", Run = AuditTimerCases.AfterZeroSameInstant });
+            list.Add(new Case { Name = "timers.after-zero-runaway", Run = AuditTimerCases.AfterZeroRunaway });
+            list.Add(new Case { Name = "timers.runaway-many-timers", Run = AuditTimerCases.RunawayManyTimers });
+            list.Add(new Case { Name = "timers.catch-up-not-runaway", Run = AuditTimerCases.CatchUpNotRunaway });
 #if DEBUG
             list.Add(new Case { Name = "debug.timers.no-drift-at-speed", Run = AuditTimerCases.NoDriftAtSpeed });
 #endif
