@@ -204,6 +204,31 @@ namespace Moonwell.Testing
             Expect.True(ball.VX < -300.0f, "and still speeding down it; VX " + ball.VX);
         }
 
+        /// <summary>
+        /// A cast to an end out of any map gives false at once, instead of sampling every 32 along it for ever: an end at
+        /// 2^127 along x, which 1 / 0 is in the game's Lua, an infinite end, and, where the cases run with NaN, a NaN end. A
+        /// cast 100,000 straight down still meets the ground.
+        /// </summary>
+        public static void CastOutOfTheMap(FakeWorld world)
+        {
+            Flat(0.0f);
+            float hitX;
+            float hitY;
+            float hitZ;
+            float fraction;
+            float startGap;
+            Expect.True(!Ground.Cast(64.0f, 64.0f, 100.0f, 1.70141183e38f, 64.0f, -100.0f, out hitX, out hitY, out hitZ, out fraction, out startGap), "an end at 2^127: no hit, at once");
+            Expect.True(!Ground.Cast(64.0f, 64.0f, 100.0f, float.PositiveInfinity, 64.0f, -100.0f, out hitX, out hitY, out hitZ, out fraction, out startGap), "an infinite end: no hit");
+            if (GameNumbers.HasNaN)
+            {
+                Expect.True(!Ground.Cast(64.0f, 64.0f, 100.0f, float.NaN, 64.0f, -100.0f, out hitX, out hitY, out hitZ, out fraction, out startGap), "a NaN end: no hit");
+            }
+
+            Expect.True(Ground.Cast(64.0f, 64.0f, 100.0f, 64.0f, 64.0f, -100000.0f, out hitX, out hitY, out hitZ, out fraction, out startGap), "100,000 straight down: a hit");
+            Within(0.0f, hitZ, 0.01f, "on the ground");
+            Within(100.0f, startGap, 0.01f, "100 above it at its start");
+        }
+
         /// <summary>Before OnImpact runs, VX, VY and VZ read the velocity where it met the ground; the outcome works from the velocity OnImpact leaves, so a Bounce whose reaction sets VZ to 0 does not bounce up.</summary>
         public static void ImpactVelocity(FakeWorld world)
         {

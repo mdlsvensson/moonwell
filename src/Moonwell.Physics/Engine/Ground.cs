@@ -14,6 +14,13 @@ namespace Moonwell.Engine
         /// <summary>How many times a cast halves the span of its first sample under the ground.</summary>
         private const int Bisections = 5;
 
+        /// <summary>
+        /// The longest change along x, y or z a cast takes: twice the width of the largest map (480 tiles of 128 is 61,440),
+        /// so no move inside a map is longer. A longer one gives false at once: sampled every 32, it would not end in any
+        /// time that matters (the game's Lua has no infinity, and 1 / 0 is 2^127 there).
+        /// </summary>
+        private const float Longest = 131072.0f;
+
         /// <summary>How many times the height has been read; the cases read it to see how often the ground is read.</summary>
         internal static int reads;
 
@@ -108,9 +115,9 @@ namespace Moonwell.Engine
         /// The first place the segment from (x0, y0, z0) to (x1, y1, z1) meets the ground, as the terrain's raycast does,
         /// with the decks not above the segment's start: sampled every 32 along its length in XY and at its end, the span
         /// of the first sample at or under the ground halved five times, then crossed by a straight line. A segment that
-        /// starts under the ground hits at fraction 0, on the ground above its start. One that stays above it, or has a NaN
-        /// or an infinite end, gives false. Gives the point, the fraction along the segment, and how far the start is above
-        /// the ground (0 when it was not read).
+        /// starts under the ground hits at fraction 0, on the ground above its start. One that stays above it, or changes by
+        /// more than Longest along x, y or z, gives false. Gives the point, the fraction along the segment, and how far the
+        /// start is above the ground (0 when it was not read).
         /// </summary>
         internal static bool Cast(float x0, float y0, float z0, float x1, float y1, float z1, out float hitX, out float hitY, out float hitZ, out float fraction, out float startGap)
         {
@@ -122,7 +129,9 @@ namespace Moonwell.Engine
             var dx = x1 - x0;
             var dy = y1 - y0;
             var dz = z1 - z0;
-            if (!Finite(dx) || !Finite(dy) || !Finite(dz) || !Finite(x0) || !Finite(y0) || !Finite(z0))
+            // Written so that a NaN fails it too, as do infinite ends on .NET: any of them makes a change that is not a number
+            // or infinite.
+            if (!(dx <= Longest && dx >= -Longest && dy <= Longest && dy >= -Longest && dz <= Longest && dz >= -Longest))
             {
                 return false;
             }
@@ -203,12 +212,6 @@ namespace Moonwell.Engine
         private static float Gap(float x0, float y0, float z0, float dx, float dy, float dz, float t)
         {
             return z0 + dz * t - Height(x0 + dx * t, y0 + dy * t, z0);
-        }
-
-        /// <summary>Whether a number is neither NaN nor infinite: only then is it taken away from itself to 0.</summary>
-        private static bool Finite(float value)
-        {
-            return value - value == 0.0f;
         }
     }
 }
