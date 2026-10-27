@@ -432,14 +432,15 @@ public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
         public void Conversion(OperationAnalysisContext context)
         {
             var conversion = (IConversionOperation)context.Operation;
-            if (Silenced(conversion, context.ContainingSymbol))
-            {
-                return;
-            }
-
-            if (!conversion.IsImplicit && conversion.Type is { } target && Banned(target) is { } banned)
+            var silenced = Silenced(conversion, context.ContainingSymbol);
+            if (!conversion.IsImplicit && conversion.Type is { } target && Banned(target) is { } banned && (!silenced || banned == "decimal"))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Rules.NumberType, conversion.Syntax.GetLocation(), banned, Why(banned)));
+            }
+
+            if (silenced)
+            {
+                return;
             }
 
             if (HashName(conversion.Operand) is { } hash && IsCollection(conversion.Type)
@@ -463,7 +464,7 @@ public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
         public void Literal(OperationAnalysisContext context)
         {
             var literal = context.Operation;
-            if (literal.Type is { } type && Banned(type) is { } banned && !Silenced(literal, context.ContainingSymbol))
+            if (literal.Type is { } type && Banned(type) is { } banned && (banned == "decimal" || !Silenced(literal, context.ContainingSymbol)))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Rules.NumberType, literal.Syntax.GetLocation(), banned, Why(banned)));
             }
@@ -472,7 +473,7 @@ public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
         public void Declarator(OperationAnalysisContext context)
         {
             var declarator = (IVariableDeclaratorOperation)context.Operation;
-            if (Banned(declarator.Symbol.Type) is { } banned && !Silenced(declarator, context.ContainingSymbol))
+            if (Banned(declarator.Symbol.Type) is { } banned && (banned == "decimal" || !Silenced(declarator, context.ContainingSymbol)))
             {
                 var location = declarator.Symbol.Locations.FirstOrDefault() ?? declarator.Syntax.GetLocation();
                 context.ReportDiagnostic(Diagnostic.Create(Rules.NumberType, location, banned, Why(banned)));
@@ -482,7 +483,7 @@ public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
         public void Declaration(SymbolAnalysisContext context)
         {
             var symbol = context.Symbol;
-            if (symbol.IsImplicitlyDeclared || Has(symbol, syncUnchecked))
+            if (symbol.IsImplicitlyDeclared)
             {
                 return;
             }
@@ -506,8 +507,9 @@ public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
                     break;
             }
 
+            // [SyncUnchecked] does not silence decimal: it is a number the game's Lua gets wrong on every machine.
             var banned = types.Select(Banned).FirstOrDefault(b => b != null);
-            if (banned != null && symbol.Locations.FirstOrDefault() is { } location && location.IsInSource)
+            if (banned != null && (banned == "decimal" || !Has(symbol, syncUnchecked)) && symbol.Locations.FirstOrDefault() is { } location && location.IsInSource)
             {
                 context.ReportDiagnostic(Diagnostic.Create(Rules.NumberType, location, banned, Why(banned)));
             }

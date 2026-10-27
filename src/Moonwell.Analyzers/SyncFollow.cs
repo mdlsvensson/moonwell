@@ -316,7 +316,8 @@ public sealed partial class SyncAnalyzer
                 return statics.Through("static " + type.Name + "()").Through(name);
             }
 
-            if (member is IFieldSymbol or ILocalSymbol or IEventSymbol || Has(member, syncUnchecked))
+            // [SyncUnchecked] silences the diagnostics in the method's own body; Local.For still follows it.
+            if (member is IFieldSymbol or ILocalSymbol or IEventSymbol)
             {
                 return null;
             }

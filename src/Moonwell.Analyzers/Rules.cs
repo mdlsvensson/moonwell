@@ -4,14 +4,15 @@ using Microsoft.CodeAnalysis;
 namespace Moonwell.Analyzers;
 
 /// <summary>
-/// The multiplayer mistakes the analyzer rejects (decision 13); <c>[SyncUnchecked]</c> on a method turns all of them off there.
-/// Then the C# CSharp.lua cannot compile, which nothing turns off.
+/// The multiplayer mistakes the analyzer rejects (decision 13); <c>[SyncUnchecked]</c> on a method turns them off in its
+/// own body, except <c>decimal</c>, and Local.For still follows the method. Then the C# CSharp.lua cannot compile, which
+/// nothing turns off.
 /// </summary>
 public static class Rules
 {
     private const string Category = "Multiplayer";
 
-    private const string Silence = " [SyncUnchecked] on the method turns this check off.";
+    private const string Silence = " [SyncUnchecked] on the method (or the lambda or local function) turns this check off in its own body; Local.For still follows a method so marked.";
 
     public static readonly DiagnosticDescriptor StateInLocal = new(
         "MW0001",
@@ -56,7 +57,7 @@ public static class Rules
         Category,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "The game's Lua has 32-bit integers and single-precision floats." + Silence);
+        description: "The game's Lua has 32-bit integers and single-precision floats. [SyncUnchecked] on the method turns this check off in its own body, except for decimal, which is wrong in the game's Lua wherever it runs.");
 
     public static readonly DiagnosticDescriptor Desyncs = new(
         "MW0006",

@@ -522,11 +522,12 @@ public class LocalTests
     }
 
     [Fact]
-    public void sync_unchecked_silences_a_method_and_trusts_it_when_followed()
+    public void sync_unchecked_silences_a_method_and_is_still_followed_from_local_for()
     {
         var found = MapCode.Check(
             """
             Local.For(p, () => Trusted());
+            Local.For(p, [SyncUnchecked] () => Trusted());
             Unchecked(p);
             """,
             """
@@ -546,7 +547,41 @@ public class LocalTests
                 }
             """);
 
-        Assert.Empty(found);
+        // The attribute silences the method's own body; a block that runs it is silenced on the block.
+        Assert.Equal(new[] { "MW0001: Trusted()" }, found);
+    }
+
+    [Fact]
+    public void sync_unchecked_for_a_double_does_not_hide_a_unit_made_inside_local_for()
+    {
+        var found = MapCode.Check("Local.For(p, () => Average(p));", """
+                [SyncUnchecked]
+                private static float Average(Player who)
+                {
+                    double total = 0;
+                    Natives.CreateUnit(who.Handle, 0, 0f, 0f, 0f);
+                    return (float)total;
+                }
+            """);
+
+        Assert.Equal(new[] { "MW0001: Average(p)" }, found);
+    }
+
+    [Fact]
+    public void sync_unchecked_does_not_silence_decimal()
+    {
+        var found = MapCode.Check("Money();", """
+                [SyncUnchecked]
+                private static decimal Money()
+                {
+                    decimal m = 0.1m;
+                    var n = (decimal)2;
+                    long big = 1L;
+                    return m + n;
+                }
+            """);
+
+        Assert.Equal(new[] { "MW0005: Money", "MW0005: m", "MW0005: 0.1m", "MW0005: n", "MW0005: (decimal)2" }, found);
     }
 
     [Fact]
