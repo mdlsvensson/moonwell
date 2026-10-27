@@ -145,7 +145,7 @@ public static class Fields
     /// null), and no property is named like an enum it does not hold: see <see cref="BesideEnums"/>.
     /// </summary>
     public static IReadOnlyList<Field> Of(
-        ExportTables tables,
+        GameTables tables,
         Kind kind,
         IReadOnlySet<string>? reserved = null,
         IReadOnlyDictionary<string, ChoiceType>? choices = null)
@@ -288,7 +288,7 @@ public static class Fields
     /// (<paramref name="mentioned"/>): such an ability's class has the fields of its code and of its id, so they must not
     /// share a name. From the base tables and every balance set.
     /// </summary>
-    private static Dictionary<string, List<string>> Aliases(ExportTables tables, List<string> mentioned)
+    private static Dictionary<string, List<string>> Aliases(GameTables tables, List<string> mentioned)
     {
         var named = new HashSet<string>(mentioned, StringComparer.Ordinal);
         var aliases = new Dictionary<string, List<string>>(StringComparer.Ordinal);
@@ -564,7 +564,7 @@ public static class Fields
     /// The editor's label of a field: <c>displayName</c> looked up (it may name another label) and, for an upgrade
     /// effect, <c>%s</c> replaced by the row's <c>effectType</c>. The empty string when the export has no label.
     /// </summary>
-    private static string LabelOf(ExportTables tables, MetaRow row)
+    private static string LabelOf(GameTables tables, MetaRow row)
     {
         var key = Value(row, "displayName");
         var label = key;

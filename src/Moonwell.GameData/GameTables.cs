@@ -35,10 +35,15 @@ public sealed record ChoiceEntry(int Index, string Text, string Label, IReadOnly
 public sealed record ObjectRows(string Id, IReadOnlyDictionary<string, string> Values, IReadOnlySet<string>? Wrapped = null);
 
 /// <summary>
-/// The game's data export (the <c>war3.w3mod</c> folder): metadata tables, per-object tables and text, and the
-/// editor's labels, read as strings exactly as the files spell them.
+/// The game's tables: metadata tables, per-object tables and text, and the editor's labels, read as strings exactly as
+/// the files spell them, from an install's storage (<see cref="OpenInstall(string)"/>) or from an export of it, the
+/// <c>war3.w3mod</c> folder (<see cref="OpenExport"/>).
 /// </summary>
 /// <remarks>
+/// <para>
+/// The install's tables are its <c>War3.w3mod</c> module's, as an export holds them; the Reforged modules (<c>_HD</c>,
+/// <c>_DE</c>) are not read. The text is the installed locale's.
+/// </para>
 /// <para>
 /// An object's values are merged in a fixed order, a later source replacing an earlier one on the same key: the
 /// kind's tables in the order of <see cref="Sources"/>, then its func files, skin files and locale strings. The
@@ -58,7 +63,7 @@ public sealed record ObjectRows(string Id, IReadOnlyDictionary<string, string> V
 /// The table's <c>Rows</c> and <c>Columns</c> are the highest indexes holding a cell, not counts.
 /// </para>
 /// </remarks>
-public sealed class ExportTables
+public sealed class GameTables : IDisposable
 {
     private static readonly string[] BalanceSets = { "melee_v0", "custom_v0", "custom_v1" };
 
@@ -102,35 +107,99 @@ public sealed class ExportTables
                 new[] { "units/*upgradestrings.txt", "units/upgradeskinstrings.txt" })),
     };
 
-    private const string LocaleFolder = "_locales/enus.w3mod";
-    private const string LabelsFile = LocaleFolder + "/ui/worldeditstrings.txt";
-    private const string GameLabelsFile = LocaleFolder + "/ui/worldeditgamestrings.txt";
+    private const string ExportLocale = "enUS";
+    private const string LabelsFile = "ui/worldeditstrings.txt";
+    private const string GameLabelsFile = "ui/worldeditgamestrings.txt";
     private const string LabelsSection = "WorldEditStrings";
     private const string ChoicesFile = "ui/uniteditordata.txt";
 
-    private readonly string _folder;
-    private readonly Dictionary<string, string> _labels;
+    private readonly ITableFiles _files;
+    private readonly IDisposable? _owned;
+    private readonly string _localeFolder;
+    private readonly Dictionary<string, string> _labels = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<Kind, IReadOnlyList<MetaRow>> _meta = new();
     private readonly Dictionary<(Kind, string?), IReadOnlyList<ObjectRows>> _objects = new();
     private Dictionary<string, IReadOnlyList<ChoiceEntry>>? _choices;
 
-    private ExportTables(string folder, Dictionary<string, string> labels)
+    private GameTables(ITableFiles files, IDisposable? owned, GameBuild? build, string locale)
     {
-        _folder = folder;
-        _labels = labels;
+        _files = files;
+        _owned = owned;
+        Build = build;
+        Locale = locale;
+        _localeFolder = "_locales/" + locale.ToLowerInvariant() + ".w3mod";
     }
+
+    /// <summary>The install's build the tables are read from; null for an export, which does not say.</summary>
+    public GameBuild? Build { get; }
+
+    /// <summary>The locale of the text and labels: the installed one, or <c>enUS</c> for an export.</summary>
+    public string Locale { get; }
 
     /// <summary>
     /// Opens the export in <paramref name="folder"/> (the <c>war3.w3mod</c> folder) and reads its labels: the editor's
     /// (<c>worldeditstrings.txt</c>), then those only the game uses (<c>worldeditgamestrings.txt</c>, the destructables'
-    /// names among them).
+    /// names among them). Its text is the <c>enUS</c> locale's.
     /// </summary>
-    public static ExportTables Read(string folder)
+    public static GameTables OpenExport(string folder)
     {
-        var tables = new ExportTables(folder, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
-        tables.ReadLabels(LabelsFile);
-        tables.ReadLabels(GameLabelsFile);
+        return Opened(new GameTables(new FolderFiles(folder), null, null, ExportLocale));
+    }
+
+    /// <summary>
+    /// Opens the install in <paramref name="gameFolder"/> (the folder with <c>.build.info</c>; see
+    /// <see cref="GameInstall"/>) and reads its labels, as <see cref="OpenExport"/> does. The tables keep the storage
+    /// open until they are disposed.
+    /// </summary>
+    /// <exception cref="IOException">There is no install there, or its storage cannot be read.</exception>
+    /// <exception cref="FileNotFoundException">The installed locale's files are not stored on this computer.</exception>
+    public static GameTables OpenInstall(string gameFolder)
+    {
+        var files = GameFiles.Open(gameFolder);
+        try
+        {
+            return Opened(new GameTables(new StorageFiles(files.Storage), files, files.Build, files.Build.Locale));
+        }
+        catch
+        {
+            files.Dispose();
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Reads the tables of an install already open (as the editor has it for icons and models), as
+    /// <see cref="OpenInstall(string)"/> does; disposing the tables leaves <paramref name="files"/> open.
+    /// </summary>
+    /// <exception cref="FileNotFoundException">The installed locale's files are not stored on this computer.</exception>
+    public static GameTables OpenInstall(GameFiles files)
+    {
+        return OpenInstall(files, files.Build.Locale);
+    }
+
+    internal static GameTables OpenInstall(GameFiles files, string locale)
+    {
+        return Opened(new GameTables(new StorageFiles(files.Storage), null, files.Build, locale));
+    }
+
+    private static GameTables Opened(GameTables tables)
+    {
+        var labels = tables._localeFolder + "/" + LabelsFile;
+        if (tables._files.Find(labels) == null)
+        {
+            throw new FileNotFoundException(
+                $"The {tables.Locale} locale's files are not in {tables._files.Where}: {labels} is missing", labels);
+        }
+
+        tables.ReadLabels(labels);
+        tables.ReadLabels(tables._localeFolder + "/" + GameLabelsFile);
         return tables;
+    }
+
+    /// <summary>Closes the install's storage when the tables opened it.</summary>
+    public void Dispose()
+    {
+        _owned?.Dispose();
     }
 
     /// <summary>
@@ -191,7 +260,7 @@ public sealed class ExportTables
     }
 
     /// <summary>
-    /// The balance sets the export holds, in the order <c>melee_v0</c>, <c>custom_v0</c>, <c>custom_v1</c> (the three
+    /// The balance sets the tables hold, in the order <c>melee_v0</c>, <c>custom_v0</c>, <c>custom_v1</c> (the three
     /// the game has; a set whose folder is missing from <c>_balance</c> is left out).
     /// </summary>
     public IReadOnlyList<string> Sets
@@ -201,7 +270,7 @@ public sealed class ExportTables
             var sets = new List<string>();
             foreach (var set in BalanceSets)
             {
-                if (Find(_folder, "_balance/" + set + ".w3mod") != null)
+                if (_files.HasFolder("_balance/" + set + ".w3mod"))
                 {
                     sets.Add(set);
                 }
@@ -228,7 +297,7 @@ public sealed class ExportTables
         var setFolder = SetFolder(set);
         foreach (var path in Sources[kind].Tables)
         {
-            var file = Find(setFolder, path);
+            var file = _files.Find(setFolder + "/" + path);
             if (file == null)
             {
                 continue;
@@ -278,7 +347,7 @@ public sealed class ExportTables
         return _choices.TryGetValue(type, out var entries) ? entries : null;
     }
 
-    private static Dictionary<string, IReadOnlyList<ChoiceEntry>> ReadChoices(string path)
+    private Dictionary<string, IReadOnlyList<ChoiceEntry>> ReadChoices(string path)
     {
         var choices = new Dictionary<string, IReadOnlyList<ChoiceEntry>>(StringComparer.Ordinal);
         foreach (var section in ReadSections(path, out _))
@@ -370,7 +439,7 @@ public sealed class ExportTables
         return objects;
     }
 
-    private static void MergeText(
+    private void MergeText(
         Dictionary<string, Dictionary<string, string>> values,
         Dictionary<string, HashSet<string>> wrapped,
         List<string> files)
@@ -422,7 +491,7 @@ public sealed class ExportTables
         var slash = pattern.LastIndexOf('/');
         var folder = pattern.Substring(0, slash);
         var name = pattern.Substring(slash + 1);
-        var directoryPath = inSet ? folder : LocaleFolder + "/" + folder;
+        var directoryPath = inSet ? folder : _localeFolder + "/" + folder;
         var useSet = inSet ? set : null;
         if (!name.StartsWith('*'))
         {
@@ -431,17 +500,10 @@ public sealed class ExportTables
 
         var suffix = name.Substring(1);
         var names = new SortedDictionary<string, string>(StringComparer.Ordinal);
-        foreach (var root in useSet == null ? new[] { _folder } : new[] { _folder, SetFolder(useSet) })
+        foreach (var root in useSet == null ? new[] { "" } : new[] { "", SetFolder(useSet) + "/" })
         {
-            var directory = Find(root, directoryPath);
-            if (directory == null)
+            foreach (var (fileName, file) in _files.List(root + directoryPath))
             {
-                continue;
-            }
-
-            foreach (var file in Directory.EnumerateFiles(directory))
-            {
-                var fileName = Path.GetFileName(file);
                 if (fileName.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
                 {
                     names[fileName.ToLowerInvariant()] = file;
@@ -457,78 +519,41 @@ public sealed class ExportTables
         return new List<string>(names.Values);
     }
 
+    /// <summary>The set's folder (<c>_balance/custom_v1.w3mod</c>); a missing one is a DirectoryNotFoundException.</summary>
     private string SetFolder(string set)
     {
-        var folder = Find(_folder, "_balance/" + set + ".w3mod");
-        if (folder == null)
+        var folder = "_balance/" + set + ".w3mod";
+        if (!_files.HasFolder(folder))
         {
-            throw new DirectoryNotFoundException($"_balance/{set}.w3mod is missing from {_folder}");
+            throw new DirectoryNotFoundException($"{folder} is missing from {_files.Where}");
         }
 
         return folder;
     }
 
-    /// <summary>The full path of an export file, the set's when it has one; a missing file is a FileNotFoundException.</summary>
+    /// <summary>The key of a file, the set's when it has one; a missing file is a FileNotFoundException.</summary>
     private string Require(string relative, string? set)
     {
         if (set != null)
         {
-            var inSet = Find(SetFolder(set), relative);
+            var inSet = _files.Find(SetFolder(set) + "/" + relative);
             if (inSet != null)
             {
                 return inSet;
             }
         }
 
-        return Find(_folder, relative) ?? throw Missing(relative);
+        return _files.Find(relative) ?? throw Missing(relative);
     }
 
     private FileNotFoundException Missing(string relative)
     {
-        return new FileNotFoundException($"{relative} is missing from {_folder}", Path.Combine(_folder, relative));
+        return new FileNotFoundException($"{relative} is missing from {_files.Where}", relative);
     }
 
-    /// <summary>Finds a path under a folder, matching each segment without regard to case.</summary>
-    private static string? Find(string root, string relative)
+    private string ReadText(string key)
     {
-        var path = root;
-        foreach (var segment in relative.Split('/'))
-        {
-            var direct = Path.Combine(path, segment);
-            if (File.Exists(direct) || Directory.Exists(direct))
-            {
-                path = direct;
-                continue;
-            }
-
-            if (!Directory.Exists(path))
-            {
-                return null;
-            }
-
-            string? match = null;
-            foreach (var entry in Directory.EnumerateFileSystemEntries(path))
-            {
-                if (string.Equals(Path.GetFileName(entry), segment, StringComparison.OrdinalIgnoreCase))
-                {
-                    match = entry;
-                }
-            }
-
-            if (match == null)
-            {
-                return null;
-            }
-
-            path = match;
-        }
-
-        return path;
-    }
-
-    private static string ReadText(string path)
-    {
-        var text = Encoding.UTF8.GetString(File.ReadAllBytes(path));
+        var text = Encoding.UTF8.GetString(_files.Read(key));
         return text.StartsWith('\uFEFF') ? text.Substring(1) : text;
     }
 
@@ -538,8 +563,8 @@ public sealed class ExportTables
     /// <paramref name="wrapped"/> (by section). A section repeated in the file is merged. A key given twice in a section
     /// takes the later value, or with <paramref name="firstWins"/> the first.
     /// </summary>
-    private static Dictionary<string, Dictionary<string, string>> ReadSections(
-        string path,
+    private Dictionary<string, Dictionary<string, string>> ReadSections(
+        string file,
         out Dictionary<string, HashSet<string>> wrapped,
         bool firstWins = false)
     {
@@ -547,7 +572,7 @@ public sealed class ExportTables
         wrapped = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
         Dictionary<string, string>? section = null;
         HashSet<string>? wrappedKeys = null;
-        foreach (var raw in ReadText(path).Split('\n'))
+        foreach (var raw in ReadText(file).Split('\n'))
         {
             var line = raw.Trim(' ', '\t', '\r', '\v', '\f');
             if (line.Length == 0 || line.StartsWith("//", StringComparison.Ordinal))
@@ -611,12 +636,12 @@ public sealed class ExportTables
     /// An SLK table: the first row names the columns and the first column is the id. Cells are the text of the file,
     /// quoted text unquoted and numbers and booleans as written; empty cells are left out.
     /// </summary>
-    private static List<TableRow> ReadTable(string path, string display)
+    private List<TableRow> ReadTable(string key, string display)
     {
         SylkTable table;
         try
         {
-            using var stream = File.OpenRead(path);
+            using var stream = new MemoryStream(_files.Read(key));
             table = new SylkParser(keepText: true).Parse(stream);
         }
         catch (Exception failure) when (failure is FormatException or InvalidDataException or OverflowException)

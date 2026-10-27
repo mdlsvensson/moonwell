@@ -37,7 +37,7 @@ static int Natives(string scriptsFolder, string root, string gameVersion)
 static int Objects(string exportFolder, string root, string gameVersion)
 {
     var runtime = RuntimeMembers.Read(MoonwellDll(root));
-    var files = GeneratedObjects.Make(ExportTables.Read(exportFolder), runtime, gameVersion);
+    var files = GeneratedObjects.Make(GameTables.OpenExport(exportFolder), runtime, gameVersion);
 
     var generated = Path.Combine(root, "src", "Moonwell.Objects", "Generated");
     if (Directory.Exists(generated))

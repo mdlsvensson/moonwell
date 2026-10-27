@@ -28,7 +28,7 @@ public static class GeneratedObjects
     /// <param name="tables">The export.</param>
     /// <param name="runtime">The runtime classes' members, whose names no field takes; null for none.</param>
     /// <param name="gameVersion">The game version written in each C# file's first line.</param>
-    public static IReadOnlyDictionary<string, string> Make(ExportTables tables, RuntimeMembers? runtime, string gameVersion)
+    public static IReadOnlyDictionary<string, string> Make(GameTables tables, RuntimeMembers? runtime, string gameVersion)
     {
         var files = new SortedDictionary<string, string>(StringComparer.Ordinal);
         // CSharp.lua compiles with MOONWELL_LUA and reads the build's stubs of the used classes instead.
@@ -101,7 +101,7 @@ public static class GeneratedObjects
     }
 
     /// <summary>The constants of <see cref="MiscKeys"/> in the base file and in each balance set the export holds, by set (<c>base</c> for the base).</summary>
-    private static Dictionary<string, IReadOnlyDictionary<string, string>> MiscConstants(ExportTables tables)
+    private static Dictionary<string, IReadOnlyDictionary<string, string>> MiscConstants(GameTables tables)
     {
         var sets = new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.Ordinal);
         foreach (var set in new string?[] { null }.Concat(tables.Sets))

@@ -137,7 +137,7 @@ public static class Choices
     /// either of which would hide it) gets <c>Choice</c> appended; a core enum (<see cref="IsCore"/>) is that type of
     /// namespace <c>Moonwell</c> and keeps its name.
     /// </summary>
-    public static IReadOnlyDictionary<string, ChoiceType> All(ExportTables tables, IReadOnlySet<string>? taken)
+    public static IReadOnlyDictionary<string, ChoiceType> All(GameTables tables, IReadOnlySet<string>? taken)
     {
         var all = new SortedDictionary<string, ChoiceType>(StringComparer.Ordinal);
         foreach (var kind in Enum.GetValues<Kind>())
@@ -162,7 +162,7 @@ public static class Choices
     }
 
     /// <summary>The choice type of a metadata type stored as <paramref name="store"/>; null when <c>ui/uniteditordata.txt</c> has no section for it.</summary>
-    public static ChoiceType? Of(ExportTables tables, string type, string store)
+    public static ChoiceType? Of(GameTables tables, string type, string store)
     {
         var entries = tables.Choices(type);
         return entries == null ? null : Make(type, store, entries, key => LabelOf(tables, key));
@@ -345,7 +345,7 @@ public static class Choices
     }
 
     // A label key looked up as Fields does: a label may name another label. Empty when the export has none.
-    private static string LabelOf(ExportTables tables, string key)
+    private static string LabelOf(GameTables tables, string key)
     {
         var label = key;
         for (var i = 0; i < LabelDepth; i++)
