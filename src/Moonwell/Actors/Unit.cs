@@ -885,7 +885,7 @@ namespace Moonwell
         public T Add<T>(T component)
             where T : UnitComponent => AddComponent(component);
 
-        /// <summary>Applies a buff to the unit and returns the buff now on it: a buff of its class already there is refreshed, as its stacking says (it takes the given buff's duration and the source, and keeps its other values and what it has counted), and the given buff is dropped; otherwise the given buff is added and started.</summary>
+        /// <summary>Applies a buff to the unit and returns the buff now on it: a buff of its class already there is refreshed, as its stacking says (it takes the given buff's duration and the source, and keeps its other values and what it has counted), and the given buff is dropped; otherwise the given buff is added and started. A buff that is on a unit already (one that applies itself again in OnExpire) or has ended is left as it is, and the error is reported, in every build.</summary>
         public T Apply<T>(T buff, Unit? source = null)
             where T : Buff
         {
@@ -895,6 +895,12 @@ namespace Moonwell
             {
                 existing.Refresh(buff, source);
                 return (T)existing;
+            }
+
+            // A buff on a unit already (one that applies itself again) or one that has ended is reported and left as it is.
+            if (Refuses(buff, "Apply"))
+            {
+                return buff;
             }
 
             buff.Source = source;

@@ -159,5 +159,99 @@ namespace Moonwell.Testing
             Expect.True(!hero.IsIllusion && hero is CountedHero && hero.ComponentCount == 1, "the hero itself is of its class, with its component, and no illusion");
             Expect.True(watch.Seen.Contains(taken), "OnUnitCreated sees the illusion");
         }
+
+        /// <summary>The lines of the log that hold a text.</summary>
+        private static int Logged(FakeWorld world, string text)
+        {
+            var count = 0;
+            foreach (var line in world.Logged)
+            {
+                if (line.Contains(text))
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        /// <summary>One component added to a second unit is refused, in every build: it is reported and stays on the first, so ending the first leaves the second's timer running (decision 74).</summary>
+        public static void SharedComponentRefused(FakeWorld world)
+        {
+            var a = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var b = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var ran = 0;
+            b.Run(() => { Timer.Every(1.0f, () => { ran++; }); });
+            var shared = a.Add(new Marker());
+            try
+            {
+                b.Add(shared);
+            }
+            catch (MoonwellException error)
+            {
+                Expect.True(false, "the second add threw: " + error.Message);
+            }
+
+            Expect.Equal(1, Logged(world, "Unit.Add failed: Marker is already on an actor or has ended"), "the reports of the second add: " + string.Join(" | ", world.Logged));
+            Expect.True(shared.Actor == a && !b.Has<Marker>(), "the component stays on the first unit only");
+            a.Remove();
+            world.Advance(2.5f);
+            Expect.Equal("2 False 1", ran + " " + b.HasEnded + " " + b.OwnedCount, "runs of the second unit's timer after the first was removed, whether it ended, and what it owns");
+        }
+
+        /// <summary>A Separate buff that applies itself again in OnExpire is refused, in every build: it is reported, the buff starts nothing again and ends at its expiry, and its unit ends (in a release build it used to be linked twice, and its unit's end never returned) (decision 74).</summary>
+        public static void BuffReappliedToItselfRefused(FakeWorld world)
+        {
+            var target = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var buff = target.Apply(new SelfApplying());
+            world.Advance(1.1f);
+            Expect.Equal(1, Logged(world, "Unit.Apply failed: SelfApplying is already on an actor or has ended"), "the reports of the apply: " + string.Join(" | ", world.Logged));
+            Expect.True(buff.HasEnded, "the buff has ended at its expiry");
+            Expect.Equal(1, buff.Applied, "the buff's applies");
+            target.Remove();
+            Expect.True(target.HasEnded, "the unit has ended");
+            Expect.Equal(0, target.OwnedCount, "what the ended unit still owns");
+        }
+
+        /// <summary>Removing a component from another actor than the one it is on is refused, in every build: it is reported, and the component stays on its actor (decision 74).</summary>
+        public static void RemoveOthersComponentRefused(FakeWorld world)
+        {
+            var a = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var b = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var marker = a.Add(new Marker());
+            try
+            {
+                b.Remove(marker);
+            }
+            catch (MoonwellException error)
+            {
+                Expect.True(false, "the remove threw: " + error.Message);
+            }
+
+            Expect.Equal(1, Logged(world, "Unit.Remove failed: Marker is not on this actor"), "the reports of the remove: " + string.Join(" | ", world.Logged));
+            Expect.True(!marker.HasEnded && a.Has<Marker>(), "the component stays on its unit");
+        }
+
+        /// <summary>A timer adopted by a second owner is refused, in every build: it is reported and stays with its first owner (decision 74).</summary>
+        public static void AdoptAgainRefused(FakeWorld world)
+        {
+            var first = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var second = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var ran = 0;
+            var timer = Timer.Every(1.0f, () => { ran++; }, first);
+            try
+            {
+                second.Adopt(timer);
+            }
+            catch (MoonwellException error)
+            {
+                Expect.True(false, "the adopt threw: " + error.Message);
+            }
+
+            Expect.Equal(1, Logged(world, "Unit.Adopt failed: Timer already has an owner or has ended"), "the reports of the adopt: " + string.Join(" | ", world.Logged));
+            second.Remove();
+            world.Advance(2.5f);
+            Expect.Equal("2 1 0", ran + " " + first.OwnedCount + " " + second.OwnedCount, "the timer's runs after the second owner was removed, and what each owns");
+        }
     }
 }

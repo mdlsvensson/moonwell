@@ -40,6 +40,19 @@ namespace Moonwell
             }
         }
 
+        /// <summary>Reports a call the runtime refuses, in every build, as an error raised at the call, so the log names the map's line: one of the few checks whose failure would freeze the game or break Moonwell's own lists (decision 74). The caller then leaves things as they were.</summary>
+        internal static void Refuse(string label, string message)
+        {
+            try
+            {
+                throw new MoonwellException(message);
+            }
+            catch (MoonwellException error)
+            {
+                Report(label, error);
+            }
+        }
+
         /// <summary>Forgets every error count; Runtime.Reset calls it.</summary>
         internal static void Reset()
         {
