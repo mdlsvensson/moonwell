@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Moonwell.Objects
 {
@@ -76,6 +77,31 @@ namespace Moonwell.Objects
             whenCounted += check;
         }
 #endif
+
+        /// <summary>
+        /// These values with some levels put by themselves (<c>Set("Htb1", 2, 250f)</c>), as the build writes them: a copy of
+        /// the values given one by one with the puts at their levels (a put past them is left out), or a formula that gives
+        /// a put level its put value.
+        /// </summary>
+        internal Levels<T> WithLevels(IReadOnlyDictionary<int, T> puts)
+        {
+            if (counted)
+            {
+                var copy = (T[])values.Clone();
+                foreach (var put in puts)
+                {
+                    if (put.Key >= 1 && put.Key <= copy.Length)
+                    {
+                        copy[put.Key - 1] = put.Value;
+                    }
+                }
+
+                return new Levels<T>(copy);
+            }
+
+            var formula = this.formula!;
+            return new Levels<T>(level => puts.TryGetValue(level, out var one) ? one : formula(level));
+        }
 
         /// <summary>
         /// Fixes the number of levels of a formula and works out the value of each, checking each against the rules of the

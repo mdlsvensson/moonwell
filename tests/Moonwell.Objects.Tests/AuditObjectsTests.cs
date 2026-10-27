@@ -112,6 +112,47 @@ namespace Moonwell.Objects.Tests
             Assert.Equal("Ecen", IdOf(typeof(Campaign.Units.Cenarius)));
         }
 
+        /// <summary>A Storm Bolt of a map's own that puts level 2's damage by id and reads it back.</summary>
+        public class HardBolt : Human.Abilities.StormBolt
+        {
+            public HardBolt()
+            {
+                Set("Htb1", 2, 250f);
+                ReadInConstructor = Damage[2];
+            }
+
+            public float ReadInConstructor { get; }
+        }
+
+        /// <summary>A Storm Bolt of a map's own that puts every level, then level 2 again by id.</summary>
+        public class EvenBolt : Human.Abilities.StormBolt
+        {
+            public EvenBolt()
+            {
+                Damage = Levels(10f, 20f, 30f);
+                Set("Htb1", 2, 250f);
+            }
+        }
+
+        [Fact]
+        public void a_level_put_by_id_reads_back_as_put()
+        {
+            // The build writes a level put by itself over the field's; reading the field gives the same.
+            var hard = new HardBolt();
+            Assert.Equal(250f, hard.ReadInConstructor);
+            Assert.Equal(250f, hard.Damage[2]);
+            Assert.Equal(100f, hard.Damage[1]);
+
+            var even = new EvenBolt();
+            Assert.Equal(new[] { 10f, 250f, 30f }, new[] { even.Damage[1], even.Damage[2], even.Damage[3] });
+            Assert.Equal(3, even.Damage.Count);
+
+            StandardValues.Read = (id, field, level) => field == "Htb1" ? (level * 100).ToString(System.Globalization.CultureInfo.InvariantCulture) : null;
+            var built = new HardBolt();
+            Assert.Equal(250f, built.Damage[2]);
+            Assert.Equal(300f, built.Damage[3]);
+        }
+
         [Fact]
         public void a_target_type_of_self_is_named_self()
         {

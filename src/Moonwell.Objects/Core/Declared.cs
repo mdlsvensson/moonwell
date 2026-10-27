@@ -155,20 +155,37 @@ namespace Moonwell.Objects
             values[Key(field, level)] = value;
         }
 
-        /// <summary>Gives the per-level values put on a field, else the standard object's values, read level by level.</summary>
+        /// <summary>
+        /// Gives the per-level values put on a field, else the standard object's values, read level by level; a level put by
+        /// itself (<see cref="PutLevel"/>) reads as it was put, as the build writes it over the field's.
+        /// </summary>
         public Levels<T> GetLevels<T>(object owner, string field)
         {
+            Levels<T> levels;
             if (values.TryGetValue(field, out var put))
             {
-                return (Levels<T>)put!;
+                levels = (Levels<T>)put!;
             }
-
-            if (StandardValues.Read == null && standard.TryGetValue(field, out var constructed))
+            else if (StandardValues.Read == null && standard.TryGetValue(field, out var constructed))
             {
-                return (Levels<T>)constructed!;
+                levels = (Levels<T>)constructed!;
+            }
+            else
+            {
+                levels = new Levels<T>(level => ReadStandard<T>(owner, field, level));
             }
 
-            return new Levels<T>(level => ReadStandard<T>(owner, field, level));
+            var puts = new Dictionary<int, T>();
+            var prefix = field + ":";
+            foreach (var entry in values)
+            {
+                if (entry.Key.StartsWith(prefix, StringComparison.Ordinal) && LevelOf(entry.Key.Substring(prefix.Length)) is int level)
+                {
+                    puts[level] = (T)entry.Value!;
+                }
+            }
+
+            return puts.Count == 0 ? levels : levels.WithLevels(puts);
         }
 
         /// <summary>Gives the list of a field, made the first time it is asked for as the standard object's list; a field with levels starts as level 1's.</summary>
@@ -266,6 +283,28 @@ namespace Moonwell.Objects
         {
             // A level is a whole number from 1 up, so no culture changes its digits; CultureInfo would add a local to every map's Lua.
             return field + ":" + level;
+        }
+
+        // The level of a key's digits (Key's), read without a culture; null for anything else.
+        private static int? LevelOf(string digits)
+        {
+            if (digits.Length == 0)
+            {
+                return null;
+            }
+
+            var level = 0;
+            foreach (var digit in digits)
+            {
+                if (digit < '0' || digit > '9')
+                {
+                    return null;
+                }
+
+                level = (level * 10) + (digit - '0');
+            }
+
+            return level;
         }
 
         // A standard list's entries, each trimmed and an empty one left out: the Hydra's abilities are "Aspo, Aspt".
