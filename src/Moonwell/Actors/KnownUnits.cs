@@ -12,6 +12,9 @@ namespace Moonwell
         /// <summary>The units the runtime holds, in the order they were taken in.</summary>
         internal static OrderedSet<Unit> Live = new OrderedSet<Unit>();
 
+        /// <summary>The units the runtime removed whose type id still read when they ended, as the game's does in the frame of RemoveUnit, keyed by the handle, in the order removed: each handle stays mapped to its ended object, which TakeIn does not take in again, so an event the game fires after the removal (an item's drop, the enter of a unit made in the same instant) makes no second object. The sweep forgets each once its type id reads 0.</summary>
+        private static OrderedMap<unit, Unit> removed = new OrderedMap<unit, Unit>();
+
         /// <summary>Whether every unit that enters the map is taken in, as the interactions package asks once units are tracked; otherwise only a unit of a registered type, or every unit while something wants OnUnitCreated.</summary>
         internal static bool EveryUnit;
 
@@ -33,6 +36,12 @@ namespace Moonwell
             if (existing != null)
             {
                 return existing;
+            }
+
+            // A unit the runtime removed is not taken in again, though its type id still reads in that frame.
+            if (removed.ContainsKey(handle))
+            {
+                return null;
             }
 
             var typeId = Runtime.World.UnitTypeId(handle);
@@ -104,11 +113,33 @@ namespace Moonwell
             return hero ? new Hero() : new Unit();
         }
 
-        /// <summary>Forgets a unit the game has removed, so that its handle makes no object again.</summary>
+        /// <summary>Forgets a unit that is ending, as it leaves the game, so that its handle makes no object again. A handle whose type id still reads (the runtime removed the unit in this frame) is kept in removed until the sweep reads its type id 0.</summary>
         internal static void Forget(Unit unit)
         {
-            known.Remove(unit.Handle);
             Live.Remove(unit);
+            if (unit.Handle == null)
+            {
+                return;
+            }
+
+            known.Remove(unit.Handle);
+            if (Runtime.World.UnitTypeId(unit.Handle) != 0)
+            {
+                removed[unit.Handle] = unit;
+            }
+        }
+
+        /// <summary>Forgets the handles of the units the runtime removed whose type id now reads 0; the sweep calls it.</summary>
+        internal static void ForgetRemoved()
+        {
+            for (var i = removed.Count - 1; i >= 0; i--)
+            {
+                var handle = removed.KeyAt(i);
+                if (Runtime.World.UnitTypeId(handle) == 0)
+                {
+                    removed.Remove(handle);
+                }
+            }
         }
 
         /// <summary>From now on takes in every unit that enters the map, and takes in now each unit in the world the runtime does not hold: units the game makes with no Moonwell code (trained, summoned, made by a native) are known from then on. The interactions package calls it when units are first asked for, which is synced code, so every machine takes in the same units.</summary>
@@ -139,6 +170,7 @@ namespace Moonwell
         {
             known.Clear();
             Live.Clear();
+            removed.Clear();
             EveryUnit = false;
         }
 

@@ -130,6 +130,9 @@ namespace Moonwell.Testing
         /// <summary>The drops of units the runtime removed (RemoveUnit): the game fires them after the call (seen 10-21), so they wait for the next Advance. The items are removed with the unit.</summary>
         private readonly List<KeyValuePair<unit, item>> pendingDrops = new List<KeyValuePair<unit, item>>();
 
+        /// <summary>The units removed by the runtime in this frame, whose type id still reads until the next Advance.</summary>
+        private readonly List<unit> pendingRemovals = new List<unit>();
+
         /// <summary>The units the game has removed but whose handles still answer: every number reads 0, as the game gives in the quarter second before the sweep.</summary>
         private readonly HashSet<unit> vanishedUnits = new HashSet<unit>();
 
@@ -405,11 +408,12 @@ namespace Moonwell.Testing
             return null;
         }
 
-        /// <summary>Moves time forward by the seconds, calling Runtime.Wake at each wake request on the way, WakeLate after the time it asked for.</summary>
+        /// <summary>Moves time forward by the seconds, calling Runtime.Wake at each wake request on the way, WakeLate after the time it asked for. The frame of the last calls ends first: the drops that waited for it fire, and the units removed in it read type id 0.</summary>
         public void Advance(float seconds)
         {
             var target = Time + seconds;
             DeliverPendingDrops();
+            EndPendingRemovals();
             while (WakeAt.HasValue && WakeAt.Value + WakeLate <= target + 0.001f)
             {
                 Time = WakeAt.Value + WakeLate;
@@ -418,6 +422,17 @@ namespace Moonwell.Testing
             }
 
             Time = target;
+        }
+
+        /// <summary>Makes the units removed in the frame that ends read type id 0.</summary>
+        private void EndPendingRemovals()
+        {
+            foreach (var removed in pendingRemovals)
+            {
+                unitTypes[removed] = 0;
+            }
+
+            pendingRemovals.Clear();
         }
 
         /// <summary>Fires the drop events that waited for the end of the call that removed their unit, when they are listened for, and then removes the items with the unit.</summary>
@@ -701,7 +716,7 @@ namespace Moonwell.Testing
             return 0;
         }
 
-        /// <summary>Records a unit removed by the runtime, and reads its type id as 0. The unit's items leave its slots inside the call, at its place; their drop events come after the call, at the next Advance, and the items are removed with the unit (seen 10-21 for a hero).</summary>
+        /// <summary>Records a unit removed by the runtime. Its type id still reads in this frame, as the game's does after RemoveUnit, and reads 0 from the next Advance, after the drop events (seen 10-21: 0 by 0.05 s later; seen 10-26: the drops fire after the call while it still reads). The unit's items leave its slots inside the call, at its place; their drop events come after the call, at the next Advance, and the items are removed with the unit (seen 10-21 for a hero).</summary>
         public void DeleteUnit(unit unit)
         {
             RemovedUnits.Add(unit);
@@ -719,7 +734,7 @@ namespace Moonwell.Testing
                 }
             }
 
-            unitTypes[unit] = 0;
+            pendingRemovals.Add(unit);
         }
 
         /// <summary>Puts an item that leaves a unit's slots on the ground at the unit's place.</summary>

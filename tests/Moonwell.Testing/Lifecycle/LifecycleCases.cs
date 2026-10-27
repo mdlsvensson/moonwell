@@ -232,6 +232,49 @@ namespace Moonwell.Testing
             Expect.True(!marker.HasEnded && a.Has<Marker>(), "the component stays on its unit");
         }
 
+        /// <summary>A hero of a class carrying an item Moonwell knows is removed with Remove(). The game fires the item's drop after RemoveUnit, in the same frame, while the hero's type id still reads (seen 10-26): its handle makes no second object, and no drop reaction runs for it; OnCreated, OnUnitCreated and OnLeave each run once.</summary>
+        public static void RemovedHeroDropMakesNoSecond(FakeWorld world)
+        {
+            CountedHero.Created = 0;
+            CountedHero.Left = 0;
+            var id = ObjectTypes.FourCC("H0RM");
+            ObjectTypes.Unit(id, () => new CountedHero());
+            var watch = Game.Instance.Add(new CreatedWatch());
+            var handle = world.NewUnit(id, hero: true);
+            Inbound.Entered(handle);
+            var hero = (CountedHero)KnownUnits.Find(handle)!;
+            ObjectTypes.Item(ObjectTypes.FourCC("I0RM"), () => new CarrierWatch());
+            var item = (CarrierWatch)Item.Of(world.NewItem(ObjectTypes.FourCC("I0RM")))!;
+            hero.Give(item);
+            hero.Remove();
+            Expect.True(world.UnitTypeId(handle) != 0, "the removed hero's type id still reads in the frame of its removal");
+            Expect.True(Unit.Of(handle) == null, "Unit.Of of the removed hero's handle in that frame");
+
+            world.Advance(0.01f);
+            Expect.True(KnownUnits.Find(handle) == null && Unit.Of(handle) == null, "no second object for the removed hero after the drop");
+            Expect.Equal("1 1 1", CountedHero.Created + " " + watch.Seen.Count + " " + CountedHero.Left, "OnCreated's, OnUnitCreated's and OnLeave's runs");
+            Expect.True(!item.DropSeen, "the item's drop reaction for the removed hero");
+            world.Advance(0.3f);
+            Expect.Equal(1, CountedHero.Left, "OnLeave's runs after the sweep");
+        }
+
+        /// <summary>A unit of a class made with Unit.Create and removed in the same instant: the game's enter event for it comes after CreateUnit returns, in the same frame, reading its type id (seen 10-26). It makes no second object.</summary>
+        public static void CreatedAndRemovedEnterMakesNoSecond(FakeWorld world)
+        {
+            CountedHero.Created = 0;
+            CountedHero.Left = 0;
+            var id = ObjectTypes.FourCC("H0CR");
+            ObjectTypes.Unit(id, () => new CountedHero());
+            var watch = Game.Instance.Add(new CreatedWatch());
+            var made = Unit.Create<CountedHero>(Player.Get(0), 0.0f, 0.0f);
+            var handle = made.Handle;
+            made.Remove();
+            Inbound.Entered(handle);
+            Expect.True(KnownUnits.Find(handle) == null && Unit.Of(handle) == null, "no second object for the removed unit after its enter");
+            world.Advance(0.3f);
+            Expect.Equal("1 1 1", CountedHero.Created + " " + watch.Seen.Count + " " + CountedHero.Left, "OnCreated's, OnUnitCreated's and OnLeave's runs");
+        }
+
         /// <summary>A timer adopted by a second owner is refused, in every build: it is reported and stays with its first owner (decision 74).</summary>
         public static void AdoptAgainRefused(FakeWorld world)
         {

@@ -249,9 +249,10 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 Moonwell listens for pick-ups and drops from the start, so an item a unit picks up is taken in; one a unit held before
 the map began has no `Carrier`. A unit that is not a hero drops its items when it dies, with no drop reactions; a hero
 keeps them. When a unit is removed from the game (`RemoveUnit`), its items leave it inside the call, but the game fires
-the drops after it: `Carrier` is already null then, and the drop reactions run for an object about to be swept. The
-items of a removed hero are removed with it, as seen; other units are assumed to do the same. A member's exact
-behaviour is in its comment.
+the drops after it. For a unit Moonwell removed (`Remove()`, or its owner ending) no drop reaction runs; for one a
+native removed, the drop reactions run for an object about to be swept, with `Carrier` already null. The items of a
+removed hero are removed with it, as seen; other units are assumed to do the same. A member's exact behaviour is in
+its comment.
 
 ## Damage
 

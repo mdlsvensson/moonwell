@@ -812,7 +812,7 @@ namespace Moonwell
             return !IsGone && !item.IsGone && Runtime.World.GiveItem(Handle, item.Handle);
         }
 
-        /// <summary>Makes the unit drop an item from its inventory where it stands (UnitRemoveItem). The game counts it as a drop, so OnDropped and OnItemDropped run, inside this call and while the unit still has the item: the item's Carrier is the unit there, and null after the call. Does nothing for an item that lies on the ground, and once the unit or the item is gone. A unit that dies drops its items (a hero keeps them) with no drop reactions, and the items of a unit removed with RemoveUnit leave it inside that call, but the game fires their drop events after the call: Carrier is already null then, and the item's and the unit's drop reactions run for an object that is about to be swept (a unit that Remove() has already ended runs none). Seen for a hero, whose items are then removed with it; other units are assumed to do the same.</summary>
+        /// <summary>Makes the unit drop an item from its inventory where it stands (UnitRemoveItem). The game counts it as a drop, so OnDropped and OnItemDropped run, inside this call and while the unit still has the item: the item's Carrier is the unit there, and null after the call. Does nothing for an item that lies on the ground, and once the unit or the item is gone. A unit that dies drops its items (a hero keeps them) with no drop reactions, and the items of a unit removed with RemoveUnit leave it inside that call, but the game fires their drop events after the call, while the unit's type id still reads. For a unit Moonwell removed (Remove(), or its owner ending) no drop reaction runs, neither the item's nor the unit's, and its handle makes no second object; for one a native removed, which Moonwell has not noticed yet, the drop reactions run for an object that is about to be swept, with Carrier already null. Seen for a hero, whose items are then removed with it; other units are assumed to do the same.</summary>
         public void Drop(Item item)
         {
             if (!IsGone && !item.IsGone)
@@ -824,7 +824,7 @@ namespace Moonwell
         /// <summary>The starting components, which the runtime adds in order when the unit enters.</summary>
         internal List<UnitComponent> StartComponents => Components;
 
-        /// <summary>The object of a game unit: made when the unit is first seen; null for null or for a unit the game has removed.</summary>
+        /// <summary>The object of a game unit: made when the unit is first seen; null for null, for a unit the game has removed, and for one Moonwell has removed, whose handle still reads its type in that frame.</summary>
         public static Unit? Of(unit? handle)
         {
             if (handle == null)
