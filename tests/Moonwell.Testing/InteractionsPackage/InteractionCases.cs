@@ -128,7 +128,7 @@ namespace Moonwell.Testing
             ExpectLog(new string[] { "meet b", "tick b" }, "at 300 it meets, at 300.5 not");
         }
 
-        /// <summary>A unit Accepts refuses makes no pair and is asked again at the next tick; Accepts runs with the interaction as the current owner, and a pair is not asked again.</summary>
+        /// <summary>A unit Accepts refuses makes no pair and is asked again at the next tick; Accepts runs with the interaction as the current owner, and a pair is asked again before each tick (decision 73).</summary>
         public static void Accepts(FakeWorld world)
         {
             Fresh();
@@ -150,7 +150,7 @@ namespace Moonwell.Testing
             Expect.Equal(3, aura.Asked, "asked a third time");
             ExpectLog(new string[] { "meet b", "tick b" }, "accepted: they meet");
             Steps(world, 16);
-            Expect.Equal(3, aura.Asked, "a pair is not asked again");
+            Expect.Equal(4, aura.Asked, "a pair is asked again before each tick");
         }
 
         /// <summary>An interaction never pairs with its own holder.</summary>

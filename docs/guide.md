@@ -396,6 +396,9 @@ var near = Find.InRange<Unit>(x, y, 500f);                // a new list; or Find
   not hidden, not loaded), a visible item on the ground, a live destructable and a gizmo have a place; `OnPart` runs
   once, when a pair ends. A timer a pair's reactions make is the pair's and ends when it parts; a buff or component
   they add is the unit's, so `OnPart` removes it, as `FrostAura` does.
+- `Accepts` is asked before a meeting and again before each tick: a no parts the pair (`OnPart`), and the two meet
+  again once it says yes, so `FireAura` stops burning a unit that changes sides (Charm, a new owner). Set
+  `RecheckAccepts = false` in the constructor to ask only before a meeting, a call less per pair at each tick.
 - A thing moved far in one jump (a teleport, a unit unloaded or revived, an item dropped far from where it was picked
   up) is found at its new place within `CellCheck` (0.1 s). A pair whose holder and other moved together stays paired.
 - From the first interaction or `Find` that asks for units, Moonwell takes in every unit in the game, and each one

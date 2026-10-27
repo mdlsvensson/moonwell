@@ -36,6 +36,12 @@ namespace Moonwell
         /// <summary>The check at which each stopped other was last kept, by its entry id; a lookup only.</summary>
         internal Dictionary<int, int>? stoppedSeen;
 
+        /// <summary>The entry ids of the others whose pair Accepts refused at the check refusedCheck, so that check does not ask them again; a lookup only, null until a pair is refused.</summary>
+        internal Dictionary<int, bool>? refused;
+
+        /// <summary>The check refused holds the refusals of; 0 before any.</summary>
+        internal int refusedCheck;
+
         /// <summary>The interaction's place in the cycle; made when it starts.</summary>
         internal InteractionDue? due;
 
@@ -50,6 +56,9 @@ namespace Moonwell
 
         /// <summary>The seconds between checks.</summary>
         internal float tick;
+
+        /// <summary>Whether a check asks Accepts again for the pairs that have met; true unless the map turns it off.</summary>
+        internal bool recheckAccepts;
 
         /// <summary>The kind of thing TOther is exactly (Tracking.ExactKind), which a check compares an entry's kind with; 0 when it tests the thing's class.</summary>
         internal int otherKind;
@@ -66,6 +75,8 @@ namespace Moonwell
             // reaction, so the interaction keeps them as its own. They are false already.
             ending = false;
             paused = false;
+            recheckAccepts = true;
+            refusedCheck = 0;
         }
 
         /// <summary>How near, centre to centre and flat, the other must be to the holder to meet it, in game units; required, more than 0. A map sets it in its constructor; a change takes effect at the next check.</summary>
@@ -86,6 +97,14 @@ namespace Moonwell
                 Dev.Check(value >= 0.0f, Names.NameOf(this) + ".Tick: seconds must be 0 or more");
                 tick = value;
             }
+        }
+
+        /// <summary>Whether Accepts is asked again, before each tick, for the pairs that have met: a no parts the pair (OnPart), and the other may meet again at a later tick once Accepts says yes. True unless set; false asks only before a meeting and saves a call per pair at each tick. A map sets it in its constructor; a change takes effect at the next check.</summary>
+        [LocalSafe]
+        public bool RecheckAccepts
+        {
+            get { return recheckAccepts; }
+            protected set { recheckAccepts = value; }
         }
 
         /// <summary>Whether the interaction is paused: it makes no checks, and its pairs are kept.</summary>
@@ -302,6 +321,23 @@ namespace Moonwell
             }
         }
 
+        /// <summary>Notes that Accepts refused an other's pair at this check, so the check does not ask it again as a new other.</summary>
+        internal void Refuse(Entry other)
+        {
+            if (refused == null)
+            {
+                refused = new Dictionary<int, bool>();
+            }
+
+            if (refusedCheck != checks)
+            {
+                refused.Clear();
+                refusedCheck = checks;
+            }
+
+            refused[other.Id] = true;
+        }
+
         /// <summary>Forgets the stopped others that were not kept at this check, so they meet again when next in range. One the check did not collect is read directly first, as for a pair (StillNear): within range of the holder's place it is kept.</summary>
         internal void ForgetStopped(float hx, float hy, float limit)
         {
@@ -390,8 +426,9 @@ namespace Moonwell
     /// What a holder of class THolder does with the things of class TOther near it: a map's aura, link or missile hit. The
     /// constructor sets Range, and Tick unless a check at every step is wanted. At each tick the interaction checks what is
     /// within Range: a new other is asked about with Accepts and, if accepted, meets (OnMeet, then OnTick); an other still
-    /// in range ticks (OnTick); one gone out of range, or with no place, parts (OnPart). Reactions run guarded, the pair's
-    /// with the pair as the current owner and Accepts with the interaction.
+    /// in range is asked again, unless RecheckAccepts is off, and ticks (OnTick); one refused, gone out of range or with
+    /// no place parts (OnPart). Reactions run guarded, the pair's with the pair as the current owner and Accepts with the
+    /// interaction.
     /// </summary>
     /// <typeparam name="THolder">The class of the holder: Unit, Item, Destructable, Gizmo, a map's class of one of them, or Actor.</typeparam>
     /// <typeparam name="TOther">The class of the things it pairs with, as Find takes: Unit, Item, Destructable, Gizmo, a map's gizmo class, or Actor.</typeparam>
@@ -425,7 +462,7 @@ namespace Moonwell
             get { return Pairing.View<THolder, TOther>(this); }
         }
 
-        /// <summary>Whether a new other within range may meet the holder; true unless a map says. Refused, they do not meet, and it is asked again at the next tick. Runs with the interaction as the current owner.</summary>
+        /// <summary>Whether an other within range may meet the holder, and, asked again before each tick while RecheckAccepts is on (the default), whether a pair that has met goes on; true unless a map says. Refused, a new other does not meet and is asked again at the next tick; a pair parts (OnPart), and its other is asked again from the next tick and meets again once accepted. An error it throws is reported and refuses. Runs with the interaction as the current owner.</summary>
         public virtual bool Accepts(TOther other)
         {
             return true;
@@ -441,7 +478,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs once when the pair ends, for any reason: out of range, a side with no place or ending, Stop, or the interaction ending. The pair is the current owner; what it made ends after.</summary>
+        /// <summary>Runs once when the pair ends, for any reason: out of range, a side with no place or ending, Accepts refusing it, Stop, or the interaction ending. The pair is the current owner; what it made ends after.</summary>
         public virtual void OnPart(Pair pair)
         {
         }
@@ -499,10 +536,12 @@ namespace Moonwell
         /// <summary>
         /// The check at a tick, in this order. The holder is read; with no place every pair parts and the check ends. The
         /// things within Range plus Slack are collected, and those of class TOther, not the holder, with a place and within
-        /// Range are kept. The pairs whose other is not kept part, in meeting order, unless a direct read of the other finds
-        /// it within Range (one moved far in one jump is still in the cell it was last read in); a stopped other that is not
-        /// kept is forgotten, after the same direct read. The kept pairs tick, in meeting order, unless paused or waiting. The kept others with no pair, in the
-        /// grid's order, are asked about unless stopped, and those accepted meet and tick. After any reaction that pauses or
+        /// Range are kept. The pairs, in meeting order: one whose other is not kept parts, unless a direct read of the other
+        /// finds it within Range (one moved far in one jump is still in the cell it was last read in); while RecheckAccepts
+        /// is on, one still in range is asked Accepts again, paused or waiting too, and parts if refused. A stopped other
+        /// that is not kept is forgotten, after the same direct read. The kept pairs tick, in meeting order, unless paused
+        /// or waiting. The kept others with no pair, in the grid's order, are asked about unless stopped or refused in this
+        /// check, and those accepted meet and tick. After any reaction that pauses or
         /// ends the interaction or ends its holder, the check stops. An error the package's own code raises stops the check
         /// and is given back, and the cycle's due reports it as ClassName.Check; a reaction's error is reported where it runs.
         /// </summary>
@@ -589,28 +628,61 @@ namespace Moonwell
                 }
             }
 
+            var recheck = recheckAccepts;
             WalkPairs();
             var walkEnd = walk.Count;
             for (var i = walkStart; i < walkEnd; i++)
             {
                 Pair pair = Pairing.As<THolder, TOther>(Raw.At(walk, i));
-                if (Gone(pair) || pair.kept == checks)
+                if (Gone(pair))
                 {
                     continue;
                 }
 
-                // An other moved far in one jump may stand in range from a cell the box did not take in.
-                var other = pair.otherEntry;
-                if (StillNear(other, hx, hy, limit))
+                if (pair.kept != checks)
                 {
+                    // An other moved far in one jump may stand in range from a cell the box did not take in.
+                    var other = pair.otherEntry;
+                    if (!StillNear(other, hx, hy, limit))
+                    {
+                        pair.End();
+                        if (Over)
+                        {
+                            return;
+                        }
+
+                        continue;
+                    }
+
                     pair.Keep(checks, hx, hy, other.X, other.Y);
+                }
+
+                if (!recheck)
+                {
                     continue;
                 }
 
-                pair.End();
+                // Asked again before each tick (decision 73): a no parts the pair, and the other is not asked again in
+                // this check. Accepts may have ended the pair, its other or the interaction, or paused it.
+                var accepted = CallAccepts(pair.other);
                 if (Over)
                 {
                     return;
+                }
+
+                if (accepted)
+                {
+                    continue;
+                }
+
+                Refuse(pair.otherEntry);
+                if (!Gone(pair))
+                {
+                    pair.End();
+                    if (Over)
+                    {
+                        return;
+                    }
                 }
             }
 
@@ -634,10 +706,11 @@ namespace Moonwell
             }
 
             Pairing.Release(walkStart);
+            var refusedNow = refusedCheck == checks ? refused : null;
             for (var i = start; i < end; i++)
             {
                 var entry = Raw.At(candidates, i);
-                if (entry.Ended || byOther.ContainsKey(entry.Id) || IsStopped(entry))
+                if (entry.Ended || byOther.ContainsKey(entry.Id) || IsStopped(entry) || (refusedNow != null && refusedNow.ContainsKey(entry.Id)))
                 {
                     continue;
                 }

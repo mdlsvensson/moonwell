@@ -235,6 +235,11 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.audit.teleport-together-stays-paired", Run = AuditInteractionCases.TeleportTogetherStaysPaired });
             list.Add(new Case { Name = "interactions.audit.teleport-together-keeps-stop", Run = AuditInteractionCases.TeleportTogetherKeepsStop });
             list.Add(new Case { Name = "interactions.audit.teleport-apart-parts", Run = AuditInteractionCases.TeleportApartParts });
+            list.Add(new Case { Name = "interactions.audit.guide-fire-aura-spares-changed-owner", Run = AuditInteractionCases.GuideFireAuraSparesChangedOwner });
+            list.Add(new Case { Name = "interactions.audit.recheck-off-keeps-pair", Run = AuditInteractionCases.RecheckOffKeepsPair });
+            list.Add(new Case { Name = "interactions.audit.recheck-refusal-parts-and-meets-again", Run = AuditInteractionCases.RecheckRefusalPartsAndMeetsAgain });
+            list.Add(new Case { Name = "interactions.audit.recheck-throwing-accepts-refuses", Run = AuditInteractionCases.RecheckThrowingAcceptsRefuses });
+            list.Add(new Case { Name = "interactions.audit.recheck-parts-once-per-meet", Run = AuditInteractionCases.RecheckPartsOncePerMeet });
         }
 
         /// <summary>Adds the areas package's cases.</summary>
