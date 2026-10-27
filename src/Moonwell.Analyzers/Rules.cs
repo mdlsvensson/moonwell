@@ -238,7 +238,7 @@ public static class Rules
         "MW0020",
         "Struct element changed through a copy",
         "'{0}' is not a copy in the game's Lua: changing it changes the element of the array or collection; make a new struct, or write the copy back",
-        "CSharp.lua does not copy a struct read from an array, a List or a Dictionary element (var c = arr[0]; c.X = 6; changes arr[0]). A copy from a local, a field, a property or a parameter is right.");
+        "CSharp.lua does not copy a struct read from an array, a List or a Dictionary element, so changing the copy changes the element: var c = arr[0]; then c.X = 6, c.Inner.X = 6, c.Move() (a method of the struct that sets a field) or Bump(ref c). A copy from a local, a field, a property or a parameter is right, and so is a copy stored back into the same element after its changes (arr[0] = c) with no other use of that element in between.");
 
     public static readonly DiagnosticDescriptor TupleForm = Syntax(
         "MW0022",

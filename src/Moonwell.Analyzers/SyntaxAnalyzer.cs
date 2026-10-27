@@ -169,7 +169,8 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
 
     private static void CheckCopy(SyntaxNodeAnalysisContext context, ILocalSymbol local, ElementAccessExpressionSyntax access, SyntaxNode scopeStart)
     {
-        var type = context.SemanticModel.GetTypeInfo(access, context.CancellationToken).Type;
+        var model = context.SemanticModel;
+        var type = model.GetTypeInfo(access, context.CancellationToken).Type;
         if (type is not INamedTypeSymbol { TypeKind: TypeKind.Struct, SpecialType: SpecialType.None, IsReadOnly: false, OriginalDefinition.SpecialType: not SpecialType.System_Nullable_T })
         {
             return;
@@ -181,24 +182,172 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+        SyntaxNode? lastChange = null;
         foreach (var node in scope.DescendantNodes())
         {
-            var target = node switch
+            if (node.SpanStart >= scopeStart.Span.End && Changes(context.Compilation, model, node, local))
+            {
+                lastChange = node;
+            }
+        }
+
+        if (lastChange != null && !WrittenBack(model, scope, access, local, scopeStart, lastChange))
+        {
+            context.ReportDiagnostic(Diagnostic.Create(Rules.StructCopy, access.GetLocation(), local.Name));
+        }
+    }
+
+    /// <summary>
+    /// Whether a node changes a struct local in place: an assignment, ++ or -- to a field of it (c.X, c.Inner.X), a
+    /// call of a method of the struct that changes it (c.Move()), or passing it or a field of it by ref.
+    /// </summary>
+    private static bool Changes(Compilation compilation, SemanticModel model, SyntaxNode node, ILocalSymbol local)
+    {
+        switch (node)
+        {
+            case AssignmentExpressionSyntax assignment:
+                return RootedAt(model, assignment.Left, local);
+            case PrefixUnaryExpressionSyntax prefix when prefix.IsKind(SyntaxKind.PreIncrementExpression) || prefix.IsKind(SyntaxKind.PreDecrementExpression):
+                return RootedAt(model, prefix.Operand, local);
+            case PostfixUnaryExpressionSyntax postfix when postfix.IsKind(SyntaxKind.PostIncrementExpression) || postfix.IsKind(SyntaxKind.PostDecrementExpression):
+                return RootedAt(model, postfix.Operand, local);
+            case InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax member } invocation:
+                return (Is(model, member.Expression, local) || RootedAt(model, member.Expression, local))
+                    && model.GetSymbolInfo(invocation).Symbol is IMethodSymbol method && Mutates(compilation, method, new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default));
+            case ArgumentSyntax argument when argument.RefKindKeyword.IsKind(SyntaxKind.RefKeyword):
+                return Is(model, argument.Expression, local) || RootedAt(model, argument.Expression, local);
+            default:
+                return false;
+        }
+    }
+
+    private static bool Is(SemanticModel model, ExpressionSyntax expression, ILocalSymbol local) =>
+        expression is IdentifierNameSyntax && SymbolEqualityComparer.Default.Equals(model.GetSymbolInfo(expression).Symbol, local);
+
+    // A field of a struct local reached through struct fields only (c.X, c.Inner.X), which is part of the local's own value.
+    private static bool RootedAt(SemanticModel model, ExpressionSyntax target, ILocalSymbol local)
+    {
+        for (var at = target; at is MemberAccessExpressionSyntax member; at = member.Expression)
+        {
+            if (Is(model, member.Expression, local))
+            {
+                return true;
+            }
+
+            if (model.GetTypeInfo(member.Expression).Type is not { IsValueType: true })
+            {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>Whether an instance method of a struct of the map changes the struct: it is not readonly, and sets a field of it or calls a method of it that does.</summary>
+    private static bool Mutates(Compilation compilation, IMethodSymbol method, HashSet<IMethodSymbol> seen)
+    {
+        method = method.OriginalDefinition;
+        if (method.IsStatic || method.IsReadOnly || method.ContainingType is not { TypeKind: TypeKind.Struct } type || !seen.Add(method))
+        {
+            return false;
+        }
+
+        foreach (var reference in method.DeclaringSyntaxReferences)
+        {
+            var syntax = reference.GetSyntax();
+            var model = Models.Of(compilation, syntax.SyntaxTree);
+            foreach (var node in syntax.DescendantNodes())
+            {
+                var target = node switch
+                {
+                    AssignmentExpressionSyntax assignment => assignment.Left,
+                    PrefixUnaryExpressionSyntax prefix when prefix.IsKind(SyntaxKind.PreIncrementExpression) || prefix.IsKind(SyntaxKind.PreDecrementExpression) => prefix.Operand,
+                    PostfixUnaryExpressionSyntax postfix when postfix.IsKind(SyntaxKind.PostIncrementExpression) || postfix.IsKind(SyntaxKind.PostDecrementExpression) => postfix.Operand,
+                    ArgumentSyntax argument when argument.RefKindKeyword.IsKind(SyntaxKind.RefKeyword) => argument.Expression,
+                    _ => null,
+                };
+                if (target != null && OwnState(model, target, type))
+                {
+                    return true;
+                }
+
+                if (node is InvocationExpressionSyntax { Expression: IdentifierNameSyntax or MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax } } call
+                    && model.GetSymbolInfo(call).Symbol is IMethodSymbol callee
+                    && SymbolEqualityComparer.Default.Equals(callee.ContainingType?.OriginalDefinition, type.OriginalDefinition)
+                    && Mutates(compilation, callee, seen))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    // Whether an expression in a struct's method is the struct's own state: this, or a field or property of it.
+    private static bool OwnState(SemanticModel model, ExpressionSyntax target, INamedTypeSymbol type)
+    {
+        var at = target;
+        while (at is MemberAccessExpressionSyntax member && member.Expression is not ThisExpressionSyntax)
+        {
+            at = member.Expression;
+        }
+
+        if (at is ThisExpressionSyntax or MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax })
+        {
+            return true;
+        }
+
+        return at is IdentifierNameSyntax && model.GetSymbolInfo(at).Symbol is { IsStatic: false, Kind: SymbolKind.Field or SymbolKind.Property } own
+            && SymbolEqualityComparer.Default.Equals(own.ContainingType?.OriginalDefinition, type.OriginalDefinition);
+    }
+
+    /// <summary>
+    /// Whether the copy is stored back into the same element after its last change (arr[0] = c), with no other use of
+    /// that element and no change to what its index names in between: then .NET and the game's Lua end the same.
+    /// </summary>
+    private static bool WrittenBack(SemanticModel model, BlockSyntax scope, ElementAccessExpressionSyntax access, ILocalSymbol local, SyntaxNode scopeStart, SyntaxNode lastChange)
+    {
+        var text = Tokens(access);
+        var back = scope.DescendantNodes().OfType<AssignmentExpressionSyntax>().FirstOrDefault(a =>
+            a.SpanStart > lastChange.Span.End && a.IsKind(SyntaxKind.SimpleAssignmentExpression)
+            && a.Left is ElementAccessExpressionSyntax left && Tokens(left) == text && Is(model, a.Right, local));
+        if (back == null)
+        {
+            return false;
+        }
+
+        var named = new HashSet<ISymbol>(access.DescendantNodesAndSelf().OfType<IdentifierNameSyntax>()
+            .Select(n => model.GetSymbolInfo(n).Symbol).Where(symbol => symbol is ILocalSymbol or IParameterSymbol or IFieldSymbol)!, SymbolEqualityComparer.Default);
+        foreach (var node in scope.DescendantNodes())
+        {
+            if (node.SpanStart < scopeStart.Span.End || node.SpanStart >= back.SpanStart)
+            {
+                continue;
+            }
+
+            if (node is ElementAccessExpressionSyntax other && Tokens(other) == text)
+            {
+                return false;
+            }
+
+            var changed = node switch
             {
                 AssignmentExpressionSyntax assignment => assignment.Left,
-                PrefixUnaryExpressionSyntax prefix when prefix.IsKind(SyntaxKind.PreIncrementExpression) || prefix.IsKind(SyntaxKind.PreDecrementExpression) => prefix.Operand,
+                PrefixUnaryExpressionSyntax prefix => prefix.Operand,
                 PostfixUnaryExpressionSyntax postfix => postfix.Operand,
                 _ => null,
             };
-
-            if (target is MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax receiver }
-                && SymbolEqualityComparer.Default.Equals(context.SemanticModel.GetSymbolInfo(receiver, context.CancellationToken).Symbol, local))
+            if (changed is IdentifierNameSyntax && model.GetSymbolInfo(changed).Symbol is { } symbol && named.Contains(symbol))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rules.StructCopy, access.GetLocation(), local.Name));
-                return;
+                return false;
             }
         }
+
+        return true;
     }
+
+    private static string Tokens(SyntaxNode node) => string.Concat(node.DescendantTokens().Select(token => token.Text));
 
     // ---- MW0022 ----
 
@@ -795,4 +944,10 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(Diagnostic.Create(Rules.UsingOrder, declaration.GetLocation()));
         }
     }
+}
+
+/// <summary>A semantic model for code in another file than the one an analyzer action was given, such as a method it follows.</summary>
+internal static class Models
+{
+    internal static SemanticModel Of(Compilation compilation, SyntaxTree tree) => compilation.GetSemanticModel(tree);
 }

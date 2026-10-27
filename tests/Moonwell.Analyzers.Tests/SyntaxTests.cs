@@ -256,4 +256,90 @@ public class SyntaxTests
             "Split(string) runs out of memory in the game's Lua; split on a char",
             MapCode.Message("var n = \"a--b\".Split(\"--\").Length;").Replace("'\"a--b\".Split(\"--\")' ", string.Empty));
     }
+
+    private const string Structs = """
+            struct In { public int X; }
+            struct Pt2
+            {
+                public int X;
+                public In Inner;
+                public void Move() { X++; }
+                public void Shift() { Move(); }
+                public int Read() => X;
+                public readonly int Twice() => X * 2;
+            }
+            class Holder { public int X; }
+            struct WithRef { public Holder H; }
+            static void Bump(ref Pt2 p) { p.X++; }
+    """;
+
+    [Fact]
+    public void a_struct_element_changed_through_a_method_a_nested_field_or_ref_is_mw0020()
+    {
+        var found = MapCode.Check("""
+            var arr = new Pt2[2];
+            var f = arr[1];
+            f.Move();
+            var g = arr[0];
+            g.Inner.X = 4;
+            var h = arr[0];
+            Bump(ref h);
+            var list = new List<Pt2> { new Pt2() };
+            var k = list[0];
+            k.Inner.X++;
+            var s = arr[1];
+            s.Shift();
+            """, Structs);
+
+        Assert.Equal(new[] { "MW0020: arr[1]", "MW0020: arr[0]", "MW0020: arr[0]", "MW0020: list[0]", "MW0020: arr[1]" }, found);
+    }
+
+    [Fact]
+    public void reading_a_struct_element_copy_or_changing_what_it_points_at_is_accepted()
+    {
+        Assert.Empty(MapCode.Check("""
+            var arr = new Pt2[2];
+            var a = arr[0];
+            var n = a.Read() + a.Twice() + a.X + a.Inner.X;
+            var refs = new WithRef[1];
+            var r = refs[0];
+            r.H.X = 3;
+            """, Structs));
+    }
+
+    [Fact]
+    public void a_struct_element_copy_written_back_is_accepted()
+    {
+        Assert.Empty(MapCode.Check("""
+            var arr = new Pt2[2];
+            var c = arr[0];
+            c.X = 6;
+            c.Move();
+            arr[0] = c;
+            var list = new List<Pt2> { new Pt2() };
+            var i = 0;
+            var d = list[i];
+            d.Inner.X = 1;
+            list[i] = d;
+            """, Structs));
+    }
+
+    [Fact]
+    public void a_struct_element_read_or_moved_before_the_write_back_is_mw0020()
+    {
+        var found = MapCode.Check("""
+            var arr = new Pt2[2];
+            var c = arr[0];
+            c.X = 6;
+            var seen = arr[0].X;
+            arr[0] = c;
+            var i = 0;
+            var d = arr[i];
+            d.X = 1;
+            i++;
+            arr[i] = d;
+            """, Structs);
+
+        Assert.Equal(new[] { "MW0020: arr[0]", "MW0020: arr[i]" }, found);
+    }
 }
