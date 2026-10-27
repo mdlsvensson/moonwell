@@ -10,6 +10,13 @@ namespace Moonwell.Engine
     /// </summary>
     internal static class Walls
     {
+        /// <summary>
+        /// How near a wall a pushed unit's line counts as at it, as Raycast's wall skin: the wall reaches this past its ends,
+        /// so a line through the corner where two walls meet crosses one of them whatever a float's rounding; and a unit
+        /// within this of a wall is not held by it, whichever way it is pushed, so one standing on a wall can be pushed off.
+        /// </summary>
+        private const float Skin = 0.01f;
+
         /// <summary>The walls, in the order they were made; an ended one stays until the list is packed. Made on first use after an install. It holds no null, so the checks read it raw.</summary>
         private static List<Wall>? walls;
 
@@ -75,8 +82,9 @@ namespace Moonwell.Engine
 
         /// <summary>
         /// Whether a wall stands across the line a pushed unit looks along, from its place to the point ahead of it: the two
-        /// segments cross (touching counts), and the wall is endless or taller than the unit is lifted (a flyer: its fly
-        /// height). Worked out in floats, so nothing is made.
+        /// segments cross (touching counts, and the wall reaches the Skin past its ends), and the wall is endless or taller
+        /// than the unit is lifted (a flyer: its fly height). A wall the unit stands on, within the Skin, does not hold it.
+        /// Worked out in floats, so nothing is made.
         /// </summary>
         internal static bool Blocks(Pushed push, float fromX, float fromY, float toX, float toY)
         {
@@ -88,10 +96,10 @@ namespace Moonwell.Engine
 
             var rx = toX - fromX;
             var ry = toY - fromY;
-            var lowX = fromX < toX ? fromX : toX;
-            var highX = fromX < toX ? toX : fromX;
-            var lowY = fromY < toY ? fromY : toY;
-            var highY = fromY < toY ? toY : fromY;
+            var lowX = (fromX < toX ? fromX : toX) - Skin;
+            var highX = (fromX < toX ? toX : fromX) + Skin;
+            var lowY = (fromY < toY ? fromY : toY) - Skin;
+            var highY = (fromY < toY ? toY : fromY) + Skin;
             var blocked = false;
             var lift = -1.0f;
             var count = list.Count;
@@ -117,6 +125,15 @@ namespace Moonwell.Engine
 
                 var sx = x2 - x1;
                 var sy = y2 - y1;
+                var qx = x1 - fromX;
+                var qy = y1 - fromY;
+                var lengthSquared = sx * sx + sy * sy;
+                if (On(qx, qy, sx, sy, lengthSquared))
+                {
+                    // It stands on the wall: the wall does not hold it, whichever way it goes.
+                    continue;
+                }
+
                 var across = rx * sy - ry * sx;
                 if (across == 0.0f)
                 {
@@ -124,13 +141,21 @@ namespace Moonwell.Engine
                     continue;
                 }
 
-                var qx = x1 - fromX;
-                var qy = y1 - fromY;
                 var t = (qx * sy - qy * sx) / across;
                 var u = (qx * ry - qy * rx) / across;
-                if (t < 0.0f || t > 1.0f || u < 0.0f || u > 1.0f)
+                if (t < 0.0f || t > 1.0f)
                 {
                     continue;
+                }
+
+                if (u < 0.0f || u > 1.0f)
+                {
+                    // Past an end: it still meets the wall within the Skin of it, as through a corner.
+                    var past = u < 0.0f ? -u : u - 1.0f;
+                    if (past * past * lengthSquared > Skin * Skin)
+                    {
+                        continue;
+                    }
                 }
 
                 if (wall.height > 0.0f)
@@ -152,6 +177,28 @@ namespace Moonwell.Engine
 
             Done();
             return blocked;
+        }
+
+        /// <summary>Whether a point is within the Skin of a wall that starts (qx, qy) from it and runs (sx, sy), of that length squared.</summary>
+        private static bool On(float qx, float qy, float sx, float sy, float lengthSquared)
+        {
+            // The point is -q from the wall's start: along is how far along the wall its nearest point is, times the length squared.
+            var along = -(qx * sx + qy * sy);
+            var nearX = qx;
+            var nearY = qy;
+            if (along >= lengthSquared)
+            {
+                nearX = qx + sx;
+                nearY = qy + sy;
+            }
+            else if (along > 0.0f)
+            {
+                var share = along / lengthSquared;
+                nearX = qx + sx * share;
+                nearY = qy + sy * share;
+            }
+
+            return nearX * nearX + nearY * nearY <= Skin * Skin;
         }
 
         /// <summary>Takes the ended walls out of the list, keeping the order of the rest.</summary>

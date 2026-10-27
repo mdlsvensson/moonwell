@@ -300,5 +300,47 @@ namespace Moonwell.Testing
             Expect.True(unit.X + 16.0f <= 650.0f, "short of the wall, its collision size off; at " + unit.X);
             Expect.True(unit.X > 580.0f, "after moving some way; at " + unit.X);
         }
+
+        /// <summary>
+        /// A pushed unit's line ahead through the corner where two walls meet is stopped, whatever a float's rounding, as each
+        /// wall reaches 0.01 past its ends (as Raycast's walls): this line from (1094, 568), through the corner (976, 607)
+        /// into the walls' angle, missed both walls in floats by their last bit. A line straight up 0.005 beside the corner,
+        /// outside the walls' angle, is stopped; one 0.05 beside it is not.
+        /// </summary>
+        public static void PushCorner(FakeWorld world)
+        {
+            Fresh();
+            Wall.Create(711.0f, 421.0f, 976.0f, 607.0f);
+            Wall.Create(976.0f, 607.0f, 748.0f, 933.0f);
+            var handle = world.NewUnit(ObjectTypes.FourCC(PusheeId));
+            world.MoveUnit(handle, 1094.0f, 568.0f);
+            var push = new Engine.Pushed(Unit.Of(handle)!, false, 16.0f);
+            Expect.True(Engine.Walls.Blocks(push, 1094.0f, 568.0f, 893.4f, 634.3f), "through the corner: stopped");
+            Expect.True(Engine.Walls.Blocks(push, 976.005f, 500.0f, 976.005f, 700.0f), "0.005 beside the corner: stopped");
+            Expect.True(!Engine.Walls.Blocks(push, 976.05f, 500.0f, 976.05f, 700.0f), "0.05 beside it: not stopped");
+        }
+
+        /// <summary>
+        /// A unit standing on a wall (a wall made through its place) is not held by it, whichever way it is pushed, as a
+        /// raycast from the surface it leaves is no hit: pushed at 600 north or south, it moves off the wall with no slam. It
+        /// was stopped at once both ways, the wall crossing its line at its start.
+        /// </summary>
+        public static void PushOnWall(FakeWorld world)
+        {
+            Fresh();
+            Wall.Create(300.0f, 512.0f, 700.0f, 512.0f);
+            var north = world.NewUnit(ObjectTypes.FourCC(PusheeId));
+            world.MoveUnit(north, 512.0f, 512.0f);
+            var northUnit = (Pushee)Unit.Of(north)!;
+            northUnit.Push(0.0f, 600.0f);
+            var south = world.NewUnit(ObjectTypes.FourCC(PusheeId));
+            world.MoveUnit(south, 600.0f, 512.0f);
+            var southUnit = (Pushee)Unit.Of(south)!;
+            southUnit.Push(0.0f, -600.0f);
+            Steps(world, 16);
+            Expect.Equal(0, northUnit.Slams.Count + southUnit.Slams.Count, "no slam");
+            Expect.True(northUnit.Y > 600.0f, "pushed north, it moved off the wall; at " + northUnit.Y);
+            Expect.True(southUnit.Y < 424.0f, "pushed south, so did the other; at " + southUnit.Y);
+        }
     }
 }
