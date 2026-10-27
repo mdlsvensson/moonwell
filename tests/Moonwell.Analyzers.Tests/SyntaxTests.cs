@@ -80,6 +80,8 @@ public class SyntaxTests
     [InlineData("MW0030", "var q = new Queue<int>(); q.TryPeek(out var x);", "TryPeek")]
     [InlineData("MW0030", "var s = new Stack<int>(); s.TryPop(out var x);", "TryPop")]
     [InlineData("MW0030", "var h = new HashSet<int>(); var b = h.SetEquals(new[] { 1 });", "SetEquals")]
+    [InlineData("MW0030", "ISet<int> h = new HashSet<int>(); var b = h.SetEquals(new[] { 1 });", "SetEquals")]
+    [InlineData("MW0030", "IReadOnlySet<int> h = new HashSet<int>(); var b = h.SetEquals(new[] { 1 });", "SetEquals")]
     [InlineData("MW0030", "var c = StringComparer.Ordinal;", "StringComparer")]
     [InlineData("MW0030", "var g = Guid.NewGuid();", "Guid")]
     [InlineData("MW0030", "var n = Environment.NewLine;", "NewLine")]

@@ -728,6 +728,8 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
         ["System.UInt32.RotateLeft"] = Missing,
         ["System.UInt32.RotateRight"] = Missing,
         ["System.Collections.Generic.HashSet`1.SetEquals"] = "says False for equal sets in the game's Lua; compare Count and Contains",
+        ["System.Collections.Generic.ISet`1.SetEquals"] = "says False for equal sets in the game's Lua; compare Count and Contains",
+        ["System.Collections.Generic.IReadOnlySet`1.SetEquals"] = "says False for equal sets in the game's Lua; compare Count and Contains",
         ["System.Math.DivRem"] = "gives its quotient as a float (3.0) in the game's Lua; use / and %",
         ["System.Random.Shared"] = Missing + "; use Natives.GetRandomInt",
     }.ToImmutableDictionary();
