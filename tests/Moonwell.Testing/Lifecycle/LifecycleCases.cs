@@ -88,5 +88,27 @@ namespace Moonwell.Testing
             Expect.True(creep.HasEnded, "the creep has ended with its corpse");
             Expect.Equal("1 90", creep.Respawned + " " + creep.Lingered, "the respawn timer's runs, and the runs of the timer the creep owns");
         }
+
+        /// <summary>A 5 s chill applied over a 2 s one, 1 s in, refreshes it: the buff there takes the new duration from the refresh, and keeps its own strength and what it counted (decision 66). A refresh with no duration lasts until the buff is removed.</summary>
+        public static void RefreshTakesNewDuration(FakeWorld world)
+        {
+            var target = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var first = target.Apply(new Chilled(2.0f, 0.3f));
+            world.Advance(1.0f);
+            var refreshed = target.Apply(new Chilled(5.0f, 0.6f));
+            Expect.Same(first, refreshed, "the buff the refresh gives");
+            world.Advance(2.5f);
+            Expect.True(!first.HasEnded, "the buff at 3.5 s, refreshed at 1 s for 5 s, has not ended");
+            Expect.Near(5.0f, first.Duration, "the buff's duration");
+            Expect.Near(0.3f, first.Strength, "the buff's strength");
+            Expect.Equal(2, first.Applied, "the applies the buff counted");
+            world.Advance(2.6f);
+            Expect.True(first.HasEnded, "the buff at 6.1 s has ended");
+
+            var lasting = target.Apply(new Chilled(2.0f, 0.3f));
+            target.Apply(new Chilled(0.0f, 0.6f));
+            world.Advance(10.0f);
+            Expect.True(!lasting.HasEnded, "a buff refreshed with no duration lasts until it is removed");
+        }
     }
 }

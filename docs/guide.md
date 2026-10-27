@@ -193,7 +193,9 @@ public sealed class KillCounter : UnitComponent
 - An event runs the type's reaction first, then its components' in the order added, then the game's and the
   players'. A reaction that fails is reported, and the others still run.
 - A buff is a class that inherits `Buff`, or a standard buff to show its icon. `Duration` and `Tick` set its time,
-  `OnApply`, `OnTick` and `OnExpire` are its reactions, and `unit.Apply(new Burn())` puts it on a unit.
+  `OnApply`, `OnTick` and `OnExpire` are its reactions, and `unit.Apply(new Burn())` puts it on a unit. A second
+  apply of its class refreshes the one there, unless its `Stacking` says otherwise: that one lasts the new apply's
+  `Duration` from then on, and keeps its other values and what it has counted.
 - `Timer.After(seconds, action)` and `Timer.Every(seconds, action)` run code later. A timer, buff or component
   belongs to whatever made it, and ends with it.
 - What an ability's `OnCast` makes belongs to the ability, which lasts as long as the caster is in the game, so a

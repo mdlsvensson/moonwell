@@ -881,7 +881,7 @@ namespace Moonwell
         public T Add<T>(T component)
             where T : UnitComponent => AddComponent(component);
 
-        /// <summary>Applies a buff to the unit and returns the buff now on it: a buff of its class already there is refreshed, as its stacking says, and the given buff is dropped; otherwise the given buff is added and started.</summary>
+        /// <summary>Applies a buff to the unit and returns the buff now on it: a buff of its class already there is refreshed, as its stacking says (it takes the given buff's duration and the source, and keeps its other values and what it has counted), and the given buff is dropped; otherwise the given buff is added and started.</summary>
         public T Apply<T>(T buff, Unit? source = null)
             where T : Buff
         {
@@ -889,8 +889,7 @@ namespace Moonwell
             var existing = StackedWith(buff, source);
             if (existing != null)
             {
-                existing.Source = source;
-                existing.Reapply();
+                existing.Refresh(buff, source);
                 return (T)existing;
             }
 

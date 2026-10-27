@@ -8,7 +8,7 @@ namespace Moonwell
         /// <summary>The timer that ends the buff; a refresh ends it and starts a new one. Null when the buff has no expiry.</summary>
         internal Timer? expiry;
 
-        /// <summary>The seconds the buff lasts; 0 until it is removed.</summary>
+        /// <summary>The seconds the buff lasts; 0 until it is removed. A refresh gives the buff there the duration of the new apply, from the refresh on.</summary>
         [LocalSafe]
         public float Duration { get; protected set; } = 0.0f;
 
@@ -92,12 +92,19 @@ namespace Moonwell
             CallApply();
         }
 
-        /// <summary>Gives a buff already on its unit a new expiry, and runs OnApply again.</summary>
-        internal void Reapply()
+        /// <summary>Refreshes a buff already on its unit with a new apply of its class (decision 66): it takes the new buff's duration and the source, starts its expiry again for that duration (a duration of 0 lasts until it is removed), and runs OnApply again. Its other values, and what it has counted, stay its own; the new buff is dropped.</summary>
+        internal void Refresh(Buff from, Unit? source)
         {
+            Source = source;
+            Duration = from.Duration;
             if (Duration > 0.0f)
             {
                 StartExpiry();
+            }
+            else if (expiry != null)
+            {
+                expiry.End();
+                expiry = null;
             }
 
             CallApply();
