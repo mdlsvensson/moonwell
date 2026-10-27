@@ -292,7 +292,7 @@ namespace Moonwell.Testing
                 Within(Physics.GroundHeight(ball.X, ball.Y) + 16.0f, ball.Z, 1.0f, what + "on the ground, at step " + i);
             }
 
-            Expect.True(settled <= 8, what + "it met the wall, and the ground after a bounce off it, a few times at first; " + settled + " impacts");
+            Expect.True(settled <= (GameNumbers.HasNaN ? 3 : 8), what + "it met the wall, and the ground after a bounce off it, a few times at first; " + settled + " impacts");
             Expect.Equal(settled, ball.Impacts, what + "then none: it went on along the wall");
             Expect.True(still <= 1, what + "still at " + still + " steps");
             var along = (x - ball.X + y - ball.Y) * 0.70710678f;
