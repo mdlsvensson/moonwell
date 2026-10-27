@@ -367,6 +367,8 @@ if (Terrain.Raycast(from, to, out var hit)) { /* the missile meets the ground at
 - `IsWalkable`, `IsFlyable`, `IsBuildable` and `IsWater` are terrain only, as the game's own. After changing pathing with
   natives, call `Terrain.Refresh(area)`. `CanStand` also sees trees and buildings and needs walkable ground, but it
   places a hidden item, so it changes game state and is not for `Local.For`.
+- Pathing is read from the game a block of 16 by 16 cells of 32 at a time, the first time a cell in it is asked for
+  (1,024 reads, about 0.3 ms), and kept: all of the largest map is about 8 MB of Lua's memory.
 - On a bridge, `Height` reads the water or ground beneath, and `IsWalkable` and `CanStand` read false.
 - `Terrain.Raycast(from, to, out hit)` is for a missile against the ground; a ridge narrower than 32 can be stepped over.
   As with the maths raycasts, a missile moved to `hit.Point` and bounced or slid there goes on. Only the part of a ray
