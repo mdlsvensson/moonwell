@@ -25,7 +25,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs once for each unit Moonwell takes in, when it comes into the game: made by code, trained, summoned, or placed in World Editor. For the game's components, then the owner's player components.</summary>
+        /// <summary>Runs once for each unit Moonwell takes in as it comes into the game: made by code, trained, summoned, or placed in World Editor. A unit that came in while nothing wanted OnUnitCreated, and that Moonwell takes in later (when it is first hit, cast at or found), runs none. For the game's components, then the owner's player components.</summary>
         /// <param name="createdUnit">The unit that came into the game.</param>
         public virtual void OnUnitCreated(Unit createdUnit)
         {

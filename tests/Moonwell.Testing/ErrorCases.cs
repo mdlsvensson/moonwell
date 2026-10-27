@@ -65,7 +65,7 @@ namespace Moonwell.Testing
             Expect.Equal("Moonwell: Rage.OnDamaged failed 10 times: boom", world.Logged[1], "the second log line");
         }
 
-        /// <summary>Only a hundred distinct errors are remembered; a later one is logged every time it happens.</summary>
+        /// <summary>Only a hundred distinct errors are remembered; every error past them is counted together, under one count, and logged at its first time and each power of ten, so an error storm does not write the log file at every error.</summary>
         public static void ReportManyKeys(FakeWorld world)
         {
             for (var i = 0; i < 101; i++)
@@ -74,7 +74,14 @@ namespace Moonwell.Testing
             }
 
             Errors.Report("Rage.OnDamaged", new InvalidOperationException("message 100"));
-            Expect.Equal(102, world.Logged.Count, "log lines after 101 distinct errors and the 101st again");
+            Expect.Equal(101, world.Logged.Count, "log lines after 101 distinct errors and the 101st again");
+            for (var i = 0; i < 8; i++)
+            {
+                Errors.Report("Rage.OnDamaged", new InvalidOperationException("message " + (101 + i)));
+            }
+
+            Expect.Equal(102, world.Logged.Count, "log lines after the tenth error past the hundred");
+            Expect.Equal("Moonwell: Rage.OnDamaged failed: message 108", world.Logged[101], "the line of the tenth");
         }
 
         /// <summary>The name of an object is its class name, and two objects of one class share the class.</summary>

@@ -46,6 +46,10 @@ namespace Moonwell
         [LocalSafe]
         public int TypeId { get; internal set; }
 
+        /// <summary>Whether the unit is an illusion (Mirror Image, a Wand of Illusion), as the game read it when the unit was taken in. An illusion has its hero's type id but is taken in as a plain unit, not as the hero's class: it has none of the class's starting components and runs no OnCreated. Map-wide reactions (OnUnitCreated, OnUnitDied) still see it.</summary>
+        [LocalSafe]
+        public bool IsIllusion { get; internal set; }
+
         /// <summary>The default object of the unit's type, as Unreal's class default object: the values its class declares (a type no class of the map's declares, its values as World Editor made them, standard where World Editor left them), the same whatever this unit's are now and once it is gone. One per type, shared by its units, with no handle; it is gone, so its live actions do nothing.</summary>
         [LocalSafe]
         public Unit Default => ObjectTypes.DefaultOf(this, DeclaredTypeId);
@@ -808,7 +812,7 @@ namespace Moonwell
             return !IsGone && !item.IsGone && Runtime.World.GiveItem(Handle, item.Handle);
         }
 
-        /// <summary>Makes the unit drop an item from its inventory where it stands (UnitRemoveItem). The game counts it as a drop, so OnDropped and OnItemDropped run, inside this call and while the unit still has the item: the item's Carrier is the unit there, and null after the call. Does nothing for an item that lies on the ground, and once the unit or the item is gone. A unit that dies drops its items (a hero keeps them) with no drop reactions, and the items of a unit removed with RemoveUnit leave it inside that call, but the game fires their drop events after the call: Carrier is already null then, and the item's and the unit's drop reactions run for an object that is about to be swept (a unit that Remove() has already ended runs none). Seen for a hero, whose items are then removed with it; other units are assumed to do the same.</summary>
+        /// <summary>Makes the unit drop an item from its inventory where it stands (UnitRemoveItem). The game counts it as a drop, so OnDropped and OnItemDropped run, inside this call and while the unit still has the item: the item's Carrier is the unit there, and null after the call. Does nothing for an item that lies on the ground, and once the unit or the item is gone. A unit that dies drops its items (a hero keeps them) with no drop reactions, and the items of a unit removed with RemoveUnit leave it inside that call, but the game fires their drop events after the call, while the unit's type id still reads. For a unit Moonwell removed (Remove(), or its owner ending) no drop reaction runs, neither the item's nor the unit's, and its handle makes no second object; for one a native removed, which Moonwell has not noticed yet, the drop reactions run for an object that is about to be swept, with Carrier already null. Seen for a hero, whose items are then removed with it; other units are assumed to do the same.</summary>
         public void Drop(Item item)
         {
             if (!IsGone && !item.IsGone)
@@ -820,7 +824,7 @@ namespace Moonwell
         /// <summary>The starting components, which the runtime adds in order when the unit enters.</summary>
         internal List<UnitComponent> StartComponents => Components;
 
-        /// <summary>The object of a game unit: made when the unit is first seen; null for null or for a unit the game has removed.</summary>
+        /// <summary>The object of a game unit: made when the unit is first seen; null for null, for a unit the game has removed, and for one Moonwell has removed, whose handle still reads its type in that frame.</summary>
         public static Unit? Of(unit? handle)
         {
             if (handle == null)
@@ -828,17 +832,22 @@ namespace Moonwell
                 return null;
             }
 
-            return KnownUnits.TakeIn(handle, null);
+            return KnownUnits.TakeIn(handle, null, false);
         }
 
         /// <summary>The facing of a unit made without one, in degrees: the game's bj_UNIT_FACING.</summary>
         public const float DefaultFacing = 270.0f;
 
-        /// <summary>Creates a unit of a type for a player at a place and facing (270 degrees without one); owner, when given, owns it.</summary>
+        /// <summary>Creates a unit of a type for a player at a place and facing (270 degrees without one); owner, when given, owns it. Throws a MoonwellException naming the id when the game makes no unit of the type.</summary>
         public static Unit Create(int typeId, Player player, float x, float y, float facing = DefaultFacing, Owner? owner = null)
         {
             var handle = Runtime.World.SpawnUnit(player.Handle, typeId, x, y, facing);
-            var made = KnownUnits.TakeIn(handle, owner)!;
+            if (handle == null)
+            {
+                throw new MoonwellException("Unit.Create: the game made no unit of type " + Names.IdText(typeId));
+            }
+
+            var made = KnownUnits.TakeIn(handle, owner, true)!;
             if (owner != null && made.Owner == null)
             {
                 owner.Adopt(made);
@@ -881,7 +890,7 @@ namespace Moonwell
         public T Add<T>(T component)
             where T : UnitComponent => AddComponent(component);
 
-        /// <summary>Applies a buff to the unit and returns the buff now on it: a buff of its class already there is refreshed, as its stacking says, and the given buff is dropped; otherwise the given buff is added and started.</summary>
+        /// <summary>Applies a buff to the unit and returns the buff now on it: a buff of its class already there is refreshed, as its stacking says (it takes the given buff's duration and the source, and keeps its other values and what it has counted), and the given buff is dropped; otherwise the given buff is added and started. A buff that is on a unit already (one that applies itself again in OnExpire) or has ended is left as it is, and the error is reported, in every build.</summary>
         public T Apply<T>(T buff, Unit? source = null)
             where T : Buff
         {
@@ -889,9 +898,14 @@ namespace Moonwell
             var existing = StackedWith(buff, source);
             if (existing != null)
             {
-                existing.Source = source;
-                existing.Reapply();
+                existing.Refresh(buff, source);
                 return (T)existing;
+            }
+
+            // A buff on a unit already (one that applies itself again) or one that has ended is reported and left as it is.
+            if (Refuses(buff, "Apply"))
+            {
+                return buff;
             }
 
             buff.Source = source;
@@ -945,7 +959,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the unit leaves the game, before its components end; HasEnded is still false here.</summary>
+        /// <summary>Runs when the unit leaves the game, before its components end; HasEnded is still false here. It runs once for each OnCreated: one made for an owner that had already ended, which ends at once, runs neither.</summary>
         protected virtual void OnLeave()
         {
         }
@@ -978,7 +992,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the unit dies, before the unit's components see it; the killer is null when no unit killed it.</summary>
+        /// <summary>Runs when the unit dies, before the unit's components see it; the killer is null when no unit killed it. Death is not an end, and the corpse can go at any time (it decays, explodes or is raised), so what this makes belongs to the game: a respawn timer started here runs whatever happens to the corpse. An effect that should end with the corpse names the unit as its owner: Timer.Every(1f, Smoke, this).</summary>
         /// <param name="killerUnit">The unit whose damage killed it; null when no unit did: Kill() or Life set to 0 from code, timed life running out, or its own damage (seen 10-21).</param>
         public virtual void OnDeath(Unit? killerUnit)
         {
@@ -995,9 +1009,14 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Tells the interactions package, if there is one; runs OnLeave; the components then end, and the unit leaves the game.</summary>
+        /// <summary>Tells the interactions package, if there is one; runs OnLeave; the components then end, and the unit leaves the game. One that never came in, as one made for an owner that had ended, runs neither, as it ran no OnCreated.</summary>
         protected sealed override void OnEnd()
         {
+            if (!entered)
+            {
+                return;
+            }
+
             Hooks.CallEnding(this);
             var previous = Owner.current;
             Owner.current = this;

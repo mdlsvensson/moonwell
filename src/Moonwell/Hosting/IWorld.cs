@@ -98,6 +98,9 @@ namespace Moonwell.Hosting
         /// <summary>Whether a unit is a hero.</summary>
         bool IsHero(unit unit);
 
+        /// <summary>Whether a unit is an illusion, as Mirror Image and a Wand of Illusion make.</summary>
+        bool IsIllusion(unit unit);
+
         /// <summary>The player that owns a unit; null a while after the game has removed it.</summary>
         player OwnerOf(unit unit);
 
@@ -172,6 +175,9 @@ namespace Moonwell.Hosting
 
         /// <summary>Hides an ability on a unit.</summary>
         void HideAbility(unit unit, int abilityId);
+
+        /// <summary>Makes an ability code gave a unit stay through a morph, which otherwise takes it away.</summary>
+        void MakeAbilityPermanent(unit unit, int abilityId);
 
         /// <summary>Takes an ability from a unit.</summary>
         void RemoveAbility(unit unit, int abilityId);
@@ -251,11 +257,17 @@ namespace Moonwell.Hosting
         /// <summary>A hero's experience.</summary>
         int ExperienceOf(unit hero);
 
-        /// <summary>Sets a hero's experience; the game gives the levels that come with it, with the level-up effect when asked.</summary>
+        /// <summary>Sets a hero's experience; the game gives the levels that come with it, with the level-up effect when asked. It only raises: a lower value changes nothing.</summary>
         void SetExperience(unit hero, int experience, bool showEffect);
 
-        /// <summary>Gives a hero a level, with the level-up effect when asked.</summary>
+        /// <summary>Adds experience to a hero, or with a negative amount takes it away, which lowers the experience but not the level.</summary>
+        void AddExperience(unit hero, int experience, bool showEffect);
+
+        /// <summary>Gives a hero a level, with the level-up effect when asked, and the experience of that level. It only raises: a lower level changes nothing.</summary>
         void LevelHero(unit hero, int level, bool showEffect);
+
+        /// <summary>Takes a number of levels from a hero.</summary>
+        void StripLevels(unit hero, int levels);
 
         /// <summary>A hero's strength; with the bonus items and auras give when asked.</summary>
         int StrengthOf(unit hero, bool withBonus);

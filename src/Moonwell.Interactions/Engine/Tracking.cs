@@ -169,7 +169,7 @@ namespace Moonwell.Engine
             return order;
         }
 
-        /// <summary>Asks for a kind of thing to be tracked. The first ask for a kind fills it with the things there are: the live units, the items and destructables of the world, taken in if the runtime has not. Those made after come in through core's take-in hook. Gizmos are always tracked. The package installs itself on the game first if it is not installed, as an install after the ask would forget it.</summary>
+        /// <summary>Asks for a kind of thing to be tracked. The first ask for a kind fills it with the things there are: the units, items and destructables of the world, taken in if the runtime has not. Those made after come in through core's take-in hook; for units, core takes in every unit that enters from the first ask on, also those the game makes with no Moonwell code (trained, summoned, made by a native). Gizmos are always tracked. The package installs itself on the game first if it is not installed, as an install after the ask would forget it.</summary>
         public static void Need(int kind)
         {
             Interactions.EnsureInstalled();
@@ -182,6 +182,9 @@ namespace Moonwell.Engine
                     {
                         AddUnit(KnownUnits.Live[i]);
                     }
+
+                    // The units the runtime does not hold yet are taken in, and the take-in hook tracks each.
+                    KnownUnits.TakeInEveryUnit();
                 }
             }
             else if (kind == ItemKind)

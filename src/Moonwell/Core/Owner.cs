@@ -56,10 +56,15 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Takes a child under this owner; a child adopted by an ended owner ends at once.</summary>
+        /// <summary>Takes a child under this owner; a child adopted by an ended owner ends at once. A child that already has an owner, or has ended, is left as it is, and the error is reported, in every build: linked twice, it would break the owners' lists (decision 74).</summary>
         internal void Adopt(Owned child)
         {
-            Dev.Check(child.Owner == null && !child.HasEnded, "Owner.Adopt: the child already has an owner or has ended");
+            if (child.Owner != null || child.HasEnded)
+            {
+                Errors.Refuse(Names.NameOf(this) + ".Adopt", Names.NameOf(child) + " already has an owner or has ended");
+                return;
+            }
+
             child.Owner = this;
             if (HasEnded || childrenEnded)
             {

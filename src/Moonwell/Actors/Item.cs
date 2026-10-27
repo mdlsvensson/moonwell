@@ -272,10 +272,15 @@ namespace Moonwell
             return KnownItems.TakeIn(handle, null);
         }
 
-        /// <summary>Creates an item of a type at a place; owner, when given, owns it.</summary>
+        /// <summary>Creates an item of a type at a place; owner, when given, owns it. Throws a MoonwellException naming the id when the game makes no item of the type.</summary>
         public static Item Create(int typeId, float x, float y, Owner? owner = null)
         {
             var handle = Runtime.World.SpawnItem(typeId, x, y);
+            if (handle == null)
+            {
+                throw new MoonwellException("Item.Create: the game made no item of type " + Names.IdText(typeId));
+            }
+
             var made = KnownItems.TakeIn(handle, owner)!;
             if (owner != null && made.Owner == null)
             {
@@ -310,7 +315,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the item leaves the game, before its components end; HasEnded is still false here.</summary>
+        /// <summary>Runs when the item leaves the game, before its components end; HasEnded is still false here. It runs once for each OnCreated: one made for an owner that had already ended, which ends at once, runs neither.</summary>
         protected virtual void OnLeave()
         {
         }
@@ -333,9 +338,14 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Tells the interactions package, if there is one; runs OnLeave; the components then end, and the item leaves the game.</summary>
+        /// <summary>Tells the interactions package, if there is one; runs OnLeave; the components then end, and the item leaves the game. One that never came in, as one made for an owner that had ended, runs neither, as it ran no OnCreated.</summary>
         protected sealed override void OnEnd()
         {
+            if (!entered)
+            {
+                return;
+            }
+
             Hooks.CallEnding(this);
             var previous = Owner.current;
             Owner.current = this;

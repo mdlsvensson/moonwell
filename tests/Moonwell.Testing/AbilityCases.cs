@@ -46,7 +46,7 @@ namespace Moonwell.Testing
             Expect.Same(caster.AbilityOf(ObjectTypes.FourCC("A000")), caster.AbilityOf<TestBolt>(), "the ability of the class");
         }
 
-        /// <summary>A cast runs the ability's OnCast, then the caster's type and components, then the map's, then the caster's player's; Owner.Current in OnCast is the cast.</summary>
+        /// <summary>A cast runs the ability's OnCast, then the caster's type and components, then the map's, then the caster's player's; Owner.Current in OnCast is the ability.</summary>
         public static void Order(FakeWorld world)
         {
             Arena();
@@ -56,7 +56,7 @@ namespace Moonwell.Testing
             Inbound.SpellEffect(striker.Handle, ObjectTypes.FourCC("A000"), null, 0f, 0f);
             ExpectLog(new string[] { "bolt cast", "striker cast", "striker comp cast", "game cast", "p0 cast" }, "the log");
             Expect.True(bolt.Given != null, "the cast was given to OnCast");
-            Expect.Same(bolt.Given, bolt.Seen, "Owner.Current inside OnCast");
+            Expect.Same(bolt, bolt.Seen, "Owner.Current inside OnCast");
         }
 
         /// <summary>The cast has the level read when it begins, the target's object, and the given place.</summary>
@@ -76,20 +76,19 @@ namespace Moonwell.Testing
             Expect.Near(4f, cast.Y, "the y of the cast");
         }
 
-        /// <summary>A timer started in OnCast runs until the spell ends, then the cast's end stops it.</summary>
-        public static void OwnsWhatItStarts(FakeWorld world)
+        /// <summary>A timer started in OnCast belongs to the ability, so it runs on after the spell ends, as a delayed effect of an instant spell must; one given the cast as its owner stops when the spell ends (decision 63).</summary>
+        public static void AbilityOwnsWhatItStarts(FakeWorld world)
         {
             Arena();
             var striker = Unit.Of(world.NewUnit(ObjectTypes.FourCC("H001"), slot: 0))!;
             var bolt = striker.AbilityOf<TestBolt>();
             Inbound.SpellEffect(striker.Handle, ObjectTypes.FourCC("A000"), null, 0f, 0f);
             world.Advance(0.6f);
-            Expect.Equal(1, bolt.Ticks, "the ticks before the spell ends");
+            Expect.Equal("1 1", bolt.Ticks + " " + bolt.ChannelTicks, "the ticks of the ability's timer and the cast's before the spell ends");
             Inbound.SpellEnded(striker.Handle, ObjectTypes.FourCC("A000"));
             Expect.True(bolt.Given!.HasEnded, "the cast has ended");
-            var ticks = bolt.Ticks;
             world.Advance(2f);
-            Expect.Equal(ticks, bolt.Ticks, "the ticks after the spell ends");
+            Expect.Equal("5 1", bolt.Ticks + " " + bolt.ChannelTicks, "the ticks of the ability's timer and the cast's after the spell ends");
         }
 
         /// <summary>A second cast by the same caster ends the first one.</summary>

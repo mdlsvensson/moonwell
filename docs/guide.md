@@ -184,21 +184,32 @@ public sealed class KillCounter : UnitComponent
 
 - A type lists the components its instances start with in its constructor. `unit.Add(new KillCounter())` adds one in the
   game, and `unit.Remove<KillCounter>()` removes it (`End()` ends a component from inside). `HasEnded` is false inside
-  `OnRemoved`, `OnLeave` and `OnEnd`, and true once the removal or `End()` returns.
+  `OnRemoved`, `OnLeave` and `OnEnd`, and true once the removal or `End()` returns. A component object is on one
+  actor only: adding it to a second, applying a buff that is on a unit already, or removing a component from an actor
+  it is not on is reported and refused, in a release build too.
 - Reactions to the whole map (`OnGameStart`, `OnUnitCreated`, `OnUnitDied`, `OnUnitCast`, `OnLeave`) go on a game or
-  player component. `OnUnitCreated` runs once for each unit, when it comes into the game; a unit's own is `OnCreated`.
+  player component. `OnUnitCreated` runs once for each unit, when it comes into the game (one that came in before
+  anything wanted it runs none); a unit's own is `OnCreated`.
 - A reaction's parameters say the role: `OnPickedUp(Unit carrierUnit)`, `OnUnitDied(Unit dyingUnit, Unit? killerUnit)`,
   `OnKill(Unit killedUnit)`. The killer is null when no unit's damage killed: `Kill()` or `Life = 0` from code, timed
   life running out, or a unit's own damage.
 - An event runs the type's reaction first, then its components' in the order added, then the game's and the
   players'. A reaction that fails is reported, and the others still run.
 - A buff is a class that inherits `Buff`, or a standard buff to show its icon. `Duration` and `Tick` set its time,
-  `OnApply`, `OnTick` and `OnExpire` are its reactions, and `unit.Apply(new Burn())` puts it on a unit.
-- `Timer.After(seconds, action)` and `Timer.Every(seconds, action)` run code later. A timer, buff or component
-  belongs to whatever made it, and ends with it.
+  `OnApply`, `OnTick` and `OnExpire` are its reactions, and `unit.Apply(new Burn())` puts it on a unit. A second
+  apply of its class refreshes the one there, unless its `Stacking` says otherwise: that one lasts the new apply's
+  `Duration` from then on, and keeps its other values and what it has counted.
+- `Timer.After(seconds, action)` and `Timer.Every(seconds, action)` run code later. A timer belongs to whatever made
+  it, and ends with it. A component or buff belongs to the actor it is added to, whoever added it: it ends when it is
+  removed or that actor ends, so an aura that buffs others removes its buff in `OnPart` (Interactions, below).
 - `Timer.After(0, action)` inside a timer runs in the same instant, as the game's own 0 s timer does. More than 10000
   timer runs in one instant (a timer that keeps starting itself, say) are reported, and the rest wait 1/32 s.
   `Timer.Every` needs seconds above 0: 0 or less is reported, and that timer never runs.
+- What an ability's `OnCast` makes belongs to the ability, which lasts as long as the caster is in the game, so a
+  delayed effect runs after the spell has ended; work that should stop with a channel names the cast:
+  `Timer.Every(0.5f, Pulse, owner: cast)`. What a unit's own `OnDeath` makes belongs to the game, as death is not an
+  end and the corpse can go at any time, so a respawn timer runs; an effect that should end with the corpse names the
+  unit: `owner: this`. What a component's `OnDeath` makes belongs to the component, which ends when the corpse goes.
 - Game work starts in a reaction. Top-level code and static fields make nothing in the game.
 
 ## Units, heroes and items
@@ -216,6 +227,7 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 | `Facing` | read and set (the unit turns, so a read at once gives the old one); `FaceNow(degrees)` turns at once, a walking unit turns back |
 | `Level` | read; a hero's hero level; a unit's level is set only in its declared class's constructor |
 | `IsAlive`, `Kill()` | whether it lives; kills it, with `OnDeath` run |
+| `IsIllusion` | an illusion (Mirror Image, a Wand of Illusion) has its hero's type but is a plain unit, not the hero's class: no starting components, no `OnCreated`; map-wide reactions still see it |
 | `IsPaused`, `Scale`, `FlyHeight` | read and set; a paused unit takes no orders but still animates; `Scale` reads its type's scale until set; `FlyHeight` also lifts a ground unit |
 | `Name` | read inside `Local.For` only (each player's language), set anywhere outside it |
 | `Tint(red, green, blue, alpha)` | colours the model, each value clamped to 0-255 |
@@ -224,8 +236,8 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 
 | Hero (a unit the game makes as a hero) | |
 |---|---|
-| `Experience` | read and set; the levels that come with it are given |
-| `SetLevel(level)`, `Revive(x, y)` | `showEffect:` turns the effect off |
+| `Experience` | read and set; a higher value gives the levels that come with it, a lower one keeps the level |
+| `SetLevel(level)`, `Revive(x, y)` | `showEffect:` turns the effect off; a lower level takes levels away |
 | `Strength`, `Agility`, `Intelligence` | the base, read and set |
 | `StrengthWithBonus`, `AgilityWithBonus`, `IntelligenceWithBonus` | with items and auras, read |
 | `SkillPoints` | read and set |
@@ -241,9 +253,10 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 Moonwell listens for pick-ups and drops from the start, so an item a unit picks up is taken in; one a unit held before
 the map began has no `Carrier`. A unit that is not a hero drops its items when it dies, with no drop reactions; a hero
 keeps them. When a unit is removed from the game (`RemoveUnit`), its items leave it inside the call, but the game fires
-the drops after it: `Carrier` is already null then, and the drop reactions run for an object about to be swept. The
-items of a removed hero are removed with it, as seen; other units are assumed to do the same. A member's exact
-behaviour is in its comment.
+the drops after it. For a unit Moonwell removed (`Remove()`, or its owner ending) no drop reaction runs; for one a
+native removed, the drop reactions run for an object about to be swept, with `Carrier` already null. The items of a
+removed hero are removed with it, as seen; other units are assumed to do the same. A member's exact behaviour is in
+its comment.
 
 ## Damage
 
@@ -354,6 +367,13 @@ public sealed class FireAura : Interaction<Unit, Unit> // held by a unit, pairs 
     public override void OnTick(Pair pair) { Holder.Damage(pair.Other, 10f); }
 }
 
+public sealed class FrostAura : Interaction<Unit, Unit>
+{
+    public FrostAura() { Range = 600f; }
+    public override void OnMeet(Pair pair) { pair.Other.Apply(new Chilled()); }
+    public override void OnPart(Pair pair) { pair.Other.Remove<Chilled>(); } // the buff is the unit's, not the pair's
+}
+
 unit.Interact(new FireAura()); // made inside a buff, it ends with the buff
 var well = Gizmo.Create(new Well(), x, y, caster.Player); // a gizmo is a map's own object with a place
 var near = Find.InRange<Unit>(x, y, 500f);                // a new list; or Find.InRange(x, y, 500f, list)
@@ -362,7 +382,10 @@ var near = Find.InRange<Unit>(x, y, 500f);                // a new list; or Find
 - `Range` is centre to centre and flat. A pair is found at the next tick after they come within range, so a 1 s tick
   may start up to 1 s late (interactions started together take turns over its steps). Only a unit in the game (alive,
   not hidden, not loaded), a visible item on the ground, a live destructable and a gizmo have a place; `OnPart` runs
-  once, when a pair ends.
+  once, when a pair ends. A timer a pair's reactions make is the pair's and ends when it parts; a buff or component
+  they add is the unit's, so `OnPart` removes it, as `FrostAura` does.
+- From the first interaction or `Find` that asks for units, Moonwell takes in every unit in the game, and each one
+  that comes in after, also those the game makes with no code of the map (trained, summoned, made by a native).
 - `Find` has `InRange`, `InRect`, `InPolygon`, `AlongLine` and `Closest`. Each gives a new list, or fills a list the
   map keeps (which makes none; use it every tick); `Closest` gives the nearest one, or the nearest few into a list.
 - `Interactions.CellSize` (128), `CellCheck` (0.1), `Slack` (64) and `Step` (1/32) are set in the map's constructor.
