@@ -17,7 +17,8 @@ namespace Moonwell.Generator.Objects;
 /// </para>
 /// <para>
 /// A field with a value for each level is <c>Name = Levels(...)</c> when its levels from 1 have values with no gap,
-/// else one <c>Set("id", level, value)</c> for each level that has one. A list is <c>Name.Set&lt;...&gt;()</c> of up to
+/// else one <c>Set("id", level, value)</c> for each level that has one. A list (its entries trimmed, an empty one left
+/// out) is <c>Name.Set&lt;...&gt;()</c> of up to
 /// eight standard classes, then <c>Name.Add&lt;...&gt;()</c> for each further one; an id with no standard class of
 /// the list's kind is <c>Name.Add("id")</c> in its place. A reference is <c>Name.Set&lt;...&gt;()</c>, or
 /// <c>Name.Set("id")</c> for an id with no class. A list or reference with a value for each level has the one of level
@@ -160,9 +161,10 @@ public sealed class StandardConstructors
         return obj.Values.TryGetValue(field.Id, out var text) || obj.Values.TryGetValue(field.Id + ":1", out text) ? text : null;
     }
 
+    // The entries trimmed, an empty one left out: the Hydra's standard abilities are "Aspo, Aspt".
     private void AddList(List<string> lines, Field field, string text)
     {
-        var entries = text.Split(',');
+        var entries = text.Split(',').Select(entry => entry.Trim()).Where(entry => entry.Length > 0).ToArray();
         var first = entries.TakeWhile(entry => ClassOf(entry, field) != null).Take(MostInSet).Select(entry => ClassOf(entry, field)!).ToList();
         if (first.Count > 0)
         {
