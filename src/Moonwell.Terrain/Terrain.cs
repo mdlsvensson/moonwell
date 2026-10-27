@@ -98,9 +98,12 @@ namespace Moonwell
         /// <summary>
         /// The first place the segment from <paramref name="from"/> to <paramref name="to"/> meets the ground (the
         /// blended <c>Height</c>), with the ground's <c>Normal</c> there. Sampled every 32 along its length, so a ridge
-        /// narrower than that can be stepped over. A segment that starts at or under the ground hits at fraction 0 with
-        /// the normal straight up (so does one of zero length that is under it); one that stays above it, or leaves the
-        /// map over its edge (which reads flat), gives false and an empty hit, and makes nothing.
+        /// narrower than that can be stepped over. A map can move its missile to a hit's point and bounce or slide it
+        /// there: a segment that starts on the ground (within 0.02 of it) hits it only where it goes under by more than
+        /// 0.01 and deeper than it started, and the hit is put on the ground there; one that rises or runs along it does
+        /// not hit it. A segment that starts deeper under the ground hits at fraction 0 with the normal straight up (so
+        /// does one of zero length that is under it); one that stays above it, or leaves the map over its edge (which reads
+        /// flat), gives false and an empty hit, and makes nothing.
         /// </summary>
         [LocalSafe]
         public static bool Raycast(Vector3 from, Vector3 to, out TerrainHit hit)

@@ -341,7 +341,11 @@ target.PlaceAt(Vector2.Lerp(start, end, Ease.OutQuad(t)));
 - `unit.Position()` is a method. `PlaceAt` ignores pathing and keeps the unit's order, which a push wants; `MoveTo`
   goes through pathing and ends it.
 - `Raycast.Circle`, `Segment`, `Bounds` and `Polygon` give the first hit along a segment in an `out` value, with a
-  normal for `Bounce` and `Slide`.
+  normal for `Bounce` and `Slide`. The usual loop, `pos = hit.Point; vel = vel.Bounce(hit.Normal)`, goes on: a segment
+  that starts on a surface (within 0.02) hits it only when it goes in, and the hit is then put on the surface. One that
+  starts deeper inside hits at once, with the normal against its direction.
+- A wall (`Segment`) has no inside, so a point that slides along it, or meets it within 0.01 of where another wall
+  joins it, can end up on its far side. Make something solid from a `Polygon` or `Bounds`.
 
 ## Terrain
 
@@ -363,6 +367,7 @@ if (Terrain.Raycast(from, to, out var hit)) { /* the missile meets the ground at
   places a hidden item, so it changes game state and is not for `Local.For`.
 - On a bridge, `Height` reads the water or ground beneath, and `IsWalkable` and `CanStand` read false.
 - `Terrain.Raycast(from, to, out hit)` is for a missile against the ground; a ridge narrower than 32 can be stepped over.
+  As with the maths raycasts, a missile moved to `hit.Point` and bounced or slid there goes on.
 - A `Height` read costs about 9 microseconds in the game, so code that runs every tick on many objects should read it
   sparingly.
 

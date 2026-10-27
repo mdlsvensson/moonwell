@@ -6,8 +6,10 @@ namespace Moonwell.Engine
     /// A segment against the blended ground. The segment is sampled every 32 along its length in XY (and at its end);
     /// at the first sample at or under the ground the span back to the sample before is bisected five times, then the
     /// last span is crossed by a straight line between its two gaps, so a ray straight down (one sample, at its end)
-    /// still lands on the ground. A segment with a NaN or an infinite end misses at once (it would never reach its end).
-    /// All of it is worked out in floats: a miss makes nothing.
+    /// still lands on the ground. As Raycast's shapes, a segment that starts on the ground (within 0.02 of it) hits only
+    /// where it goes under by more than 0.01 and deeper than it started, and the hit is put on the ground there, so a
+    /// bounce or a roll from a hit's point goes on. A segment with a NaN or an infinite end misses at once (it would never
+    /// reach its end). All of it is worked out in floats: a miss makes nothing.
     /// </summary>
     internal static class GroundRay
     {
@@ -16,6 +18,12 @@ namespace Moonwell.Engine
 
         /// <summary>How many times the span of the first sample under the ground is halved.</summary>
         private const int Bisections = 5;
+
+        /// <summary>How far under the ground a segment that starts on it must go to hit it, as Raycast's skin: above the blend's and a float's rounding of a hit's point, and below anything the game shows.</summary>
+        private const float Skin = 0.01f;
+
+        /// <summary>How close to the ground a start counts as on it, as Raycast's surface: twice the skin, so a start that rounding has carried a little under the skin is still on the ground, and the next hit puts it back on it.</summary>
+        private const float Surface = 0.02f;
 
         /// <summary>The empty hit every miss gives, made on first use and shared (a TerrainHit never changes).</summary>
         private static TerrainHit[]? none;
@@ -33,11 +41,15 @@ namespace Moonwell.Engine
             }
 
             var startGap = fromZ - Terrain.Height(fromX, fromY);
-            if (startGap <= 0f)
+            if (startGap < -Surface)
             {
                 hit = new TerrainHit(new Vector3(fromX, fromY, fromZ), Vector3.UnitZ, 0f);
                 return true;
             }
+
+            // A segment that starts on the ground hits only where it goes under it by more than the skin and deeper than it
+            // started, until it has risen clear of it.
+            var floor = startGap > Surface ? 0f : (startGap < -Skin ? startGap : -Skin);
 
             var length = MathF.Sqrt(dx * dx + dy * dy);
             if (!Finite(length))
@@ -59,9 +71,9 @@ namespace Moonwell.Engine
                 }
 
                 var gap = Gap(fromX, fromY, fromZ, dx, dy, dz, t);
-                if (gap <= 0f)
+                if (gap <= floor)
                 {
-                    hit = HitBetween(fromX, fromY, fromZ, dx, dy, dz, before, gapBefore, t, gap);
+                    hit = HitBetween(fromX, fromY, fromZ, dx, dy, dz, before, gapBefore, t, gap, floor);
                     return true;
                 }
 
@@ -69,6 +81,11 @@ namespace Moonwell.Engine
                 {
                     hit = Miss();
                     return false;
+                }
+
+                if (gap > Skin)
+                {
+                    floor = 0f;
                 }
 
                 before = t;
@@ -82,14 +99,20 @@ namespace Moonwell.Engine
             return value - value == 0f;
         }
 
-        /// <summary>The hit in the span from a fraction above the ground to one at or under it.</summary>
-        private static TerrainHit HitBetween(float fromX, float fromY, float fromZ, float dx, float dy, float dz, float above, float gapAbove, float under, float gapUnder)
+        /// <summary>
+        /// The hit in the span from a fraction above the floor to one at or under it: where the segment reaches the floor,
+        /// the span halved five times, then crossed by a straight line. The floor is the ground for a segment that came from
+        /// above it. For one that started on the ground it is the skin under the ground (or the segment's start, if that is
+        /// deeper), and the hit is put on the ground there: a map that moves its missile to the hit's point keeps it on the
+        /// ground however a float rounds its steps, and a roll through a hollow goes on.
+        /// </summary>
+        private static TerrainHit HitBetween(float fromX, float fromY, float fromZ, float dx, float dy, float dz, float above, float gapAbove, float under, float gapUnder, float floor)
         {
             for (var i = 0; i < Bisections; i++)
             {
                 var middle = (above + under) / 2f;
                 var gap = Gap(fromX, fromY, fromZ, dx, dy, dz, middle);
-                if (gap > 0f)
+                if (gap > floor)
                 {
                     above = middle;
                     gapAbove = gap;
@@ -101,10 +124,11 @@ namespace Moonwell.Engine
                 }
             }
 
-            var fraction = above + (under - above) * gapAbove / (gapAbove - gapUnder);
+            var fraction = gapAbove > floor ? above + (under - above) * (gapAbove - floor) / (gapAbove - gapUnder) : above;
             var x = fromX + dx * fraction;
             var y = fromY + dy * fraction;
-            return new TerrainHit(new Vector3(x, y, fromZ + dz * fraction), Terrain.Normal(x, y), fraction);
+            var z = floor < 0f ? Terrain.Height(x, y) : fromZ + dz * fraction;
+            return new TerrainHit(new Vector3(x, y, z), Terrain.Normal(x, y), fraction);
         }
 
         /// <summary>How far the segment is above the ground at a fraction of its length.</summary>

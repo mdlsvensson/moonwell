@@ -108,7 +108,7 @@ namespace Moonwell
                 var ay = points[i].Y;
                 var bx = points[j].X;
                 var by = points[j].Y;
-                if (IsOnSegment(x, y, ax, ay, bx, by))
+                if (Near(x, y, ax, ay, bx, by, OnEdge))
                 {
                     return true;
                 }
@@ -123,21 +123,41 @@ namespace Moonwell
             return inside;
         }
 
-        /// <summary>Whether the point (x, y) lies on the segment from (ax, ay) to (bx, by), within OnEdge.</summary>
-        private static bool IsOnSegment(float x, float y, float ax, float ay, float bx, float by)
+        /// <summary>Whether a point is farther than a distance from every edge, given as floats so that no vector is made; the raycasts' test of a point deeper inside than the surface.</summary>
+        internal bool Clear(float x, float y, float distance)
+        {
+            var count = points.Length;
+            for (int i = 0, j = count - 1; i < count; j = i++)
+            {
+                if (Near(x, y, points[i].X, points[i].Y, points[j].X, points[j].Y, distance))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Whether the point (x, y) lies within a distance of the segment from (ax, ay) to (bx, by). Worked out from (ax, ay),
+        /// so a point far from (0, 0) keeps its small distance (a float's step there is up to 0.004).
+        /// </summary>
+        internal static bool Near(float x, float y, float ax, float ay, float bx, float by, float distance)
         {
             var abx = bx - ax;
             var aby = by - ay;
+            var px = x - ax;
+            var py = y - ay;
             var lengthSquared = abx * abx + aby * aby;
             if (lengthSquared == 0f)
             {
-                return Maths.DistanceSquared(x, y, ax, ay) <= OnEdge * OnEdge;
+                return px * px + py * py <= distance * distance;
             }
 
-            var t = Maths.Clamp01(((x - ax) * abx + (y - ay) * aby) / lengthSquared);
-            var nearestX = ax + abx * t;
-            var nearestY = ay + aby * t;
-            return Maths.DistanceSquared(x, y, nearestX, nearestY) <= OnEdge * OnEdge;
+            var t = Maths.Clamp01((px * abx + py * aby) / lengthSquared);
+            var ex = px - abx * t;
+            var ey = py - aby * t;
+            return ex * ex + ey * ey <= distance * distance;
         }
     }
 }

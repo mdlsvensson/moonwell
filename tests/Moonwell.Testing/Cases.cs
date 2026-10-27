@@ -17,6 +17,7 @@ namespace Moonwell.Testing
             AddMaths(list);
             AddInteractions(list);
             AddTerrain(list);
+            AddAuditMaths(list);
             AddAreas(list);
             AddInput(list);
             AddLifecycle(list);
@@ -339,6 +340,29 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "terrain.raycast.hit-values", Run = GroundRayCases.HitValues });
             list.Add(new Case { Name = "terrain.raycast.not-installed", Run = GroundRayCases.NotInstalled });
             list.Add(new Case { Name = "terrain.raycast.miss-makes-nothing", Run = MissCases.GroundMissMakesNothing });
+        }
+
+        /// <summary>Adds the cases for the full audit's fixes to the maths and terrain packages.</summary>
+        private static void AddAuditMaths(List<Case> list)
+        {
+            list.Add(new Case { Name = "maths.bounce.circle-exact", Run = BounceCases.CircleExact });
+            list.Add(new Case { Name = "maths.bounce.bounds-exact", Run = BounceCases.BoundsExact });
+            list.Add(new Case { Name = "maths.bounce.polygon-exact", Run = BounceCases.PolygonExact });
+            list.Add(new Case { Name = "maths.bounce.wall-exact", Run = BounceCases.WallExact });
+            list.Add(new Case { Name = "maths.bounce.circle-sweep", Run = BounceCases.CircleSweep });
+            list.Add(new Case { Name = "maths.bounce.bounds-sweep", Run = BounceCases.BoundsSweep });
+            list.Add(new Case { Name = "maths.bounce.polygon-sweep", Run = BounceCases.PolygonSweep });
+            list.Add(new Case { Name = "maths.bounce.wall-sweep", Run = BounceCases.WallSweep });
+            list.Add(new Case { Name = "maths.bounce.room", Run = BounceCases.Room });
+            list.Add(new Case { Name = "maths.bounce.notch", Run = BounceCases.Notch });
+            list.Add(new Case { Name = "maths.bounce.slide-bounds", Run = BounceCases.SlideBounds });
+            list.Add(new Case { Name = "maths.bounce.slide-polygon", Run = BounceCases.SlidePolygon });
+            list.Add(new Case { Name = "maths.bounce.into-from-surface", Run = BounceCases.IntoFromSurface });
+            list.Add(new Case { Name = "terrain.bounce.flat", Run = GroundBounceCases.BounceFlat });
+            list.Add(new Case { Name = "terrain.bounce.slope", Run = GroundBounceCases.BounceSlope });
+            list.Add(new Case { Name = "terrain.bounce.roll-flat", Run = GroundBounceCases.RollFlat });
+            list.Add(new Case { Name = "terrain.bounce.roll-slope", Run = GroundBounceCases.RollSlope });
+            list.Add(new Case { Name = "terrain.bounce.into-from-ground", Run = GroundBounceCases.IntoFromGround });
         }
 
         /// <summary>Adds the maths package's cases.</summary>
