@@ -1,10 +1,14 @@
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Moonwell
 {
-    /// <summary>A set that keeps its items in insertion order, so a loop gives the same order on every machine.</summary>
+    /// <summary>
+    /// A set that keeps its items in insertion order, so a loop gives the same order on every machine: <c>foreach (var item in set)</c>,
+    /// LINQ, or by index. A loop that adds or removes an item throws; to change the set as you go, loop over <see cref="Snapshot"/>.
+    /// </summary>
     [LocalSafe]
-    public sealed class OrderedSet<T> where T : notnull
+    public sealed class OrderedSet<T> : IEnumerable<T> where T : notnull
     {
         private readonly List<T> items = new List<T>();
         private readonly HashSet<T> lookup = new HashSet<T>();
@@ -68,6 +72,24 @@ namespace Moonwell
         public List<T> Snapshot()
         {
             return new List<T>(items);
+        }
+
+        /// <summary>The items in insertion order, for foreach; adding or removing an item during the loop throws an InvalidOperationException.</summary>
+        public List<T>.Enumerator GetEnumerator()
+        {
+            return items.GetEnumerator();
+        }
+
+        /// <summary>The items in insertion order, for LINQ and whatever takes an IEnumerable.</summary>
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
+        {
+            return items.GetEnumerator();
+        }
+
+        /// <summary>The items in insertion order.</summary>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return items.GetEnumerator();
         }
     }
 }

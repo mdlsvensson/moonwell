@@ -14,7 +14,7 @@ namespace Moonwell
         /// <summary>The bit mask of the reactions this class overrides, worked out when the component is added.</summary>
         internal int Mask;
 
-        /// <summary>The actor the component is on; null until it is added.</summary>
+        /// <summary>The actor the component is on. Before the component is added it is null, though its type does not say so: read it from OnAdded on, not in the constructor.</summary>
         [LocalSafe]
         public Actor Actor => actor!;
 
