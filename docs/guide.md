@@ -367,7 +367,9 @@ if (Terrain.Raycast(from, to, out var hit)) { /* the missile meets the ground at
   places a hidden item, so it changes game state and is not for `Local.For`.
 - On a bridge, `Height` reads the water or ground beneath, and `IsWalkable` and `CanStand` read false.
 - `Terrain.Raycast(from, to, out hit)` is for a missile against the ground; a ridge narrower than 32 can be stepped over.
-  As with the maths raycasts, a missile moved to `hit.Point` and bounced or slid there goes on.
+  As with the maths raycasts, a missile moved to `hit.Point` and bounced or slid there goes on. Only the part of a ray
+  over the map is cast: past the map's edge it meets nothing, and a long ray reads the ground at most about 2,700 times
+  (across the largest map, about 25 ms).
 - A `Height` read costs about 9 microseconds in the game, so code that runs every tick on many objects should read it
   sparingly.
 

@@ -361,6 +361,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "maths.raycast.corners-found", Run = CornerRayCases.Found });
             list.Add(new Case { Name = "maths.raycast.through-corners", Run = CornerRayCases.ThroughCorners });
             list.Add(new Case { Name = "maths.shapes.polygon-far", Run = FarPolygonCases.AreaAndCenter });
+            list.Add(new Case { Name = "terrain.raycast.past-the-edge", Run = GroundClipCases.PastTheEdge });
+            list.Add(new Case { Name = "terrain.raycast.long-ray-clipped", Run = GroundClipCases.LongRayClipped });
             list.Add(new Case { Name = "terrain.bounce.flat", Run = GroundBounceCases.BounceFlat });
             list.Add(new Case { Name = "terrain.bounce.slope", Run = GroundBounceCases.BounceSlope });
             list.Add(new Case { Name = "terrain.bounce.roll-flat", Run = GroundBounceCases.RollFlat });

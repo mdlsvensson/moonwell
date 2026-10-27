@@ -102,8 +102,10 @@ namespace Moonwell
         /// there: a segment that starts on the ground (within 0.02 of it) hits it only where it goes under by more than
         /// 0.01 and deeper than it started, and the hit is put on the ground there; one that rises or runs along it does
         /// not hit it. A segment that starts deeper under the ground hits at fraction 0 with the normal straight up (so
-        /// does one of zero length that is under it); one that stays above it, or leaves the map over its edge (which reads
-        /// flat), gives false and an empty hit, and makes nothing.
+        /// does one of zero length that is under it); one that stays above it gives false and an empty hit, and makes
+        /// nothing. Only the part of the segment over the map's grid (the whole map, its unplayable edge included) is cast,
+        /// from where it comes in over the edge: past the edge it meets nothing, so a long segment reads the ground at most
+        /// about 2,700 times, across the largest map (about 25 ms in the game).
         /// </summary>
         [LocalSafe]
         public static bool Raycast(Vector3 from, Vector3 to, out TerrainHit hit)
