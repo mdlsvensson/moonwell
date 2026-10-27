@@ -379,6 +379,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "deck.height", Run = DeckCases.Height });
             list.Add(new Case { Name = "deck.turned-scaled", Run = DeckCases.TurnedScaled });
             list.Add(new Case { Name = "deck.over-water", Run = DeckCases.OverWater });
+            list.Add(new Case { Name = "deck.water-edge", Run = DeckCases.WaterEdge });
             list.Add(new Case { Name = "deck.under", Run = DeckCases.Under });
             list.Add(new Case { Name = "deck.unit-on", Run = DeckCases.UnitOn });
             list.Add(new Case { Name = "deck.push-rail", Run = DeckCases.PushRail });

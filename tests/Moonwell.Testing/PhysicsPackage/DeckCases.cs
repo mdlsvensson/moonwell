@@ -224,6 +224,43 @@ namespace Moonwell.Testing
             Expect.True(Physics.GroundHeight(1536.0f, 1536.0f) == 170.0f, "the second bridge, on dry ground: 130 above Terrain.Height, 40; was " + Physics.GroundHeight(1536.0f, 1536.0f));
         }
 
+        /// <summary>
+        /// At the water's edge: the grid is water at -20 for the corners up to y 768 and dry ground at 40 from y 896, so the
+        /// tiles from 768 to 896 have wet corners below and dry ones above. A bridge the game reports at (512, 832), in such a
+        /// tile, stands on the ground beneath the build wrote (-60), as any corner of its tile is wet: 70 at its middle, not
+        /// 130 above the blend there (10). On a tile line the tile is the one above it: at y 768 its corners at 768 are wet,
+        /// at y 896 none of its corners is; so a bridge reported at (1536, 896) stands on Terrain.Height (40), not on the
+        /// build's 40.001.
+        /// </summary>
+        public static void WaterEdge(FakeWorld world)
+        {
+            Interactions.Install(new FakeInteractionWorld());
+            var fake = new FakePhysicsWorld();
+            Physics.Install(fake);
+            var terrain = new FakeTerrainWorld();
+            var text = "";
+            for (var j = 0; j < 17; j++)
+            {
+                var corner = j <= 6 ? GridText.Corner(-20.0f, 2, false, true) : GridText.Corner(40.0f, 2, false, false);
+                for (var i = 0; i < 17; i++)
+                {
+                    text = text + corner;
+                }
+            }
+
+            Terrain.Install(terrain, 17, 17, 0.0f, 0.0f, text);
+            Expect.True(Terrain.Grid.IsWet(512.0f, 832.0f), "a tile with wet corners below and dry above is wet");
+            Expect.True(Terrain.Grid.IsWet(512.0f, 768.0f), "on the line y 768: its tile, above, has wet corners at 768");
+            Expect.True(!Terrain.Grid.IsWet(512.0f, 896.0f), "on the line y 896: its tile, above, has none");
+            Within(10.0f, Terrain.Height(512.0f, 832.0f), 0.01f, "the blend in the tile at the water's edge");
+            Bridge(world, fake, FixedId, 512.0f, 832.0f);
+            Bridge(world, fake, TurningId, 1536.0f, 896.0f);
+            Physics.Install(FixedId + " 0 500 820 270 1 0 -60\n" + TurningId + " 0 1530 890 270 1 1 40.001", Shape);
+            Expect.Equal(2, Decks.count, "two decks");
+            Within(70.0f, Physics.GroundHeight(512.0f, 832.0f), 0.01f, "at the water's edge: 130 above the ground beneath");
+            Expect.True(Physics.GroundHeight(1536.0f, 896.0f) == 170.0f, "on the tile line above the water: 130 above Terrain.Height, 40; was " + Physics.GroundHeight(1536.0f, 896.0f));
+        }
+
         /// <summary>A missile with DestructableContact set to Stop flies over a deck, through where the bridge would stand as a destructable 64 around and 250 tall on its deck, and stops at a barrel past it: the bridge is not met as a destructable.</summary>
         public static void NotACylinder(FakeWorld world)
         {
