@@ -11,6 +11,7 @@ namespace Moonwell.Testing
         {
             var list = new List<Case>();
             AddFirst(list);
+            AddAuditTimers(list);
             AddMiddle(list);
             AddLast(list);
             AddMaths(list);
@@ -452,6 +453,18 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "players.print", Run = PlayerCases.PlayersPrint });
             list.Add(new Case { Name = "players.print-seconds", Run = PlayerCases.PlayersPrintSeconds });
             list.Add(new Case { Name = "game.print", Run = PlayerCases.GamePrint });
+        }
+
+        /// <summary>Adds the cases from the full audit's timer findings; the one that needs Moonwell's clock exists only in a development build, and is named debug.* (see AddDebug).</summary>
+        private static void AddAuditTimers(List<Case> list)
+        {
+            list.Add(new Case { Name = "timers.every-late-no-drift", Run = AuditTimerCases.EveryLateNoDrift });
+            list.Add(new Case { Name = "timers.every-tiny-late", Run = AuditTimerCases.EveryTinyLate });
+            list.Add(new Case { Name = "timers.every-milli-very-late", Run = AuditTimerCases.EveryMilliVeryLate });
+            list.Add(new Case { Name = "timers.buff-ticks-late", Run = AuditTimerCases.BuffTicksLate });
+#if DEBUG
+            list.Add(new Case { Name = "debug.timers.no-drift-at-speed", Run = AuditTimerCases.NoDriftAtSpeed });
+#endif
         }
 
         /// <summary>Adds the player, local, unit and inventory cases (Lua allows 200 locals in a function, and each case made here is one).</summary>

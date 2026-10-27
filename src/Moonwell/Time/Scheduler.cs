@@ -83,7 +83,7 @@ namespace Moonwell
                 }
                 else if (!timer.HasEnded)
                 {
-                    timer.due += timer.Interval;
+                    MoveOn(timer);
                     Push(new TimerEntry(timer.due, entry.sequence, timer));
                 }
             }
@@ -108,6 +108,21 @@ namespace Moonwell
             if (heap.Count > 0)
             {
                 Runtime.World.WakeIn(heap[0].due - Runtime.World.Now());
+            }
+        }
+
+        /// <summary>
+        /// Moves a repeating timer on to its next run: due a whole number of intervals after its start, never before the run it
+        /// moves on from. Late in a game a float moves in steps (0.0005 s from about 68 minutes); worked out from the start, the
+        /// rounding of each due time stays within one step, and an interval shorter than a step gives runs that share an instant.
+        /// </summary>
+        private static void MoveOn(Timer timer)
+        {
+            timer.intervals++;
+            var next = timer.start + timer.intervals * timer.Interval;
+            if (next > timer.due)
+            {
+                timer.due = next;
             }
         }
 

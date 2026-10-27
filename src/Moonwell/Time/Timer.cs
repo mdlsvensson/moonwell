@@ -8,14 +8,24 @@ namespace Moonwell
         /// <summary>The action each run calls.</summary>
         internal readonly Action action;
 
+        /// <summary>The game time the timer was started at.</summary>
+        internal readonly float start = 0.0f;
+
         /// <summary>The game time the timer is next due.</summary>
         internal float due = 0.0f;
 
-        /// <summary>Makes a timer; it is not yet adopted or scheduled.</summary>
-        private Timer(float due, float interval, bool periodic, Action action)
+        /// <summary>
+        /// How many intervals after its start a repeating timer is next due; 1 until it first runs. Its due time is worked out
+        /// from the start and this count, not added up run by run, so the rounding of a float late in a game does not add up.
+        /// </summary>
+        internal int intervals = 1;
+
+        /// <summary>Makes a timer due the seconds after its start, again at every interval of them when it repeats; it is not yet adopted or scheduled.</summary>
+        private Timer(float start, float seconds, bool periodic, Action action)
         {
-            this.due = due;
-            Interval = interval;
+            this.start = start;
+            due = start + seconds;
+            Interval = periodic ? seconds : 0.0f;
             IsPeriodic = periodic;
             this.action = action;
         }
@@ -42,14 +52,14 @@ namespace Moonwell
         public static Timer After(float seconds, Action action, Owner? owner = null)
         {
             Dev.Check(seconds >= 0.0f, "Timer.After: seconds must be 0 or more");
-            return Start(new Timer(Runtime.World.Now() + seconds, 0.0f, false, action), owner);
+            return Start(new Timer(Runtime.World.Now(), seconds, false, action), owner);
         }
 
         /// <summary>Runs an action at every interval of the seconds, for the owner or else the current owner.</summary>
         public static Timer Every(float seconds, Action action, Owner? owner = null)
         {
             Dev.Check(seconds > 0.0f, "Timer.Every: seconds must be more than 0");
-            return Start(new Timer(Runtime.World.Now() + seconds, seconds, true, action), owner);
+            return Start(new Timer(Runtime.World.Now(), seconds, true, action), owner);
         }
 
         /// <summary>Adopts a new timer under its owner, and schedules it unless its owner has already ended.</summary>
