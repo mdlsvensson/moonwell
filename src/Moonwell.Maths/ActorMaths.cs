@@ -81,16 +81,26 @@ namespace Moonwell
             return Maths.AngleBetween(unit.X, unit.Y, point.X, point.Y);
         }
 
-        /// <summary>Turns the unit toward a point at its turn rate, as setting Facing does; a read just after still gives the old facing.</summary>
+        /// <summary>Turns the unit toward a point at its turn rate, as setting Facing does; a read just after still gives the old facing. Toward its own place it keeps its facing.</summary>
         public static void FaceToward(this Unit unit, Vector2 point)
         {
-            unit.Facing = Maths.AngleBetween(unit.X, unit.Y, point.X, point.Y);
+            var x = unit.X;
+            var y = unit.Y;
+            if (point.X != x || point.Y != y)
+            {
+                unit.Facing = Maths.AngleBetween(x, y, point.X, point.Y);
+            }
         }
 
-        /// <summary>Turns the unit toward a point at once, as Unit.FaceNow(degrees).</summary>
+        /// <summary>Turns the unit toward a point at once, as Unit.FaceNow(degrees). Toward its own place it keeps its facing.</summary>
         public static void FaceNow(this Unit unit, Vector2 point)
         {
-            unit.FaceNow(Maths.AngleBetween(unit.X, unit.Y, point.X, point.Y));
+            var x = unit.X;
+            var y = unit.Y;
+            if (point.X != x || point.Y != y)
+            {
+                unit.FaceNow(Maths.AngleBetween(x, y, point.X, point.Y));
+            }
         }
 
         /// <summary>The item's place (its X and Y).</summary>

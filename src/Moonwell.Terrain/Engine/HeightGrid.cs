@@ -43,6 +43,12 @@ namespace Moonwell.Engine
         /// <summary>The y of corner 0, 0.</summary>
         internal readonly float Bottom;
 
+        /// <summary>The x of the last column of corners.</summary>
+        internal readonly float Right;
+
+        /// <summary>The y of the last row of corners.</summary>
+        internal readonly float Top;
+
         /// <summary>How many blocks have been unpacked; the cases read it to see that a read unpacks one block, once.</summary>
         internal int Unpacked { get; private set; }
 
@@ -59,6 +65,8 @@ namespace Moonwell.Engine
             Rows = rows;
             Left = left;
             Bottom = bottom;
+            Right = left + (columns - 1) * TileSize;
+            Top = bottom + (rows - 1) * TileSize;
             blocksAcross = (columns + Side - 1) / Side;
             var blocks = blocksAcross * ((rows + Side - 1) / Side);
             heights = new float[blocks][];

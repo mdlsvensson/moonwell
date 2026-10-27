@@ -346,7 +346,11 @@ target.PlaceAt(Vector2.Lerp(start, end, Ease.OutQuad(t)));
 - `unit.Position()` is a method. `PlaceAt` ignores pathing and keeps the unit's order, which a push wants; `MoveTo`
   goes through pathing and ends it.
 - `Raycast.Circle`, `Segment`, `Bounds` and `Polygon` give the first hit along a segment in an `out` value, with a
-  normal for `Bounce` and `Slide`.
+  normal for `Bounce` and `Slide`. The usual loop, `pos = hit.Point; vel = vel.Bounce(hit.Normal)`, goes on: a segment
+  that starts on a surface (within 0.02) hits it only when it goes in, and the hit is then put on the surface. One that
+  starts deeper inside hits at once, with the normal against its direction.
+- A wall (`Segment`) has no inside, so a point that slides along it, or meets it within 0.01 of where another wall
+  joins it, can end up on its far side. Make something solid from a `Polygon` or `Bounds`.
 
 ## Terrain
 
@@ -360,14 +364,22 @@ if (Terrain.Raycast(from, to, out var hit)) { /* the missile meets the ground at
 
 - The build writes the height grid from the map's terrain file, so it is the same on every machine. It does not see
   deformations or bridges; `Terrain.LocalHeight`, inside `Local.For` only, reads the live height and sees both.
-- A height blends the four corners of each 128 tile, so it is rough within 128 of a cliff. `IsCliff` tells a cliff tile,
-  for treating it as a wall. Water reads its surface where that is above the ground. Over the water at the map's outer
-  edge, far outside the playable area, heights can differ from the game's.
+- A height blends the four corners of each 128 tile. It is the game's at the corners, and rough between them on steep
+  ground and within 128 of a cliff: on Lost Temple the game's heights between corners differed from such a blend by 0.05
+  on average away from cliffs, but by up to 77 there and 96 near a cliff or ramp. How the game blends inside a tile has
+  not been measured. `IsCliff` tells a cliff tile, for treating it as a wall. Water reads its surface where that is above
+  the ground. Over the water at the map's outer edge, far outside the playable area, heights can differ from the game's.
 - `IsWalkable`, `IsFlyable`, `IsBuildable` and `IsWater` are terrain only, as the game's own. After changing pathing with
   natives, call `Terrain.Refresh(area)`. `CanStand` also sees trees and buildings and needs walkable ground, but it
   places a hidden item, so it changes game state and is not for `Local.For`.
+- Pathing is read from the game a block of 16 by 16 cells of 32 at a time, the first time a cell in it is asked for
+  (1,024 reads, about 0.3 ms), and kept: all of the largest map is about 8 MB of Lua's memory in the test host's Lua
+  (not measured in the game).
 - On a bridge, `Height` reads the water or ground beneath, and `IsWalkable` and `CanStand` read false.
 - `Terrain.Raycast(from, to, out hit)` is for a missile against the ground; a ridge narrower than 32 can be stepped over.
+  As with the maths raycasts, a missile moved to `hit.Point` and bounced or slid there goes on. Only the part of a ray
+  over the map is cast: past the map's edge it meets nothing, and a long ray reads the ground at most about 2,700 times
+  (across the largest map, about 25 ms).
 - A `Height` read costs about 9 microseconds in the game, so code that runs every tick on many objects should read it
   sparingly.
 

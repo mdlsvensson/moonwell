@@ -8,7 +8,7 @@ namespace Moonwell
         /// <summary>The point hit.</summary>
         public readonly Vector3 Point;
 
-        /// <summary>The ground's normal at the point, of length 1 (<c>Terrain.Normal</c> there): straight up when the segment starts at or under the ground.</summary>
+        /// <summary>The ground's normal at the point, of length 1 (<c>Terrain.Normal</c> there): straight up when the segment starts under the ground (by more than 0.02).</summary>
         public readonly Vector3 Normal;
 
         /// <summary>How far along the segment: 0 at its start, 1 at its end.</summary>
