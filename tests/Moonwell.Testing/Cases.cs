@@ -19,6 +19,7 @@ namespace Moonwell.Testing
             AddAuditInteractions(list);
             AddTerrain(list);
             AddAreas(list);
+            AddAuditAreas(list);
             AddInput(list);
             AddLifecycle(list);
             AddDebug(list);
@@ -287,6 +288,33 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "areas.area.step-hands-over-and-restarts", Run = AreaCases.StepHandsOverAndRestarts });
             list.Add(new Case { Name = "areas.area.step-hands-over-and-keeps-running", Run = AreaCases.StepHandsOverAndKeepsRunning });
             list.Add(new Case { Name = "areas.area.step-leaves-and-reenters", Run = AreaCases.StepLeavesAndReenters });
+        }
+
+        /// <summary>Adds the cases for the full audit's fixes to areas and input.</summary>
+        private static void AddAuditAreas(List<Case> list)
+        {
+            list.Add(new Case { Name = "audit.areas.fake-covers-as-the-game", Run = AuditAreaCases.FakeCoversAsTheGame });
+            list.Add(new Case { Name = "audit.areas.fake-walks", Run = AuditAreaCases.FakeWalks });
+            list.Add(new Case { Name = "audit.areas.small-circle", Run = AuditAreaCases.SmallCircle });
+            list.Add(new Case { Name = "audit.areas.thin-polygon", Run = AuditAreaCases.ThinPolygon });
+            list.Add(new Case { Name = "audit.areas.centre-cell-always", Run = AuditAreaCases.CentreCellAlways });
+            list.Add(new Case { Name = "audit.areas.shared-edge", Run = AuditAreaCases.SharedEdge });
+            list.Add(new Case { Name = "audit.areas.rect-rounded-out", Run = AuditAreaCases.RectRoundedOut });
+            list.Add(new Case { Name = "audit.areas.shadowed-fields", Run = AuditAreaCases.ShadowedFields });
+            list.Add(new Case { Name = "audit.areas.recheck-leaves-and-enters", Run = AuditAreaCases.RecheckLeavesAndEnters });
+            list.Add(new Case { Name = "audit.areas.recheck-refused-at-entry", Run = AuditAreaCases.RecheckRefusedAtEntry });
+            list.Add(new Case { Name = "audit.areas.recheck-off", Run = AuditAreaCases.RecheckOff });
+            list.Add(new Case { Name = "audit.areas.recheck-forgets-leavers", Run = AuditAreaCases.RecheckForgetsLeavers });
+            list.Add(new Case { Name = "audit.areas.recheck-ends-area", Run = AuditAreaCases.RecheckEndsArea });
+            list.Add(new Case { Name = "audit.areas.corpse-checks-without-steps", Run = AuditAreaCases.CorpseChecksWithoutSteps });
+            list.Add(new Case { Name = "audit.areas.no-tick-no-steps", Run = AuditAreaCases.NoTickNoSteps });
+            list.Add(new Case { Name = "audit.areas.many-corpses", Run = AuditAreaCases.ManyCorpses });
+            list.Add(new Case { Name = "audit.areas.left-while-ending", Run = AuditAreaCases.LeftWhileEnding });
+            list.Add(new Case { Name = "audit.input.no-moves", Run = AuditInputCases.NoMoves });
+            list.Add(new Case { Name = "audit.input.moves", Run = AuditInputCases.Moves });
+            list.Add(new Case { Name = "audit.input.watchers-kept", Run = AuditInputCases.WatchersKept });
+            list.Add(new Case { Name = "audit.input.watchers-changed-in-dispatch", Run = AuditInputCases.WatchersChangedInDispatch });
+            list.Add(new Case { Name = "audit.input.camera-named-before-start", Run = AuditInputCases.CameraNamedBeforeStart });
         }
 
         /// <summary>Adds the input package's cases.</summary>

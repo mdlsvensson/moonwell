@@ -5,8 +5,8 @@ namespace Moonwell.Hosting
     /// <summary>The game as the input package sees it: the synced mouse events, and the machine-local reads and the changes for one player's screen. Types are the game's numbers.</summary>
     public interface IInputWorld
     {
-        /// <summary>Starts delivering one player's mouse events: the three actions run when the mouse moves, a button goes down and a button comes up. Inside them, <c>EventPlayer</c>, <c>EventMouseX</c>, <c>EventMouseY</c> and <c>EventMouseButton</c> are the event's.</summary>
-        void ListenMouse(player p, Action moved, Action pressed, Action released);
+        /// <summary>Starts delivering one player's mouse events: the three actions run when the mouse moves, a button goes down and a button comes up; a null <paramref name="moved"/> registers no move event. Inside them, <c>EventPlayer</c>, <c>EventMouseX</c>, <c>EventMouseY</c> and <c>EventMouseButton</c> are the event's.</summary>
+        void ListenMouse(player p, Action? moved, Action pressed, Action released);
 
         /// <summary>The player of the mouse event being delivered.</summary>
         player EventPlayer();

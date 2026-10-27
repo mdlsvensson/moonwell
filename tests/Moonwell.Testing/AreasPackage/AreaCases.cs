@@ -68,11 +68,13 @@ namespace Moonwell.Testing
             Expect.Equal(5, area.Log.Count, "nothing runs after the unit left");
         }
 
-        /// <summary>Accepts decides: a footman is refused, a hero accepted, and the footman enters at its next enter event once the area accepts it.</summary>
+        /// <summary>With RecheckAccepts off, Accepts decides as a unit comes inside: a footman is refused, a hero accepted, and the footman enters at its next enter event once the area accepts it (with it on, the default, the place check asks again: audit.areas.recheck-*).</summary>
         public static void Accepts(FakeWorld world)
         {
             var fake = Fresh();
-            var area = Added(world, new LogArea(Square()));
+            var area = new LogArea(Square());
+            area.SetRecheck(false);
+            Added(world, area);
             area.Accept = u => u is Hero;
             var footman = UnitAt(world, 10f, 10f);
             var hero = UnitAt(world, 20f, 20f, true);
@@ -310,8 +312,8 @@ namespace Moonwell.Testing
             Game.Instance.Add(new LogArea(AreaShape.Region("Shop")));
             var shop = fake.Regions[1];
             Expect.Equal(4, shop.Rects.Count, "a region is one rect");
-            Expect.Near(256f, shop.Rects[2], "its right edge");
-            Expect.Near(128f, shop.Rects[3], "its top edge");
+            Expect.Near(240f, shop.Rects[2], "its right edge: the middle of its last cell, so that the cell past 256 is not the game's");
+            Expect.Near(112f, shop.Rects[3], "its top edge: the middle of its last cell");
             Expect.Equal(0, shop.Cells.Count, "a region adds no cells");
             Game.Instance.Add(new LogArea(AreaShape.Of(AreaShape.Rect(new Bounds(new Vector2(0f, 0f), new Vector2(64f, 64f))), circle)));
             Expect.Equal(4, fake.Regions[2].Rects.Count, "a union holds its rect");
@@ -343,7 +345,7 @@ namespace Moonwell.Testing
             AreaSystem.Install(fake, new[] { "Shop" }, new[] { 0f, 0f, 256f, 128f });
             Added(world, area);
             Expect.Equal(1, fake.Regions.Count, "the region is made when the area is added");
-            Expect.Near(256f, fake.Regions[0].Rects[2], "its right edge");
+            Expect.Near(240f, fake.Regions[0].Rects[2], "its right edge: the middle of its last cell");
             var unit = UnitAt(world, 10f, 10f);
             area.Labels[unit] = "a";
             fake.Enter(fake.Regions[0], unit.Handle);
@@ -384,7 +386,7 @@ namespace Moonwell.Testing
             Expect.Near(2f, area.Since(a), "Since counts game seconds");
         }
 
-        /// <summary>The package has one timer: none while no area has a unit, one when any has, the first area's OnUnitStays twice for the second's once, a Tick of 0.04 every 2 steps, and a Tick of 0 never.</summary>
+        /// <summary>The package has one step and one check: none while no area has a unit, both when an area with a Tick has, the first area's OnUnitStays twice for the second's once, a Tick of 0.04 every 2 steps, and a Tick of 0 never.</summary>
         public static void SharedTimer(FakeWorld world)
         {
             var fake = Fresh();
@@ -400,11 +402,11 @@ namespace Moonwell.Testing
             var owned = Game.Instance.OwnedCount;
             fake.Enter(fake.Regions[0], a.Handle);
             Expect.True(AreaTracker.Running, "a timer once an area has a unit");
-            Expect.Equal(owned + 1, Game.Instance.OwnedCount, "one timer more");
+            Expect.Equal(owned + 2, Game.Instance.OwnedCount, "two timers more, the step and the check");
             fake.Enter(fake.Regions[1], b.Handle);
             fake.Enter(fake.Regions[2], c.Handle);
             fake.Enter(fake.Regions[3], d.Handle);
-            Expect.Equal(owned + 1, Game.Instance.OwnedCount, "still one timer for four areas");
+            Expect.Equal(owned + 2, Game.Instance.OwnedCount, "still two timers for four areas");
             world.Advance(2f);
             Expect.Equal(4, half.SinceAtStay.Count, "Tick 0.5 over 2 seconds");
             Expect.Equal(2, one.SinceAtStay.Count, "Tick 1 over 2 seconds");

@@ -205,8 +205,8 @@ namespace Moonwell.Testing
             }
         }
 
-        /// <summary>Remembers what to run for a player's mouse.</summary>
-        public void ListenMouse(player p, Action moved, Action pressed, Action released)
+        /// <summary>Remembers what to run for a player's mouse; a null moved is no move event.</summary>
+        public void ListenMouse(player p, Action? moved, Action pressed, Action released)
         {
             var one = new Listened();
             one.Player = p;

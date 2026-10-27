@@ -3,19 +3,54 @@ using System.Collections.Generic;
 
 namespace Moonwell.Engine
 {
-    /// <summary>Takes the game's mouse events into the player's Mouse and runs the map-wide reactions: the game's components in add order, then the player's own, never another player's.</summary>
+    /// <summary>
+    /// Takes the game's mouse events into the player's Mouse and runs the map-wide reactions: the game's components in add
+    /// order, then the player's own, never another player's. The watchers of the game and of each player are kept in a
+    /// list, read again only when that actor's components change, so an event does not look at every component again (a
+    /// map with many areas has many game components, and the moves come 120 to 240 times a second).
+    /// </summary>
     internal static class MouseReactions
     {
+        /// <summary>One actor's map components that write a mouse reaction, with their masks, as read from its list of components.</summary>
+        private sealed class Watchers
+        {
+            /// <summary>The actor they were read from; null before the first read.</summary>
+            internal Actor? Actor;
+
+            /// <summary>The actor's list of components they were read from: core makes a new list when it drops a removed component.</summary>
+            internal List<Component?>? Source;
+
+            /// <summary>How many components that list held then: an added one makes it more.</summary>
+            internal int Count;
+
+            /// <summary>The watchers, in add order; a new list at each read, so a loop over the old one is not changed under it.</summary>
+            internal List<MapComponent> Found = new List<MapComponent>();
+
+            /// <summary>The mask of each watcher, in the same order.</summary>
+            internal List<int> Masks = new List<int>();
+        }
+
         /// <summary>The reaction methods, one bit each: a class's mask holds the ones it has.</summary>
         private const int Moved = 1, Pressed = 2, Released = 4;
 
         /// <summary>The mask of each class seen, keyed by the class.</summary>
         private static readonly Dictionary<object, int> masks = new Dictionary<object, int>();
 
-        /// <summary>Forgets every class's mask; Install calls it.</summary>
+        /// <summary>The game's watchers.</summary>
+        private static Watchers gameWatchers = new Watchers();
+
+        /// <summary>Each slot's player's watchers; null until that player's first event.</summary>
+        private static Watchers?[] playerWatchers = new Watchers?[Player.MaxSlots];
+
+        /// <summary>How many times a component's mask was looked up; for the cases.</summary>
+        internal static int Lookups;
+
+        /// <summary>Forgets every class's mask and the watchers read; Install calls it.</summary>
         internal static void Reset()
         {
             masks.Clear();
+            gameWatchers = new Watchers();
+            playerWatchers = new Watchers?[Player.MaxSlots];
         }
 
         /// <summary>The game's move event: takes the place, then runs OnMouseMoved.</summary>
@@ -86,28 +121,66 @@ namespace Moonwell.Engine
         /// <summary>Runs a reaction on the game's components, then on the mouse's player's.</summary>
         private static void Run(Mouse mouse, int bit, MouseButton button)
         {
-            RunMap(Game.Instance, mouse, bit, button);
+            RunMap(Game.Instance, gameWatchers, mouse, bit, button);
             var player = Player.Existing(mouse.Slot);
             if (player != null)
             {
-                RunMap(player, mouse, bit, button);
+                var watchers = playerWatchers[mouse.Slot];
+                if (watchers == null)
+                {
+                    watchers = new Watchers();
+                    playerWatchers[mouse.Slot] = watchers;
+                }
+
+                RunMap(player, watchers, mouse, bit, button);
             }
         }
 
-        /// <summary>Runs the reaction on an actor's map components, in add order.</summary>
-        private static void RunMap(Actor actor, Mouse mouse, int bit, MouseButton button)
+        /// <summary>Runs the reaction on an actor's watchers, in add order: those there when the event came (one added by a reaction runs from the next event), skipping one that has ended.</summary>
+        private static void RunMap(Actor actor, Watchers watchers, Mouse mouse, int bit, MouseButton button)
         {
-            var count = actor.BeginDispatch();
-            for (var i = 0; i < count; i++)
+            if (watchers.Actor != actor || watchers.Source != actor.components || watchers.Count != actor.components.Count)
             {
-                var component = actor.ComponentAt(i) as MapComponent;
-                if (component != null && !component.HasEnded && (MaskOf(component) & bit) != 0)
+                Read(watchers, actor);
+            }
+
+            var found = watchers.Found;
+            var masksFound = watchers.Masks;
+            for (var i = 0; i < found.Count; i++)
+            {
+                var component = found[i];
+                if (!component.HasEnded && (masksFound[i] & bit) != 0)
                 {
                     Call(component, mouse, bit, button);
                 }
             }
+        }
 
-            actor.EndDispatch();
+        /// <summary>Reads an actor's watchers from its list of components: the map components that have not ended and write a mouse reaction.</summary>
+        private static void Read(Watchers watchers, Actor actor)
+        {
+            var components = actor.components;
+            var found = new List<MapComponent>();
+            var masksFound = new List<int>();
+            for (var i = 0; i < components.Count; i++)
+            {
+                var component = components[i] as MapComponent;
+                if (component != null && !component.HasEnded)
+                {
+                    var mask = MaskOf(component);
+                    if (mask != 0)
+                    {
+                        found.Add(component);
+                        masksFound.Add(mask);
+                    }
+                }
+            }
+
+            watchers.Actor = actor;
+            watchers.Source = components;
+            watchers.Count = components.Count;
+            watchers.Found = found;
+            watchers.Masks = masksFound;
         }
 
         /// <summary>Calls one reaction with the component as the current owner; a failing reaction is reported.</summary>
@@ -135,6 +208,7 @@ namespace Moonwell.Engine
         /// <summary>The bits of the reaction methods an object's class writes, worked out once per class. Only methods the class writes count: in Lua an interface's empty defaults are not there.</summary>
         private static int MaskOf(object obj)
         {
+            Lookups++;
             var key = Names.ClassOf(obj);
             if (masks.TryGetValue(key, out var mask))
             {

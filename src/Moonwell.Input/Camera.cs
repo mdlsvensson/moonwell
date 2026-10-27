@@ -3,7 +3,9 @@ namespace Moonwell
     /// <summary>
     /// A player's camera. Get one with <c>player.Camera()</c>. Where a camera looks and how is that machine's alone, so the
     /// reads (the target, the eye, the distance and the angles) are read inside <c>Local.For</c>, and the game gives them a
-    /// moment late: after a pan or a move, the target reads the old place until the next frame. The changes (PanTo, the
+    /// moment late: after a pan or a move, the target reads the old place until the next frame. A read is this machine's
+    /// camera whichever player's camera it is read from: inside <c>Local.For(Player.One, ...)</c>,
+    /// <c>Player.Two.Camera().Distance</c> reads Player One's. The changes (PanTo, the
     /// Set methods, Follow, StopFollowing, Apply, Reset, SetBounds) move only that player's camera and run only on that
     /// player's machine, so they are safe anywhere. Angles are in degrees. No event comes when a camera moves.
     /// </summary>

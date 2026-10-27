@@ -81,6 +81,7 @@ namespace Moonwell.Build.Tests
 
             var main = File.ReadAllText(Path.Combine(generated, "MapMain.g.cs"));
             Assert.Contains("global::Moonwell.InputSystem.Install(", main);
+            Assert.Contains("InputSystem.Install(global::Moonwell.Generated.InputData.Mouse, true, ", main);
             Assert.DoesNotContain("AreaSystem", main);
 
             var script = File.ReadAllText(Path.Combine(project, "build", "Input", "war3map.lua"));
@@ -91,6 +92,25 @@ namespace Moonwell.Build.Tests
             lua.DoString("main()");
             Assert.Contains("InputSystem.Install", script);
             Assert.DoesNotContain("AreaSystem", script);
+        }
+
+        [Fact]
+        public void press_only_map_listens_to_no_moves()
+        {
+            // Aim reads the mouse's Position in its press reaction, which takes the moves (the build cannot tell where it is read).
+            // Without it the map only reacts to presses, which give the position themselves.
+            var project = folders.TemporaryCopyOf("Input");
+            var file = Path.Combine(project, "Aim.cs");
+            var text = File.ReadAllText(file);
+            var changed = text.Replace("hero.FaceNow(hero.AngleTo(mouse.Position));", "hero.FaceNow(0f);");
+            Assert.NotEqual(text, changed);
+            File.WriteAllText(file, changed);
+
+            Build(project);
+
+            var generated = Path.Combine(project, "build", "generated");
+            Assert.Contains("public const bool Mouse = true;", File.ReadAllText(Path.Combine(generated, "InputData.g.cs")));
+            Assert.Contains("InputSystem.Install(global::Moonwell.Generated.InputData.Mouse, false, ", File.ReadAllText(Path.Combine(generated, "MapMain.g.cs")));
         }
 
         [Fact]

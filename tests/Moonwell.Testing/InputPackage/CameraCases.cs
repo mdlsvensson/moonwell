@@ -244,15 +244,17 @@ namespace Moonwell.Testing
             Expect.Equal(0, fake.Made.Count, "no setup was made from bad data");
         }
 
-        /// <summary>A camera read before Install throws, and so does a setup; a map's cameras are forgotten when Install runs again.</summary>
+        /// <summary>A camera read before Install throws; a setup named before Install is made, to be looked up when applied (audit.input.camera-named-before-start); a map's cameras are forgotten when Install runs again.</summary>
         public static void NotInstalled(FakeWorld world)
         {
             Fresh(world, new[] { "Intro", "Outro" }, TwoCameras());
             InputSystem.Uninstall();
             Expect.Throws<InvalidOperationException>(() => Player.One.Camera(), "a camera before Install");
-            Expect.Throws<InvalidOperationException>(() => CameraSetup.Named("Intro"), "a setup before Install");
+            var early = CameraSetup.Named("Intro");
+            Expect.Equal("Intro", early.Name, "a setup named before Install");
             Fresh(world);
             Expect.Throws<ArgumentException>(() => CameraSetup.Named("Intro"), "the earlier install's cameras are gone");
+            Expect.Throws<ArgumentException>(() => Player.One.Camera().Apply(early), "for the setup named before Install too");
         }
     }
 }

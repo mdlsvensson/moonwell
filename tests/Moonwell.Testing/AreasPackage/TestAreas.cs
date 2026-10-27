@@ -30,11 +30,20 @@ namespace Moonwell.Testing
         /// <summary>The current owner seen in the last reaction.</summary>
         public Owner? OwnerSeen;
 
+        /// <summary>How many times Accepts was asked.</summary>
+        public int AcceptsAsked;
+
         /// <summary>Makes an area of a shape that stays every tick seconds (0 for never).</summary>
         public LogArea(AreaShape shape, float tick = 0f)
         {
             Shape = shape;
             Tick = tick;
+        }
+
+        /// <summary>Turns asking Accepts again at the place check on or off.</summary>
+        public void SetRecheck(bool on)
+        {
+            RecheckAccepts = on;
         }
 
         /// <summary>Sets the shape later than the constructor, for a case that checks it cannot be.</summary>
@@ -52,6 +61,7 @@ namespace Moonwell.Testing
         /// <summary>Asks the case's answer.</summary>
         public override bool Accepts(Unit unit)
         {
+            AcceptsAsked++;
             return Accept == null || Accept(unit);
         }
 

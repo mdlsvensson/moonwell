@@ -5,7 +5,7 @@ using Moonwell.Hosting;
 
 namespace Moonwell
 {
-    /// <summary>Starts the input package; a map's generated Main calls Install when the map uses the package, with whether the map names the mouse and the World Editor cameras the build wrote.</summary>
+    /// <summary>Starts the input package; a map's generated Main calls Install when the map uses the package, with whether the map names the mouse, whether it needs the mouse's moves, and the World Editor cameras the build wrote.</summary>
     public static class InputSystem
     {
         /// <summary>The world the package talks to; null until Install.</summary>
@@ -27,18 +27,33 @@ namespace Moonwell
         private static float cornerY;
 
         /// <summary>
-        /// Installs the package on the game. With the mouse, it listens for the mouse of every user player playing now.
-        /// The camera names and their numbers are World Editor's cameras, as the build wrote them: for each camera in the
+        /// Installs the package on the game. With the mouse, it listens for the mouse of every user player playing now:
+        /// its presses and releases, and its moves too when <paramref name="moves"/> is true. The build sets that only when
+        /// the map's code reads a mouse's synced position (<c>X</c>, <c>Y</c>, <c>Position</c>, <c>HasPosition</c>) or writes
+        /// <c>OnMouseMoved</c>, as the moves are synced events, 120 to 240 a second for each player moving the mouse. The
+        /// camera names and their numbers are World Editor's cameras, as the build wrote them: for each camera in the
         /// names' order, the target x and y, the count n, n pairs of field code and value, and the camera type (-1 for
         /// none). Throws ArgumentException when the numbers do not hold exactly the cameras the names say.
         /// </summary>
-        public static void Install(bool mouse, string[] cameraNames, float[] cameras)
+        public static void Install(bool mouse, bool moves, string[] cameraNames, float[] cameras)
         {
-            Install(new NativeInputWorld(), mouse, cameraNames, cameras);
+            Install(new NativeInputWorld(), mouse, moves, cameraNames, cameras);
         }
 
-        /// <summary>Installs the package on a world; tests give a fake one. With the mouse, it listens for the mouse of every user player playing now, in slot order.</summary>
+        /// <summary>Installs the package on the game, listening for every mouse event, the moves included, when the mouse is on.</summary>
+        public static void Install(bool mouse, string[] cameraNames, float[] cameras)
+        {
+            Install(new NativeInputWorld(), mouse, mouse, cameraNames, cameras);
+        }
+
+        /// <summary>Installs the package on a world, listening for every mouse event, the moves included, when the mouse is on; tests give a fake one.</summary>
         public static void Install(IInputWorld host, bool mouse, string[] cameraNames, float[] cameras)
+        {
+            Install(host, mouse, mouse, cameraNames, cameras);
+        }
+
+        /// <summary>Installs the package on a world; tests give a fake one. With the mouse, it listens for the mouse of every user player playing now, in slot order: its presses and releases, and its moves when <paramref name="moves"/> is true.</summary>
+        public static void Install(IInputWorld host, bool mouse, bool moves, string[] cameraNames, float[] cameras)
         {
             var starts = CameraStarts(cameraNames, cameras);
             world = host;
@@ -65,10 +80,17 @@ namespace Moonwell
             host.WorldTopRight(out var maxX, out var maxY);
             cornerX = maxX - 32f;
             cornerY = maxY - 32f;
+            // Set by an if: CSharp.lua 2.0.4-moonwell.12 fails with a BugErrorException on moves ? MouseReactions.OnMoved : null.
+            Action? moved = null;
+            if (moves)
+            {
+                moved = MouseReactions.OnMoved;
+            }
+
             var users = Player.Users;
             for (var i = 0; i < users.Count; i++)
             {
-                host.ListenMouse(users[i].Handle, MouseReactions.OnMoved, MouseReactions.OnPressed, MouseReactions.OnReleased);
+                host.ListenMouse(users[i].Handle, moved, MouseReactions.OnPressed, MouseReactions.OnReleased);
             }
         }
 
@@ -112,6 +134,12 @@ namespace Moonwell
             }
 
             return eachCamera[slot];
+        }
+
+        /// <summary>Whether the package has been installed, so that World Editor's cameras can be looked up.</summary>
+        internal static bool Installed
+        {
+            get { return setups != null; }
         }
 
         /// <summary>The setup World Editor's camera of this name made, or ArgumentException when none has it. Throws before Install.</summary>
