@@ -404,6 +404,25 @@ public class ReactionTests
     }
 
     [Fact]
+    public void a_reaction_that_takes_a_nullable_unit_is_named_without_its_mark()
+    {
+        Assert.Equal(new[]
+        {
+            "'OnPushed' never runs: a reaction of IPushTarget is public, not static, and takes a Unit",
+        }, MapCode.MessagesOfFile("""
+            using Moonwell;
+
+            namespace Map
+            {
+                public class Wrong : Unit, IPushTarget
+                {
+                    public void OnPushed(string pusher) { }
+                }
+            }
+            """));
+    }
+
+    [Fact]
     public void written_right_physics_reactions_are_left_alone()
     {
         Assert.Empty(MapCode.CheckFile("""

@@ -327,11 +327,15 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
             method.Parameters.Length == reaction.Parameters.Length
             && method.Parameters.Zip(reaction.Parameters, (a, b) => SymbolEqualityComparer.Default.Equals(a.Type, b.Type)).All(same => same);
 
+        // How a type a reaction takes is named: shortly, and a class without the nullable mark ("a Unit", not "a Unit?").
+        private static readonly SymbolDisplayFormat TypeName = SymbolDisplayFormat.MinimallyQualifiedFormat
+            .RemoveMiscellaneousOptions(SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
+
         // What a reaction takes: "a Hit", "a float", or "(Mouse, MouseButton)".
         private static string Takes(IMethodSymbol reaction) =>
             reaction.Parameters.Length == 1
-                ? "a " + reaction.Parameters[0].Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)
-                : "(" + string.Join(", ", reaction.Parameters.Select(p => p.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat))) + ")";
+                ? "a " + reaction.Parameters[0].Type.ToDisplayString(TypeName)
+                : "(" + string.Join(", ", reaction.Parameters.Select(p => p.Type.ToDisplayString(TypeName))) + ")";
 
         /// <summary>Reports a reaction interface on a class the package never calls it on.</summary>
         private void CheckHosts(SymbolAnalysisContext context, INamedTypeSymbol type)
