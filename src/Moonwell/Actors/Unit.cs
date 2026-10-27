@@ -978,7 +978,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the unit dies, before the unit's components see it; the killer is null when no unit killed it.</summary>
+        /// <summary>Runs when the unit dies, before the unit's components see it; the killer is null when no unit killed it. Death is not an end, and the corpse can go at any time (it decays, explodes or is raised), so what this makes belongs to the game: a respawn timer started here runs whatever happens to the corpse. An effect that should end with the corpse names the unit as its owner: Timer.Every(1f, Smoke, this).</summary>
         /// <param name="killerUnit">The unit whose damage killed it; null when no unit did: Kill() or Life set to 0 from code, timed life running out, or its own damage (seen 10-21).</param>
         public virtual void OnDeath(Unit? killerUnit)
         {

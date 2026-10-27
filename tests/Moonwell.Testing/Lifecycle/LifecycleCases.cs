@@ -75,5 +75,18 @@ namespace Moonwell.Testing
 
             Expect.Equal(1, reported, "the error's reports, on player 1's machine only: " + string.Join(" | ", world.Logged));
         }
+
+        /// <summary>A creep's own OnDeath starts a 120 s respawn timer; its corpse is gone 90 s later. What OnDeath makes belongs to the game, so the respawn runs; a timer it names the unit the owner of ends with the corpse (decision 64).</summary>
+        public static void DeathRespawnOutlivesCorpse(FakeWorld world)
+        {
+            ObjectTypes.Unit(ObjectTypes.FourCC("n0RS"), () => new Respawning());
+            var creep = (Respawning)Unit.Of(world.NewUnit(ObjectTypes.FourCC("n0RS"), slot: 24))!;
+            creep.Kill();
+            world.Advance(90.1f);
+            world.VanishUnit(creep.Handle);
+            world.Advance(40.0f);
+            Expect.True(creep.HasEnded, "the creep has ended with its corpse");
+            Expect.Equal("1 90", creep.Respawned + " " + creep.Lingered, "the respawn timer's runs, and the runs of the timer the creep owns");
+        }
     }
 }

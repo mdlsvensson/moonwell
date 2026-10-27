@@ -196,6 +196,11 @@ public sealed class KillCounter : UnitComponent
   `OnApply`, `OnTick` and `OnExpire` are its reactions, and `unit.Apply(new Burn())` puts it on a unit.
 - `Timer.After(seconds, action)` and `Timer.Every(seconds, action)` run code later. A timer, buff or component
   belongs to whatever made it, and ends with it.
+- What an ability's `OnCast` makes belongs to the ability, which lasts as long as the caster is in the game, so a
+  delayed effect runs after the spell has ended; work that should stop with a channel names the cast:
+  `Timer.Every(0.5f, Burn, owner: cast)`. What a unit's own `OnDeath` makes belongs to the game, as death is not an
+  end and the corpse can go at any time, so a respawn timer runs; an effect that should end with the corpse names the
+  unit: `owner: this`. What a component's `OnDeath` makes belongs to the component, which ends when the corpse goes.
 - Game work starts in a reaction. Top-level code and static fields make nothing in the game.
 
 ## Units, heroes and items

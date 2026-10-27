@@ -1,6 +1,6 @@
 namespace Moonwell.Testing
 {
-    /// <summary>An ability that logs its cast, keeps the cast and the owner it saw, and starts a timer the cast owns.</summary>
+    /// <summary>An ability that logs its cast, keeps the cast and the owner it saw, and starts a timer the ability owns and one the cast owns.</summary>
     public class TestBolt : Ability
     {
         /// <summary>The cast the last OnCast was given; null when none.</summary>
@@ -9,16 +9,20 @@ namespace Moonwell.Testing
         /// <summary>The owner that was current when the last OnCast ran.</summary>
         public Owner? Seen;
 
-        /// <summary>How many times the timer started by the last cast has run.</summary>
+        /// <summary>How many times the timer started by the last cast with no owner given has run.</summary>
         public int Ticks;
 
-        /// <summary>Logs the cast, keeps it, and starts a timer every half second that counts its ticks.</summary>
+        /// <summary>How many times the timer started by the last cast with the cast as its owner has run.</summary>
+        public int ChannelTicks;
+
+        /// <summary>Logs the cast, keeps it, and starts two timers every half second that count their ticks: one with no owner given, which the ability owns, and one the cast owns, as work that stops with a channel.</summary>
         public override void OnCast(Cast cast)
         {
             TestLog.Lines.Add("bolt cast");
             Given = cast;
             Seen = Owner.Current;
             Timer.Every(0.5f, () => { Ticks++; });
+            Timer.Every(0.5f, () => { ChannelTicks++; }, cast);
         }
     }
 }

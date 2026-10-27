@@ -28,6 +28,7 @@ namespace Moonwell.Testing
         {
             list.Add(new Case { Name = "lifecycle.units-the-game-makes-are-met", Run = LifecycleCases.UnitsTheGameMakesAreMet });
             list.Add(new Case { Name = "lifecycle.local-throw-keeps-sync", Run = LifecycleCases.LocalThrowKeepsSync });
+            list.Add(new Case { Name = "lifecycle.death-respawn-outlives-corpse", Run = LifecycleCases.DeathRespawnOutlivesCorpse });
         }
 
         /// <summary>Adds the debug mode's cases; they exist only in a development build, as the debug mode does.</summary>
@@ -673,7 +674,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "abilities.generic", Run = AbilityCases.Generic });
             list.Add(new Case { Name = "cast.order", Run = AbilityCases.Order });
             list.Add(new Case { Name = "cast.fields", Run = AbilityCases.Fields });
-            list.Add(new Case { Name = "cast.owns-what-it-starts", Run = AbilityCases.OwnsWhatItStarts });
+            list.Add(new Case { Name = "cast.ability-owns-what-it-starts", Run = AbilityCases.AbilityOwnsWhatItStarts });
             list.Add(new Case { Name = "cast.next-ends-previous", Run = AbilityCases.NextEndsPrevious });
             list.Add(new Case { Name = "cast.listen", Run = AbilityCases.Listens });
             list.Add(new Case { Name = "cast.ends-with-unit", Run = AbilityCases.EndsWithUnit });

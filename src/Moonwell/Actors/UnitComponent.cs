@@ -49,7 +49,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the unit dies; the killer is null when no unit killed it.</summary>
+        /// <summary>Runs when the unit dies; the killer is null when no unit killed it. What this makes belongs to the component, which ends when the unit leaves the game, as its corpse goes; a respawn timer names the game as its owner: Timer.After(60f, Respawn, Game.Instance).</summary>
         /// <param name="killerUnit">The unit whose damage killed it; null when no unit did: Kill() or Life set to 0 from code, timed life running out, or its own damage (seen 10-21).</param>
         public virtual void OnDeath(Unit? killerUnit)
         {

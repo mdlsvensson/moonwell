@@ -596,13 +596,13 @@ namespace Moonwell
             hit.EndDispatch();
         }
 
-        /// <summary>Runs OnDeath on a unit, then on its components, in add order.</summary>
+        /// <summary>Runs OnDeath on a unit, then on its components, in add order. The unit's own OnDeath runs with the game as the current owner (decision 64): death is not an end, and its corpse can go at any time, so what it makes, such as a respawn timer, must not end with it.</summary>
         private static void Dying(Unit dead, Unit? killer)
         {
             if (!dead.HasEnded && (dead.Mask & Hook.OnDeath) != 0)
             {
                 var previous = Owner.current;
-                Owner.current = dead;
+                Owner.current = Game.Instance;
                 try
                 {
                     dead.OnDeath(killer);
@@ -744,13 +744,13 @@ namespace Moonwell
             actor.EndDispatch();
         }
 
-        /// <summary>Runs OnCast on an ability, with the cast as the current owner, unless the ability has ended or does not override it.</summary>
+        /// <summary>Runs OnCast on an ability, with the ability as the current owner (decision 63), unless the ability has ended or does not override it: what it makes runs on after the spell ends, and work that stops with a channel names the cast.</summary>
         private static void AbilityCast(Ability ability, Cast cast)
         {
             if (!ability.HasEnded && (ability.Mask & Hook.OnCast) != 0)
             {
                 var previous = Owner.current;
-                Owner.current = cast;
+                Owner.current = ability;
                 try
                 {
                     ability.OnCast(cast);
