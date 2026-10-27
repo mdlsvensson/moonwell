@@ -16,6 +16,7 @@ namespace Moonwell.Testing
             AddLast(list);
             AddMaths(list);
             AddInteractions(list);
+            AddAuditInteractions(list);
             AddTerrain(list);
             AddAreas(list);
             AddInput(list);
@@ -226,6 +227,25 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.pair.data-and-since", Run = PairCases.DataAndSince });
             list.Add(new Case { Name = "interactions.pair.pair-owns", Run = PairCases.PairOwns });
             list.Add(new Case { Name = "interactions.tree", Run = TreeCases.Tree });
+        }
+
+        /// <summary>Adds the cases for the full audit's fixes to the interactions package.</summary>
+        private static void AddAuditInteractions(List<Case> list)
+        {
+            list.Add(new Case { Name = "interactions.audit.teleport-together-stays-paired", Run = AuditInteractionCases.TeleportTogetherStaysPaired });
+            list.Add(new Case { Name = "interactions.audit.teleport-together-keeps-stop", Run = AuditInteractionCases.TeleportTogetherKeepsStop });
+            list.Add(new Case { Name = "interactions.audit.teleport-apart-parts", Run = AuditInteractionCases.TeleportApartParts });
+            list.Add(new Case { Name = "interactions.audit.guide-fire-aura-spares-changed-owner", Run = AuditInteractionCases.GuideFireAuraSparesChangedOwner });
+            list.Add(new Case { Name = "interactions.audit.recheck-off-keeps-pair", Run = AuditInteractionCases.RecheckOffKeepsPair });
+            list.Add(new Case { Name = "interactions.audit.recheck-refusal-parts-and-meets-again", Run = AuditInteractionCases.RecheckRefusalPartsAndMeetsAgain });
+            list.Add(new Case { Name = "interactions.audit.recheck-throwing-accepts-refuses", Run = AuditInteractionCases.RecheckThrowingAcceptsRefuses });
+            list.Add(new Case { Name = "interactions.audit.recheck-parts-once-per-meet", Run = AuditInteractionCases.RecheckPartsOncePerMeet });
+            list.Add(new Case { Name = "interactions.audit.gizmo-leave-has-no-place", Run = AuditInteractionCases.GizmoLeaveHasNoPlace });
+            list.Add(new Case { Name = "interactions.audit.cell-check-removal-keeps-round", Run = AuditInteractionCases.CellCheckRemovalKeepsRound });
+            list.Add(new Case { Name = "interactions.audit.destructable-holder-tracked-alone", Run = AuditInteractionCases.DestructableHolderTrackedAlone });
+            list.Add(new Case { Name = "interactions.audit.item-holder-tracked-alone", Run = AuditInteractionCases.ItemHolderTrackedAlone });
+            list.Add(new Case { Name = "interactions.audit.unit-holder-of-gizmos-tracked-alone", Run = AuditInteractionCases.UnitHolderOfGizmosTrackedAlone });
+            list.Add(new Case { Name = "interactions.audit.carried-item-has-no-place", Run = AuditInteractionCases.CarriedItemHasNoPlace });
         }
 
         /// <summary>Adds the areas package's cases.</summary>

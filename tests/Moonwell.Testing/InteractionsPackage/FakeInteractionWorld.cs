@@ -45,10 +45,14 @@ namespace Moonwell.Testing
         /// <summary>The destructable types IsTreeType answers true for.</summary>
         public List<int> TreeTypes = new List<int>();
 
+        /// <summary>The units IsHidden was asked about, in order: the units the package read.</summary>
+        public List<unit> UnitReads = new List<unit>();
+
         /// <summary>Whether a unit is hidden; counts the read.</summary>
         public bool IsHidden(unit target)
         {
             Reads++;
+            UnitReads.Add(target);
             if (FailingUnits.Contains(target))
             {
                 throw new System.InvalidOperationException("the call failed");

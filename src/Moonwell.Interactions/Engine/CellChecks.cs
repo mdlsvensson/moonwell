@@ -53,29 +53,50 @@ namespace Moonwell.Engine
         /// <summary>Puts an entry at the end of the list, and puts the checks on the cycle's ring if they are not on it.</summary>
         public void Add(Entry entry)
         {
+            entry.Ring = ring.Count;
             ring.Add(entry);
             Arm();
         }
 
-        /// <summary>Takes an entry out of the list, keeping the order of the rest and the place the round has got to.</summary>
+        /// <summary>Takes an entry out of the list in a few moves, with no search, as the entry keeps its index: the entries read in this round stay before the place the round has got to and those not read yet after it, so each entry left is still read once in the round. The order of the rest changes, the same way on every machine. An entry not in the list is passed over.</summary>
         public void Remove(Entry entry)
         {
-            var index = ring.IndexOf(entry);
-            if (index < 0)
+            var index = entry.Ring;
+            if (index < 0 || index >= ring.Count || Raw.At(ring, index) != entry)
             {
                 return;
             }
 
-            ring.RemoveAt(index);
+            // The cursor is always below the count, so the last entry is one not yet read in this round.
+            var last = ring.Count - 1;
             if (index < cursor)
             {
-                cursor--;
+                // Read in this round: the last entry read takes its place, and the last entry of the list takes the last
+                // read one's, where the round reads next.
+                var lastRead = cursor - 1;
+                Place(index, Raw.At(ring, lastRead));
+                Place(lastRead, Raw.At(ring, last));
+                cursor = lastRead;
+            }
+            else
+            {
+                // Not read yet: the last entry, not read yet either, takes its place.
+                Place(index, Raw.At(ring, last));
             }
 
+            ring.RemoveAt(last);
+            entry.Ring = -1;
             if (cursor >= ring.Count)
             {
                 cursor = 0;
             }
+        }
+
+        /// <summary>Puts an entry at an index of the list, which it then keeps.</summary>
+        private void Place(int index, Entry entry)
+        {
+            Raw.Put(ring, index, entry);
+            entry.Ring = index;
         }
 
         /// <summary>Reads the next entries of the round, and puts the checks on the ring for the next step unless the list is empty. An error a read raises, the world's, ends the step's reads and is reported as Interactions.CellCheck, and the round goes on from the entry after at the next step: nothing leaves the cycle's step.</summary>
