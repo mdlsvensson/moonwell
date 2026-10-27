@@ -153,6 +153,24 @@ namespace Moonwell.Objects.Tests
             Assert.Equal(300f, built.Damage[3]);
         }
 
+        /// <summary>A Druid of the Talon of a map's own that sets nothing.</summary>
+        public class PlainTalon : NightElf.Units.DruidOfTheTalon
+        {
+        }
+
+        [Fact]
+        public void a_reference_starts_as_the_standard_objects_in_the_build_as_on_net()
+        {
+            // With no build the constructor's Faerie Fire; in the build the data set's (udaa is Afae), as a list starts.
+            Assert.True(new PlainTalon().DefaultActiveAbility.Is<NightElf.Abilities.FaerieFire>());
+
+            StandardValues.Read = (id, field, level) => id == "edot" && field == "udaa" && level == 0 ? "Afae" : null;
+            Assert.True(new PlainTalon().DefaultActiveAbility.Is<NightElf.Abilities.FaerieFire>());
+
+            StandardValues.Read = (id, field, level) => null;
+            Assert.Null(new PlainTalon().DefaultActiveAbility.Type);
+        }
+
         [Fact]
         public void a_target_type_of_self_is_named_self()
         {

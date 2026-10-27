@@ -230,7 +230,11 @@ namespace Moonwell.Objects
             return (ObjectList<T>)list!;
         }
 
-        /// <summary>Gives the reference of a field, made the first time it is asked for: empty, or the standard class's constructor's when no build gives the values.</summary>
+        /// <summary>
+        /// Gives the reference of a field, made the first time it is asked for as the standard object's, as a list starts (a
+        /// field with levels starts as level 1's): the build's values, or the standard class's constructor's when no build gives
+        /// them.
+        /// </summary>
         public ObjectRef<T> GetRef<T>(string field)
         {
             if (FromStandard())
@@ -247,7 +251,12 @@ namespace Moonwell.Objects
             if (!values.TryGetValue(field, out var reference))
             {
                 var made = new ObjectRef<T>();
-                if (StandardValues.Read == null && standard.TryGetValue(field, out var constructed))
+                if (StandardValues.Read != null)
+                {
+                    var entries = owner == null ? new List<object>() : StandardEntries(ReadText(owner, field, 0) ?? ReadText(owner, field, 1));
+                    made.Entry = entries.Count > 0 ? entries[0] : null;
+                }
+                else if (standard.TryGetValue(field, out var constructed))
                 {
                     made.Entry = ((ObjectRef<T>)constructed!).Entry;
                 }
