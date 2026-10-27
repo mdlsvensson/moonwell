@@ -113,10 +113,11 @@ namespace Moonwell.Testing
             return hits;
         }
 
-        /// <summary>Ray and RayHit have ==, Equals, a hash and text, as Vector2.</summary>
+        /// <summary>Ray and RayHit have ==, Equals, a hash and text, as Vector2. A ray keeps its direction normalized, which in the game's Lua, with its square root, is only near (0, 1) for (0, 5).</summary>
         public static void RayValues(FakeWorld world)
         {
-            var ray = new Ray(Vector2.Zero, new Vector2(0f, 5f));
+            Vector2Cases.Near(Vector2.Up, new Ray(Vector2.Zero, new Vector2(0f, 5f)).Direction, "the direction of a ray made with (0, 5)");
+            var ray = new Ray(Vector2.Zero, new Vector2(0f, 1f));
             Expect.True(ray == new Ray(Vector2.Zero, Vector2.Up), "ray ==");
             Expect.True(ray != new Ray(Vector2.One, Vector2.Up), "ray !=");
             Expect.True(ray.Equals((object)new Ray(Vector2.Zero, Vector2.Up)), "ray Equals(object)");

@@ -321,8 +321,14 @@ public static class Rules
         "using var is disposed after the earlier using var here, not before it, in the game's Lua; use nested using (...) blocks",
         "C# disposes using var declarations in reverse order; CSharp.lua disposes them in the order they are written.");
 
+    public static readonly DiagnosticDescriptor NotANumber = Syntax(
+        "MW0042",
+        "NaN or infinity, which the game's Lua does not have",
+        "'{0}' {1}",
+        "The game's own Lua has floats of its own (the 0.3 gate, 10-27): its arithmetic makes no NaN and no infinity. float.NaN and double.NaN, which CSharp.lua writes 0 / 0, are 1 there; 1 / 0 is 2^127 (1.7e38), and inf - inf and 0 * inf are 0. So float.IsNaN is never true, IsInfinity, IsPositiveInfinity, IsNegativeInfinity and IsFinite test for what never happens, and PositiveInfinity and NegativeInfinity turn into plain numbers in arithmetic. Mark no value with a bool or a float?, use float.MaxValue for no limit, and test what could go wrong before it does (a length of 0 before dividing by it).");
+
     /// <summary>The rules for syntax and library CSharp.lua or its Lua core cannot do.</summary>
     public static ImmutableArray<DiagnosticDescriptor> Syntaxes { get; } = ImmutableArray.Create(
         PatternStops, PatternWrong, StructCopy, TupleForm, FormWrong, RangeIndex, RefForm,
-        ParamsForm, StringCall, BoxedValue, CatchForm, LuaMember, CheckedForm, EnumText, UsingOrder);
+        ParamsForm, StringCall, BoxedValue, CatchForm, LuaMember, CheckedForm, EnumText, UsingOrder, NotANumber);
 }

@@ -346,11 +346,27 @@ target.PlaceAt(Vector2.Lerp(start, end, Ease.OutQuad(t)));
 - `unit.Position()` is a method. `PlaceAt` ignores pathing and keeps the unit's order, which a push wants; `MoveTo`
   goes through pathing and ends it.
 - `Raycast.Circle`, `Segment`, `Bounds` and `Polygon` give the first hit along a segment in an `out` value, with a
-  normal for `Bounce` and `Slide`. The usual loop, `pos = hit.Point; vel = vel.Bounce(hit.Normal)`, goes on: a segment
-  that starts on a surface (within 0.02) hits it only when it goes in, and the hit is then put on the surface. One that
-  starts deeper inside hits at once, with the normal against its direction.
+  normal for `Bounce` and `Slide`. After a hit, a step goes on for the rest of its time with the new velocity, as
+  below; moved only to `hit.Point`, something pulled into a surface at every step (by gravity) hits at the start of each
+  step and stands where it landed. A segment that starts on a surface (within 0.02) hits it only when it goes in, and
+  the hit is then put on the surface; one that starts deeper inside hits at once, with the normal against its direction.
 - A wall (`Segment`) has no inside, so a point that slides along it, or meets it within 0.01 of where another wall
   joins it, can end up on its far side. Make something solid from a `Polygon` or `Bounds`.
+- The game's numbers are not .NET's: a square root, sine or cosine is off by up to about 2 parts in 100,000, an
+  addition drops what is below two float steps of its result (0.004 at 20,000), and nothing makes NaN or infinity
+  (MW0042). Compare places with a tolerance, not `==`.
+
+```csharp
+var left = dt;                                     // the step's seconds
+for (var hits = 0; hits < 4 && left > 0f; hits++)  // at most 4 hits in a step
+{
+    var to = pos + vel * left;
+    if (!Raycast.Polygon(pos, to, rock, out var hit)) { pos = to; break; }
+    pos = hit.Point;
+    vel = vel.Slide(hit.Normal);                   // or Bounce
+    left *= 1f - hit.Fraction;
+}
+```
 
 ## Terrain
 
@@ -377,9 +393,9 @@ if (Terrain.Raycast(from, to, out var hit)) { /* the missile meets the ground at
   (not measured in the game).
 - On a bridge, `Height` reads the water or ground beneath, and `IsWalkable` and `CanStand` read false.
 - `Terrain.Raycast(from, to, out hit)` is for a missile against the ground; a ridge narrower than 32 can be stepped over.
-  As with the maths raycasts, a missile moved to `hit.Point` and bounced or slid there goes on. Only the part of a ray
-  over the map is cast: past the map's edge it meets nothing, and a long ray reads the ground at most about 2,700 times
-  (across the largest map, about 25 ms).
+  As with the maths raycasts, a missile goes on when its step moves on after a hit for the rest of its time. Only the
+  part of a ray over the map is cast: past the map's edge it meets nothing, and a long ray reads the ground at most
+  about 2,700 times (across the largest map, about 25 ms).
 - A `Height` read costs about 9 microseconds in the game, so code that runs every tick on many objects should read it
   sparingly.
 
@@ -583,6 +599,7 @@ compared, and from later checks of the compiler Moonwell builds with.
 | MW0032 | `Enum.Parse`, `Enum.GetValues`/`GetNames`, `ToString("D")` on an enum, a `[Flags]` combination turned into text, `(Color)5 + "x"` | a `switch` on the value, `HasFlag` |
 | MW0034 | two `using var` in one block (disposed in the wrong order) | nested `using ( ) { }` |
 | MW0035 | `(unit)data`, `data as unit`, `data is unit`, `case unit u` from an `object`, a `widget` or a `T`, `foreach (unit u in widgets)`, `widgets.OfType<unit>()` and `widgets.Cast<unit>()`: a game handle fails every check for its type | a field or variable of the handle's type, or a class of your own that holds it |
+| MW0042 | `float.NaN` and `double.NaN` (1 in the game, whose arithmetic makes no NaN), `IsNaN` (never true), `PositiveInfinity`, `NegativeInfinity`, `IsInfinity` and `IsFinite` (`1 / 0` is 2^127 there) | a `bool` or a `float?` for no value, `float.MaxValue` for no limit, a test before dividing |
 
 The analyzer does not see these, so they build and then go wrong in the game:
 
@@ -603,7 +620,8 @@ What works is most of the language: classes, structs, records, primary construct
 generics with constraints, enums, delegates, events, `switch` statements, `is` patterns with constants, types and
 properties, `??`, `?.`, collection expressions, `foreach` over every collection, `yield`, lambdas and closures,
 `ref`/`out`/`in` parameters, `lock`, string interpolation, `List`, `Dictionary`, `HashSet`, `Queue`, `Stack`, arrays and
-most of LINQ. `float` and `int` arithmetic is the game's, see MW0005.
+most of LINQ. `float` and `int` arithmetic is the game's, see MW0005; its floats have no NaN or infinity (MW0042), and
+its square roots and sines are off by up to about 2 parts in 100,000 (Maths).
 
 ## The build
 

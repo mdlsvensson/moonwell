@@ -103,6 +103,15 @@ public class SyntaxTests
     [InlineData("MW0032", "var s = (Color)5 + \" x\";", "(Color)5")]
     // MW0034: using order
     [InlineData("MW0034", "using var a = new Res(); using var b = new Res();", "using var b = new Res();", "class Res : IDisposable { public void Dispose() { } }")]
+    // MW0042: NaN and the infinities, which the game's own numbers do not have
+    [InlineData("MW0042", "var x = float.NaN;", "NaN")]
+    [InlineData("MW0042", "var x = double.NaN;", "NaN")]
+    [InlineData("MW0042", "float y = 2f; var b = float.IsNaN(y);", "IsNaN")]
+    [InlineData("MW0042", "var x = float.PositiveInfinity;", "PositiveInfinity")]
+    [InlineData("MW0042", "var x = double.NegativeInfinity;", "NegativeInfinity")]
+    [InlineData("MW0042", "float y = 2f; var b = float.IsInfinity(y);", "IsInfinity")]
+    [InlineData("MW0042", "float y = 2f; var b = float.IsFinite(y);", "IsFinite")]
+    [InlineData("MW0042", "float y = 2f; var b = y.Equals(float.NaN);", "NaN")]
     // MW0005: decimal
     [InlineData("MW0005", "decimal d = 1;", "d")]
     public void rejected(string id, string body, string pointsAt, string members = "")
@@ -157,7 +166,19 @@ public class SyntaxTests
             var big = 5; var cast = checked((byte)big);
             var mode = Mode.A | Mode.B; var has2 = mode.HasFlag(Mode.A) && (mode & Mode.B) != 0;
             var named = Color.Green; var back = (Color)5; var ok = back == named;
+            var most = float.MaxValue; var least = float.MinValue; var root = MathF.Sqrt(2f); var near = MathF.Abs(root - 1.414f) < 0.001f;
             """, Types));
+    }
+
+    [Fact]
+    public void an_infinity_in_an_attribute_is_accepted()
+    {
+        var found = MapCode.CheckFile("""
+            class MaxAttribute : System.Attribute { public MaxAttribute(float most) { } }
+            [Max(float.PositiveInfinity)]
+            class Limited { }
+            """);
+        Assert.Empty(found);
     }
 
     [Fact]

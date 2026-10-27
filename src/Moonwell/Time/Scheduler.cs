@@ -156,6 +156,8 @@ namespace Moonwell
         /// Moves a repeating timer on to its next run: due a whole number of intervals after its start, never before the run it
         /// moves on from. Late in a game a float moves in steps (0.0005 s from about 68 minutes); worked out from the start, the
         /// rounding of each due time stays within one step, and an interval shorter than a step gives runs that share an instant.
+        /// In the game's own Lua an addition drops what is below two steps (seen 10-27), so there a due time can be up to two
+        /// steps early, and runs share an instant from an interval of two steps.
         /// </summary>
         private static void MoveOn(Timer timer)
         {

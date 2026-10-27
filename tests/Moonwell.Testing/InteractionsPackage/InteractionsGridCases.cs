@@ -226,7 +226,7 @@ namespace Moonwell.Testing
             Expect.Near(256.0f, Interactions.CellSize, "a setting can be set again after a reset");
         }
 
-        /// <summary>A CellSize, CellCheck or Step that is not more than 0, or not a number, is an error in a development build, and changes nothing; a Slack of 0 is allowed.</summary>
+        /// <summary>A CellSize, CellCheck or Step that is not more than 0, or not a number, is an error in a development build, and changes nothing; a Slack of 0 is allowed. The game's Lua has no NaN (float.NaN is 1 there), so there the NaN checks are left out.</summary>
         public static void SettingsChecked(FakeWorld world)
         {
             Interactions.Install(new FakeInteractionWorld());
@@ -234,13 +234,17 @@ namespace Moonwell.Testing
             var nan = float.NaN;
             Expect.Throws<MoonwellException>(() => Interactions.CellSize = 0.0f, "a CellSize of 0");
             Expect.Throws<MoonwellException>(() => Interactions.CellSize = -128.0f, "a CellSize below 0");
-            Expect.Throws<MoonwellException>(() => Interactions.CellSize = nan, "a CellSize that is not a number");
             Expect.Throws<MoonwellException>(() => Interactions.CellCheck = 0.0f, "a CellCheck of 0");
             Expect.Throws<MoonwellException>(() => Interactions.CellCheck = -0.1f, "a CellCheck below 0");
-            Expect.Throws<MoonwellException>(() => Interactions.CellCheck = nan, "a CellCheck that is not a number");
             Expect.Throws<MoonwellException>(() => Interactions.Step = 0.0f, "a Step of 0");
             Expect.Throws<MoonwellException>(() => Interactions.Step = -0.03125f, "a Step below 0");
-            Expect.Throws<MoonwellException>(() => Interactions.Step = nan, "a Step that is not a number");
+            if (GameNumbers.HasNaN)
+            {
+                Expect.Throws<MoonwellException>(() => Interactions.CellSize = nan, "a CellSize that is not a number");
+                Expect.Throws<MoonwellException>(() => Interactions.CellCheck = nan, "a CellCheck that is not a number");
+                Expect.Throws<MoonwellException>(() => Interactions.Step = nan, "a Step that is not a number");
+            }
+
             Expect.Near(128.0f, Interactions.CellSize, "CellSize is as it was");
             Expect.Near(0.1f, Interactions.CellCheck, "CellCheck is as it was");
             Expect.Near(0.03125f, Interactions.Step, "Step is as it was");

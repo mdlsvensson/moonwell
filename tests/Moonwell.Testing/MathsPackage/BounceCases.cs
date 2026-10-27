@@ -310,5 +310,50 @@ namespace Moonwell.Testing
             Expect.True(!Raycast.Segment(new Vector2(0f, 3f), new Vector2(8f, 5f), new Vector2(0f, -50f), new Vector2(0f, 50f), out _), "from on a wall, either way: no hit");
             Expect.True(!Raycast.Segment(new Vector2(0f, 3f), new Vector2(-8f, 5f), new Vector2(0f, -50f), new Vector2(0f, 50f), out _), "from on a wall, the other way: no hit");
         }
+
+        /// <summary>
+        /// A point pulled toward a slope at every step, as by gravity, slides down along it when a step goes on after a hit
+        /// with the new velocity for the rest of the step, as the guide's loop does. Moved only to the hit's point, it hits at
+        /// the start of every step and stands where it landed: the 0.3 gate saw that, in the game and in desktop Lua.
+        /// </summary>
+        public static void SlideUnderGravity(FakeWorld world)
+        {
+            const float step = 1f / 32f;
+            var ramp = new Polygon(new Vector2(-500f, 250f), new Vector2(300f, -150f), new Vector2(-500f, -150f));
+            var outward = new Vector2(0.4472136f, 0.8944272f);
+            var position = new Vector2(-400f, 550f);
+            var velocity = Vector2.Zero;
+            var landed = false;
+            var landedX = 0f;
+            for (var i = 0; i < 96; i++)
+            {
+                velocity = velocity + new Vector2(0f, -900f * step);
+                var left = step;
+                for (var hits = 0; hits < 4 && left > 0f; hits++)
+                {
+                    var to = position + velocity * left;
+                    if (!Raycast.Polygon(position, to, ramp, out var hit))
+                    {
+                        position = to;
+                        break;
+                    }
+
+                    position = hit.Point;
+                    velocity = velocity.Slide(hit.Normal);
+                    left *= 1f - hit.Fraction;
+                    if (!landed)
+                    {
+                        landed = true;
+                        landedX = position.X;
+                    }
+                }
+
+                // On the slope is not in it: 0.1 off the slope, outward, is outside.
+                Expect.True(!ramp.Contains(position + outward * 0.1f), "never in the ramp, at step " + i + ": " + position);
+            }
+
+            Expect.True(landed, "it landed on the slope");
+            Expect.True(position.X - landedX > 300f, "slid on down the slope: " + (position.X - landedX) + " along x from where it landed");
+        }
     }
 }

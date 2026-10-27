@@ -115,12 +115,17 @@ namespace Moonwell.Testing
             Expect.Near(0.1f, hit.Fraction, "fraction");
         }
 
-        /// <summary>A segment that ends at infinity, or at a number that is not one, gives up at once and misses; it does not walk on for ever.</summary>
+        /// <summary>A segment that ends at infinity, or at a number that is not one, gives up at once and misses; it does not walk on for ever. The game's Lua has no NaN (float.NaN is 1 there), so there the NaN checks are left out.</summary>
         public static void NotFinite(FakeWorld world)
         {
             OneTile(GridText.Tile(GridText.Corner(0f, 2), GridText.Corner(0f, 2), GridText.Corner(0f, 2), GridText.Corner(0f, 2)));
             Expect.True(!Terrain.Raycast(new Vector3(64f, 64f, 50f), new Vector3(float.PositiveInfinity, 64f, 50f), out var infinite), "an infinite end missed");
             Expect.True(infinite == new TerrainHit(Vector3.Zero, Vector3.Zero, 0f), "an infinite end: an empty hit");
+            if (!GameNumbers.HasNaN)
+            {
+                return;
+            }
+
             Expect.True(!Terrain.Raycast(new Vector3(64f, 64f, 50f), new Vector3(float.NaN, 64f, 50f), out var notANumber), "a NaN end missed");
             Expect.True(notANumber == new TerrainHit(Vector3.Zero, Vector3.Zero, 0f), "a NaN end: an empty hit");
             Expect.True(!Terrain.Raycast(new Vector3(float.NaN, 64f, 50f), new Vector3(100f, 64f, 50f), out _), "a NaN start missed");

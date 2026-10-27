@@ -43,9 +43,14 @@ namespace Moonwell.Testing
             Expect.True(!Terrain.IsCliff(-756f, 500f), "outside is no cliff on one level");
         }
 
-        /// <summary>A coordinate that is not a number reads the edge (the first corner's side), and does not fail.</summary>
+        /// <summary>A coordinate that is not a number reads the edge (the first corner's side), and does not fail. The game's Lua has no NaN (float.NaN is 1 there), so there the case checks nothing.</summary>
         public static void NotANumber(FakeWorld world)
         {
+            if (!GameNumbers.HasNaN)
+            {
+                return;
+            }
+
             Terrain.Install(new FakeTerrainWorld(), 2, 2, 0f, 0f, GridText.Tile(GridText.Corner(10f, 2), GridText.Corner(20f, 2), GridText.Corner(30f, 2), GridText.Corner(40f, 2)));
             Expect.Near(10f, Terrain.Height(float.NaN, float.NaN), "NaN both ways reads the first corner");
             Expect.Near(30f, Terrain.Height(float.NaN, 128f), "NaN across, at the top: the top left");

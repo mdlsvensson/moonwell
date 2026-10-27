@@ -108,7 +108,8 @@ public class FieldRulesParityTests
         yield return new object[] { "float below the lower limit", Tree, "", "Scale = 0.0099999f;" };
         yield return new object[] { "float at the upper limit", Tree, "", "MaximumScale = 100f;" };
         yield return new object[] { "float above the upper limit", Tree, "", "MaximumScale = 100.00001f;" };
-        yield return new object[] { "float that is not a number", Tree, "", "Scale = float.NaN;" };
+        // NaN made by dividing: float.NaN is MW0042 too, as the game's Lua has no NaN, and this case is about MW0009 alone.
+        yield return new object[] { "float that is not a number", Tree, "", "Scale = 0f / 0f;" };
         yield return new object[] { "float, an int constant", Tree, "", "Scale = 200;" };
     }
 
