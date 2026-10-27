@@ -707,7 +707,7 @@ namespace Moonwell.Engine
         }
 
         /// <summary>Lays a missile still on the ground, with no velocity, and runs OnRest on it, then on its components in the order they were added, each with the missile as the current owner and each reporting an error it throws; none runs once the missile has ended.</summary>
-        private static void Rest(Missile missile)
+        internal static void Rest(Missile missile)
         {
             missile.resting = true;
             missile.vx = 0.0f;

@@ -56,6 +56,9 @@ namespace Moonwell.Engine
         /// <summary>The bit of OnStruck in a class's mask.</summary>
         private const int StruckBit = 1;
 
+        /// <summary>How many rounds Held takes the velocity and the pull down the walls a ball touched: each round leaves of what goes into a corner a share as small as the cosine between the walls' feet.</summary>
+        private const int Rounds = 4;
+
         /// <summary>A length shorter than this gives no direction, for a normal.</summary>
         private const float Tiny = 0.0001f;
 
@@ -88,6 +91,9 @@ namespace Moonwell.Engine
 
         /// <summary>A count of the walks down the walls for a missile, so a wall met in this walk is not met again in it.</summary>
         private static int wallRound;
+
+        /// <summary>Whether the walk down the walls running now put a ball on the ground along a wall's foot, so it may rest against the walls when the walk ends.</summary>
+        private static bool footed;
 
         /// <summary>The reactions each class writes, keyed by the class (never by an actor); made on first use.</summary>
         private static Dictionary<object, int>? masks;
@@ -640,9 +646,31 @@ namespace Moonwell.Engine
                 // move (Through): a second wall closing a corner ahead is met this step, not a step late from its far side.
                 touch.touching = true;
                 touch.lastTouch = now;
-                missile.vx = vx - into * nx;
-                missile.vy = vy - into * ny;
+                vx -= into * nx;
+                vy -= into * ny;
+                var along = missile.vz;
                 Beside(wall, radius, nx, ny, ref bx, ref by);
+                if (!missile.fell)
+                {
+                    // On the ground this step and not leaving it: it stays on the ground where it is put, as Beside puts it
+                    // out of the wall across the slope, uphill or down, and goes along the line where the wall meets the
+                    // ground. Kept at its height, it was put into the ground uphill, and a Bounce met the ground again.
+                    float gx;
+                    float gy;
+                    float gz;
+                    Ground.Slope(bx, by, bz, out gx, out gy, out gz);
+                    if (gz > 0.0f && vx * gx + vy * gy + along * gz < Settle)
+                    {
+                        Foot(nx, ny, gx, gy, gz, ref vx, ref vy, ref along);
+                        bz = Ground.Height(bx, by, bz) + radius;
+                        missile.z = bz;
+                        footed = true;
+                    }
+                }
+
+                missile.vx = vx;
+                missile.vy = vy;
+                missile.vz = along;
                 grid.Move(entry, bx, by);
                 Placed(missile, bx, by, bz);
                 Flight.Place(missile, world, bx, by, bz);
@@ -1632,6 +1660,7 @@ namespace Moonwell.Engine
             }
 
             wallRound++;
+            footed = false;
             var round = wallRound;
             var count = list.Count;
             for (var turn = 0; turn < count && !Ended(missile) && missile.wallContact != Contact.None; turn++)
@@ -1733,6 +1762,10 @@ namespace Moonwell.Engine
             }
 
             Walls.Done();
+            if (footed && !Ended(missile))
+            {
+                Held(missile);
+            }
         }
 
         /// <summary>
@@ -1886,6 +1919,119 @@ namespace Moonwell.Engine
             nx = lx;
             ny = ly;
             return Met;
+        }
+
+        /// <summary>
+        /// Keeps of a velocity only its part along the line where a wall meets the ground: the wall's level normal (nx, ny)
+        /// crossed with the ground's (gx, gy, gz), so it goes neither into the wall nor into the ground.
+        /// </summary>
+        private static void Foot(float nx, float ny, float gx, float gy, float gz, ref float vx, ref float vy, ref float vz)
+        {
+            var tx = ny * gz;
+            var ty = -nx * gz;
+            var tz = nx * gy - ny * gx;
+            var square = tx * tx + ty * ty + tz * tz;
+            if (!(square > Tiny * Tiny))
+            {
+                return;
+            }
+
+            var share = (vx * tx + vy * ty + vz * tz) / square;
+            vx = share * tx;
+            vy = share * ty;
+            vz = share * tz;
+        }
+
+        /// <summary>
+        /// After a walk that put a ball on the ground along a wall's foot: it rests (OnRest), as a ball stopped on ground its
+        /// friction holds does, when the walls it is at (touched in the last Recent steps, and its radius and the Skin from
+        /// it or less: in a corner it meets the two walls a step about) take what is left of its velocity and of the
+        /// slope's pull. Its velocity and the pull along the ground (by Physics.Gravity, as Roll's) each keep, wall by wall and
+        /// over a few rounds, only the part along a wall's foot where they go into the wall; at rest the velocity is under
+        /// its Friction for a step, and the pull no more than its Friction. A ball pulled into two walls closing a corner
+        /// rests there; one pulled along a single wall down a slope does not.
+        /// </summary>
+        private static void Held(Missile missile)
+        {
+            var touches = missile.wallTouches;
+            if (touches == null)
+            {
+                return;
+            }
+
+            var entry = missile.entry!;
+            var x = entry.X;
+            var y = entry.Y;
+            var z = missile.z;
+            float gx;
+            float gy;
+            float gz;
+            Ground.Slope(x, y, z, out gx, out gy, out gz);
+            if (!(gz > 0.0f))
+            {
+                return;
+            }
+
+            var radius = missile.radius;
+            var gravity = Physics.Current().Gravity;
+            var px = gravity * gz * gx;
+            var py = gravity * gz * gy;
+            var pz = gravity * (gz * gz - 1.0f);
+            var vx = missile.vx;
+            var vy = missile.vy;
+            var vz = missile.vz;
+            var now = Tracking.StepNow;
+            var count = touches.Count;
+            for (var pass = 0; pass < Rounds; pass++)
+            {
+                for (var i = 0; i < count; i++)
+                {
+                    var touch = Raw.At(touches, i);
+                    var wall = touch.wall!;
+                    if (now - touch.lastTouch > Recent || wall.ending)
+                    {
+                        continue;
+                    }
+
+                    // The level normal out of the wall toward the ball.
+                    float x1;
+                    float y1;
+                    float x2;
+                    float y2;
+                    Ends(wall, out x1, out y1, out x2, out y2);
+                    float qx;
+                    float qy;
+                    Nearest(x, y, x1, y1, x2 - x1, y2 - y1, out qx, out qy);
+                    var ox = x - qx;
+                    var oy = y - qy;
+                    var off = Trig.Sqrt(ox * ox + oy * oy);
+                    if (!(off > Tiny) || off > radius + Skin)
+                    {
+                        // Not at the wall now.
+                        continue;
+                    }
+
+                    var nx = ox / off;
+                    var ny = oy / off;
+                    if (px * nx + py * ny < 0.0f)
+                    {
+                        Foot(nx, ny, gx, gy, gz, ref px, ref py, ref pz);
+                    }
+
+                    if (vx * nx + vy * ny < 0.0f)
+                    {
+                        Foot(nx, ny, gx, gy, gz, ref vx, ref vy, ref vz);
+                    }
+                }
+            }
+
+            var friction = missile.friction;
+            var lost = friction * Interactions.Current().Step;
+            if (vx * vx + vy * vy + vz * vz <= lost * lost && px * px + py * py + pz * pz <= friction * friction)
+            {
+                missile.rolling = missile.groundContact == Contact.Slide;
+                Flight.Rest(missile);
+            }
         }
 
         /// <summary>A wall's two ends where it is now: as made, moved by how far its place has moved since.</summary>

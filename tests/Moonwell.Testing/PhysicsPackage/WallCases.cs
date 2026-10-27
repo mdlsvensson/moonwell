@@ -302,10 +302,12 @@ namespace Moonwell.Testing
         /// <summary>
         /// The slide-under-gravity scene with a second wall from (300, 200) to (600, -100) across the ball's way, closing the
         /// corner at (300, 200): the ball comes down along the first wall at about 640 a second, more than its radius a step,
-        /// and stays its radius off both walls for 8 seconds, ending in the corner; rolling, on the ground, and as a Bounce
-        /// not under it (sent back up the slope by the second wall, it hops along it). The slide along the first
-        /// wall ended the step's walk down the walls, so the second was met a step late, from its far side, and the ball went
-        /// through it. So rolling, and going along the ground as a Bounce.
+        /// and stays its radius off both walls, and on the ground: rolling throughout, and as a Bounce, knocked back up the
+        /// slope by the second wall to bounce on it a few times, once settled. In the corner it comes to rest: no impact
+        /// after 8 s (the Bounce's last near 6 s), OnRest once, and still for the last second of 16. The slide along the
+        /// first wall ended the step's walk down the walls, so the second was met a step late, from its far side, and the
+        /// ball went through it; then, held in the corner, it was put back out uphill into the ground, so a Bounce met the
+        /// ground at 5.2 every 3 steps for ever, and neither ever rested.
         /// </summary>
         public static void SlideIntoCorner(FakeWorld world)
         {
@@ -313,7 +315,7 @@ namespace Moonwell.Testing
             IntoCorner(world, Contact.Bounce, Contact.Bounce, "Bounce: ");
         }
 
-        /// <summary>Lays a ball with the given contacts against the slope's wall with the second wall across its way, and checks it stays off both for 8 seconds.</summary>
+        /// <summary>Lays a ball with the given contacts against the slope's wall with the second wall across its way, and checks it stays off both and on the ground, and rests in the corner.</summary>
         private static void IntoCorner(FakeWorld world, Contact ground, Contact side, string what)
         {
             SlopeWithWall();
@@ -322,8 +324,22 @@ namespace Moonwell.Testing
             float y;
             var ball = AgainstSlopeWall(ground, side, out x, out y);
             var fastest = 0.0f;
-            for (var i = 0; i < 256; i++)
+            var settled = 0;
+            var lastX = 0.0f;
+            var lastY = 0.0f;
+            for (var i = 0; i < 512; i++)
             {
+                if (i == 256)
+                {
+                    settled = ball.Impacts;
+                }
+
+                if (i == 480)
+                {
+                    lastX = ball.X;
+                    lastY = ball.Y;
+                }
+
                 Steps(world, 1);
                 var speed = MathF.Sqrt(ball.VX * ball.VX + ball.VY * ball.VY);
                 if (speed > fastest)
@@ -336,19 +352,24 @@ namespace Moonwell.Testing
                 Expect.True(offA > 15.9f, what + "its radius off the first wall, at step " + i + ": " + offA);
                 Expect.True(offB > 15.9f, what + "its radius off the second wall, at step " + i + ": " + offB);
                 var floor = Physics.GroundHeight(ball.X, ball.Y) + 16.0f;
-                if (ground == Contact.Slide)
+                if (ground == Contact.Slide || i >= 256)
                 {
                     Within(floor, ball.Z, 1.0f, what + "on the ground, at step " + i);
                 }
                 else
                 {
-                    // A Bounce sent back up the slope by the second wall hops along it.
+                    // A Bounce knocked back up the slope by the second wall at 640 a second meets the slope and bounces
+                    // off it a few times before it settles.
                     Expect.True(ball.Z > floor - 1.0f, what + "not under the ground, at step " + i + ": " + (ball.Z - floor));
                 }
             }
 
             Expect.True(fastest > 16.0f * 32.0f, what + "faster than its radius a step on the way: " + fastest);
             Expect.True(ball.X < 360.0f && ball.Y < 240.0f, what + "in the corner at the end; at (" + ball.X + ", " + ball.Y + ")");
+            Expect.Equal(settled, ball.Impacts, what + "no impact after 8 s");
+            Expect.Equal(1, ball.Rested, what + "it rests in the corner, OnRest once");
+            Within(lastX, ball.X, 0.0f, what + "still for the last second: x");
+            Within(lastY, ball.Y, 0.0f, what + "y");
         }
 
         /// <summary>
