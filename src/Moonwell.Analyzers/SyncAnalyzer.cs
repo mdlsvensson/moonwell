@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -12,7 +14,7 @@ namespace Moonwell.Analyzers;
 
 /// <summary>Rejects the multiplayer mistakes of decision 13 in a map project.</summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class SyncAnalyzer : DiagnosticAnalyzer
+public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
 {
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules.All;
 
@@ -30,65 +32,17 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             start.RegisterOperationAction(checker.Literal, OperationKind.Literal);
             start.RegisterOperationAction(checker.Declarator, OperationKind.VariableDeclarator);
             start.RegisterOperationAction(checker.Text, OperationKind.Binary, OperationKind.Interpolation, OperationKind.Conversion);
+            start.RegisterOperationAction(checker.Implicit,
+                OperationKind.Binary, OperationKind.Unary, OperationKind.CompoundAssignment, OperationKind.Increment, OperationKind.Decrement,
+                OperationKind.Conversion, OperationKind.Using, OperationKind.UsingDeclaration, OperationKind.Loop, OperationKind.LocalReference,
+                OperationKind.EventReference);
+            start.RegisterOperationAction(checker.Delegates, OperationKind.Argument, OperationKind.ParameterReference);
             start.RegisterSymbolAction(checker.Declaration, SymbolKind.Field, SymbolKind.Property, SymbolKind.Method, SymbolKind.NamedType);
         });
     }
 
-    /// <summary>Why a call may not run on one machine: the path from the call to what it reaches, and what that does.</summary>
-    private sealed class Finding
-    {
-        public Finding(string path, string what)
-        {
-            Path = path;
-            What = what;
-        }
-
-        public string Path { get; }
-
-        public string What { get; }
-
-        public string Message(string name) =>
-            Path == name ? $"'{name}' {What}" : $"'{name}' {What} (through {Path})";
-    }
-
-    /// <summary>The nodes being followed now, each with its depth, and the lowest depth a cycle was cut back to.</summary>
-    private sealed class Walk
-    {
-        public Dictionary<object, int> Depths { get; } = new(new NodeComparer());
-
-        public int Low { get; set; } = int.MaxValue;
-    }
-
-    /// <summary>A part of a class that is followed as one: its static initializers and constructor, or its instance initializers.</summary>
-    private sealed class Part
-    {
-        public Part(INamedTypeSymbol type, bool isStatic)
-        {
-            Type = type;
-            IsStatic = isStatic;
-        }
-
-        public INamedTypeSymbol Type { get; }
-
-        public bool IsStatic { get; }
-
-        public override bool Equals(object? other) =>
-            other is Part part && part.IsStatic == IsStatic && SymbolEqualityComparer.Default.Equals(part.Type, Type);
-
-        public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(Type) * 2 + (IsStatic ? 1 : 0);
-    }
-
-    /// <summary>Compares followed nodes: symbols as Roslyn compares them, anything else by its own equality.</summary>
-    private sealed class NodeComparer : IEqualityComparer<object>
-    {
-        public new bool Equals(object? x, object? y) =>
-            x is ISymbol a && y is ISymbol b ? SymbolEqualityComparer.Default.Equals(a, b) : object.Equals(x, y);
-
-        public int GetHashCode(object node) => node is ISymbol symbol ? SymbolEqualityComparer.Default.GetHashCode(symbol) : node.GetHashCode();
-    }
-
     /// <summary>The checks of one compilation, with the symbols they compare against.</summary>
-    private sealed class Checker
+    private sealed partial class Checker
     {
         private readonly Compilation compilation;
         private readonly INamedTypeSymbol? natives;
@@ -109,6 +63,15 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
 
         /// <summary>What each followed node of the map reaches; a node that reaches nothing rejected maps to null.</summary>
         private readonly ConcurrentDictionary<object, Finding?> followed = new(new NodeComparer());
+
+        /// <summary>The map's overrides and implementations of each method, found once.</summary>
+        private readonly Lazy<Dictionary<IMethodSymbol, List<IMethodSymbol>>> overriders;
+
+        /// <summary>The delegates given to each delegate field, property and event of the map, found once.</summary>
+        private readonly Lazy<Dictionary<ISymbol, List<SyntaxNode>>> memberValues;
+
+        /// <summary>The delegate parameters whose delegate runs on one machine, found once.</summary>
+        private readonly Lazy<HashSet<IParameterSymbol>> localParameters;
 
         public Checker(Compilation compilation)
         {
@@ -139,12 +102,17 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             enumerable = compilation.GetTypeByMetadataName("System.Collections.IEnumerable");
             enumerableOfT = compilation.GetTypeByMetadataName("System.Collections.Generic.IEnumerable`1");
             handle = compilation.GetTypeByMetadataName("Moonwell.handle");
+            overriders = new(FindOverriders, LazyThreadSafetyMode.ExecutionAndPublication);
+            memberValues = new(FindMemberValues, LazyThreadSafetyMode.ExecutionAndPublication);
+            localParameters = new(FindLocalParameters, LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
         public void Call(OperationAnalysisContext context)
         {
             var operation = context.Operation;
-            var (member, write) = Target(operation);
+            var reach = Targets(operation).FirstOrDefault();
+            var member = reach.Member;
+            var write = reach.Write;
             if (member == null || Silenced(operation, context.ContainingSymbol))
             {
                 return;
@@ -173,11 +141,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             }
             else if (IsLocal(operation, context.ContainingSymbol))
             {
-                var finding = Rejected(member, write, new Walk(), context.ContainingSymbol as INamedTypeSymbol ?? context.ContainingSymbol.ContainingType);
-                if (finding != null)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Rules.StateInLocal, location, finding.Message(Name(member))));
-                }
+                ReportLocal(context, operation);
             }
             else if (IsMachineLocal(member, write) && !DeclaredName(operation, member, write) && !InNameOf(operation))
             {
@@ -189,6 +153,42 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             {
                 context.ReportDiagnostic(Diagnostic.Create(Rules.LocalOutside, location, Name(member), why));
             }
+        }
+
+        /// <summary>MW0001 (or MW0039) for what Local.For reaches without a name: an operator, a conversion, a using's Dispose, a foreach's enumerator, and a delegate variable or event it runs.</summary>
+        public void Implicit(OperationAnalysisContext context)
+        {
+            var operation = context.Operation;
+            var named = operation switch
+            {
+                IBinaryOperation binary => binary.OperatorMethod != null,
+                IUnaryOperation unary => unary.OperatorMethod != null,
+                ICompoundAssignmentOperation compound => compound.OperatorMethod != null,
+                IIncrementOrDecrementOperation increment => increment.OperatorMethod != null,
+                IConversionOperation conversion => conversion.OperatorMethod != null,
+                ILocalReferenceOperation local => local.Local.Type.TypeKind == TypeKind.Delegate,
+                IEventReferenceOperation => true,
+                IUsingOperation or IUsingDeclarationOperation or IForEachLoopOperation => true,
+                _ => false,
+            };
+            if (named && !Silenced(operation, context.ContainingSymbol) && IsLocal(operation, context.ContainingSymbol))
+            {
+                ReportLocal(context, operation);
+            }
+        }
+
+        /// <summary>Reports what an operation inside Local.For reaches: MW0001, or MW0039 for code the analyzer cannot follow.</summary>
+        private void ReportLocal(OperationAnalysisContext context, IOperation operation)
+        {
+            if (Reaches(operation, new Walk()) is not { } finding)
+            {
+                return;
+            }
+
+            var location = operation is IForEachLoopOperation loop ? loop.Collection.Syntax.GetLocation()
+                : operation is IUsingOperation usingBlock ? usingBlock.Resources.Syntax.GetLocation()
+                : operation.Syntax.GetLocation();
+            context.ReportDiagnostic(Diagnostic.Create(finding.Unseen ? Rules.Unfollowed : Rules.StateInLocal, location, finding.Message(finding.Name)));
         }
 
         private const string Clock = "; it is this machine's clock: time game logic with Timer.After or Timer.Every";
@@ -483,260 +483,6 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             }
         }
 
-        /// <summary>The member an operation calls or touches, and whether it writes a property or field.</summary>
-        private static (ISymbol? Member, bool Write) Target(IOperation operation) => operation switch
-        {
-            IInvocationOperation invocation => (invocation.TargetMethod, false),
-            IPropertyReferenceOperation property => (property.Property, IsWritten(property)),
-            IFieldReferenceOperation field => (field.Field, IsWritten(field)),
-            IMethodReferenceOperation reference => (reference.Method, false),
-            IObjectCreationOperation creation => (creation.Constructor, false),
-            _ => (null, false),
-        };
-
-        private static bool IsWritten(IOperation operation) => operation.Parent switch
-        {
-            IAssignmentOperation assignment => assignment.Target == operation,
-            IIncrementOrDecrementOperation => true,
-            _ => false,
-        };
-
-        /// <summary>
-        /// Why a member may not be called on one machine; null when it may. The code that calls it is code of the class
-        /// from (null for none), which is there already: touching its own members runs nothing of it for the first time.
-        /// </summary>
-        private Finding? Rejected(ISymbol member, bool write, Walk walk, INamedTypeSymbol? from)
-        {
-            var name = Name(member);
-            if (IsNative(member))
-            {
-                if (member is IPropertySymbol)
-                {
-                    return write ? new Finding(name, "is set, which changes game state") : null;
-                }
-
-                if (Has(member, createsHandle))
-                {
-                    return new Finding(name, "creates a handle");
-                }
-
-                return Has(member, changesState) ? new Finding(name, "changes game state") : null;
-            }
-
-            if (member is IFieldSymbol && !IsMap(member))
-            {
-                return null;
-            }
-
-            if ((runtime != null && SymbolEqualityComparer.Default.Equals(member.ContainingAssembly, runtime))
-                || packages.Any(package => SymbolEqualityComparer.Default.Equals(member.ContainingAssembly, package)))
-            {
-                // Making a Moonwell object changes nothing in the game until it is added or started.
-                if (member is IMethodSymbol { MethodKind: MethodKind.Constructor } || IsLocalSafe(member, write) || IsMachineLocal(member, write))
-                {
-                    return null;
-                }
-
-                return new Finding(name, "may change game state (it is not marked [LocalSafe])");
-            }
-
-            if (!IsMap(member))
-            {
-                return null;
-            }
-
-            // CSharp.lua runs a class's static initializers and static constructor when the class is first touched.
-            var type = member.ContainingType.OriginalDefinition;
-            if (!SymbolEqualityComparer.Default.Equals(type, from?.OriginalDefinition) && FollowStatics(type, walk) is { } statics)
-            {
-                return new Finding(name + " > static " + type.Name + "() > " + statics.Path, statics.What);
-            }
-
-            if (member is IFieldSymbol || Has(member, syncUnchecked) || IsMachineLocal(member, write))
-            {
-                return null;
-            }
-
-            if (member is IMethodSymbol { MethodKind: MethodKind.Constructor } constructor)
-            {
-                return FollowConstructor(constructor, walk) is { } made ? new Finding(name + " > " + made.Path, made.What) : null;
-            }
-
-            var methods = member switch
-            {
-                IMethodSymbol method => new[] { method },
-                IPropertySymbol property => new[] { write ? property.SetMethod : property.GetMethod },
-                _ => new IMethodSymbol?[0],
-            };
-            foreach (var method in methods)
-            {
-                if (method != null && Follow(method, walk) is { } inner)
-                {
-                    return new Finding(name + " > " + inner.Path, inner.What);
-                }
-            }
-
-            return null;
-        }
-
-        private bool IsMap(ISymbol member) => SymbolEqualityComparer.Default.Equals(member.ContainingAssembly, compilation.Assembly);
-
-        /// <summary>What a class's static field and property initializers and its static constructor reach.</summary>
-        private Finding? FollowStatics(INamedTypeSymbol type, Walk walk) =>
-            Follow(new Part(type, true), Initializers(type, true).Concat(type.StaticConstructors.SelectMany(Syntax)), type, walk);
-
-        /// <summary>
-        /// What making an object with a constructor of the map reaches: its body, its class's field and property
-        /// initializers, and an implicit constructor's base constructor.
-        /// </summary>
-        private Finding? FollowConstructor(IMethodSymbol constructor, Walk walk)
-        {
-            constructor = constructor.OriginalDefinition;
-            var type = constructor.ContainingType;
-            var found = Follow(constructor, Syntax(constructor).Concat(Initializers(type, false)), type, walk);
-            if (found == null && constructor.IsImplicitlyDeclared
-                && type.BaseType?.InstanceConstructors.FirstOrDefault(c => c.Parameters.Length == 0) is { } baseConstructor)
-            {
-                found = Rejected(baseConstructor, false, walk, type);
-            }
-
-            return found;
-        }
-
-        /// <summary>The initializers of a class's static or instance fields and properties.</summary>
-        private static IEnumerable<SyntaxNode> Initializers(INamedTypeSymbol type, bool isStatic)
-        {
-            foreach (var member in type.GetMembers())
-            {
-                if (member.IsStatic != isStatic || member.IsImplicitlyDeclared || member is not (IFieldSymbol { IsConst: false } or IPropertySymbol))
-                {
-                    continue;
-                }
-
-                foreach (var reference in member.DeclaringSyntaxReferences)
-                {
-                    var initializer = reference.GetSyntax() switch
-                    {
-                        VariableDeclaratorSyntax variable => variable.Initializer,
-                        PropertyDeclarationSyntax property => property.Initializer,
-                        _ => null,
-                    };
-                    if (initializer != null)
-                    {
-                        yield return initializer;
-                    }
-                }
-            }
-        }
-
-        // The declarations of a method; a primary constructor's is its class's, whose parameters run nothing.
-        private static IEnumerable<SyntaxNode> Syntax(IMethodSymbol method) =>
-            method.DeclaringSyntaxReferences.Select(reference => reference.GetSyntax()).Where(syntax => syntax is not TypeDeclarationSyntax);
-
-        /// <summary>What a method of the map reaches that may not run on one machine.</summary>
-        private Finding? Follow(IMethodSymbol method, Walk walk)
-        {
-            method = method.OriginalDefinition;
-            return Follow(method, Syntax(method), method.ContainingType, walk);
-        }
-
-        /// <summary>
-        /// What the code of a node (a method, or a part of a class run at its first touch) reaches that may not run on
-        /// one machine. A node met again while it is still being followed is a cycle, cut there with nothing found; a
-        /// result is kept for later only when no cycle was cut back to a node that is still being followed above it,
-        /// since that node's own code may still find something, so the answer never depends on what was followed first.
-        /// </summary>
-        private Finding? Follow(object node, IEnumerable<SyntaxNode> code, INamedTypeSymbol? from, Walk walk)
-        {
-            if (followed.TryGetValue(node, out var known))
-            {
-                return known;
-            }
-
-            if (walk.Depths.TryGetValue(node, out var on))
-            {
-                walk.Low = System.Math.Min(walk.Low, on);
-                return null;
-            }
-
-            var depth = walk.Depths.Count;
-            walk.Depths[node] = depth;
-            var outerLow = walk.Low;
-            walk.Low = int.MaxValue;
-            Finding? found = null;
-            foreach (var syntax in code)
-            {
-                var body = compilation.GetSemanticModel(syntax.SyntaxTree).GetOperation(syntax);
-                if (body == null)
-                {
-                    continue;
-                }
-
-                foreach (var inner in body.DescendantsAndSelf())
-                {
-                    var (member, write) = Target(inner);
-                    if (member != null && (found = Rejected(member, write, walk, from)) != null)
-                    {
-                        break;
-                    }
-                }
-
-                if (found != null)
-                {
-                    break;
-                }
-            }
-
-            walk.Depths.Remove(node);
-            var low = walk.Low;
-            walk.Low = System.Math.Min(outerLow, low);
-            if (found != null || low >= depth)
-            {
-                followed[node] = found;
-            }
-
-            return found;
-        }
-
-        /// <summary>Whether an operation runs on one machine: inside Local.For's action, or in a [MachineLocal] method.</summary>
-        private bool IsLocal(IOperation operation, ISymbol container)
-        {
-            var model = operation.SemanticModel!;
-            for (var node = operation.Syntax; node != null; node = node.Parent)
-            {
-                if (node is ArgumentSyntax argument && IsLocalForAction(argument, model))
-                {
-                    return true;
-                }
-
-                if (node is LocalFunctionStatementSyntax or AnonymousFunctionExpressionSyntax
-                    && DeclaredBy(node, model) is { } function && Has(function, machineLocal))
-                {
-                    return true;
-                }
-
-                if (node is MemberDeclarationSyntax)
-                {
-                    break;
-                }
-            }
-
-            return Has(container, machineLocal);
-        }
-
-        private bool IsLocalForAction(ArgumentSyntax argument, SemanticModel model)
-        {
-            if (localFor == null || argument.Parent is not ArgumentListSyntax list || list.Parent is not InvocationExpressionSyntax invocation)
-            {
-                return false;
-            }
-
-            var isAction = argument.NameColon != null
-                ? argument.NameColon.Name.Identifier.ValueText == localFor.Parameters[1].Name
-                : list.Arguments.IndexOf(argument) == 1;
-            return isAction && SymbolEqualityComparer.Default.Equals(model.GetSymbolInfo(invocation).Symbol?.OriginalDefinition, localFor);
-        }
-
         /// <summary>Whether [SyncUnchecked] is on the member, local function or lambda around an operation.</summary>
         private bool Silenced(IOperation operation, ISymbol container)
         {
@@ -871,6 +617,9 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
         private static string Name(ISymbol member) => member switch
         {
             IMethodSymbol { MethodKind: MethodKind.Constructor } constructor => constructor.ContainingType.Name,
+            ILocalSymbol or IParameterSymbol => member.Name,
+            IMethodSymbol { MethodKind: MethodKind.UserDefinedOperator or MethodKind.Conversion } method =>
+                method.ContainingType.Name + "." + method.ToDisplayString(new SymbolDisplayFormat(memberOptions: SymbolDisplayMemberOptions.None)),
             _ when member.ContainingType is { Name: "Natives" } => member.Name,
             _ => member.ContainingType != null ? member.ContainingType.Name + "." + member.Name : member.Name,
         };

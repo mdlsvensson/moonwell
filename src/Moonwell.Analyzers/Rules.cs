@@ -76,8 +76,26 @@ public static class Rules
         isEnabledByDefault: true,
         description: "CSharp.lua's Random without a seed calls math.randomseed(os.time()) and then math.random. In the game math.random is the game's own synced generator (seen 2026-10-26), so each machine reseeds it with its own clock, and every GetRandomInt after it differs between machines, wherever the Random was made. new Random(seed) is computed in Lua alone, so it gives the same numbers on every machine when the seed is the same (one from Natives.GetRandomInt is)." + Silence);
 
+    public static readonly DiagnosticDescriptor Unfollowed = new(
+        "MW0039",
+        "Code inside Local.For the analyzer cannot follow",
+        "{0}; inside Local.For, write the lambda in place or call a method of the map",
+        Category,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "The analyzer follows what Local.For runs: a lambda written in place, a method of the map, a delegate parameter whose callers' arguments it checks, and the delegates given to a variable, field, property or event of the map. A delegate from anywhere else (a list's element, a library's result, a lambda's parameter) runs code it cannot see, which may change the game on one machine only." + Silence);
+
+    public static readonly DiagnosticDescriptor OneMachineCode = new(
+        "MW0040",
+        "Code of one machine where it runs on every machine",
+        "'{0}' {1}",
+        Category,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Code the analyzer checks as code of one machine (a delegate parameter given to Local.For, whose callers' lambdas may read the camera) must not also run on every machine, where such a read desyncs the game." + Silence);
+
     public static ImmutableArray<DiagnosticDescriptor> All { get; } =
-        ImmutableArray.Create(StateInLocal, LocalOutside, HandleId, HashLoop, NumberType, Desyncs, UnseededRandom);
+        ImmutableArray.Create(StateInLocal, LocalOutside, HandleId, HashLoop, NumberType, Desyncs, UnseededRandom, Unfollowed, OneMachineCode);
 
     private const string LuaCategory = "Lua";
 
