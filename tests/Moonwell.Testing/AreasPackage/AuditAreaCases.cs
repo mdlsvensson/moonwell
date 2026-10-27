@@ -174,6 +174,26 @@ namespace Moonwell.Testing
             Expect.True(!fake.Covers(line, 63.9f, 10f) && !fake.Covers(line, 96f, 10f) && !fake.Covers(line, 64f, 64f), "and no others");
         }
 
+        /// <summary>A map's area with fields of its own named as Area's keeps them apart from the base's: the area enters, stays and leaves its unit, and its own fields keep their values. CSharp.lua gives the subclass's fields names of their own (inside1), as it sees Area's private ones in the same compile.</summary>
+        public static void ShadowedFields(FakeWorld world)
+        {
+            var fake = Fresh();
+            var area = new ShadowArea(AreaShape.Rect(new Bounds(new Vector2(0f, 0f), new Vector2(256f, 256f))));
+            Game.Instance.Add(area);
+            world.Advance(0f);
+            Expect.Equal("own shape, 7, 0, 0, 0, idle, 0", area.Own(), "its own fields at the start");
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            fake.Walk(unit.Handle, 10f, 10f);
+            Expect.True(area.Has(unit) && area.Units.Count == 1, "the unit is inside");
+            Expect.True(area.Contains(10f, 10f) && !area.Contains(300f, 10f), "the shape is the area's");
+            world.Advance(1f);
+            Expect.True(AreaTracker.Running, "the timer runs");
+            fake.Walk(unit.Handle, 900f, 900f);
+            Expect.Equal("entered, stays, left", string.Join(", ", area.Log.ToArray()), "the reactions");
+            Expect.Equal("own shape, 7, 1, 1, 1, idle, 1", area.Own(), "its own fields");
+            Expect.True(!AreaTracker.Running, "the timer stopped with the last unit");
+        }
+
         /// <summary>A unit walked into a region gets an enter event, and out of it a leave event, once each.</summary>
         public static void FakeWalks(FakeWorld world)
         {
