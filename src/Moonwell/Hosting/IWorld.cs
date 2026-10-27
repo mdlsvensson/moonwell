@@ -176,6 +176,9 @@ namespace Moonwell.Hosting
         /// <summary>Hides an ability on a unit.</summary>
         void HideAbility(unit unit, int abilityId);
 
+        /// <summary>Makes an ability code gave a unit stay through a morph, which otherwise takes it away.</summary>
+        void MakeAbilityPermanent(unit unit, int abilityId);
+
         /// <summary>Takes an ability from a unit.</summary>
         void RemoveAbility(unit unit, int abilityId);
 

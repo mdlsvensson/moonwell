@@ -146,7 +146,7 @@ namespace Moonwell
             return false;
         }
 
-        /// <summary>Shows the buff on its unit through its carrier ability, when a display is registered for its class.</summary>
+        /// <summary>Shows the buff on its unit through its carrier ability, when a display is registered for its class. The carrier is made permanent, as a morph (Metamorphosis, Bear Form) takes away an ability code added that is not, and its icon with it (seen 10-26).</summary>
         private void Show()
         {
             var carrier = ObjectTypes.CarrierOf(this);
@@ -157,6 +157,7 @@ namespace Moonwell
 
             Runtime.World.AddAbility(Unit.Handle, carrier);
             Runtime.World.HideAbility(Unit.Handle, carrier);
+            Runtime.World.MakeAbilityPermanent(Unit.Handle, carrier);
         }
 
         /// <summary>Ends the expiry timer the buff has, if any, and starts a new one for its duration.</summary>

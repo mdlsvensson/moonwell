@@ -370,6 +370,19 @@ namespace Moonwell.Testing
             Expect.Equal("0 0 0 0", CountedHero.Created + " " + CountedHero.Left + " " + CountedItem.Created + " " + CountedItem.Left, "the unit's OnCreated and OnLeave runs, and the item's");
         }
 
+        /// <summary>A buff's hidden carrier, which shows its icon, is made permanent when it is added, so a morph (Metamorphosis, Bear Form), which takes away an ability code added that is not permanent (seen 10-26), leaves it on the unit.</summary>
+        public static void BuffCarrierSurvivesMorph(FakeWorld world)
+        {
+            var buffId = ObjectTypes.FourCC("B0CH");
+            var carrier = ObjectTypes.FourCC("A0CH");
+            ObjectTypes.BuffDisplay<Chilled>(buffId, carrier);
+            var handle = world.NewUnit(ObjectTypes.FourCC("Edem"), hero: true);
+            var target = Unit.Of(handle)!;
+            target.Apply(new Chilled(0.0f, 0.5f));
+            world.Morph(handle);
+            Expect.True(world.HasAddedAbility(handle, carrier), "the buff's carrier after the morph: " + string.Join(", ", world.AbilityCalls));
+        }
+
         /// <summary>A timer adopted by a second owner is refused, in every build: it is reported and stays with its first owner (decision 74).</summary>
         public static void AdoptAgainRefused(FakeWorld world)
         {

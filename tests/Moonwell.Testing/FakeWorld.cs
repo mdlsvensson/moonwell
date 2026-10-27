@@ -94,6 +94,12 @@ namespace Moonwell.Testing
         /// <summary>The units made illusions.</summary>
         private readonly HashSet<unit> illusions = new HashSet<unit>();
 
+        /// <summary>The abilities code gave each unit, which a morph takes away unless they are permanent.</summary>
+        private readonly Dictionary<unit, List<int>> addedAbilities = new Dictionary<unit, List<int>>();
+
+        /// <summary>The abilities made permanent on each unit.</summary>
+        private readonly Dictionary<unit, HashSet<int>> permanentAbilities = new Dictionary<unit, HashSet<int>>();
+
         /// <summary>The ability levels of each unit, keyed by ability id.</summary>
         private readonly Dictionary<unit, Dictionary<int, int>> abilityLevels = new Dictionary<unit, Dictionary<int, int>>();
 
@@ -949,10 +955,11 @@ namespace Moonwell.Testing
             return !IsAllyOf(source, other);
         }
 
-        /// <summary>Records an add-ability call.</summary>
+        /// <summary>Records an add-ability call, and keeps the ability among those code gave the unit.</summary>
         public void AddAbility(unit unit, int abilityId)
         {
             AbilityCalls.Add("add " + abilityId);
+            AddedTo(unit).Add(abilityId);
             if (abilityId == CrowForm)
             {
                 crowFormed.Add(unit);
@@ -965,14 +972,60 @@ namespace Moonwell.Testing
             AbilityCalls.Add("hide " + abilityId);
         }
 
-        /// <summary>Records a remove-ability call.</summary>
+        /// <summary>Records a make-permanent call, and keeps the ability through a morph.</summary>
+        public void MakeAbilityPermanent(unit unit, int abilityId)
+        {
+            AbilityCalls.Add("permanent " + abilityId);
+            if (!permanentAbilities.TryGetValue(unit, out var permanent))
+            {
+                permanent = new HashSet<int>();
+                permanentAbilities[unit] = permanent;
+            }
+
+            permanent.Add(abilityId);
+        }
+
+        /// <summary>Records a remove-ability call, and takes the ability from those code gave the unit.</summary>
         public void RemoveAbility(unit unit, int abilityId)
         {
             AbilityCalls.Add("remove " + abilityId);
+            AddedTo(unit).Remove(abilityId);
             if (abilityId == CrowForm && crowFormed.Remove(unit))
             {
                 floaters.Add(unit);
             }
+        }
+
+        /// <summary>Morphs a unit as Metamorphosis or Bear Form does: it loses each ability code gave it that was not made permanent (seen 10-26), and each is recorded as "stripped".</summary>
+        public void Morph(unit u)
+        {
+            var added = AddedTo(u);
+            for (var i = added.Count - 1; i >= 0; i--)
+            {
+                if (!permanentAbilities.TryGetValue(u, out var permanent) || !permanent.Contains(added[i]))
+                {
+                    AbilityCalls.Add("stripped " + added[i]);
+                    added.RemoveAt(i);
+                }
+            }
+        }
+
+        /// <summary>Whether a unit has an ability code gave it, not removed or stripped by a morph since.</summary>
+        public bool HasAddedAbility(unit u, int abilityId)
+        {
+            return AddedTo(u).Contains(abilityId);
+        }
+
+        /// <summary>The abilities code gave a unit, in the order given.</summary>
+        private List<int> AddedTo(unit u)
+        {
+            if (!addedAbilities.TryGetValue(u, out var added))
+            {
+                added = new List<int>();
+                addedAbilities[u] = added;
+            }
+
+            return added;
         }
 
         /// <summary>The id of Crow Form (Amrf), whose adding and removing lets a ground unit show a fly height.</summary>

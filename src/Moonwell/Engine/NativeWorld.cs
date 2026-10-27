@@ -590,6 +590,12 @@ namespace Moonwell.Engine
             Natives.BlzUnitHideAbility(unit, abilityId, true);
         }
 
+        /// <summary>Makes an ability stay through a morph: UnitMakeAbilityPermanent.</summary>
+        public void MakeAbilityPermanent(unit unit, int abilityId)
+        {
+            Natives.UnitMakeAbilityPermanent(unit, true, abilityId);
+        }
+
         /// <summary>Takes an ability from a unit.</summary>
         public void RemoveAbility(unit unit, int abilityId)
         {
