@@ -195,8 +195,9 @@ namespace Moonwell.Build
 
             if (physics)
             {
-                // After the terrain: a deck stands on the ground at its bridge's place.
-                BridgeWriter.Write(project, map.Doodads, declared, standardIds, log);
+                // A deck stands on the ground beneath any water at its bridge's place, which the terrain's grid does not keep: the
+                // bridges' text carries it.
+                BridgeWriter.Write(project, map.Doodads, map.Environment, declared, standardIds, log);
                 installs.Add("global::Moonwell.Physics.Install(global::Moonwell.Generated.PhysicsData.Bridges(), global::Moonwell.Generated.PhysicsData.Decks());");
             }
             else

@@ -5,11 +5,11 @@ namespace Moonwell.Engine
 {
     /// <summary>
     /// The decks of the map's placed bridges, which are ground where they stand. The build writes each placed bridge (its
-    /// type, its deck's shape, its place, facing and scale, and whether its type turns with its facing) and the shapes of
-    /// the types placed, as text. At the start each bridge's handle is found near its place, and its deck is turned and
-    /// scaled about the place the game reports, on the ground there; a deck counts until its bridge dies or leaves the
-    /// game. The ground asks the living decks whose box holds a point, in the order the build wrote them; it asks only when
-    /// there is one.
+    /// type, its deck's shape, its place, facing and scale, whether its type turns with its facing, and the ground beneath
+    /// any water at the place the game makes it) and the shapes of the types placed, as text. At the start each bridge's
+    /// handle is found near its place, and its deck is turned and scaled about the place the game reports, on the ground
+    /// beneath any water there; a deck counts until its bridge dies or leaves the game. The ground asks the living decks
+    /// whose box holds a point, in the order the build wrote them; it asks only when there is one.
     /// </summary>
     internal static class Decks
     {
@@ -40,10 +40,11 @@ namespace Moonwell.Engine
 
         /// <summary>
         /// Makes the decks of the bridges the build wrote. A shape is "cell columns rows originColumn originRow" and then its
-        /// values row by row, each a height or "." for none. A bridge is "type shape x y facing scale turns": its four-character
-        /// type, the number of its shape in the order written, its place in war3map.doo, its facing in degrees, its scale,
-        /// and 1 when its type turns with its facing (fixed rotation -1), else 0. A bridge whose handle is not found near its
-        /// place has no deck.
+        /// values row by row, each a height or "." for none. A bridge is "type shape x y facing scale turns ground": its
+        /// four-character type, the number of its shape in the order written, its place in war3map.doo, its facing in degrees,
+        /// its scale, 1 when its type turns with its facing (fixed rotation -1), else 0, and the ground's height beneath any
+        /// water at the place the game makes it, which its deck stands on over water. A bridge whose handle is not found near
+        /// its place has no deck.
         /// </summary>
         internal static void Load(IPhysicsWorld world, string bridges, string shapes)
         {
@@ -79,6 +80,7 @@ namespace Moonwell.Engine
                 var facing = reader.Number();
                 var scale = reader.Number();
                 var turns = reader.Number() != 0.0f;
+                var beneath = reader.Number();
                 var handle = world.FindPlacedDestructable(type, x, y);
                 var bridge = handle == null ? null : Destructable.Of(handle);
                 if (bridge == null || bridge.HasEnded || bridge.ending)
@@ -96,7 +98,8 @@ namespace Moonwell.Engine
                     (int)shapeSizes[sizes + 3],
                     (int)shapeSizes[sizes + 4],
                     turns ? facing - 270.0f : 0.0f,
-                    scale);
+                    scale,
+                    beneath);
                 if (decks == null)
                 {
                     decks = new List<Deck>();

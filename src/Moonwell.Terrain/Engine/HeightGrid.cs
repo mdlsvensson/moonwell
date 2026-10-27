@@ -210,6 +210,18 @@ namespace Moonwell.Engine
         }
 
         /// <summary>
+        /// Whether a corner of the tile that holds a point (kept inside the grid) is under water: there Height blends the
+        /// water's surface, not the ground beneath it, which the grid does not keep.
+        /// </summary>
+        internal bool IsWet(float x, float y)
+        {
+            Locate(x, y, out var i, out var j, out _, out _);
+            var right = i + 1 < Columns ? i + 1 : i;
+            var top = j + 1 < Rows ? j + 1 : j;
+            return IsWater(i, j) || IsWater(right, j) || IsWater(i, top) || IsWater(right, top);
+        }
+
+        /// <summary>
         /// Whether the tile that holds a point (kept inside the grid) is a cliff: on more than one cliff level, with no
         /// ramp corner.
         /// </summary>

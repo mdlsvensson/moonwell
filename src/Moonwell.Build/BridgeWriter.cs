@@ -1,13 +1,15 @@
 using System.Globalization;
 using System.Text;
+using War3Net.Build.Environment;
 using War3Net.Build.Widget;
 
 namespace Moonwell.Build
 {
     /// <summary>
     /// Writes the map's placed bridges, read from <c>war3map.doo</c>, as the C# file <c>Moonwell.Physics</c> makes its decks
-    /// from: each placed walkable destructable (its type, the number of its deck shape, its place, facing and scale, and
-    /// whether its type turns with its facing) and the deck shapes of the types placed, from the shapes Moonwell ships
+    /// from: each placed walkable destructable (its type, the number of its deck shape, its place, facing and scale,
+    /// whether its type turns with its facing, and the ground's height beneath any water at the place the game makes it,
+    /// read from <c>war3map.w3e</c>, which its deck stands on) and the deck shapes of the types placed, from the shapes Moonwell ships
     /// (<c>Data/Decks.txt</c>, measured in the game). A type of the map's own that is based on a standard bridge takes its
     /// base's shape, unless it changes the model or the fixed rotation, which would change the deck; one declared in code
     /// wins over the object files. A placed walkable type with no shape is a warning, as is a placed type that is neither
@@ -26,19 +28,27 @@ namespace Moonwell.Build
 
         private const string WalkableField = "bwal";
 
+        // The game makes a placed bridge on a grid of this, not at its doo place (game facts, 10-27).
+        private const double PlaceGrid = 64.0;
+
         // The walkable types whose fixed rotation is -1, which the game turns by their facing in war3map.doo; every other
         // walkable type keeps its fixed rotation, as its shape was measured (Moonwell.Objects' standard data, 3.0.1).
         private static readonly string[] Turning = { "DTep", "DTs0", "DTs1", "DTs2", "DTs3", "ITf1", "ITf2", "ITf3", "ITf4", "WGTR" };
 
-        /// <summary>The placed bridges' text, one bridge a line: <c>type shape x y facing scale turns</c>.</summary>
+        /// <summary>
+        /// The placed bridges' text, one bridge a line: <c>type shape x y facing scale turns ground</c>. The ground is the
+        /// ground's height beneath any water (<see cref="TerrainWriter.GroundBeneath"/>) at the place the game makes the
+        /// bridge (<see cref="GamePlace"/>); on dry ground it is the ground there.
+        /// </summary>
         /// <param name="project">The map project; its map folder's object files give the map's own destructable types.</param>
         /// <param name="doodads">The map's placed doodads and destructables; null when it has no <c>war3map.doo</c>.</param>
+        /// <param name="environment">The map's ground; null when it has no <c>war3map.w3e</c>, when the ground written is 0.</param>
         /// <param name="declared">The destructable types the map declares in code, which win over its object files; empty without <c>Moonwell.Objects</c>.</param>
         /// <param name="standardIds">The ids of the game's standard objects, of every kind; null without <c>Moonwell.Objects</c>, when a placed type the map does not know cannot be told from a standard one.</param>
         /// <param name="log">Where a placed walkable type with no deck shape, and a placed type nobody knows, are warned of.</param>
         /// <param name="decks">The shapes of the types placed, in the order the bridges number them: <c>cell columns rows originColumn originRow</c>, then the rows.</param>
         /// <returns>The text.</returns>
-        public static string Encode(MapProject project, MapDoodads? doodads, IReadOnlyList<OwnType> declared, IReadOnlySet<string>? standardIds, TextWriter log, out string decks)
+        public static string Encode(MapProject project, MapDoodads? doodads, MapEnvironment? environment, IReadOnlyList<OwnType> declared, IReadOnlySet<string>? standardIds, TextWriter log, out string decks)
         {
             var shapes = Shapes(out var unmeasured);
             var own = new Dictionary<string, OwnType>(StringComparer.Ordinal);
@@ -99,6 +109,8 @@ namespace Moonwell.Build
                 }
 
                 var facing = doodad.Rotation * 180.0 / Math.PI;
+                GamePlace(doodad.Position.X, doodad.Position.Y, out var gameX, out var gameY);
+                var ground = environment == null ? 0f : TerrainWriter.GroundBeneath(environment, (float)gameX, (float)gameY);
                 bridges.Append(id)
                     .Append(' ').Append(index.ToString(CultureInfo.InvariantCulture))
                     .Append(' ').Append(Number(doodad.Position.X))
@@ -106,6 +118,7 @@ namespace Moonwell.Build
                     .Append(' ').Append(Number(facing))
                     .Append(' ').Append(Number(doodad.Scale.X))
                     .Append(' ').Append(Array.IndexOf(Turning, baseType) >= 0 ? '1' : '0')
+                    .Append(' ').Append(Number(ground))
                     .Append('\n');
             }
 
@@ -117,6 +130,21 @@ namespace Moonwell.Build
 
             decks = text.ToString();
             return bridges.ToString();
+        }
+
+        /// <summary>
+        /// The place the game makes a placed bridge at, from its place in <c>war3map.doo</c>: x on the grid of 64 toward 0,
+        /// plus 32, and y on it toward 0. A Long Stone Bridge written at x 0 is made at x 32, and <c>CreateDestructable</c>
+        /// moves one so: (2600, 1200) to (2592, 1152), and (2600, -1200) to (2592, -1152) (game facts, 10-27).
+        /// </summary>
+        /// <param name="x">The doo place's x.</param>
+        /// <param name="y">The doo place's y.</param>
+        /// <param name="gameX">The game's x.</param>
+        /// <param name="gameY">The game's y.</param>
+        public static void GamePlace(double x, double y, out double gameX, out double gameY)
+        {
+            gameX = (PlaceGrid * Math.Truncate(x / PlaceGrid)) + (PlaceGrid / 2.0);
+            gameY = PlaceGrid * Math.Truncate(y / PlaceGrid);
         }
 
         /// <summary>The destructable types a map declares in code, as the bridges see them, and its doodad types, which are never walkable.</summary>
@@ -154,13 +182,14 @@ namespace Moonwell.Build
         /// </summary>
         /// <param name="project">The map project.</param>
         /// <param name="doodads">The map's placed doodads and destructables; null when it has no <c>war3map.doo</c>.</param>
+        /// <param name="environment">The map's ground; null when it has no <c>war3map.w3e</c>.</param>
         /// <param name="declared">The destructable types the map declares in code; empty without <c>Moonwell.Objects</c>.</param>
         /// <param name="standardIds">The ids of the game's standard objects; null without <c>Moonwell.Objects</c>.</param>
         /// <param name="log">Where a placed walkable type with no deck shape, and a placed type nobody knows, are warned of.</param>
         /// <returns>The path of the written file.</returns>
-        public static string Write(MapProject project, MapDoodads? doodads, IReadOnlyList<OwnType> declared, IReadOnlySet<string>? standardIds, TextWriter log)
+        public static string Write(MapProject project, MapDoodads? doodads, MapEnvironment? environment, IReadOnlyList<OwnType> declared, IReadOnlySet<string>? standardIds, TextWriter log)
         {
-            var bridges = Encode(project, doodads, declared, standardIds, log, out var decks);
+            var bridges = Encode(project, doodads, environment, declared, standardIds, log, out var decks);
             Directory.CreateDirectory(project.GeneratedFolder);
             var path = Path.Combine(project.GeneratedFolder, FileName);
             var text = string.Join(

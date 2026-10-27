@@ -1,3 +1,4 @@
+using War3Net.Build.Environment;
 using War3Net.Build.Extensions;
 using War3Net.Build.Object;
 using War3Net.Build.Widget;
@@ -63,8 +64,9 @@ namespace Moonwell.Build.Tests
             var bridges = lines.Single(line => line.Contains("public static string Bridges() => ", StringComparison.Ordinal));
             var decks = lines.Single(line => line.Contains("public static string Decks() => ", StringComparison.Ordinal));
 
-            // The fixture's three Long Stone Bridges: plain, at facing 90 (a fixed-rotation type: not turned), and at scale 1.2.
-            Assert.EndsWith("\"YT16 0 0 1280 270 1 0\\nYT16 0 0 0 90 1 0\\nYT16 0 0 -1280 270 1.2 0\\n\";", bridges);
+            // The fixture's three Long Stone Bridges: plain, at facing 90 (a fixed-rotation type: not turned), and at scale 1.2,
+            // each on the fixture's flat ground at 0.
+            Assert.EndsWith("\"YT16 0 0 1280 270 1 0 0\\nYT16 0 0 0 90 1 0 0\\nYT16 0 0 -1280 270 1.2 0 0\\n\";", bridges);
 
             // One deck shape, the type's: 13 cells across, 41 along, its place at column 6, row 20; 287 at its middle.
             var text = decks.Substring(decks.IndexOf('"') + 1);
@@ -168,14 +170,74 @@ namespace Moonwell.Build.Tests
             Assert.DoesNotContain("places B002", log);
 
             var data = File.ReadAllText(Path.Combine(project, "build", "generated", "PhysicsData.g.cs"));
-            Assert.Contains("B000 0 1024 0 270 1 0\\n", data);
-            Assert.Contains("B002 0 -1024 0 270 1 0\\n", data);
+            Assert.Contains("B000 0 1024 0 270 1 0 0\\n", data);
+            Assert.Contains("B002 0 -1024 0 270 1 0 0\\n", data);
             Assert.DoesNotContain("B001", data);
             Assert.DoesNotContain("B003", data);
             Assert.DoesNotContain("Zzz9", data);
             Assert.DoesNotContain(" 0 2048 ", data);
             var decks = data.Split('\n').Single(line => line.Contains("public static string Decks() => ", StringComparison.Ordinal));
             Assert.Single(decks.Split("32 13 41 6 20").Skip(1));
+        }
+
+        [Fact]
+        public void a_bridge_stands_on_the_ground_beneath_water()
+        {
+            // Four tiles each way from (-256, -256). The corners up to y 0 are under water (its surface at -89.6) with the
+            // ground beneath at -163 + 8 a column; from y 128 they are dry, at 20 + 32 a column. A bridge written at (0, -128)
+            // is made at (32, -128), a quarter of the way from column 2 to column 3: the ground beneath there is
+            // -147 * 0.75 + -139 * 0.25 = -145, where the terrain's grid keeps the surface. One written at (0, 256), on
+            // the dry top row, is made at (32, 256): the ground there, 84 * 0.75 + 116 * 0.25 = 92.
+            var environment = new MapEnvironment(MapEnvironmentFormatVersion.v11) { Width = 4, Height = 4, Left = -256, Bottom = -256 };
+            for (var row = 0; row < 5; row++)
+            {
+                for (var column = 0; column < 5; column++)
+                {
+                    environment.TerrainTiles.Add(row <= 2
+                        ? new TerrainTile { Height = (-163f + (8f * column)) / 128f, WaterHeight = 0, CliffLevel = 2, Flags = TileFlags.Water }
+                        : new TerrainTile { Height = (20f + (32f * column)) / 128f, CliffLevel = 2 });
+                }
+            }
+
+            var project = folders.TemporaryCopyOf("Physics");
+            MapDoodads doodads;
+            using (var reader = new BinaryReader(File.OpenRead(Path.Combine(project, "map", "war3map.doo"))))
+            {
+                doodads = reader.ReadMapDoodads();
+            }
+
+            doodads.Doodads.Clear();
+            foreach (var y in new[] { -128f, 256f })
+            {
+                doodads.Doodads.Add(new DoodadData
+                {
+                    TypeId = BitConverter.ToInt32(System.Text.Encoding.ASCII.GetBytes("YT16")),
+                    Variation = 0,
+                    Position = new System.Numerics.Vector3(0f, y, 0f),
+                    Rotation = 1.5f * MathF.PI,
+                    Scale = new System.Numerics.Vector3(1f, 1f, 1f),
+                    Life = 100,
+                    MapItemTableId = -1,
+                    CreationNumber = doodads.Doodads.Count,
+                });
+            }
+
+            var bridges = BridgeWriter.Encode(MapProject.Find(project), doodads, environment, new List<BridgeWriter.OwnType>(), null, new StringWriter(), out _);
+
+            Assert.Equal("YT16 0 0 -128 270 1 0 -145\nYT16 0 0 256 270 1 0 92\n", bridges);
+        }
+
+        [Fact]
+        public void the_game_makes_a_placed_bridge_on_the_grid_of_64()
+        {
+            // Game facts (10-27): a Long Stone Bridge written at x 0 is made at x 32; CreateDestructable moves (2600, 1200) to
+            // (2592, 1152) and (2600, -1200) to (2592, -1152).
+            BridgeWriter.GamePlace(0, 0, out var x, out var y);
+            Assert.Equal((32.0, 0.0), (x, y));
+            BridgeWriter.GamePlace(2600, 1200, out x, out y);
+            Assert.Equal((2592.0, 1152.0), (x, y));
+            BridgeWriter.GamePlace(2600, -1200, out x, out y);
+            Assert.Equal((2592.0, -1152.0), (x, y));
         }
 
         // Adds placed destructables to a project's war3map.doo, each at facing 270 and scale 1, with a life in percent.

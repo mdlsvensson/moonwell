@@ -3,8 +3,10 @@ namespace Moonwell.Engine
     /// <summary>
     /// One placed bridge's deck in the world: its type's shape, heights above the ground every cell along and across it in
     /// the bridge's own frame (at facing 270 and scale 1, as Decks.txt holds it), turned and scaled about the place the game
-    /// reports for the bridge, and standing on the ground there. A point whose nearest cell has no deck is off it; on it,
-    /// the height is blended between the four cells around the point where all four have a deck, else the nearest's.
+    /// reports for the bridge, and standing on the ground beneath any water there, as the game sets it (Terrain.Height on
+    /// dry ground; over water, the ground beneath that the build wrote, as the grid keeps only the water's surface). A
+    /// point whose nearest cell has no deck is off it; on it, the height is blended between the four cells around the
+    /// point where all four have a deck, else the nearest's.
     /// </summary>
     internal sealed class Deck
     {
@@ -41,7 +43,7 @@ namespace Moonwell.Engine
         /// <summary>The bridge's scale, which scales the heights too.</summary>
         private readonly float scale;
 
-        /// <summary>The ground's height at the bridge's place, which the heights stand on.</summary>
+        /// <summary>The ground's height beneath any water at the bridge's place, which the heights stand on.</summary>
         private readonly float ground;
 
         /// <summary>The bridge.</summary>
@@ -62,8 +64,12 @@ namespace Moonwell.Engine
         /// <summary>Whether the deck counts as ground: until its bridge dies or leaves the game.</summary>
         internal bool living = true;
 
-        /// <summary>Makes a bridge's deck from its shape, turned by an angle in degrees and scaled about the bridge's place, on the ground there.</summary>
-        internal Deck(Destructable bridge, float[] values, float cellSize, int columns, int rows, int originColumn, int originRow, float turn, float scale)
+        /// <summary>
+        /// Makes a bridge's deck from its shape, turned by an angle in degrees and scaled about the bridge's place, on the
+        /// ground beneath any water there: Terrain.Height where no corner of its tile is under water, else the ground beneath
+        /// the build wrote for it.
+        /// </summary>
+        internal Deck(Destructable bridge, float[] values, float cellSize, int columns, int rows, int originColumn, int originRow, float turn, float scale, float beneath)
         {
             this.bridge = bridge;
             this.values = values;
@@ -77,7 +83,7 @@ namespace Moonwell.Engine
             sin = Angles.Sin(turn);
             cell = cellSize * scale;
             this.scale = scale;
-            ground = Terrain.Height(x, y);
+            ground = Terrain.Grid.IsWet(x, y) ? beneath : Terrain.Height(x, y);
 
             // The box: the four corners of the grid's outer cells, turned.
             var left = (-originColumn - 0.5f) * cell;

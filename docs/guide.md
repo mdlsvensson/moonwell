@@ -500,7 +500,8 @@ target.Knockback(caster.AngleTo(target), 300f, 0.5f); // 300 away over half a se
   that pushes its own unit again loops.
 - **Bridges**: placed bridges are ground, for missiles landing (from above: one below a deck flies under it) and units
   standing, until the bridge dies (brought back to life, it is not ground again); missiles do not meet it as a
-  destructable. A bridge made by code is not ground, nor a type with no deck Moonwell knows (an ice floe, or the map's
+  destructable. A deck stands on the ground beneath any water at its bridge's place, as in the game; the build writes
+  that ground, which `Terrain.Height` does not read (it reads the water's surface). A bridge made by code is not ground, nor a type with no deck Moonwell knows (an ice floe, or the map's
   own type with its model changed): the build warns of it.
 - Everything runs on every machine. Reads are safe in `Local.For`; firing, pushing and every set are not.
 - In the debug mode, a selected missile's panel shows its speed, velocity and radius, and a pushed unit's its push;

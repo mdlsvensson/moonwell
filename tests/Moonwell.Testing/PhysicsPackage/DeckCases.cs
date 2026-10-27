@@ -4,10 +4,12 @@ using Moonwell.Engine;
 namespace Moonwell.Testing
 {
     /// <summary>
-    /// Cases for placed bridges: a deck's heights from its shape, turned and scaled; a missile under a deck and onto it; a
-    /// unit standing on one; a push along its rail; and a bridge that dies. The shape is a small bridge of 3 cells across
-    /// (with no deck in the cells either side) and 7 along, rising 10 a cell from 100 at its ends to 130 at its middle;
-    /// the bridge is placed at (500, 500) in war3map.doo, and the game reports it at (512, 512).
+    /// Cases for placed bridges: a deck's heights from its shape, turned and scaled; a deck over water, on the ground
+    /// beneath; a missile under a deck and onto it, with the deck's normal; a unit standing on one; a push along its rail;
+    /// and a bridge that dies. The shape is a small bridge of 3 cells across (with no deck in the cells either side) and 7
+    /// along, rising 10 a cell from 100 at its ends to 130 at its middle; the bridge is placed at (500, 500) in
+    /// war3map.doo, and the game reports it at (512, 512). The last number of a bridge's line is the ground beneath any
+    /// water at its place, as the build writes it.
     /// </summary>
     public static class DeckCases
     {
@@ -74,11 +76,17 @@ namespace Moonwell.Testing
             return handle;
         }
 
-        /// <summary>Places the fixed bridge, found at (512, 512), unturned at scale 1, and makes its deck.</summary>
+        /// <summary>Places the fixed bridge, found at (512, 512), unturned at scale 1, on dry ground at 0, and makes its deck.</summary>
         private static destructable Placed(FakeWorld world, FakePhysicsWorld fake)
         {
+            return Placed(world, fake, "0");
+        }
+
+        /// <summary>Places the fixed bridge, found at (512, 512), unturned at scale 1, with the ground beneath the build wrote for it, and makes its deck.</summary>
+        private static destructable Placed(FakeWorld world, FakePhysicsWorld fake, string ground)
+        {
             var handle = Bridge(world, fake, FixedId, 512.0f, 512.0f);
-            Physics.Install(FixedId + " 0 500 500 270 1 0", Shape);
+            Physics.Install(FixedId + " 0 500 500 270 1 0 " + ground, Shape);
             return handle;
         }
 
@@ -122,7 +130,7 @@ namespace Moonwell.Testing
         {
             FakeTerrainWorld terrain;
             var fake = Fresh(40.0f, false, out terrain);
-            Placed(world, fake);
+            Placed(world, fake, "40");
             Expect.Equal(1, Decks.count, "one deck");
             Within(170.0f, Physics.GroundHeight(512.0f, 512.0f), 0.01f, "at its middle: 130 above the ground");
             Within(160.0f, Physics.GroundHeight(512.0f, 544.0f), 0.01f, "a cell along");
@@ -152,7 +160,7 @@ namespace Moonwell.Testing
             var fake = Fresh(0.0f, false, out terrain);
             Bridge(world, fake, TurningId, 512.0f, 512.0f);
             Bridge(world, fake, FixedId, 1536.0f, 1536.0f);
-            Physics.Install(TurningId + " 0 500 500 0 1.5 1\n" + FixedId + " 0 1530 1530 0 1 0", Ramp);
+            Physics.Install(TurningId + " 0 500 500 0 1.5 1 0\n" + FixedId + " 0 1530 1530 0 1 0 0", Ramp);
             Expect.Equal(2, Decks.count, "two decks");
             Within(181.5f, Physics.GroundHeight(512.0f, 512.0f), 0.01f, "the turned one's place: 1.5 times its cell, 121");
             Within(183.0f, Physics.GroundHeight(512.0f, 560.0f), 0.01f, "48 north: the next column");
@@ -176,6 +184,43 @@ namespace Moonwell.Testing
             Within(131.0f, Physics.GroundHeight(1536.0f, 1568.0f), 0.01f, "32 north: the next row");
             Within(100.0f, Physics.GroundHeight(1504.0f, 1472.0f), 0.01f, "its first cell, south-west");
             Within(143.0f, Physics.GroundHeight(1600.0f, 1600.0f), 0.01f, "its last column, two rows north");
+        }
+
+        /// <summary>
+        /// A bridge over water stands on the ground beneath it, as the game sets it, not on the water's surface, which is
+        /// all the terrain's grid keeps there: the grid is water at -20 for the corners up to y 768 and dry ground at 40 from
+        /// y 896, and the build wrote the ground beneath the first bridge as -60. Its deck is that plus its shape, and beside
+        /// it the ground is the water. A bridge on dry ground stands on Terrain.Height, as before, not on what the build
+        /// wrote, which is rounded to a thousandth.
+        /// </summary>
+        public static void OverWater(FakeWorld world)
+        {
+            Interactions.Install(new FakeInteractionWorld());
+            var fake = new FakePhysicsWorld();
+            Physics.Install(fake);
+            var terrain = new FakeTerrainWorld();
+            var text = "";
+            for (var j = 0; j < 17; j++)
+            {
+                var corner = j <= 6 ? GridText.Corner(-20.0f, 2, false, true) : GridText.Corner(40.0f, 2, false, false);
+                for (var i = 0; i < 17; i++)
+                {
+                    text = text + corner;
+                }
+            }
+
+            Terrain.Install(terrain, 17, 17, 0.0f, 0.0f, text);
+            Bridge(world, fake, FixedId, 512.0f, 512.0f);
+            Bridge(world, fake, TurningId, 1536.0f, 1536.0f);
+            Physics.Install(FixedId + " 0 500 500 270 1 0 -60\n" + TurningId + " 0 1530 1530 270 1 1 40.001", Shape);
+            Expect.Equal(2, Decks.count, "two decks");
+            Within(-20.0f, Terrain.Height(512.0f, 512.0f), 0.01f, "the grid under the first bridge: the water's surface");
+            Within(70.0f, Physics.GroundHeight(512.0f, 512.0f), 0.01f, "at its middle: 130 above the ground beneath");
+            Within(60.0f, Physics.GroundHeight(512.0f, 544.0f), 0.01f, "a cell along");
+            Within(40.0f, Physics.GroundHeight(512.0f, 416.0f), 0.01f, "at its south end: 100 above the ground beneath");
+            Within(-20.0f, Physics.GroundHeight(700.0f, 512.0f), 0.01f, "beside it: the water");
+            Within(-20.0f, Physics.GroundHeight(512.0f, 512.0f, 60.0f), 0.01f, "under it, with a height below it: the water");
+            Expect.True(Physics.GroundHeight(1536.0f, 1536.0f) == 170.0f, "the second bridge, on dry ground: 130 above Terrain.Height, 40; was " + Physics.GroundHeight(1536.0f, 1536.0f));
         }
 
         /// <summary>A missile with DestructableContact set to Stop flies over a deck, through where the bridge would stand as a destructable 64 around and 250 tall on its deck, and stops at a barrel past it: the bridge is not met as a destructable.</summary>
@@ -372,7 +417,8 @@ namespace Moonwell.Testing
 
         /// <summary>
         /// A bridge that dies is watched, and its deck is ground no more at once: GroundHeight reads the water beneath, and a
-        /// ball resting on the deck falls onto the water. A bridge that leaves the game takes its deck too.
+        /// ball resting on the deck falls onto the water. A bridge that leaves the game takes its deck too. The water's
+        /// surface is at -20 and the ground beneath it at -60, which the decks stand on.
         /// </summary>
         public static void Dies(FakeWorld world)
         {
@@ -380,24 +426,24 @@ namespace Moonwell.Testing
             var fake = Fresh(-20.0f, true, out terrain);
             var handle = Bridge(world, fake, FixedId, 512.0f, 512.0f);
             var other = Bridge(world, fake, TurningId, 1536.0f, 1536.0f);
-            Physics.Install(FixedId + " 0 500 500 270 1 0\n" + TurningId + " 0 1530 1530 270 1 1", Shape);
+            Physics.Install(FixedId + " 0 500 500 270 1 0 -60\n" + TurningId + " 0 1530 1530 270 1 1 -60", Shape);
             Expect.True(world.Watched.Contains(handle) && world.Watched.Contains(other), "their deaths are watched");
-            Within(110.0f, Physics.GroundHeight(512.0f, 512.0f), 0.01f, "the deck, 130 above the water");
+            Within(70.0f, Physics.GroundHeight(512.0f, 512.0f), 0.01f, "the deck, 130 above the ground beneath the water");
             var ball = new Ball();
             ball.GroundContact = Contact.Slide;
             ball.Gravity = 800.0f;
             ball.Friction = 1000.0f;
             ball.VZ = -10.0f;
-            Missile.Create(ball, 512.0f, 512.0f, 127.0f);
+            Missile.Create(ball, 512.0f, 512.0f, 87.0f);
             Steps(world, 32);
             Expect.True(ball.Rested >= 1, "the ball rests on the deck");
-            Within(126.0f, ball.Z, 0.5f, "on it");
+            Within(86.0f, ball.Z, 0.5f, "on it");
             Inbound.DestructableDied(handle);
             Expect.Equal(1, Decks.count, "the other deck counts");
             Within(-20.0f, Physics.GroundHeight(512.0f, 512.0f), 0.01f, "GroundHeight reads the water");
             Steps(world, 96);
             Within(-4.0f, ball.Z, 0.5f, "the ball fell onto the water");
-            Within(110.0f, Physics.GroundHeight(1536.0f, 1536.0f), 0.01f, "the other deck");
+            Within(70.0f, Physics.GroundHeight(1536.0f, 1536.0f), 0.01f, "the other deck");
             Destructable.Of(other)!.Remove();
             Expect.Equal(0, Decks.count, "a bridge that leaves the game takes its deck");
             Within(-20.0f, Physics.GroundHeight(1536.0f, 1536.0f), 0.01f, "GroundHeight reads the water there");
