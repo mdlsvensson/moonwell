@@ -500,7 +500,8 @@ target.Knockback(caster.AngleTo(target), 300f, 0.5f); // 300 away over half a se
   move. Set `Speed` or `Velocity`, and `Radius` (16), `Mass`, `Bounciness`, `Friction`, `Duration` or `MaxDistance`, in
   the constructor.
 - `Fire` starts it `LaunchHeight` (60) above the unit, with the unit as `Source`. With `Arc` it sets its own `Gravity`
-  and lands on the mark: the peak is above the line from launch to mark, and an arc at a unit lands on its middle.
+  and lands on the mark: the peak is above the line from launch to mark, an arc at a point lands with its bottom on the
+  ground there, and an arc at a unit lands on its middle.
   `Missile.Create(missile, x, y, z, player, owner)` places one at rest; one made touching the ground with
   `GroundContact = Stop` ends at once.
 - `ImpactDamage` and the rest go through `source.Damage` with the missile as `Tag`. A missile with damage and no

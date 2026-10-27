@@ -141,7 +141,7 @@ namespace Moonwell.Testing
             Within(0.0f, dart.VY, 0.001f, "along x still");
         }
 
-        /// <summary>Fired at a point 800 away with Arc 0.35 (and no launch height, so the chord is level): it peaks at 280 and lands within 2 of the point at the ground's height.</summary>
+        /// <summary>Fired at a point 800 away with Arc 0.35 and no launch height: it aims its middle at the ground plus its radius of 16 there, so its middle peaks 280 above the line to that (288 high), and its bottom lands on the ground within 2 of the point. It aimed its middle at the ground, and its bottom met the ground about 11 short.</summary>
         public static void Arc(FakeWorld world)
         {
             Fresh();
@@ -169,9 +169,10 @@ namespace Moonwell.Testing
                     peak = dart.Z;
                 }
 
-                if (step > 1 && dart.Z <= 0.0f && previousZ > 0.0f)
+                // Where its bottom comes down to the ground: its middle at its radius.
+                if (step > 1 && dart.Z <= 16.0f && previousZ > 16.0f)
                 {
-                    var share = previousZ / (previousZ - dart.Z);
+                    var share = (previousZ - 16.0f) / (previousZ - dart.Z);
                     landX = previousX + (dart.X - previousX) * share;
                     landY = previousY + (dart.Y - previousY) * share;
                     break;
@@ -182,8 +183,8 @@ namespace Moonwell.Testing
                 previousZ = dart.Z;
             }
 
-            Within(280.0f, peak, 2.0f, "the peak");
-            Within(800.0f, landX, 2.0f, "where it lands: x");
+            Within(288.0f, peak, 2.0f, "the peak");
+            Within(800.0f, landX, 2.0f, "where its bottom lands: x");
             Within(0.0f, landY, 2.0f, "where it lands: y");
 #if DEBUG
             var still = new Dart();

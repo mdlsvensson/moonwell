@@ -29,7 +29,7 @@ namespace Moonwell
             return missile;
         }
 
-        /// <summary>Fires a missile at a point, and returns it: with no Arc at the height above the ground there that it left at, so on flat ground it flies level; with an Arc it lands on the ground there.</summary>
+        /// <summary>Fires a missile at a point, and returns it: with no Arc at the height above the ground there that it left at, so on flat ground it flies level; with an Arc it lands on the ground there, its middle aimed its radius above the ground so its bottom meets the ground at the point.</summary>
         public static T Fire<T>(this Unit source, T missile, float x, float y, Owner? owner = null)
             where T : Missile
         {

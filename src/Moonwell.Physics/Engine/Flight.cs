@@ -807,8 +807,8 @@ namespace Moonwell.Engine
         /// Launches a missile from a unit toward a mark and creates it. It starts at the unit's place, its LaunchOffset ahead
         /// along the unit's facing, and its LaunchHeight above the ground and the unit's fly height there. The mark is
         /// <paramref name="above"/> over the ground at (<paramref name="x"/>, <paramref name="y"/>); when
-        /// <paramref name="level"/>, it is at the launch's own height above the ground, or on the ground with an Arc. The
-        /// source and its player are the missile's.
+        /// <paramref name="level"/>, it is at the launch's own height above the ground, or with an Arc its radius above the
+        /// ground, so its bottom lands on the ground there. The source and its player are the missile's.
         /// </summary>
         public static void Launch(Unit source, Missile missile, float x, float y, float above, bool level, Owner? owner)
         {
@@ -823,7 +823,8 @@ namespace Moonwell.Engine
             var startZ = Ground.Height(sourceX, sourceY) + startAbove;
             if (level)
             {
-                above = missile.arc > 0.0f ? 0.0f : startAbove;
+                // With an Arc its middle is aimed at the ground plus its radius, so its bottom lands on the mark.
+                above = missile.arc > 0.0f ? missile.radius : startAbove;
             }
 
             var dz = missile.followsGround ? above - startAbove : Ground.Height(x, y) + above - startZ;
