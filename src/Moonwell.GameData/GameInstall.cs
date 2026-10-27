@@ -37,10 +37,12 @@ public static class GameInstall
     }
 
     /// <summary>The install's folder (see <see cref="Places(string?)"/>).</summary>
-    /// <exception cref="DirectoryNotFoundException">No place holds an install; the message names each place.</exception>
+    /// <exception cref="DirectoryNotFoundException">
+    /// No place holds an install; the message names the place, and <see cref="Variable"/> when no folder was given.
+    /// </exception>
     public static string Require(string? folder = null)
     {
-        return Require(Places(folder));
+        return Require(Places(folder), string.IsNullOrWhiteSpace(folder));
     }
 
     /// <summary>The active build of the install in <paramref name="folder"/>.</summary>
@@ -79,11 +81,11 @@ public static class GameInstall
         return places.FirstOrDefault(place => File.Exists(Path.Combine(place, BuildInfo)));
     }
 
-    internal static string Require(IReadOnlyList<string> places)
+    internal static string Require(IReadOnlyList<string> places, bool hint)
     {
         return Find(places) ?? throw new DirectoryNotFoundException(
-            $"No Warcraft III install (a folder with {BuildInfo}) in {string.Join(", ", places)}; "
-            + $"set {Variable} to the game's folder.");
+            $"No Warcraft III install (a folder with {BuildInfo}) in {string.Join(", ", places)}."
+            + (hint ? $" Set {Variable} to the game's folder." : ""));
     }
 
     /// <summary>

@@ -70,10 +70,21 @@ public class GameInstallTests
     {
         using var empty = new TempFolder();
 
-        var error = Assert.Throws<DirectoryNotFoundException>(() => GameInstall.Require(new[] { empty.Path }));
+        var error = Assert.Throws<DirectoryNotFoundException>(() => GameInstall.Require(new[] { empty.Path }, true));
 
         Assert.Contains(empty.Path, error.Message);
         Assert.Contains(GameInstall.Variable, error.Message);
+    }
+
+    [Fact]
+    public void no_install_in_a_given_folder_is_an_error_that_names_only_the_folder()
+    {
+        using var empty = new TempFolder();
+
+        var error = Assert.Throws<DirectoryNotFoundException>(() => GameInstall.Require(empty.Path));
+
+        Assert.Contains(empty.Path, error.Message);
+        Assert.DoesNotContain(GameInstall.Variable, error.Message);
     }
 
     private sealed class TempFolder : IDisposable

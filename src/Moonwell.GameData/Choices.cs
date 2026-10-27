@@ -20,7 +20,7 @@ public enum ChoiceForm
 /// <param name="Value">The member's number: the game's number for a value the data spells as one, its bit for flags, else its place in World Editor's list.</param>
 /// <param name="Text">How the game's data and the object file spell the value: the editor's text, or the number for a value stored as a number.</param>
 /// <param name="Alternates">The other spellings the game's data uses for the value; empty when none.</param>
-/// <param name="Label">The editor's label for the value, without its accelerator mark (<c>&amp;</c>); empty when the export has none.</param>
+/// <param name="Label">The editor's label for the value, without its accelerator mark (<c>&amp;</c>); empty when the tables have none.</param>
 public sealed record ChoiceMember(string Name, int Value, string Text, IReadOnlyList<string> Alternates, string Label);
 
 /// <summary>A metadata type whose values World Editor offers as a list (<c>attackType</c>, <c>targetList</c>), as a C# enum.</summary>
@@ -44,7 +44,7 @@ public sealed record ChoiceType(string Type, string Name, ChoiceForm Form, strin
     public string TypeName => (Core ? "global::Moonwell." : "global::Moonwell.Objects.") + Name;
 }
 
-/// <summary>The choice types of the export: every metadata type a field uses that <c>ui/uniteditordata.txt</c> has a section for.</summary>
+/// <summary>The choice types of the tables: every metadata type a field uses that <c>ui/uniteditordata.txt</c> has a section for.</summary>
 /// <remarks>
 /// <para>
 /// A member is named by its text (<c>magic</c> is <c>Magic</c>), with the word breaks of its label when the label
@@ -344,7 +344,7 @@ public static class Choices
         return shown;
     }
 
-    // A label key looked up as Fields does: a label may name another label. Empty when the export has none.
+    // A label key looked up as Fields does: a label may name another label. Empty when the tables have none.
     private static string LabelOf(GameTables tables, string key)
     {
         var label = key;

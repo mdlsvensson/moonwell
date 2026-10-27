@@ -329,7 +329,7 @@ public sealed class GameTables : IDisposable
             : throw new FormatException($"{path} has no [Misc] section");
     }
 
-    /// <summary>The English label for a <c>WESTRING_</c> key (looked up without regard to case, as the game does), or the key itself when the export has none.</summary>
+    /// <summary>The label (English for an export) for a <c>WESTRING_</c> key (looked up without regard to case, as the game does), or the key itself when the tables have none.</summary>
     public string Label(string key)
     {
         return _labels.TryGetValue(key, out var label) ? label : key;

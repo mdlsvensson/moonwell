@@ -4,25 +4,75 @@ using Moonwell.Generator.Objects;
 
 const string Usage = """
     usage:
-      Moonwell.Generator natives <folder with common.j, blizzard.j, common.ai> <repository root> <game version>
-      Moonwell.Generator objects <war3.w3mod folder> <repository root> <game version>
+      Moonwell.Generator natives <repository root> [--install <game folder>]
+      Moonwell.Generator natives <repository root> --scripts <folder with common.j, blizzard.j, common.ai> <game version>
+      Moonwell.Generator objects <repository root> [--install <game folder>]
+      Moonwell.Generator objects <repository root> --export <war3.w3mod folder> <game version>
+
+    Without --install, the install is the folder MOONWELL_WAR3 names, else the usual folder. The game version is the
+    install's own.
     """;
 
-if (args.Length != 4 || (args[0] != "natives" && args[0] != "objects"))
+if (args.Length < 2 || (args[0] != "natives" && args[0] != "objects"))
 {
     Console.Error.WriteLine(Usage);
     return 2;
 }
 
-var (command, source, root, gameVersion) = (args[0], args[1], args[2], args[3]);
-return command == "natives" ? Natives(source, root, gameVersion) : Objects(source, root, gameVersion);
-
-static int Natives(string scriptsFolder, string root, string gameVersion)
+var (command, root) = (args[0], args[1]);
+var copied = command == "natives" ? "--scripts" : "--export";
+if (args.Length == 5 && args[2] == copied)
 {
-    var scripts = Jass.Read(
-        File.ReadAllText(Path.Combine(scriptsFolder, "common.j")),
-        File.ReadAllText(Path.Combine(scriptsFolder, "blizzard.j")));
-    LuaExtras.AddTo(scripts, File.ReadAllText(Path.Combine(scriptsFolder, "common.ai")));
+    return command == "natives" ? Natives(ScriptsFolder(args[3]), root, args[4]) : Objects(GameTables.OpenExport(args[3]), root, args[4]);
+}
+
+if (args.Length != 2 && (args.Length != 4 || args[2] != "--install"))
+{
+    Console.Error.WriteLine(Usage);
+    return 2;
+}
+
+string folder;
+try
+{
+    folder = GameInstall.Require(args.Length == 4 ? args[3] : null);
+}
+catch (DirectoryNotFoundException missing)
+{
+    Console.Error.WriteLine(args.Length == 4 ? missing.Message : missing.Message + " Or pass --install <game folder>.");
+    return 1;
+}
+
+using var files = GameFiles.Open(folder);
+if (command == "natives")
+{
+    return Natives(InstallScripts(files), root, files.Build.Version);
+}
+
+using var tables = GameTables.OpenInstall(files);
+return Objects(tables, root, files.Build.Version);
+
+// The scripts by name, from a folder.
+static Func<string, string> ScriptsFolder(string folder)
+{
+    return name => File.ReadAllText(Path.Combine(folder, name));
+}
+
+// The scripts by name, from the install's Scripts folder.
+static Func<string, string> InstallScripts(GameFiles files)
+{
+    return name =>
+    {
+        var bytes = files.Read("Scripts/" + name) ?? throw new FileNotFoundException($"Scripts/{name} is not in the install", name);
+        var text = System.Text.Encoding.UTF8.GetString(bytes);
+        return text.StartsWith('\uFEFF') ? text.Substring(1) : text;
+    };
+}
+
+static int Natives(Func<string, string> script, string root, string gameVersion)
+{
+    var scripts = Jass.Read(script("common.j"), script("blizzard.j"));
+    LuaExtras.AddTo(scripts, script("common.ai"));
 
     var natives = Path.Combine(root, "src", "Moonwell.Natives");
     Directory.CreateDirectory(Path.Combine(natives, "Generated"));
@@ -34,10 +84,10 @@ static int Natives(string scriptsFolder, string root, string gameVersion)
     return 0;
 }
 
-static int Objects(string exportFolder, string root, string gameVersion)
+static int Objects(GameTables tables, string root, string gameVersion)
 {
     var runtime = RuntimeMembers.Read(MoonwellDll(root));
-    var files = GeneratedObjects.Make(GameTables.OpenExport(exportFolder), runtime, gameVersion);
+    var files = GeneratedObjects.Make(tables, runtime, gameVersion);
 
     var generated = Path.Combine(root, "src", "Moonwell.Objects", "Generated");
     if (Directory.Exists(generated))

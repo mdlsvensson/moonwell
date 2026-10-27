@@ -8,10 +8,10 @@ namespace Moonwell.GameData;
 /// <param name="Name">
 /// The in-game name: the kind's <c>Name</c> field (an upgrade's at level 1; a buff's tooltip title first), or the
 /// empty string. A <c>WESTRING_</c> key, which the game resolves itself, is replaced by the editor's English label
-/// (<see cref="GameTables.Label"/>), or by the empty string when the export has none; <paramref name="Values"/>
+/// (<see cref="GameTables.Label"/>), or by the empty string when the tables have none; <paramref name="Values"/>
 /// keeps the key.
 /// </param>
-/// <param name="Race">The export's <c>race</c> value as written (<c>human</c>), or the empty string for a kind without one.</param>
+/// <param name="Race">The tables' <c>race</c> value as written (<c>human</c>), or the empty string for a kind without one.</param>
 /// <param name="Campaign">True for a unit whose <c>campaign</c> column is 1; false for every other kind.</param>
 /// <param name="IsHero">True for a unit whose id starts with a capital letter.</param>
 /// <param name="Code">An ability's <c>code</c> column, the ability it behaves as; null for every other kind.</param>
@@ -201,7 +201,7 @@ public static class StandardObjects
             Resolved(tables, evaluator.SuffixOf(values)).Trim());
     }
 
-    /// <summary>The label of a <c>WESTRING_</c> key; the empty string for a key the export has no label for; any other name as it is.</summary>
+    /// <summary>The label of a <c>WESTRING_</c> key; the empty string for a key the tables have no label for; any other name as it is.</summary>
     private static string Resolved(GameTables tables, string name)
     {
         var label = tables.Label(name);
@@ -294,7 +294,7 @@ public static class StandardObjects
     /// </summary>
     private sealed class Row
     {
-        // A blank :de value is read as the value, so the key has none: the export's only one, Aent's Casterart:de, leaves
+        // A blank :de value is read as the value, so the key has none: the tables' only one, Aent's Casterart:de, leaves
         // Entangle Gold Mine without its caster art. Not checked in the game. A blank :hd value, with no :de one, is read
         // the same way.
         private const string GameMode = ":de";
