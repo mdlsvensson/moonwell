@@ -92,7 +92,7 @@ public static class Rules
         Category,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "Code the analyzer checks as code of one machine (a delegate parameter given to Local.For, whose callers' lambdas may read the camera) must not also run on every machine, where such a read desyncs the game." + Silence);
+        description: "Code the analyzer checks as code of one machine must not also run on every machine, where its machine-local reads desync the game: a delegate parameter given to Local.For (whose callers' lambdas are checked as blocks) called outside it, and [MachineLocal] on an override or an interface implementation (Moonwell calls OnGameStart on every machine) or on a lambda given to a method or event that runs it (Timer.Every). [MachineLocal] on an override of a map method that has it too is right." + Silence);
 
     public static ImmutableArray<DiagnosticDescriptor> All { get; } =
         ImmutableArray.Create(StateInLocal, LocalOutside, HandleId, HashLoop, NumberType, Desyncs, UnseededRandom, Unfollowed, OneMachineCode);

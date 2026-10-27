@@ -38,6 +38,8 @@ public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
                 OperationKind.EventReference);
             start.RegisterOperationAction(checker.Delegates, OperationKind.Argument, OperationKind.ParameterReference);
             start.RegisterOperationAction(checker.HashArgument, OperationKind.Argument);
+            start.RegisterOperationAction(checker.LambdaPlacement, OperationKind.AnonymousFunction);
+            start.RegisterSymbolAction(checker.Placement, SymbolKind.Method, SymbolKind.Property);
             start.RegisterSymbolAction(checker.Declaration, SymbolKind.Field, SymbolKind.Property, SymbolKind.Method, SymbolKind.NamedType);
         });
     }

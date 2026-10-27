@@ -316,8 +316,25 @@ public sealed partial class SyncAnalyzer
                 return statics.Through("static " + type.Name + "()").Through(name);
             }
 
-            if (member is IFieldSymbol or ILocalSymbol or IEventSymbol || Has(member, syncUnchecked) || IsMachineLocal(member, write))
+            if (member is IFieldSymbol or ILocalSymbol or IEventSymbol || Has(member, syncUnchecked))
             {
+                return null;
+            }
+
+            if (IsMachineLocal(member, write))
+            {
+                // Its body is checked as a block; an override without the attribute is not, so it is followed.
+                foreach (var method in methods)
+                {
+                    foreach (var runs in method == null ? Enumerable.Empty<IMethodSymbol>() : Overriders(method, reach))
+                    {
+                        if (!Has(runs, machineLocal) && Follow(runs, walk) is { } overridden)
+                        {
+                            return overridden.Through(Name(runs)).Through(name);
+                        }
+                    }
+                }
+
                 return null;
             }
 
@@ -992,6 +1009,93 @@ public sealed partial class SyncAnalyzer
             {
                 context.ReportDiagnostic(Diagnostic.Create(Rules.OneMachineCode, reference.Syntax.GetLocation(), reference.Parameter.Name,
                     "is given to Local.For, so the code given for it is checked as code of one machine, and here it runs on every machine; call it only inside Local.For"));
+            }
+        }
+
+        /// <summary>MW0040 for [MachineLocal] on an override or an interface implementation, which is called on every machine.</summary>
+        public void Placement(SymbolAnalysisContext context)
+        {
+            var symbol = context.Symbol;
+            if (symbol.IsImplicitlyDeclared || machineLocal == null || Has(symbol, syncUnchecked)
+                || !symbol.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, machineLocal)))
+            {
+                return;
+            }
+
+            ISymbol? above = symbol switch
+            {
+                IMethodSymbol method => method.OverriddenMethod,
+                IPropertySymbol property => property.OverriddenProperty,
+                _ => null,
+            };
+            var how = "overrides";
+            if (above == null && symbol.ContainingType != null)
+            {
+                above = Implemented(symbol).FirstOrDefault(i => !(IsMap(i) && Has(i, machineLocal)));
+                how = "implements";
+            }
+
+            if (above != null && !(IsMap(above) && Has(above, machineLocal)) && symbol.Locations.FirstOrDefault() is { IsInSource: true } location)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rules.OneMachineCode, location, Name(symbol),
+                    "is [MachineLocal], but it " + how + " " + Name(above) + ", which is called on every machine; put its machine-local code in Local.For(player, ...)"));
+            }
+        }
+
+        // The interface members a method or property implements.
+        private static IEnumerable<ISymbol> Implemented(ISymbol symbol)
+        {
+            var explicitly = symbol switch
+            {
+                IMethodSymbol method => method.ExplicitInterfaceImplementations.Cast<ISymbol>(),
+                IPropertySymbol property => property.ExplicitInterfaceImplementations,
+                _ => Enumerable.Empty<ISymbol>(),
+            };
+            foreach (var member in explicitly)
+            {
+                yield return member;
+            }
+
+            foreach (var face in symbol.ContainingType.AllInterfaces)
+            {
+                foreach (var member in face.GetMembers(symbol.Name))
+                {
+                    if (SymbolEqualityComparer.Default.Equals(symbol.ContainingType.FindImplementationForInterfaceMember(member), symbol))
+                    {
+                        yield return member;
+                    }
+                }
+            }
+        }
+
+        /// <summary>MW0040 for a [MachineLocal] lambda given to a method or event that runs it on every machine.</summary>
+        public void LambdaPlacement(OperationAnalysisContext context)
+        {
+            var lambda = (IAnonymousFunctionOperation)context.Operation;
+            if (!Has(lambda.Symbol, machineLocal) || Silenced(lambda, context.ContainingSymbol))
+            {
+                return;
+            }
+
+            IOperation value = lambda;
+            var up = lambda.Parent;
+            while (up is IDelegateCreationOperation or IConversionOperation)
+            {
+                value = up;
+                up = up.Parent;
+            }
+
+            var where = up switch
+            {
+                IArgumentOperation { Parameter: { } parameter } when !IsLocalForAction(parameter) && !localParameters.Value.Contains(parameter.OriginalDefinition) =>
+                    "is given to " + Name(parameter.ContainingSymbol),
+                IEventAssignmentOperation { Adds: true, EventReference: IEventReferenceOperation reference } => "is added to " + Name(reference.Event),
+                _ => null,
+            };
+            if (where != null)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rules.OneMachineCode, lambda.Syntax.GetLocation(), "[MachineLocal] lambda",
+                    where + ", which runs it on every machine; put its machine-local code in Local.For(player, ...)"));
             }
         }
 
