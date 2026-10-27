@@ -178,7 +178,8 @@ namespace Moonwell.Testing
         /// <summary>
         /// A Bounce lying on a slope of 1 in 2 with Gravity 800 and no velocity goes on down it along the ground, as the guide's
         /// loop goes on after a hit: it meets the ground at the start of every step, and keeps the step's gravity along the
-        /// ground. With the step's gravity taken away whole, it stood where it lay.
+        /// ground, less its Friction of 200 a second (a pull of about 158 a second squared). With the step's gravity taken
+        /// away whole, it stood where it lay.
         /// </summary>
         public static void BounceUnderGravity(FakeWorld world)
         {
@@ -200,9 +201,85 @@ namespace Moonwell.Testing
             }
 
             Expect.Equal(0, ball.Impacts, "it goes along the ground with no impact");
-            Expect.True(1000.0f - ball.X > 300.0f, "slid on down the slope: " + (1000.0f - ball.X) + " along x from where it lay");
+            Expect.True(1000.0f - ball.X > 250.0f, "slid on down the slope: " + (1000.0f - ball.X) + " along x from where it lay");
             Within(64.0f, ball.Y, 0.001f, "straight down it");
-            Expect.True(ball.VX < -300.0f, "and still speeding down it; VX " + ball.VX);
+            Expect.True(ball.VX < -250.0f, "and still speeding down it; VX " + ball.VX);
+        }
+
+        /// <summary>
+        /// A Bounce going along the ground loses its Friction a second, as a Slide rolling does, and rests where its friction
+        /// holds it. Thrown at 300 along flat ground with the default Friction 200, it is at 200 after half a second and
+        /// rests after a second and a half, OnRest once, about 225 on. Lying on a slope of 10 degrees, whose pull of about
+        /// 139 a second squared its friction holds, it rests at once. On a slope of 1 in 2, whose pull of about 358 is more,
+        /// it goes down along the ground, no faster than a Slide beside it, and does not rest. It went on at 300 for ever on
+        /// flat ground, and sped up down any slope.
+        /// </summary>
+        public static void BounceFriction(FakeWorld world)
+        {
+            Flat(0.0f);
+            var thrown = new Ball();
+            thrown.GroundContact = Contact.Bounce;
+            thrown.Gravity = 800.0f;
+            Missile.Create(thrown, 64.0f, 64.0f, 16.0f);
+            thrown.VX = 300.0f;
+            Steps(world, 16);
+            Within(200.0f, thrown.VX, 7.0f, "at 200 after half a second");
+            Within(16.0f, thrown.Z, 0.01f, "on the ground");
+            for (var i = 0; i < 64 && thrown.Rested == 0; i++)
+            {
+                Steps(world, 1);
+            }
+
+            Expect.Equal(1, thrown.Rested, "it rests, OnRest once");
+            Expect.Equal(0, thrown.Impacts, "with no impact");
+            Within(64.0f + 225.0f, thrown.X, 10.0f, "about 225 on");
+            Within(0.0f, thrown.VX, 0.0f, "still");
+
+            var heights = new float[12];
+            for (var i = 0; i < heights.Length; i++)
+            {
+                heights[i] = i * SlopeRise;
+            }
+
+            Along(heights);
+            var gentle = new Ball();
+            gentle.GroundContact = Contact.Bounce;
+            gentle.Gravity = 800.0f;
+            Missile.Create(gentle, 700.0f, 64.0f, Physics.GroundHeight(700.0f, 64.0f) + 16.0f);
+            Steps(world, 32);
+            Expect.Equal(1, gentle.Rested, "on a slope of 10 degrees it rests, OnRest once");
+            Within(700.0f, gentle.X, 1.0f, "where it lay");
+
+            var steep = new float[16];
+            for (var i = 0; i < steep.Length; i++)
+            {
+                steep[i] = i * 64.0f;
+            }
+
+            Along(steep);
+            var bounce = new Ball();
+            bounce.GroundContact = Contact.Bounce;
+            bounce.Gravity = 800.0f;
+            Missile.Create(bounce, 1000.0f, 64.0f, Physics.GroundHeight(1000.0f, 64.0f) + 16.0f);
+            var slide = new Ball();
+            slide.GroundContact = Contact.Slide;
+            slide.Gravity = 800.0f;
+            Missile.Create(slide, 1000.0f, 192.0f, Physics.GroundHeight(1000.0f, 192.0f) + 16.0f);
+            Steps(world, 32);
+            var bounceBefore = MathF.Sqrt(bounce.VX * bounce.VX + bounce.VZ * bounce.VZ);
+            var slideBefore = MathF.Sqrt(slide.VX * slide.VX + slide.VZ * slide.VZ);
+            Steps(world, 32);
+            var bounceSpeed = MathF.Sqrt(bounce.VX * bounce.VX + bounce.VZ * bounce.VZ);
+            var slideSpeed = MathF.Sqrt(slide.VX * slide.VX + slide.VZ * slide.VZ);
+            // The Slide spends its first step coming onto the ground, so it is a step behind: their gains over the second
+            // second are compared, and the Bounce's speed with gravity's pull less its friction for 2 s.
+            Expect.True(bounceSpeed - bounceBefore <= slideSpeed - slideBefore + 0.5f, "on a slope of 1 in 2, it speeds up no faster than a Slide: " + (bounceSpeed - bounceBefore) + " a second against " + (slideSpeed - slideBefore));
+            Within((800.0f * 0.4472136f - 200.0f) * 2.0f, bounceSpeed, 2.0f, "its speed after 2 s: gravity's pull less its friction");
+            Expect.Equal(0, bounce.Rested, "it does not rest there");
+            Expect.True(bounce.X < 900.0f, "it goes down the slope; at " + bounce.X);
+            Within(Physics.GroundHeight(bounce.X, bounce.Y) + 16.0f, bounce.Z, 0.5f, "along the ground");
+            var expected = 0.5f * (800.0f * 0.4472136f - 200.0f) * 4.0f;
+            Within(expected, (1000.0f - bounce.X) / 0.8944272f, 25.0f, "about as far as gravity's pull less its friction takes it in 2 s");
         }
 
         /// <summary>

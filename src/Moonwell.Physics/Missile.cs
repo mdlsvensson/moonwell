@@ -440,7 +440,7 @@ namespace Moonwell
             set { bounciness = value; }
         }
 
-        /// <summary>The speed it loses a second while sliding on the ground; 200 by default.</summary>
+        /// <summary>The speed it loses a second while sliding on the ground: a Slide rolling, or a Bounce going along the ground once it no longer bounces. Stopped where a slope's pull is no more than this, it rests and OnRest runs. 200 by default; 0 never slows it.</summary>
         [LocalSafe]
         public float Friction
         {
@@ -448,7 +448,7 @@ namespace Moonwell
             set { friction = value; }
         }
 
-        /// <summary>What it does on meeting the ground (water's surface and bridges' decks too): Stop, the default, ends it there; Bounce bounces off; Slide bounces until slow, then rolls and comes to rest; None flies through, and so does Pass, as the ground has no such outcome.</summary>
+        /// <summary>What it does on meeting the ground (water's surface and bridges' decks too): Stop, the default, ends it there; Bounce bounces off, and once too slow to bounce goes along the ground, slowing by its Friction, and comes to rest as Slide does; Slide bounces until slow, then rolls and comes to rest; None flies through, and so does Pass, as the ground has no such outcome.</summary>
         [LocalSafe]
         public Contact GroundContact
         {

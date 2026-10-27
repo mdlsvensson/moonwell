@@ -371,7 +371,7 @@ namespace Moonwell.Engine
                 }
             }
 
-            Meet(missile, grid, world, entry, hitX, hitY, hitZ, nx, ny, nz, vx, vy, vz, x, y, z, again);
+            Meet(missile, step, grid, world, entry, hitX, hitY, hitZ, nx, ny, nz, vx, vy, vz, x, y, z, again);
             return true;
         }
 
@@ -401,9 +401,11 @@ namespace Moonwell.Engine
         /// keeping its Bounciness of the speed into the ground; Slide bounces, or rolls once slower than SlideSpeed into it;
         /// None and Pass let it on through to where its move took it (endX, endY, endZ). A Bounce or Slide that was on the
         /// ground already (<paramref name="along"/>) and comes back to it slower than SlideSpeed goes on along it with no
-        /// impact, a Slide rolling; a Stop that touches the ground stops, however slowly.
+        /// impact, a Slide rolling, and a Bounce losing its Friction a second for the step, as a Slide rolling does: stopped
+        /// where the slope's pull is no more than its friction, it rests and OnRest runs. A Stop that touches the ground
+        /// stops, however slowly.
         /// </summary>
-        private static void Meet(Missile missile, Grid grid, IPhysicsWorld world, Entry entry, float hitX, float hitY, float hitZ, float nx, float ny, float nz, float vx, float vy, float vz, float endX, float endY, float endZ, bool along)
+        private static void Meet(Missile missile, float step, Grid grid, IPhysicsWorld world, Entry entry, float hitX, float hitY, float hitZ, float nx, float ny, float nz, float vx, float vy, float vz, float endX, float endY, float endZ, bool along)
         {
             var radius = missile.radius;
             var into = vx * nx + vy * ny + vz * nz;
@@ -424,6 +426,32 @@ namespace Moonwell.Engine
                 if (setting == Contact.Slide && nz > 0.0f)
                 {
                     missile.rolling = true;
+                }
+                else if (along && nz > 0.0f && setting == Contact.Bounce)
+                {
+                    // A Bounce going along the ground loses its Friction, as Roll does a Slide.
+                    var friction = missile.friction;
+                    var speed = Trig.Sqrt(vx * vx + vy * vy + vz * vz);
+                    var lost = friction * step;
+                    if (speed <= lost)
+                    {
+                        missile.vx = 0.0f;
+                        missile.vy = 0.0f;
+                        missile.vz = 0.0f;
+                        Place(missile, world, hitX, hitY, hitZ + radius);
+                        var steep = 1.0f - nz * nz;
+                        if ((steep > 0.0f ? missile.gravity * Trig.Sqrt(steep) : 0.0f) <= friction)
+                        {
+                            Rest(missile);
+                        }
+
+                        return;
+                    }
+
+                    var share = (speed - lost) / speed;
+                    vx *= share;
+                    vy *= share;
+                    vz *= share;
                 }
 
                 missile.vx = vx;
@@ -578,7 +606,7 @@ namespace Moonwell.Engine
                         missile.vx = vx;
                         missile.vy = vy;
                         missile.vz = vz;
-                        Meet(missile, grid, world, entry, fromX, fromY, bottom, wx, wy, wz, vx, vy, vz, x, y, ground + radius, true);
+                        Meet(missile, step, grid, world, entry, fromX, fromY, bottom, wx, wy, wz, vx, vy, vz, x, y, ground + radius, true);
                         if (!missile.ending && !missile.HasEnded)
                         {
                             Ends(missile, world, fromX, fromY, fromZ, entry.X, entry.Y, missile.z, step);
