@@ -6,13 +6,16 @@ namespace Moonwell
     /// <summary>Reports an error from a hook to the screen and the log, and throttles an error that repeats.</summary>
     internal static class Errors
     {
-        /// <summary>How many distinct errors are remembered; a later one is reported every time.</summary>
+        /// <summary>How many distinct errors are remembered; every error past them is counted together, under one count.</summary>
         private const int MaxKeys = 100;
 
         /// <summary>How many times each remembered error has happened, keyed by its label and message.</summary>
         private static readonly Dictionary<string, int> counts = new Dictionary<string, int>();
 
-        /// <summary>Reports an error from a hook, shown at its first time and then at every power of ten.</summary>
+        /// <summary>How many errors have happened that are not remembered, as a hundred other errors came first: one count for them all, so a storm of errors whose messages change is throttled too and does not write the log file at every error.</summary>
+        private static int unremembered;
+
+        /// <summary>Reports an error from a hook, shown at its first time and then at every power of ten. An error past the hundred remembered is shown, with no count, at the first time and every power of ten of the count of all such errors.</summary>
         internal static void Report(string label, Exception error)
         {
 #if DEBUG
@@ -23,17 +26,25 @@ namespace Moonwell
             var where = Where(error);
             var key = label + "\n" + error.Message + "\n" + First(where);
             var times = 1;
+            bool shows;
             if (counts.TryGetValue(key, out var seen))
             {
                 times = seen + 1;
                 counts[key] = times;
+                shows = ShowsAt(times);
             }
             else if (counts.Count < MaxKeys)
             {
                 counts[key] = 1;
+                shows = true;
+            }
+            else
+            {
+                unremembered++;
+                shows = ShowsAt(unremembered);
             }
 
-            if (ShowsAt(times))
+            if (shows)
             {
                 Runtime.World.Print(ScreenLine(label, error.Message, times, release, where));
                 Runtime.World.Log(LogLine(label, error.Message, times, where));
@@ -57,6 +68,7 @@ namespace Moonwell
         internal static void Reset()
         {
             counts.Clear();
+            unremembered = 0;
         }
 
         /// <summary>
