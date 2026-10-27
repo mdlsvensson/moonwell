@@ -286,6 +286,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "audit.areas.recheck-off", Run = AuditAreaCases.RecheckOff });
             list.Add(new Case { Name = "audit.areas.recheck-forgets-leavers", Run = AuditAreaCases.RecheckForgetsLeavers });
             list.Add(new Case { Name = "audit.areas.recheck-ends-area", Run = AuditAreaCases.RecheckEndsArea });
+            list.Add(new Case { Name = "audit.input.no-moves", Run = AuditInputCases.NoMoves });
+            list.Add(new Case { Name = "audit.input.moves", Run = AuditInputCases.Moves });
         }
 
         /// <summary>Adds the input package's cases.</summary>
