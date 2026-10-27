@@ -307,6 +307,14 @@ namespace Moonwell.Build
             }
 
             var values = (Array)type.GetProperty("Values", Internal)!.GetValue(value)!;
+            if (levels > 0 && values.Length != levels)
+            {
+                // Levels(5f) on an object of 3 levels would change level 1 only; Cooldown = 5f is one value for every level.
+                throw new BuildException(
+                    $"{className}: {field.Id} is given {Count(values.Length, "level value")}, and the object has {Count(levels, "level")}: "
+                    + "give one value for each level, or a single value (not in Levels) for every level");
+            }
+
             var differs = false;
             for (var i = 0; i < values.Length; i++)
             {
@@ -492,6 +500,12 @@ namespace Moonwell.Build
         private static string Key(string field, int level)
         {
             return field + ":" + level.ToString(CultureInfo.InvariantCulture);
+        }
+
+        // "1 level", "3 levels".
+        private static string Count(int count, string noun)
+        {
+            return count.ToString(CultureInfo.InvariantCulture) + " " + noun + (count == 1 ? string.Empty : "s");
         }
 
         // A declared value as the build keeps it: a choice's enum value as its number, the enum's type being the map's.

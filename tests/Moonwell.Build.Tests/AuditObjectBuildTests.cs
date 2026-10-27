@@ -190,6 +190,34 @@ namespace Moonwell.Build.Tests
             Assert.Equal(new[] { "0=blighted" }, LevelsOf(units, "h001", "upar"));
         }
 
+        [Theory]
+        [InlineData("Cooldown = Levels(5f);", "acdn is given 1 level value, and the object has 3 levels")]
+        [InlineData("Damage = Levels(1f, 2f, 3f, 4f);", "Htb1 is given 4 level values, and the object has 3 levels")]
+        public void levels_of_another_count_than_the_objects_fail_the_build(string statement, string expected)
+        {
+            // Levels(5f) on a Storm Bolt of 3 levels used to change level 1 only; one value for every level is Cooldown = 5f.
+            var copy = folders.TemporaryCopyOfSample();
+            File.WriteAllText(Path.Combine(copy, "Objects.cs"), $$"""
+                namespace Sample
+                {
+                    [Moonwell.Objects.ObjectId("A001")]
+                    public sealed class Slow : Moonwell.Objects.Human.Abilities.StormBolt
+                    {
+                        public Slow()
+                        {
+                            {{statement}}
+                        }
+                    }
+                }
+                """);
+
+            var error = Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), TextWriter.Null));
+
+            Assert.Equal(
+                $"Sample.Slow: {expected}: give one value for each level, or a single value (not in Levels) for every level",
+                error.Message);
+        }
+
         private string Build(string objects)
         {
             var copy = folders.TemporaryCopyOfSample();
