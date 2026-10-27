@@ -36,6 +36,59 @@ namespace Moonwell.Testing
             return fake;
         }
 
+        /// <summary>
+        /// A push whose step throws (here the fake's item trick, once) loses that step alone: the error is reported, the
+        /// push after it in the list moves, the step's missiles move, and from the next step all move again. The throw left
+        /// the pushes' step marked as running and skipped the step's missiles.
+        /// </summary>
+        public static void ThrownStep(FakeWorld world)
+        {
+            FakeTerrainWorld terrain;
+            FakeInteractionWorld interactions;
+            Fresh(out terrain, out interactions);
+            var first = PusheeAt(world, 300.0f, 500.0f);
+            var second = PusheeAt(world, 300.0f, 900.0f);
+            var dart = new Dart();
+            Missile.Create(dart, 300.0f, 1300.0f, 100.0f);
+            dart.VX = 600.0f;
+            first.Push(600.0f, 0.0f);
+            second.Push(600.0f, 0.0f);
+            var armed = true;
+            terrain.Occupied = (x, y) =>
+            {
+                if (armed && y < 700.0f)
+                {
+                    armed = false;
+                    throw new InvalidOperationException("thrown in the fake's item trick");
+                }
+
+                return false;
+            };
+            world.Logged.Clear();
+            Steps(world, 1);
+            Expect.True(!armed, "the first push's step threw");
+            var reported = false;
+            for (var i = 0; i < world.Logged.Count; i++)
+            {
+                if (world.Logged[i].Contains("thrown in the fake's item trick"))
+                {
+                    reported = true;
+                }
+            }
+
+            Expect.True(reported, "the error is reported, in the log");
+            Within(300.0f, first.X, 0.0f, "the push that threw lost its step");
+            Expect.True(second.X > 310.0f, "the push after it moved; at " + second.X);
+            Expect.True(dart.X > 310.0f, "the step's missile moved; at " + dart.X);
+            var firstX = first.X;
+            var secondX = second.X;
+            var dartX = dart.X;
+            Steps(world, 1);
+            Expect.True(first.X > firstX + 10.0f, "the next step the first push moves; at " + first.X);
+            Expect.True(second.X > secondX + 10.0f, "and the second; at " + second.X);
+            Expect.True(dart.X > dartX + 10.0f, "and the missile; at " + dart.X);
+        }
+
         /// <summary>Makes a Pushee at a place, and takes it in.</summary>
         private static Pushee PusheeAt(FakeWorld world, float x, float y)
         {

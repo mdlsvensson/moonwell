@@ -182,7 +182,7 @@ namespace Moonwell.Engine
             }
         }
 
-        /// <summary>Moves each push that was in the list when the step began and has not ended, in the order they began; then packs away the ended ones. A push begun by a reaction moves from the next step.</summary>
+        /// <summary>Moves each push that was in the list when the step began and has not ended, in the order they began; then packs away the ended ones. A push begun by a reaction moves from the next step. A push whose step throws loses that step alone: the error is reported and the rest move, and so do the step's missiles after.</summary>
         internal static void Run(float step)
         {
             var list = pushes;
@@ -192,15 +192,26 @@ namespace Moonwell.Engine
             }
 
             var count = list.Count;
-            // No try here: in Lua a try is a closure, a table every step. A throw leaves stepping set, which only keeps
-            // the ended pushes for the next step's pack.
+            var at = 0;
             stepping = true;
-            for (var i = 0; i < count; i++)
+            while (at < count)
             {
-                var push = Raw.At(list, i);
-                if (!push.ended)
+                // One try a step, not one a push: in Lua a try is closures. A throw goes on from the push after.
+                try
                 {
-                    Step(push, step);
+                    for (; at < count; at++)
+                    {
+                        var push = Raw.At(list, at);
+                        if (!push.ended)
+                        {
+                            Step(push, step);
+                        }
+                    }
+                }
+                catch (Exception error)
+                {
+                    at++;
+                    Errors.Report("Moonwell.Physics", error);
                 }
             }
 
