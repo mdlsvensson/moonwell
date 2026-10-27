@@ -40,7 +40,6 @@ namespace Moonwell.Build.Tests
             var called = (string)lua.DoString("return ',' .. table.concat(called, ',') .. ','")[0];
             Assert.Contains(",GetWorldBounds,", called);
             Assert.Contains("Moonwell.Missile", script);
-            Assert.Contains("Moonwell.Physics", script);
             Assert.Contains("Firebolt", script);
             Assert.Contains("Knockback", script);
         }

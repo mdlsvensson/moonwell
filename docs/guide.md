@@ -408,40 +408,26 @@ public sealed class Shell : Missile // a mortar shell that arcs to a point and b
 target.Knockback(caster.AngleTo(target), 300f, 0.5f); // 300 away over half a second, slowing to a stop
 ```
 
-- **One motion** for every missile: each step its speed changes by `Acceleration` (up to `MaxSpeed`), `Gravity` pulls it
-  down, and it moves. Set `Speed` or `Velocity` (or `VX`, `VY`, `VZ`); `Physics.Gravity` (800) is the world's. The rest:
-  `Radius` (16), `Mass`, `Bounciness` (0.5), `Friction` (200), `Duration`, `MaxDistance`, `FollowsGround`. Settings
-  are written in the constructor and are live after.
-- `Fire` starts the missile `LaunchHeight` (60) above the unit and `LaunchOffset` ahead, with the unit as its `Source`.
-  Without `Arc` it flies level and on past the mark. With `Arc` it sets its own `Gravity` and lands on the mark: the
-  peak is above the line from launch to mark, and an arc at a unit lands on the unit's middle, where it was at launch
-  (unless the missile has `Homing`). `Missile.Create(missile, x, y, z, player, owner)` places one at rest, for code that
-  sets the velocity itself; one created touching the ground with `GroundContact = Stop` ends at once.
-- Components: `Homing { TurnRate }` (`Fire(missile, unit)` gives it its target), `Shadow` and `LoopingSound(path)`.
-  `ImpactDamage`, `DamageKind`, `AttackType`, `IsAttack` and `Ranged` go through `source.Damage` with the missile as its
-  `Tag`, so `Moonwell.Damage`'s stages see it. A missile with damage and no `Source` deals none.
+- Every missile moves the same way: `Acceleration` (up to `MaxSpeed`), `Gravity` (`Physics.Gravity` is 800), then the
+  move. Set `Speed` or `Velocity`, and `Radius` (16), `Mass`, `Bounciness`, `Friction`, `Duration` or `MaxDistance`, in
+  the constructor.
+- `Fire` starts it `LaunchHeight` (60) above the unit, with the unit as `Source`. With `Arc` it sets its own `Gravity`
+  and lands on the mark: the peak is above the line from launch to mark, and an arc at a unit lands on its middle.
+  `Missile.Create(missile, x, y, z, player, owner)` places one at rest; one made touching the ground with
+  `GroundContact = Stop` ends at once.
+- `ImpactDamage` and the rest go through `source.Damage` with the missile as `Tag`. A missile with damage and no
+  `Source` deals none. `Homing { TurnRate }` is given its target by `Fire(missile, unit)`.
 - **Contacts**: `UnitContact` and `GroundContact` are `Stop`; `DestructableContact`, `ItemContact`, `MissileContact`
-  and `WallContact` are `None`, which is not checked at all. The others: `Bounce`, `Pass` (reacts once each time it
-  enters, flies on) and, for ground and walls, `Slide` (bounces until slow, then rolls).
-- **At a contact**, in this order: the missile's `OnImpact` and its components'; then, on a unit, `OnStruck` of
-  `IMissileTarget` (its class, components and buffs), so the defender has the last word; then the damage; then the
-  outcome. `Impact` has `Kind`, `Other`, `Unit`, `Destructable`, `Item`, `Missile`, `X`, `Y`, `Z`, `Normal`, `Speed`,
-  and a `Contact` and `Damage` a reaction may change (a shield sets `Contact.Bounce` and `Damage = 0f`).
+  and `WallContact` are `None` (not checked). The others are `Bounce`, `Pass` and, for ground and walls, `Slide`.
+- **At a contact**: the missile's `OnImpact` and its components'; then `OnStruck` of `IMissileTarget` on a unit, so the
+  defender has the last word (a shield sets `impact.Contact` to `Bounce`); then the damage; then the outcome.
 - **Ownership**: a missile belongs to the game unless `Fire` or `Create` is given an `owner`, so one fired in a spell
-  outlives the cast. `OnImpact` runs with the missile's owner, so what it makes outlives a missile that stops there.
-- **Knockback**: `Push(vx, vy, vz)`, `Knockback`, `PushVelocity()`, `IsPushed()` and `StopPush()`. The unit's order carries
-  on. It stops at trees, cliffs, buildings, walls (`Wall.Create(x1, y1, x2, y2)`) and a bridge's rail, sliding along
-  them when it can; a stopped push stops a little short of the edge. `Body` (`Mass`, `Height`, `Friction`,
-  `Immovable`) sets a unit's weight and shape. `IPushTarget` has `OnPushed`, `OnSlammed` and `OnGrounded`; an `OnPushed`
+  outlives the cast. `OnImpact` runs with the missile's owner.
+- **Knockback** keeps the unit's order. It stops at trees, cliffs, walls (`Wall.Create`) and a bridge's rail; a stopped
+  push stops a little short of the edge. `IPushTarget` has `OnPushed`, `OnSlammed` and `OnGrounded`; an `OnPushed`
   that pushes its own unit again loops.
-- **Bridges**: placed bridges are ground. A missile lands on one, a unit stands on it and a push slides along its
-  rail. A bridge made by code is not (the game cannot say which way it faces). `Physics.GroundHeight(x, y)` reads
-  the ground with them; `Physics.DestructableSize(typeId, radius, height)` sizes a destructable type (64 around, 250
-  tall unless set).
-- `Ballistics.Velocity(from, to, speed, high, Physics.Gravity, out var launch)` gives the velocity that lobs
-  something onto a point; `Ballistics.Speed` the speed for a launch angle.
-- Everything runs on every machine, in the same order. Reads are safe inside `Local.For`; firing, creating, pushing
-  and every set are changes and are not.
+- **Bridges**: placed bridges are ground, for missiles landing and units standing; a bridge made by code is not.
+- Everything runs on every machine. Reads are safe in `Local.For`; firing, pushing and every set are not.
 
 ## Areas
 
