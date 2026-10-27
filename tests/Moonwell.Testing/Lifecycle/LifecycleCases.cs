@@ -294,6 +294,40 @@ namespace Moonwell.Testing
             Expect.Equal("300 2", hero.Experience + " " + hero.Level, "the removed hero's last experience and level");
         }
 
+        /// <summary>A component with a helper named like a reaction and taking other parameters (OnDeath(string)) and with no reaction: adding it works on .NET as in Lua, its mask has no OnDeath, and the unit's death does not call the helper. Only a method that overrides the base's reaction counts.</summary>
+        public static void HelperNamedLikeReaction(FakeWorld world)
+        {
+            Helpered.Log = "";
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var added = "added";
+            Helpered? helpered = null;
+            try
+            {
+                helpered = unit.Add(new Helpered());
+            }
+            catch (Exception error)
+            {
+                added = "Add threw: " + error.Message;
+            }
+
+            Expect.Equal("added", added, "adding the component");
+            Expect.True((helpered!.Mask & Hook.OnDeath) == 0, "the component's mask has no OnDeath");
+            Runtime.World.Listen(Moonwell.Hosting.GameEvent.Death);
+            unit.Kill();
+            Expect.Equal("", Helpered.Log, "the helper's calls after the death");
+        }
+
+        /// <summary>A component whose OnDamaged hides the base's (new, not override) has no OnDamaged reaction, on .NET as in Lua, and is not called.</summary>
+        public static void HidingMethodIsNoReaction(FakeWorld world)
+        {
+            Hiding.Calls = 0;
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var hiding = unit.Add(new Hiding());
+            Expect.True((hiding.Mask & Hook.OnDamaged) == 0, "the component's mask has no OnDamaged");
+            Inbound.Damaged(unit.Handle, null, 10.0f, true);
+            Expect.Equal(0, Hiding.Calls, "the hiding method's calls after a damage");
+        }
+
         /// <summary>A timer adopted by a second owner is refused, in every build: it is reported and stays with its first owner (decision 74).</summary>
         public static void AdoptAgainRefused(FakeWorld world)
         {
