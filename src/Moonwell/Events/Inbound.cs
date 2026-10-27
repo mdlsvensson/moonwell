@@ -21,7 +21,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>A unit enters the map: it is taken in when its type is registered, or when a component wants to hear of entries.</summary>
+        /// <summary>A unit enters the map: it is taken in when its type is registered, when a component wants to hear of entries, or once the interactions package tracks units (KnownUnits.EveryUnit).</summary>
         internal static void Entered(unit handle)
         {
             if (KnownUnits.Find(handle) != null)
@@ -29,7 +29,7 @@ namespace Moonwell
                 return;
             }
 
-            if (ObjectTypes.UnitMaker(Runtime.World.UnitTypeId(handle)) != null || Events.Wants(Hook.OnUnitCreated))
+            if (KnownUnits.EveryUnit || ObjectTypes.UnitMaker(Runtime.World.UnitTypeId(handle)) != null || Events.Wants(Hook.OnUnitCreated))
             {
                 KnownUnits.TakeIn(handle, null);
             }

@@ -360,6 +360,8 @@ var near = Find.InRange<Unit>(x, y, 500f);                // a new list; or Find
   may start up to 1 s late (interactions started together take turns over its steps). Only a unit in the game (alive,
   not hidden, not loaded), a visible item on the ground, a live destructable and a gizmo have a place; `OnPart` runs
   once, when a pair ends.
+- From the first interaction or `Find` that asks for units, Moonwell takes in every unit in the game, and each one
+  that comes in after, also those the game makes with no code of the map (trained, summoned, made by a native).
 - `Find` has `InRange`, `InRect`, `InPolygon`, `AlongLine` and `Closest`. Each gives a new list, or fills a list the
   map keeps (which makes none; use it every tick); `Closest` gives the nearest one, or the nearest few into a list.
 - `Interactions.CellSize` (128), `CellCheck` (0.1), `Slack` (64) and `Step` (1/32) are set in the map's constructor.

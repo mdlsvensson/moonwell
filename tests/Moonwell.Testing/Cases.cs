@@ -18,8 +18,15 @@ namespace Moonwell.Testing
             AddTerrain(list);
             AddAreas(list);
             AddInput(list);
+            AddLifecycle(list);
             AddDebug(list);
             return list;
+        }
+
+        /// <summary>Adds the cases for the full audit's fixes to core's lifecycle.</summary>
+        private static void AddLifecycle(List<Case> list)
+        {
+            list.Add(new Case { Name = "lifecycle.units-the-game-makes-are-met", Run = LifecycleCases.UnitsTheGameMakesAreMet });
         }
 
         /// <summary>Adds the debug mode's cases; they exist only in a development build, as the debug mode does.</summary>
