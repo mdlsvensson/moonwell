@@ -25,7 +25,7 @@ namespace Moonwell.Testing
             return list;
         }
 
-        /// <summary>Adds the cases for the full audit's doc fixes: OrderedMap and OrderedSet in a foreach.</summary>
+        /// <summary>Adds the cases for the full audit's doc fixes: OrderedMap and OrderedSet in a foreach, and the guide's forms to write instead.</summary>
         private static void AddAuditDocs(List<Case> list)
         {
             list.Add(new Case { Name = "collections.set-foreach-keeps-order", Run = AuditDocsCases.SetForeachKeepsOrder });
@@ -34,6 +34,12 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "collections.map-foreach-change-throws", Run = AuditDocsCases.MapForeachChangeThrows });
             list.Add(new Case { Name = "collections.foreach-left-early", Run = AuditDocsCases.ForeachLeftEarly });
             list.Add(new Case { Name = "collections.linq", Run = AuditDocsCases.Linq });
+            list.Add(new Case { Name = "forms.using-statement-in-loop", Run = AuditDocsCases.UsingStatementInLoop });
+            list.Add(new Case { Name = "forms.property-pattern-on-null", Run = AuditDocsCases.PropertyPatternOnNull });
+            list.Add(new Case { Name = "forms.local-function-before-switch", Run = AuditDocsCases.LocalFunctionBeforeSwitch });
+            list.Add(new Case { Name = "forms.readonly-struct-in-list", Run = AuditDocsCases.ReadonlyStructInList });
+            list.Add(new Case { Name = "forms.number-formats", Run = AuditDocsCases.NumberFormats });
+            list.Add(new Case { Name = "forms.long-const-string-field", Run = AuditDocsCases.LongConstStringField });
         }
 
         /// <summary>Adds the cases for the full audit's fixes to core's lifecycle.</summary>

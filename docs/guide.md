@@ -508,8 +508,8 @@ every machine.
 ## C# the game's Lua cannot run
 
 Moonwell turns your C# into Lua with CSharp.lua, and the game runs the Lua. A few C# forms stop the compiler, write
-Lua that does something else, or call a library function the Lua core does not have. The analyzer rejects them as
-errors with their line, so the map does not build and then fail on the screen. Nothing silences them (`[SyncUnchecked]`
+Lua that does something else, or call a library function the Lua core does not have. The analyzer rejects most of them
+as errors with their line, so the map does not build and then fail on the screen. Nothing silences them (`[SyncUnchecked]`
 does not), because the Lua cannot run them anywhere. The list comes from running about 770 small programs on .NET and
 in Lua and comparing what they printed.
 
@@ -533,12 +533,26 @@ in Lua and comparing what they printed.
 | MW0034 | two `using var` in one block (disposed in the wrong order) | nested `using ( ) { }` |
 | MW0035 | `(unit)data`, `data as unit`, `data is unit`, `case unit u` from an `object`, a `widget` or a `T`, `foreach (unit u in widgets)`, `widgets.OfType<unit>()` and `widgets.Cast<unit>()`: a game handle fails every check for its type | a field or variable of the handle's type, or a class of your own that holds it |
 
+The analyzer does not see these, so they build and then go wrong in the game:
+
+| Form | In the game | Write instead |
+|---|---|---|
+| a struct of your own that can change, put into a collection by an initializer, a collection expression or an indexer (`new List<P> { a }`, `[a]`, `new P[] { a }`, `list[0] = a`, `dict[k] = a`), or changed through a lambda's parameter (`p => p.X = 9`, `list.ForEach(...)`) | not copied: both hold the same struct, so a change to one is a change to the other | a `readonly struct`, made new to change it, or a class; `Add` and `Insert` copy |
+| a `where T : struct` or `unmanaged` method that copies its value (`var y = x;`, `foreach (var x in e) return x;`), given an `int`, a `float` or a `bool` | fails: "attempt to index a number value" | the method without the constraint |
+| a number format other than `F`, `D`, `X`, `E`, `G` and a width: `N0`, `P0`, `00`, `0.0`, `#,##0.00` | the number as it is (`{x:N0}` of 1234567 shows `1234567`, `{x:P0}` of 0.5 shows `0.5`); `D3` of a negative number has a digit too few | `F` and a width (`{x,6:F1}`), `$"{x * 100:F0}%"` |
+| a `null` after a number, `bool` or `char` in a `+` chain: `"a" + true + null` | the build stops: "unexpected error: BugErrorException" | leave the `null` out |
+| `break` or `continue` after a `using var` in a loop | the script does not load | `using (var d = ...) { }` around the loop's body |
+| a positional pattern on a class or record (`case (1, 2):`, `(1, 2) =>`) given null | fails: `Deconstruct` is called before the null check | a property pattern (`{ X: 1, Y: 2 }`), or a test for null first |
+| a local function called from another `switch` section than the one it is declared in | fails: "attempt to call a nil value" | declare it before the `switch` |
+| a `const string` local longer than 27 characters that is not one literal (`const string L = Prefix + "...";`), read on its own | nil, which shows as empty | one literal, or a `const` field |
+| `catch (DivideByZeroException)` around `%` | never catches: `%` by zero is a plain Lua error | `catch (Exception)`, or test first |
+| `byte` and `short` arithmetic | does not wrap | `int`, wrapped yourself |
+
 What works is most of the language: classes, structs, records, primary constructors, interfaces and default methods,
 generics with constraints, enums, delegates, events, `switch` statements, `is` patterns with constants, types and
 properties, `??`, `?.`, collection expressions, `foreach` over every collection, `yield`, lambdas and closures,
 `ref`/`out`/`in` parameters, `lock`, string interpolation, `List`, `Dictionary`, `HashSet`, `Queue`, `Stack`, arrays and
-most of LINQ. `float` and `int` arithmetic is the game's, see MW0005. One thing the analyzer cannot see: `byte`/`short`
-arithmetic does not wrap.
+most of LINQ. `float` and `int` arithmetic is the game's, see MW0005.
 
 ## The build
 

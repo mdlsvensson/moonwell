@@ -4,7 +4,10 @@ using System.Linq;
 
 namespace Moonwell.Testing
 {
-    /// <summary>Cases for the full audit's doc fixes: OrderedMap and OrderedSet looped with foreach and LINQ (DO4).</summary>
+    /// <summary>
+    /// Cases for the full audit's doc fixes: OrderedMap and OrderedSet looped with foreach and LINQ (DO4), and what the guide
+    /// says to write instead of the C# the game's Lua cannot run and the analyzer does not see (DO3).
+    /// </summary>
     public static class AuditDocsCases
     {
         /// <summary>A foreach over a set gives its items in insertion order, after adds and removes, and an empty set none.</summary>
@@ -198,6 +201,101 @@ namespace Moonwell.Testing
             Expect.Equal(2, map.Count(pair => pair.Value > 1), "how many values are above 1");
         }
 
+        /// <summary>
+        /// A using statement around a loop's body, which the guide gives for a break or continue after a using var: each
+        /// iteration disposes its object, the one left by break too.
+        /// </summary>
+        public static void UsingStatementInLoop(FakeWorld world)
+        {
+            var log = new List<string>();
+            for (var i = 0; i < 3; i++)
+            {
+                using (var held = new Held(log, i))
+                {
+                    if (i == 1)
+                    {
+                        continue;
+                    }
+
+                    log.Add("body " + i);
+                }
+            }
+
+            for (var i = 0; i < 3; i++)
+            {
+                using (var held = new Held(log, 10 + i))
+                {
+                    if (i == 1)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            Expect.Equal("body 0,dispose 0,dispose 1,body 2,dispose 2,dispose 10,dispose 11", string.Join(",", log), "what the loops did");
+        }
+
+        /// <summary>A property pattern on a class given null, which the guide gives instead of a positional pattern: null matches none.</summary>
+        public static void PropertyPatternOnNull(FakeWorld world)
+        {
+            Expect.Equal("null", CaseOf(null), "a switch statement's property pattern given null");
+            Expect.Equal("12", CaseOf(new Spot { X = 1, Y = 2 }), "a switch statement's property pattern given a match");
+            Expect.Equal("null", ArmOf(null), "a switch expression's property pattern given null");
+            Expect.Equal("other", ArmOf(new Spot { X = 3, Y = 2 }), "a switch expression's property pattern given another spot");
+        }
+
+        /// <summary>A local function declared before a switch, which the guide gives for one used from several sections.</summary>
+        public static void LocalFunctionBeforeSwitch(FakeWorld world)
+        {
+            int Five() => 5;
+            var results = new List<int>();
+            for (var section = 1; section <= 2; section++)
+            {
+                switch (section)
+                {
+                    case 1:
+                        results.Add(Five());
+                        break;
+                    default:
+                        results.Add(Five() + 1);
+                        break;
+                }
+            }
+
+            Expect.Equal("5,6", string.Join(",", results), "both sections called the local function");
+        }
+
+        /// <summary>A readonly struct put into a list by an initializer, which the guide gives for a struct the list should copy.</summary>
+        public static void ReadonlyStructInList(FakeWorld world)
+        {
+            var point = new Fixed(1);
+            var list = new List<Fixed> { point };
+            point = new Fixed(5);
+            Expect.Equal(1, list[0].X, "the list's struct after the variable took a new one");
+            Expect.Equal(5, point.X, "the variable's struct");
+        }
+
+        /// <summary>The number formats the guide says work in the game's Lua: F, D, X and a width.</summary>
+        public static void NumberFormats(FakeWorld world)
+        {
+            Expect.Equal("2.50", 2.5f.ToString("F2"), "F2");
+            Expect.Equal("2.5|", $"{2.5f:F1}|", "F1 in an interpolation");
+            Expect.Equal("   ab|3.14", string.Format("{0,5}|{1:F2}", "ab", 3.14159f), "a width, and F2 in a format");
+            Expect.Equal("005", 5.ToString("D3"), "D3");
+            Expect.Equal("FF", 255.ToString("X"), "X");
+            Expect.Equal("50%", $"{0.5f * 100:F0}%", "a percent made with F0");
+        }
+
+        /// <summary>A long const string field built from another constant, which the guide gives instead of such a local.</summary>
+        public static void LongConstStringField(FakeWorld world)
+        {
+            Expect.Equal("abc-defghijklmnopqrstuvwxyz0123456789", LongName, "the field read on its own");
+        }
+
+        private const string ShortName = "abc";
+
+        private const string LongName = ShortName + "-defghijklmnopqrstuvwxyz0123456789";
+
         private static int FirstBelow(OrderedSet<int> set, int limit)
         {
             foreach (var item in set)
@@ -222,6 +320,62 @@ namespace Moonwell.Testing
             }
 
             return string.Empty;
+        }
+
+        private static string CaseOf(Spot? spot)
+        {
+            switch (spot)
+            {
+                case { X: 1, Y: 2 }:
+                    return "12";
+                case null:
+                    return "null";
+                default:
+                    return "other";
+            }
+        }
+
+        private static string ArmOf(Spot? spot) => spot switch
+        {
+            { X: 1, Y: 2 } => "12",
+            null => "null",
+            _ => "other",
+        };
+
+        /// <summary>A disposable that logs its disposal.</summary>
+        private sealed class Held : IDisposable
+        {
+            private readonly List<string> log;
+            private readonly int number;
+
+            public Held(List<string> log, int number)
+            {
+                this.log = log;
+                this.number = number;
+            }
+
+            public void Dispose()
+            {
+                log.Add("dispose " + number);
+            }
+        }
+
+        /// <summary>A class with two fields, for patterns.</summary>
+        private sealed class Spot
+        {
+            public int X;
+            public int Y;
+        }
+
+        /// <summary>A struct that cannot change.</summary>
+        private readonly struct Fixed
+        {
+            public readonly int X;
+
+            public Fixed(int x)
+            {
+                X = x;
+            }
         }
     }
 }
