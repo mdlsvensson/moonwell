@@ -3483,7 +3483,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\8x8SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 384f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\other\\GoblinShipyard\\GoblinShipyard_portrait";
@@ -3606,7 +3606,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\16x16Goldmine.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\other\\GoldMine\\GoldMine_portrait";

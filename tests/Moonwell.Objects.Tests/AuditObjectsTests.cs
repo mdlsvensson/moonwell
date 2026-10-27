@@ -94,6 +94,16 @@ namespace Moonwell.Objects.Tests
                 && one.GetProperty("values").TryGetProperty(key, out var value) ? value.GetString() : null;
         }
 
+        [Fact]
+        public void the_placement_fields_hold_world_editors_names()
+        {
+            // Decision 70: a human building's preventPlace "unbuildable" is World Editor's "Placement Requires: Buildable".
+            Assert.Equal(PathingRequire.Buildable, new Human.Units.Barracks().PlacementRequires);
+            Assert.Equal("unbuildable", typeof(PathingRequire).GetField(nameof(PathingRequire.Buildable))!.GetCustomAttribute<GameValueAttribute>()!.Text);
+            Assert.Equal("blighted", typeof(PathingPrevent).GetField(nameof(PathingPrevent.Unblighted))!.GetCustomAttribute<GameValueAttribute>()!.Text);
+            Assert.Equal(typeof(PathingPrevent), typeof(StandardUnit).GetProperty("PlacementPreventedBy")!.PropertyType);
+        }
+
         private static IEnumerable<string> FieldsOf(Type type)
         {
             return type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)

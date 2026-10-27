@@ -682,64 +682,64 @@ namespace Moonwell.Objects
         NoOcclusion = 2,
     }
 
-    /// <summary>Any of the values of the metadata type <c>pathingListPrevent</c>, as World Editor offers them; the object file holds a comma list of their texts, and 0 is none of them. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
+    /// <summary>Any of the values of the metadata type <c>pathingListRequire</c>, named as World Editor shows them: the game stores each as its opposite, which the object file holds as a comma list (Buildable is "unbuildable"), and 0 is none of them. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     [global::System.Flags]
-    public enum PathingListPrevent
+    public enum PathingPrevent
     {
-        /// <summary>Unblighted.</summary>
+        /// <summary>Unblighted: the game's "blighted".</summary>
         [global::Moonwell.Objects.GameValue("blighted")]
-        Blighted = 1,
+        Unblighted = 1,
 
-        /// <summary>Buildable.</summary>
+        /// <summary>Buildable: the game's "unbuildable".</summary>
         [global::Moonwell.Objects.GameValue("unbuildable")]
-        Unbuildable = 2,
+        Buildable = 2,
 
-        /// <summary>Air-pathable.</summary>
+        /// <summary>Air-pathable: the game's "unflyable".</summary>
         [global::Moonwell.Objects.GameValue("unflyable")]
-        Unflyable = 4,
+        AirPathable = 4,
 
-        /// <summary>Ground-pathable.</summary>
+        /// <summary>Ground-pathable: the game's "unwalkable".</summary>
         [global::Moonwell.Objects.GameValue("unwalkable")]
-        Unwalkable = 8,
+        GroundPathable = 8,
 
-        /// <summary>Amphibious-pathable.</summary>
+        /// <summary>Amphibious-pathable: the game's "unamph".</summary>
         [global::Moonwell.Objects.GameValue("unamph")]
-        Unamph = 16,
+        AmphibiousPathable = 16,
 
-        /// <summary>Sea-pathable.</summary>
+        /// <summary>Sea-pathable: the game's "unfloat".</summary>
         [global::Moonwell.Objects.GameValue("unfloat")]
-        Unfloat = 32,
+        SeaPathable = 32,
     }
 
-    /// <summary>Any of the values of the metadata type <c>pathingListRequire</c>, as World Editor offers them; the object file holds a comma list of their texts, and 0 is none of them. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
+    /// <summary>Any of the values of the metadata type <c>pathingListPrevent</c>, named as World Editor shows them: the game stores each as its opposite, which the object file holds as a comma list (Buildable is "unbuildable"), and 0 is none of them. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>
     /// @CSharpLua.Ignore
     [global::System.Flags]
-    public enum PathingListRequire
+    public enum PathingRequire
     {
-        /// <summary>Unblighted.</summary>
+        /// <summary>Unblighted: the game's "blighted".</summary>
         [global::Moonwell.Objects.GameValue("blighted")]
-        Blighted = 1,
+        Unblighted = 1,
 
-        /// <summary>Buildable.</summary>
+        /// <summary>Buildable: the game's "unbuildable".</summary>
         [global::Moonwell.Objects.GameValue("unbuildable")]
-        Unbuildable = 2,
+        Buildable = 2,
 
-        /// <summary>Air-pathable.</summary>
+        /// <summary>Air-pathable: the game's "unflyable".</summary>
         [global::Moonwell.Objects.GameValue("unflyable")]
-        Unflyable = 4,
+        AirPathable = 4,
 
-        /// <summary>Ground-pathable.</summary>
+        /// <summary>Ground-pathable: the game's "unwalkable".</summary>
         [global::Moonwell.Objects.GameValue("unwalkable")]
-        Unwalkable = 8,
+        GroundPathable = 8,
 
-        /// <summary>Amphibious-pathable.</summary>
+        /// <summary>Amphibious-pathable: the game's "unamph".</summary>
         [global::Moonwell.Objects.GameValue("unamph")]
-        Unamph = 16,
+        AmphibiousPathable = 16,
 
-        /// <summary>Sea-pathable.</summary>
+        /// <summary>Sea-pathable: the game's "unfloat".</summary>
         [global::Moonwell.Objects.GameValue("unfloat")]
-        Unfloat = 32,
+        SeaPathable = 32,
     }
 
     /// <summary>Any of the values of the metadata type <c>pickFlags</c>, as World Editor offers them; the object file holds the number whose bits they are, and 0 is none of them. Its numbers are Moonwell's, from World Editor's list, not the natives' (JASS's ATTACK_TYPE_MAGIC is 4, AttackType.Magic is 6): never cast one to or from a native's value.</summary>

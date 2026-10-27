@@ -1270,7 +1270,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\10x10Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\naga\\AltarOfDepths\\AltarOfDepths_portrait";
@@ -2432,7 +2432,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\ArcaneObservatoryPath.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\other\\ArcaneObservatory\\ArcaneObservatory_portrait";
@@ -4489,7 +4489,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\8x8SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\other\\BarrowDens\\BarrowDens_portrait";
@@ -9844,7 +9844,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\6x6SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\naga\\CoralBed\\CoralBed_portrait";
@@ -9993,7 +9993,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 9;
@@ -10160,7 +10160,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\6x6SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 4;
@@ -10301,7 +10301,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\6x6SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\demon\\CorruptedMoonWell\\CorruptedMoonWell_portrait";
@@ -10453,7 +10453,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\12x12TreeOfLife.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 1;
@@ -10616,7 +10616,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\12x12TreeOfLife.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 1;
@@ -10778,7 +10778,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\12x12TreeOfLife.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 1;
@@ -15031,7 +15031,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\6x6SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\orc\\TrollBurrow\\TrollBurrow_portrait";
@@ -22107,7 +22107,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\6x6SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 384f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\human\\HumanShipyard\\HumanShipyard_portrait";
@@ -32909,7 +32909,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\6x6SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 384f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\NightElf\\NightElfShipyard\\NightElfShipyard_portrait";
@@ -33594,7 +33594,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\8x8SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 384f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\other\\GoblinShipyard\\GoblinShipyard";
@@ -38252,7 +38252,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\naga\\ShrineOfAshjara\\ShrineOfAshjara_portrait";
@@ -39584,7 +39584,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\naga\\SpawningGrounds\\SpawningGrounds_portrait";
@@ -41876,7 +41876,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\16x16Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\naga\\TempleofTides\\TempleofTides_portrait";
@@ -42997,7 +42997,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\4x4SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\naga\\TidalGuardian\\TidalGuardian_portrait";
@@ -43850,7 +43850,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 384f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\undead\\UndeadShipyard\\UndeadShipyard_portrait";

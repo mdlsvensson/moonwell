@@ -163,6 +163,33 @@ namespace Moonwell.Build.Tests
             Assert.Equal(new[] { "5=325" }, LevelsOf(abilities, "A003", "Htb1"));
         }
 
+        [Fact]
+        public void the_placement_fields_take_world_editors_names_and_write_the_games()
+        {
+            // Decision 70: World Editor's "Placement Requires: Buildable, Unblighted" is the game's preventPlace "blighted,unbuildable";
+            // its "Placement Prevented By: Unblighted" is the game's requirePlace "blighted", an undead building's.
+            var staged = Build("""
+                using Moonwell.Objects;
+
+                namespace Sample
+                {
+                    [ObjectId("h001")]
+                    public sealed class BlightBarracks : Human.Units.Barracks
+                    {
+                        public BlightBarracks()
+                        {
+                            PlacementRequires = PathingRequire.Buildable | PathingRequire.Unblighted;
+                            PlacementPreventedBy = PathingPrevent.Unblighted;
+                        }
+                    }
+                }
+                """);
+
+            var units = ReadUnits(staged);
+            Assert.Equal(new[] { "0=blighted,unbuildable" }, LevelsOf(units, "h001", "upap"));
+            Assert.Equal(new[] { "0=blighted" }, LevelsOf(units, "h001", "upar"));
+        }
+
         private string Build(string objects)
         {
             var copy = folders.TemporaryCopyOfSample();
