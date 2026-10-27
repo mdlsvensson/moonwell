@@ -1967,10 +1967,10 @@ namespace Moonwell.Engine
         }
 
         /// <summary>
-        /// Puts a ball's middle at (x, y) back out at a wall's side, its radius from the wall: when it is nearer on its own
-        /// side (the side of the normal (nx, ny)), away from the nearest point of the wall; and whenever it is on the wall's
-        /// line or past it, whatever its radius, along the normal, its radius out and at least Clear, so a ball of radius 0
-        /// is on its own side too.
+        /// Puts a ball's middle at (x, y) back out at a wall's side, its radius from the wall and at least Clear (so a ball of
+        /// radius 0 is off the line, which a float's last bit would leave it on): when it is nearer on its own side (the
+        /// side of the normal (nx, ny)), away from the nearest point of the wall; and whenever it is on the wall's line or
+        /// past it, along the normal.
         /// </summary>
         private static void Beside(Wall wall, float radius, float nx, float ny, ref float x, ref float y)
         {
@@ -1988,19 +1988,20 @@ namespace Moonwell.Engine
             var oy = y - qy;
             var off = Trig.Sqrt(ox * ox + oy * oy);
             var own = ox * nx + oy * ny > 0.0f;
-            if (own && off >= radius)
+            // Its radius out, and at least Clear for a thin ball, which a float's last bit would leave on the line.
+            var back = radius > Clear ? radius : Clear;
+            if (own && off >= back)
             {
                 return;
             }
 
             if (own && off > Tiny)
             {
-                x = qx + ox / off * radius;
-                y = qy + oy / off * radius;
+                x = qx + ox / off * back;
+                y = qy + oy / off * back;
                 return;
             }
 
-            var back = radius > Clear ? radius : Clear;
             x = qx + nx * back;
             y = qy + ny * back;
         }
