@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Moonwell.Engine;
 
 namespace Moonwell.Testing
 {
@@ -34,6 +35,80 @@ namespace Moonwell.Testing
             Expect.True(!mouse.IsDown(MouseButton.Left), "the release is heard");
         }
 
+        /// <summary>Fails unless the log is exactly these lines.</summary>
+        private static void ExpectLog(List<string> log, string[] expected, string what)
+        {
+            Expect.Equal(string.Join(", ", expected), string.Join(", ", log.ToArray()), what);
+        }
+
+        /// <summary>
+        /// A mouse event runs the watchers without looking at every game component again: with 50 game components that do
+        /// not watch the mouse (areas, say) and one that does, 100 moves look at the components once. A watcher added later
+        /// is called from the next event, and one that ended is not called.
+        /// </summary>
+        public static void WatchersKept(FakeWorld world)
+        {
+            TwoUsers(world);
+            var fake = new FakeInputWorld();
+            InputSystem.Install(fake, true, true, new string[0], new float[0]);
+            for (var i = 0; i < 50; i++)
+            {
+                Game.Instance.Add(new QuietGame());
+            }
+
+            var log = new List<string>();
+            var first = new LogMouseGame(log, "first");
+            Game.Instance.Add(first);
+            MouseReactions.Lookups = 0;
+            for (var i = 0; i < 100; i++)
+            {
+                fake.Move(Player.One, 10f + i, 20f);
+            }
+
+            Expect.Equal(100, log.Count, "the watcher is called at each move");
+            Expect.True(MouseReactions.Lookups <= 51, "the components are looked at once, not at each move: " + MouseReactions.Lookups);
+            log.Clear();
+            var second = new LogMouseGame(log, "second");
+            Game.Instance.Add(second);
+            fake.Move(Player.One, 1f, 2f);
+            ExpectLog(log, new[] { "first moved", "second moved" }, "a watcher added is called from the next event");
+            log.Clear();
+            first.End();
+            fake.Press(Player.One, MouseButton.Left, 1f, 2f);
+            ExpectLog(log, new[] { "second pressed Left" }, "one that ended is not");
+            log.Clear();
+            var quiet = Game.Instance.Get<QuietGame>()!;
+            quiet.End();
+            var third = new LogMouseGame(log, "third");
+            Game.Instance.Add(third);
+            fake.Move(Player.One, 1f, 2f);
+            ExpectLog(log, new[] { "second moved", "third moved" }, "one ended and one added, the count the same: the new one is called");
+        }
+
+        /// <summary>A watcher added by a watcher's reaction is called from the next event, and one ended by an earlier watcher's reaction in the same event is not called; a player's watchers are kept apart from another player's.</summary>
+        public static void WatchersChangedInDispatch(FakeWorld world)
+        {
+            TwoUsers(world);
+            var fake = new FakeInputWorld();
+            InputSystem.Install(fake, true, true, new string[0], new float[0]);
+            var log = new List<string>();
+            var late = new LogMouseGame(log, "late");
+            var adder = new AddingMouse(log, new LogMouseGame(log, "added"), late);
+            Game.Instance.Add(adder);
+            Game.Instance.Add(late);
+            fake.Press(Player.One, MouseButton.Left, 1f, 2f);
+            ExpectLog(log, new[] { "adder pressed" }, "the added one waits for the next event, and the ended one is not called");
+            log.Clear();
+            fake.Press(Player.One, MouseButton.Left, 1f, 2f);
+            ExpectLog(log, new[] { "adder pressed", "added pressed Left" }, "the added one at the next event");
+            log.Clear();
+            Player.One.Add(new LogMousePlayer(log, "one"));
+            Player.Two.Add(new LogMousePlayer(log, "two"));
+            fake.Release(Player.Two, MouseButton.Left, 1f, 2f);
+            fake.Release(Player.One, MouseButton.Left, 1f, 2f);
+            ExpectLog(log, new[] { "added released Left", "two released Left", "added released Left", "one released Left" }, "each player's own watchers");
+        }
+
         /// <summary>With the mouse and its moves on, all three events are listened to; with the mouse off, none, whatever the moves say.</summary>
         public static void Moves(FakeWorld world)
         {
@@ -46,6 +121,43 @@ namespace Moonwell.Testing
             var off = new FakeInputWorld();
             InputSystem.Install(off, false, true, new string[0], new float[0]);
             Expect.Equal(0, off.Listens.Count, "no mouse, no events");
+        }
+    }
+
+    /// <summary>A game component that does not watch the mouse.</summary>
+    public sealed class QuietGame : GameComponent
+    {
+    }
+
+    /// <summary>A game component whose press reaction logs "adder pressed", adds a watcher to the game the first time, and ends another.</summary>
+    public sealed class AddingMouse : GameComponent, IMouseWatch
+    {
+        private readonly List<string> log;
+
+        private readonly GameComponent toAdd;
+
+        private readonly GameComponent toEnd;
+
+        private bool done;
+
+        /// <summary>Makes it with the log, the watcher it adds and the one it ends.</summary>
+        public AddingMouse(List<string> log, GameComponent added, GameComponent ended)
+        {
+            this.log = log;
+            toAdd = added;
+            toEnd = ended;
+        }
+
+        /// <summary>Logs, and the first time adds one watcher and ends the other.</summary>
+        public void OnMousePressed(Mouse mouse, MouseButton button)
+        {
+            log.Add("adder pressed");
+            if (!done)
+            {
+                done = true;
+                Game.Instance.Add(toAdd);
+                toEnd.End();
+            }
         }
     }
 }
