@@ -13,7 +13,7 @@ namespace Moonwell.Analyzers;
 /// Rejects the C# syntax and library calls that CSharp.lua stops on, writes wrong or leaves to a Lua core that does not have
 /// them, so the editor and dotnet build show it with its line (MW0017 to MW0034). Found by running about 770 checks
 /// against .NET; each rule's description says what was seen. MW0019, MW0021 and MW0033 are gone: the fork's CSharp.lua
-/// writes their forms right.
+/// writes their forms right. MW0042 is the game's own numbers, which have no NaN or infinity (the 0.3 gate).
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
@@ -681,6 +681,32 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
 
     private const string Missing = "is not in the game's Lua core; it fails when it runs";
 
+    private const string NaNIsOne = "is 1 in the game's Lua, whose arithmetic makes no NaN (CSharp.lua writes it 0 / 0); mark no value with a bool or a float?";
+    private const string NaNNever = "is never true in the game's Lua, whose arithmetic makes no NaN; test what could go wrong before it does, such as a length of 0 before dividing by it";
+    private const string NoInfinity = "has no use in the game's Lua, whose arithmetic makes no infinity (1 / 0 is 2^127, inf - inf is 0); use float.MaxValue for no limit";
+    private const string InfinityNever = "tests for an infinity the game's Lua never makes (1 / 0 is 2^127 there); test the value's range";
+
+    // MW0042: the members for NaN and the infinities, which the game's own numbers do not have.
+    private static readonly ImmutableDictionary<string, string> NotNumbers = new Dictionary<string, string>
+    {
+        ["System.Single.NaN"] = NaNIsOne,
+        ["System.Double.NaN"] = NaNIsOne,
+        ["System.Single.IsNaN"] = NaNNever,
+        ["System.Double.IsNaN"] = NaNNever,
+        ["System.Single.PositiveInfinity"] = NoInfinity,
+        ["System.Single.NegativeInfinity"] = NoInfinity,
+        ["System.Double.PositiveInfinity"] = NoInfinity,
+        ["System.Double.NegativeInfinity"] = NoInfinity,
+        ["System.Single.IsInfinity"] = InfinityNever,
+        ["System.Single.IsPositiveInfinity"] = InfinityNever,
+        ["System.Single.IsNegativeInfinity"] = InfinityNever,
+        ["System.Single.IsFinite"] = InfinityNever,
+        ["System.Double.IsInfinity"] = InfinityNever,
+        ["System.Double.IsPositiveInfinity"] = InfinityNever,
+        ["System.Double.IsNegativeInfinity"] = InfinityNever,
+        ["System.Double.IsFinite"] = InfinityNever,
+    }.ToImmutableDictionary();
+
     private static readonly ImmutableHashSet<string> MissingTypes = ImmutableHashSet.Create(
         "System.Range", "System.Index", "System.StringComparer", "System.Threading.Monitor", "System.Threading.Lock",
         "System.Threading.Thread", "System.Threading.Tasks.Task", "System.Threading.Tasks.Task`1", "System.Collections.BitArray",
@@ -766,6 +792,13 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
         }
 
         var key = Full(original.ContainingType) + "." + original.Name;
+        // An attribute's argument, such as a limit of double.PositiveInfinity, is never run in the game.
+        if (NotNumbers.TryGetValue(key, out var notANumber) && name.FirstAncestorOrSelf<AttributeSyntax>() == null)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(Rules.NotANumber, name.GetLocation(), name.Identifier.Text, notANumber));
+            return;
+        }
+
         if (Members.TryGetValue(key, out var why))
         {
             context.ReportDiagnostic(Diagnostic.Create(Rules.LuaMember, name.GetLocation(), name.Identifier.Text, why));
