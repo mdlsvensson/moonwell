@@ -409,5 +409,32 @@ namespace Moonwell.Testing
             Expect.True(northUnit.Y > 600.0f, "pushed north, it moved off the wall; at " + northUnit.Y);
             Expect.True(southUnit.Y < 424.0f, "pushed south, so did the other; at " + southUnit.Y);
         }
+
+        /// <summary>
+        /// Forty units 0.011 to 0.05 north of a wall along y 512, pushed at (600, -0.3), glancing toward it at 0.03 degrees,
+        /// do not cross it: a unit within 0.01 of a wall is let go only where its line ends on its own side of the wall, so
+        /// one that has drifted that near is stopped by it, not let through. Eight of them ended on the far side.
+        /// </summary>
+        public static void PushGlancing(FakeWorld world)
+        {
+            Fresh();
+            Wall.Create(300.0f, 512.0f, 2000.0f, 512.0f);
+            var units = new List<Pushee>();
+            for (var i = 0; i < 40; i++)
+            {
+                var handle = world.NewUnit(ObjectTypes.FourCC(PusheeId));
+                world.MoveUnit(handle, 400.0f + i * 20.0f, 512.0f + 0.011f + i * 0.001f);
+                var unit = (Pushee)Unit.Of(handle)!;
+                unit.Push(600.0f, -0.3f);
+                units.Add(unit);
+            }
+
+            Steps(world, 48);
+            for (var i = 0; i < units.Count; i++)
+            {
+                Expect.True(!units[i].IsPushed(), "unit " + i + " has stopped");
+                Expect.True(units[i].Y >= 512.0f, "unit " + i + " on its own side of the wall; at y " + units[i].Y);
+            }
+        }
     }
 }

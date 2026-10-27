@@ -13,7 +13,8 @@ namespace Moonwell.Engine
         /// <summary>
         /// How near a wall a pushed unit's line counts as at it, as Raycast's wall skin: the wall reaches this past its ends,
         /// so a line through the corner where two walls meet crosses one of them whatever a float's rounding; and a unit
-        /// within this of a wall is not held by it, whichever way it is pushed, so one standing on a wall can be pushed off.
+        /// within this of a wall is not held by it when its line ends on its own side, so one standing on a wall can be
+        /// pushed off, and when on the wall's line exactly, whichever way.
         /// </summary>
         private const float Skin = 0.01f;
 
@@ -83,7 +84,8 @@ namespace Moonwell.Engine
         /// <summary>
         /// Whether a wall stands across the line a pushed unit looks along, from its place to the point ahead of it: the two
         /// segments cross (touching counts, and the wall reaches the Skin past its ends), and the wall is endless or taller
-        /// than the unit is lifted (a flyer: its fly height). A wall the unit stands on, within the Skin, does not hold it.
+        /// than the unit is lifted (a flyer: its fly height). A wall the unit stands on, within the Skin, does not hold it
+        /// where the line ends on the unit's own side of it (either side when the unit is on its line exactly).
         /// Worked out in floats, so nothing is made.
         /// </summary>
         internal static bool Blocks(Pushed push, float fromX, float fromY, float toX, float toY)
@@ -128,13 +130,21 @@ namespace Moonwell.Engine
                 var qx = x1 - fromX;
                 var qy = y1 - fromY;
                 var lengthSquared = sx * sx + sy * sy;
+                var across = rx * sy - ry * sx;
                 if (On(qx, qy, sx, sy, lengthSquared))
                 {
-                    // It stands on the wall: the wall does not hold it, whichever way it goes.
-                    continue;
+                    // It stands on the wall: the wall does not hold it where its line ends on the unit's own side of the
+                    // wall's line, or either side when it is on that line exactly. side is the unit's side times the wall's
+                    // length, and side - across the line's end's; worked out across the wall, not from the nearest point,
+                    // whose part along a long wall is off by more than the unit's offset. A unit glancing toward the wall
+                    // that has come within the Skin of it is still held, so it does not cross.
+                    var side = qx * sy - qy * sx;
+                    if (side == 0.0f || side * (side - across) > 0.0f)
+                    {
+                        continue;
+                    }
                 }
 
-                var across = rx * sy - ry * sx;
                 if (across == 0.0f)
                 {
                     // Along the wall's line, or no move: it does not cross it.
