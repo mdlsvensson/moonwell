@@ -532,7 +532,14 @@ namespace Moonwell.Engine
                 var onFrom = OnDeck(fromX, fromY, out from);
                 if (onFrom)
                 {
-                    if (!Inside(push.size, fromX, fromY, centreX, centreY, from))
+                    // The deck's height where the middle moves to, for its edge there; off the deck, the height where it stands.
+                    float there;
+                    if (!OnDeck(centreX, centreY, out there))
+                    {
+                        there = from;
+                    }
+
+                    if (!Inside(push.size, fromX, fromY, centreX, centreY, from, there))
                     {
                         // Its body would go over the rail.
                         return false;
@@ -558,35 +565,38 @@ namespace Moonwell.Engine
         }
 
         /// <summary>
-        /// Whether a unit on a deck of a height at (fromX, fromY) keeps its body inside the deck's rail when it moves to
-        /// (centreX, centreY): each point of its edge, its collision size out every eighth of a turn, on the side it moves
-        /// toward, is on a deck or over ground within DeckStep of the deck, or was off both already where it is (a body
-        /// over the rail already does not hold it there, so it can be pushed back or along).
+        /// Whether a unit on a deck at (fromX, fromY), the deck <paramref name="here"/> high under its middle, keeps its body
+        /// inside the deck's rail when it moves to (centreX, centreY), where the deck is <paramref name="there"/> high: each
+        /// point of its edge, its collision size out every eighth of a turn, on the side it moves toward, is on a deck or
+        /// over ground within DeckStep of the deck where it moves to, or was off both already where it is, against the
+        /// deck's height there (a body over the rail already does not hold it, so it can be pushed back or along). Each
+        /// against its own middle's height, so a unit that comes onto a ramp with its body over the side meets the rail
+        /// where the rail begins, not after.
         /// </summary>
-        private static bool Inside(float size, float fromX, float fromY, float centreX, float centreY, float deck)
+        private static bool Inside(float size, float fromX, float fromY, float centreX, float centreY, float here, float there)
         {
             var moveX = centreX - fromX;
             var moveY = centreY - fromY;
             var slant = size * Slant;
-            return Rim(moveX, moveY, size, 0.0f, fromX, fromY, centreX, centreY, deck)
-                && Rim(moveX, moveY, -size, 0.0f, fromX, fromY, centreX, centreY, deck)
-                && Rim(moveX, moveY, 0.0f, size, fromX, fromY, centreX, centreY, deck)
-                && Rim(moveX, moveY, 0.0f, -size, fromX, fromY, centreX, centreY, deck)
-                && Rim(moveX, moveY, slant, slant, fromX, fromY, centreX, centreY, deck)
-                && Rim(moveX, moveY, slant, -slant, fromX, fromY, centreX, centreY, deck)
-                && Rim(moveX, moveY, -slant, slant, fromX, fromY, centreX, centreY, deck)
-                && Rim(moveX, moveY, -slant, -slant, fromX, fromY, centreX, centreY, deck);
+            return Rim(moveX, moveY, size, 0.0f, fromX, fromY, centreX, centreY, here, there)
+                && Rim(moveX, moveY, -size, 0.0f, fromX, fromY, centreX, centreY, here, there)
+                && Rim(moveX, moveY, 0.0f, size, fromX, fromY, centreX, centreY, here, there)
+                && Rim(moveX, moveY, 0.0f, -size, fromX, fromY, centreX, centreY, here, there)
+                && Rim(moveX, moveY, slant, slant, fromX, fromY, centreX, centreY, here, there)
+                && Rim(moveX, moveY, slant, -slant, fromX, fromY, centreX, centreY, here, there)
+                && Rim(moveX, moveY, -slant, slant, fromX, fromY, centreX, centreY, here, there)
+                && Rim(moveX, moveY, -slant, -slant, fromX, fromY, centreX, centreY, here, there);
         }
 
-        /// <summary>Whether one point of a unit's edge, (offsetX, offsetY) from its middle, does not take it over a deck's rail: on a side it does not move toward, held where it moves to, or not held where it is already.</summary>
-        private static bool Rim(float moveX, float moveY, float offsetX, float offsetY, float fromX, float fromY, float centreX, float centreY, float deck)
+        /// <summary>Whether one point of a unit's edge, (offsetX, offsetY) from its middle, does not take it over a deck's rail: on a side it does not move toward, held where it moves to (against the deck's height there), or not held where it is already (against the height here).</summary>
+        private static bool Rim(float moveX, float moveY, float offsetX, float offsetY, float fromX, float fromY, float centreX, float centreY, float here, float there)
         {
             if (moveX * offsetX + moveY * offsetY <= 0.0f)
             {
                 return true;
             }
 
-            return Holds(centreX + offsetX, centreY + offsetY, deck) || !Holds(fromX + offsetX, fromY + offsetY, deck);
+            return Holds(centreX + offsetX, centreY + offsetY, there) || !Holds(fromX + offsetX, fromY + offsetY, here);
         }
 
         /// <summary>Whether a point holds the body of a unit on a deck of a height: a deck is there (its height is not read: the middle's checks see the heights), or the ground there is within DeckStep of that height.</summary>

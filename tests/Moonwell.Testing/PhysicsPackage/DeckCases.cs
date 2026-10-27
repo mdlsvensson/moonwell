@@ -432,6 +432,90 @@ namespace Moonwell.Testing
             }
         }
 
+        /// <summary>A bridge with ramps: 3 cells across (x 464 to 560) and 11 along (y 336 to 688), 20 above the ground at its ends rising 18 a cell to 110 at its middle, its sides a rail only where it is more than 64 above the ground beside it.</summary>
+        private const string Ramps = "32 5 11 2 5\n"
+            + ". 20 20 20 .\n"
+            + ". 38 38 38 .\n"
+            + ". 56 56 56 .\n"
+            + ". 74 74 74 .\n"
+            + ". 92 92 92 .\n"
+            + ". 110 110 110 .\n"
+            + ". 92 92 92 .\n"
+            + ". 74 74 74 .\n"
+            + ". 56 56 56 .\n"
+            + ". 38 38 38 .\n"
+            + ". 20 20 20 .\n";
+
+        /// <summary>
+        /// A unit that comes onto a deck at its ramp with its body over the deck's side meets the rail where the rail
+        /// begins: a footman of collision size 16 at (556, 320) on the bank, its body 12 over the east side, pushed north,
+        /// stops at the rail's start with OnSlammed, its middle short of y 450. It rode the whole deck to the far bank with
+        /// its body over the rail, as the body's points over the side were held by the low ground at the ramp and then
+        /// counted as over the edge already. Units of collision size 16 to 64 pushed straight along the deck's middle still
+        /// go on at one ramp and off at the other, both ways, with no slam; one of 64 pushed at a slant stops at the ramp's
+        /// side, and pushed back it leaves.
+        /// </summary>
+        public static void PushRamp(FakeWorld world)
+        {
+            FakeTerrainWorld terrain;
+            var fake = Fresh(0.0f, false, out terrain);
+            Bridge(world, fake, FixedId, 512.0f, 512.0f);
+            Physics.Install(FixedId + " 0 500 500 270 1 0 0", Ramps);
+            // A river under the deck that nothing walks.
+            for (var x = 400.0f; x < 720.0f; x += 32.0f)
+            {
+                for (var y = 400.0f; y < 624.0f; y += 32.0f)
+                {
+                    terrain.Block(x, y, FakeTerrainWorld.NoWalk);
+                }
+            }
+
+            var side = PusheeAt(world, 556.0f, 320.0f);
+            side.Knockback(90.0f, 300.0f, 1.0f);
+            var north = 0.0f;
+            for (var i = 0; i < 48; i++)
+            {
+                Steps(world, 1);
+                if (side.Y > north)
+                {
+                    north = side.Y;
+                }
+            }
+
+            Expect.True(north < 450.0f, "its body over the side, it stops where the rail begins; it went to y " + north);
+            Expect.True(side.Slams.Count >= 1, "OnSlammed ran");
+            side.Kill();
+
+            var sizes = new float[] { 16.0f, 32.0f, 48.0f, 64.0f };
+            for (var k = 0; k < sizes.Length; k++)
+            {
+                var size = sizes[k];
+                var unit = PusheeAt(world, 512.0f, 250.0f);
+                fake.Sizes[unit.Handle] = size;
+                unit.Knockback(90.0f, 600.0f, 1.0f);
+                Steps(world, 40);
+                Expect.True(unit.Y > 700.0f, "size " + size + ": on at one ramp and off at the other; at y " + unit.Y);
+                unit.Knockback(270.0f, 600.0f, 1.0f);
+                Steps(world, 40);
+                Expect.True(unit.Y < 330.0f, "size " + size + ": and back; at y " + unit.Y);
+                Expect.Equal(0, unit.Slams.Count, "size " + size + ": with no slam");
+                unit.Kill();
+                Steps(world, 1);
+            }
+
+            // Wider than half the deck and pushed at a slant onto the ramp, its body meets the rail there and it stops; it
+            // is not stuck: pushed back, it leaves the ramp.
+            var wide = PusheeAt(world, 512.0f, 250.0f);
+            fake.Sizes[wide.Handle] = 64.0f;
+            wide.Knockback(80.0f, 600.0f, 1.0f);
+            Steps(world, 40);
+            Expect.True(wide.Y < 450.0f && wide.Slams.Count >= 1, "a wide unit at a slant stops at the ramp's side; at y " + wide.Y);
+            var stoppedY = wide.Y;
+            wide.Knockback(270.0f, 300.0f, 1.0f);
+            Steps(world, 40);
+            Expect.True(wide.Y < stoppedY - 100.0f, "and pushed back it goes; at y " + wide.Y + " from " + stoppedY);
+        }
+
         /// <summary>
         /// A ball falling at a slant onto a deck over sloped terrain bounces off the deck's slope, not the terrain's beneath
         /// it: the terrain rises north 20 a tile (its normal leans 0.154 south), the deck's south half rises 10 a cell (its

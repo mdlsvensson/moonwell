@@ -385,6 +385,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "deck.unit-on", Run = DeckCases.UnitOn });
             list.Add(new Case { Name = "deck.push-rail", Run = DeckCases.PushRail });
             list.Add(new Case { Name = "deck.push-rail-body", Run = DeckCases.PushRailBody });
+            list.Add(new Case { Name = "deck.push-ramp", Run = DeckCases.PushRamp });
             list.Add(new Case { Name = "deck.dies", Run = DeckCases.Dies });
             list.Add(new Case { Name = "deck.not-a-cylinder", Run = DeckCases.NotACylinder });
             list.Add(new Case { Name = "deck.slope-normal", Run = DeckCases.SlopeNormal });
