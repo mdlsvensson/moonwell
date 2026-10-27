@@ -51,6 +51,23 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             Path == name ? $"'{name}' {What}" : $"'{name}' {What} (through {Path})";
     }
 
+    /// <summary>The nodes being followed now, each with its depth, and the lowest depth a cycle was cut back to.</summary>
+    private sealed class Walk
+    {
+        public Dictionary<object, int> Depths { get; } = new(new NodeComparer());
+
+        public int Low { get; set; } = int.MaxValue;
+    }
+
+    /// <summary>Compares followed nodes: symbols as Roslyn compares them, anything else by its own equality.</summary>
+    private sealed class NodeComparer : IEqualityComparer<object>
+    {
+        public new bool Equals(object? x, object? y) =>
+            x is ISymbol a && y is ISymbol b ? SymbolEqualityComparer.Default.Equals(a, b) : object.Equals(x, y);
+
+        public int GetHashCode(object node) => node is ISymbol symbol ? SymbolEqualityComparer.Default.GetHashCode(symbol) : node.GetHashCode();
+    }
+
     /// <summary>The checks of one compilation, with the symbols they compare against.</summary>
     private sealed class Checker
     {
@@ -71,8 +88,8 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
         private readonly INamedTypeSymbol? enumerableOfT;
         private readonly INamedTypeSymbol? handle;
 
-        /// <summary>What each followed map method reaches; a method that reaches nothing rejected maps to null.</summary>
-        private readonly ConcurrentDictionary<IMethodSymbol, Finding?> followed = new(SymbolEqualityComparer.Default);
+        /// <summary>What each followed node of the map reaches; a node that reaches nothing rejected maps to null.</summary>
+        private readonly ConcurrentDictionary<object, Finding?> followed = new(new NodeComparer());
 
         public Checker(Compilation compilation)
         {
@@ -137,7 +154,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             }
             else if (IsLocal(operation, context.ContainingSymbol))
             {
-                var finding = Rejected(member, write, new HashSet<IMethodSymbol>(SymbolEqualityComparer.Default));
+                var finding = Rejected(member, write, new Walk());
                 if (finding != null)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Rules.StateInLocal, location, finding.Message(Name(member))));
@@ -465,7 +482,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
         };
 
         /// <summary>Why a member may not be called on one machine; null when it may.</summary>
-        private Finding? Rejected(ISymbol member, bool write, HashSet<IMethodSymbol> visiting)
+        private Finding? Rejected(ISymbol member, bool write, Walk walk)
         {
             var name = Name(member);
             if (IsNative(member))
@@ -509,7 +526,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             };
             foreach (var method in methods)
             {
-                if (method != null && Follow(method, visiting) is { } inner)
+                if (method != null && Follow(method, walk) is { } inner)
                 {
                     return new Finding(name + " > " + inner.Path, inner.What);
                 }
@@ -519,23 +536,38 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
         }
 
         /// <summary>What a method of the map reaches that may not run on one machine.</summary>
-        private Finding? Follow(IMethodSymbol method, HashSet<IMethodSymbol> visiting)
+        private Finding? Follow(IMethodSymbol method, Walk walk)
         {
             method = method.OriginalDefinition;
-            if (followed.TryGetValue(method, out var known))
+            return Follow(method, method.DeclaringSyntaxReferences.Select(reference => reference.GetSyntax()), walk);
+        }
+
+        /// <summary>
+        /// What the code of a node (a method, or a part of a class run at its first touch) reaches that may not run on
+        /// one machine. A node met again while it is still being followed is a cycle, cut there with nothing found; a
+        /// result is kept for later only when no cycle was cut back to a node that is still being followed above it,
+        /// since that node's own code may still find something, so the answer never depends on what was followed first.
+        /// </summary>
+        private Finding? Follow(object node, IEnumerable<SyntaxNode> code, Walk walk)
+        {
+            if (followed.TryGetValue(node, out var known))
             {
                 return known;
             }
 
-            if (!visiting.Add(method))
+            if (walk.Depths.TryGetValue(node, out var on))
             {
+                walk.Low = System.Math.Min(walk.Low, on);
                 return null;
             }
 
+            var depth = walk.Depths.Count;
+            walk.Depths[node] = depth;
+            var outerLow = walk.Low;
+            walk.Low = int.MaxValue;
             Finding? found = null;
-            foreach (var reference in method.DeclaringSyntaxReferences)
+            foreach (var syntax in code)
             {
-                var syntax = reference.GetSyntax();
                 var body = compilation.GetSemanticModel(syntax.SyntaxTree).GetOperation(syntax);
                 if (body == null)
                 {
@@ -545,7 +577,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
                 foreach (var inner in body.DescendantsAndSelf())
                 {
                     var (member, write) = Target(inner);
-                    if (member != null && (found = Rejected(member, write, visiting)) != null)
+                    if (member != null && (found = Rejected(member, write, walk)) != null)
                     {
                         break;
                     }
@@ -557,8 +589,14 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
                 }
             }
 
-            visiting.Remove(method);
-            followed[method] = found;
+            walk.Depths.Remove(node);
+            var low = walk.Low;
+            walk.Low = System.Math.Min(outerLow, low);
+            if (found != null || low >= depth)
+            {
+                followed[node] = found;
+            }
+
             return found;
         }
 
