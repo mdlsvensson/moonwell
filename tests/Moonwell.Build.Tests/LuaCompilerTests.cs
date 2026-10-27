@@ -210,6 +210,30 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void csharplua_stop_is_a_build_error_at_its_line()
+        {
+            var folder = folders.TemporaryCopyOfSample();
+            File.WriteAllText(
+                Path.Combine(folder, "Stop.cs"),
+                "namespace Sample\n"
+                + "{\n"
+                + "    public static class Stop\n"
+                + "    {\n"
+                + "        public static string Text()\n"
+                + "        {\n"
+                + "            return \"a\" + true + null;\n"
+                + "        }\n"
+                + "    }\n"
+                + "}\n");
+
+            var error = Assert.Throws<BuildException>(() => MapBuild.Run(folder, new BuildOptions(), TextWriter.Null));
+
+            // The line of the statement CSharp.lua stopped in, in the project's file rather than the marked copy.
+            Assert.StartsWith(Path.Combine(folder, "Stop.cs") + "(7): CSharp.lua cannot compile this code", error.Message);
+            Assert.DoesNotContain("marked", error.Message);
+        }
+
+        [Fact]
         public void map_without_terrain_is_an_error()
         {
             var folder = folders.TemporaryCopyOfSample();

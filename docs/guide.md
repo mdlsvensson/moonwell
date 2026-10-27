@@ -347,11 +347,27 @@ target.PlaceAt(Vector2.Lerp(start, end, Ease.OutQuad(t)));
 - `unit.Position()` is a method. `PlaceAt` ignores pathing and keeps the unit's order, which a push wants; `MoveTo`
   goes through pathing and ends it.
 - `Raycast.Circle`, `Segment`, `Bounds` and `Polygon` give the first hit along a segment in an `out` value, with a
-  normal for `Bounce` and `Slide`. The usual loop, `pos = hit.Point; vel = vel.Bounce(hit.Normal)`, goes on: a segment
-  that starts on a surface (within 0.02) hits it only when it goes in, and the hit is then put on the surface. One that
-  starts deeper inside hits at once, with the normal against its direction.
+  normal for `Bounce` and `Slide`. After a hit, a step goes on for the rest of its time with the new velocity, as
+  below; moved only to `hit.Point`, something pulled into a surface at every step (by gravity) hits at the start of each
+  step and stands where it landed. A segment that starts on a surface (within 0.02) hits it only when it goes in, and
+  the hit is then put on the surface; one that starts deeper inside hits at once, with the normal against its direction.
 - A wall (`Segment`) has no inside, so a point that slides along it, or meets it within 0.01 of where another wall
   joins it, can end up on its far side. Make something solid from a `Polygon` or `Bounds`.
+- The game's numbers are not .NET's: a square root, sine or cosine is off by up to about 2 parts in 100,000, an
+  addition drops what is below two float steps of its result (0.004 at 20,000), and nothing makes NaN or infinity
+  (MW0042). Compare places with a tolerance, not `==`.
+
+```csharp
+var left = dt;                                     // the step's seconds
+for (var hits = 0; hits < 4 && left > 0f; hits++)  // at most 4 hits in a step
+{
+    var to = pos + vel * left;
+    if (!Raycast.Polygon(pos, to, rock, out var hit)) { pos = to; break; }
+    pos = hit.Point;
+    vel = vel.Slide(hit.Normal);                   // or Bounce
+    left *= 1f - hit.Fraction;
+}
+```
 
 ## Terrain
 
@@ -378,9 +394,9 @@ if (Terrain.Raycast(from, to, out var hit)) { /* the missile meets the ground at
   (not measured in the game).
 - On a bridge, `Height` reads the water or ground beneath, and `IsWalkable` and `CanStand` read false.
 - `Terrain.Raycast(from, to, out hit)` is for a missile against the ground; a ridge narrower than 32 can be stepped over.
-  As with the maths raycasts, a missile moved to `hit.Point` and bounced or slid there goes on. Only the part of a ray
-  over the map is cast: past the map's edge it meets nothing, and a long ray reads the ground at most about 2,700 times
-  (across the largest map, about 25 ms).
+  As with the maths raycasts, a missile goes on when its step moves on after a hit for the rest of its time. Only the
+  part of a ray over the map is cast: past the map's edge it meets nothing, and a long ray reads the ground at most
+  about 2,700 times (across the largest map, about 25 ms).
 - A `Height` read costs about 9 microseconds in the game, so code that runs every tick on many objects should read it
   sparingly.
 
@@ -651,12 +667,13 @@ compared, and from later checks of the compiler Moonwell builds with.
 | MW0026 | `params List<int>`, `params` in a lambda | `params int[]` |
 | MW0027 | `s.Split("--")` (runs out of memory), `s.Split(new[] { ", " }, options)` (never ends), `StartsWith('a')`, `EndsWith('a')`, ignore-case `IndexOf`/`StartsWith`/`EndsWith`, `"abc".Reverse()` | split on a char, a string argument, lower-case both |
 | MW0028 | a `char` or an enum given to `string.Format`, `Console.WriteLine(object)`, `StringBuilder.Append(object)`, `string.Join`, `string.Concat` (shown as its number) | `.ToString()` |
-| MW0029 | `catch (NullReferenceException)`, `catch (IndexOutOfRangeException)`, a pattern variable in a `catch ... when` | `catch (Exception)`, test first |
-| MW0030 | a library member the Lua core lacks: `StringComparer`, `Guid`, `Task`/`await`, `Index`/`Range`, LINQ `Append`/`Prepend`/`Zip`/`TakeLast`/`ToHashSet`/`Chunk`, `List.ConvertAll`, `StringBuilder.Replace`/`Insert`, `Dictionary.GetValueOrDefault`, `TryPeek`/`TryPop`, `Environment.NewLine`, `Random.Shared`, and more (the rule's description lists them); also `SetEquals` (of a `HashSet`, an `ISet` or an `IReadOnlySet`), `Math.DivRem`, `d.Remove(k, out v)` and `ToList()` of a `Dictionary`, which give wrong answers | `TryGetValue`, `"\n"`, a loop |
+| MW0029 | `catch (NullReferenceException)`, `catch (IndexOutOfRangeException)`, `catch (DivideByZeroException)` around an integer `%` (an integer `/` by zero does throw it), a pattern variable in a `catch ... when` | `catch (Exception)`, test first |
+| MW0030 | a library member the Lua core lacks: `StringComparer`, `Guid`, `Task`/`await`, `Index`/`Range`, LINQ `Append`/`Prepend`/`Zip`/`TakeLast`/`ToHashSet`/`Chunk`, `List.ConvertAll`, `StringBuilder.Replace`/`Insert`, `Dictionary.GetValueOrDefault`, `TryPeek`/`TryPop`, `Environment.NewLine`, `Random.Shared`, and more (the rule's description lists them); also `SetEquals` (of a `HashSet`, an `ISet` or an `IReadOnlySet`), `Math.DivRem`, `d.Remove(k, out v)` and `ToList()` of a `Dictionary` (of an `OrderedMap` it works), which give wrong answers | `TryGetValue`, `"\n"`, a loop |
 | MW0031 | `checked(a + b)`, `checked { }` (an overflow is never detected) | test the range yourself |
 | MW0032 | `Enum.Parse`, `Enum.GetValues`/`GetNames`, `ToString("D")` on an enum, a `[Flags]` combination turned into text, `(Color)5 + "x"` | a `switch` on the value, `HasFlag` |
 | MW0034 | two `using var` in one block (disposed in the wrong order) | nested `using ( ) { }` |
 | MW0035 | `(unit)data`, `data as unit`, `data is unit`, `case unit u` from an `object`, a `widget` or a `T`, `foreach (unit u in widgets)`, `widgets.OfType<unit>()` and `widgets.Cast<unit>()`: a game handle fails every check for its type | a field or variable of the handle's type, or a class of your own that holds it |
+| MW0042 | `float.NaN` and `double.NaN` (1 in the game, whose arithmetic makes no NaN), `IsNaN` (never true), `PositiveInfinity`, `NegativeInfinity`, `IsInfinity` and `IsFinite` (`1 / 0` is 2^127 there) | a `bool` or a `float?` for no value, `float.MaxValue` for no limit, a test before dividing |
 
 The analyzer does not see these, so they build and then go wrong in the game:
 
@@ -665,19 +682,19 @@ The analyzer does not see these, so they build and then go wrong in the game:
 | a struct of your own that can change, put into a collection by an initializer, a collection expression or an indexer (`new List<P> { a }`, `[a]`, `new P[] { a }`, `list[0] = a`, `dict[k] = a`), or changed through a lambda's parameter (`p => p.X = 9`, `list.ForEach(...)`) | not copied: both hold the same struct, so a change to one is a change to the other | a `readonly struct`, made new to change it, or a class; `Add` and `Insert` copy |
 | a `where T : struct` or `unmanaged` method that copies its value (`var y = x;`, `foreach (var x in e) return x;`), given an `int`, a `float` or a `bool` | fails: "attempt to index a number value" | the method without the constraint |
 | a number format other than `F`, `D`, `X`, `E`, `G` and a width: `N0`, `P0`, `00`, `0.0`, `#,##0.00` | the number as it is (`{x:N0}` of 1234567 shows `1234567`, `{x:P0}` of 0.5 shows `0.5`); `D3` of a negative number has a digit too few | `F` and a width (`{x,6:F1}`), `$"{x * 100:F0}%"` |
-| a `null` after a number, `bool` or `char` in a `+` chain: `"a" + true + null` | the build stops: "unexpected error: BugErrorException" | leave the `null` out |
+| a `null` after a number, `bool` or `char` in a `+` chain: `"a" + true + null` | the build stops at its line: "CSharp.lua cannot compile this code" | leave the `null` out |
 | `break` or `continue` after a `using var` in a loop | the script does not load | `using (var d = ...) { }` around the loop's body |
 | a positional pattern on a class or record (`case (1, 2):`, `(1, 2) =>`) given null | fails: `Deconstruct` is called before the null check | a property pattern (`{ X: 1, Y: 2 }`), or a test for null first |
 | a local function called from another `switch` section than the one it is declared in | fails: "attempt to call a nil value" | declare it before the `switch` |
 | a `const string` local longer than 27 characters that is not one literal (`const string L = Prefix + "...";`), read on its own | nil, which shows as empty | one literal, or a `const` field |
-| `catch (DivideByZeroException)` around `%` | never catches: `%` by zero is a plain Lua error | `catch (Exception)`, or test first |
 | `byte` and `short` arithmetic | does not wrap | `int`, wrapped yourself |
 
 What works is most of the language: classes, structs, records, primary constructors, interfaces and default methods,
 generics with constraints, enums, delegates, events, `switch` statements, `is` patterns with constants, types and
 properties, `??`, `?.`, collection expressions, `foreach` over every collection, `yield`, lambdas and closures,
 `ref`/`out`/`in` parameters, `lock`, string interpolation, `List`, `Dictionary`, `HashSet`, `Queue`, `Stack`, arrays and
-most of LINQ. `float` and `int` arithmetic is the game's, see MW0005.
+most of LINQ. `float` and `int` arithmetic is the game's, see MW0005; its floats have no NaN or infinity (MW0042), and
+its square roots and sines are off by up to about 2 parts in 100,000 (Maths).
 
 ## The build
 

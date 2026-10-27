@@ -414,60 +414,6 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Ansp.</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Ansp")]
-            public class Ansp : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public Ansp()
-                {
-                    CastTime = Levels(0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(0f);
-                    Detects = Levels(global::Moonwell.Objects.DetectionType.Invisible);
-                    Duration = Levels(10f);
-                    GoldCostPerStructure = Levels(100);
-                    HeroAbility = false;
-                    HeroDuration = Levels(10f);
-                    ItemAbility = false;
-                    LevelCount = 1;
-                    LevelSkipRequirement = 0;
-                    LumberCostPerUse = Levels(0);
-                    ManaCost = Levels(0);
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Creeps;
-                    RequiredLevel = 0;
-                    UseNewDefaultLevelCap = false;
-                }
-
-                /// <summary>The field <c>Nsp1</c>.</summary>
-                [global::Moonwell.Objects.Field("Nsp1", Label = "Gold Cost per Structure")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<int> GoldCostPerStructure
-                {
-                    get { return Fields.GetLevels<int>(this, "Nsp1"); }
-                    protected set { Fields.Put("Nsp1", value); }
-                }
-
-                /// <summary>The field <c>Nsp2</c>.</summary>
-                [global::Moonwell.Objects.Field("Nsp2", Label = "Lumber Cost per Use")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<int> LumberCostPerUse
-                {
-                    get { return Fields.GetLevels<int>(this, "Nsp2"); }
-                    protected set { Fields.Put("Nsp2", value); }
-                }
-
-                /// <summary>The field <c>Nsp3</c>.</summary>
-                [global::Moonwell.Objects.Field("Nsp3", Label = "Detection Type")]
-                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DetectionType> Detects
-                {
-                    get { return Fields.GetLevels<global::Moonwell.Objects.DetectionType>(this, "Nsp3"); }
-                    protected set { Fields.Put("Nsp3", value); }
-                }
-            }
-
             /// <summary>Anti-magic Shell (Neutral Hostile), ACam.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ACam")]
@@ -3410,7 +3356,7 @@ namespace Moonwell.Objects
                 {
                     Area = Levels(900f);
                     AttackDamageIncrease = Levels(0.1f);
-                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.BOac>();
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.CommandAura>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = 2;
                     CastTime = Levels(0f);
@@ -8501,7 +8447,10 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public HealingWave()
                 {
+                    AnimationNames = "spell,throw";
                     Area = Levels(500f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
                     CastTime = Levels(0f);
                     CheckDependencies = true;
                     Cooldown = Levels(9f);
@@ -8512,16 +8461,20 @@ namespace Moonwell.Objects
                     HeroAbility = false;
                     HeroDuration = Levels(0f);
                     Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHealingWave.blp";
                     ItemAbility = false;
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
+                    LightningEffects = "HWPB,HWSB";
                     ManaCost = Levels(90);
                     Name = "Healing Wave";
                     NumberOfTargetsHit = Levels(3);
+                    Order = "healingwave";
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
                     Range = Levels(700f);
                     RequiredLevel = 0;
+                    Target = "Abilities\\Spells\\Orc\\HealingWave\\HealingWaveTarget.mdl";
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
                     Tooltip = Levels("Healing Wave");
                     TooltipExtended = Levels("Calls forth a wave of healing energy that bounces up to <AChv,DataB1> times, healing <AChv,DataA1> damage on the primary target. Each jump heals less damage.");
@@ -15966,6 +15919,66 @@ namespace Moonwell.Objects
                 {
                     get { return Fields.GetLevels<int>(this, "Osf2"); }
                     protected set { Fields.Put("Osf2", value); }
+                }
+            }
+
+            /// <summary>Spy (Ansp).</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("Ansp")]
+            public class Spy : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Spy()
+                {
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Detects = Levels(global::Moonwell.Objects.DetectionType.Invisible);
+                    Duration = Levels(10f);
+                    GoldCostPerStructure = Levels(100);
+                    HeroAbility = false;
+                    HeroDuration = Levels(10f);
+                    Hotkey = "Y";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSpy.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    LumberCostPerUse = Levels(0);
+                    ManaCost = Levels(0);
+                    Name = "Spy";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Spy");
+                    UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Nsp1</c>.</summary>
+                [global::Moonwell.Objects.Field("Nsp1", Label = "Gold Cost per Structure")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<int> GoldCostPerStructure
+                {
+                    get { return Fields.GetLevels<int>(this, "Nsp1"); }
+                    protected set { Fields.Put("Nsp1", value); }
+                }
+
+                /// <summary>The field <c>Nsp2</c>.</summary>
+                [global::Moonwell.Objects.Field("Nsp2", Label = "Lumber Cost per Use")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<int> LumberCostPerUse
+                {
+                    get { return Fields.GetLevels<int>(this, "Nsp2"); }
+                    protected set { Fields.Put("Nsp2", value); }
+                }
+
+                /// <summary>The field <c>Nsp3</c>.</summary>
+                [global::Moonwell.Objects.Field("Nsp3", Label = "Detection Type")]
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.DetectionType> Detects
+                {
+                    get { return Fields.GetLevels<global::Moonwell.Objects.DetectionType>(this, "Nsp3"); }
+                    protected set { Fields.Put("Nsp3", value); }
                 }
             }
 

@@ -13,7 +13,7 @@ namespace Moonwell.Analyzers;
 /// Rejects the C# syntax and library calls that CSharp.lua stops on, writes wrong or leaves to a Lua core that does not have
 /// them, so the editor and dotnet build show it with its line (MW0017 to MW0034). Found by running about 770 checks
 /// against .NET; each rule's description says what was seen. MW0019, MW0021 and MW0033 are gone: the fork's CSharp.lua
-/// writes their forms right.
+/// writes their forms right. MW0042 is the game's own numbers, which have no NaN or infinity (the 0.3 gate).
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
@@ -660,12 +660,29 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
     private static void CatchType(SyntaxNodeAnalysisContext context)
     {
         var declaration = (CatchDeclarationSyntax)context.Node;
-        if (context.SemanticModel.GetTypeInfo(declaration.Type, context.CancellationToken).Type is { Name: "NullReferenceException" or "IndexOutOfRangeException", ContainingNamespace: { Name: "System", ContainingNamespace.IsGlobalNamespace: true } } type)
+        var type = context.SemanticModel.GetTypeInfo(declaration.Type, context.CancellationToken).Type;
+        if (type is not { ContainingNamespace: { Name: "System", ContainingNamespace.IsGlobalNamespace: true } })
+        {
+            return;
+        }
+
+        if (type.Name is "NullReferenceException" or "IndexOutOfRangeException")
         {
             context.ReportDiagnostic(Diagnostic.Create(Rules.CatchForm, declaration.Type.GetLocation(),
                 "catch (" + type.Name + ") may never catch in the game's Lua: a null dereference or an array index out of range is a plain Exception there; catch (Exception), or test for null and the length first"));
         }
+        // An integer / by zero throws DivideByZeroException there too; only % is a plain Lua error.
+        else if (type.Name == "DivideByZeroException" && declaration.Parent is CatchClauseSyntax { Parent: TryStatementSyntax tryStatement }
+            && tryStatement.Block.DescendantNodes().Any(node => IsIntegerModulo(node, context)))
+        {
+            context.ReportDiagnostic(Diagnostic.Create(Rules.CatchForm, declaration.Type.GetLocation(),
+                "catch (DivideByZeroException) does not catch % by zero in the game's Lua, which is a plain Exception there; catch (Exception), or test the divisor first"));
+        }
     }
+
+    private static bool IsIntegerModulo(SyntaxNode node, SyntaxNodeAnalysisContext context) =>
+        node is BinaryExpressionSyntax { RawKind: (int)SyntaxKind.ModuloExpression } or AssignmentExpressionSyntax { RawKind: (int)SyntaxKind.ModuloAssignmentExpression }
+        && context.SemanticModel.GetTypeInfo(node, context.CancellationToken).Type?.SpecialType is SpecialType.System_Int32 or SpecialType.System_Int64 or SpecialType.System_UInt32 or SpecialType.System_Int16 or SpecialType.System_Byte or SpecialType.System_SByte or SpecialType.System_UInt16 or SpecialType.System_UInt64;
 
     private static void CatchFilter(SyntaxNodeAnalysisContext context)
     {
@@ -680,6 +697,32 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
     // ---- MW0030 ----
 
     private const string Missing = "is not in the game's Lua core; it fails when it runs";
+
+    private const string NaNIsOne = "is 1 in the game's Lua, whose arithmetic makes no NaN (CSharp.lua writes it 0 / 0); mark no value with a bool or a float?";
+    private const string NaNNever = "is never true in the game's Lua, whose arithmetic makes no NaN; test what could go wrong before it does, such as a length of 0 before dividing by it";
+    private const string NoInfinity = "has no use in the game's Lua, whose arithmetic makes no infinity (1 / 0 is 2^127, inf - inf is 0); use float.MaxValue for no limit";
+    private const string InfinityNever = "tests for an infinity the game's Lua never makes (1 / 0 is 2^127 there); test the value's range";
+
+    // MW0042: the members for NaN and the infinities, which the game's own numbers do not have.
+    private static readonly ImmutableDictionary<string, string> NotNumbers = new Dictionary<string, string>
+    {
+        ["System.Single.NaN"] = NaNIsOne,
+        ["System.Double.NaN"] = NaNIsOne,
+        ["System.Single.IsNaN"] = NaNNever,
+        ["System.Double.IsNaN"] = NaNNever,
+        ["System.Single.PositiveInfinity"] = NoInfinity,
+        ["System.Single.NegativeInfinity"] = NoInfinity,
+        ["System.Double.PositiveInfinity"] = NoInfinity,
+        ["System.Double.NegativeInfinity"] = NoInfinity,
+        ["System.Single.IsInfinity"] = InfinityNever,
+        ["System.Single.IsPositiveInfinity"] = InfinityNever,
+        ["System.Single.IsNegativeInfinity"] = InfinityNever,
+        ["System.Single.IsFinite"] = InfinityNever,
+        ["System.Double.IsInfinity"] = InfinityNever,
+        ["System.Double.IsPositiveInfinity"] = InfinityNever,
+        ["System.Double.IsNegativeInfinity"] = InfinityNever,
+        ["System.Double.IsFinite"] = InfinityNever,
+    }.ToImmutableDictionary();
 
     private static readonly ImmutableHashSet<string> MissingTypes = ImmutableHashSet.Create(
         "System.Range", "System.Index", "System.StringComparer", "System.Threading.Monitor", "System.Threading.Lock",
@@ -766,6 +809,13 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
         }
 
         var key = Full(original.ContainingType) + "." + original.Name;
+        // An attribute's argument, such as a limit of double.PositiveInfinity, is never run in the game.
+        if (NotNumbers.TryGetValue(key, out var notANumber) && name.FirstAncestorOrSelf<AttributeSyntax>() == null)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(Rules.NotANumber, name.GetLocation(), name.Identifier.Text, notANumber));
+            return;
+        }
+
         if (Members.TryGetValue(key, out var why))
         {
             context.ReportDiagnostic(Diagnostic.Create(Rules.LuaMember, name.GetLocation(), name.Identifier.Text, why));
@@ -787,11 +837,33 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(Diagnostic.Create(Rules.LuaMember, name.GetLocation(), name.Identifier.Text, "leaves the out value nil in the game's Lua; read it with TryGetValue first"));
         }
         else if (key is "System.Linq.Enumerable.ToList" or "System.Linq.Enumerable.ToArray"
-            && method.TypeArguments.FirstOrDefault() is INamedTypeSymbol { Name: "KeyValuePair", ContainingNamespace.Name: "Generic" })
+            && method.TypeArguments.FirstOrDefault() is INamedTypeSymbol { Name: "KeyValuePair", ContainingNamespace.Name: "Generic" }
+            && !IsCompiledCollection(ReceiverType(name, method, context)))
         {
             context.ReportDiagnostic(Diagnostic.Create(Rules.LuaMember, name.GetLocation(), name.Identifier.Text, "of a Dictionary gives pairs without their Key in the game's Lua; copy with new Dictionary<,>(d), or Select the key and value"));
         }
     }
+
+    // The collection a LINQ call reads: d in d.ToList(), d?.ToList() and Enumerable.ToList(d).
+    private static ITypeSymbol? ReceiverType(SimpleNameSyntax name, IMethodSymbol method, SyntaxNodeAnalysisContext context)
+    {
+        ExpressionSyntax? receiver = method.ReducedFrom != null
+            ? name.Parent switch
+            {
+                MemberAccessExpressionSyntax access => access.Expression,
+                MemberBindingExpressionSyntax => name.FirstAncestorOrSelf<ConditionalAccessExpressionSyntax>()?.Expression,
+                _ => null,
+            }
+            : (name.Parent?.Parent as InvocationExpressionSyntax ?? name.Parent as InvocationExpressionSyntax)?.ArgumentList.Arguments.FirstOrDefault()?.Expression;
+        return receiver == null ? null : context.SemanticModel.GetTypeInfo(receiver, context.CancellationToken).Type;
+    }
+
+    // A class or struct of the map or of Moonwell (OrderedMap) is compiled from C#, so its pairs keep their Key; only the
+    // Lua core's own collections, such as Dictionary, and an interface that may be one give pairs without it.
+    private static bool IsCompiledCollection(ITypeSymbol? type) =>
+        type is { TypeKind: TypeKind.Class or TypeKind.Struct }
+        && type.ContainingNamespace?.ToDisplayString() is { } space
+        && space != "System" && !space.StartsWith("System.", System.StringComparison.Ordinal);
 
     private static string Full(INamedTypeSymbol type) =>
         (type.ContainingType != null ? Full(type.ContainingType) + "+" : type.ContainingNamespace.ToDisplayString() + ".") + type.MetadataName;

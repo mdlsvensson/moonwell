@@ -548,6 +548,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "maths.bounce.slide-bounds", Run = BounceCases.SlideBounds });
             list.Add(new Case { Name = "maths.bounce.slide-polygon", Run = BounceCases.SlidePolygon });
             list.Add(new Case { Name = "maths.bounce.into-from-surface", Run = BounceCases.IntoFromSurface });
+            list.Add(new Case { Name = "maths.bounce.slide-under-gravity", Run = BounceCases.SlideUnderGravity });
             list.Add(new Case { Name = "maths.raycast.corners-found", Run = CornerRayCases.Found });
             list.Add(new Case { Name = "maths.raycast.through-corners", Run = CornerRayCases.ThroughCorners });
             list.Add(new Case { Name = "maths.shapes.polygon-far", Run = FarPolygonCases.AreaAndCenter });
@@ -561,6 +562,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "terrain.bounce.roll-flat", Run = GroundBounceCases.RollFlat });
             list.Add(new Case { Name = "terrain.bounce.roll-slope", Run = GroundBounceCases.RollSlope });
             list.Add(new Case { Name = "terrain.bounce.into-from-ground", Run = GroundBounceCases.IntoFromGround });
+            list.Add(new Case { Name = "terrain.bounce.roll-under-gravity", Run = GroundBounceCases.RollUnderGravity });
         }
 
         /// <summary>Adds the maths package's cases.</summary>

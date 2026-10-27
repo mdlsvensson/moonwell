@@ -41,10 +41,11 @@ namespace Moonwell.Testing
             }
         }
 
-        /// <summary>Fails unless the two floats are within 0.001.</summary>
+        /// <summary>Fails unless the two floats are within 0.001; in the game's own Lua, whose square roots and trig are off by up to about 2 parts in 100,000, within 0.001 and 2 parts in 10,000 of the expected value.</summary>
         public static void Near(float expected, float actual, string what)
         {
-            if (Math.Abs(expected - actual) > 0.001f)
+            var tolerance = GameNumbers.HasNaN ? 0.001f : 0.001f + Math.Abs(expected) * 0.0002f;
+            if (Math.Abs(expected - actual) > tolerance)
             {
                 throw Mismatch(what, expected, actual);
             }

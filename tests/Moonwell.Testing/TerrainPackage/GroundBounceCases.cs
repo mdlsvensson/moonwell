@@ -128,5 +128,47 @@ namespace Moonwell.Testing
             Expect.True(Terrain.Raycast(new Vector3(300f, 200f, 140f), new Vector3(308f, 200f, 200f), out hit), "under the ground: hits");
             Expect.True(hit.Normal == Vector3.UnitZ, "under the ground: straight up, as before");
         }
+
+        /// <summary>
+        /// A point dropped onto a slope of 1 in 2 and pulled down at every step, as by gravity, rolls down it when a step goes
+        /// on after a hit with the new velocity for the rest of the step, as the guide's loop does; moved only to the hit's
+        /// point, it would hit at the start of every step and stand where it landed.
+        /// </summary>
+        public static void RollUnderGravity(FakeWorld world)
+        {
+            Slope(64f);
+            var position = new Vector3(600f, 500f, 400f);
+            var velocity = Vector3.Zero;
+            var landed = false;
+            var landedX = 0f;
+            for (var i = 0; i < 40; i++)
+            {
+                velocity = velocity + new Vector3(0f, 0f, -1f);
+                var left = 1f;
+                for (var hits = 0; hits < 4 && left > 0f; hits++)
+                {
+                    var to = position + velocity * left;
+                    if (!Terrain.Raycast(position, to, out var hit))
+                    {
+                        position = to;
+                        break;
+                    }
+
+                    position = hit.Point;
+                    velocity = velocity.Slide(hit.Normal);
+                    left *= 1f - hit.Fraction;
+                    if (!landed)
+                    {
+                        landed = true;
+                        landedX = position.X;
+                    }
+                }
+
+                Expect.True(position.Z > Terrain.Height(position.X, position.Y) - 0.05f, "never under the ground, at step " + i + ": " + position);
+            }
+
+            Expect.True(landed, "it landed on the slope");
+            Expect.True(landedX - position.X > 50f, "rolled on down the slope: " + (landedX - position.X) + " along x from where it landed");
+        }
     }
 }

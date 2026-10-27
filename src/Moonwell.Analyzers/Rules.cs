@@ -214,7 +214,7 @@ public static class Rules
         ObjectsCategory,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "Every class that declares an object of the map's own needs its id, as World Editor shows it, in [ObjectId(\"h001\")]; a [Replaces] class has its standard object's. A buff also names its carrier, the hidden ability that shows its icon: [ObjectId(\"B001\", Carrier = \"A001\")]. The build fails without them and names a free id to use.");
+        description: "Every class that declares an object of the map's own needs its id, as World Editor shows it, in [ObjectId(\"h001\")]; a [Replaces] class has its standard object's. A buff also gives the id of its carrier, the hidden ability the build makes to show its icon, so no class of the map declares that id: [ObjectId(\"B001\", Carrier = \"A001\")]. The build fails without them and names a free id to use.");
 
     public static readonly DiagnosticDescriptor BadId = new(
         "MW0014",
@@ -241,7 +241,7 @@ public static class Rules
         "MW0018",
         "Pattern that gives the wrong answer",
         "{0}",
-        "A positional pattern in an is test (p is (1, 2), t is (1, _), p is Pt(var a, var b)) and an extended property pattern (p is { Inner.X: 9 }) compile to Lua that is false, or stops the compiler. A positional pattern in a switch expression arm works; so does a property pattern with one name per level ({ Inner: { X: 9 } }).");
+        "A positional pattern in an is test (p is (1, 2), t is (1, _), p is Pt(var a, var b)) and an extended property pattern (p is { Inner.X: 9 }) compile to Lua that is false, or stops the compiler. A positional pattern in a switch expression arm works, except on a class or record given null, whose Deconstruct runs before the null check (the analyzer does not see that); so does a property pattern with one name per level ({ Inner: { X: 9 } }).");
 
     public static readonly DiagnosticDescriptor StructCopy = Syntax(
         "MW0020",
@@ -295,13 +295,13 @@ public static class Rules
         "MW0029",
         "catch that does not catch",
         "{0}",
-        "A null dereference, an index outside an array and % by zero are plain Lua errors there, not NullReferenceException, IndexOutOfRangeException or DivideByZeroException: catch (Exception) catches them. A pattern variable in a catch filter (when (e is X x)) is nil.");
+        "A null dereference, an index outside an array and % by zero are plain Lua errors there, not NullReferenceException, IndexOutOfRangeException or DivideByZeroException: catch (Exception) catches them. An integer / by zero does throw DivideByZeroException, so that catch is rejected only around an integer %. A pattern variable in a catch filter (when (e is X x)) is nil.");
 
     public static readonly DiagnosticDescriptor LuaMember = Syntax(
         "MW0030",
         "Library member the game's Lua does not have",
         "'{0}' {1}",
-        "The Lua core behind CSharp.lua has no such type or member, or gives another answer than .NET; the call fails when it runs, not when the map is built. The list: System.Range/Index, StringComparer, Monitor, Lock, Thread, Task, BitArray, BitOperations, HashCode, Guid, FormattableString, async/await, pointers; LINQ Append, Prepend, SkipLast, TakeLast, ToLookup, Empty, Zip, Chunk, ToHashSet, DefaultIfEmpty; List.ConvertAll; Span.ToArray/Fill/Clear; StringBuilder.Replace/Insert/Equals/AppendJoin; Exception.Source; Delegate.Target/Method; char.IsAscii/ToUpperInvariant; Environment.NewLine; Enum/Nullable.GetUnderlyingType; string.Create/Normalize/Intern/EnumerateRunes; Queue.TryPeek; Stack.TryPop/TryPeek; Dictionary.GetValueOrDefault; Convert.ToHexString; int.RotateLeft; Array.Sort(keys, items); HashSet.SetEquals (also through ISet and IReadOnlySet); Math.DivRem; Dictionary.Remove(key, out v); ToList/ToArray of a Dictionary; Random.Shared.");
+        "The Lua core behind CSharp.lua has no such type or member, or gives another answer than .NET; the call fails when it runs, not when the map is built. The list: System.Range/Index, StringComparer, Monitor, Lock, Thread, Task, BitArray, BitOperations, HashCode, Guid, FormattableString, async/await, pointers; LINQ Append, Prepend, SkipLast, TakeLast, ToLookup, Empty, Zip, Chunk, ToHashSet, DefaultIfEmpty; List.ConvertAll; Span.ToArray/Fill/Clear; StringBuilder.Replace/Insert/Equals/AppendJoin; Exception.Source; Delegate.Target/Method; char.IsAscii/ToUpperInvariant; Environment.NewLine; Enum/Nullable.GetUnderlyingType; string.Create/Normalize/Intern/EnumerateRunes; Queue.TryPeek; Stack.TryPop/TryPeek; Dictionary.GetValueOrDefault; Convert.ToHexString; int.RotateLeft; Array.Sort(keys, items); HashSet.SetEquals (also through ISet and IReadOnlySet); Math.DivRem; Dictionary.Remove(key, out v); ToList/ToArray of a Dictionary (of a collection of the map's or Moonwell's own, such as OrderedMap, they work); Random.Shared.");
 
     public static readonly DiagnosticDescriptor CheckedForm = Syntax(
         "MW0031",
@@ -321,8 +321,14 @@ public static class Rules
         "using var is disposed after the earlier using var here, not before it, in the game's Lua; use nested using (...) blocks",
         "C# disposes using var declarations in reverse order; CSharp.lua disposes them in the order they are written.");
 
+    public static readonly DiagnosticDescriptor NotANumber = Syntax(
+        "MW0042",
+        "NaN or infinity, which the game's Lua does not have",
+        "'{0}' {1}",
+        "The game's own Lua has floats of its own (the 0.3 gate, 10-27): its arithmetic makes no NaN and no infinity. float.NaN and double.NaN, which CSharp.lua writes 0 / 0, are 1 there; 1 / 0 is 2^127 (1.7e38), and inf - inf and 0 * inf are 0. So float.IsNaN is never true, IsInfinity, IsPositiveInfinity, IsNegativeInfinity and IsFinite test for what never happens, and PositiveInfinity and NegativeInfinity turn into plain numbers in arithmetic. Mark no value with a bool or a float?, use float.MaxValue for no limit, and test what could go wrong before it does (a length of 0 before dividing by it).");
+
     /// <summary>The rules for syntax and library CSharp.lua or its Lua core cannot do.</summary>
     public static ImmutableArray<DiagnosticDescriptor> Syntaxes { get; } = ImmutableArray.Create(
         PatternStops, PatternWrong, StructCopy, TupleForm, FormWrong, RangeIndex, RefForm,
-        ParamsForm, StringCall, BoxedValue, CatchForm, LuaMember, CheckedForm, EnumText, UsingOrder);
+        ParamsForm, StringCall, BoxedValue, CatchForm, LuaMember, CheckedForm, EnumText, UsingOrder, NotANumber);
 }

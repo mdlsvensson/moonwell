@@ -932,7 +932,7 @@ namespace Moonwell.Objects
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
             public AnyasBackpack()
             {
-                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ExpandedInventory, global::Moonwell.Objects.Other.Abilities.AEqu, global::Moonwell.Objects.Other.Abilities.TalentsATua, global::Moonwell.Objects.Other.Abilities.StatDetails>();
+                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ExpandedInventory, global::Moonwell.Objects.Other.Abilities.EquipmentSlots, global::Moonwell.Objects.Other.Abilities.TalentsATua, global::Moonwell.Objects.Other.Abilities.StatDetails>();
                 ActivelyUsed = true;
                 AllowCustomTeamColor = false;
                 ArmorType = global::Moonwell.Objects.ArmorType.Wood;
@@ -3392,7 +3392,7 @@ namespace Moonwell.Objects
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
             public BorelgoreTheCorpulentOne()
             {
-                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemHeroStatBonusAS20, global::Moonwell.Objects.Other.Abilities.Aisy, global::Moonwell.Objects.Other.Abilities.ItemBorelgoreAttack>();
+                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemHeroStatBonusAS20, global::Moonwell.Objects.Other.Abilities.ItemAttackSpeedBonusAisy, global::Moonwell.Objects.Other.Abilities.ItemBorelgoreAttack>();
                 ActivelyUsed = false;
                 AllowCustomTeamColor = true;
                 ArmorType = global::Moonwell.Objects.ArmorType.Wood;
@@ -9983,7 +9983,7 @@ namespace Moonwell.Objects
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
             public GareksBackpack()
             {
-                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ExpandedInventory, global::Moonwell.Objects.Other.Abilities.AEqu, global::Moonwell.Objects.Other.Abilities.TalentsAThg, global::Moonwell.Objects.Other.Abilities.StatDetails>();
+                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ExpandedInventory, global::Moonwell.Objects.Other.Abilities.EquipmentSlots, global::Moonwell.Objects.Other.Abilities.TalentsAThg, global::Moonwell.Objects.Other.Abilities.StatDetails>();
                 ActivelyUsed = true;
                 AllowCustomTeamColor = false;
                 ArmorType = global::Moonwell.Objects.ArmorType.Wood;
@@ -10035,7 +10035,7 @@ namespace Moonwell.Objects
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
             public GareksBackpackEbug()
             {
-                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ExpandedInventory, global::Moonwell.Objects.Other.Abilities.AEqu, global::Moonwell.Objects.Other.Abilities.TalentsATug, global::Moonwell.Objects.Other.Abilities.StatDetails>();
+                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ExpandedInventory, global::Moonwell.Objects.Other.Abilities.EquipmentSlots, global::Moonwell.Objects.Other.Abilities.TalentsATug, global::Moonwell.Objects.Other.Abilities.StatDetails>();
                 ActivelyUsed = true;
                 AllowCustomTeamColor = false;
                 ArmorType = global::Moonwell.Objects.ArmorType.Wood;
@@ -14630,7 +14630,7 @@ namespace Moonwell.Objects
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
             public IlastarsBackpack()
             {
-                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ExpandedInventory, global::Moonwell.Objects.Other.Abilities.AEqu, global::Moonwell.Objects.Other.Abilities.TalentsAThi, global::Moonwell.Objects.Other.Abilities.StatDetails>();
+                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ExpandedInventory, global::Moonwell.Objects.Other.Abilities.EquipmentSlots, global::Moonwell.Objects.Other.Abilities.TalentsAThi, global::Moonwell.Objects.Other.Abilities.StatDetails>();
                 ActivelyUsed = true;
                 AllowCustomTeamColor = false;
                 ArmorType = global::Moonwell.Objects.ArmorType.Wood;
@@ -15959,7 +15959,7 @@ namespace Moonwell.Objects
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
             public LandensBackpack()
             {
-                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ExpandedInventory, global::Moonwell.Objects.Other.Abilities.AEqu, global::Moonwell.Objects.Other.Abilities.TalentsAThl, global::Moonwell.Objects.Other.Abilities.StatDetails>();
+                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ExpandedInventory, global::Moonwell.Objects.Other.Abilities.EquipmentSlots, global::Moonwell.Objects.Other.Abilities.TalentsAThl, global::Moonwell.Objects.Other.Abilities.StatDetails>();
                 ActivelyUsed = true;
                 AllowCustomTeamColor = false;
                 ArmorType = global::Moonwell.Objects.ArmorType.Wood;
@@ -16063,7 +16063,7 @@ namespace Moonwell.Objects
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
             public LeonidsBackpack()
             {
-                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ExpandedInventory, global::Moonwell.Objects.Other.Abilities.AEqu, global::Moonwell.Objects.Other.Abilities.TalentsATul, global::Moonwell.Objects.Other.Abilities.StatDetails>();
+                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ExpandedInventory, global::Moonwell.Objects.Other.Abilities.EquipmentSlots, global::Moonwell.Objects.Other.Abilities.TalentsATul, global::Moonwell.Objects.Other.Abilities.StatDetails>();
                 ActivelyUsed = true;
                 AllowCustomTeamColor = false;
                 ArmorType = global::Moonwell.Objects.ArmorType.Wood;

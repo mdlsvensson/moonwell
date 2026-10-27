@@ -116,9 +116,14 @@ namespace Moonwell.Testing
             Expect.True(Terrain.IsWalkable(-257f, 200f), "just left of the edge reads the cell of that row");
         }
 
-        /// <summary>A coordinate that is not a number reads the first cell of its row or column, and does not fail.</summary>
+        /// <summary>A coordinate that is not a number reads the first cell of its row or column, and does not fail. The game's Lua has no NaN (float.NaN is 1 there), so there the case checks nothing.</summary>
         public static void NotANumber(FakeWorld world)
         {
+            if (!GameNumbers.HasNaN)
+            {
+                return;
+            }
+
             var fake = new FakeTerrainWorld();
             fake.Block(16f, 16f, FakeTerrainWorld.NoWalk | FakeTerrainWorld.NoFly | FakeTerrainWorld.NoBuild | FakeTerrainWorld.NoFloat);
             Flat(fake, 0f, 0f);

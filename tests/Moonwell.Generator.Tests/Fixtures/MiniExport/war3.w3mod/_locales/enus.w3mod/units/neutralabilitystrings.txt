@@ -1,0 +1,4 @@
+// Command Aura: the export files the buff's strings under [Boac], while its id is BOac
+[Boac]
+Bufftip=Command Aura
+Buffubertip="This unit is under the effects of Command Aura; it has increased attack damage."

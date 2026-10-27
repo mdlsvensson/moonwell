@@ -11,7 +11,7 @@ public class StaticSetupTests
     [Fact]
     public void PublicTypesHaveNoStaticInitializer()
     {
-        var types = new[] { typeof(Moonwell.Unit).Assembly, typeof(Moonwell.Hit).Assembly }
+        var types = Packages.All
             .SelectMany(assembly => assembly.GetTypes())
             .Where(type => type.IsVisible && !(type.IsAbstract && type.IsSealed))
             .Where(type => type.TypeInitializer != null)
