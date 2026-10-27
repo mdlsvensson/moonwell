@@ -267,6 +267,7 @@ namespace Moonwell.Build
                         field,
                         (IReadOnlyList<object>)type.GetProperty("Entries", Internal)!.GetValue(value)!,
                         (IReadOnlyList<object>)type.GetProperty("Standard", Internal)!.GetValue(value)!,
+                        (IReadOnlyList<object[]>)type.GetProperty("Changes", Internal)!.GetValue(value)!,
                         root,
                         levels,
                         changed,
@@ -315,22 +316,41 @@ namespace Moonwell.Build
             }
         }
 
-        // The list as the constructor left it. A list the constructor did not change is not written. A field with levels
-        // has one list for every level, written under each level when it differs from the standard list of any level.
-        private void WholeList(StandardData.ObjectField field, IReadOnlyList<object> entries, IReadOnlyList<object> started, string root, int levels, SortedDictionary<string, object?> changed, ISet<string> references)
+        // The list as the constructor left it. A list the constructor did not change is not written. A field with levels has
+        // a list for each level: what the constructor did to its list (added, removed, replaced, set) is done again to each
+        // level's own standard list (decision 72), and every level is written when any one differs from its standard list.
+        private void WholeList(StandardData.ObjectField field, IReadOnlyList<object> entries, IReadOnlyList<object> started, IReadOnlyList<object[]> changes, string root, int levels, SortedDictionary<string, object?> changed, ISet<string> references)
         {
-            var final = entries.Select(NameOf).ToArray();
-            if (final.SequenceEqual(started.Select(NameOf)))
+            var classes = new HashSet<string>(classNames.Values, StringComparer.Ordinal);
+            foreach (var entry in entries.Concat(changes.SelectMany(change => change.Skip(1))))
             {
+                if (entry is Type type)
+                {
+                    classes.Add(MapClasses.Describe(type));
+                }
+            }
+
+            if (!field.PerLevel)
+            {
+                var final = entries.Select(NameOf).ToArray();
+                if (final.SequenceEqual(started.Select(NameOf)) || final.SequenceEqual(NamesOf(standard.Value(root, field.Id, 0, set))))
+                {
+                    return;
+                }
+
+                changed[field.Id] = final;
+                AddReferences(final, classes, references);
                 return;
             }
 
-            var first = field.PerLevel ? 1 : 0;
-            var last = field.PerLevel ? levels : 0;
+            var lists = new List<string[]>();
             var differs = false;
-            for (var level = first; level <= last; level++)
+            for (var level = 1; level <= levels; level++)
             {
-                differs |= !final.SequenceEqual(NamesOf(standard.Value(root, field.Id, level, set)));
+                var standardList = NamesOf(standard.Value(root, field.Id, level, set));
+                var list = Replayed(standardList, changes);
+                differs |= !list.SequenceEqual(standardList);
+                lists.Add(list.ToArray());
             }
 
             if (!differs)
@@ -338,16 +358,72 @@ namespace Moonwell.Build
                 return;
             }
 
-            for (var level = first; level <= last; level++)
+            for (var level = 1; level <= levels; level++)
             {
-                changed[field.PerLevel ? Key(field.Id, level) : field.Id] = final;
+                changed[Key(field.Id, level)] = lists[level - 1];
+                AddReferences(lists[level - 1], classes, references);
+            }
+        }
+
+        // A list's changes done again on another list, as ObjectList does them: add at the end unless there, remove the first,
+        // set the whole list, replace in the old one's place (or only take the old one out when the new one is there).
+        private static List<string> Replayed(IReadOnlyList<string> start, IReadOnlyList<object[]> changes)
+        {
+            var list = new List<string>(start);
+            foreach (var change in changes)
+            {
+                var names = change.Skip(1).Select(NameOf).ToList();
+                switch ((string)change[0])
+                {
+                    case "add":
+                        if (!list.Contains(names[0]))
+                        {
+                            list.Add(names[0]);
+                        }
+
+                        break;
+                    case "remove":
+                        list.Remove(names[0]);
+                        break;
+                    case "set":
+                        list.Clear();
+                        foreach (var name in names)
+                        {
+                            if (!list.Contains(name))
+                            {
+                                list.Add(name);
+                            }
+                        }
+
+                        break;
+                    case "replace":
+                        var at = list.IndexOf(names[0]);
+                        if (at >= 0 && list.Contains(names[1]))
+                        {
+                            list.RemoveAt(at);
+                        }
+                        else if (at >= 0)
+                        {
+                            list[at] = names[1];
+                        }
+
+                        break;
+                    default:
+                        throw new InvalidOperationException($"an object list holds a change the build does not know: {change[0]}");
+                }
             }
 
-            foreach (var entry in entries)
+            return list;
+        }
+
+        // The class names of a written list are the classes it references; an id with no class is not one.
+        private static void AddReferences(IEnumerable<string> names, HashSet<string> classes, ISet<string> references)
+        {
+            foreach (var name in names)
             {
-                if (entry is Type type)
+                if (classes.Contains(name))
                 {
-                    references.Add(MapClasses.Describe(type));
+                    references.Add(name);
                 }
             }
         }
