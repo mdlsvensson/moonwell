@@ -241,6 +241,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.audit.recheck-throwing-accepts-refuses", Run = AuditInteractionCases.RecheckThrowingAcceptsRefuses });
             list.Add(new Case { Name = "interactions.audit.recheck-parts-once-per-meet", Run = AuditInteractionCases.RecheckPartsOncePerMeet });
             list.Add(new Case { Name = "interactions.audit.gizmo-leave-has-no-place", Run = AuditInteractionCases.GizmoLeaveHasNoPlace });
+            list.Add(new Case { Name = "interactions.audit.cell-check-removal-keeps-round", Run = AuditInteractionCases.CellCheckRemovalKeepsRound });
         }
 
         /// <summary>Adds the areas package's cases.</summary>

@@ -310,6 +310,61 @@ namespace Moonwell.Testing
             Expect.Equal(CountOf("meet b") + CountOf("meet c") + CountOf("meet d"), CountOf("part b") + CountOf("part c") + CountOf("part d"), "OnPart once per OnMeet");
         }
 
+        /// <summary>Units removed from the cell checks before, at and after the place the round has got to, and the last one: each unit left is read once in what is left of the round, those not yet read first, before any is read again.</summary>
+        public static void CellCheckRemovalKeepsRound(FakeWorld world)
+        {
+            var fake = Fresh();
+            var units = new List<Unit>();
+            for (var i = 0; i < 32; i++)
+            {
+                units.Add(UnitAt(world, 0.0f, 0.0f));
+            }
+
+            Tracking.Need(Tracking.UnitKind);
+            fake.UnitReads.Clear();
+            Steps(world, 1);
+            Expect.Equal(10, fake.UnitReads.Count, "32 units: the first step read 10, the first 10");
+            var unread = new List<Unit>();
+            var read = new List<Unit>();
+            for (var i = 0; i < 32; i++)
+            {
+                if (i == 3 || i == 10 || i == 20 || i == 31)
+                {
+                    continue;
+                }
+
+                if (i < 10)
+                {
+                    read.Add(units[i]);
+                }
+                else
+                {
+                    unread.Add(units[i]);
+                }
+            }
+
+            units[3].Remove();
+            units[10].Remove();
+            units[20].Remove();
+            units[31].Remove();
+            units[2].Remove();
+            read.Remove(units[2]);
+            units[30].Remove();
+            unread.Remove(units[30]);
+            fake.UnitReads.Clear();
+            Steps(world, 4);
+            var left = unread.Count + read.Count;
+            Expect.Equal(26, left, "26 units are left");
+            Expect.True(fake.UnitReads.Count >= left, "four steps read the round");
+            for (var i = 0; i < left; i++)
+            {
+                var unit = Unit.Of(fake.UnitReads[i])!;
+                var first = i < unread.Count;
+                Expect.True(first ? unread.Contains(unit) : read.Contains(unit), "read " + i + " is of a unit " + (first ? "not yet read" : "read before"));
+                Expect.True(fake.UnitReads.IndexOf(fake.UnitReads[i]) == i, "read " + i + " is the unit's first");
+            }
+        }
+
         /// <summary>In a gizmo's OnLeave the gizmo has no place: a Find from it does not see it, though it is still in its cell, and a gizmo beside it is found; it leaves the cell after.</summary>
         public static void GizmoLeaveHasNoPlace(FakeWorld world)
         {
