@@ -778,7 +778,7 @@ namespace Moonwell.Engine
             return unit.IsAlive && !world.IsHidden(unit.Handle) && !world.IsLoaded(unit.Handle);
         }
 
-        /// <summary>Whether an item has a place: on the ground, so not carried, and visible.</summary>
+        /// <summary>Whether an item has a place: on the ground, so not carried, and visible. An item in a unit's slot is not visible (seen 10-26), so one whose pick-up Moonwell never saw, with no Carrier, has none either; the 3.0 bag and equipment slots, where the unit does not count the item as held, were not checked in the game.</summary>
         private static bool ItemHasPlace(Item item)
         {
             return ItemHasPlace(item, Interactions.World);

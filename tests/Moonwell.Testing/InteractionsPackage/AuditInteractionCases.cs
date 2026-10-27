@@ -453,6 +453,31 @@ namespace Moonwell.Testing
             Expect.Equal(1, Tracking.Count, "which is no longer tracked");
         }
 
+        /// <summary>An item in a unit's slot has no place, also one whose pick-up Moonwell never saw, so it has no Carrier: the game says an item in a slot is not visible (seen 10-26), and the place asks that. Dropped, out of the slot and visible, it has a place at the unit's.</summary>
+        public static void CarriedItemHasNoPlace(FakeWorld world)
+        {
+            var fake = Fresh();
+            Tracking.Need(Tracking.ItemKind);
+            var hero = UnitAt(world, 0.0f, 0.0f);
+            var handle = world.NewItem(ObjectTypes.FourCC("ofoo"));
+            world.MoveItem(handle, 40.0f, 0.0f);
+            world.PutInSlot(hero.Handle, 0, handle);
+            fake.Unseen.Add(handle);
+            var orb = Item.Of(handle)!;
+            Expect.True(orb.Carrier == null, "Moonwell never saw it picked up");
+            var entry = Tracking.EntryOf(orb);
+            Expect.True(entry != null, "it is tracked");
+            Expect.True(!entry!.HasPlace, "and has no place");
+            Steps(world, 4);
+            Expect.True(!entry.HasPlace, "nor after its cell checks");
+            Expect.Equal(0, Find.InRange<Item>(40.0f, 0.0f, 100.0f).Count, "a Find does not find it where it was picked up");
+            world.DropItem(hero.Handle, handle);
+            fake.Unseen.Remove(handle);
+            Steps(world, 4);
+            Expect.True(entry.HasPlace, "dropped, it has a place");
+            Expect.Equal(1, Find.InRange<Item>(0.0f, 0.0f, 10.0f).Count, "at the unit's");
+        }
+
         /// <summary>In a gizmo's OnLeave the gizmo has no place: a Find from it does not see it, though it is still in its cell, and a gizmo beside it is found; it leaves the cell after.</summary>
         public static void GizmoLeaveHasNoPlace(FakeWorld world)
         {

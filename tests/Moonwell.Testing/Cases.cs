@@ -245,6 +245,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.audit.destructable-holder-tracked-alone", Run = AuditInteractionCases.DestructableHolderTrackedAlone });
             list.Add(new Case { Name = "interactions.audit.item-holder-tracked-alone", Run = AuditInteractionCases.ItemHolderTrackedAlone });
             list.Add(new Case { Name = "interactions.audit.unit-holder-of-gizmos-tracked-alone", Run = AuditInteractionCases.UnitHolderOfGizmosTrackedAlone });
+            list.Add(new Case { Name = "interactions.audit.carried-item-has-no-place", Run = AuditInteractionCases.CarriedItemHasNoPlace });
         }
 
         /// <summary>Adds the areas package's cases.</summary>
