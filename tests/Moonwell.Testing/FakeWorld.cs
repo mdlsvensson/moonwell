@@ -46,6 +46,9 @@ namespace Moonwell.Testing
         /// <summary>The damage the runtime asked the game to deal: the amount (whole), attack, ranged, and the game's attack, damage and weapon numbers.</summary>
         public List<string> Dealt = new List<string>();
 
+        /// <summary>The type ids SpawnUnit and SpawnItem make nothing of, as the game for an id it has no object for.</summary>
+        public List<int> Unmakeable = new List<int>();
+
         /// <summary>Whether the game deals no damage the runtime asks for, as for a target that cannot take it.</summary>
         public bool RefuseDamage;
 
@@ -669,19 +672,29 @@ namespace Moonwell.Testing
             return new List<destructable>(PlacedDestructables);
         }
 
-        /// <summary>Makes a unit owned by the owner's slot at the place, and keeps the facing in LastFacing.</summary>
+        /// <summary>Makes a unit owned by the owner's slot at the place, and keeps the facing in LastFacing; null for a type in Unmakeable, as the game's CreateUnit gives for a type it cannot make.</summary>
         public unit SpawnUnit(player owner, int typeId, float x, float y, float facing)
         {
             LastFacing = facing;
+            if (Unmakeable.Contains(typeId))
+            {
+                return null!;
+            }
+
             var created = NewUnit(typeId, SlotOf(owner));
             unitXs[created] = x;
             unitYs[created] = y;
             return created;
         }
 
-        /// <summary>Makes an item; the place is not kept.</summary>
+        /// <summary>Makes an item at the place; null for a type in Unmakeable, as the game's CreateItem gives for a type it cannot make.</summary>
         public item SpawnItem(int typeId, float x, float y)
         {
+            if (Unmakeable.Contains(typeId))
+            {
+                return null!;
+            }
+
             var created = NewItem(typeId);
             itemPlaces[created] = new float[] { x, y };
             return created;

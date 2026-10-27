@@ -272,10 +272,14 @@ namespace Moonwell
             return KnownItems.TakeIn(handle, null);
         }
 
-        /// <summary>Creates an item of a type at a place; owner, when given, owns it.</summary>
+        /// <summary>Creates an item of a type at a place; owner, when given, owns it. Throws a MoonwellException naming the id when the game makes no item of the type.</summary>
         public static Item Create(int typeId, float x, float y, Owner? owner = null)
         {
             var handle = Runtime.World.SpawnItem(typeId, x, y);
+            if (handle == null)
+            {
+                throw new MoonwellException("Item.Create: the game made no item of type " + Names.IdText(typeId));
+            }
             var made = KnownItems.TakeIn(handle, owner)!;
             if (owner != null && made.Owner == null)
             {

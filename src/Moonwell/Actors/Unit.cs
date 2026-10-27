@@ -838,10 +838,14 @@ namespace Moonwell
         /// <summary>The facing of a unit made without one, in degrees: the game's bj_UNIT_FACING.</summary>
         public const float DefaultFacing = 270.0f;
 
-        /// <summary>Creates a unit of a type for a player at a place and facing (270 degrees without one); owner, when given, owns it.</summary>
+        /// <summary>Creates a unit of a type for a player at a place and facing (270 degrees without one); owner, when given, owns it. Throws a MoonwellException naming the id when the game makes no unit of the type.</summary>
         public static Unit Create(int typeId, Player player, float x, float y, float facing = DefaultFacing, Owner? owner = null)
         {
             var handle = Runtime.World.SpawnUnit(player.Handle, typeId, x, y, facing);
+            if (handle == null)
+            {
+                throw new MoonwellException("Unit.Create: the game made no unit of type " + Names.IdText(typeId));
+            }
             var made = KnownUnits.TakeIn(handle, owner, true)!;
             if (owner != null && made.Owner == null)
             {

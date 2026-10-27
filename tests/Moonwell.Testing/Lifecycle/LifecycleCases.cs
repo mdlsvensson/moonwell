@@ -394,6 +394,43 @@ namespace Moonwell.Testing
             Expect.True(unit.Mark != null && !unit.Mark.HasEnded, "the buff OnDeath applied stays");
         }
 
+        /// <summary>Unit.Create and Item.Create with a type the game cannot make, which CreateUnit and CreateItem answer with nothing, throw a MoonwellException that names the id, not a bare error about a null key.</summary>
+        public static void CreateOfUnknownTypeNamesIt(FakeWorld world)
+        {
+            world.Unmakeable.Add(ObjectTypes.FourCC("h00X"));
+            world.Unmakeable.Add(ObjectTypes.FourCC("I00X"));
+            var unitError = "none";
+            try
+            {
+                Unit.Create(ObjectTypes.FourCC("h00X"), Player.Get(0), 0.0f, 0.0f);
+            }
+            catch (MoonwellException error)
+            {
+                unitError = error.Message;
+            }
+            catch (Exception error)
+            {
+                unitError = "another error: " + error.Message;
+            }
+
+            var itemError = "none";
+            try
+            {
+                Item.Create(ObjectTypes.FourCC("I00X"), 0.0f, 0.0f);
+            }
+            catch (MoonwellException error)
+            {
+                itemError = error.Message;
+            }
+            catch (Exception error)
+            {
+                itemError = "another error: " + error.Message;
+            }
+
+            Expect.Equal("Unit.Create: the game made no unit of type h00X", unitError, "the unit's error");
+            Expect.Equal("Item.Create: the game made no item of type I00X", itemError, "the item's error");
+        }
+
         /// <summary>A timer adopted by a second owner is refused, in every build: it is reported and stays with its first owner (decision 74).</summary>
         public static void AdoptAgainRefused(FakeWorld world)
         {

@@ -32,5 +32,17 @@ namespace Moonwell
         {
             return obj.GetType().Name;
         }
+
+        /// <summary>The four characters of an object id, as World Editor shows them ("h00X"), the first from the highest byte; FourCC's reverse.</summary>
+        internal static string IdText(int id)
+        {
+            return Character((id >> 24) & 255) + Character((id >> 16) & 255) + Character((id >> 8) & 255) + Character(id & 255);
+        }
+
+        /// <summary>The character of a code, as a string.</summary>
+        private static string Character(int code)
+        {
+            return ((char)code).ToString();
+        }
     }
 }
