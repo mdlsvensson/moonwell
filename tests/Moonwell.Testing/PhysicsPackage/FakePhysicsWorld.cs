@@ -69,6 +69,9 @@ namespace Moonwell.Testing
         /// <summary>The x, y and z each effect was last put at; one never put has none.</summary>
         public Dictionary<effect, float[]> Places = new Dictionary<effect, float[]>();
 
+        /// <summary>The x and y each effect was made at, which the game draws its trail from.</summary>
+        public Dictionary<effect, float[]> MadeAt = new Dictionary<effect, float[]>();
+
         /// <summary>The scale each effect was last given; one never scaled has none.</summary>
         public Dictionary<effect, float> Scales = new Dictionary<effect, float>();
 
@@ -112,6 +115,7 @@ namespace Moonwell.Testing
             Effects.Add(made);
             Models[made] = model;
             Places[made] = new float[] { x, y, 0.0f };
+            MadeAt[made] = new float[] { x, y };
             return made;
         }
 

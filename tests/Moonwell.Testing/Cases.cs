@@ -285,6 +285,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "flight.facing", Run = FlightCases.Facing });
             list.Add(new Case { Name = "flight.fire-at-self", Run = FlightCases.FireAtSelf });
             list.Add(new Case { Name = "flight.effect", Run = FlightCases.Effects });
+            list.Add(new Case { Name = "flight.made-at-launch", Run = FlightCases.MadeAtLaunch });
             list.Add(new Case { Name = "flight.gizmo-create", Run = FlightCases.GizmoCreate });
             list.Add(new Case { Name = "flight.end-mid-pass", Run = FlightCases.EndMidPass });
             list.Add(new Case { Name = "ground.stop", Run = GroundCases.Stop });

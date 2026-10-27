@@ -526,6 +526,33 @@ namespace Moonwell.Testing
             Expect.Equal(0, fake.Effects.Count, "none made");
         }
 
+        /// <summary>A missile's effects are made at its launch point, not made elsewhere and moved there, as an effect draws its trail from where it was made: fired from a unit at (300, 200) facing east with LaunchOffset 50, its model and an added effect are made at (350, 200); one placed with Missile.Create at (700, 900) has its effect made there.</summary>
+        public static void MadeAtLaunch(FakeWorld world)
+        {
+            var fake = Fresh();
+            var source = UnitAt(world, 300.0f, 200.0f, 0.0f);
+            var dart = new Dart();
+            dart.Model = "dart.mdl";
+            dart.AddEffect("glow.mdl", 10.0f);
+            dart.Speed = 600.0f;
+            dart.LaunchOffset = 50.0f;
+            source.Fire(dart, 1000.0f, 200.0f);
+            Expect.Equal(2, fake.Effects.Count, "the model and the added effect");
+            for (var i = 0; i < fake.Effects.Count; i++)
+            {
+                var made = fake.MadeAt[fake.Effects[i]];
+                Within(350.0f, made[0], 0.001f, fake.Models[fake.Effects[i]] + " made at the launch point: x");
+                Within(200.0f, made[1], 0.001f, fake.Models[fake.Effects[i]] + " made at the launch point: y");
+            }
+
+            var placed = new Dart();
+            placed.Model = "placed.mdl";
+            Missile.Create(placed, 700.0f, 900.0f, 50.0f);
+            var look = placed.Effect!;
+            Within(700.0f, fake.MadeAt[look][0], 0.001f, "one placed with Create is made where it is placed: x");
+            Within(900.0f, fake.MadeAt[look][1], 0.001f, "y");
+        }
+
         /// <summary>A missile placed through Gizmo.Create, or Missile.Create with no height, is a missile all the same: it belongs to the game, starts at its LaunchHeight above the ground, has its effect, and moves.</summary>
         public static void GizmoCreate(FakeWorld world)
         {
