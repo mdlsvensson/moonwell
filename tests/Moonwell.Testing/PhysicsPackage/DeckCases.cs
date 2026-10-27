@@ -348,6 +348,54 @@ namespace Moonwell.Testing
         }
 
         /// <summary>
+        /// A unit pushed along a deck at a slant toward its east edge, the rail, keeps its collision size inside the edge at
+        /// every step, as the rail stops its body, not its middle, and slides north along it, on the deck; so does one of
+        /// collision size 24. The gate's footman, knocked north at a slant along a deck's east edge, stopped with its middle
+        /// 8 inside the edge, its body in the rail's model, which hid it. The deck's east edge is at x 560.
+        /// </summary>
+        public static void PushRailBody(FakeWorld world)
+        {
+            FakeTerrainWorld terrain;
+            var fake = Fresh(0.0f, false, out terrain);
+            Placed(world, fake);
+            for (var x = 496.0f; x < 544.0f; x += 32.0f)
+            {
+                for (var y = 400.0f; y < 624.0f; y += 32.0f)
+                {
+                    terrain.Block(x, y, FakeTerrainWorld.NoWalk);
+                }
+            }
+
+            var sizes = new float[] { 16.0f, 24.0f };
+            for (var k = 0; k < sizes.Length; k++)
+            {
+                var size = sizes[k];
+                var unit = PusheeAt(world, 500.0f, 430.0f);
+                fake.Sizes[unit.Handle] = size;
+                unit.Knockback(75.0f, 300.0f, 1.0f);
+                var east = 0.0f;
+                for (var i = 0; i < 40; i++)
+                {
+                    Steps(world, 1);
+                    if (unit.X > east)
+                    {
+                        east = unit.X;
+                    }
+
+                    Expect.True(unit.X + size <= 560.01f, "size " + size + ": its body inside the deck's east edge at step " + i + "; its middle at " + unit.X);
+                }
+
+                Expect.True(east > 560.0f - size - 10.0f, "size " + size + ": it came near the edge, short of it by less than a step; its middle at most at " + east);
+                Expect.True(unit.Y > 540.0f, "size " + size + ": it slid north along the rail; at y " + unit.Y);
+                float height;
+                Expect.True(Decks.Under(unit.X, unit.Y, out height), "size " + size + ": on the deck");
+                Expect.True(unit.Slams.Count >= 1, "size " + size + ": OnSlammed ran");
+                unit.Kill();
+                Steps(world, 1);
+            }
+        }
+
+        /// <summary>
         /// A ball falling at a slant onto a deck over sloped terrain bounces off the deck's slope, not the terrain's beneath
         /// it: the terrain rises north 20 a tile (its normal leans 0.154 south), the deck's south half rises 10 a cell (its
         /// normal leans 0.298 south) and its north half falls so (0.298 north). The first ball meets the deck where it was

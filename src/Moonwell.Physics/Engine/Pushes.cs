@@ -28,6 +28,9 @@ namespace Moonwell.Engine
         /// <summary>Degrees to radians.</summary>
         private const float Radians = 0.0174532925f;
 
+        /// <summary>The cosine of an eighth of a turn, for the points of a unit's edge between the axes.</summary>
+        private const float Slant = 0.70710678f;
+
         /// <summary>The most the ground beside a bridge's deck may differ from it for a pushed unit to cross between them; more, and the deck's edge is a rail.</summary>
         private const float DeckStep = 64.0f;
 
@@ -433,7 +436,7 @@ namespace Moonwell.Engine
             var size = push.size;
             var toX = x + ux * distance;
             var toY = y + uy * distance;
-            if (Free(push, x, y, toX + ux * size, toY + uy * size))
+            if (Free(push, x, y, toX, toY, toX + ux * size, toY + uy * size))
             {
                 Place(unit, toX, toY);
                 push.vx = ux * after;
@@ -453,7 +456,7 @@ namespace Moonwell.Engine
 
                 if (alongX)
                 {
-                    if (Free(push, x, y, toX + (ux > 0.0f ? size : -size), y))
+                    if (Free(push, x, y, toX, y, toX + (ux > 0.0f ? size : -size), y))
                     {
                         Place(unit, toX, y);
                         push.vx = ux * after;
@@ -462,7 +465,7 @@ namespace Moonwell.Engine
                         return;
                     }
                 }
-                else if (Free(push, x, y, x, toY + (uy > 0.0f ? size : -size)))
+                else if (Free(push, x, y, x, toY, x, toY + (uy > 0.0f ? size : -size)))
                 {
                     Place(unit, x, toY);
                     push.vx = 0.0f;
@@ -486,12 +489,14 @@ namespace Moonwell.Engine
         }
 
         /// <summary>
-        /// Whether a pushed unit at (fromX, fromY) may stand at a point: inside the world's bounds, with no wall it is not
-        /// lifted over across the way there, and flyable for a flyer; for a unit that does not fly, walkable and where an
-        /// item lands, or on a bridge's deck. A deck is walkable inside its area (the terrain's pathing reads the water
-        /// beneath it), and its edge is a rail, except where the ground beyond is within DeckStep of it (its ends, on the banks).
+        /// Whether a pushed unit at (fromX, fromY) may move to (centreX, centreY), looking ahead to a point (x, y), its
+        /// collision size ahead along the move: the point inside the world's bounds, with no wall it is not lifted over
+        /// across the way there, and flyable for a flyer; for a unit that does not fly, walkable and where an item lands, or
+        /// on a bridge's deck. A deck is ground inside its area, whatever the terrain's pathing reads under it, and its edge
+        /// is a rail, except where the ground beyond is within DeckStep of it (its ends, on the banks). The rail stops the
+        /// unit's body, not its middle: on a deck, its collision size around the place it moves to stays on the deck.
         /// </summary>
-        private static bool Free(Pushed push, float fromX, float fromY, float x, float y)
+        private static bool Free(Pushed push, float fromX, float fromY, float centreX, float centreY, float x, float y)
         {
             if (x < Pass.minX || x > Pass.maxX || y < Pass.minY || y > Pass.maxY)
             {
@@ -514,13 +519,19 @@ namespace Moonwell.Engine
                 float from;
                 var onTo = OnDeck(x, y, out to);
                 var onFrom = OnDeck(fromX, fromY, out from);
-                if (onTo && onFrom)
-                {
-                    return true;
-                }
-
                 if (onFrom)
                 {
+                    if (!Inside(push.size, fromX, fromY, centreX, centreY, from))
+                    {
+                        // Its body would go over the rail.
+                        return false;
+                    }
+
+                    if (onTo)
+                    {
+                        return true;
+                    }
+
                     // Off the deck's edge: onto the ground only near the deck's height, else it is the rail.
                     return Near(Terrain.Height(x, y), from) && Terrain.IsWalkable(x, y) && Terrain.ItemLands(x, y);
                 }
@@ -533,6 +544,45 @@ namespace Moonwell.Engine
             }
 
             return Terrain.IsWalkable(x, y) && Terrain.ItemLands(x, y);
+        }
+
+        /// <summary>
+        /// Whether a unit on a deck of a height at (fromX, fromY) keeps its body inside the deck's rail when it moves to
+        /// (centreX, centreY): each point of its edge, its collision size out every eighth of a turn, on the side it moves
+        /// toward, is on a deck or over ground within DeckStep of the deck, or was off both already where it is (a body
+        /// over the rail already does not hold it there, so it can be pushed back or along).
+        /// </summary>
+        private static bool Inside(float size, float fromX, float fromY, float centreX, float centreY, float deck)
+        {
+            var moveX = centreX - fromX;
+            var moveY = centreY - fromY;
+            var slant = size * Slant;
+            return Rim(moveX, moveY, size, 0.0f, fromX, fromY, centreX, centreY, deck)
+                && Rim(moveX, moveY, -size, 0.0f, fromX, fromY, centreX, centreY, deck)
+                && Rim(moveX, moveY, 0.0f, size, fromX, fromY, centreX, centreY, deck)
+                && Rim(moveX, moveY, 0.0f, -size, fromX, fromY, centreX, centreY, deck)
+                && Rim(moveX, moveY, slant, slant, fromX, fromY, centreX, centreY, deck)
+                && Rim(moveX, moveY, slant, -slant, fromX, fromY, centreX, centreY, deck)
+                && Rim(moveX, moveY, -slant, slant, fromX, fromY, centreX, centreY, deck)
+                && Rim(moveX, moveY, -slant, -slant, fromX, fromY, centreX, centreY, deck);
+        }
+
+        /// <summary>Whether one point of a unit's edge, (offsetX, offsetY) from its middle, does not take it over a deck's rail: on a side it does not move toward, held where it moves to, or not held where it is already.</summary>
+        private static bool Rim(float moveX, float moveY, float offsetX, float offsetY, float fromX, float fromY, float centreX, float centreY, float deck)
+        {
+            if (moveX * offsetX + moveY * offsetY <= 0.0f)
+            {
+                return true;
+            }
+
+            return Holds(centreX + offsetX, centreY + offsetY, deck) || !Holds(fromX + offsetX, fromY + offsetY, deck);
+        }
+
+        /// <summary>Whether a point holds the body of a unit on a deck of a height: it is on a deck, or the ground there is within DeckStep of that height.</summary>
+        private static bool Holds(float x, float y, float deck)
+        {
+            float height;
+            return OnDeck(x, y, out height) || Near(Terrain.Height(x, y), deck);
         }
 
         /// <summary>Whether a point is on a deck, which is above the terrain there, and the deck's height; false off every deck, or where the terrain is higher (a deck's end, in a bank).</summary>
