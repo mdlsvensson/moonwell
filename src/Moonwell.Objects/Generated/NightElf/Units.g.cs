@@ -1109,7 +1109,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public AvatarOfVengeance()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.NightElf.Abilities.Sphere, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin, global::Moonwell.Objects.NightElf.Abilities.SpiritOfVengeance, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.NightElf.Abilities.Sphere, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin, global::Moonwell.Objects.NightElf.Abilities.SpiritOfVengeance, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -4192,7 +4192,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public OwlScout()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Invulnerable, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Other.Abilities.TrueSightAdtg>();
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Invulnerable, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Other.Abilities.TrueSightAdtg>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -4317,7 +4317,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public OwlScoutNow3()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Invulnerable, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Other.Abilities.TrueSightAdtg>();
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Invulnerable, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Other.Abilities.TrueSightAdtg>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -4441,7 +4441,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public OwlScoutNowl()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Invulnerable, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Other.Abilities.TrueSightAdtg>();
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Invulnerable, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Other.Abilities.TrueSightAdtg>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;

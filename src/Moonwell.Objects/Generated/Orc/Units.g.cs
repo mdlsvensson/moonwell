@@ -1661,7 +1661,7 @@ namespace Moonwell.Objects
                 {
                     AIPlacementRadius = 8f;
                     AIPlacementType = global::Moonwell.Objects.AiBuffer.Townhall;
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.BlightDispelLarge, global::Moonwell.Objects.Orc.Abilities.SpikedBarricades, global::Moonwell.Objects.Other.Abilities.ReturnGoldAndLumber, global::Moonwell.Objects.Orc.Abilities.SpikedBarricadesSpikedBarricadesImprovedSpikedBarricades>();
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.BlightDispelLarge, global::Moonwell.Objects.Orc.Abilities.SpikedBarricades, global::Moonwell.Objects.Other.Abilities.ReturnGoldAndLumber, global::Moonwell.Objects.Orc.Abilities.SpikedBarricadesAosp>();
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
@@ -1792,7 +1792,7 @@ namespace Moonwell.Objects
                 {
                     AIPlacementRadius = 8f;
                     AIPlacementType = global::Moonwell.Objects.AiBuffer.Townhall;
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.BlightDispelLarge, global::Moonwell.Objects.Orc.Abilities.SpikedBarricades, global::Moonwell.Objects.Other.Abilities.ReturnGoldAndLumber, global::Moonwell.Objects.Orc.Abilities.SpikedBarricadesSpikedBarricadesImprovedSpikedBarricades>();
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.BlightDispelLarge, global::Moonwell.Objects.Orc.Abilities.SpikedBarricades, global::Moonwell.Objects.Other.Abilities.ReturnGoldAndLumber, global::Moonwell.Objects.Orc.Abilities.SpikedBarricadesAosp>();
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
@@ -2213,7 +2213,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public HealingWard()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.HealingWardAura, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.HealingWardAura, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
@@ -2792,7 +2792,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SentryWard()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.Detector, global::Moonwell.Objects.Undead.Abilities.GhostAeth, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.Detector, global::Moonwell.Objects.Undead.Abilities.GhostAeth, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
@@ -2912,7 +2912,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SerpentWard()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -3051,7 +3051,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SerpentWardOsp2()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -3191,7 +3191,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SerpentWardOsp3()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -3331,7 +3331,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SerpentWardOsp4()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -4664,7 +4664,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public StasisTrap()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.GhostAeth, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.GhostAeth, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
@@ -4786,7 +4786,7 @@ namespace Moonwell.Objects
                 {
                     AIPlacementRadius = 8f;
                     AIPlacementType = global::Moonwell.Objects.AiBuffer.Townhall;
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.BlightDispelLarge, global::Moonwell.Objects.Orc.Abilities.SpikedBarricades, global::Moonwell.Objects.Other.Abilities.ReturnGoldAndLumber, global::Moonwell.Objects.Orc.Abilities.SpikedBarricadesSpikedBarricadesImprovedSpikedBarricades>();
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.BlightDispelLarge, global::Moonwell.Objects.Orc.Abilities.SpikedBarricades, global::Moonwell.Objects.Other.Abilities.ReturnGoldAndLumber, global::Moonwell.Objects.Orc.Abilities.SpikedBarricadesAosp>();
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
@@ -4915,7 +4915,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Tauren()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.PulverizePulverize, global::Moonwell.Objects.Other.Abilities.UnitInventoryAion, global::Moonwell.Objects.Creeps.Abilities.ResistantSkinACsk>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.Pulverize, global::Moonwell.Objects.Other.Abilities.UnitInventoryAion, global::Moonwell.Objects.Creeps.Abilities.ResistantSkinACsk>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.3f;

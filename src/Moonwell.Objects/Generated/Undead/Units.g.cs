@@ -2341,7 +2341,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Destroyer()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.DevourMagic, global::Moonwell.Objects.Undead.Abilities.OrbOfAnnihilation, global::Moonwell.Objects.Undead.Abilities.DestroyerForm, global::Moonwell.Objects.Undead.Abilities.AbsorbMana, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.DevourMagic, global::Moonwell.Objects.Undead.Abilities.OrbOfAnnihilation, global::Moonwell.Objects.Undead.Abilities.DestroyerForm, global::Moonwell.Objects.Undead.Abilities.AbsorbMana, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -5580,7 +5580,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public StoneFormGargoyle()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.StoneForm, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.StoneForm, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;

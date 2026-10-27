@@ -1146,7 +1146,7 @@ namespace Moonwell.Objects
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
             public ArcaniteShield()
             {
-                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemArmorBonusAId5, global::Moonwell.Objects.Other.Abilities.DefendPassiveDefense>();
+                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemArmorBonusAId5, global::Moonwell.Objects.Other.Abilities.Defend>();
                 ActivelyUsed = false;
                 AllowCustomTeamColor = false;
                 ArmorType = global::Moonwell.Objects.ArmorType.Wood;

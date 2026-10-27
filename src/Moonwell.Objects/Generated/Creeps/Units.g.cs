@@ -2233,7 +2233,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public BattleGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2695,7 +2695,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public BerserkElemental()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.FrostNova>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.FrostNova>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2995,7 +2995,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public BlackDragon()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -3900,7 +3900,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public BlueDragon()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Undead.Abilities.FrostAttackAfrc, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Undead.Abilities.FrostAttackAfrc, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -5448,7 +5448,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public BronzeDragon()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.NightElf.Abilities.LightningAttack, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.NightElf.Abilities.LightningAttack, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -9455,7 +9455,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DefenderGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -11238,7 +11238,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Earth()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.Pulverize, global::Moonwell.Objects.Creeps.Abilities.Taunt, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.Pulverize, global::Moonwell.Objects.Creeps.Abilities.Taunt, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -11376,7 +11376,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public EarthNpn6()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.Pulverize, global::Moonwell.Objects.Creeps.Abilities.Taunt, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.Pulverize, global::Moonwell.Objects.Creeps.Abilities.Taunt, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -12395,7 +12395,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public EnragedElemental()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -19849,7 +19849,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public GraniteGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder, global::Moonwell.Objects.Creeps.Abilities.SlamACtc>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder, global::Moonwell.Objects.Creeps.Abilities.SlamACtc>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -20162,7 +20162,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public GreenDragon()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -20631,7 +20631,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public GuardianGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder, global::Moonwell.Objects.Creeps.Abilities.SlamACtc>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder, global::Moonwell.Objects.Creeps.Abilities.SlamACtc>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -24772,7 +24772,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public MagnataurDestroyer()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.FrostBolt, global::Moonwell.Objects.Creeps.Abilities.SlamACtc>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.FrostBolt, global::Moonwell.Objects.Creeps.Abilities.SlamACtc>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -24933,7 +24933,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public MagnataurReaver()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.FrostBolt>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.FrostBolt>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -25094,7 +25094,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public MagnataurWarrior()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -26532,7 +26532,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public MossCoveredGraniteGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder, global::Moonwell.Objects.Creeps.Abilities.SlamACtc>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder, global::Moonwell.Objects.Creeps.Abilities.SlamACtc>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -26691,7 +26691,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public MudGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.Slow>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.Slow>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -29500,7 +29500,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public NetherDragon()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.Cripple>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.Cripple>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -33655,7 +33655,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public RedDragon()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -34853,7 +34853,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public RockGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -38468,7 +38468,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SiegeGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -45657,7 +45657,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public WarGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;

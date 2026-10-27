@@ -7161,13 +7161,13 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Defend, Passive Defense (item), AIdd.</summary>
+            /// <summary>Defend (item), AIdd.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIdd")]
-            public class DefendPassiveDefense : global::Moonwell.Objects.StandardAbility
+            public class Defend : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public DefendPassiveDefense()
+                public Defend()
                 {
                     AttackSpeedFactor = Levels(0f);
                     CastTime = Levels(0f);
@@ -7190,7 +7190,7 @@ namespace Moonwell.Objects
                     MagicDamageReduction = Levels(1f);
                     ManaCost = Levels(0);
                     MovementSpeedFactor = Levels(0f);
-                    Name = "Defend, Passive Defense";
+                    Name = "Defend";
                     Order = "defend";
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
@@ -10724,7 +10724,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Harvest (Neutral),  (Gold and Lumber), ANha.</summary>
+            /// <summary>Harvest (Neutral), ANha.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ANha")]
             public class Harvest : global::Moonwell.Objects.StandardAbility
@@ -10742,7 +10742,7 @@ namespace Moonwell.Objects
                     Cooldown = Levels(0f);
                     DamageToTree = Levels(1);
                     Duration = Levels(1f);
-                    EditorSuffix = "(Neutral),  (Gold and Lumber)";
+                    EditorSuffix = "(Neutral)";
                     GoldCapacity = Levels(10);
                     HeroAbility = false;
                     HeroDuration = Levels(0f);
@@ -39290,13 +39290,13 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Permanent Damage Gain, Item Attack Damage Gain (AIaa).</summary>
+            /// <summary>Item Permanent Damage Gain (AIaa).</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIaa")]
-            public class ItemPermanentDamageGainItemAttackDamageGain : global::Moonwell.Objects.StandardAbility
+            public class ItemPermanentDamageGain : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public ItemPermanentDamageGainItemAttackDamageGain()
+                public ItemPermanentDamageGain()
                 {
                     AttackModification = Levels(3);
                     CastTime = Levels(0f);
@@ -39312,7 +39312,7 @@ namespace Moonwell.Objects
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
-                    Name = "Item Permanent Damage Gain, Item Attack Damage Gain";
+                    Name = "Item Permanent Damage Gain";
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
@@ -51855,13 +51855,13 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>On Basic Attack, Cast Spell (Aals).</summary>
+            /// <summary>On Basic Attack (Aals).</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aals")]
-            public class OnBasicAttackCastSpell : global::Moonwell.Objects.StandardAbility
+            public class OnBasicAttack : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public OnBasicAttackCastSpell()
+                public OnBasicAttack()
                 {
                     Ability.Set<global::Moonwell.Objects.Orc.Abilities.ChainLightning>();
                     ButtonPositionNormalX = 0;
@@ -51884,7 +51884,7 @@ namespace Moonwell.Objects
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
-                    Name = "On Basic Attack, Cast Spell";
+                    Name = "On Basic Attack";
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
@@ -52049,13 +52049,13 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>On Magic Attack, Cast Spell (Asas).</summary>
+            /// <summary>On Magic Attack (Asas).</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Asas")]
-            public class OnMagicAttackCastSpell : global::Moonwell.Objects.StandardAbility
+            public class OnMagicAttack : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public OnMagicAttackCastSpell()
+                public OnMagicAttack()
                 {
                     Ability.Set<global::Moonwell.Objects.Orc.Abilities.ChainLightning>();
                     ButtonPositionNormalX = 0;
@@ -52073,7 +52073,7 @@ namespace Moonwell.Objects
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
-                    Name = "On Magic Attack, Cast Spell";
+                    Name = "On Magic Attack";
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
@@ -53087,7 +53087,7 @@ namespace Moonwell.Objects
                     Tooltip = Levels("Provoke - [|cffffcc00Level 1|r]", "Provoke - [|cffffcc00Level 2|r]", "Provoke - [|cffffcc00Level 3|r]", "Provoke - [|cffffcc00Level 4|r]", "Provoke - [|cffffcc00Level 5|r]");
                     TooltipExtended = Levels("Gain a shield that can absorb <AHhc,DataF1> damage, and taunt all nearby enemies within <AHhc,Area1> range for <AHhc,Dur1> seconds.", "Gain a shield that can absorb <AHhc,DataF2> damage, and taunt all nearby enemies within <AHhc,Area2> range for <AHhc,Dur2> seconds.", "Gain a shield that can absorb <AHhc,DataF3> damage, and taunt all nearby enemies within <AHhc,Area3> range for <AHhc,Dur3> seconds.", "Gain a shield that can absorb <AHhc,DataF4> damage, and taunt all nearby enemies within <AHhc,Area4> range for <AHhc,Dur4> seconds.", "Gain a shield that can absorb <AHhc,DataF5> damage, and taunt all nearby enemies within <AHhc,Area5> range for <AHhc,Dur5> seconds.");
                     TooltipLearn = "Learn Provoke - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "\"Gain a shield and taunt nearby enemies.|n|n|cffffcc00Level 1|r - <AHhc,DataF1> damage shield, <AHhc,Area1> range taunt for <AHhc,Dur1> seconds.|n|cffffcc00Level 2|r - <AHhc,DataF2> damage shield, <AHhc,Area2> range taunt for <AHhc,Dur2> seconds. |n|cffffcc00Level 3|r - <AHhc,DataF3> damage shield, <AHhc,Area3> range taunt for <AHhc,Dur3> seconds.|n|cffffcc00Level 4|r - <AHhc,DataF4> damage shield, <AHhc,Area4> range taunt for <AHhc,Dur4> seconds. |n|cffffcc00Level 5|r - <AHhc,DataF5> damage shield, <AHhc,Area5> range taunt for <AHhc,Dur5> seconds.\"\"";
+                    TooltipLearnExtended = "Gain a shield and taunt nearby enemies.|n|n|cffffcc00Level 1|r - <AHhc,DataF1> damage shield, <AHhc,Area1> range taunt for <AHhc,Dur1> seconds.|n|cffffcc00Level 2|r - <AHhc,DataF2> damage shield, <AHhc,Area2> range taunt for <AHhc,Dur2> seconds. |n|cffffcc00Level 3|r - <AHhc,DataF3> damage shield, <AHhc,Area3> range taunt for <AHhc,Dur3> seconds.|n|cffffcc00Level 4|r - <AHhc,DataF4> damage shield, <AHhc,Area4> range taunt for <AHhc,Dur4> seconds. |n|cffffcc00Level 5|r - <AHhc,DataF5> damage shield, <AHhc,Area5> range taunt for <AHhc,Dur5> seconds.";
                     UseNewDefaultLevelCap = true;
                 }
 
@@ -53170,7 +53170,7 @@ namespace Moonwell.Objects
                     Tooltip = Levels("Provoke - [|cffffcc00Level 1|r]", "Provoke - [|cffffcc00Level 2|r]", "Provoke - [|cffffcc00Level 3|r]", "Provoke - [|cffffcc00Level 4|r]", "Provoke - [|cffffcc00Level 5|r]");
                     TooltipExtended = Levels("Gain a shield that can absorb <AHu1,DataF1> damage, and taunt all nearby enemies within <AHu1,Area1> range for <AHu1,Dur1> seconds. Taunted enemies have their armor reduced by <AHu1,DataI1>.", "Gain a shield that can absorb <AHu1,DataF2> damage, and taunt all nearby enemies within <AHu1,Area2> range for <AHu1,Dur2> seconds. Taunted enemies have their armor reduced by <AHu1,DataI2>.", "Gain a shield that can absorb <AHu1,DataF3> damage, and taunt all nearby enemies within <AHu1,Area3> range for <AHu1,Dur3> seconds. Taunted enemies have their armor reduced by <AHu1,DataI3>.", "Gain a shield that can absorb <AHu1,DataF4> damage, and taunt all nearby enemies within <AHu1,Area4> range for <AHu1,Dur4> seconds. Taunted enemies have their armor reduced by <AHu1,DataI4>.", "Gain a shield that can absorb <AHu1,DataF5> damage, and taunt all nearby enemies within <AHu1,Area5> range for <AHu1,Dur5> seconds. Taunted enemies have their armor reduced by <AHu1,DataI5>.");
                     TooltipLearn = "Learn Provoke - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "\"Gain a shield and taunt nearby enemies. Taunted enemies have their armor reduced.|n|n|cffffcc00Level 1|r - <AHu1,DataF1> damage shield, <AHu1,DataI1> armor reduced, <AHu1,Area1> range taunt for <AHu1,Dur1> seconds.|n|cffffcc00Level 2|r - <AHu1,DataF2> damage shield, <AHu1,DataI2> armor reduced, <AHu1,Area2> range taunt for <AHu1,Dur2> seconds. |n|cffffcc00Level 3|r - <AHu1,DataF3> damage shield, <AHu1,DataI3> armor reduced, <AHu1,Area3> range taunt for <AHu1,Dur3> seconds.|n|cffffcc00Level 4|r - <AHu1,DataF4> damage shield, <AHu1,DataI4> armor reduced, <AHu1,Area4> range taunt for <AHu1,Dur4> seconds. |n|cffffcc00Level 5|r - <AHu1,DataF5> damage shield, <AHu1,DataI5> armor reduced, <AHu1,Area5> range taunt for <AHu1,Dur5> seconds.\"\"";
+                    TooltipLearnExtended = "Gain a shield and taunt nearby enemies. Taunted enemies have their armor reduced.|n|n|cffffcc00Level 1|r - <AHu1,DataF1> damage shield, <AHu1,DataI1> armor reduced, <AHu1,Area1> range taunt for <AHu1,Dur1> seconds.|n|cffffcc00Level 2|r - <AHu1,DataF2> damage shield, <AHu1,DataI2> armor reduced, <AHu1,Area2> range taunt for <AHu1,Dur2> seconds. |n|cffffcc00Level 3|r - <AHu1,DataF3> damage shield, <AHu1,DataI3> armor reduced, <AHu1,Area3> range taunt for <AHu1,Dur3> seconds.|n|cffffcc00Level 4|r - <AHu1,DataF4> damage shield, <AHu1,DataI4> armor reduced, <AHu1,Area4> range taunt for <AHu1,Dur4> seconds. |n|cffffcc00Level 5|r - <AHu1,DataF5> damage shield, <AHu1,DataI5> armor reduced, <AHu1,Area5> range taunt for <AHu1,Dur5> seconds.";
                     UseNewDefaultLevelCap = true;
                 }
 
@@ -53253,7 +53253,7 @@ namespace Moonwell.Objects
                     Tooltip = Levels("Provoke - [|cffffcc00Level 1|r]", "Provoke - [|cffffcc00Level 2|r]", "Provoke - [|cffffcc00Level 3|r]", "Provoke - [|cffffcc00Level 4|r]", "Provoke - [|cffffcc00Level 5|r]");
                     TooltipExtended = Levels("Gain a shield that can absorb <AHu2,DataF1> damage and reflect <AHu2,DataG1>% attack damage, and taunt all nearby enemies within <AHu2,Area1> range for <AHu2,Dur1> seconds.", "Gain a shield that can absorb <AHu2,DataF2> damage and reflect <AHu2,DataG2>% attack damage, and taunt all nearby enemies within <AHu2,Area2> range for <AHu2,Dur2> seconds.", "Gain a shield that can absorb <AHu2,DataF3> damage and reflect <AHu2,DataG3>% attack damage, and taunt all nearby enemies within <AHu2,Area3> range for <AHu2,Dur3> seconds.", "Gain a shield that can absorb <AHu2,DataF4> damage and reflect <AHu2,DataG4>% attack damage, and taunt all nearby enemies within <AHu2,Area4> range for <AHu2,Dur4> seconds.", "Gain a shield that can absorb <AHu2,DataF5> damage and reflect <AHu2,DataG5>% attack damage, and taunt all nearby enemies within <AHu2,Area5> range for <AHu2,Dur5> seconds.");
                     TooltipLearn = "Learn Provoke - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "\"Gain a shield that reflects attack damage and taunt nearby enemies.|n|n|cffffcc00Level 1|r - <AHu2,DataF1> damage shield, <AHu2,DataG1>% reflected, <AHu2,Area1> range taunt for <AHu2,Dur1> seconds.|n|cffffcc00Level 2|r - <AHu2,DataF2> damage shield, <AHu2,DataG2>% reflected, <AHu2,Area2> range taunt for <AHu2,Dur2> seconds. |n|cffffcc00Level 3|r - <AHu2,DataF3> damage shield, <AHu2,DataG3>% reflected, <AHu2,Area3> range taunt for <AHu2,Dur3> seconds.|n|cffffcc00Level 4|r - <AHu2,DataF4> damage shield, <AHu2,DataG4>% reflected, <AHu2,Area4> range taunt for <AHu2,Dur4> seconds. |n|cffffcc00Level 5|r - <AHu2,DataF5> damage shield, <AHu2,DataG5>% reflected, <AHu2,Area5> range taunt for <AHu2,Dur5> seconds.\"\"";
+                    TooltipLearnExtended = "Gain a shield that reflects attack damage and taunt nearby enemies.|n|n|cffffcc00Level 1|r - <AHu2,DataF1> damage shield, <AHu2,DataG1>% reflected, <AHu2,Area1> range taunt for <AHu2,Dur1> seconds.|n|cffffcc00Level 2|r - <AHu2,DataF2> damage shield, <AHu2,DataG2>% reflected, <AHu2,Area2> range taunt for <AHu2,Dur2> seconds. |n|cffffcc00Level 3|r - <AHu2,DataF3> damage shield, <AHu2,DataG3>% reflected, <AHu2,Area3> range taunt for <AHu2,Dur3> seconds.|n|cffffcc00Level 4|r - <AHu2,DataF4> damage shield, <AHu2,DataG4>% reflected, <AHu2,Area4> range taunt for <AHu2,Dur4> seconds. |n|cffffcc00Level 5|r - <AHu2,DataF5> damage shield, <AHu2,DataG5>% reflected, <AHu2,Area5> range taunt for <AHu2,Dur5> seconds.";
                     UseNewDefaultLevelCap = true;
                 }
 
@@ -53336,7 +53336,7 @@ namespace Moonwell.Objects
                     Tooltip = Levels("Provoke - [|cffffcc00Level 1|r]", "Provoke - [|cffffcc00Level 2|r]", "Provoke - [|cffffcc00Level 3|r]", "Provoke - [|cffffcc00Level 4|r]", "Provoke - [|cffffcc00Level 5|r]");
                     TooltipExtended = Levels("Gain a shield that can absorb <AHu3,DataF1> damage for <AHu3,DataH1> seconds, and taunt all nearby enemies within <AHu3,Area1> range for <AHu3,Dur1> seconds.", "Gain a shield that can absorb <AHu3,DataF2> damage for <AHu3,DataH2> seconds, and taunt all nearby enemies within <AHu3,Area2> range for <AHu3,Dur2> seconds.", "Gain a shield that can absorb <AHu3,DataF3> damage for <AHu3,DataH3> seconds, and taunt all nearby enemies within <AHu3,Area3> range for <AHu3,Dur3> seconds.", "Gain a shield that can absorb <AHu3,DataF4> damage for <AHu3,DataH4> seconds, and taunt all nearby enemies within <AHu3,Area4> range for <AHu3,Dur4> seconds.", "Gain a shield that can absorb <AHu3,DataF5> damage for <AHu3,DataH5> seconds, and taunt all nearby enemies within <AHu3,Area5> range for <AHu3,Dur5> seconds.");
                     TooltipLearn = "Learn Provoke - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "\"Gain a shield and taunt nearby enemies.|n|n|cffffcc00Level 1|r - <AHu3,DataF1> damage shield that lasts for <AHu3,DataH1> seconds, <AHu3,Area1> range taunt for <AHu3,Dur1> seconds.|n|cffffcc00Level 2|r - <AHu3,DataF2> damage shield that lasts for <AHu3,DataH2> seconds, <AHu3,Area2> range taunt for <AHu3,Dur2> seconds. |n|cffffcc00Level 3|r - <AHu3,DataF3> damage shield that lasts for <AHu3,DataH3> seconds, <AHu3,Area3> range taunt for <AHu3,Dur3> seconds.|n|cffffcc00Level 4|r - <AHu3,DataF4> damage shield that lasts for <AHu3,DataH4> seconds, <AHu3,Area4> range taunt for <AHu3,Dur4> seconds. |n|cffffcc00Level 5|r - <AHu3,DataF5> damage shield that lasts for <AHu3,DataH5> seconds, <AHu3,Area5> range taunt for <AHu3,Dur5> seconds.\"\"";
+                    TooltipLearnExtended = "Gain a shield and taunt nearby enemies.|n|n|cffffcc00Level 1|r - <AHu3,DataF1> damage shield that lasts for <AHu3,DataH1> seconds, <AHu3,Area1> range taunt for <AHu3,Dur1> seconds.|n|cffffcc00Level 2|r - <AHu3,DataF2> damage shield that lasts for <AHu3,DataH2> seconds, <AHu3,Area2> range taunt for <AHu3,Dur2> seconds. |n|cffffcc00Level 3|r - <AHu3,DataF3> damage shield that lasts for <AHu3,DataH3> seconds, <AHu3,Area3> range taunt for <AHu3,Dur3> seconds.|n|cffffcc00Level 4|r - <AHu3,DataF4> damage shield that lasts for <AHu3,DataH4> seconds, <AHu3,Area4> range taunt for <AHu3,Dur4> seconds. |n|cffffcc00Level 5|r - <AHu3,DataF5> damage shield that lasts for <AHu3,DataH5> seconds, <AHu3,Area5> range taunt for <AHu3,Dur5> seconds.";
                     UseNewDefaultLevelCap = true;
                 }
 
@@ -54117,7 +54117,7 @@ namespace Moonwell.Objects
                     ButtonPositionNormalY = 1;
                     CheckDependencies = true;
                     HeroAbility = false;
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRallyPoint.blp,ReplaceableTextures\\CommandButtons\\BTNOrcRallyPoint.blp,ReplaceableTextures\\CommandButtons\\BTNRallyPointUndead.blp,ReplaceableTextures\\CommandButtons\\BTNRallyPointNightElf.blp";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRallyPoint.blp";
                     ItemAbility = false;
                     LevelCount = 0;
                     LevelSkipRequirement = 0;
@@ -63924,7 +63924,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Unload (Air Transports),  (Goblin Zeppelin), Adro.</summary>
+            /// <summary>Unload (Air Transports), Adro.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Adro")]
             public class Unload : global::Moonwell.Objects.StandardAbility
@@ -63938,7 +63938,7 @@ namespace Moonwell.Objects
                     CheckDependencies = true;
                     Cooldown = Levels(0f);
                     Duration = Levels(0f);
-                    EditorSuffix = "(Air Transports),  (Goblin Zeppelin)";
+                    EditorSuffix = "(Air Transports)";
                     HeroAbility = false;
                     HeroDuration = Levels(0f);
                     Hotkey = "U";

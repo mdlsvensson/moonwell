@@ -4197,7 +4197,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Peasant()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.HarvestAhar, global::Moonwell.Objects.Human.Abilities.CallToArmsAmil, global::Moonwell.Objects.Human.Abilities.Repair, global::Moonwell.Objects.Human.Abilities.ImprovedLumberHarvestingImprovedLumberHarvestingAdvancedLumberHarvesting>();
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.HarvestAhar, global::Moonwell.Objects.Human.Abilities.CallToArmsAmil, global::Moonwell.Objects.Human.Abilities.Repair, global::Moonwell.Objects.Human.Abilities.ImprovedLumberHarvesting>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -4358,7 +4358,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Phoenix()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Human.Abilities.PhoenixMorphingEggRelated, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin, global::Moonwell.Objects.Human.Abilities.PhoenixFire, global::Moonwell.Objects.Human.Abilities.PhoenixAhpe>();
+                    Abilities.Set<global::Moonwell.Objects.Human.Abilities.PhoenixMorphingEggRelated, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin, global::Moonwell.Objects.Human.Abilities.PhoenixFire, global::Moonwell.Objects.Human.Abilities.PhoenixAhpe>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -4508,7 +4508,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public PhoenixEgg()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Human.Abilities.PhoenixMorphingEggRelated, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Human.Abilities.PhoenixMorphingEggRelated, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
@@ -4930,7 +4930,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Runner()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.HarvestAhar, global::Moonwell.Objects.Human.Abilities.CallToArmsAmil, global::Moonwell.Objects.Human.Abilities.Repair, global::Moonwell.Objects.Human.Abilities.ImprovedLumberHarvestingImprovedLumberHarvestingAdvancedLumberHarvesting>();
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.HarvestAhar, global::Moonwell.Objects.Human.Abilities.CallToArmsAmil, global::Moonwell.Objects.Human.Abilities.Repair, global::Moonwell.Objects.Human.Abilities.ImprovedLumberHarvesting>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;

@@ -2627,7 +2627,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Archimonde()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory, global::Moonwell.Objects.Creeps.Abilities.SpellImmunitySpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
                     AcquisitionRange = 600f;
                     Agility = 17;
                     AgilityPerLevel = 3f;
@@ -17072,7 +17072,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public FountainOfPower()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.LifeRegenerationAura, global::Moonwell.Objects.Creeps.Abilities.ManaRegenerationLifeRegenerationAura, global::Moonwell.Objects.Other.Abilities.Invulnerable>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.LifeRegenerationAura, global::Moonwell.Objects.Creeps.Abilities.ManaRegeneration, global::Moonwell.Objects.Other.Abilities.Invulnerable>();
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
@@ -22798,7 +22798,7 @@ namespace Moonwell.Objects
                     TintingColor1Red = 255;
                     TintingColor2Green = 255;
                     TintingColor3Blue = 255;
-                    Tooltip = "Purchase Icy Treasure Box, Build Treasure Box";
+                    Tooltip = "Purchase Icy Treasure Box";
                     TooltipExtended = "A treasure lies frozen within.";
                     UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
                     UseClickHelper = false;
@@ -23333,7 +23333,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Demon Hunter (Morphed),  (Evil), Eevm.</summary>
+            /// <summary>Demon Hunter (Morphed), Eevm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Eevm")]
             public class IllidanEevm : global::Moonwell.Objects.StandardHero
@@ -23449,7 +23449,7 @@ namespace Moonwell.Objects
                     Model = "units\\nightelf\\EvilIllidan\\IllidanEvil";
                     ModelFileExtraVersions = 0;
                     Name = "Demon Hunter";
-                    NameEditorSuffix = "(Morphed),  (Evil)";
+                    NameEditorSuffix = "(Morphed)";
                     NormalSkin = "AInv,Ault,ANcl";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -28020,7 +28020,7 @@ namespace Moonwell.Objects
                     TintingColor1Red = 255;
                     TintingColor2Green = 255;
                     TintingColor3Blue = 255;
-                    Tooltip = "Purchase Magic Vault, Build Magic Vault";
+                    Tooltip = "Purchase Magic Vault";
                     TooltipExtended = "A secret lies within every box.";
                     UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
                     UseClickHelper = false;
@@ -32216,7 +32216,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Night Elf Fishing Village (ruined, two story), nvr0.</summary>
+            /// <summary>Night Elf Fishing Village (ruined, nvr0.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nvr0")]
             public class NightElfFishingVillageNvr0 : global::Moonwell.Objects.StandardUnit
@@ -32285,7 +32285,7 @@ namespace Moonwell.Objects
                     Model = "buildings\\other\\ElvenFishVillageBuildingRuined0\\ElvenFishVillageBuildingRuined0";
                     ModelFileExtraVersions = 0;
                     Name = "Night Elf Fishing Village";
-                    NameEditorSuffix = "(ruined, two story)";
+                    NameEditorSuffix = "(ruined";
                     NeutralBuildingShowsMinimapIcon = false;
                     OccluderHeight = 200f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -32332,7 +32332,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Night Elf Fishing Village (ruined, one story), nvr1.</summary>
+            /// <summary>Night Elf Fishing Village (ruined, nvr1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nvr1")]
             public class NightElfFishingVillageNvr1 : global::Moonwell.Objects.StandardUnit
@@ -32401,7 +32401,7 @@ namespace Moonwell.Objects
                     Model = "buildings\\other\\ElvenFishVillageBuildingRuined1\\ElvenFishVillageBuildingRuined1";
                     ModelFileExtraVersions = 0;
                     Name = "Night Elf Fishing Village";
-                    NameEditorSuffix = "(ruined, one story)";
+                    NameEditorSuffix = "(ruined";
                     NeutralBuildingShowsMinimapIcon = false;
                     OccluderHeight = 200f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -32448,7 +32448,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Night Elf Fishing Village (ruined, crested), nvr2.</summary>
+            /// <summary>Night Elf Fishing Village (ruined, nvr2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nvr2")]
             public class NightElfFishingVillageNvr2 : global::Moonwell.Objects.StandardUnit
@@ -32517,7 +32517,7 @@ namespace Moonwell.Objects
                     Model = "buildings\\other\\ElvenFishVillageBuildingRuined2\\ElvenFishVillageBuildingRuined2";
                     ModelFileExtraVersions = 0;
                     Name = "Night Elf Fishing Village";
-                    NameEditorSuffix = "(ruined, crested)";
+                    NameEditorSuffix = "(ruined";
                     NeutralBuildingShowsMinimapIcon = false;
                     OccluderHeight = 200f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -43180,7 +43180,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public TotemOfBattle()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.HealingWardAura, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.ItemTotemOgreMagiBloodlust>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.HealingWardAura, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.ItemTotemOgreMagiBloodlust>();
                     AcquisitionRange = 900f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;

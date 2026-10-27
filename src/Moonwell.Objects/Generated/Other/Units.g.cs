@@ -2576,7 +2576,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public FountainOfMana()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Invulnerable, global::Moonwell.Objects.Creeps.Abilities.ManaRegenerationLifeRegenerationAura>();
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Invulnerable, global::Moonwell.Objects.Creeps.Abilities.ManaRegeneration>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;

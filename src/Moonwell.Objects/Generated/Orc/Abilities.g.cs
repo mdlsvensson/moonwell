@@ -2749,13 +2749,13 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Pulverize,Pulverize (Awar).</summary>
+            /// <summary>Pulverize (Awar).</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Awar")]
-            public class PulverizePulverize : global::Moonwell.Objects.StandardAbility
+            public class Pulverize : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public PulverizePulverize()
+                public Pulverize()
                 {
                     AnimationNames = "slam";
                     ButtonPositionNormalX = 0;
@@ -2775,7 +2775,7 @@ namespace Moonwell.Objects
                     LevelCount = 2;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0, 0);
-                    Name = "Pulverize,Pulverize";
+                    Name = "Pulverize";
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Orc;
                     RequiredLevel = 0;
@@ -3853,13 +3853,13 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Spiked Barricades,Spiked Barricades,Improved Spiked Barricades (Icon), Aosp.</summary>
+            /// <summary>Spiked Barricades (Icon), Aosp.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aosp")]
-            public class SpikedBarricadesSpikedBarricadesImprovedSpikedBarricades : global::Moonwell.Objects.StandardAbility
+            public class SpikedBarricadesAosp : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public SpikedBarricadesSpikedBarricadesImprovedSpikedBarricades()
+                public SpikedBarricadesAosp()
                 {
                     ButtonPositionNormalX = 3;
                     ButtonPositionNormalY = 2;
@@ -3870,12 +3870,12 @@ namespace Moonwell.Objects
                     EditorSuffix = "(Icon)";
                     HeroAbility = false;
                     HeroDuration = Levels(0f);
-                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNSpikedBarricades.blp,ReplaceableTextures\\PassiveButtons\\PASBTNImprovedSpikedBarricades.blp,ReplaceableTextures\\PassiveButtons\\PASBTNAdvancedSpikedBarricades.blp";
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNSpikedBarricades.blp";
                     ItemAbility = false;
                     LevelCount = 2;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
-                    Name = "Spiked Barricades,Spiked Barricades,Improved Spiked Barricades";
+                    Name = "Spiked Barricades";
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Orc;
                     RequiredLevel = 0;

@@ -504,7 +504,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Infernal()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Other.Abilities.PermanentImmolation, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Other.Abilities.PermanentImmolation, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;

@@ -1860,13 +1860,13 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Improved Lumber Harvesting,Improved Lumber Harvesting,Advanced Lumber Harvesting (Icon), Ahlh.</summary>
+            /// <summary>Improved Lumber Harvesting (Icon), Ahlh.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Ahlh")]
-            public class ImprovedLumberHarvestingImprovedLumberHarvestingAdvancedLumberHarvesting : global::Moonwell.Objects.StandardAbility
+            public class ImprovedLumberHarvesting : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public ImprovedLumberHarvestingImprovedLumberHarvestingAdvancedLumberHarvesting()
+                public ImprovedLumberHarvesting()
                 {
                     ButtonPositionNormalX = 2;
                     ButtonPositionNormalY = 1;
@@ -1877,12 +1877,12 @@ namespace Moonwell.Objects
                     EditorSuffix = "(Icon)";
                     HeroAbility = false;
                     HeroDuration = Levels(0f);
-                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNHumanLumberUpgrade1.blp,ReplaceableTextures\\PassiveButtons\\PASBTNHumanLumberUpgrade2.blp";
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNHumanLumberUpgrade1.blp";
                     ItemAbility = false;
                     LevelCount = 2;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
-                    Name = "Improved Lumber Harvesting,Improved Lumber Harvesting,Advanced Lumber Harvesting";
+                    Name = "Improved Lumber Harvesting";
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Human;
                     RequiredLevel = 0;

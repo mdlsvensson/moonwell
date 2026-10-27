@@ -347,7 +347,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Animate Dead (Neutral Hostile), (Neutral Hostile), ACad.</summary>
+            /// <summary>Animate Dead (Neutral Hostile), ACad.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ACad")]
             public class AnimateDead : global::Moonwell.Objects.StandardAbility
@@ -363,7 +363,7 @@ namespace Moonwell.Objects
                     CheckDependencies = false;
                     Cooldown = Levels(180f);
                     Duration = Levels(40f);
-                    EditorSuffix = "(Neutral Hostile), (Neutral Hostile)";
+                    EditorSuffix = "(Neutral Hostile)";
                     HeroAbility = false;
                     HeroDuration = Levels(40f);
                     Hotkey = "D";
@@ -660,7 +660,7 @@ namespace Moonwell.Objects
                     Tooltip = Levels("Attribute Bonus - [|cffffcc00Level 1|r]", "Attribute Bonus - [|cffffcc00Level 2|r]");
                     TooltipExtended = Levels("Gives a total of <Aaml,DataA1> points to Agility, Intelligence, and Strength", "Gives a total of <Aaml,DataA2> points to Agility, Intelligence, and Strength");
                     TooltipLearn = "Learn Attribute Bonus - [|cffffcc00Level %d|r].";
-                    TooltipLearnExtended = "\"Gives a permanent bonus to Agility, Intelligence, and Strength. |n|n|cffffcc00Level 1|r - Grants <Aaml,DataA1> points to all stats.|n|cffffcc00Level 2|r - Grants an additional <Aaml,DataA1> points to all stats.";
+                    TooltipLearnExtended = "\"Gives a permanent bonus to Agility";
                     UseNewDefaultLevelCap = true;
                 }
 
@@ -1511,8 +1511,8 @@ namespace Moonwell.Objects
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Structure);
                     Tooltip = Levels("Breath of Fire - [|cffffcc00Level 1|r]", "Breath of Fire - [|cffffcc00Level 2|r]", "Breath of Fire - [|cffffcc00Level 3|r]");
                     TooltipExtended = Levels("Breathes a cone of fire at enemy units, dealing <ANbf,DataA1> initial damage. Units that have Drunken Haze on them will ignite and burn for <ANbf,DataE1> damage per second over <ANbf,Dur1> seconds.", "Breathes a cone of fire at enemy units, dealing <ANbf,DataA2> initial damage. Units that have Drunken Haze on them will ignite and burn for <ANbf,DataE2> damage per second over <ANbf,Dur2> seconds.", "Breathes a cone of fire at enemy units, dealing <ANbf,DataA3> initial damage. Units that have Drunken Haze on them will ignite and burn for <ANbf,DataE3> damage per second over <ANbf,Dur3> seconds.");
-                    TooltipLearn = "Learn Breath of Fire - [|cffffcc00Level %d|r],\"Learn Breath of Fire - [|cffffcc00Level %d|r]\"";
-                    TooltipLearnExtended = "\"Breathes a cone of fire at enemy units which deals damage. Units that have Drunken Haze on them will ignite and take burn damage over time. |nLasts <ANbf,Dur1> seconds. |n|n|cffffcc00Level 1|r - <ANbf,DataA1> initial damage, <ANbf,DataE1> damage per second. |n|cffffcc00Level 2|r - <ANbf,DataA2> initial damage, <ANbf,DataE2> damage per second. |n|cffffcc00Level 3|r - <ANbf,DataA3> initial damage, <ANbf,DataE3> damage per second.\",\"Breathes a cone of fire at enemy units, dealing initial damage, and then damage over time. |nLasts <ANbf,Dur1> seconds. |n|n|cffffcc00Level 1|r - <ANbf,DataA1> initial damage, <ANbf,DataE1> damage per second. |n|cffffcc00Level 2|r - <ANbf,DataA2> initial damage, <ANbf,DataE2> damage per second. |n|cffffcc00Level 3|r - <ANbf,DataA3> initial damage, <ANbf,DataE3> damage per second.\"";
+                    TooltipLearn = "Learn Breath of Fire - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Breathes a cone of fire at enemy units which deals damage. Units that have Drunken Haze on them will ignite and take burn damage over time. |nLasts <ANbf,Dur1> seconds. |n|n|cffffcc00Level 1|r - <ANbf,DataA1> initial damage, <ANbf,DataE1> damage per second. |n|cffffcc00Level 2|r - <ANbf,DataA2> initial damage, <ANbf,DataE2> damage per second. |n|cffffcc00Level 3|r - <ANbf,DataA3> initial damage, <ANbf,DataE3> damage per second.";
                     UseNewDefaultLevelCap = false;
                 }
 
@@ -10648,6 +10648,56 @@ namespace Moonwell.Objects
                 }
             }
 
+            /// <summary>Mana Regeneration (Neutral), ANre.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("ANre")]
+            public class ManaRegeneration : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ManaRegeneration()
+                {
+                    AmountRegenerated = Levels(0.01f);
+                    Area = Levels(500f);
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Neutral)";
+                    EffectSoundLooping = "FountainOfLifeLoop";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeal.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Mana Regeneration";
+                    Percentage = Levels(true);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Vulnerable);
+                    UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Arm1</c>.</summary>
+                [global::Moonwell.Objects.Field("Arm1", Label = "Amount Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> AmountRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "Arm1"); }
+                    protected set { Fields.Put("Arm1", value); }
+                }
+
+                /// <summary>The field <c>Arm2</c>.</summary>
+                [global::Moonwell.Objects.Field("Arm2", Label = "Percentage")]
+                public global::Moonwell.Objects.Levels<bool> Percentage
+                {
+                    get { return Fields.GetLevels<bool>(this, "Arm2"); }
+                    protected set { Fields.Put("Arm2", value); }
+                }
+            }
+
             /// <summary>Mana Regeneration Aura (Revival Altar), ADmr.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ADmr")]
@@ -10677,56 +10727,6 @@ namespace Moonwell.Objects
                     RequiredLevel = 0;
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
                     UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>Arm1</c>.</summary>
-                [global::Moonwell.Objects.Field("Arm1", Label = "Amount Regenerated")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> AmountRegenerated
-                {
-                    get { return Fields.GetLevels<float>(this, "Arm1"); }
-                    protected set { Fields.Put("Arm1", value); }
-                }
-
-                /// <summary>The field <c>Arm2</c>.</summary>
-                [global::Moonwell.Objects.Field("Arm2", Label = "Percentage")]
-                public global::Moonwell.Objects.Levels<bool> Percentage
-                {
-                    get { return Fields.GetLevels<bool>(this, "Arm2"); }
-                    protected set { Fields.Put("Arm2", value); }
-                }
-            }
-
-            /// <summary>Mana Regeneration, Life Regeneration Aura (Neutral), ANre.</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("ANre")]
-            public class ManaRegenerationLifeRegenerationAura : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public ManaRegenerationLifeRegenerationAura()
-                {
-                    AmountRegenerated = Levels(0.01f);
-                    Area = Levels(500f);
-                    CastTime = Levels(0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(0f);
-                    Duration = Levels(0f);
-                    EditorSuffix = "(Neutral)";
-                    EffectSoundLooping = "FountainOfLifeLoop";
-                    HeroAbility = false;
-                    HeroDuration = Levels(0f);
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeal.blp";
-                    ItemAbility = false;
-                    LevelCount = 1;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(0);
-                    Name = "Mana Regeneration, Life Regeneration Aura";
-                    Percentage = Levels(true);
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Creeps;
-                    RequiredLevel = 0;
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Vulnerable);
-                    UseNewDefaultLevelCap = false;
                 }
 
                 /// <summary>The field <c>Arm1</c>.</summary>
@@ -15647,13 +15647,97 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Spell Immunity (Neutral Hostile), ACmi.</summary>
+            /// <summary>Spell Immunity (Archimonde), ACm2.</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("ACmi")]
+            [global::Moonwell.Objects.Standard("ACm2")]
             public class SpellImmunity : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SpellImmunity()
+                {
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 1;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Archimonde)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNGenericSpellImmunity.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    MagicDamageFactor = Levels(0f);
+                    ManaCost = Levels(0);
+                    Name = "Spell Immunity";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Spell Immunity");
+                    TooltipExtended = Levels("Renders this unit immune to all spells.");
+                    UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>mim1</c>.</summary>
+                [global::Moonwell.Objects.Field("mim1", Label = "Magic Damage Factor")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<float> MagicDamageFactor
+                {
+                    get { return Fields.GetLevels<float>(this, "mim1"); }
+                    protected set { Fields.Put("mim1", value); }
+                }
+            }
+
+            /// <summary>Spell Immunity (Dragon), ACm3.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("ACm3")]
+            public class SpellImmunityACm3 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpellImmunityACm3()
+                {
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Dragon)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNGenericSpellImmunity.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    MagicDamageFactor = Levels(0f);
+                    ManaCost = Levels(0);
+                    Name = "Spell Immunity";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RequiredLevel = 0;
+                    Tooltip = Levels("Spell Immunity");
+                    TooltipExtended = Levels("Renders this unit immune to all spells.");
+                    UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>mim1</c>.</summary>
+                [global::Moonwell.Objects.Field("mim1", Label = "Magic Damage Factor")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<float> MagicDamageFactor
+                {
+                    get { return Fields.GetLevels<float>(this, "mim1"); }
+                    protected set { Fields.Put("mim1", value); }
+                }
+            }
+
+            /// <summary>Spell Immunity (Neutral Hostile), ACmi.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("ACmi")]
+            public class SpellImmunityACmi : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpellImmunityACmi()
                 {
                     ButtonPositionNormalX = 2;
                     ButtonPositionNormalY = 2;
@@ -15676,90 +15760,6 @@ namespace Moonwell.Objects
                     RequiredLevel = 0;
                     Tooltip = Levels("Spell Immunity");
                     TooltipExtended = Levels("Renders this unit immune to magic and most spells.");
-                    UseNewDefaultLevelCap = false;
-                }
-
-                /// <summary>The field <c>mim1</c>.</summary>
-                [global::Moonwell.Objects.Field("mim1", Label = "Magic Damage Factor")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<float> MagicDamageFactor
-                {
-                    get { return Fields.GetLevels<float>(this, "mim1"); }
-                    protected set { Fields.Put("mim1", value); }
-                }
-            }
-
-            /// <summary>Spell Immunity, Spell Immunity (Archimonde), ACm2.</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("ACm2")]
-            public class SpellImmunitySpellImmunity : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public SpellImmunitySpellImmunity()
-                {
-                    ButtonPositionNormalX = 1;
-                    ButtonPositionNormalY = 1;
-                    CastTime = Levels(0f);
-                    CheckDependencies = false;
-                    Cooldown = Levels(0f);
-                    Duration = Levels(0f);
-                    EditorSuffix = "(Archimonde)";
-                    HeroAbility = false;
-                    HeroDuration = Levels(0f);
-                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNGenericSpellImmunity.blp";
-                    ItemAbility = false;
-                    LevelCount = 1;
-                    LevelSkipRequirement = 0;
-                    MagicDamageFactor = Levels(0f);
-                    ManaCost = Levels(0);
-                    Name = "Spell Immunity, Spell Immunity";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Creeps;
-                    RequiredLevel = 0;
-                    Tooltip = Levels("Spell Immunity");
-                    TooltipExtended = Levels("Renders this unit immune to all spells.");
-                    UseNewDefaultLevelCap = false;
-                }
-
-                /// <summary>The field <c>mim1</c>.</summary>
-                [global::Moonwell.Objects.Field("mim1", Label = "Magic Damage Factor")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<float> MagicDamageFactor
-                {
-                    get { return Fields.GetLevels<float>(this, "mim1"); }
-                    protected set { Fields.Put("mim1", value); }
-                }
-            }
-
-            /// <summary>Spell Immunity, Spell Immunity (Dragon), ACm3.</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("ACm3")]
-            public class SpellImmunitySpellImmunityACm3 : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public SpellImmunitySpellImmunityACm3()
-                {
-                    ButtonPositionNormalX = 1;
-                    ButtonPositionNormalY = 2;
-                    CastTime = Levels(0f);
-                    CheckDependencies = false;
-                    Cooldown = Levels(0f);
-                    Duration = Levels(0f);
-                    EditorSuffix = "(Dragon)";
-                    HeroAbility = false;
-                    HeroDuration = Levels(0f);
-                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNGenericSpellImmunity.blp";
-                    ItemAbility = false;
-                    LevelCount = 1;
-                    LevelSkipRequirement = 0;
-                    MagicDamageFactor = Levels(0f);
-                    ManaCost = Levels(0);
-                    Name = "Spell Immunity, Spell Immunity";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Creeps;
-                    RequiredLevel = 0;
-                    Tooltip = Levels("Spell Immunity");
-                    TooltipExtended = Levels("Renders this unit immune to all spells.");
                     UseNewDefaultLevelCap = false;
                 }
 
@@ -16814,7 +16814,7 @@ namespace Moonwell.Objects
                     Tooltip = Levels("Summon Lava Spawn - [|cffffcc00Level 1|r]", "Summon Lava Spawn - [|cffffcc00Level 2|r]", "Summon Lava Spawn - [|cffffcc00Level 3|r]");
                     TooltipExtended = Levels("Summons a Lava Spawn, a resilient and deadly fire creature. As a Lava Spawn deals damage, it consumes the flesh of its target, thereby fueling its fires and eventually splitting into two healthy Lava Spawns.|n|nHas <nlv1,realHP> hit points and deals <nlv1,mindmg1> - <nlv1,maxdmg1> damage.|nLasts <ANlm,Dur1> seconds.|n|n|cffffcc00Attacks ground and air units.|r", "Summons a Lava Spawn, a resilient and deadly fire creature. As a Lava Spawn deals damage, it consumes the flesh of its target, thereby fueling its fires and eventually splitting into two healthy Lava Spawns.|n|nHas <nlv2,realHP> hit points and deals <nlv2,mindmg1> - <nlv2,maxdmg1> damage.|nLasts <ANlm,Dur2> seconds.|n|n|cffffcc00Attacks ground and air units.|r", "Summons a Lava Spawn, a resilient and deadly fire creature. As a Lava Spawn deals damage, it consumes the flesh of its target, thereby fueling its fires and eventually splitting into two healthy Lava Spawns.|n|nHas <nlv3,realHP> hit points and deals <nlv3,mindmg1> - <nlv3,maxdmg1> damage.|nLasts <ANlm,Dur3> seconds.|n|n|cffffcc00Attacks ground and air units.|r");
                     TooltipLearn = "Learn Summon Lava Spawn - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "\"Summons a Lava Spawn, a resilient and deadly fire creature. As a Lava Spawn deals damage, it consumes the flesh of its target, eventually splitting into two healthy Lava Spawns.|nLasts <ANlm,Dur1> seconds.|n|n|cffffcc00Level 1|r - <nlv1,realHP> hit points, <nlv1,mindmg1> - <nlv1,maxdmg1> damage.|n|cffffcc00Level 2|r - <nlv2,realHP> hit points, <nlv2,mindmg1> - <nlv2,maxdmg1> damage.|n|cffffcc00Level 3|r - <nlv3,realHP> hit points, <nlv3,mindmg1> - <nlv3,maxdmg1> damage.|n|n|cffffcc00Attacks ground and air units.|r";
+                    TooltipLearnExtended = "\"Summons a Lava Spawn";
                     UnitSkinList = "nlv1,nlv2,nlv3,nlv3";
                     UseNewDefaultLevelCap = false;
                 }
@@ -17877,7 +17877,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>War Stomp (Neutral Hostile 3), (Neutral Hostile), Awrg.</summary>
+            /// <summary>War Stomp (Neutral Hostile 3), Awrg.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Awrg")]
             public class WarStomp : global::Moonwell.Objects.StandardAbility
@@ -17896,7 +17896,7 @@ namespace Moonwell.Objects
                     Cooldown = Levels(6f);
                     Damage = Levels(25f);
                     Duration = Levels(3f);
-                    EditorSuffix = "(Neutral Hostile 3), (Neutral Hostile)";
+                    EditorSuffix = "(Neutral Hostile 3)";
                     HeroAbility = false;
                     HeroDuration = Levels(2f);
                     Hotkey = "T";
@@ -17946,7 +17946,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>War Stomp (Neutral Hostile 2), (Neutral Hostile), Awrh.</summary>
+            /// <summary>War Stomp (Neutral Hostile 2), Awrh.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Awrh")]
             public class WarStompAwrh : global::Moonwell.Objects.StandardAbility
@@ -17965,7 +17965,7 @@ namespace Moonwell.Objects
                     Cooldown = Levels(6f);
                     Damage = Levels(25f);
                     Duration = Levels(3f);
-                    EditorSuffix = "(Neutral Hostile 2), (Neutral Hostile)";
+                    EditorSuffix = "(Neutral Hostile 2)";
                     HeroAbility = false;
                     HeroDuration = Levels(2f);
                     Hotkey = "T";
@@ -18015,7 +18015,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>War Stomp (Neutral Hostile 1), (Neutral Hostile), Awrs.</summary>
+            /// <summary>War Stomp (Neutral Hostile 1), Awrs.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Awrs")]
             public class WarStompAwrs : global::Moonwell.Objects.StandardAbility
@@ -18034,7 +18034,7 @@ namespace Moonwell.Objects
                     Cooldown = Levels(6f);
                     Damage = Levels(25f);
                     Duration = Levels(3f);
-                    EditorSuffix = "(Neutral Hostile 1), (Neutral Hostile)";
+                    EditorSuffix = "(Neutral Hostile 1)";
                     HeroAbility = false;
                     HeroDuration = Levels(2f);
                     Hotkey = "T";
