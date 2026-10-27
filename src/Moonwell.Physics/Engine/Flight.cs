@@ -226,7 +226,7 @@ namespace Moonwell.Engine
             if (missile.followsGround)
             {
                 // It keeps its height above the ground, so it meets the ground only when it comes down onto it.
-                var ground = missile.groundZ;
+                var ground = Ground.Last(missile);
                 if (bottom > ground || rise >= 0.0f)
                 {
                     return false;
@@ -325,7 +325,7 @@ namespace Moonwell.Engine
                 // at the end of its move, on the ground there, coming back as fast as it left.
                 hitX = x;
                 hitY = y;
-                hitZ = missile.groundZ;
+                hitZ = Ground.Last(missile);
             }
 
             float nx;

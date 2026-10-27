@@ -606,6 +606,13 @@ namespace Moonwell.Engine
         /// <summary>Tells the package a thing was moved by code to a place, as a push does: when the thing is tracked, its entry takes the place for this step at once (so it is not read again until the next step) and its cell follows; a thing not tracked is passed over.</summary>
         public static void Moved(Actor thing, float x, float y)
         {
+            var unit = thing as Unit;
+            if (unit != null)
+            {
+                UnitMoved(unit, x, y);
+                return;
+            }
+
             var entry = EntryOf(thing);
             if (entry == null)
             {
@@ -614,15 +621,9 @@ namespace Moonwell.Engine
 
             entry.ReadStep = (cycle ?? Beat).StepNow;
             Interactions.Grid.Move(entry, x, y);
-            var unit = thing as Unit;
-            if (unit != null && Local.Depth == 0)
-            {
-                unit.lastX = x;
-                unit.lastY = y;
-            }
         }
 
-        /// <summary>Moved for a unit, as a push moves its unit every step: the same, with the entry looked up by the unit's handle as EntryOf does for a unit, and none of EntryOf's casts.</summary>
+        /// <summary>Moved for a unit, which a push calls for its unit every step: the entry is looked up by the unit's handle, as EntryOf does for a unit, with none of EntryOf's casts, and the unit's last place is kept too.</summary>
         public static void UnitMoved(Unit unit, float x, float y)
         {
             var handle = unit.Handle;

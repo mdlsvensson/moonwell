@@ -474,5 +474,76 @@ namespace Moonwell.Testing
             Expect.Equal(1, ball.Impacts, "one impact");
             Within((float)(int)ImpactKind.Ground, ball.Read[0], 0.0f, "with the ground");
         }
+
+        /// <summary>
+        /// A read put off is made, from the grid it was put off on, by whichever needs its height first. Three balls fly
+        /// along x at 900 over ground that climbs 3 every 128 along x, their bottoms at 314, above the 301 of their span (the
+        /// block's highest corner, 300, plus 1): the same ground under each, so their reads fall due on the same steps.
+        /// A plain one's read is put off, and the slack check of the next step, its bottom 13 above spanHigh and 315 above
+        /// spanLow, falls between the two and makes it. One with a shadow has it made by the shadow in that same step. One
+        /// turned to follow the ground has it made as the ground under it before its move.
+        /// </summary>
+        public static void PutOff(FakeWorld world)
+        {
+            var corners = "";
+            for (var row = 0; row < 8; row++)
+            {
+                for (var column = 0; column < 20; column++)
+                {
+                    corners = corners + GridText.Corner(column == 12 && row == 7 ? 300.0f : column * 3.0f, 2);
+                }
+            }
+
+            Fresh(20, 8, corners);
+            var plain = new Ball();
+            var shaded = new Ball();
+            var follower = new Ball();
+            var balls = new Ball[] { plain, shaded, follower };
+            for (var k = 0; k < balls.Length; k++)
+            {
+                balls[k].VX = 900.0f;
+                Missile.Create(balls[k], 200.0f, 192.0f + k * 256.0f, 330.0f);
+            }
+
+            var shadow = shaded.Add(new Shadow());
+            var steps = 0;
+            while (!plain.groundPending && steps < 16)
+            {
+                world.Advance(Interactions.Step);
+                steps++;
+            }
+
+            Expect.True(plain.groundPending, "the plain ball's read is put off within 16 steps; " + steps + " steps");
+            Expect.True(follower.groundPending, "and the follower's, on the same step");
+            Within(301.0f, plain.spanHigh, 0.0f, "the span's high is the block's highest corner plus 1");
+            Within(-1.0f, plain.spanLow, 0.0f, "its low the lowest less 1");
+
+            // The shadow made its ball's read in the step it was put off, at the ball's place.
+            Expect.True(!shaded.groundPending && shaded.groundRead, "the shadow made its ball's read");
+            Expect.True(shaded.groundX == shaded.X && shaded.groundY == shaded.Y, "at the ball's place");
+            Expect.True(shaded.groundZ == Terrain.Height(shaded.X, shaded.Y), "the read is the ground there: " + shaded.groundZ);
+            Expect.True(shadow.groundZ == shaded.groundZ, "and the shadow has it");
+
+            // The follower's ground before its move is the put-off read, at its place.
+            follower.FollowsGround = true;
+            var fromX = follower.X;
+            var fromZ = follower.Z;
+            var stale = follower.groundZ;
+            var below = Terrain.Height(fromX, follower.Y);
+            Expect.True(stale != below, "the field still holds an older read, so a stale one would show");
+            var plainX = plain.groundX;
+            var plainY = plain.groundY;
+            world.Advance(Interactions.Step);
+            var toX = fromX + 900.0f * Interactions.Step;
+            Within(toX, follower.X, 0.001f, "the follower moved along x");
+            Within(Terrain.Height(toX, follower.Y) + fromZ - below, follower.Z, 0.001f, "kept its height above the ground, from the put-off read");
+            Expect.True(!follower.groundPending && follower.groundZ == Terrain.Height(follower.X, follower.Y), "and read the ground where it is");
+
+            // The plain ball's slack check made its read: where it was put off, as the ground there.
+            Expect.True(!plain.groundPending, "the slack check made the plain ball's read");
+            Expect.True(plain.groundX == plainX && plain.groundY == plainY, "at the place it was put off");
+            Expect.True(plain.groundZ == Terrain.Height(plainX, plainY), "as the ground there: " + plain.groundZ);
+            Expect.True(!plain.HasEnded && plain.Z == 330.0f && plain.Impacts == 0, "and it flies on, level");
+        }
     }
 }

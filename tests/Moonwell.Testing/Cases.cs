@@ -184,6 +184,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "ground.wake-moved", Run = GroundCases.WakeMoved });
             list.Add(new Case { Name = "ground.fast-ridge", Run = GroundCases.FastRidge });
             list.Add(new Case { Name = "ground.cliff-roll", Run = GroundCases.CliffRoll });
+            list.Add(new Case { Name = "ground.put-off", Run = GroundCases.PutOff });
             list.Add(new Case { Name = "homing.turn-rate", Run = ComponentCases.TurnRate });
             list.Add(new Case { Name = "homing.circle", Run = ComponentCases.Circle });
             list.Add(new Case { Name = "homing.lost", Run = ComponentCases.Lost });
@@ -330,6 +331,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "terrain.grid.blocks", Run = GridCases.Blocks });
             list.Add(new Case { Name = "terrain.grid.many-blocks", Run = GridCases.ManyBlocks });
             list.Add(new Case { Name = "terrain.grid.alphabet", Run = GridCases.Alphabet });
+            list.Add(new Case { Name = "terrain.grid.span", Run = GridCases.Span });
             list.Add(new Case { Name = "terrain.height.corners", Run = HeightCases.Corners });
             list.Add(new Case { Name = "terrain.height.blend", Run = HeightCases.Blend });
             list.Add(new Case { Name = "terrain.height.clamped", Run = HeightCases.Clamped });
