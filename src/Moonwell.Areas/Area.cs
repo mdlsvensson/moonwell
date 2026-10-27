@@ -19,7 +19,10 @@ namespace Moonwell
     /// <c>OnUnitStays</c>, runs only while an area with a <c>Tick</c> has a unit inside. Adding an area lists every unit of
     /// every player once, three natives each, to find those already inside: on a map of thousands of units, an area made
     /// at each cast pays that at each cast. Add it in the map's <c>Components</c> or with <c>Game.Instance.Add</c>; ending it
-    /// lets every unit inside leave.
+    /// lets every unit inside leave. What a reaction makes that has an owner (a timer, an interaction) belongs to the area
+    /// (decision 11) and ends when the area ends, so one made in <c>OnUnitLeft</c> while the area ends is ended at once; a
+    /// buff or component added to a unit is the unit's (decision 65). Make it inside <c>Game.Instance.Run</c> to outlive the
+    /// area.
     /// </summary>
     public abstract class Area : GameComponent
     {
@@ -142,7 +145,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs once when a unit that entered goes out, dies, is hidden or loaded, ends, or the area ends. A unit that dies and is brought back to life inside enters again (<c>OnUnitEntered</c>). The unit is no longer inside here.</summary>
+        /// <summary>Runs once when a unit that entered goes out, dies, is hidden or loaded, ends, is refused at the place check, or the area ends. A unit that dies and is brought back to life inside enters again (<c>OnUnitEntered</c>). The unit is no longer inside here. When the area ends, a timer made here is the area's and is ended at once; a buff or component added to the unit is the unit's.</summary>
         /// <param name="leavingUnit">The unit that left.</param>
         public virtual void OnUnitLeft(Unit leavingUnit)
         {

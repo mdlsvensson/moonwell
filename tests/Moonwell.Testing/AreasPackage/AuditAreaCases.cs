@@ -389,6 +389,32 @@ namespace Moonwell.Testing
             Expect.True(!AreaTracker.Running, "the corpses out of the region are forgotten, and the timer stopped");
         }
 
+        /// <summary>What OnUnitLeft makes while its area ends: a timer belongs to the area and ends at once (decision 11); a component added to the unit is the unit's (decision 65) and stays; a timer made under Game.Instance.Run outlives the area.</summary>
+        public static void LeftWhileEnding(FakeWorld world)
+        {
+            var fake = Fresh();
+            var area = Added(world, new LogArea(Square()));
+            var unit = Labelled(world, area, "a");
+            fake.Walk(unit.Handle, 10f, 10f);
+            Timer? own = null;
+            Timer? kept = null;
+            Tally? tally = null;
+            var fired = 0;
+            area.WhenLeft = u =>
+            {
+                own = Timer.After(1f, () => fired++);
+                Game.Instance.Run(() => kept = Timer.After(1f, () => fired += 10));
+                tally = u.Add(new Tally());
+            };
+            area.End();
+            ExpectLog(area, new[] { "entered a", "left a" }, "it left as the area ended");
+            Expect.True(own!.HasEnded, "the area's timer ended with it");
+            Expect.True(!kept!.HasEnded, "the game's did not");
+            Expect.True(!tally!.HasEnded && unit.Has<Tally>(), "the component is the unit's");
+            world.Advance(1f);
+            Expect.Equal(10, fired, "only the game's timer fired");
+        }
+
         /// <summary>A map's area with fields of its own named as Area's keeps them apart from the base's: the area enters, stays and leaves its unit, and its own fields keep their values. CSharp.lua gives the subclass's fields names of their own (inside1), as it sees Area's private ones in the same compile.</summary>
         public static void ShadowedFields(FakeWorld world)
         {
