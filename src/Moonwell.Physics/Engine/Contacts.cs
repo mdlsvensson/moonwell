@@ -2061,6 +2061,12 @@ namespace Moonwell.Engine
     /// <summary>A missile's checks against units: the package starts it on a missile whose UnitContact is not None.</summary>
     internal sealed class UnitContacts : Interaction<Missile, Unit>
     {
+        /// <summary>Makes the checks; every unit is accepted, so a pair is not asked again before each tick (a guarded call per pair, every step).</summary>
+        public UnitContacts()
+        {
+            RecheckAccepts = false;
+        }
+
         /// <summary>Keeps what the pair needs: the unit's radius.</summary>
         public override void OnMeet(Pair pair)
         {
@@ -2086,6 +2092,12 @@ namespace Moonwell.Engine
     /// <summary>A missile's checks against destructables: the package starts it on a missile whose DestructableContact is not None. A placed bridge is not one of them: its deck is its shape, met as the ground.</summary>
     internal sealed class DestructableContacts : Interaction<Missile, Destructable>
     {
+        /// <summary>Makes the checks; whether a destructable is a placed bridge does not change, so a pair is not asked again before each tick (a guarded call per pair, every step).</summary>
+        public DestructableContacts()
+        {
+            RecheckAccepts = false;
+        }
+
         /// <summary>Refuses a placed bridge, which is ground where its deck is, not an upright cylinder.</summary>
         public override bool Accepts(Destructable other)
         {
@@ -2117,6 +2129,12 @@ namespace Moonwell.Engine
     /// <summary>A missile's checks against items on the ground: the package starts it on a missile whose ItemContact is not None.</summary>
     internal sealed class ItemContacts : Interaction<Missile, Item>
     {
+        /// <summary>Makes the checks; every item is accepted, so a pair is not asked again before each tick (a guarded call per pair, every step).</summary>
+        public ItemContacts()
+        {
+            RecheckAccepts = false;
+        }
+
         /// <summary>Keeps what the pair needs: the item's size.</summary>
         public override void OnMeet(Pair pair)
         {
@@ -2142,6 +2160,12 @@ namespace Moonwell.Engine
     /// <summary>A missile's checks against other missiles: the package starts it on a missile whose MissileContact is not None. Of two missiles, the one made first checks the pair.</summary>
     internal sealed class MissileContacts : Interaction<Missile, Missile>
     {
+        /// <summary>Makes the checks; every missile is accepted, so a pair is not asked again before each tick (a guarded call per pair, every step).</summary>
+        public MissileContacts()
+        {
+            RecheckAccepts = false;
+        }
+
         /// <summary>Keeps what the pair needs: the one state the two missiles keep of each other, shared with the other side's pair.</summary>
         public override void OnMeet(Pair pair)
         {
