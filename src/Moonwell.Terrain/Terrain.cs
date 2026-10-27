@@ -118,7 +118,9 @@ namespace Moonwell
         /// <summary>
         /// Whether units can walk at a point, as the map's terrain says: cliffs, deep water and the like, not trees,
         /// buildings or units. A point outside the map reads the edge. Read a cell at a time, once, and kept until
-        /// <c>Refresh</c>. On a bridge it reads false, as the water beneath does.
+        /// <c>Refresh</c>. Under a bridge it reads what the map's pathing file holds there: World Editor writes a placed
+        /// bridge's footprint walkable, so its deck reads true; under a bridge made at runtime, or in a map whose pathing
+        /// file a tool wrote, it reads the water or ground beneath (false over deep water).
         /// </summary>
         [LocalSafe]
         public static bool IsWalkable(float x, float y)

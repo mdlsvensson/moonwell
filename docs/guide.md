@@ -392,7 +392,9 @@ if (Terrain.Raycast(from, to, out var hit)) { /* the missile meets the ground at
 - Pathing is read from the game a block of 16 by 16 cells of 32 at a time, the first time a cell in it is asked for
   (1,024 reads, about 0.3 ms), and kept: all of the largest map is about 8 MB of Lua's memory in the test host's Lua
   (not measured in the game).
-- On a bridge, `Height` reads the water or ground beneath, and `IsWalkable` and `CanStand` read false.
+- On a bridge, `Height` reads the water or ground beneath, and `CanStand` reads false. `IsWalkable` reads the map's
+  pathing file, which World Editor writes walkable under a placed bridge's deck; under a bridge made at runtime, or in
+  a map whose pathing file a tool wrote, it reads the water or ground beneath.
 - `Terrain.Raycast(from, to, out hit)` is for a missile against the ground; a ridge narrower than 32 can be stepped over.
   As with the maths raycasts, a missile goes on when its step moves on after a hit for the rest of its time. Only the
   part of a ray over the map is cast: past the map's edge it meets nothing, and a long ray reads the ground at most
@@ -524,8 +526,11 @@ target.Knockback(caster.AngleTo(target), 300f, 0.5f); // 300 away over half a se
 - **Bridges**: placed bridges are ground, for missiles landing (from above: one below a deck flies under it) and units
   standing, until the bridge dies (brought back to life, it is not ground again); missiles do not meet it as a
   destructable. A deck stands on the ground beneath any water at its bridge's place, as in the game; the build writes
-  that ground, which `Terrain.Height` does not read (it reads the water's surface). A bridge made by code is not ground, nor a type with no deck Moonwell knows (an ice floe, or the map's
-  own type with its model changed): the build warns of it.
+  that ground, which `Terrain.Height` does not read (it reads the water's surface). A bridge made by code is not
+  ground, nor a type with no deck Moonwell knows (an ice floe, or the map's own type with its model changed): the build
+  warns of it. A pushed unit uses the deck, whatever the pathing under it; the game's own pathing (move orders) walks a
+  deck only where the map's pathing file says so, which World Editor writes for a placed bridge, but not for a bridge
+  made at runtime or in a map whose pathing file a tool wrote.
 - Everything runs on every machine. Reads are safe in `Local.For`; firing, pushing and every set are not.
 - In the debug mode, a selected missile's panel shows its speed, velocity and radius, and a pushed unit's its push;
   `-stats` counts the missiles (and how many rest) and the pushed units.
