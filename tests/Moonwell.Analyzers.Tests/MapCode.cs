@@ -24,10 +24,10 @@ internal static class MapCode
         return Found(Analyze(Wrap(body, members)));
     }
 
-    /// <summary>The analyzer's diagnostics for a whole file, in source order, each as "id: the code it points at".</summary>
-    public static List<string> CheckFile(string source)
+    /// <summary>The analyzer's diagnostics for a whole file, in source order, each as "id: the code it points at"; path names the file.</summary>
+    public static List<string> CheckFile(string source, string path = "")
     {
-        return Found(Analyze(source));
+        return Found(Analyze(source, path: path));
     }
 
     /// <summary>The id analyzer's diagnostics for a whole file, in source order, each as "id: the code it points at".</summary>
@@ -111,9 +111,9 @@ internal static class MapCode
         return System.Reflection.Assembly.Load(stream.ToArray());
     }
 
-    private static (SyntaxTree Tree, CSharpCompilation Compilation) Compile(string source, bool broken = false)
+    private static (SyntaxTree Tree, CSharpCompilation Compilation) Compile(string source, bool broken = false, string path = "")
     {
-        var tree = CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.Latest));
+        var tree = CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.Latest), path);
         var compilation = CSharpCompilation.Create("Map" + Guid.NewGuid().ToString("N"), new[] { tree }, References,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));
         var errors = compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
@@ -122,9 +122,9 @@ internal static class MapCode
     }
 
     // Every analyzer but the id analyzer, unless the caller names them: the other tests' classes have no ids.
-    private static (SyntaxTree Tree, ImmutableArray<Diagnostic> Diagnostics) Analyze(string source, bool broken = false, ImmutableArray<DiagnosticAnalyzer>? analyzers = null)
+    private static (SyntaxTree Tree, ImmutableArray<Diagnostic> Diagnostics) Analyze(string source, bool broken = false, ImmutableArray<DiagnosticAnalyzer>? analyzers = null, string path = "")
     {
-        var (tree, compilation) = Compile(source, broken);
+        var (tree, compilation) = Compile(source, broken, path);
         analyzers ??= ImmutableArray.Create<DiagnosticAnalyzer>(new SyncAnalyzer(), new LuaAnalyzer(), new SyntaxAnalyzer(), new FieldRulesAnalyzer(), new MovedAnalyzer(), new DeclaredAnalyzer(), new ReactionAnalyzer());
         return (tree, compilation.WithAnalyzers(analyzers.Value).GetAnalyzerDiagnosticsAsync().Result);
     }

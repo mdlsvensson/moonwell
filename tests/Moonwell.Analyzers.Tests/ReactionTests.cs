@@ -225,4 +225,107 @@ public class ReactionTests
             }
             """));
     }
+
+    [Fact]
+    public void a_mouse_reaction_the_input_package_never_calls_is_an_error()
+    {
+        Assert.Equal(new[]
+        {
+            "MW0036: IMouseWatch",
+            "MW0036: OnMousePressed",
+            "MW0036: OnMousePressed",
+            "MW0036: OnMouseReleased",
+            "MW0036: OnMouseMove",
+            "MW0036: OnMouseMoved",
+        }, MapCode.CheckFile("""
+            using Moonwell;
+
+            namespace Map
+            {
+                public class Aim : UnitComponent, IMouseWatch
+                {
+                    public void OnMousePressed(Mouse mouse, MouseButton button) { }
+                }
+
+                public class Explicit : PlayerComponent, IMouseWatch
+                {
+                    void IMouseWatch.OnMousePressed(Mouse mouse, MouseButton button) { }
+                }
+
+                public class NoButton : PlayerComponent, IMouseWatch
+                {
+                    public void OnMousePressed(Mouse mouse) { }
+
+                    void OnMouseReleased(Mouse mouse, MouseButton button) { }
+                }
+
+                public class Typo : GameComponent, IMouseWatch
+                {
+                    public void OnMouseMove(Mouse mouse) { }
+                }
+
+                public class Forgot : GameComponent
+                {
+                    public void OnMouseMoved(Mouse mouse) { }
+                }
+            }
+            """));
+    }
+
+    [Fact]
+    public void a_mouse_reaction_message_says_what_to_write()
+    {
+        Assert.Equal(new[]
+        {
+            "'IMouseWatch' on this class never runs: the input package calls IMouseWatch only on the game's and players' components",
+            "'OnMousePressed' runs in the game's Lua but not on .NET, where the input package calls only public methods; write it as public void OnMousePressed(...)",
+            "'OnMouseReleased' is not called on .NET, while the game's Lua calls it by its name, so the two disagree: a reaction of IMouseWatch is public, not static, and takes (Mouse, MouseButton)",
+        }, MapCode.MessagesOfFile("""
+            using Moonwell;
+
+            namespace Map
+            {
+                public class Aim : UnitComponent, IMouseWatch
+                {
+                }
+
+                public class Explicit : PlayerComponent, IMouseWatch
+                {
+                    void IMouseWatch.OnMousePressed(Mouse mouse, MouseButton button) { }
+                }
+
+                public class NoButton : PlayerComponent, IMouseWatch
+                {
+                    public void OnMouseReleased(Mouse mouse) { }
+                }
+            }
+            """));
+    }
+
+    [Fact]
+    public void right_mouse_reactions_and_helpers_pass()
+    {
+        Assert.Empty(MapCode.CheckFile("""
+            using Moonwell;
+
+            namespace Map
+            {
+                public sealed class Aim : PlayerComponent, IMouseWatch
+                {
+                    public void OnMousePressed(Mouse mouse, MouseButton button) { }
+
+                    public void OnMouseMoved(Mouse mouse) { }
+
+                    public void Aiming(Mouse mouse) { }
+
+                    private void OnAim(Mouse mouse) { }
+                }
+
+                public sealed class Everyone : GameComponent, IMouseWatch
+                {
+                    public void OnMouseReleased(Mouse mouse, MouseButton button) { }
+                }
+            }
+            """));
+    }
 }
