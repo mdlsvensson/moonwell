@@ -63,6 +63,9 @@ public class SyntaxTests
     [InlineData("MW0028", "char c = 'a'; var s = string.Format(\"{0}\", c);", "c")]
     [InlineData("MW0028", "var c = Color.Green; Console.WriteLine(c);", "c")]
     [InlineData("MW0028", "var sb = new System.Text.StringBuilder(); sb.Append((object)Color.Green);", "Color.Green")]
+    [InlineData("MW0028", "char c = 'a'; var e = Color.Green; var s = string.Join(\",\", c, e);", "c")]
+    [InlineData("MW0028", "char c = 'a'; var e = Color.Green; var s = string.Join(\",\", c, e);", "e")]
+    [InlineData("MW0028", "char c = 'a'; var s = string.Format(\"{0}{1}{2}{3}\", c, 1, 2, 3);", "c")]
     // MW0029: catch
     [InlineData("MW0029", "try { } catch (NullReferenceException) { }", "NullReferenceException")]
     [InlineData("MW0029", "try { } catch (IndexOutOfRangeException) { }", "IndexOutOfRangeException")]

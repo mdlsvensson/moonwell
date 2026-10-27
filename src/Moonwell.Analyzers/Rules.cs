@@ -289,7 +289,7 @@ public static class Rules
         "MW0028",
         "char or enum given to an object parameter",
         "'{0}' {1}",
-        "A char or an enum given to a library method's object parameter (string.Format, string.Concat, Console.WriteLine(object), StringBuilder.Append(object)) is shown as its number in the game's Lua. Joined with + or put in an interpolation hole it is right. Enums of Moonwell.Objects are MW0010.");
+        "A char or an enum given to a library method's object parameter (string.Format, string.Concat, string.Join, Console.WriteLine(object), StringBuilder.Append(object)), also through .NET 9's params ReadOnlySpan<object?> overloads, is shown as its number in the game's Lua. Joined with + or put in an interpolation hole it is right. Enums of Moonwell.Objects are MW0010.");
 
     public static readonly DiagnosticDescriptor CatchForm = Syntax(
         "MW0029",

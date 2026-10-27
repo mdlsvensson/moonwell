@@ -639,7 +639,7 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
 
         // Only the library methods that make the text: an argument of a method that is not the map's own.
         var up = conversion.Parent;
-        while (up is IArrayInitializerOperation or IArrayCreationOperation)
+        while (up is IArrayInitializerOperation or IArrayCreationOperation or ICollectionExpressionOperation)
         {
             up = up.Parent;
         }

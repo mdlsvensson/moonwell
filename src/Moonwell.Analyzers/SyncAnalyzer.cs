@@ -315,7 +315,7 @@ public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
         private static bool WritesText(IConversionOperation conversion)
         {
             var up = conversion.Parent;
-            while (up is IArrayInitializerOperation or IArrayCreationOperation)
+            while (up is IArrayInitializerOperation or IArrayCreationOperation or ICollectionExpressionOperation)
             {
                 up = up.Parent;
             }
