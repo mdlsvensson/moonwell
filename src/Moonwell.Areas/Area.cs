@@ -11,8 +11,10 @@ namespace Moonwell
     /// traps: the game sees the area in whole 32 by 32 cells, so <c>Contains</c> (the true shape) and the area can
     /// disagree within a cell of an edge; and the game sends no event for a unit hidden, shown, loaded or unloaded, so
     /// the package checks those on its own timer every quarter of a second, and such a unit leaves and enters up to
-    /// 0.25 seconds late. A unit that stays hidden or loaded inside an area, and a dead one (which leaves when it dies, and
-    /// enters again if something brings it back to life there, a hero's revive or a Resurrection), keeps the package's
+    /// 0.25 seconds late. At the same check the area asks <c>Accepts</c> again for each unit inside and each unit in it
+    /// that was refused, unless <c>RecheckAccepts</c> is off: a no makes a unit leave, a yes lets one enter (decision 75).
+    /// A unit that stays hidden or loaded inside an area, a dead one (which leaves when it dies, and enters again if
+    /// something brings it back to life there, a hero's revive or a Resurrection), and a refused one, keeps the package's
     /// timer stepping (about 0.3 ms a second) until it leaves, decays or is removed, or the area ends. Add it in the map's <c>Components</c> or with
     /// <c>Game.Instance.Add</c>; ending it lets every unit inside leave.
     /// </summary>
@@ -42,13 +44,16 @@ namespace Moonwell
         /// <summary>The units that left because they have no place (hidden, loaded or dead), in the order they left: the place check enters them again once they have a place and are inside the region.</summary>
         private readonly List<Unit> away = new List<Unit>();
 
+        /// <summary>The units in the region that Accepts refused, in the order refused: while RecheckAccepts, the place check asks again for each that has a place, and a yes enters it. A unit that leaves the region, or ends, is forgotten.</summary>
+        private readonly OrderedSet<Unit> refused = new OrderedSet<Unit>();
+
         /// <summary>How many package steps a Tick is, worked out when the area is added; 0 for none.</summary>
         internal int tickSteps;
 
         /// <summary>The package step the area's first unit entered at; its OnUnitStays are due a Tick of steps after it, and again at every Tick.</summary>
         internal int startStep;
 
-        /// <summary>Whether the area counts for the package timer: it has a unit inside, or one away.</summary>
+        /// <summary>Whether the area counts for the package timer: it has a unit inside, one away, or one refused.</summary>
         private bool active;
 
         /// <summary>The shape of the area. Set it in the constructor; it is fixed once the area is added, and an area added without one is reported as an error and watches nothing.</summary>
@@ -102,7 +107,17 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Whether a unit that comes inside enters: false and it does not (and is asked again the next time it comes inside). True here.</summary>
+        /// <summary>
+        /// Whether the area asks <c>Accepts</c> again at its place check, every quarter of a second (decision 75): for each
+        /// unit inside, which leaves (<c>OnUnitLeft</c>) at a no, and for each unit in the area that it refused, which
+        /// enters (<c>OnUnitEntered</c>) at a yes. True unless set; set it to false in the constructor to save the calls when
+        /// the answer for a unit never changes, and a unit is then asked only as it comes inside. A change takes effect at
+        /// the next check.
+        /// </summary>
+        [LocalSafe]
+        public bool RecheckAccepts { get; protected set; } = true;
+
+        /// <summary>Whether a unit that comes inside enters, and while <c>RecheckAccepts</c> (the default) whether it may stay: the place check asks again every quarter of a second, for each unit inside (a no makes it leave, with <c>OnUnitLeft</c>) and each unit in the area that was refused (a yes lets it enter). With <c>RecheckAccepts</c> off, a refused unit is asked again only the next time it comes inside. True here.</summary>
         /// <param name="unit">The unit that came inside.</param>
         public virtual bool Accepts(Unit unit)
         {
@@ -214,6 +229,7 @@ namespace Moonwell
             }
 
             away.Clear();
+            refused.Clear();
             var leaving = new List<Unit>(inside);
             for (var i = 0; i < leaving.Count; i++)
             {
@@ -320,6 +336,11 @@ namespace Moonwell
             if (!CallAccepts(unit))
             {
                 away.Remove(unit);
+                if (RecheckAccepts && !stopped && !since.ContainsKey(unit) && !unit.HasEnded && !unit.ending)
+                {
+                    refused.Add(unit);
+                }
+
                 Refresh();
                 return false;
             }
@@ -332,6 +353,7 @@ namespace Moonwell
             since[unit] = Runtime.World.Now();
             inside.Add(unit);
             away.Remove(unit);
+            refused.Remove(unit);
             Refresh();
             if (inside.Count == 1)
             {
@@ -342,10 +364,11 @@ namespace Moonwell
             return true;
         }
 
-        /// <summary>Takes a unit out, whatever the reason (it left, died, ended, or has no place), and forgets it was away; OnUnitLeft runs if it was inside.</summary>
+        /// <summary>Takes a unit out, whatever the reason (it left the region, or ended), and forgets it was away or refused; OnUnitLeft runs if it was inside.</summary>
         internal void Drop(Unit unit)
         {
             away.Remove(unit);
+            refused.Remove(unit);
             Exit(unit);
             Refresh();
         }
@@ -386,7 +409,12 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The place check: takes out each unit that has no place, to enter again, and enters the ones away that have a place and are inside the region.</summary>
+        /// <summary>
+        /// The place check: takes out each unit that has no place, to enter again, and, while RecheckAccepts, each that
+        /// Accepts now refuses; enters the ones away that have a place and are inside the region; and, while
+        /// RecheckAccepts, asks again for the units refused before this check that have a place and are still in the
+        /// region, forgetting those that are not. A unit refused at this check is asked again at the next.
+        /// </summary>
         internal void CheckPlaces()
         {
             if (stopped)
@@ -395,6 +423,13 @@ namespace Moonwell
             }
 
             var world = tracker!.World;
+            var recheck = RecheckAccepts;
+            if (!recheck)
+            {
+                refused.Clear();
+            }
+
+            var again = refused.Snapshot();
             var present = new List<Unit>(inside);
             for (var i = 0; i < present.Count; i++)
             {
@@ -404,10 +439,28 @@ namespace Moonwell
                 }
 
                 var unit = present[i];
-                if (since.ContainsKey(unit) && !world.HasPlace(unit.Handle))
+                if (!since.ContainsKey(unit))
+                {
+                    continue;
+                }
+
+                if (!world.HasPlace(unit.Handle))
                 {
                     away.Add(unit);
                     Exit(unit);
+                }
+                else if (recheck && !CallAccepts(unit))
+                {
+                    if (stopped)
+                    {
+                        return;
+                    }
+
+                    if (since.ContainsKey(unit) && !unit.HasEnded && !unit.ending)
+                    {
+                        refused.Add(unit);
+                        Exit(unit);
+                    }
                 }
             }
 
@@ -441,6 +494,30 @@ namespace Moonwell
                 {
                     // A corpse that is no longer in the region is forgotten.
                     away.Remove(unit);
+                }
+            }
+
+            for (var i = 0; i < again.Count; i++)
+            {
+                if (stopped)
+                {
+                    return;
+                }
+
+                var unit = again[i];
+                if (!refused.Contains(unit))
+                {
+                    continue;
+                }
+
+                if (unit.HasEnded || unit.ending || !world.IsInside(handle!, unit.Handle))
+                {
+                    refused.Remove(unit);
+                }
+                else if (world.HasPlace(unit.Handle))
+                {
+                    // A yes enters it; a no keeps it among the refused.
+                    TryEnter(unit);
                 }
             }
 
@@ -492,7 +569,7 @@ namespace Moonwell
         /// <summary>Tells the tracker when the area starts or stops counting for the package timer: it has a unit inside or away.</summary>
         private void Refresh()
         {
-            var now = inside.Count > 0 || away.Count > 0;
+            var now = inside.Count > 0 || away.Count > 0 || refused.Count > 0;
             if (now != active)
             {
                 active = now;

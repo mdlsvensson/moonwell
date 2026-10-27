@@ -174,6 +174,136 @@ namespace Moonwell.Testing
             Expect.True(!fake.Covers(line, 63.9f, 10f) && !fake.Covers(line, 96f, 10f) && !fake.Covers(line, 64f, 64f), "and no others");
         }
 
+        /// <summary>A rect from (0, 0) to (256, 256).</summary>
+        private static AreaShape Square()
+        {
+            return AreaShape.Rect(new Bounds(new Vector2(0f, 0f), new Vector2(256f, 256f)));
+        }
+
+        /// <summary>Decision 75: a unit inside that Accepts now refuses leaves at the next quarter-second check, with OnUnitLeft, and enters again at the first check after a yes; nothing happens between checks.</summary>
+        public static void RecheckLeavesAndEnters(FakeWorld world)
+        {
+            var fake = Fresh();
+            var area = Added(world, new LogArea(Square()));
+            var unit = Labelled(world, area, "a");
+            var allowed = true;
+            area.Accept = u => allowed;
+            fake.Walk(unit.Handle, 10f, 10f);
+            ExpectLog(area, new[] { "entered a" }, "entered");
+            allowed = false;
+            world.Advance(0.21875f);
+            ExpectLog(area, new[] { "entered a" }, "nothing before the check");
+            world.Advance(0.03125f);
+            ExpectLog(area, new[] { "entered a", "left a" }, "a no at the check: it leaves");
+            Expect.True(!area.Has(unit) && area.Units.Count == 0, "it is not inside");
+            Expect.True(AreaTracker.Running, "a refused unit in the area keeps the check running");
+            world.Advance(0.5f);
+            Expect.Equal(2, area.Log.Count, "nothing while the answer is no");
+            allowed = true;
+            world.Advance(0.25f);
+            ExpectLog(area, new[] { "entered a", "left a", "entered a" }, "a yes at a later check: it enters again");
+            Expect.True(area.Has(unit), "inside again");
+            fake.Walk(unit.Handle, 900f, 900f);
+            ExpectLog(area, new[] { "entered a", "left a", "entered a", "left a" }, "it walks out");
+            Expect.True(!AreaTracker.Running, "nothing inside or refused: the timer stopped");
+        }
+
+        /// <summary>A unit Accepts refused as it came inside is asked again at each check while it is in the area, and enters at the first yes; once inside it is asked at each check too.</summary>
+        public static void RecheckRefusedAtEntry(FakeWorld world)
+        {
+            var fake = Fresh();
+            var area = Added(world, new LogArea(Square()));
+            var unit = Labelled(world, area, "a");
+            var allowed = false;
+            area.Accept = u => allowed;
+            fake.Walk(unit.Handle, 10f, 10f);
+            Expect.Equal(0, area.Log.Count, "refused");
+            Expect.Equal(1, area.AcceptsAsked, "asked once as it came inside");
+            world.Advance(0.25f);
+            Expect.Equal(2, area.AcceptsAsked, "asked again at the check");
+            Expect.Equal(0, area.Log.Count, "still refused");
+            allowed = true;
+            world.Advance(0.25f);
+            ExpectLog(area, new[] { "entered a" }, "entered at the check after the yes");
+            Expect.Equal(3, area.AcceptsAsked, "asked once at that check");
+            world.Advance(0.25f);
+            Expect.Equal(4, area.AcceptsAsked, "and once at each check while inside");
+            Expect.True(area.Has(unit), "inside");
+        }
+
+        /// <summary>With RecheckAccepts off, Accepts is asked only as a unit comes inside: a unit inside stays when the answer turns to no, and a refused one waits for its next enter event.</summary>
+        public static void RecheckOff(FakeWorld world)
+        {
+            var fake = Fresh();
+            var area = new LogArea(Square());
+            area.SetRecheck(false);
+            Added(world, area);
+            var first = Labelled(world, area, "first");
+            var second = Labelled(world, area, "second");
+            var allowed = true;
+            area.Accept = u => allowed;
+            fake.Walk(first.Handle, 10f, 10f);
+            allowed = false;
+            fake.Walk(second.Handle, 20f, 20f);
+            world.Advance(1f);
+            ExpectLog(area, new[] { "entered first" }, "the first stays inside, the second stays out");
+            Expect.Equal(2, area.AcceptsAsked, "asked only as each came inside");
+            allowed = true;
+            world.Advance(1f);
+            Expect.True(!area.Has(second), "the second is not asked again by itself");
+            fake.Walk(second.Handle, 900f, 900f);
+            fake.Walk(second.Handle, 20f, 20f);
+            ExpectLog(area, new[] { "entered first", "entered second" }, "the second enters at its next enter event");
+            Expect.Equal(3, area.AcceptsAsked, "asked once more");
+        }
+
+        /// <summary>A refused unit that walks out is forgotten: it is not asked again, and the timer stops; one that is no longer in the region with no event is forgotten at the next check.</summary>
+        public static void RecheckForgetsLeavers(FakeWorld world)
+        {
+            var fake = Fresh();
+            var area = Added(world, new LogArea(Square()));
+            area.Accept = u => false;
+            var walks = Labelled(world, area, "walks");
+            var slips = Labelled(world, area, "slips");
+            fake.Walk(walks.Handle, 10f, 10f);
+            Expect.True(AreaTracker.Running, "the refused unit keeps the check running");
+            fake.Walk(walks.Handle, 900f, 900f);
+            Expect.True(!AreaTracker.Running, "it walked out: forgotten, and the timer stopped");
+            world.Advance(1f);
+            Expect.Equal(1, area.AcceptsAsked, "never asked again");
+            fake.Walk(slips.Handle, 20f, 20f);
+            fake.Regions[0].Inside.Remove(slips.Handle);
+            world.Advance(0.25f);
+            Expect.Equal(2, area.AcceptsAsked, "a unit no longer in the region is not asked");
+            Expect.True(!AreaTracker.Running, "and is forgotten at the check");
+            Expect.Equal(0, area.Log.Count, "nothing entered");
+        }
+
+        /// <summary>An Accepts that ends its area at the check lets each unit inside leave once, and nothing runs after.</summary>
+        public static void RecheckEndsArea(FakeWorld world)
+        {
+            var fake = Fresh();
+            var area = Added(world, new LogArea(Square(), 0.1f));
+            var a = Labelled(world, area, "a");
+            var b = Labelled(world, area, "b");
+            fake.Walk(a.Handle, 10f, 10f);
+            fake.Walk(b.Handle, 20f, 20f);
+            area.Accept = u =>
+            {
+                area.End();
+                return false;
+            };
+            world.Advance(0.25f);
+            Expect.True(area.HasEnded, "the area ended");
+            var log = string.Join(", ", area.Log.ToArray());
+            Expect.True(log.EndsWith("left a, left b"), "each left once, in entering order: " + log);
+            var count = area.Log.Count;
+            world.Advance(1f);
+            Expect.Equal(count, area.Log.Count, "nothing after");
+            Expect.True(!AreaTracker.Running, "the timer stopped");
+            Expect.Equal(0, world.Logged.Count, "no error");
+        }
+
         /// <summary>A map's area with fields of its own named as Area's keeps them apart from the base's: the area enters, stays and leaves its unit, and its own fields keep their values. CSharp.lua gives the subclass's fields names of their own (inside1), as it sees Area's private ones in the same compile.</summary>
         public static void ShadowedFields(FakeWorld world)
         {

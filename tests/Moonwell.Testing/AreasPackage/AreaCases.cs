@@ -68,11 +68,13 @@ namespace Moonwell.Testing
             Expect.Equal(5, area.Log.Count, "nothing runs after the unit left");
         }
 
-        /// <summary>Accepts decides: a footman is refused, a hero accepted, and the footman enters at its next enter event once the area accepts it.</summary>
+        /// <summary>With RecheckAccepts off, Accepts decides as a unit comes inside: a footman is refused, a hero accepted, and the footman enters at its next enter event once the area accepts it (with it on, the default, the place check asks again: audit.areas.recheck-*).</summary>
         public static void Accepts(FakeWorld world)
         {
             var fake = Fresh();
-            var area = Added(world, new LogArea(Square()));
+            var area = new LogArea(Square());
+            area.SetRecheck(false);
+            Added(world, area);
             area.Accept = u => u is Hero;
             var footman = UnitAt(world, 10f, 10f);
             var hero = UnitAt(world, 20f, 20f, true);

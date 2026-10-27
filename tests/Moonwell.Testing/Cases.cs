@@ -281,6 +281,11 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "audit.areas.shared-edge", Run = AuditAreaCases.SharedEdge });
             list.Add(new Case { Name = "audit.areas.rect-rounded-out", Run = AuditAreaCases.RectRoundedOut });
             list.Add(new Case { Name = "audit.areas.shadowed-fields", Run = AuditAreaCases.ShadowedFields });
+            list.Add(new Case { Name = "audit.areas.recheck-leaves-and-enters", Run = AuditAreaCases.RecheckLeavesAndEnters });
+            list.Add(new Case { Name = "audit.areas.recheck-refused-at-entry", Run = AuditAreaCases.RecheckRefusedAtEntry });
+            list.Add(new Case { Name = "audit.areas.recheck-off", Run = AuditAreaCases.RecheckOff });
+            list.Add(new Case { Name = "audit.areas.recheck-forgets-leavers", Run = AuditAreaCases.RecheckForgetsLeavers });
+            list.Add(new Case { Name = "audit.areas.recheck-ends-area", Run = AuditAreaCases.RecheckEndsArea });
         }
 
         /// <summary>Adds the input package's cases.</summary>
