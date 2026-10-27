@@ -110,5 +110,35 @@ namespace Moonwell.Testing
             world.Advance(10.0f);
             Expect.True(!lasting.HasEnded, "a buff refreshed with no duration lasts until it is removed");
         }
+
+        /// <summary>A buff an aura's pair applies in OnMeet belongs to the unit it is on, not to the pair or the aura: it stays after they part, unless OnPart removes it, as the guide's FrostAura does (decision 65).</summary>
+        public static void PairBuffBelongsToUnit(FakeWorld world)
+        {
+            Interactions.Install(new FakeInteractionWorld());
+            TestLog.Lines.Clear();
+            var holder = Unit.Of(FootmanAt(world, 0.0f, 0.0f))!;
+            var kept = Unit.Of(FootmanAt(world, 100.0f, 0.0f))!;
+            var removed = Unit.Of(FootmanAt(world, 0.0f, 100.0f))!;
+            var aura = new FireAura(300.0f, 0.125f);
+            aura.Meeting = pair => { pair.Other.Apply(new Chilled(0.0f, 0.5f)); };
+            aura.Parting = pair =>
+            {
+                if (pair.Other == removed)
+                {
+                    pair.Other.Remove<Chilled>();
+                }
+            };
+            holder.Interact(aura);
+            Steps(world, 8);
+            Expect.True(kept.Has<Chilled>() && removed.Has<Chilled>(), "both others are chilled while near");
+            Expect.Same(kept, kept.Get<Chilled>()!.Owner, "the owner of the buff the pair applied");
+
+            world.MoveUnit(kept.Handle, 900.0f, 900.0f);
+            world.MoveUnit(removed.Handle, -900.0f, -900.0f);
+            Steps(world, 40);
+            Expect.Equal(2, TestLog.Lines.FindAll(line => line.StartsWith("part")).Count, "the pairs that parted: " + string.Join(", ", TestLog.Lines));
+            Expect.True(kept.Has<Chilled>(), "the buff stays on the unit after its pair parted");
+            Expect.True(!removed.Has<Chilled>(), "the buff OnPart removed");
+        }
     }
 }

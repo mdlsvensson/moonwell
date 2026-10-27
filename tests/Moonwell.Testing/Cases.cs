@@ -30,6 +30,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "lifecycle.local-throw-keeps-sync", Run = LifecycleCases.LocalThrowKeepsSync });
             list.Add(new Case { Name = "lifecycle.death-respawn-outlives-corpse", Run = LifecycleCases.DeathRespawnOutlivesCorpse });
             list.Add(new Case { Name = "lifecycle.refresh-takes-new-duration", Run = LifecycleCases.RefreshTakesNewDuration });
+            list.Add(new Case { Name = "lifecycle.pair-buff-belongs-to-unit", Run = LifecycleCases.PairBuffBelongsToUnit });
         }
 
         /// <summary>Adds the debug mode's cases; they exist only in a development build, as the debug mode does.</summary>

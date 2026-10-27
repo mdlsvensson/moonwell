@@ -196,8 +196,9 @@ public sealed class KillCounter : UnitComponent
   `OnApply`, `OnTick` and `OnExpire` are its reactions, and `unit.Apply(new Burn())` puts it on a unit. A second
   apply of its class refreshes the one there, unless its `Stacking` says otherwise: that one lasts the new apply's
   `Duration` from then on, and keeps its other values and what it has counted.
-- `Timer.After(seconds, action)` and `Timer.Every(seconds, action)` run code later. A timer, buff or component
-  belongs to whatever made it, and ends with it.
+- `Timer.After(seconds, action)` and `Timer.Every(seconds, action)` run code later. A timer belongs to whatever made
+  it, and ends with it. A component or buff belongs to the actor it is added to, whoever added it: it ends when it is
+  removed or that actor ends, so an aura that buffs others removes its buff in `OnPart` (Interactions, below).
 - What an ability's `OnCast` makes belongs to the ability, which lasts as long as the caster is in the game, so a
   delayed effect runs after the spell has ended; work that should stop with a channel names the cast:
   `Timer.Every(0.5f, Burn, owner: cast)`. What a unit's own `OnDeath` makes belongs to the game, as death is not an
@@ -358,6 +359,13 @@ public sealed class FireAura : Interaction<Unit, Unit> // held by a unit, pairs 
     public override void OnTick(Pair pair) { Holder.Damage(pair.Other, 10f); }
 }
 
+public sealed class FrostAura : Interaction<Unit, Unit>
+{
+    public FrostAura() { Range = 600f; }
+    public override void OnMeet(Pair pair) { pair.Other.Apply(new Chilled()); }
+    public override void OnPart(Pair pair) { pair.Other.Remove<Chilled>(); } // the buff is the unit's, not the pair's
+}
+
 unit.Interact(new FireAura()); // made inside a buff, it ends with the buff
 var well = Gizmo.Create(new Well(), x, y, caster.Player); // a gizmo is a map's own object with a place
 var near = Find.InRange<Unit>(x, y, 500f);                // a new list; or Find.InRange(x, y, 500f, list)
@@ -366,7 +374,8 @@ var near = Find.InRange<Unit>(x, y, 500f);                // a new list; or Find
 - `Range` is centre to centre and flat. A pair is found at the next tick after they come within range, so a 1 s tick
   may start up to 1 s late (interactions started together take turns over its steps). Only a unit in the game (alive,
   not hidden, not loaded), a visible item on the ground, a live destructable and a gizmo have a place; `OnPart` runs
-  once, when a pair ends.
+  once, when a pair ends. A timer a pair's reactions make is the pair's and ends when it parts; a buff or component
+  they add is the unit's, so `OnPart` removes it, as `FrostAura` does.
 - From the first interaction or `Find` that asks for units, Moonwell takes in every unit in the game, and each one
   that comes in after, also those the game makes with no code of the map (trained, summoned, made by a native).
 - `Find` has `InRange`, `InRect`, `InPolygon`, `AlongLine` and `Closest`. Each gives a new list, or fills a list the
