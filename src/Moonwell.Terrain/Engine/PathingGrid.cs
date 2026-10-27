@@ -26,6 +26,9 @@ namespace Moonwell.Engine
         /// <summary>The cells across and up one block.</summary>
         private const int Side = 16;
 
+        /// <summary>Side as a power of two: a cell's block is its column and row shifted down by it.</summary>
+        private const int SideBits = 4;
+
         /// <summary>The width of a cell, which is also how finely the game's pathing is kept.</summary>
         private const float CellSize = 32f;
 
@@ -62,20 +65,40 @@ namespace Moonwell.Engine
             blocks = new int[blocksAcross * ((rows + Side - 1) / Side)][];
         }
 
-        /// <summary>The flags of the cell that holds a point, which is first kept inside the grid.</summary>
+        /// <summary>The flags of the cell that holds a point, which is first kept inside the grid. A pushed unit asks it every step, so it is written out in one: Cell for the column and the row, then the block and the slot by shifts and masks (the column and row are 0 or more), read from the slots.</summary>
         internal int Flags(float x, float y)
         {
-            var column = Cell(x, left, columns);
-            var row = Cell(y, bottom, rows);
-            var block = (row / Side) * blocksAcross + column / Side;
-            var flags = blocks[block];
-            if (flags == null)
+            var across = (x - left) / CellSize;
+            if (!(across > 0f))
             {
-                flags = Read(column / Side * Side, row / Side * Side);
-                blocks[block] = flags;
+                across = 0f;
             }
 
-            return flags[(row % Side) * Side + column % Side];
+            if (across > columns - 1)
+            {
+                across = columns - 1;
+            }
+
+            var up = (y - bottom) / CellSize;
+            if (!(up > 0f))
+            {
+                up = 0f;
+            }
+
+            if (up > rows - 1)
+            {
+                up = rows - 1;
+            }
+
+            var column = Slots.Whole(across);
+            var row = Slots.Whole(up);
+            var block = (row >> SideBits) * blocksAcross + (column >> SideBits);
+            if (!Slots.Has(blocks, block))
+            {
+                blocks[block] = Read(column >> SideBits << SideBits, row >> SideBits << SideBits);
+            }
+
+            return Slots.At(Slots.At(blocks, block)!, (row & (Side - 1)) * Side + (column & (Side - 1)));
         }
 
         /// <summary>Drops every block an area touches (the area kept inside the grid), so the next read of one reads it again.</summary>
@@ -108,7 +131,7 @@ namespace Moonwell.Engine
                 cells = count - 1;
             }
 
-            return (int)MathF.Floor(cells);
+            return Slots.Whole(cells);
         }
 
         /// <summary>Reads the cells of a block, whose first cell is at a column and a row; the cells past the grid's edge are not read.</summary>

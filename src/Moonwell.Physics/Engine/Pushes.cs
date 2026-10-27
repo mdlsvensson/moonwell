@@ -544,7 +544,7 @@ namespace Moonwell.Engine
         private static void Place(Unit unit, float x, float y)
         {
             unit.PlaceAt(x, y);
-            Tracking.Moved(unit, x, y);
+            Tracking.UnitMoved(unit, x, y);
         }
 
         /// <summary>Runs OnSlammed for a slam: the speed lost, the unit's place, and the direction out of what it hit.</summary>

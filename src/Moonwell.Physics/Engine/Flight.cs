@@ -144,10 +144,11 @@ namespace Moonwell.Engine
             var z = fromZ + rise;
             if (missile.followsGround)
             {
-                var below = missile.groundRead && missile.groundX == fromX && missile.groundY == fromY ? missile.groundZ : Ground.Height(fromX, fromY, fromZ);
+                var below = missile.groundRead && missile.groundX == fromX && missile.groundY == fromY ? Ground.Last(missile) : Ground.Height(fromX, fromY, fromZ);
                 var ground = Ground.Height(x, y, fromZ);
                 z = ground + z - below;
                 missile.groundRead = true;
+                missile.groundPending = false;
                 missile.groundX = x;
                 missile.groundY = y;
                 missile.groundZ = ground;
@@ -210,6 +211,9 @@ namespace Moonwell.Engine
         /// speed down. That is checked a step at a time from where it is, so a change of its velocity is seen at once; one
         /// that follows the ground was read this step.
         /// Below the ground, its move is cast against it for the point of contact. Whether it placed or ended the missile.
+        /// With no deck living, a read where the missile is above its span's highest ground is put off (Ground.Last makes
+        /// it): it could only find the ground below, which changes nothing but what is kept of the read, and the next
+        /// step's check is made from the span's bounds while they decide it, as they do for whatever the read finds.
         /// </summary>
         private static bool Land(Missile missile, float step, Grid grid, IPhysicsWorld world, Entry entry, float fromX, float fromY, float fromZ, float x, float y, float z, float rise)
         {
@@ -239,24 +243,39 @@ namespace Moonwell.Engine
                 // missile let fall past its top between two reads would be under it, where it is not met.
                 if (missile.groundRead && (Decks.count == 0 || !Decks.Near(x, y)))
                 {
-                    var high = bottom - missile.groundZ;
                     var since = missile.groundSince;
-                    if (high > Slack * since)
+                    if (missile.groundPending)
                     {
-                        // Its speed is worked out only when the least slack does not bring it to a read.
-                        var alongX = missile.vx;
-                        var alongY = missile.vy;
-                        var down = missile.vz < 0.0f ? -missile.vz : 0.0f;
-                        var fast = SlackShare * (Trig.Sqrt(alongX * alongX + alongY * alongY) + down);
-                        if (fast <= Slack || high > fast * since)
+                        // The ground there is above spanLow and below spanHigh, and Far is no less for a lower ground: not Far
+                        // with spanLow reads it for any ground there, and Far with spanHigh skips it for any. Between, the
+                        // put-off read is made.
+                        if (Far(missile, bottom - missile.spanLow, since) && (Far(missile, bottom - missile.spanHigh, since) || Far(missile, bottom - Ground.Last(missile), since)))
                         {
                             return false;
                         }
                     }
+                    else if (Far(missile, bottom - missile.groundZ, since))
+                    {
+                        return false;
+                    }
+                }
+
+                if (x >= missile.spanMinX && x <= missile.spanMaxX && y >= missile.spanMinY && y <= missile.spanMaxY && bottom > missile.spanHigh && Decks.count == 0 && missile.spanGrid == Terrain.Grid)
+                {
+                    // Above the highest ground of its span: the read could only find the ground below. It is put off.
+                    Ground.reads++;
+                    missile.groundRead = true;
+                    missile.groundPending = true;
+                    missile.groundX = x;
+                    missile.groundY = y;
+                    missile.groundSince = 0.0f;
+                    missile.throughGround = false;
+                    return false;
                 }
 
                 var ground = Ground.Height(x, y, fromZ);
                 missile.groundRead = true;
+                missile.groundPending = false;
                 missile.groundX = x;
                 missile.groundY = y;
                 missile.groundZ = ground;
@@ -264,6 +283,14 @@ namespace Moonwell.Engine
                 if (bottom > ground)
                 {
                     missile.throughGround = false;
+                    if (Decks.count == 0 && (x < missile.spanMinX || x > missile.spanMaxX || y < missile.spanMinY || y > missile.spanMaxY || missile.spanGrid != Terrain.Grid))
+                    {
+                        // Out of its span: the span of where it is, for the reads after.
+                        var terrain = Terrain.Grid;
+                        missile.spanGrid = terrain;
+                        terrain.Span(x, y, out missile.spanMinX, out missile.spanMinY, out missile.spanMaxX, out missile.spanMaxY, out missile.spanLow, out missile.spanHigh);
+                    }
+
                     return false;
                 }
 
@@ -324,6 +351,25 @@ namespace Moonwell.Engine
 
             Meet(missile, grid, world, entry, hitX, hitY, hitZ, nx, ny, nz, vx, vy, vz, x, y, z, again);
             return true;
+        }
+
+        /// <summary>Whether a missile this high above the ground, so many seconds after its last read, cannot have reached it yet: the slack check of Land. True for no less a height once true.</summary>
+        private static bool Far(Missile missile, float high, float since)
+        {
+            if (high > Slack * since)
+            {
+                // Its speed is worked out only when the least slack does not bring it to a read.
+                var alongX = missile.vx;
+                var alongY = missile.vy;
+                var down = missile.vz < 0.0f ? -missile.vz : 0.0f;
+                var fast = SlackShare * (Trig.Sqrt(alongX * alongX + alongY * alongY) + down);
+                if (fast <= Slack || high > fast * since)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>

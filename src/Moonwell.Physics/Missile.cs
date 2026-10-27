@@ -165,11 +165,35 @@ namespace Moonwell
         /// <summary>The y the ground was last read at.</summary>
         internal float groundY;
 
-        /// <summary>The ground's height last read.</summary>
+        /// <summary>The ground's height last read; while groundPending, not read yet (Ground.Last reads it).</summary>
         internal float groundZ;
+
+        /// <summary>Whether the last read of the ground, at groundX and groundY, was put off as it could only find the ground below the missile: spanGrid reads it when something needs its height.</summary>
+        internal bool groundPending;
 
         /// <summary>The seconds since the ground was last read, for the ground's contact.</summary>
         internal float groundSince;
+
+        /// <summary>The terrain's grid the span was read from; null before the first.</summary>
+        internal HeightGrid? spanGrid;
+
+        /// <summary>The span's box (HeightGrid.Span), where the ground is between spanLow and spanHigh: its left edge.</summary>
+        internal float spanMinX;
+
+        /// <summary>The span's bottom edge.</summary>
+        internal float spanMinY;
+
+        /// <summary>The span's right edge; below spanMinX for no box.</summary>
+        internal float spanMaxX = -1.0f;
+
+        /// <summary>The span's top edge.</summary>
+        internal float spanMaxY = -1.0f;
+
+        /// <summary>The ground in the span's box is above this.</summary>
+        internal float spanLow;
+
+        /// <summary>The ground in the span's box is below this.</summary>
+        internal float spanHigh;
 
         /// <summary>What it does on meeting the ground.</summary>
         internal Contact groundContact = Contact.Stop;

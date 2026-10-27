@@ -3,8 +3,8 @@ namespace Moonwell.Engine
     /// <summary>
     /// The ground as the package sees it: the terrain's grid (water's surface where it is above the ground), or a placed
     /// bridge's deck where one stands. Every height the package reads goes through it, and every read is in floats: a read
-    /// makes no table. A read of the height costs as much as the terrain's (9.4 µs in the game), so the pass reads it
-    /// only when a missile may have reached the ground.
+    /// makes no table. A read calls the terrain's grid straight, and still costs as much as a few dozen Lua calls, so the
+    /// pass reads it only when a missile may have reached the ground.
     /// </summary>
     internal static class Ground
     {
@@ -21,7 +21,7 @@ namespace Moonwell.Engine
         internal static float Height(float x, float y)
         {
             reads++;
-            var height = Terrain.Height(x, y);
+            var height = Terrain.Grid.Height(x, y);
             if (Decks.count > 0)
             {
                 float deck;
@@ -38,7 +38,7 @@ namespace Moonwell.Engine
         internal static float Height(float x, float y, float z)
         {
             reads++;
-            var height = Terrain.Height(x, y);
+            var height = Terrain.Grid.Height(x, y);
             if (Decks.count > 0)
             {
                 float deck;
@@ -49,6 +49,18 @@ namespace Moonwell.Engine
             }
 
             return height;
+        }
+
+        /// <summary>The ground's height a missile last read, at its groundX and groundY: a read it put off is made now, from the grid it was put off on, which reads what it would have read then (no deck was living, and the grid does not change).</summary>
+        internal static float Last(Missile missile)
+        {
+            if (missile.groundPending)
+            {
+                missile.groundZ = missile.spanGrid!.Height(missile.groundX, missile.groundY);
+                missile.groundPending = false;
+            }
+
+            return missile.groundZ;
         }
 
         /// <summary>The direction straight out of the ground at a point, for something at a height, of length 1. In a cliff tile it is made level, so a cliff's face is met as a wall, not up its blend.</summary>

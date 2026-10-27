@@ -151,7 +151,7 @@ namespace Moonwell
             world.MoveImage(made, across, x, y);
             if (missile.groundRead && missile.groundX == x && missile.groundY == y)
             {
-                groundZ = missile.groundZ;
+                groundZ = Ground.Last(missile);
                 since = 0.0f;
             }
             else if (since >= Interval)

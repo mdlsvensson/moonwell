@@ -622,6 +622,31 @@ namespace Moonwell.Engine
             }
         }
 
+        /// <summary>Moved for a unit, as a push moves its unit every step: the same, with the entry looked up by the unit's handle as EntryOf does for a unit, and none of EntryOf's casts.</summary>
+        public static void UnitMoved(Unit unit, float x, float y)
+        {
+            var handle = unit.Handle;
+            if (handle == null)
+            {
+                return;
+            }
+
+            Entry? entry;
+            unitEntries.TryGetValue(handle, out entry);
+            if (entry == null || entry.Ended)
+            {
+                return;
+            }
+
+            entry.ReadStep = (cycle ?? Beat).StepNow;
+            Interactions.Grid.Move(entry, x, y);
+            if (Local.Depth == 0)
+            {
+                unit.lastX = x;
+                unit.lastY = y;
+            }
+        }
+
         /// <summary>Ends the cycle's timer when nothing is tracked, no items are asked for and nothing keeps it awake.</summary>
         private static void StopTimerIfIdle()
         {
