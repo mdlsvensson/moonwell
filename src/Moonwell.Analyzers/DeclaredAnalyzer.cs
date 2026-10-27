@@ -170,7 +170,7 @@ public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
         context.ReportDiagnostic(Diagnostic.Create(Rules.LiveInDeclaration, invocation.GetLocation(), "Set(\"ulev\")", HeroLevelWhy));
     }
 
-    // MW0015: a unit's Level set anywhere but the constructor of its declared class (or a lambda or local function in it).
+    // MW0015: a unit's Level set anywhere but the constructor of its declared class (or a local function in it).
     private static void LevelSet(OperationAnalysisContext context)
     {
         var reference = (IPropertyReferenceOperation)context.Operation;
@@ -181,6 +181,12 @@ public sealed class DeclaredAnalyzer : DiagnosticAnalyzer
 
         for (var node = reference.Syntax; node != null; node = node.Parent)
         {
+            // A lambda may run later in the game, where setting the level does nothing; a local function is called there.
+            if (node is AnonymousFunctionExpressionSyntax)
+            {
+                break;
+            }
+
             if (node is ConstructorDeclarationSyntax constructor)
             {
                 if (!constructor.Modifiers.Any(SyntaxKind.StaticKeyword)

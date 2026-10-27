@@ -193,7 +193,7 @@ public static class Rules
         ObjectsCategory,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "The game has no setter for a unit's level, so Level is a unit's declared value: it is set in the constructor of the class that declares the unit (and in a lambda or local function there), and only read anywhere else. A hero's level is set with SetLevel; a hero's constructor does not declare it. The build rejects the same set.");
+        description: "The game has no setter for a unit's level, so Level is a unit's declared value: it is set in the constructor of the class that declares the unit (and in a local function there), and only read anywhere else; a lambda there may run later in the game, where the set does nothing. A hero's level is set with SetLevel; a hero's constructor does not declare it. The build rejects the same set.");
 
     public static readonly DiagnosticDescriptor DefaultKind = new(
         "MW0037",
