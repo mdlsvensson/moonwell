@@ -29,6 +29,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             start.RegisterOperationAction(checker.Conversion, OperationKind.Conversion);
             start.RegisterOperationAction(checker.Literal, OperationKind.Literal);
             start.RegisterOperationAction(checker.Declarator, OperationKind.VariableDeclarator);
+            start.RegisterOperationAction(checker.Text, OperationKind.Binary, OperationKind.Interpolation, OperationKind.Conversion);
             start.RegisterSymbolAction(checker.Declaration, SymbolKind.Field, SymbolKind.Property, SymbolKind.Method, SymbolKind.NamedType);
         });
     }
@@ -68,6 +69,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
         private readonly INamedTypeSymbol?[] hashTypes;
         private readonly INamedTypeSymbol? enumerable;
         private readonly INamedTypeSymbol? enumerableOfT;
+        private readonly INamedTypeSymbol? handle;
 
         /// <summary>What each followed map method reaches; a method that reaches nothing rejected maps to null.</summary>
         private readonly ConcurrentDictionary<IMethodSymbol, Finding?> followed = new(SymbolEqualityComparer.Default);
@@ -100,6 +102,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             };
             enumerable = compilation.GetTypeByMetadataName("System.Collections.IEnumerable");
             enumerableOfT = compilation.GetTypeByMetadataName("System.Collections.Generic.IEnumerable`1");
+            handle = compilation.GetTypeByMetadataName("Moonwell.handle");
         }
 
         public void Call(OperationAnalysisContext context)
@@ -112,6 +115,12 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             }
 
             var location = operation.Syntax.GetLocation();
+            if (operation is IObjectCreationOperation { Constructor: { Parameters.Length: 0 } constructor } && IsNamed(constructor.ContainingType, "System.Random"))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rules.UnseededRandom, location, Name(constructor)));
+                return;
+            }
+
             if (IsNative(member) && member.Name is "GetHandleId" or "GetHandleIdBJ")
             {
                 context.ReportDiagnostic(Diagnostic.Create(Rules.HandleId, location));
@@ -140,7 +149,142 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
                 var declared = member is IPropertySymbol { Name: "Name" } && IsRuntime(member) && member.ContainingType.Name == "Unit" ? "; the declared name is Default.Name" : string.Empty;
                 context.ReportDiagnostic(Diagnostic.Create(Rules.LocalOutside, location, Name(member), declared));
             }
+            else if (LibraryLocal(operation, member) is { } why)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rules.LocalOutside, location, Name(member), why));
+            }
         }
+
+        private const string Clock = "; it is this machine's clock: time game logic with Timer.After or Timer.Every";
+
+        private const string Address = "; in the game's Lua it is the object's address: key by the object itself, or by a number the map assigns";
+
+        private const string HandleText = "; in the game's Lua a handle as text is its address";
+
+        /// <summary>
+        /// Why a .NET library member gives a different answer on each machine, as the suffix of MW0002's message: the
+        /// clock, or an address in the game's Lua (the hash of a handle or of a class without its own, a handle as text).
+        /// Null for any other member.
+        /// </summary>
+        private string? LibraryLocal(IOperation operation, ISymbol member)
+        {
+            var type = member.ContainingType;
+            if (type == null)
+            {
+                return null;
+            }
+
+            if (member is IPropertySymbol { Name: "Now" or "UtcNow" or "Today" } && (IsNamed(type, "System.DateTime") || IsNamed(type, "System.DateTimeOffset")))
+            {
+                return Clock;
+            }
+
+            if (member is IPropertySymbol { Name: "TickCount" or "TickCount64" } && IsNamed(type, "System.Environment"))
+            {
+                return Clock;
+            }
+
+            if (member.Name is "Elapsed" or "ElapsedMilliseconds" or "ElapsedTicks" or "GetTimestamp" or "GetElapsedTime" && IsNamed(type, "System.Diagnostics.Stopwatch"))
+            {
+                return Clock;
+            }
+
+            if (member is IMethodSymbol { Name: "GetHashCode", IsStatic: true } && IsNamed(type, "System.Runtime.CompilerServices.RuntimeHelpers"))
+            {
+                return Address;
+            }
+
+            if (operation is not IInvocationOperation { Instance.Type: { } receiver, TargetMethod: { IsStatic: false, Parameters.Length: 0 } })
+            {
+                return null;
+            }
+
+            if (member.Name == "GetHashCode" && HashIsAddress(receiver))
+            {
+                return Address;
+            }
+
+            return member.Name == "ToString" && IsHandle(receiver) ? HandleText : null;
+        }
+
+        /// <summary>
+        /// Whether GetHashCode of a value of a type is its address in the game's Lua: a handle, or a class with no
+        /// GetHashCode of its own below object (a record, a string, an anonymous type and a struct hash their content).
+        /// </summary>
+        private bool HashIsAddress(ITypeSymbol type)
+        {
+            if (IsHandle(type))
+            {
+                return true;
+            }
+
+            if (type is not INamedTypeSymbol { TypeKind: TypeKind.Class, IsAnonymousType: false } named || named.SpecialType != SpecialType.None)
+            {
+                return false;
+            }
+
+            for (var at = named; at != null && at.SpecialType != SpecialType.System_Object; at = at.BaseType)
+            {
+                if (at.GetMembers("GetHashCode").OfType<IMethodSymbol>().Any(m => m.IsOverride && m.Parameters.Length == 0))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>MW0002 for a handle turned into text outside Local.For: joined to a string, in an interpolation hole, or given as an object to a library method that writes text.</summary>
+        public void Text(OperationAnalysisContext context)
+        {
+            var operation = context.Operation;
+            var values = operation switch
+            {
+                IBinaryOperation { OperatorKind: BinaryOperatorKind.Add, Type.SpecialType: SpecialType.System_String } add => new[] { add.LeftOperand, add.RightOperand },
+                IInterpolationOperation hole => new[] { hole.Expression },
+                IConversionOperation { Type.SpecialType: SpecialType.System_Object } conversion when WritesText(conversion) => new[] { conversion.Operand },
+                _ => new IOperation[0],
+            };
+
+            foreach (var value in values.Select(Unwrap))
+            {
+                if (value.Type != null && IsHandle(value.Type) && !IsLocal(operation, context.ContainingSymbol) && !Silenced(operation, context.ContainingSymbol))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Rules.LocalOutside, value.Syntax.GetLocation(), value.Syntax.ToString(), HandleText));
+                }
+            }
+        }
+
+        // An object argument of a library method that makes text of it (Console.WriteLine, string.Format, StringBuilder.Append).
+        private static bool WritesText(IConversionOperation conversion)
+        {
+            var up = conversion.Parent;
+            while (up is IArrayInitializerOperation or IArrayCreationOperation)
+            {
+                up = up.Parent;
+            }
+
+            return up is IArgumentOperation { Parent: IInvocationOperation invocation }
+                && invocation.TargetMethod.Locations.All(l => !l.IsInSource)
+                && invocation.TargetMethod.Name is "WriteLine" or "Write" or "Format" or "Concat" or "Append" or "AppendFormat" or "Join";
+        }
+
+        private bool IsHandle(ITypeSymbol type)
+        {
+            for (var at = type; at != null; at = at.BaseType)
+            {
+                if (handle != null && SymbolEqualityComparer.Default.Equals(at, handle))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Whether a type is the one of a full metadata name, such as System.DateTime.
+        private static bool IsNamed(INamedTypeSymbol? type, string fullName) =>
+            type != null && type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == "global::" + fullName;
 
         /// <summary>
         /// Whether a read of a unit's name (not a hero's proper name, which has no declared value) is the declared one, the same on every machine: in a declared class's

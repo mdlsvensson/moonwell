@@ -575,6 +575,7 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
         ["System.UInt32.RotateRight"] = Missing,
         ["System.Collections.Generic.HashSet`1.SetEquals"] = "says False for equal sets in the game's Lua; compare Count and Contains",
         ["System.Math.DivRem"] = "gives its quotient as a float (3.0) in the game's Lua; use / and %",
+        ["System.Random.Shared"] = Missing + "; use Natives.GetRandomInt",
     }.ToImmutableDictionary();
 
     private static void Name(SyntaxNodeAnalysisContext context)
