@@ -15838,7 +15838,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -15956,7 +15956,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -17549,7 +17549,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -18445,7 +18445,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -18647,7 +18647,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -18988,7 +18988,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -19551,7 +19551,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -19970,7 +19970,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -24425,7 +24425,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -24521,7 +24521,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -28081,7 +28081,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -28404,7 +28404,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -28553,7 +28553,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -28796,7 +28796,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -29005,7 +29005,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -29069,7 +29069,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -29169,7 +29169,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -29513,7 +29513,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -31016,7 +31016,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -31173,7 +31173,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -31233,7 +31233,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -33936,7 +33936,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -34359,7 +34359,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -34538,7 +34538,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -35313,7 +35313,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -36916,7 +36916,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -38548,7 +38548,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -42501,7 +42501,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -42751,7 +42751,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -42912,7 +42912,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -43115,7 +43115,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -43686,7 +43686,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -46622,7 +46622,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -46751,7 +46751,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -48126,7 +48126,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -48350,7 +48350,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -48502,7 +48502,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -49083,7 +49083,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }
@@ -49204,7 +49204,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Shelf);
+                    TargetType = Levels(global::Moonwell.Objects.ProctargetType.Self);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic);
                     UseNewDefaultLevelCap = true;
                 }

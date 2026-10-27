@@ -768,9 +768,9 @@ namespace Moonwell.Objects
     /// @CSharpLua.Ignore
     public enum ProctargetType
     {
-        /// <summary>Shelf.</summary>
+        /// <summary>Self.</summary>
         [global::Moonwell.Objects.GameValue("0")]
-        Shelf = 0,
+        Self = 0,
 
         /// <summary>Enemies.</summary>
         [global::Moonwell.Objects.GameValue("1")]
@@ -957,7 +957,7 @@ namespace Moonwell.Objects
         [global::Moonwell.Objects.GameValue("sapper")]
         Sapper = 262144,
 
-        /// <summary>Shelf.</summary>
+        /// <summary>Self.</summary>
         [global::Moonwell.Objects.GameValue("self")]
         Self = 524288,
 

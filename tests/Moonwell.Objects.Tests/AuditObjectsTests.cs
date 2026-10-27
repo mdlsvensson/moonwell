@@ -104,6 +104,14 @@ namespace Moonwell.Objects.Tests
             Assert.Equal(typeof(PathingPrevent), typeof(StandardUnit).GetProperty("PlacementPreventedBy")!.PropertyType);
         }
 
+        [Fact]
+        public void a_target_type_of_self_is_named_self()
+        {
+            // worldeditstrings.txt gives the label as "Self", then again as "Shelf"; the first one is the name.
+            Assert.Equal(0, (int)ProctargetType.Self);
+            Assert.Null(typeof(ProctargetType).GetField("Shelf"));
+        }
+
         private static IEnumerable<string> FieldsOf(Type type)
         {
             return type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
