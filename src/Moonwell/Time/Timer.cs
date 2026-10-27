@@ -38,7 +38,7 @@ namespace Moonwell
         [LocalSafe]
         public bool IsPeriodic { get; }
 
-        /// <summary>The seconds until the timer is next due; 0 once it has ended.</summary>
+        /// <summary>The seconds until the timer is next due, inside a repeating timer's own run the time to its next run; 0 once it has ended.</summary>
         [LocalSafe]
         public float Remaining
         {

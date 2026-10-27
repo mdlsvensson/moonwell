@@ -105,6 +105,12 @@ namespace Moonwell
 
                 Pop();
                 runs++;
+                if (timer.IsPeriodic)
+                {
+                    // Before the run, so Remaining inside it is the time to the next run.
+                    MoveOn(timer);
+                }
+
                 Run(timer);
                 if (!timer.IsPeriodic)
                 {
@@ -112,7 +118,6 @@ namespace Moonwell
                 }
                 else if (!timer.HasEnded)
                 {
-                    MoveOn(timer);
                     Push(new TimerEntry(timer.due, entry.sequence, timer));
                 }
             }

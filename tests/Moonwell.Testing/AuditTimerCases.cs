@@ -296,6 +296,18 @@ namespace Moonwell.Testing
             var reported = LoggedWith(world, "Timer.Every failed: seconds must be more than 0");
             Expect.Equal("0 3 3", runs + " " + ended + " " + reported, "runs of Every(0), Every(-1) and Every(NaN) in 1 s, the timers ended, and the lines reported");
         }
+
+        /// <summary>Inside a repeating timer's own run, Remaining is the time to its next run: 0.5 s for Every(0.5).</summary>
+        public static void RemainingInEvery(FakeWorld world)
+        {
+            var seen = new List<float>();
+            Timer? timer = null;
+            timer = Timer.Every(0.5f, () => { seen.Add(timer!.Remaining); });
+            world.Advance(1.0f);
+            Expect.Equal(2, seen.Count, "runs in 1 s");
+            Expect.Near(0.5f, seen[0], "Remaining inside the first run");
+            Expect.Near(0.5f, seen[1], "Remaining inside the second run");
+        }
 #if DEBUG
 
         /// <summary>
