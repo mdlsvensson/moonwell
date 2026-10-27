@@ -261,9 +261,10 @@ namespace Moonwell
 
         /// <summary>
         /// Whether the segment from <paramref name="from"/> to <paramref name="to"/> meets the wall from (ax, ay) to (bx, by),
-        /// and at what fraction; worked out in floats, so nothing is made. When the segment starts on the surface of the
-        /// shape the wall belongs to, near the wall's line, it meets the wall only if it goes on past the skin and deeper
-        /// than it started: where it crosses the line, or at its start if it does not cross it.
+        /// and at what fraction; worked out in floats, so nothing is made. The wall reaches the skin past its ends, so a
+        /// segment through a corner meets one of the corner's walls whatever the rounding. When the segment starts on the
+        /// surface of the shape the wall belongs to, near the wall's line, it meets the wall only if it goes on past the
+        /// skin and deeper than it started: where it crosses the line, or at its start if it does not cross it.
         /// </summary>
         private static bool Meets(Vector2 from, Vector2 to, float ax, float ay, float bx, float by, bool surface, out float t)
         {
@@ -311,7 +312,8 @@ namespace Moonwell
             }
 
             var along = (from.X + (to.X - from.X) * t - ax) * sx + (from.Y + (to.Y - from.Y) * t - ay) * sy;
-            return along >= 0f && along <= lengthSquared;
+            var past = along - lengthSquared;
+            return (along >= 0f || along * along <= skin) && (past <= 0f || past * past <= skin);
         }
 
         /// <summary>Whether the segment's end is nearer the line of the wall from (ax, ay) to (bx, by) than its start: it comes toward the wall.</summary>
