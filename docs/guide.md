@@ -204,7 +204,7 @@ public sealed class KillCounter : UnitComponent
   removed or that actor ends, so an aura that buffs others removes its buff in `OnPart` (Interactions, below).
 - What an ability's `OnCast` makes belongs to the ability, which lasts as long as the caster is in the game, so a
   delayed effect runs after the spell has ended; work that should stop with a channel names the cast:
-  `Timer.Every(0.5f, Burn, owner: cast)`. What a unit's own `OnDeath` makes belongs to the game, as death is not an
+  `Timer.Every(0.5f, Pulse, owner: cast)`. What a unit's own `OnDeath` makes belongs to the game, as death is not an
   end and the corpse can go at any time, so a respawn timer runs; an effect that should end with the corpse names the
   unit: `owner: this`. What a component's `OnDeath` makes belongs to the component, which ends when the corpse goes.
 - Game work starts in a reaction. Top-level code and static fields make nothing in the game.
