@@ -67,7 +67,8 @@ namespace Moonwell
 
         /// <summary>
         /// A World Editor region by the name it has there. The game gives the area the region's rect rounded out to
-        /// whole 32 cells. The shape may be made before the package is installed (a map's constructors run while it is
+        /// whole 32 cells, the cells it touches: an edge on the 32 grid is where its cells end, so regions that share an
+        /// edge do not overlap. The shape may be made before the package is installed (a map's constructors run while it is
         /// built); the region is looked up at the first read of its members, or when the area is added. An unknown name
         /// then throws ArgumentException, and a read before the package is installed throws InvalidOperationException.
         /// The build checks a name written as a literal against the map's regions.
@@ -78,7 +79,7 @@ namespace Moonwell
             return new AreaShape(ShapeKind.Rect, new Bounds(Vector2.Zero, Vector2.Zero), false, name, null, Vector2.Zero, 0f, new AreaShape[0]);
         }
 
-        /// <summary>A rect. The game gives the area the rect rounded out to whole 32 cells; <c>Contains</c> tests the true rect, its edges included.</summary>
+        /// <summary>A rect. The game gives the area the rect rounded out to whole 32 cells, the cells it touches: an edge on the 32 grid is where its cells end, so rects that share an edge do not overlap. <c>Contains</c> tests the true rect, its edges included, so a shared edge is in both.</summary>
         [LocalSafe]
         public static AreaShape Rect(Bounds bounds)
         {

@@ -159,7 +159,13 @@ namespace Moonwell.Engine
             }
         }
 
-        /// <summary>Adds the rects and the cells of a shape to a region: a rect or region part is a rect, a polygon or a circle part its 32 cells; a union adds those of its parts.</summary>
+        /// <summary>
+        /// Adds the rects and the cells of a shape to a region: a rect or region part is a rect, a polygon or a circle part
+        /// its 32 cells; a union adds those of its parts. A rect is given to the game from the middle of its first cell to
+        /// the middle of its last, the cells it touches: the game gives a rect every cell from the one holding its min corner
+        /// to the one holding its max corner, so a max edge on the 32 grid given as it is would take the cell past it, and
+        /// two areas that share an edge would share a column of cells (seen 10-26).
+        /// </summary>
         private void AddParts(region made, AreaShape shape)
         {
             if (shape.Kind == AreaShape.ShapeKind.Union)
@@ -175,7 +181,7 @@ namespace Moonwell.Engine
             if (shape.Kind == AreaShape.ShapeKind.Rect)
             {
                 var bounds = shape.Bounds;
-                World.AddRect(made, bounds.Min.X, bounds.Min.Y, bounds.Max.X, bounds.Max.Y);
+                World.AddRect(made, FirstMiddle(bounds.Min.X), FirstMiddle(bounds.Min.Y), LastMiddle(bounds.Min.X, bounds.Max.X), LastMiddle(bounds.Min.Y, bounds.Max.Y));
                 return;
             }
 
@@ -185,6 +191,25 @@ namespace Moonwell.Engine
             {
                 World.AddCell(made, centres[i], centres[i + 1]);
             }
+        }
+
+        /// <summary>The middle of the 32 cell that holds a rect's min edge.</summary>
+        private static float FirstMiddle(float min)
+        {
+            return MathF.Floor(min / 32f) * 32f + 16f;
+        }
+
+        /// <summary>The middle of the last 32 cell a rect from min to max reaches into: a max edge on the grid ends the cell before it. A rect with no width has the cell of its min edge.</summary>
+        private static float LastMiddle(float min, float max)
+        {
+            var first = MathF.Floor(min / 32f);
+            var last = MathF.Ceiling(max / 32f) - 1f;
+            if (last < first)
+            {
+                last = first;
+            }
+
+            return last * 32f + 16f;
         }
 
         /// <summary>One step of the package timer: every 8th step each area's place check, then each area whose Tick is due runs OnUnitStays; in the order the areas were added. A step stops when the timer ends or restarts under it.</summary>

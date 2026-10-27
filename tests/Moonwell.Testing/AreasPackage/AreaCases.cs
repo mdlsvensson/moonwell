@@ -310,8 +310,8 @@ namespace Moonwell.Testing
             Game.Instance.Add(new LogArea(AreaShape.Region("Shop")));
             var shop = fake.Regions[1];
             Expect.Equal(4, shop.Rects.Count, "a region is one rect");
-            Expect.Near(256f, shop.Rects[2], "its right edge");
-            Expect.Near(128f, shop.Rects[3], "its top edge");
+            Expect.Near(240f, shop.Rects[2], "its right edge: the middle of its last cell, so that the cell past 256 is not the game's");
+            Expect.Near(112f, shop.Rects[3], "its top edge: the middle of its last cell");
             Expect.Equal(0, shop.Cells.Count, "a region adds no cells");
             Game.Instance.Add(new LogArea(AreaShape.Of(AreaShape.Rect(new Bounds(new Vector2(0f, 0f), new Vector2(64f, 64f))), circle)));
             Expect.Equal(4, fake.Regions[2].Rects.Count, "a union holds its rect");
@@ -343,7 +343,7 @@ namespace Moonwell.Testing
             AreaSystem.Install(fake, new[] { "Shop" }, new[] { 0f, 0f, 256f, 128f });
             Added(world, area);
             Expect.Equal(1, fake.Regions.Count, "the region is made when the area is added");
-            Expect.Near(256f, fake.Regions[0].Rects[2], "its right edge");
+            Expect.Near(240f, fake.Regions[0].Rects[2], "its right edge: the middle of its last cell");
             var unit = UnitAt(world, 10f, 10f);
             area.Labels[unit] = "a";
             fake.Enter(fake.Regions[0], unit.Handle);

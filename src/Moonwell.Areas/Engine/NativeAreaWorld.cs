@@ -30,7 +30,7 @@ namespace Moonwell.Engine
         /// <summary>Makes an empty region.</summary>
         public region NewRegion() => Natives.CreateRegion();
 
-        /// <summary>Adds a rect to a region: the game rounds it out to whole cells.</summary>
+        /// <summary>Adds a rect to a region: the game gives it every cell from the one holding its min corner to the one holding its max corner.</summary>
         public void AddRect(region r, float minX, float minY, float maxX, float maxY)
         {
             var made = Natives.Rect(minX, minY, maxX, maxY);

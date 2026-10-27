@@ -9,7 +9,7 @@ namespace Moonwell.Hosting
         /// <summary>Makes an empty region.</summary>
         region NewRegion();
 
-        /// <summary>Adds a rect to a region. The game rounds it out to whole 32 cells.</summary>
+        /// <summary>Adds a rect to a region. The game gives it every 32 cell from the one holding its min corner to the one holding its max corner, so a max edge on the 32 grid takes the cell past it (seen 10-26).</summary>
         void AddRect(region r, float minX, float minY, float maxX, float maxY);
 
         /// <summary>Adds the 32 cell that holds a point to a region.</summary>

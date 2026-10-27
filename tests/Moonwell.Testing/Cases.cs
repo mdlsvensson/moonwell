@@ -278,6 +278,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "audit.areas.small-circle", Run = AuditAreaCases.SmallCircle });
             list.Add(new Case { Name = "audit.areas.thin-polygon", Run = AuditAreaCases.ThinPolygon });
             list.Add(new Case { Name = "audit.areas.centre-cell-always", Run = AuditAreaCases.CentreCellAlways });
+            list.Add(new Case { Name = "audit.areas.shared-edge", Run = AuditAreaCases.SharedEdge });
+            list.Add(new Case { Name = "audit.areas.rect-rounded-out", Run = AuditAreaCases.RectRoundedOut });
         }
 
         /// <summary>Adds the input package's cases.</summary>
