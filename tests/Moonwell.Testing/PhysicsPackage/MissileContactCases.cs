@@ -282,6 +282,40 @@ namespace Moonwell.Testing
             Within(-600.0f, later.VX, 0.0f, "as it was");
         }
 
+        /// <summary>
+        /// Two Slide balls with Gravity 800 rolling head on at 300 each on flat ground meet and bounce apart, and stay on the
+        /// ground: the step's gravity is given back at a meeting only to a missile whose move was a free fall, not to one
+        /// that rolled. They hopped to 16.37, 0.37 off the ground.
+        /// </summary>
+        public static void RollingMeet(FakeWorld world)
+        {
+            Fresh();
+            var left = Rolling(400.0f, 300.0f);
+            var right = Rolling(700.0f, -300.0f);
+            UntilImpacts(world, left, 1, 64);
+            Expect.Equal(1, left.Impacts.Count, "they met");
+            Expect.True(left.VX < 0.0f && right.VX > 0.0f, "and bounced apart: " + left.VX + ", " + right.VX);
+            for (var i = 0; i < 8; i++)
+            {
+                Within(16.0f, left.Z, 0.001f, "the left one on the ground, " + i + " steps after");
+                Within(16.0f, right.Z, 0.001f, "the right one on the ground, " + i + " steps after");
+                Within(0.0f, left.VZ, 0.001f, "the left one not lifted, " + i + " steps after");
+                Steps(world, 1);
+            }
+        }
+
+        /// <summary>Places a Slide ball with Gravity 800 and MissileContact Bounce on the ground, rolling along x.</summary>
+        private static Shot Rolling(float x, float vx)
+        {
+            var ball = new Shot();
+            ball.MissileContact = Contact.Bounce;
+            ball.GroundContact = Contact.Slide;
+            ball.Gravity = 800.0f;
+            Missile.Create(ball, x, 500.0f, 16.0f);
+            ball.VX = vx;
+            return ball;
+        }
+
         /// <summary>Places a Bounce ball on the ground that slides to rest, and steps until it rests.</summary>
         private static Shot Resting(FakeWorld world, float x, float y)
         {

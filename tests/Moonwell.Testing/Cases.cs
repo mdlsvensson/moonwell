@@ -357,6 +357,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "missiles.sped-up", Run = MissileContactCases.SpedUp });
             list.Add(new Case { Name = "missiles.woken-frame", Run = MissileContactCases.WokenFrame });
             list.Add(new Case { Name = "missiles.none-side", Run = MissileContactCases.NoneSide });
+            list.Add(new Case { Name = "missiles.rolling-meet", Run = MissileContactCases.RollingMeet });
             list.Add(new Case { Name = "wall.bounce", Run = WallCases.Bounce });
             list.Add(new Case { Name = "wall.slide", Run = WallCases.Slide });
             list.Add(new Case { Name = "wall.height", Run = WallCases.Height });

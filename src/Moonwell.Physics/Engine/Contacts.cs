@@ -1421,10 +1421,12 @@ namespace Moonwell.Engine
                 }
             }
 
-            // The velocities where they met: gravity has acted only for the part of the frame before.
+            // The velocities where they met: gravity has acted only for the part of the frame before. Only a move that was
+            // a free fall took the step's gravity whole: one that met the ground or rolled along it this step has the
+            // ground's velocity, and none is given back, as at Hit.
             var rest = Interactions.Current().Step * frame * (1.0f - t);
-            var lateA = movedA ? first.gravity * rest : 0.0f;
-            var lateB = movedB ? second.gravity * rest : 0.0f;
+            var lateA = movedA && first.fell ? first.gravity * rest : 0.0f;
+            var lateB = movedB && second.fell ? second.gravity * rest : 0.0f;
             var avx = first.vx;
             var avy = first.vy;
             var avz = first.vz + lateA;
