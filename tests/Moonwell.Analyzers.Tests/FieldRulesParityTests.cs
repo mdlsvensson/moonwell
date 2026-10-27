@@ -102,8 +102,8 @@ public class FieldRulesParityTests
         yield return new object[] { "choice, lifted", Footman, "[BeyondLimits(nameof(AttackType))]", "AttackType = (AttackType)42;" };
         yield return new object[] { "choice, a member", Footman, "", "AttackType = AttackType.Normal;" };
         yield return new object[] { "int-stored choice", Footman, "", "DeathType = (DeathType)9;" };
-        yield return new object[] { "flags choice", Footman, "", "PlacementRequires = (PathingListPrevent)(1 << 10);" };
-        yield return new object[] { "flags choice, a combination", Footman, "", "PlacementRequires = PathingListPrevent.Unbuildable | PathingListPrevent.Unflyable;" };
+        yield return new object[] { "flags choice", Footman, "", "PlacementRequires = (PathingRequire)(1 << 10);" };
+        yield return new object[] { "flags choice, a combination", Footman, "", "PlacementRequires = PathingRequire.Buildable | PathingRequire.AirPathable;" };
         yield return new object[] { "float at the lower limit", Tree, "", "Scale = 0.01f;" };
         yield return new object[] { "float below the lower limit", Tree, "", "Scale = 0.0099999f;" };
         yield return new object[] { "float at the upper limit", Tree, "", "MaximumScale = 100f;" };

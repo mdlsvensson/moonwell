@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Moonwell.GameData;
 using Moonwell.Generator.Objects;
 
 namespace Moonwell.Generator.Tests;
@@ -501,6 +502,51 @@ public class ObjectsWriterTests
         Assert.Contains("/// <summary>Tom &amp; &lt;Jerry&gt;  second line (ratf).</summary>", named);
         Assert.Contains("/// <summary>spur.</summary>", named);
         Assert.Empty(Compile(new[] { MiniFiles.Value["Kinds/StandardItem.g.cs"], named }));
+    }
+
+    [Fact]
+    public void a_class_summary_shows_the_editor_suffix_before_the_id()
+    {
+        var tables = MiniExport();
+        var item = Find(StandardObjects.Of(tables, Kind.Item, Fields.Of(tables, Kind.Item)), "ratf");
+
+        var text = ObjectsWriter.Group(
+            "Moonwell.Objects.Items",
+            new[]
+            {
+                (item with { Id = "b001", Name = "Shockwave", EditorSuffix = "(Cairne)" }, new ClassName("Moonwell.Objects.Items", "ShockwaveB001")),
+                (item with { Id = "b002", Name = "", EditorSuffix = "(Cairne)" }, new ClassName("Moonwell.Objects.Items", "b002")),
+                (item with { Id = "b003", Name = "Shockwave" }, new ClassName("Moonwell.Objects.Items", "Shockwave")),
+            },
+            Array.Empty<Field>());
+
+        Assert.Contains("/// <summary>Shockwave (Cairne), b001.</summary>", text);
+        Assert.Contains("/// <summary>(Cairne), b002.</summary>", text);
+        Assert.Contains("/// <summary>Shockwave (b003).</summary>", text);
+    }
+
+    [Fact]
+    public void an_ability_class_has_the_fields_listed_by_its_id_and_by_its_code()
+    {
+        var tables = MiniExport();
+        var fields = Fields.Of(tables, Kind.Ability);
+        var bolt = Find(StandardObjects.Of(tables, Kind.Ability, fields), "AHtb");
+        var empty = new Dictionary<string, string>();
+
+        // An ability AHhb that behaves as Storm Bolt: Hhb1 lists its id; Htb1 lists its code but has the same column.
+        var holy = ObjectsWriter.Group(
+            "Moonwell.Objects.Human.Abilities",
+            new[] { (bolt with { Id = "AHhb", Values = empty }, new ClassName("Moonwell.Objects.Human.Abilities", "HolyBolt")) },
+            fields);
+        Assert.Contains("[global::Moonwell.Objects.Field(\"Hhb1\"", holy);
+        Assert.DoesNotContain("\"Htb1\"", holy);
+
+        // An ability of another id with Storm Bolt's code has Htb1, listed by the code.
+        var copy = ObjectsWriter.Group(
+            "Moonwell.Objects.Human.Abilities",
+            new[] { (bolt with { Id = "AHxx", Values = empty }, new ClassName("Moonwell.Objects.Human.Abilities", "OtherBolt")) },
+            fields);
+        Assert.Contains("[global::Moonwell.Objects.Field(\"Htb1\"", copy);
     }
 
     [Fact]

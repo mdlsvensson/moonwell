@@ -42,7 +42,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Backpack (Repm).</summary>
+            /// <summary>Backpack (Night Elf), Repm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Repm")]
             public class Backpack : global::Moonwell.Objects.StandardUpgrade

@@ -15,9 +15,12 @@ namespace Moonwell.Build.Tests
     {
         private readonly CompiledObjects compiled;
 
-        public ObjectLuaTests(CompiledObjects compiled)
+        private readonly ITestOutputHelper output;
+
+        public ObjectLuaTests(CompiledObjects compiled, ITestOutputHelper output)
         {
             this.compiled = compiled;
+            this.output = output;
         }
 
         [Fact]
@@ -99,7 +102,7 @@ namespace Moonwell.Build.Tests
         {
             // World Editor changed the knight and made a recruit (a footman with a name only) and a hero on the paladin; it also
             // has H001 and hfoo, which the map's Arthas and StrongFootman declare. The skin file holds the names.
-            using var folders = new TestFolders();
+            using var folders = new TestFolders(output);
             var map = folders.TemporaryFolderOutsideRepository();
             var main = new UnitObjectData(ObjectDataFormatVersion.v3);
             main.BaseUnits.Add(WorldEditorObject("hkni", string.Empty, Mod("uhpm", 500)));
@@ -131,7 +134,7 @@ namespace Moonwell.Build.Tests
         public void type_values_read_world_editor_items_and_reals()
         {
             // Fields of a kind the Objects map does not read: an item's charges, a unit's scale (a real in the object file).
-            using var folders = new TestFolders();
+            using var folders = new TestFolders(output);
             var map = folders.TemporaryFolderOutsideRepository();
             var units = new UnitObjectData(ObjectDataFormatVersion.v3);
             units.NewUnits.Add(WorldEditorObject("hkni", "h00S"));
@@ -180,7 +183,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void a_trigger_string_reference_to_no_string_stays_as_it_is()
         {
-            using var folders = new TestFolders();
+            using var folders = new TestFolders(output);
             var map = folders.TemporaryFolderOutsideRepository();
             var skin = new UnitObjectData(ObjectDataFormatVersion.v3);
             skin.NewUnits.Add(WorldEditorObject("hfoo", "h00R", Mod("unam", "TRIGSTR_999")));
@@ -197,7 +200,7 @@ namespace Moonwell.Build.Tests
         public void a_standard_class_reads_its_type_as_world_editor_changed_it()
         {
             // The map's code names Rifleman, and Paladin and Footman as bases of its classes; World Editor changed all three types.
-            using var folders = new TestFolders();
+            using var folders = new TestFolders(output);
             var map = folders.TemporaryFolderOutsideRepository();
             var main = new UnitObjectData(ObjectDataFormatVersion.v3);
             main.BaseUnits.Add(WorldEditorObject("hrif", string.Empty, Mod("uhpm", 777)));
@@ -224,7 +227,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void a_map_that_does_not_read_default_writes_no_type_values()
         {
-            using var folders = new TestFolders();
+            using var folders = new TestFolders(output);
             var map = folders.TemporaryFolderOutsideRepository();
             var main = new UnitObjectData(ObjectDataFormatVersion.v3);
             main.NewUnits.Add(WorldEditorObject("hfoo", "h00R", Mod("uhpm", 500)));
@@ -259,7 +262,7 @@ namespace Moonwell.Build.Tests
         public void trees_follow_the_destructable_types_the_map_makes_or_changes()
         {
             // World Editor made the barrel a tree and the tree wall a debris, and made a new tree on the barrel and a new barrel on it.
-            using var folders = new TestFolders();
+            using var folders = new TestFolders(output);
             var map = folders.TemporaryFolderOutsideRepository();
             var main = new DestructableObjectData(ObjectDataFormatVersion.v3);
             main.BaseDestructables.Add(WorldEditorObject("LTbr", string.Empty, Mod("btar", "tree")));
@@ -314,7 +317,7 @@ namespace Moonwell.Build.Tests
         public void a_standard_destructable_class_reads_its_type_as_world_editor_changed_it()
         {
             // Gate's chain reads TargetedAs, so the Demonic Gate it is based on gets a value; World Editor made the Demonic Gate a tree.
-            using var folders = new TestFolders();
+            using var folders = new TestFolders(output);
             var map = folders.TemporaryFolderOutsideRepository();
             var main = new DestructableObjectData(ObjectDataFormatVersion.v3);
             main.BaseDestructables.Add(WorldEditorObject("ATg1", string.Empty, Mod("btar", "tree")));

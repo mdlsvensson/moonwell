@@ -11,15 +11,129 @@ namespace Moonwell.Testing
         {
             var list = new List<Case>();
             AddFirst(list);
+            AddAuditTimers(list);
             AddMiddle(list);
             AddLast(list);
             AddMaths(list);
             AddInteractions(list);
+            AddAuditInteractions(list);
             AddPhysics(list);
             AddTerrain(list);
+            AddAuditMaths(list);
             AddAreas(list);
+            AddAuditAreas(list);
             AddInput(list);
+            AddLifecycle(list);
+            AddAuditDocs(list);
+            AddDebug(list);
             return list;
+        }
+
+        /// <summary>Adds the cases for the full audit's doc fixes: OrderedMap and OrderedSet in a foreach, and the guide's forms to write instead.</summary>
+        private static void AddAuditDocs(List<Case> list)
+        {
+            list.Add(new Case { Name = "collections.set-foreach-keeps-order", Run = AuditDocsCases.SetForeachKeepsOrder });
+            list.Add(new Case { Name = "collections.set-foreach-change-throws", Run = AuditDocsCases.SetForeachChangeThrows });
+            list.Add(new Case { Name = "collections.map-foreach-keeps-order", Run = AuditDocsCases.MapForeachKeepsOrder });
+            list.Add(new Case { Name = "collections.map-foreach-change-throws", Run = AuditDocsCases.MapForeachChangeThrows });
+            list.Add(new Case { Name = "collections.foreach-left-early", Run = AuditDocsCases.ForeachLeftEarly });
+            list.Add(new Case { Name = "collections.linq", Run = AuditDocsCases.Linq });
+            list.Add(new Case { Name = "forms.using-statement-in-loop", Run = AuditDocsCases.UsingStatementInLoop });
+            list.Add(new Case { Name = "forms.property-pattern-on-null", Run = AuditDocsCases.PropertyPatternOnNull });
+            list.Add(new Case { Name = "forms.local-function-before-switch", Run = AuditDocsCases.LocalFunctionBeforeSwitch });
+            list.Add(new Case { Name = "forms.readonly-struct-in-list", Run = AuditDocsCases.ReadonlyStructInList });
+            list.Add(new Case { Name = "forms.number-formats", Run = AuditDocsCases.NumberFormats });
+            list.Add(new Case { Name = "forms.long-const-string-field", Run = AuditDocsCases.LongConstStringField });
+        }
+
+        /// <summary>Adds the cases for the full audit's fixes to core's lifecycle.</summary>
+        private static void AddLifecycle(List<Case> list)
+        {
+            list.Add(new Case { Name = "lifecycle.units-the-game-makes-are-met", Run = LifecycleCases.UnitsTheGameMakesAreMet });
+            list.Add(new Case { Name = "lifecycle.local-throw-keeps-sync", Run = LifecycleCases.LocalThrowKeepsSync });
+            list.Add(new Case { Name = "lifecycle.death-respawn-outlives-corpse", Run = LifecycleCases.DeathRespawnOutlivesCorpse });
+            list.Add(new Case { Name = "lifecycle.refresh-takes-new-duration", Run = LifecycleCases.RefreshTakesNewDuration });
+            list.Add(new Case { Name = "lifecycle.pair-buff-belongs-to-unit", Run = LifecycleCases.PairBuffBelongsToUnit });
+            list.Add(new Case { Name = "lifecycle.illusion-is-plain", Run = LifecycleCases.IllusionIsPlain });
+            list.Add(new Case { Name = "lifecycle.shared-component-refused", Run = LifecycleCases.SharedComponentRefused });
+            list.Add(new Case { Name = "lifecycle.buff-reapplied-to-itself-refused", Run = LifecycleCases.BuffReappliedToItselfRefused });
+            list.Add(new Case { Name = "lifecycle.remove-others-component-refused", Run = LifecycleCases.RemoveOthersComponentRefused });
+            list.Add(new Case { Name = "lifecycle.adopt-again-refused", Run = LifecycleCases.AdoptAgainRefused });
+            list.Add(new Case { Name = "lifecycle.removed-hero-drop-makes-no-second", Run = LifecycleCases.RemovedHeroDropMakesNoSecond });
+            list.Add(new Case { Name = "lifecycle.created-and-removed-enter-makes-no-second", Run = LifecycleCases.CreatedAndRemovedEnterMakesNoSecond });
+            list.Add(new Case { Name = "lifecycle.hero-lowered", Run = LifecycleCases.HeroLowered });
+            list.Add(new Case { Name = "lifecycle.helper-named-like-reaction", Run = LifecycleCases.HelperNamedLikeReaction });
+            list.Add(new Case { Name = "lifecycle.hiding-method-is-no-reaction", Run = LifecycleCases.HidingMethodIsNoReaction });
+            list.Add(new Case { Name = "lifecycle.unit-created-only-when-it-comes-in", Run = LifecycleCases.UnitCreatedOnlyWhenItComesIn });
+            list.Add(new Case { Name = "lifecycle.ended-owner-runs-neither-created-nor-leave", Run = LifecycleCases.EndedOwnerRunsNeitherCreatedNorLeave });
+            list.Add(new Case { Name = "lifecycle.buff-carrier-survives-morph", Run = LifecycleCases.BuffCarrierSurvivesMorph });
+            list.Add(new Case { Name = "lifecycle.buff-applied-in-death-stays", Run = LifecycleCases.BuffAppliedInDeathStays });
+            list.Add(new Case { Name = "lifecycle.create-of-unknown-type-names-it", Run = LifecycleCases.CreateOfUnknownTypeNamesIt });
+        }
+
+        /// <summary>Adds the debug mode's cases; they exist only in a development build, as the debug mode does.</summary>
+        private static void AddDebug(List<Case> list)
+        {
+            // Every case here must be named debug.*: the release Lua test leaves those out of its count by that prefix.
+#if DEBUG
+            list.Add(new Case { Name = "debug.clock.halt", Run = ClockCases.Halt });
+            list.Add(new Case { Name = "debug.clock.step-advances", Run = ClockCases.StepAdvances });
+            list.Add(new Case { Name = "debug.clock.speed", Run = ClockCases.Speed });
+            list.Add(new Case { Name = "debug.clock.no-jump", Run = ClockCases.NoJump });
+            list.Add(new Case { Name = "debug.clock.timer-while-halted", Run = ClockCases.TimerWhileHalted });
+            list.Add(new Case { Name = "debug.clock.halt-inside-timer", Run = ClockCases.HaltInsideTimer });
+            list.Add(new Case { Name = "debug.clock.catchup", Run = ClockCases.Catchup });
+            list.Add(new Case { Name = "debug.session.off-at-start", Run = SessionCases.OffAtStart });
+            list.Add(new Case { Name = "debug.session.toggle", Run = SessionCases.Toggle });
+            list.Add(new Case { Name = "debug.session.halt-holds", Run = SessionCases.HaltHolds });
+            list.Add(new Case { Name = "debug.session.halt-free", Run = SessionCases.HaltFree });
+            list.Add(new Case { Name = "debug.session.map-paused-stays", Run = SessionCases.MapPausedStays });
+            list.Add(new Case { Name = "debug.session.new-unit-held", Run = SessionCases.NewUnitHeld });
+            list.Add(new Case { Name = "debug.session.step-free", Run = SessionCases.StepFree });
+            list.Add(new Case { Name = "debug.session.step-held", Run = SessionCases.StepHeld });
+            list.Add(new Case { Name = "debug.session.step-dropped", Run = SessionCases.StepDropped });
+            list.Add(new Case { Name = "debug.session.resume-mid-step", Run = SessionCases.ResumeMidStep });
+            list.Add(new Case { Name = "debug.session.speeds", Run = SessionCases.Speeds });
+            list.Add(new Case { Name = "debug.session.step-count", Run = SessionCases.StepCount });
+            list.Add(new Case { Name = "debug.session.off-restores", Run = SessionCases.OffRestores });
+            list.Add(new Case { Name = "debug.session.select", Run = SessionCases.Select });
+            list.Add(new Case { Name = "debug.session.select-next", Run = SessionCases.SelectNext });
+            list.Add(new Case { Name = "debug.session.select-nothing", Run = SessionCases.SelectNothing });
+            list.Add(new Case { Name = "debug.session.facade", Run = SessionCases.Facade });
+            list.Add(new Case { Name = "debug.session.halt-from-code-turns-on", Run = SessionCases.HaltFromCodeTurnsOn });
+            list.Add(new Case { Name = "debug.session.held-h-toggles-once", Run = SessionCases.HeldHTogglesOnce });
+            list.Add(new Case { Name = "debug.session.held-unit-removed", Run = SessionCases.HeldUnitRemoved });
+            list.Add(new Case { Name = "debug.session.breakpoint-escapes", Run = SessionCases.BreakpointEscapes });
+            list.Add(new Case { Name = "debug.session.right-ctrl-selects", Run = SessionCases.RightCtrlSelects });
+            list.Add(new Case { Name = "debug.session.step-bare", Run = SessionCases.StepBare });
+            list.Add(new Case { Name = "debug.session.speed-bare", Run = SessionCases.SpeedBare });
+            list.Add(new Case { Name = "debug.session.ended-selected-reads-null", Run = SessionCases.EndedSelectedReadsNull });
+            list.Add(new Case { Name = "debug.panel.status", Run = PanelCases.Status });
+            list.Add(new Case { Name = "debug.panel.unit", Run = PanelCases.SelectedUnit });
+            list.Add(new Case { Name = "debug.panel.numbers", Run = PanelCases.Numbers });
+            list.Add(new Case { Name = "debug.panel.cap", Run = PanelCases.Cap });
+            list.Add(new Case { Name = "debug.panel.throwing-shown", Run = PanelCases.ThrowingShown });
+            list.Add(new Case { Name = "debug.panel.refresh", Run = PanelCases.Refresh });
+            list.Add(new Case { Name = "debug.panel.ended", Run = PanelCases.Ended });
+            list.Add(new Case { Name = "debug.panel.off", Run = PanelCases.Off });
+            list.Add(new Case { Name = "debug.panel.reuse", Run = PanelCases.Reuse });
+            list.Add(new Case { Name = "debug.panel.stats", Run = PanelCases.Stats });
+            list.Add(new Case { Name = "debug.panel.free-halt-follows", Run = PanelCases.FreeHaltFollows });
+            list.Add(new Case { Name = "debug.interactions.candidates-no-tracking", Run = DebugViewCases.CandidatesNoTracking });
+            list.Add(new Case { Name = "debug.interactions.lines", Run = DebugViewCases.Lines });
+            list.Add(new Case { Name = "debug.interactions.paired-by", Run = DebugViewCases.PairedBy });
+            list.Add(new Case { Name = "debug.interactions.draw", Run = DebugViewCases.Draw });
+            list.Add(new Case { Name = "debug.interactions.pair-limit", Run = DebugViewCases.PairLimit });
+            list.Add(new Case { Name = "debug.interactions.gizmo-ends", Run = DebugViewCases.GizmoEnds });
+            list.Add(new Case { Name = "debug.interactions.stats", Run = DebugViewCases.Stats });
+            list.Add(new Case { Name = "debug.interactions.step-length", Run = DebugViewCases.StepLength });
+            list.Add(new Case { Name = "debug.areas.lines", Run = AreasViewCases.Lines });
+            list.Add(new Case { Name = "debug.areas.outlines", Run = AreasViewCases.Outlines });
+            list.Add(new Case { Name = "debug.areas.not-in-any", Run = AreasViewCases.NotInAny });
+            list.Add(new Case { Name = "debug.areas.region", Run = AreasViewCases.Region });
+            list.Add(new Case { Name = "debug.areas.no-tracker", Run = AreasViewCases.NoTracker });
+            list.Add(new Case { Name = "debug.areas.registered", Run = AreasViewCases.Registered });
+#endif
         }
 
         /// <summary>Adds the interactions package's cases.</summary>
@@ -254,6 +368,25 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "deck.not-a-cylinder", Run = DeckCases.NotACylinder });
         }
 
+        /// <summary>Adds the cases for the full audit's fixes to the interactions package.</summary>
+        private static void AddAuditInteractions(List<Case> list)
+        {
+            list.Add(new Case { Name = "interactions.audit.teleport-together-stays-paired", Run = AuditInteractionCases.TeleportTogetherStaysPaired });
+            list.Add(new Case { Name = "interactions.audit.teleport-together-keeps-stop", Run = AuditInteractionCases.TeleportTogetherKeepsStop });
+            list.Add(new Case { Name = "interactions.audit.teleport-apart-parts", Run = AuditInteractionCases.TeleportApartParts });
+            list.Add(new Case { Name = "interactions.audit.guide-fire-aura-spares-changed-owner", Run = AuditInteractionCases.GuideFireAuraSparesChangedOwner });
+            list.Add(new Case { Name = "interactions.audit.recheck-off-keeps-pair", Run = AuditInteractionCases.RecheckOffKeepsPair });
+            list.Add(new Case { Name = "interactions.audit.recheck-refusal-parts-and-meets-again", Run = AuditInteractionCases.RecheckRefusalPartsAndMeetsAgain });
+            list.Add(new Case { Name = "interactions.audit.recheck-throwing-accepts-refuses", Run = AuditInteractionCases.RecheckThrowingAcceptsRefuses });
+            list.Add(new Case { Name = "interactions.audit.recheck-parts-once-per-meet", Run = AuditInteractionCases.RecheckPartsOncePerMeet });
+            list.Add(new Case { Name = "interactions.audit.gizmo-leave-has-no-place", Run = AuditInteractionCases.GizmoLeaveHasNoPlace });
+            list.Add(new Case { Name = "interactions.audit.cell-check-removal-keeps-round", Run = AuditInteractionCases.CellCheckRemovalKeepsRound });
+            list.Add(new Case { Name = "interactions.audit.destructable-holder-tracked-alone", Run = AuditInteractionCases.DestructableHolderTrackedAlone });
+            list.Add(new Case { Name = "interactions.audit.item-holder-tracked-alone", Run = AuditInteractionCases.ItemHolderTrackedAlone });
+            list.Add(new Case { Name = "interactions.audit.unit-holder-of-gizmos-tracked-alone", Run = AuditInteractionCases.UnitHolderOfGizmosTrackedAlone });
+            list.Add(new Case { Name = "interactions.audit.carried-item-has-no-place", Run = AuditInteractionCases.CarriedItemHasNoPlace });
+        }
+
         /// <summary>Adds the areas package's cases.</summary>
         private static void AddAreas(List<Case> list)
         {
@@ -267,6 +400,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "areas.area.enter-stay-leave", Run = AreaCases.EnterStayLeave });
             list.Add(new Case { Name = "areas.area.accepts", Run = AreaCases.Accepts });
             list.Add(new Case { Name = "areas.area.already-inside", Run = AreaCases.AlreadyInside });
+            list.Add(new Case { Name = "areas.area.already-inside-edge", Run = AreaCases.AlreadyInsideEdge });
             list.Add(new Case { Name = "areas.area.sweep-and-event", Run = AreaCases.SweepAndEvent });
             list.Add(new Case { Name = "areas.area.death", Run = AreaCases.Death });
             list.Add(new Case { Name = "areas.area.removed", Run = AreaCases.Removed });
@@ -292,6 +426,33 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "areas.area.step-hands-over-and-restarts", Run = AreaCases.StepHandsOverAndRestarts });
             list.Add(new Case { Name = "areas.area.step-hands-over-and-keeps-running", Run = AreaCases.StepHandsOverAndKeepsRunning });
             list.Add(new Case { Name = "areas.area.step-leaves-and-reenters", Run = AreaCases.StepLeavesAndReenters });
+        }
+
+        /// <summary>Adds the cases for the full audit's fixes to areas and input.</summary>
+        private static void AddAuditAreas(List<Case> list)
+        {
+            list.Add(new Case { Name = "audit.areas.fake-covers-as-the-game", Run = AuditAreaCases.FakeCoversAsTheGame });
+            list.Add(new Case { Name = "audit.areas.fake-walks", Run = AuditAreaCases.FakeWalks });
+            list.Add(new Case { Name = "audit.areas.small-circle", Run = AuditAreaCases.SmallCircle });
+            list.Add(new Case { Name = "audit.areas.thin-polygon", Run = AuditAreaCases.ThinPolygon });
+            list.Add(new Case { Name = "audit.areas.centre-cell-always", Run = AuditAreaCases.CentreCellAlways });
+            list.Add(new Case { Name = "audit.areas.shared-edge", Run = AuditAreaCases.SharedEdge });
+            list.Add(new Case { Name = "audit.areas.rect-rounded-out", Run = AuditAreaCases.RectRoundedOut });
+            list.Add(new Case { Name = "audit.areas.shadowed-fields", Run = AuditAreaCases.ShadowedFields });
+            list.Add(new Case { Name = "audit.areas.recheck-leaves-and-enters", Run = AuditAreaCases.RecheckLeavesAndEnters });
+            list.Add(new Case { Name = "audit.areas.recheck-refused-at-entry", Run = AuditAreaCases.RecheckRefusedAtEntry });
+            list.Add(new Case { Name = "audit.areas.recheck-off", Run = AuditAreaCases.RecheckOff });
+            list.Add(new Case { Name = "audit.areas.recheck-forgets-leavers", Run = AuditAreaCases.RecheckForgetsLeavers });
+            list.Add(new Case { Name = "audit.areas.recheck-ends-area", Run = AuditAreaCases.RecheckEndsArea });
+            list.Add(new Case { Name = "audit.areas.corpse-checks-without-steps", Run = AuditAreaCases.CorpseChecksWithoutSteps });
+            list.Add(new Case { Name = "audit.areas.no-tick-no-steps", Run = AuditAreaCases.NoTickNoSteps });
+            list.Add(new Case { Name = "audit.areas.many-corpses", Run = AuditAreaCases.ManyCorpses });
+            list.Add(new Case { Name = "audit.areas.left-while-ending", Run = AuditAreaCases.LeftWhileEnding });
+            list.Add(new Case { Name = "audit.input.no-moves", Run = AuditInputCases.NoMoves });
+            list.Add(new Case { Name = "audit.input.moves", Run = AuditInputCases.Moves });
+            list.Add(new Case { Name = "audit.input.watchers-kept", Run = AuditInputCases.WatchersKept });
+            list.Add(new Case { Name = "audit.input.watchers-changed-in-dispatch", Run = AuditInputCases.WatchersChangedInDispatch });
+            list.Add(new Case { Name = "audit.input.camera-named-before-start", Run = AuditInputCases.CameraNamedBeforeStart });
         }
 
         /// <summary>Adds the input package's cases.</summary>
@@ -365,6 +526,37 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "terrain.raycast.hit-values", Run = GroundRayCases.HitValues });
             list.Add(new Case { Name = "terrain.raycast.not-installed", Run = GroundRayCases.NotInstalled });
             list.Add(new Case { Name = "terrain.raycast.miss-makes-nothing", Run = MissCases.GroundMissMakesNothing });
+        }
+
+        /// <summary>Adds the cases for the full audit's fixes to the maths and terrain packages.</summary>
+        private static void AddAuditMaths(List<Case> list)
+        {
+            list.Add(new Case { Name = "maths.bounce.circle-exact", Run = BounceCases.CircleExact });
+            list.Add(new Case { Name = "maths.bounce.bounds-exact", Run = BounceCases.BoundsExact });
+            list.Add(new Case { Name = "maths.bounce.polygon-exact", Run = BounceCases.PolygonExact });
+            list.Add(new Case { Name = "maths.bounce.wall-exact", Run = BounceCases.WallExact });
+            list.Add(new Case { Name = "maths.bounce.circle-sweep", Run = BounceCases.CircleSweep });
+            list.Add(new Case { Name = "maths.bounce.bounds-sweep", Run = BounceCases.BoundsSweep });
+            list.Add(new Case { Name = "maths.bounce.polygon-sweep", Run = BounceCases.PolygonSweep });
+            list.Add(new Case { Name = "maths.bounce.wall-sweep", Run = BounceCases.WallSweep });
+            list.Add(new Case { Name = "maths.bounce.room", Run = BounceCases.Room });
+            list.Add(new Case { Name = "maths.bounce.notch", Run = BounceCases.Notch });
+            list.Add(new Case { Name = "maths.bounce.slide-bounds", Run = BounceCases.SlideBounds });
+            list.Add(new Case { Name = "maths.bounce.slide-polygon", Run = BounceCases.SlidePolygon });
+            list.Add(new Case { Name = "maths.bounce.into-from-surface", Run = BounceCases.IntoFromSurface });
+            list.Add(new Case { Name = "maths.raycast.corners-found", Run = CornerRayCases.Found });
+            list.Add(new Case { Name = "maths.raycast.through-corners", Run = CornerRayCases.ThroughCorners });
+            list.Add(new Case { Name = "maths.shapes.polygon-far", Run = FarPolygonCases.AreaAndCenter });
+            list.Add(new Case { Name = "terrain.raycast.past-the-edge", Run = GroundClipCases.PastTheEdge });
+            list.Add(new Case { Name = "terrain.raycast.long-ray-clipped", Run = GroundClipCases.LongRayClipped });
+            list.Add(new Case { Name = "terrain.pathing.every-cell", Run = PackedPathingCases.EveryCell });
+            list.Add(new Case { Name = "terrain.pathing.full-grid-memory", Run = PackedPathingCases.FullGridMemory });
+            list.Add(new Case { Name = "maths.actors.face-own-place", Run = FaceOwnPlaceCases.KeepsFacing });
+            list.Add(new Case { Name = "terrain.bounce.flat", Run = GroundBounceCases.BounceFlat });
+            list.Add(new Case { Name = "terrain.bounce.slope", Run = GroundBounceCases.BounceSlope });
+            list.Add(new Case { Name = "terrain.bounce.roll-flat", Run = GroundBounceCases.RollFlat });
+            list.Add(new Case { Name = "terrain.bounce.roll-slope", Run = GroundBounceCases.RollSlope });
+            list.Add(new Case { Name = "terrain.bounce.into-from-ground", Run = GroundBounceCases.IntoFromGround });
         }
 
         /// <summary>Adds the maths package's cases.</summary>
@@ -456,6 +648,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "ownership.ends-newest-first", Run = OwnershipCases.EndsNewestFirst });
             list.Add(new Case { Name = "ownership.ends-grandchildren", Run = OwnershipCases.EndsGrandchildren });
             list.Add(new Case { Name = "ownership.end-once", Run = OwnershipCases.EndOnce });
+            list.Add(new Case { Name = "ownership.end-inside-end", Run = OwnershipCases.EndInsideEnd });
             list.Add(new Case { Name = "ownership.adopt-into-ended", Run = OwnershipCases.AdoptIntoEnded });
             list.Add(new Case { Name = "ownership.child-ends-alone", Run = OwnershipCases.ChildEndsAlone });
             list.Add(new Case { Name = "ownership.adopt-while-ending", Run = OwnershipCases.AdoptWhileEnding });
@@ -465,7 +658,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "timers.after", Run = TimerCases.After });
             list.Add(new Case { Name = "timers.every", Run = TimerCases.Every });
             list.Add(new Case { Name = "timers.no-drift", Run = TimerCases.NoDrift });
+            list.Add(new Case { Name = "timers.no-drift-woken-late", Run = TimerCases.NoDriftWokenLate });
             list.Add(new Case { Name = "timers.same-time-in-creation-order", Run = TimerCases.SameTimeInCreationOrder });
+            list.Add(new Case { Name = "timers.many-in-due-order", Run = TimerCases.ManyInDueOrder });
             list.Add(new Case { Name = "timers.end-cancels", Run = TimerCases.EndCancels });
             list.Add(new Case { Name = "timers.owned", Run = TimerCases.OwnerAdopts });
             list.Add(new Case { Name = "timers.current-in-callback", Run = TimerCases.CurrentInCallback });
@@ -504,6 +699,26 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "game.print", Run = PlayerCases.GamePrint });
         }
 
+        /// <summary>Adds the cases from the full audit's timer findings; the one that needs Moonwell's clock exists only in a development build, and is named debug.* (see AddDebug).</summary>
+        private static void AddAuditTimers(List<Case> list)
+        {
+            list.Add(new Case { Name = "timers.every-late-no-drift", Run = AuditTimerCases.EveryLateNoDrift });
+            list.Add(new Case { Name = "timers.every-tiny-late", Run = AuditTimerCases.EveryTinyLate });
+            list.Add(new Case { Name = "timers.every-milli-very-late", Run = AuditTimerCases.EveryMilliVeryLate });
+            list.Add(new Case { Name = "timers.buff-ticks-late", Run = AuditTimerCases.BuffTicksLate });
+            list.Add(new Case { Name = "timers.near-times-order", Run = AuditTimerCases.NearTimesOrder });
+            list.Add(new Case { Name = "timers.near-times-many", Run = AuditTimerCases.NearTimesMany });
+            list.Add(new Case { Name = "timers.after-zero-same-instant", Run = AuditTimerCases.AfterZeroSameInstant });
+            list.Add(new Case { Name = "timers.after-zero-runaway", Run = AuditTimerCases.AfterZeroRunaway });
+            list.Add(new Case { Name = "timers.runaway-many-timers", Run = AuditTimerCases.RunawayManyTimers });
+            list.Add(new Case { Name = "timers.catch-up-not-runaway", Run = AuditTimerCases.CatchUpNotRunaway });
+            list.Add(new Case { Name = "timers.every-zero-refused", Run = AuditTimerCases.EveryZeroRefused });
+            list.Add(new Case { Name = "timers.remaining-in-every", Run = AuditTimerCases.RemainingInEvery });
+#if DEBUG
+            list.Add(new Case { Name = "debug.timers.no-drift-at-speed", Run = AuditTimerCases.NoDriftAtSpeed });
+#endif
+        }
+
         /// <summary>Adds the player, local, unit and inventory cases (Lua allows 200 locals in a function, and each case made here is one).</summary>
         private static void AddMiddle(List<Case> list)
         {
@@ -529,6 +744,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "map.components-not-added-early", Run = MapCases.ComponentsNotAddedEarly });
             list.Add(new Case { Name = "map.components-assigned", Run = MapCases.ComponentsAssigned });
             list.Add(new Case { Name = "map.components-add-many", Run = MapCases.ComponentsAddMany });
+            list.Add(new Case { Name = "map.begin-takes-in-placed", Run = MapCases.BeginTakesInPlaced });
             list.Add(new Case { Name = "units.subclass-assigning-drops-parent", Run = MapCases.SubclassAssigningDropsParent });
             list.Add(new Case { Name = "units.subclass-add-many-keeps-parent", Run = MapCases.SubclassAddManyKeepsParent });
             list.Add(new Case { Name = "units.create-default-facing", Run = MapCases.CreateDefaultFacing });
@@ -548,10 +764,12 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "units.owned", Run = UnitCases.OwnedByOwner });
             list.Add(new Case { Name = "units.not-owned-by-current", Run = UnitCases.NotOwnedByCurrent });
             list.Add(new Case { Name = "units.create-generic", Run = UnitCases.CreateGeneric });
+            list.Add(new Case { Name = "units.create-place", Run = UnitCases.CreatePlace });
             list.Add(new Case { Name = "units.sweep-continues-after-error", Run = UnitCases.SweepContinuesAfterError });
             list.Add(new Case { Name = "units.add-in-onleave", Run = UnitCases.AddInOnLeave });
             list.Add(new Case { Name = "units.enter", Run = UnitCases.Enter });
             list.Add(new Case { Name = "units.player-after-removal", Run = UnitCases.PlayerAfterRemoval });
+            list.Add(new Case { Name = "units.player-set", Run = UnitCases.PlayerSet });
             list.Add(new Case { Name = "units.dictionary-key", Run = UnitCases.DictionaryKey });
             list.Add(new Case { Name = "units.life-and-mana", Run = UnitCases.LifeAndMana });
             list.Add(new Case { Name = "units.position", Run = UnitCases.Position });
@@ -661,6 +879,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "damage.nested", Run = DamageCases.Nested });
             list.Add(new Case { Name = "damage.actor-ends-mid-dispatch", Run = DamageCases.ActorEndsMidDispatch });
             list.Add(new Case { Name = "damage.error-isolated", Run = DamageCases.ErrorIsolated });
+            list.Add(new Case { Name = "damage.same-player", Run = DamageCases.SamePlayer });
+            list.Add(new Case { Name = "damage.deal-tag-in-reactions", Run = DamageCases.DealTagInReactions });
             list.Add(new Case { Name = "damage-package.no-trigger-without-need", Run = InstallCases.NoTriggerWithoutNeed });
             list.Add(new Case { Name = "damage-package.listens-for-an-interface", Run = InstallCases.ListensForAnInterface });
             list.Add(new Case { Name = "damage-package.listens-for-on-damaged", Run = InstallCases.ListensForOnDamaged });
@@ -706,14 +926,18 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "damage-package.chain-through-on-damaged", Run = DealCases.ChainThroughOnDamaged });
             list.Add(new Case { Name = "death.order", Run = DeathCases.Order });
             list.Add(new Case { Name = "death.self", Run = DeathCases.Self });
+            list.Add(new Case { Name = "death.same-player", Run = DeathCases.SamePlayer });
             list.Add(new Case { Name = "death.not-an-end", Run = DeathCases.NotAnEnd });
             list.Add(new Case { Name = "abilities.registered", Run = AbilityCases.Registered });
             list.Add(new Case { Name = "abilities.generic", Run = AbilityCases.Generic });
             list.Add(new Case { Name = "cast.order", Run = AbilityCases.Order });
             list.Add(new Case { Name = "cast.fields", Run = AbilityCases.Fields });
-            list.Add(new Case { Name = "cast.owns-what-it-starts", Run = AbilityCases.OwnsWhatItStarts });
+            list.Add(new Case { Name = "cast.ability-owns-what-it-starts", Run = AbilityCases.AbilityOwnsWhatItStarts });
             list.Add(new Case { Name = "cast.next-ends-previous", Run = AbilityCases.NextEndsPrevious });
             list.Add(new Case { Name = "cast.listen", Run = AbilityCases.Listens });
+            list.Add(new Case { Name = "cast.ends-with-unit", Run = AbilityCases.EndsWithUnit });
+            list.Add(new Case { Name = "cast.other-ability-end-keeps", Run = AbilityCases.OtherAbilityEndKeeps });
+            list.Add(new Case { Name = "cast.map-cast-listens", Run = AbilityCases.MapCastListens });
             list.Add(new Case { Name = "buff.ticks-then-expiry", Run = BuffCases.TicksThenExpiry });
             list.Add(new Case { Name = "buff.refresh", Run = BuffCases.Refresh });
             list.Add(new Case { Name = "buff.separate", Run = BuffCases.Separate });
@@ -735,6 +959,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "floats.ints-stay", Run = FloatCases.IntsStay });
             list.Add(new Case { Name = "floats.ints-start-as-integers", Run = FloatCases.IntsStart });
             list.Add(new Case { Name = "floats.made-floats-in-calls", Run = FloatCases.MadeFloatsInCalls });
+            list.Add(new Case { Name = "floats.unit-whole-values", Run = FloatCases.UnitWholeValues });
             list.Add(new Case { Name = "text.nullable-concat", Run = TextCases.NullableConcat });
             list.Add(new Case { Name = "text.conditional-access-concat", Run = TextCases.ConditionalAccessConcat });
             list.Add(new Case { Name = "text.nullable-interpolation", Run = TextCases.NullableInterpolation });
@@ -768,6 +993,11 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "compiler.initializer-temporaries", Run = CompilerCases.InitializerTemporaries });
             list.Add(new Case { Name = "compiler.foreach-disposes", Run = CompilerCases.ForeachDisposes });
             list.Add(new Case { Name = "compiler.private-base-fields", Run = CompilerCases.PrivateBaseFields });
+            list.Add(new Case { Name = "compiler.local-function-before-declaration", Run = CompilerCases.LocalFunctionBeforeDeclaration });
+            list.Add(new Case { Name = "compiler.using-declaration-returns", Run = CompilerCases.UsingDeclarationReturns });
+            list.Add(new Case { Name = "compiler.nullable-equals-null", Run = CompilerCases.NullableEqualsNull });
+            list.Add(new Case { Name = "compiler.switch-statement-patterns", Run = CompilerCases.SwitchStatementPatterns });
+            list.Add(new Case { Name = "compiler.negated-negative-constant", Run = CompilerCases.NegatedNegativeConstant });
         }
 
         /// <summary>Runs every case on a fresh world, and returns a PASS or FAIL line for each, then DONE.</summary>

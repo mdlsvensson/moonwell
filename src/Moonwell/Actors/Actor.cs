@@ -74,10 +74,15 @@ namespace Moonwell
             return Get<T>() != null;
         }
 
-        /// <summary>Removes a component from this actor: it ends, which runs its OnRemoved.</summary>
+        /// <summary>Removes a component from this actor: it ends, which runs its OnRemoved. A component that is not on this actor is left as it is, and the error is reported, in every build.</summary>
         public void Remove(Component component)
         {
-            Dev.Check(component.actor == this, Names.NameOf(this) + ".Remove: the component is not on this actor");
+            if (component.actor != this)
+            {
+                Errors.Refuse(Names.NameOf(this) + ".Remove", Names.NameOf(component) + " is not on this actor");
+                return;
+            }
+
             component.End();
         }
 
@@ -106,10 +111,26 @@ namespace Moonwell
             return found.Count;
         }
 
-        /// <summary>Adds a component to this actor, runs its OnAdded, and returns it; on an actor that has ended it ends at once.</summary>
+        /// <summary>Whether a component may not be added to this actor, as it is on an actor already or has ended: it is then reported, in every build, as an error of the action, and the caller leaves it as it is (decision 74).</summary>
+        internal bool Refuses(Component component, string action)
+        {
+            if (component.actor == null && !component.HasEnded)
+            {
+                return false;
+            }
+
+            Errors.Refuse(Names.NameOf(this) + "." + action, Names.NameOf(component) + " is already on an actor or has ended");
+            return true;
+        }
+
+        /// <summary>Adds a component to this actor, runs its OnAdded, and returns it; on an actor that has ended it ends at once. A component already on an actor, or one that has ended, is left as it is, and the error is reported, in every build.</summary>
         protected TComponent AddComponent<TComponent>(TComponent component) where TComponent : Component
         {
-            Dev.Check(component.actor == null && !component.HasEnded, Names.NameOf(this) + ".Add: the component is already on an actor or has ended");
+            if (Refuses(component, "Add"))
+            {
+                return component;
+            }
+
             component.actor = this;
             Adopt(component);
             if (component.HasEnded)

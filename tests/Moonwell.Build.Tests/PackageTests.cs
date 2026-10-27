@@ -13,11 +13,12 @@ namespace Moonwell.Build.Tests
     public sealed class PackageTests : IClassFixture<PackedMoonwell>, IDisposable
     {
         private readonly PackedMoonwell packed;
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
 
-        public PackageTests(PackedMoonwell packed)
+        public PackageTests(PackedMoonwell packed, ITestOutputHelper output)
         {
             this.packed = packed;
+            folders = new TestFolders(output);
         }
 
         public void Dispose()
@@ -296,7 +297,7 @@ namespace Moonwell.Build.Tests
             var copy = PackagedSample(false, false);
 
             var log = new StringWriter();
-            var archive = MapBuild.Run(copy, new BuildOptions(), log);
+            var archive = MapBuild.Run(copy, Packed(), log);
 
             Assert.True(File.Exists(archive), log.ToString());
             var script = File.ReadAllText(Path.Combine(copy, "build", "Sample", "war3map.lua"));
@@ -313,7 +314,7 @@ namespace Moonwell.Build.Tests
                 "namespace Sample\n{\n    public static class Desync\n    {\n        public static object Local() => Moonwell.Natives.GetLocalPlayer();\n    }\n}\n");
 
             var log = new StringWriter();
-            Assert.Throws<BuildException>(() => MapBuild.Run(copy, new BuildOptions(), log));
+            Assert.Throws<BuildException>(() => MapBuild.Run(copy, Packed(), log));
 
             Assert.Contains("Desync.cs(5,41): error MW0002", log.ToString());
         }
@@ -324,7 +325,7 @@ namespace Moonwell.Build.Tests
             var copy = PackagedSample(false, true);
 
             var log = new StringWriter();
-            var archive = MapBuild.Run(copy, new BuildOptions(), log);
+            var archive = MapBuild.Run(copy, Packed(), log);
 
             Assert.True(File.Exists(archive), log.ToString());
             var script = File.ReadAllText(Path.Combine(copy, "build", "Sample", "war3map.lua"));
@@ -339,11 +340,11 @@ namespace Moonwell.Build.Tests
             var copy = PackagedSample(true, true);
 
             var first = new StringWriter();
-            MapBuild.Run(copy, new BuildOptions(), first);
+            MapBuild.Run(copy, Packed(), first);
             Assert.True(File.Exists(Path.Combine(copy, "build", "generated", "MapMain.g.cs")), first.ToString());
 
             var second = new StringWriter();
-            var archive = MapBuild.Run(copy, new BuildOptions(), second);
+            var archive = MapBuild.Run(copy, Packed(), second);
 
             Assert.True(File.Exists(archive), second.ToString());
         }
@@ -375,7 +376,7 @@ namespace Moonwell.Build.Tests
             string archive;
             try
             {
-                archive = MapBuild.Run(map, new BuildOptions(), log);
+                archive = MapBuild.Run(map, Packed(), log);
             }
             catch (BuildException failure)
             {
@@ -406,7 +407,7 @@ namespace Moonwell.Build.Tests
             var map = Path.Combine(parent, "Keep");
             WriteFeedConfig(map);
 
-            MapBuild.Run(map, new BuildOptions { Release = true }, new StringWriter());
+            MapBuild.Run(map, Packed(release: true), new StringWriter());
 
             var script = File.ReadAllText(Path.Combine(map, "build", "Keep", "war3map.lua"));
             Assert.Contains("MoonwellObjectValues = {", script);
@@ -453,7 +454,7 @@ namespace Moonwell.Build.Tests
             string archive;
             try
             {
-                archive = MapBuild.Run(map, new BuildOptions(), log);
+                archive = MapBuild.Run(map, Packed(), log);
             }
             catch (BuildException failure)
             {
@@ -476,7 +477,7 @@ namespace Moonwell.Build.Tests
             WriteFeedConfig(map);
 
             var log = new StringWriter();
-            MapBuild.Run(map, new BuildOptions { Release = true }, log);
+            MapBuild.Run(map, Packed(release: true), log);
 
             var script = File.ReadAllText(Path.Combine(map, "build", "Keep", "war3map.lua"));
             Assert.DoesNotContain("DamageSystem", script);
@@ -488,10 +489,34 @@ namespace Moonwell.Build.Tests
             var copy = folders.TemporaryCopyOfSample();
             WriteAssets(copy, "Moonwell/0.0.0-missing", "package");
 
-            var error = Assert.Throws<BuildException>(() => PackageSources.Check(MapProject.Find(copy)));
+            var error = Assert.Throws<BuildException>(() => PackageSources.Check(MapProject.Find(copy), "0.0.0-missing"));
 
             var packages = CSharpLua.PackageHelper.GetGlobalPackagesPath();
             Assert.Equal($"Moonwell 0.0.0-missing has no source in {packages}, where CSharp.lua reads packages from", error.Message);
+        }
+
+        [Fact]
+        public void package_of_another_version_than_the_tool_is_reported()
+        {
+            // The tool reflects on Moonwell.Objects' internals and writes calls into the packages, so another version fails in ways that say nothing.
+            var copy = folders.TemporaryCopyOfSample();
+            WriteAssets(copy, "Moonwell.Objects/0.2.5", "package");
+
+            var error = Assert.Throws<BuildException>(() => PackageSources.Check(MapProject.Find(copy), "0.3.0-preview.1"));
+
+            Assert.Equal(
+                "the map's Moonwell.Objects is 0.2.5 and this moonwell is 0.3.0-preview.1, and they must be one version: run "
+                + "dotnet tool update -g Moonwell.Cli --version 0.2.5, or set the map's Moonwell PackageReference versions to 0.3.0-preview.1",
+                error.Message);
+        }
+
+        [Fact]
+        public void the_tools_version_has_no_source_revision()
+        {
+            var props = File.ReadAllText(Path.Combine(TestFolders.Fixture("."), "..", "..", "..", "Directory.Build.props"));
+            var version = Regex.Match(props, "<Version>([^<]+)</Version>").Groups[1].Value;
+
+            Assert.Equal(version, PackageSources.ToolVersion);
         }
 
         [Fact]
@@ -500,11 +525,17 @@ namespace Moonwell.Build.Tests
             var copy = folders.TemporaryCopyOfSample();
             WriteAssets(copy, "Moonwell/0.0.0-missing", "project");
 
-            PackageSources.Check(MapProject.Find(copy));
+            PackageSources.Check(MapProject.Find(copy), PackageSources.ToolVersion);
 
             WriteAssets(copy, "War3Net.Build/0.0.0-missing", "package");
 
-            PackageSources.Check(MapProject.Find(copy));
+            PackageSources.Check(MapProject.Find(copy), PackageSources.ToolVersion);
+        }
+
+        // A build of the packed packages, whose version is the tests' own, not the tool's.
+        private BuildOptions Packed(bool release = false)
+        {
+            return new BuildOptions { Release = release, PackageVersion = packed.Version };
         }
 
         private string PackagedSample(bool withoutOwnRemove, bool withObjects)

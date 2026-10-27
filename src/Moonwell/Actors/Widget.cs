@@ -7,6 +7,9 @@ namespace Moonwell
         [LocalSafe]
         public bool IsGone { get; internal set; }
 
+        /// <summary>Whether the object came into the game for the runtime: set at its take-in, before its OnCreated, unless it had ended already. Only one that came in runs OnLeave and the ending listeners when it ends. Internal, not private, for the reason Owner gives.</summary>
+        internal bool entered;
+
         /// <summary>The default object of a unit or item class, as <c>Unit.Default&lt;Champion&gt;()</c>: its declared values, the same object the Default of each of its units gives. One per class, made on first use by the class's maker, with no handle; it is gone, so its live actions do nothing. Throws for a destructable class. Declared here and not on Unit and Item, as C# allows no method named like the Default property beside it.</summary>
         [LocalSafe]
         public static T Default<T>()

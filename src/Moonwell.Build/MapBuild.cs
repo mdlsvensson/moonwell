@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Moonwell.Build
 {
     /// <summary>Builds a map project into a map archive.</summary>
@@ -15,7 +17,7 @@ namespace Moonwell.Build
         /// <summary>The areas package's assembly: a map that references it gets its World Editor regions written from <c>war3map.w3r</c>, their names in its code checked, and the package installed by its Main.</summary>
         private const string AreasAssemblyName = "Moonwell.Areas";
 
-        /// <summary>The input package's assembly: a map that references it gets World Editor's cameras written from <c>war3map.w3c</c>, their names in its code checked, and the package installed by its Main, listening for the mouse only when the code names <c>Mouse</c> or <c>IMouseWatch</c>.</summary>
+        /// <summary>The input package's assembly: a map that references it gets World Editor's cameras written from <c>war3map.w3c</c>, their names in its code checked, and the package installed by its Main, listening for the mouse only when the code names <c>Mouse</c> or <c>IMouseWatch</c>, and for its moves only when the code needs them.</summary>
         private const string InputAssemblyName = "Moonwell.Input";
 
         /// <summary>The physics package's assembly: a map that references it gets its placed bridges written from <c>war3map.doo</c> and installed by its Main.</summary>
@@ -29,11 +31,37 @@ namespace Moonwell.Build
         /// <exception cref="BuildException">A step failed in a way the modder can act on.</exception>
         public static string Run(string path, BuildOptions options, TextWriter log)
         {
+            // The map's own C# that runs here (a tooltip's formula) and CSharp.lua (a negative constant) write numbers in the
+            // current culture, and the game reads them as the invariant culture writes them: 37.5 and -1, not a Swedish 37,5
+            // and its minus sign U+2212. Threads the build starts take it too; the caller gets its cultures back.
+            var culture = CultureInfo.CurrentCulture;
+            var uiCulture = CultureInfo.CurrentUICulture;
+            var threadCulture = CultureInfo.DefaultThreadCurrentCulture;
+            var threadUiCulture = CultureInfo.DefaultThreadCurrentUICulture;
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+            try
+            {
+                return Build(path, options, log);
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = culture;
+                CultureInfo.CurrentUICulture = uiCulture;
+                CultureInfo.DefaultThreadCurrentCulture = threadCulture;
+                CultureInfo.DefaultThreadCurrentUICulture = threadUiCulture;
+            }
+        }
+
+        private static string Build(string path, BuildOptions options, TextWriter log)
+        {
             var project = MapProject.Find(path);
             log.WriteLine($"moonwell: {project.Name} ({(options.Release ? "release" : "development")} build)");
 
             var targetPath = DotnetBuild.Run(project, options.Release, log);
-            PackageSources.Check(project);
+            PackageSources.Check(project, options.PackageVersion ?? PackageSources.ToolVersion);
             var settings = MapSettingsReader.Read(targetPath, project);
             var map = SourceMap.Open(project, settings, log);
 
@@ -151,11 +179,14 @@ namespace Moonwell.Build
             if (Declarations.References(targetPath, InputAssemblyName))
             {
                 // A map that references the package but never names Mouse or IMouseWatch registers no mouse event: the package listens
-                // only when asked. A map with no war3map.w3c has no cameras: Cameras is null, and the arrays are empty.
+                // only when asked. One that names them listens to presses and releases, and to the moves, synced events 120 to 240 a
+                // second for each player moving the mouse, only when its code needs them (NeedsMouseMoves). A map with no war3map.w3c
+                // has no cameras: Cameras is null, and the arrays are empty.
                 var mouse = Declarations.ReferencesType(targetPath, "Moonwell", "Mouse") || Declarations.ReferencesType(targetPath, "Moonwell", "IMouseWatch");
+                var moves = mouse && NeedsMouseMoves(targetPath);
                 PlaceWriter.WriteInput(project, map.Cameras, mouse);
                 PlaceNames.Check(project, "CameraSetup.Named", map.Cameras?.Cameras.Select(camera => camera.Name).ToList() ?? new List<string>(), "camera");
-                installs.Add("global::Moonwell.InputSystem.Install(global::Moonwell.Generated.InputData.Mouse, global::Moonwell.Generated.InputData.CameraNames(), global::Moonwell.Generated.InputData.Cameras());");
+                installs.Add("global::Moonwell.InputSystem.Install(global::Moonwell.Generated.InputData.Mouse, " + (moves ? "true" : "false") + ", global::Moonwell.Generated.InputData.CameraNames(), global::Moonwell.Generated.InputData.Cameras());");
             }
             else
             {
@@ -174,6 +205,52 @@ namespace Moonwell.Build
             }
 
             return installs;
+        }
+
+        /// <summary>
+        /// Whether a map's code needs the mouse's move events, read from its built assembly's metadata without loading it: it reads a
+        /// mouse's synced position (a member reference to <c>Mouse.X</c>, <c>Y</c>, <c>Position</c> or <c>HasPosition</c>), which only
+        /// the moves keep up to date between presses, or it has a method named <c>OnMouseMoved</c>. A press, a release, <c>IsDown</c>,
+        /// the cursor and the machine-local reads need none. A read inside a press reaction counts too, as the build cannot tell where
+        /// it is read.
+        /// </summary>
+        /// <param name="assemblyPath">The map's built assembly.</param>
+        internal static bool NeedsMouseMoves(string assemblyPath)
+        {
+            using var stream = File.OpenRead(assemblyPath);
+            using var pe = new System.Reflection.PortableExecutable.PEReader(stream);
+            var metadata = System.Reflection.Metadata.PEReaderExtensions.GetMetadataReader(pe);
+            foreach (var handle in metadata.MemberReferences)
+            {
+                var member = metadata.GetMemberReference(handle);
+                if (member.Parent.Kind != System.Reflection.Metadata.HandleKind.TypeReference)
+                {
+                    continue;
+                }
+
+                var type = metadata.GetTypeReference((System.Reflection.Metadata.TypeReferenceHandle)member.Parent);
+                if (metadata.GetString(type.Name) != "Mouse" || metadata.GetString(type.Namespace) != "Moonwell")
+                {
+                    continue;
+                }
+
+                var name = metadata.GetString(member.Name);
+                if (name == "get_X" || name == "get_Y" || name == "get_Position" || name == "get_HasPosition")
+                {
+                    return true;
+                }
+            }
+
+            foreach (var handle in metadata.MethodDefinitions)
+            {
+                var name = metadata.GetString(metadata.GetMethodDefinition(handle).Name);
+                if (name == "OnMouseMoved" || name.EndsWith(".OnMouseMoved", StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static void StageWith(MapProject project, Action stage)

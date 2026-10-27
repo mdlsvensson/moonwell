@@ -17,7 +17,7 @@
     <PackageReference Include="Moonwell.War3Net.Build" Version="6.1.2-moonwell.4" />
     <!-- Moonwell.War3Net.Build brings War3Net.CSharpLua (through War3Net.CodeAnalysis.Transpilers); the fork's package has the same CSharp.lua assembly, so it takes the place. -->
     <PackageReference Include="War3Net.CSharpLua" Version="2.0.4" ExcludeAssets="all" />
-    <PackageReference Include="Moonwell.CSharpLua" Version="2.0.4-moonwell.11" />
+    <PackageReference Include="Moonwell.CSharpLua" Version="2.0.4-moonwell.12" />
     <PackageReference Include="Moonwell.CSharpLua.CoreSystem" Version="2.0.3-moonwell.4" />
   </ItemGroup>
 

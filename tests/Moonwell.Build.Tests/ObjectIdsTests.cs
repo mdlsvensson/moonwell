@@ -97,6 +97,23 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_pin_with_a_character_outside_ascii_fails()
+        {
+            // The object file would hold "?001", and the Lua another id still.
+            var error = Assert.Throws<BuildException>(() => Assign(Obj("Objects.Arthas", "hero", pin: "Å001")));
+
+            Assert.Equal("Objects.Arthas has the id \"Å001\", with a character that is not an ASCII letter, digit or sign", error.Message);
+        }
+
+        [Fact]
+        public void a_carrier_with_a_space_fails()
+        {
+            var error = Assert.Throws<BuildException>(() => Assign(Obj("Objects.Burn", "buff", pin: "B001", carrier: "A 01")));
+
+            Assert.Equal("Objects.Burn#carrier has the id \"A 01\", with a character that is not an ASCII letter, digit or sign", error.Message);
+        }
+
+        [Fact]
         public void a_pin_of_a_standard_id_fails()
         {
             var error = Assert.Throws<BuildException>(() => Assign(new HashSet<string> { "Hpal" }, None, Obj("Objects.Arthas", "hero", pin: "Hpal")));

@@ -89,17 +89,11 @@ namespace Moonwell.Testing
             Expect.Near(unreadItem.X, readItem.X, "the gone item's x");
         }
 
-        /// <summary>An action that throws inside Local.For leaves no read inside it: the reads after it keep their values again.</summary>
+        /// <summary>An action that throws inside Local.For leaves no read inside it: the reads after it keep their values again. Local.For reports the error and lets nothing out.</summary>
         public static void ThrowLeavesReadsKept(FakeWorld world)
         {
             var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
-            try
-            {
-                Local.For(Player.Get(0), () => { throw new System.InvalidOperationException("thrown"); });
-            }
-            catch (System.InvalidOperationException)
-            {
-            }
+            Local.For(Player.Get(0), () => { throw new System.InvalidOperationException("thrown"); });
 
             unit.PlaceAt(10.0f, 20.0f);
             Expect.Near(10.0f, unit.X, "the x read after the throw");

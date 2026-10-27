@@ -4,7 +4,8 @@ namespace Moonwell
     /// A player's mouse: the last place in the world its synced events gave, and the buttons they say are down. Get one
     /// with <c>player.Mouse()</c>. The position and the buttons are the same on every machine, so a map reads them
     /// anywhere; the cursor's place on the screen, the unit under it and a button held now are this machine's, and are
-    /// read inside <c>Local.For</c>.
+    /// read inside <c>Local.For</c>. Those are this machine's cursor whichever player's mouse they are read from: inside
+    /// <c>Local.For(Player.One, ...)</c>, <c>Player.Two.Mouse().ScreenX</c> reads Player One's cursor.
     /// </summary>
     public sealed class Mouse
     {
@@ -52,7 +53,7 @@ namespace Moonwell
         [LocalSafe]
         public bool HasPosition { get; private set; }
 
-        /// <summary>Whether the events say a button is down: kept from the press and release events, so online it is the network delay behind the physical button. False for a number that is not one of the three buttons.</summary>
+        /// <summary>Whether the events say a button is down: kept from the press and release events, so online it is the network delay behind the physical button. For a hold, not a click: a press and its release can arrive in one instant (seen 10-25), so a check on a timer may never see a quick click down; <c>OnMousePressed</c> hears every click. False for a number that is not one of the three buttons.</summary>
         [LocalSafe]
         public bool IsDown(MouseButton button)
         {
@@ -65,21 +66,21 @@ namespace Moonwell
             return down[number];
         }
 
-        /// <summary>The cursor's x on this machine's screen, in pixels. This machine's alone, so it is read inside Local.For.</summary>
+        /// <summary>The cursor's x on this machine's screen, in pixels, whichever player's mouse it is read from. This machine's alone, so it is read inside Local.For.</summary>
         public int ScreenX
         {
             [MachineLocal]
             get { return InputSystem.World.MouseScreenX(); }
         }
 
-        /// <summary>The cursor's y on this machine's screen, in pixels. This machine's alone, so it is read inside Local.For.</summary>
+        /// <summary>The cursor's y on this machine's screen, in pixels, whichever player's mouse it is read from. This machine's alone, so it is read inside Local.For.</summary>
         public int ScreenY
         {
             [MachineLocal]
             get { return InputSystem.World.MouseScreenY(); }
         }
 
-        /// <summary>The unit under the cursor on this machine now; null when no unit is under the cursor, or when Moonwell has not taken that unit in (reading it takes nothing in, as that would change the game on this machine only). This machine's alone, so it is read inside Local.For.</summary>
+        /// <summary>The unit under the cursor on this machine now, whichever player's mouse it is read from; null when no unit is under the cursor, or when Moonwell has not taken that unit in (reading it takes nothing in, as that would change the game on this machine only). This machine's alone, so it is read inside Local.For.</summary>
         public Unit? FocusUnit
         {
             [MachineLocal]
@@ -90,7 +91,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Whether a button is held on this machine now, with no network delay (IsDown has it). This machine's alone, so it is read inside Local.For.</summary>
+        /// <summary>Whether a button is held on this machine now, whichever player's mouse it is read from, with no network delay (IsDown has it). This machine's alone, so it is read inside Local.For.</summary>
         [MachineLocal]
         public bool IsHeldNow(MouseButton button)
         {

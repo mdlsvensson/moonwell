@@ -70,6 +70,13 @@ namespace Moonwell
                 Unlocked();
                 Dev.Check(value > 0.0f, "Interactions.Step: must be more than 0");
                 Current().Step = value;
+#if DEBUG
+                // A step set after the install, before the grid is made, is the debug mode's step too.
+                if (Installed())
+                {
+                    DebugViews.StepLength = value;
+                }
+#endif
             }
         }
 
@@ -149,6 +156,12 @@ namespace Moonwell
             handler = TakenIn;
             Hooks.TakenIn = handler;
             Hooks.AddEnding(Ending);
+#if DEBUG
+            // The package's view in the debug mode, added once: Runtime.Reset clears the views, and with them the install.
+            InteractionsView.Reset();
+            DebugViews.Add(InteractionsView.Instance);
+            DebugViews.StepLength = Current().Step;
+#endif
         }
 
         /// <summary>Whether the package is installed: core's TakenIn hook is the package's own. Runtime.Reset clears the hook, so the next use starts afresh.</summary>

@@ -1,6 +1,6 @@
 namespace Moonwell
 {
-    /// <summary>An ability of a unit: one object per unit and ability id, which owns the casts of the ability.</summary>
+    /// <summary>An ability of a unit: one object per unit and ability id, which owns the casts of the ability and what its OnCast makes.</summary>
     public class Ability : Owner
     {
         /// <summary>The table behind AbilityHooks, made on first use so that the class has no static initializer (see Unit.UnitHooks).</summary>
@@ -35,7 +35,7 @@ namespace Moonwell
         [LocalSafe]
         public int Level => Runtime.World.AbilityLevel(Unit.Handle, Id);
 
-        /// <summary>Runs when the unit begins a cast of the ability; Owner.Current is the cast while it runs.</summary>
+        /// <summary>Runs when the unit begins a cast of the ability. What it makes belongs to this ability object, which lasts as long as the caster is in the game, so a delayed effect started here runs after the spell has ended; work that should stop with a channel names the cast as its owner: Timer.Every(0.5f, Pulse, cast).</summary>
         public virtual void OnCast(Cast cast)
         {
         }

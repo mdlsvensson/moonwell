@@ -12,7 +12,8 @@ namespace Moonwell.Analyzers;
 
 /// <summary>
 /// Rejects a constant a map class puts outside World Editor's limits (MW0009): in an assignment to a field's property, in the
-/// arguments of <c>Levels(...)</c>, or in <c>Set("id", ...)</c>. The text is the one the build gives for the same value
+/// arguments of <c>Levels(...)</c>, as one value for every level (<c>Cooldown = 3900f;</c>, which the build checks at each level
+/// and names at level 1), or in <c>Set("id", ...)</c>. The text is the one the build gives for the same value
 /// (<c>Moonwell.Objects.RuleChecks</c>), without its "file:line: " prefix. Only a constant is checked; a computed value is
 /// left to the build.
 /// </summary>
@@ -140,7 +141,10 @@ public sealed class FieldRulesAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    /// <summary>Reports the first value of a put that breaks a rule: the constant itself, or the first of the constants of a <c>Levels(...)</c>.</summary>
+    /// <summary>
+    /// Reports the first value of a put that breaks a rule: the constant itself, the first of the constants of a
+    /// <c>Levels(...)</c>, or one value for every level at level 1, the first level the build checks it at.
+    /// </summary>
     private static void Value(OperationAnalysisContext context, Field field, int? level, IOperation value)
     {
         value = Unbox(value);
@@ -157,7 +161,22 @@ public sealed class FieldRulesAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+        if (level == null && OneForEveryLevel(value) is { } every)
+        {
+            Constant(context, field, 1, every);
+            return;
+        }
+
         Constant(context, field, level, value);
+    }
+
+    /// <summary>The value of <c>Levels&lt;T&gt;</c>'s implicit conversion, one value for every level; null when the operation is no such conversion.</summary>
+    private static IOperation? OneForEveryLevel(IOperation operation)
+    {
+        return operation is IConversionOperation { IsImplicit: true, OperatorMethod: { } conversion } levels
+            && IsObjects(conversion.ContainingType?.OriginalDefinition, "Levels")
+            ? levels.Operand
+            : null;
     }
 
     private static bool Constant(OperationAnalysisContext context, Field field, int? level, IOperation value)

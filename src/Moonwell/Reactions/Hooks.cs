@@ -20,14 +20,31 @@ namespace Moonwell
         private static readonly List<Action<Widget>> endings = new List<Action<Widget>>();
 
         /// <summary>
-        /// Whether obj's class, below declaringBase, defines name itself. In Lua MoonwellOverrides (moonwell.lua) walks
-        /// the class chain; .NET asks reflection.
+        /// Whether obj's class, below declaringBase, defines name itself: for a base class, a method that overrides the
+        /// base's reaction of that name, so a helper of the same name with other parameters, or a method that hides the
+        /// reaction with new, does not count; for object (the packages' interface reactions), any public method of that
+        /// name. In Lua MoonwellOverrides (moonwell.lua) walks the class chain, where CSharp.lua gives such a helper a name
+        /// of its own; .NET asks reflection.
         /// </summary>
         /// @CSharpLua.Template = "MoonwellOverrides({0}, {1}, {2})"
         internal static bool Overrides(object obj, string name, Type declaringBase)
         {
-            var method = obj.GetType().GetMethod(name, BindingFlags.Public | BindingFlags.Instance);
-            return method != null && method.DeclaringType != declaringBase;
+            var methods = obj.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance);
+            for (var i = 0; i < methods.Length; i++)
+            {
+                var method = methods[i];
+                if (method.Name != name || method.DeclaringType == declaringBase)
+                {
+                    continue;
+                }
+
+                if (declaringBase == typeof(object) || method.GetBaseDefinition().DeclaringType == declaringBase)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>The bit mask of the reactions obj's class overrides, worked out once per class.</summary>

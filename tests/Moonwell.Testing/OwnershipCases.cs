@@ -90,6 +90,54 @@ namespace Moonwell.Testing
             ExpectLog(log, new string[] { "end a" }, "log after ending a twice");
         }
 
+        /// <summary>
+        /// An End started inside an OnEnd does nothing: a component whose OnRemoved removes its unit runs that unit's OnLeave and
+        /// its own OnRemoved once, whether the unit is removed or the component alone.
+        /// </summary>
+        public static void EndInsideEnd(FakeWorld world)
+        {
+            ObjectTypes.Unit(ObjectTypes.FourCC("h0le"), () => new LeaveCounter());
+            var removed = (LeaveCounter)Unit.Of(world.NewUnit(ObjectTypes.FourCC("h0le")))!;
+            var withUnit = removed.Add(new RemovesItsUnit());
+            removed.Remove();
+            Expect.Equal(1, removed.Leaves, "OnLeave runs of the unit removed");
+            Expect.Equal(1, withUnit.Removals, "OnRemoved runs of its component");
+            Expect.True(removed.HasEnded, "the unit removed has ended");
+            var kept = (LeaveCounter)Unit.Of(world.NewUnit(ObjectTypes.FourCC("h0le")))!;
+            var alone = kept.Add(new RemovesItsUnit());
+            kept.Remove(alone);
+            Expect.Equal(1, kept.Leaves, "OnLeave runs of the unit whose component was removed");
+            Expect.Equal(1, alone.Removals, "OnRemoved runs of the component removed");
+            Expect.True(kept.HasEnded && alone.HasEnded, "both have ended");
+        }
+
+        /// <summary>A unit that counts its OnLeave runs.</summary>
+        private sealed class LeaveCounter : Unit
+        {
+            /// <summary>How many times OnLeave ran.</summary>
+            public int Leaves;
+
+            /// <summary>Counts the run.</summary>
+            protected override void OnLeave()
+            {
+                Leaves++;
+            }
+        }
+
+        /// <summary>A unit component that removes its unit when it is removed, and counts its OnRemoved runs.</summary>
+        private sealed class RemovesItsUnit : UnitComponent
+        {
+            /// <summary>How many times OnRemoved ran.</summary>
+            public int Removals;
+
+            /// <summary>Counts the run and removes the unit.</summary>
+            protected override void OnRemoved()
+            {
+                Removals++;
+                Unit.Remove();
+            }
+        }
+
         /// <summary>An owner that has ended ends a child it adopts at once.</summary>
         public static void AdoptIntoEnded(FakeWorld world)
         {

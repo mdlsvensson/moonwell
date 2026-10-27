@@ -4,14 +4,15 @@ using Microsoft.CodeAnalysis;
 namespace Moonwell.Analyzers;
 
 /// <summary>
-/// The multiplayer mistakes the analyzer rejects (decision 13); <c>[SyncUnchecked]</c> on a method turns all of them off there.
-/// Then the C# CSharp.lua cannot compile, which nothing turns off.
+/// The multiplayer mistakes the analyzer rejects (decision 13); <c>[SyncUnchecked]</c> on a method turns them off in its
+/// own body, except <c>decimal</c>, and Local.For still follows the method. Then the C# CSharp.lua cannot compile, which
+/// nothing turns off.
 /// </summary>
 public static class Rules
 {
     private const string Category = "Multiplayer";
 
-    private const string Silence = " [SyncUnchecked] on the method turns this check off.";
+    private const string Silence = " [SyncUnchecked] on the method (or the lambda or local function) turns this check off in its own body; Local.For still follows a method so marked.";
 
     public static readonly DiagnosticDescriptor StateInLocal = new(
         "MW0001",
@@ -29,7 +30,7 @@ public static class Rules
         Category,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "A machine-local value (the local player, the camera, the mouse, frame text, localised names) differs between machines, so game logic that uses it desyncs." + Silence);
+        description: "A machine-local value (the local player, the camera, the mouse, frame text, localised names) differs between machines, so game logic that uses it desyncs. So do .NET's clock (DateTime.Now, UtcNow and Today, Environment.TickCount, a Stopwatch's reading) and an object's address in the game's Lua: GetHashCode of a handle or of a class without its own, RuntimeHelpers.GetHashCode, and a handle turned into text." + Silence);
 
     public static readonly DiagnosticDescriptor HandleId = new(
         "MW0003",
@@ -43,11 +44,11 @@ public static class Rules
     public static readonly DiagnosticDescriptor HashLoop = new(
         "MW0004",
         "Loop over a Dictionary or HashSet",
-        "A {0} loops in no fixed order, which can differ between machines; use OrderedMap or OrderedSet",
+        "{0} loops in no fixed order, which can differ between machines; use OrderedMap or OrderedSet",
         Category,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "In the game's Lua a Dictionary or HashSet gives its items in no fixed order. Lookups are fine; loops are not." + Silence);
+        description: "In the game's Lua a Dictionary or HashSet gives its items in no fixed order. Lookups are fine; loops are not: foreach, LINQ, CopyTo, a copy into a list, and a Dictionary or HashSet held as an IEnumerable, ICollection or IReadOnlyCollection. A foreach or LINQ through IDictionary, IReadOnlyDictionary, ISet or IReadOnlySet (or their Keys and Values) is one too, since in a map only a Dictionary or a HashSet implements them." + Silence);
 
     public static readonly DiagnosticDescriptor NumberType = new(
         "MW0005",
@@ -56,7 +57,7 @@ public static class Rules
         Category,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "The game's Lua has 32-bit integers and single-precision floats." + Silence);
+        description: "The game's Lua has 32-bit integers and single-precision floats. [SyncUnchecked] on the method turns this check off in its own body, except for decimal, which is wrong in the game's Lua wherever it runs.");
 
     public static readonly DiagnosticDescriptor Desyncs = new(
         "MW0006",
@@ -67,8 +68,35 @@ public static class Rules
         isEnabledByDefault: true,
         description: "A blizzard.j function that compares GetLocalPlayer() and then changes the game, such as SelectGroupForPlayerBJ, desyncs on every call. Do its local part inside Local.For with what the analyzer allows there." + Silence);
 
+    public static readonly DiagnosticDescriptor UnseededRandom = new(
+        "MW0038",
+        "Random without a seed",
+        "'{0}' seeds itself from this machine's clock and reseeds the game's random generator with it, which desyncs every random number after it, inside Local.For too; use Natives.GetRandomInt, or new Random(seed) with a seed every machine shares",
+        Category,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "CSharp.lua's Random without a seed calls math.randomseed(os.time()) and then math.random. In the game math.random is the game's own synced generator (seen 2026-10-26), so each machine reseeds it with its own clock, and every GetRandomInt after it differs between machines, wherever the Random was made. new Random(seed) is computed in Lua alone, so it gives the same numbers on every machine when the seed is the same (one from Natives.GetRandomInt is)." + Silence);
+
+    public static readonly DiagnosticDescriptor Unfollowed = new(
+        "MW0039",
+        "Code inside Local.For the analyzer cannot follow",
+        "{0}; inside Local.For, write the lambda in place or call a method of the map",
+        Category,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "The analyzer follows what Local.For runs: a lambda written in place, a method of the map, a delegate parameter whose callers' arguments it checks, and the delegates given to a variable, field, property or event of the map. A delegate from anywhere else (a list's element, a library's result, a lambda's parameter) runs code it cannot see, which may change the game on one machine only." + Silence);
+
+    public static readonly DiagnosticDescriptor OneMachineCode = new(
+        "MW0040",
+        "Code of one machine where it runs on every machine",
+        "'{0}' {1}",
+        Category,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Code the analyzer checks as code of one machine must not also run on every machine, where its machine-local reads desync the game: a delegate parameter given to Local.For (whose callers' lambdas are checked as blocks) called outside it, and [MachineLocal] on an override or an interface implementation (Moonwell calls OnGameStart on every machine) or on a lambda given to a method or event that runs it (Timer.Every). [MachineLocal] on an override of a map method that has it too is right." + Silence);
+
     public static ImmutableArray<DiagnosticDescriptor> All { get; } =
-        ImmutableArray.Create(StateInLocal, LocalOutside, HandleId, HashLoop, NumberType, Desyncs);
+        ImmutableArray.Create(StateInLocal, LocalOutside, HandleId, HashLoop, NumberType, Desyncs, UnseededRandom, Unfollowed, OneMachineCode);
 
     private const string LuaCategory = "Lua";
 
@@ -88,7 +116,7 @@ public static class Rules
         LuaCategory,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "The enums of Moonwell.Objects (ArmorType, Targets, ...) are ignored by CSharp.lua: the game's Lua has their numbers only. ToString (also x?.ToString()), a string joined (+ or +=) or interpolated with one, one given to an object parameter (string.Format, string.Concat, StringBuilder.Append; Equals is left alone), and Enum methods given one (GetValues, GetNames, GetName, IsDefined, Parse, TryParse, Format, ToObject) give the number where .NET gives the name, or stop. Comparing, |, & and HasFlag work.");
+        description: "The enums of Moonwell.Objects (ArmorType, Targets, ...) are ignored by CSharp.lua: the game's Lua has their numbers only. ToString (also x?.ToString()), a string joined (+ or +=) or interpolated with one, a list or array of them given to string.Join or string.Concat, one given to an object parameter (string.Format, string.Concat, StringBuilder.Append; Equals is left alone), and Enum methods given one (GetValues, GetNames, GetName, IsDefined, Parse, TryParse, Format, ToObject) give the number where .NET gives the name, or stop. Comparing, |, & and HasFlag work.");
 
     public static readonly DiagnosticDescriptor HandleCheck = new(
         "MW0035",
@@ -97,7 +125,7 @@ public static class Rules
         LuaCategory,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "CSharp.lua checks a cast, is, as or a type pattern against the value's CSharp.lua class. A game handle is the game's own value (userdata), which has no such class, so a check for a handle type (unit, lightning, or a type parameter limited to one) never passes in the game: a cast throws an InvalidCastException, and is, as and patterns give false or null. A conversion to a handle type the value already is (unit to widget) checks nothing and works. The Lua cases do not show it: there the fake world's handles are CSharp.lua objects.");
+        description: "CSharp.lua checks a cast, is, as or a type pattern against the value's CSharp.lua class. A game handle is the game's own value (userdata), which has no such class, so a check for a handle type (unit, lightning, or a type parameter limited to one) never passes in the game: a cast throws an InvalidCastException, and is, as and patterns give false or null. A conversion to a handle type the value already is (unit to widget) checks nothing and works. The same checks hide in foreach (unit u in widgets), which casts each item, in OfType<unit>(), which tests each item with is, and in Cast<unit>() unless the items already are units. The Lua cases do not show it: there the fake world's handles are CSharp.lua objects.");
 
     /// <summary>The rules of C# that CSharp.lua cannot compile.</summary>
     public static ImmutableArray<DiagnosticDescriptor> Lua { get; } = ImmutableArray.Create(StaticNatives, ChoiceNames, HandleCheck);
@@ -130,15 +158,24 @@ public static class Rules
 
     public static readonly DiagnosticDescriptor UnseenReaction = new(
         "MW0036",
-        "Reaction the package never calls",
+        "Reaction a package never calls",
         "'{0}' {1}",
-        "Damage",
+        "Reactions",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "The damage and physics packages' interfaces (IDamageSource, IDamageTarget, IDamageWatch, IPushTarget, IMissileTarget) give every reaction an empty body, so the compiler accepts a class that only seems to write one. The package calls a reaction that is a public, non-static method of the interface's name and parameter, on a unit's class or its components (buffs too) for IDamageSource, IDamageTarget, IPushTarget and IMissileTarget, and on the game's and players' components for IDamageWatch. The rule rejects a method named like a reaction that is not one (not public, static, another parameter, an explicit implementation, or a reaction of an interface the class does not implement), a name renamed in Moonwell 0.3, a public method taking a Hit, a Burst, an Impact or a Slam (or the type the reaction takes) whose name is a letter off a reaction (one added, removed, changed, or two swapped) in a class with reactions, a reaction in a unit or component that lacks its interface (an abstract class is left alone: its subclasses may list the interface), and an interface on a class the package never calls. #pragma warning disable MW0036 keeps a helper's name.");
+        description: "The damage, input and physics packages' interfaces give every reaction an empty body, so the compiler accepts a class that only seems to write one. A package calls a reaction that is a public, non-static method of the interface's name and parameters: on a unit's class or its components (buffs too) for IDamageSource, IDamageTarget, IPushTarget and IMissileTarget, and on the game's and players' components for IDamageWatch and IMouseWatch. The rule rejects a method named like a reaction that is not one (not public, static, other parameters, an explicit implementation, or a reaction of an interface the class does not implement), a name renamed in Moonwell 0.3 (or IPushTarget's OnLanded, which is OnGrounded), a public method shaped like a reaction (a Hit, a Burst, an Impact or a Slam, or the parameter a physics reaction takes; a Mouse and a button) whose name is a letter off a reaction (one added, removed, changed, or two swapped) in a class with reactions, a reaction in a class that lacks its interface (an abstract class is left alone: its subclasses may list the interface), and an interface on a class the package never calls. For IMouseWatch an explicit implementation and a method with other parameters run in the game's Lua, which calls them by name, and not on .NET, so the two disagree. #pragma warning disable MW0036 keeps a helper's name.");
 
-    /// <summary>The rules for the damage package's reactions.</summary>
-    public static ImmutableArray<DiagnosticDescriptor> Reactions { get; } = ImmutableArray.Create(UnseenReaction);
+    public static readonly DiagnosticDescriptor HiddenReaction = new(
+        "MW0041",
+        "Reaction that never runs",
+        "'{0}' {1}",
+        "Reactions",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "A reaction of a Moonwell class (a unit's OnDamaged, a component's OnKill, a game component's OnGameStart, a buff's OnTick, an area's OnUnitEntered) is a virtual method the map overrides. One written without override, or with new, hides it: the compiler only warns (CS0114), and Moonwell never calls it. A method named On... like a reaction but with other parameters never runs as the reaction either, and on .NET Moonwell's lookup of reactions by name fails on it when the class is added, while the game's Lua takes it.");
+
+    /// <summary>The rules for reactions: the packages' interfaces (damage, mouse, physics) and Moonwell's virtual methods.</summary>
+    public static ImmutableArray<DiagnosticDescriptor> Reactions { get; } = ImmutableArray.Create(UnseenReaction, HiddenReaction);
 
     public static readonly DiagnosticDescriptor LiveInDeclaration = new(
         "MW0012",
@@ -156,10 +193,19 @@ public static class Rules
         ObjectsCategory,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "The game has no setter for a unit's level, so Level is a unit's declared value: it is set in the constructor of the class that declares the unit (and in a lambda or local function there), and only read anywhere else. A hero's level is set with SetLevel; a hero's constructor does not declare it. The build rejects the same set.");
+        description: "The game has no setter for a unit's level, so Level is a unit's declared value: it is set in the constructor of the class that declares the unit (and in a local function there), and only read anywhere else; a lambda there may run later in the game, where the set does nothing. A hero's level is set with SetLevel; a hero's constructor does not declare it. The build rejects the same set.");
 
-    /// <summary>The rules for the constructor of a declared object class.</summary>
-    public static ImmutableArray<DiagnosticDescriptor> Declared { get; } = ImmutableArray.Create(LiveInDeclaration, LevelOutsideConstructor);
+    public static readonly DiagnosticDescriptor DefaultKind = new(
+        "MW0037",
+        "Default<T>() of a class of another kind",
+        "{0}",
+        ObjectsCategory,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Default<T>() is declared on Widget, so C# accepts any widget class through Unit, Hero or Item: Item.Default<Guard>() compiles for a unit class, and a destructable class compiles and throws in the game. The rule rejects a class that is not of the kind the call is written on (a unit class through Item or Hero, an item class through Unit), and a destructable class anywhere, which has no default object.");
+
+    /// <summary>The rules for the constructor of a declared object class, and for a class's default object.</summary>
+    public static ImmutableArray<DiagnosticDescriptor> Declared { get; } = ImmutableArray.Create(LiveInDeclaration, LevelOutsideConstructor, DefaultKind);
 
     public static readonly DiagnosticDescriptor NoId = new(
         "MW0013",
@@ -177,7 +223,7 @@ public static class Rules
         ObjectsCategory,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "An object id is four characters. The game makes a unit whose id starts with an upper-case letter a hero, and only such a unit: a hero's id starts with one, another unit's does not.");
+        description: "An object id is four ASCII letters, digits or signs. The game makes a unit whose id starts with an upper-case letter a hero, and only such a unit: a hero's id starts with one, another unit's does not.");
 
     /// <summary>The rules for a declared object's id.</summary>
     public static ImmutableArray<DiagnosticDescriptor> Ids { get; } = ImmutableArray.Create(NoId, BadId);
@@ -197,17 +243,11 @@ public static class Rules
         "{0}",
         "A positional pattern in an is test (p is (1, 2), t is (1, _), p is Pt(var a, var b)) and an extended property pattern (p is { Inner.X: 9 }) compile to Lua that is false, or stops the compiler. A positional pattern in a switch expression arm works; so does a property pattern with one name per level ({ Inner: { X: 9 } }).");
 
-    public static readonly DiagnosticDescriptor NegatedConstant = Syntax(
-        "MW0019",
-        "Minus in front of a negative constant",
-        "'{0}' is written as --{1}, which Lua reads as a comment, so the script does not load; write the number out, or 0 - {0}",
-        "CSharp.lua writes -N with N a negative constant as --5. Lua starts a comment at --, and the rest of the line is lost.");
-
     public static readonly DiagnosticDescriptor StructCopy = Syntax(
         "MW0020",
         "Struct element changed through a copy",
         "'{0}' is not a copy in the game's Lua: changing it changes the element of the array or collection; make a new struct, or write the copy back",
-        "CSharp.lua does not copy a struct read from an array, a List or a Dictionary element (var c = arr[0]; c.X = 6; changes arr[0]). A copy from a local, a field, a property or a parameter is right.");
+        "CSharp.lua does not copy a struct read from an array, a List or a Dictionary element, so changing the copy changes the element: var c = arr[0]; then c.X = 6, c.Inner.X = 6, c.Move() (a method of the struct that sets a field) or Bump(ref c). A copy from a local, a field, a property or a parameter is right, and so is a copy stored back into the same element after its changes (arr[0] = c) with no other use of that element in between.");
 
     public static readonly DiagnosticDescriptor TupleForm = Syntax(
         "MW0022",
@@ -243,13 +283,13 @@ public static class Rules
         "MW0027",
         "String call the game's Lua gets wrong",
         "'{0}' {1}",
-        "s.Split(\"--\") with a string separator runs out of memory; StartsWith(char) and EndsWith(char) fail; IndexOf, StartsWith and EndsWith with an ignore-case StringComparison give the wrong answer or an error; LINQ Reverse() on a string fails. Split(char), Contains(char), the Ordinal comparisons and Replace/Equals/Compare with a comparison work.");
+        "s.Split(\"--\") with a string separator runs out of memory, and s.Split(new[] { \", \" }, options) with string separators never ends; StartsWith(char) and EndsWith(char) fail; IndexOf, StartsWith and EndsWith with an ignore-case StringComparison give the wrong answer or an error; LINQ Reverse() on a string fails. Split(char), Contains(char), the Ordinal comparisons and Replace/Equals/Compare with a comparison work.");
 
     public static readonly DiagnosticDescriptor BoxedValue = Syntax(
         "MW0028",
         "char or enum given to an object parameter",
         "'{0}' {1}",
-        "A char or an enum given to a library method's object parameter (string.Format, string.Concat, Console.WriteLine(object), StringBuilder.Append(object)) is shown as its number in the game's Lua. Joined with + or put in an interpolation hole it is right. Enums of Moonwell.Objects are MW0010.");
+        "A char or an enum given to a library method's object parameter (string.Format, string.Concat, string.Join, Console.WriteLine(object), StringBuilder.Append(object)), also through .NET 9's params ReadOnlySpan<object?> overloads, is shown as its number in the game's Lua. Joined with + or put in an interpolation hole it is right. Enums of Moonwell.Objects are MW0010.");
 
     public static readonly DiagnosticDescriptor CatchForm = Syntax(
         "MW0029",
@@ -261,7 +301,7 @@ public static class Rules
         "MW0030",
         "Library member the game's Lua does not have",
         "'{0}' {1}",
-        "The Lua core behind CSharp.lua has no such type or member, or gives another answer than .NET; the call fails when it runs, not when the map is built. The list: System.Range/Index, StringComparer, Monitor, Lock, Thread, Task, BitArray, BitOperations, HashCode, Guid, FormattableString, async/await, pointers; LINQ Append, Prepend, SkipLast, TakeLast, ToLookup, Empty, Zip, Chunk, ToHashSet, DefaultIfEmpty; List.ConvertAll; Span.ToArray/Fill/Clear; StringBuilder.Replace/Insert/Equals/AppendJoin; Exception.Source; Delegate.Target/Method; char.IsAscii/ToUpperInvariant; Environment.NewLine; Enum/Nullable.GetUnderlyingType; string.Create/Normalize/Intern/EnumerateRunes; Queue.TryPeek; Stack.TryPop/TryPeek; Dictionary.GetValueOrDefault; Convert.ToHexString; int.RotateLeft; Array.Sort(keys, items); HashSet.SetEquals; Math.DivRem; Dictionary.Remove(key, out v); ToList/ToArray of a Dictionary.");
+        "The Lua core behind CSharp.lua has no such type or member, or gives another answer than .NET; the call fails when it runs, not when the map is built. The list: System.Range/Index, StringComparer, Monitor, Lock, Thread, Task, BitArray, BitOperations, HashCode, Guid, FormattableString, async/await, pointers; LINQ Append, Prepend, SkipLast, TakeLast, ToLookup, Empty, Zip, Chunk, ToHashSet, DefaultIfEmpty; List.ConvertAll; Span.ToArray/Fill/Clear; StringBuilder.Replace/Insert/Equals/AppendJoin; Exception.Source; Delegate.Target/Method; char.IsAscii/ToUpperInvariant; Environment.NewLine; Enum/Nullable.GetUnderlyingType; string.Create/Normalize/Intern/EnumerateRunes; Queue.TryPeek; Stack.TryPop/TryPeek; Dictionary.GetValueOrDefault; Convert.ToHexString; int.RotateLeft; Array.Sort(keys, items); HashSet.SetEquals (also through ISet and IReadOnlySet); Math.DivRem; Dictionary.Remove(key, out v); ToList/ToArray of a Dictionary; Random.Shared.");
 
     public static readonly DiagnosticDescriptor CheckedForm = Syntax(
         "MW0031",
@@ -283,6 +323,6 @@ public static class Rules
 
     /// <summary>The rules for syntax and library CSharp.lua or its Lua core cannot do.</summary>
     public static ImmutableArray<DiagnosticDescriptor> Syntaxes { get; } = ImmutableArray.Create(
-        PatternStops, PatternWrong, NegatedConstant, StructCopy, TupleForm, FormWrong, RangeIndex, RefForm,
+        PatternStops, PatternWrong, StructCopy, TupleForm, FormWrong, RangeIndex, RefForm,
         ParamsForm, StringCall, BoxedValue, CatchForm, LuaMember, CheckedForm, EnumText, UsingOrder);
 }

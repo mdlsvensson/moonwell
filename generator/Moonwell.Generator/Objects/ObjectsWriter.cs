@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
-using ObjectKind = Moonwell.Generator.Objects.Kind;
+using Moonwell.GameData;
+using ObjectKind = Moonwell.GameData.Kind;
 
 namespace Moonwell.Generator.Objects;
 
@@ -132,7 +133,8 @@ public static class ObjectsWriter
     /// The source of one group and kind: a class for each standard object in it, ordered by name, nested in static
     /// partial classes of the group and the kind (<c>Human</c>, then <c>Units</c>) in namespace <c>Moonwell.Objects</c>.
     /// The class inherits its kind base (heroes <c>StandardHero</c>), has the object's id in <c>[Standard]</c>, and for
-    /// an ability has a property for each field specific to the ability's code. A property cannot be named like its
+    /// an ability has a property for each field specific to it (<see cref="Fields.SpecificOf"/>: listed by its code or by
+    /// its id). A property cannot be named like its
     /// class, so such a field gets its id appended unless field-names.txt names it (<c>hem1</c> is <c>HealingPercent</c>).
     /// With <paramref name="constructors"/>, a class whose object has values gets a constructor that sets them, before
     /// its properties.
@@ -148,19 +150,7 @@ public static class ObjectsWriter
         StandardConstructors? constructors = null)
     {
         var ordered = classes.OrderBy(c => c.Name.Name, StringComparer.Ordinal).ToList();
-        var byCode = new Dictionary<string, List<Field>>(StringComparer.Ordinal);
-        foreach (var field in fields)
-        {
-            foreach (var code in field.Specific)
-            {
-                if (!byCode.TryGetValue(code, out var list))
-                {
-                    byCode[code] = list = new List<Field>();
-                }
-
-                list.Add(field);
-            }
-        }
+        var specificFields = fields.Where(field => field.Specific.Count > 0).ToList();
 
         var text = new StringBuilder();
         if (ordered.Exists(c => c.Name.Name.All(ch => char.IsAsciiLetterLower(ch) || char.IsAsciiDigit(ch) || ch == '_')))
@@ -192,9 +182,7 @@ public static class ObjectsWriter
                 text.Append('\n');
             }
 
-            var own = obj.Kind == ObjectKind.Ability && obj.Code != null && byCode.TryGetValue(obj.Code, out var specific)
-                ? specific
-                : new List<Field>();
+            var own = obj.Kind == ObjectKind.Ability ? Fields.SpecificOf(specificFields, obj.Id, obj.Code) : new List<Field>();
             own = own.Select(f => f.Name == name.Name ? f with { Name = f.Name + Capitalize(f.Id) } : f).ToList();
             CheckNames(name.FullName, own);
 
@@ -400,6 +388,11 @@ public static class ObjectsWriter
 
     private static string ChoiceSummary(ChoiceType choice)
     {
+        if (choice.Placement)
+        {
+            return $"Any of the values of the metadata type <c>{Xml(choice.Type)}</c>, named as World Editor shows them: the game stores each as its opposite, which the object file holds as a comma list (Buildable is \"unbuildable\"), and 0 is none of them.{NotNatives}";
+        }
+
         switch (choice.Form)
         {
             case ChoiceForm.List:
@@ -413,6 +406,11 @@ public static class ObjectsWriter
 
     private static string MemberSummary(ChoiceType choice, ChoiceMember member)
     {
+        if (choice.Placement)
+        {
+            return $"{Xml(member.Label)}: the game's \"{Xml(member.Text)}\".";
+        }
+
         var shown = Xml(member.Label.Length > 0 ? member.Label : member.Text) + ".";
         if (choice.Flags && member.Value != 0 && member.Name == "None")
         {
@@ -668,8 +666,15 @@ public static class ObjectsWriter
         return hero ? "hero" : kind.ToString().ToLowerInvariant();
     }
 
+    // "Paladin (Hpal).", with an editor suffix "Shockwave (Cairne), AOs2." (decision 71), and "spur." for no name.
     private static string Summary(StandardObject obj)
     {
+        var suffix = obj.EditorSuffix.Trim();
+        if (suffix.Length > 0)
+        {
+            return obj.Name.Length == 0 ? $"{suffix}, {obj.Id}." : $"{obj.Name} {suffix}, {obj.Id}.";
+        }
+
         return obj.Name.Length == 0 ? obj.Id + "." : $"{obj.Name} ({obj.Id}).";
     }
 

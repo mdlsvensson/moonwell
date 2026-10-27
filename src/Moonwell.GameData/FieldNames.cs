@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Moonwell.Generator.Objects;
+namespace Moonwell.GameData;
 
 /// <summary>A field waiting for its C# property name: its id, the name its label gives, and the classes it is in.</summary>
 /// <param name="Id">The field id, appended to the name when two fields of one class would share it.</param>

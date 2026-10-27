@@ -7,7 +7,12 @@ namespace Moonwell.Build.Tests
 {
     public sealed class TerrainWriterTests : IDisposable
     {
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
+
+        public TerrainWriterTests(ITestOutputHelper output)
+        {
+            folders = new TestFolders(output);
+        }
 
         public void Dispose()
         {

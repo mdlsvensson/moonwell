@@ -10,11 +10,8 @@ namespace Moonwell.Engine
         /// <summary>How many lines the log keeps; the file holds the last ones.</summary>
         private const int LogLines = 200;
 
-        /// <summary>
-        /// The seconds the clock runs before it starts again: its elapsed time reads exact at 10 s, and steps by 0.0625 s at 604800 s.
-        /// A field, not a const: CSharp.lua writes a const by its value, 10, which Lua reads as an integer (C18).
-        /// </summary>
-        private readonly float lap = 10.0f;
+        /// <summary>The seconds the clock runs before it starts again: its elapsed time reads exact at 10 s, and steps by 0.0625 s at 604800 s.</summary>
+        private const float Lap = 10.0f;
 
         /// <summary>The clock: the game time is the laps it has run plus its elapsed time.</summary>
         private readonly timer clock;
@@ -45,7 +42,7 @@ namespace Moonwell.Engine
         {
             bounds = Natives.GetWorldBounds();
             clock = Natives.CreateTimer();
-            Natives.TimerStart(clock, lap, false, ClockLapped);
+            Natives.TimerStart(clock, Lap, false, ClockLapped);
             wake = Natives.CreateTimer();
 
             var region = Natives.CreateRegion();
@@ -58,16 +55,39 @@ namespace Moonwell.Engine
             Natives.TriggerAddAction(deathTrigger, DestructableDeathAction);
         }
 
-        /// <summary>Game seconds since the runtime started.</summary>
+        /// <summary>Game seconds since the runtime started; in a development build, Moonwell's time on its clock (Runtime.Clock).</summary>
         public float Now()
+        {
+#if DEBUG
+            return Runtime.Clock.Now(GameNow());
+#else
+            return lapStart + Natives.TimerGetElapsed(clock);
+#endif
+        }
+#if DEBUG
+
+        /// <summary>Game seconds since the runtime started, under Moonwell's clock: what the clock and the debug world take.</summary>
+        internal float GameNow()
         {
             return lapStart + Natives.TimerGetElapsed(clock);
         }
+#endif
 
-        /// <summary>Calls Runtime.Wake once after the seconds; a later request replaces it.</summary>
+        /// <summary>Calls Runtime.Wake once after the seconds; a later request replaces it. In a development build the seconds are Moonwell's, and a request while its clock is halted stops the wake until the clock re-arms it.</summary>
         public void WakeIn(float seconds)
         {
+#if DEBUG
+            if (Runtime.Clock.Arm(seconds, out var gameSeconds))
+            {
+                Natives.TimerStart(wake, gameSeconds < 0.0f ? 0.0f : gameSeconds, false, WakeAction);
+            }
+            else
+            {
+                Natives.PauseTimer(wake);
+            }
+#else
             Natives.TimerStart(wake, seconds < 0.0f ? 0.0f : seconds, false, WakeAction);
+#endif
         }
 
         /// <summary>Starts delivering an event to Inbound.</summary>
@@ -386,10 +406,22 @@ namespace Moonwell.Engine
             return Natives.IsUnitType(unit, Natives.UNIT_TYPE_HERO);
         }
 
+        /// <summary>Whether a unit is an illusion: IsUnitIllusion.</summary>
+        public bool IsIllusion(unit unit)
+        {
+            return Natives.IsUnitIllusion(unit);
+        }
+
         /// <summary>The player that owns a unit.</summary>
         public player OwnerOf(unit unit)
         {
             return Natives.GetOwningPlayer(unit);
+        }
+
+        /// <summary>Sets the owner of a unit and its colour: SetUnitOwner.</summary>
+        public void SetOwner(unit unit, player player)
+        {
+            Natives.SetUnitOwner(unit, player, true);
         }
 
         /// <summary>The level a player has of an upgrade; 0 when the player has none.</summary>
@@ -558,6 +590,12 @@ namespace Moonwell.Engine
             Natives.BlzUnitHideAbility(unit, abilityId, true);
         }
 
+        /// <summary>Makes an ability stay through a morph: UnitMakeAbilityPermanent.</summary>
+        public void MakeAbilityPermanent(unit unit, int abilityId)
+        {
+            Natives.UnitMakeAbilityPermanent(unit, true, abilityId);
+        }
+
         /// <summary>Takes an ability from a unit.</summary>
         public void RemoveAbility(unit unit, int abilityId)
         {
@@ -579,7 +617,7 @@ namespace Moonwell.Engine
         /// <summary>The most life a unit can have, from the game: BlzGetUnitMaxHP (SetUnitState does not change the most, seen 10-21).</summary>
         public float MaxLifeOf(unit unit)
         {
-            return Natives.BlzGetUnitMaxHP(unit) + 0.0f;
+            return Natives.BlzGetUnitMaxHP(unit);
         }
 
         /// <summary>Sets the most life a unit can have in the game: BlzSetUnitMaxHP, which takes a whole number.</summary>
@@ -603,7 +641,7 @@ namespace Moonwell.Engine
         /// <summary>The most mana a unit can have, from the game: BlzGetUnitMaxMana (SetUnitState does not change the most, seen 10-21).</summary>
         public float MaxManaOf(unit unit)
         {
-            return Natives.BlzGetUnitMaxMana(unit) + 0.0f;
+            return Natives.BlzGetUnitMaxMana(unit);
         }
 
         /// <summary>Sets the most mana a unit can have in the game: BlzSetUnitMaxMana, which takes a whole number.</summary>
@@ -735,10 +773,22 @@ namespace Moonwell.Engine
             Natives.SetHeroXP(hero, experience, showEffect);
         }
 
+        /// <summary>Adds experience to a hero in the game, or takes it with a negative amount.</summary>
+        public void AddExperience(unit hero, int experience, bool showEffect)
+        {
+            Natives.AddHeroXP(hero, experience, showEffect);
+        }
+
         /// <summary>Gives a hero a level in the game.</summary>
         public void LevelHero(unit hero, int level, bool showEffect)
         {
             Natives.SetHeroLevel(hero, level, showEffect);
+        }
+
+        /// <summary>Takes levels from a hero in the game.</summary>
+        public void StripLevels(unit hero, int levels)
+        {
+            Natives.UnitStripHeroLevel(hero, levels);
         }
 
         /// <summary>A hero's strength, from the game.</summary>
@@ -942,8 +992,8 @@ namespace Moonwell.Engine
         /// <summary>The clock's callback: counts the lap and starts the clock again.</summary>
         private void ClockLapped()
         {
-            lapStart += lap;
-            Natives.TimerStart(clock, lap, false, ClockLapped);
+            lapStart += Lap;
+            Natives.TimerStart(clock, Lap, false, ClockLapped);
         }
 
         /// <summary>Registers a player unit event for every player slot, with one trigger that runs the action.</summary>

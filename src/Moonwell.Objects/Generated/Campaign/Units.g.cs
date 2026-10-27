@@ -14,7 +14,7 @@ namespace Moonwell.Objects
         /// @CSharpLua.Ignore
         public static partial class Units
         {
-            /// <summary>Abomination (uabc).</summary>
+            /// <summary>Abomination (cinematic), uabc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("uabc")]
             public class Abomination : global::Moonwell.Objects.StandardUnit
@@ -1096,7 +1096,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.FeralSpirit, global::Moonwell.Objects.Orc.Abilities.ChainLightning, global::Moonwell.Objects.NightElf.Abilities.ShadowStrike, global::Moonwell.Objects.Creeps.Abilities.ReincarnationANr2>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.FeralSpirit, global::Moonwell.Objects.Orc.Abilities.ChainLightning, global::Moonwell.Objects.NightElf.Abilities.ShadowStrike, global::Moonwell.Objects.Creeps.Abilities.Reincarnation>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -1270,7 +1270,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\10x10Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\naga\\AltarOfDepths\\AltarOfDepths_portrait";
@@ -1397,7 +1397,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Human.Abilities.BrillianceAura, global::Moonwell.Objects.Creeps.Abilities.BreathOfFireANbf, global::Moonwell.Objects.Creeps.Abilities.RainOfFireANrf>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Human.Abilities.BrillianceAura, global::Moonwell.Objects.Creeps.Abilities.BreathOfFire, global::Moonwell.Objects.Creeps.Abilities.RainOfFire>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -2100,7 +2100,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.WitheringFireAUwf, global::Moonwell.Objects.Other.Abilities.SoulLanternAUla, global::Moonwell.Objects.Other.Abilities.DeathseekerArrowsAUdb, global::Moonwell.Objects.Other.Abilities.BansheesWailAUwc, global::Moonwell.Objects.Creeps.Abilities.AttributeBonusAaml>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.WitheringFire, global::Moonwell.Objects.Other.Abilities.SoulLantern, global::Moonwell.Objects.Other.Abilities.DeathseekerArrows, global::Moonwell.Objects.Other.Abilities.BansheesWail, global::Moonwell.Objects.Creeps.Abilities.AttributeBonusAaml>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -2432,7 +2432,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\ArcaneObservatoryPath.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\other\\ArcaneObservatory\\ArcaneObservatory_portrait";
@@ -2627,7 +2627,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Archimonde()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory, global::Moonwell.Objects.Creeps.Abilities.SpellImmunitySpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
                     AcquisitionRange = 600f;
                     Agility = 17;
                     AgilityPerLevel = 3f;
@@ -2795,7 +2795,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Paladin (Harf).</summary>
+            /// <summary>Paladin (wielding Frostmourne), Harf.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Harf")]
             public class ArthasHarf : global::Moonwell.Objects.StandardHero
@@ -3136,7 +3136,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Death Knight (Uarf).</summary>
+            /// <summary>Death Knight (Evil on foot), Uarf.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Uarf")]
             public class ArthasUarf : global::Moonwell.Objects.StandardHero
@@ -3215,7 +3215,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Undead.Abilities.DeathCoil, global::Moonwell.Objects.Undead.Abilities.DeathPact, global::Moonwell.Objects.Undead.Abilities.UnholyAura, global::Moonwell.Objects.Undead.Abilities.AnimateDead>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Undead.Abilities.DeathCoil, global::Moonwell.Objects.Undead.Abilities.DeathPact, global::Moonwell.Objects.Undead.Abilities.UnholyAura, global::Moonwell.Objects.Undead.Abilities.AnimateDeadAUa2>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -3308,7 +3308,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Death Knight (Uear).</summary>
+            /// <summary>Death Knight (Evil), Uear.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Uear")]
             public class ArthasUear : global::Moonwell.Objects.StandardHero
@@ -3387,7 +3387,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Undead.Abilities.DeathCoil, global::Moonwell.Objects.Undead.Abilities.DeathPact, global::Moonwell.Objects.Undead.Abilities.UnholyAura, global::Moonwell.Objects.Undead.Abilities.AnimateDead>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Undead.Abilities.DeathCoil, global::Moonwell.Objects.Undead.Abilities.DeathPact, global::Moonwell.Objects.Undead.Abilities.UnholyAura, global::Moonwell.Objects.Undead.Abilities.AnimateDeadAUa2>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -3796,7 +3796,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Banshee (ufr2).</summary>
+            /// <summary>Banshee (Banshee's Wail Curse), ufr2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ufr2")]
             public class BansheeUfr2 : global::Moonwell.Objects.StandardUnit
@@ -3933,7 +3933,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Banshee (ufrb).</summary>
+            /// <summary>Banshee (Banshee's Wail), ufrb.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ufrb")]
             public class BansheeUfrb : global::Moonwell.Objects.StandardUnit
@@ -4244,7 +4244,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Death Knight (Ubtr).</summary>
+            /// <summary>Death Knight (Death Knight), Ubtr.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Ubtr")]
             public class BaronRivendareUbtr : global::Moonwell.Objects.StandardHero
@@ -4489,7 +4489,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\8x8SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\other\\BarrowDens\\BarrowDens_portrait";
@@ -5690,7 +5690,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Tauren Chieftain (Ocb2).</summary>
+            /// <summary>Tauren Chieftain (Expansion), Ocb2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Ocb2")]
             public class CairneBloodhoofOcb2 : global::Moonwell.Objects.StandardHero
@@ -5769,7 +5769,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Orc.Abilities.Shockwave, global::Moonwell.Objects.Orc.Abilities.EnduranceAuraAOr2, global::Moonwell.Objects.Orc.Abilities.Reincarnation, global::Moonwell.Objects.Orc.Abilities.WarStomp, global::Moonwell.Objects.Creeps.Abilities.AttributeBonus>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Orc.Abilities.ShockwaveAOs2, global::Moonwell.Objects.Orc.Abilities.EnduranceAuraAOr2, global::Moonwell.Objects.Orc.Abilities.ReincarnationAOr3, global::Moonwell.Objects.Orc.Abilities.WarStomp, global::Moonwell.Objects.Creeps.Abilities.AttributeBonus>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -5942,7 +5942,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Orc.Abilities.ShockwaveAOsh, global::Moonwell.Objects.Orc.Abilities.EnduranceAura, global::Moonwell.Objects.Orc.Abilities.ReincarnationAOre, global::Moonwell.Objects.Orc.Abilities.WarStompAOws>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Orc.Abilities.Shockwave, global::Moonwell.Objects.Orc.Abilities.EnduranceAura, global::Moonwell.Objects.Orc.Abilities.Reincarnation, global::Moonwell.Objects.Orc.Abilities.WarStompAOws>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -6035,7 +6035,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Tauren Chieftain (Otcc).</summary>
+            /// <summary>Tauren Chieftain (cinematic), Otcc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Otcc")]
             public class CairneBloodhoofOtcc : global::Moonwell.Objects.StandardHero
@@ -6114,7 +6114,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Orc.Abilities.ShockwaveAOsh, global::Moonwell.Objects.Orc.Abilities.EnduranceAura, global::Moonwell.Objects.Orc.Abilities.ReincarnationAOre, global::Moonwell.Objects.Orc.Abilities.WarStompAOws>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Orc.Abilities.Shockwave, global::Moonwell.Objects.Orc.Abilities.EnduranceAura, global::Moonwell.Objects.Orc.Abilities.Reincarnation, global::Moonwell.Objects.Orc.Abilities.WarStompAOws>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -6851,7 +6851,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Child (nvk2).</summary>
+            /// <summary>Child (2), nvk2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nvk2")]
             public class ChildNvk2 : global::Moonwell.Objects.StandardUnit
@@ -7214,7 +7214,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Circle of Power (ncp2).</summary>
+            /// <summary>Circle of Power (medium), ncp2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncp2")]
             public class CircleOfPowerNcp2 : global::Moonwell.Objects.StandardUnit
@@ -7331,7 +7331,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Circle of Power (ncp3).</summary>
+            /// <summary>Circle of Power (large), ncp3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncp3")]
             public class CircleOfPowerNcp3 : global::Moonwell.Objects.StandardUnit
@@ -7448,7 +7448,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>City Building (ncb0).</summary>
+            /// <summary>City Building 0, ncb0.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncb0")]
             public class CityBuildingNcb0 : global::Moonwell.Objects.StandardUnit
@@ -7566,7 +7566,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>City Building (ncb1).</summary>
+            /// <summary>City Building 1, ncb1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncb1")]
             public class CityBuildingNcb1 : global::Moonwell.Objects.StandardUnit
@@ -7684,7 +7684,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>City Building (ncb2).</summary>
+            /// <summary>City Building 2, ncb2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncb2")]
             public class CityBuildingNcb2 : global::Moonwell.Objects.StandardUnit
@@ -7802,7 +7802,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>City Building (ncb3).</summary>
+            /// <summary>City Building 3, ncb3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncb3")]
             public class CityBuildingNcb3 : global::Moonwell.Objects.StandardUnit
@@ -7920,7 +7920,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>City Building (ncb4).</summary>
+            /// <summary>City Building 4, ncb4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncb4")]
             public class CityBuildingNcb4 : global::Moonwell.Objects.StandardUnit
@@ -8038,7 +8038,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>City Building (ncb5).</summary>
+            /// <summary>City Building 5, ncb5.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncb5")]
             public class CityBuildingNcb5 : global::Moonwell.Objects.StandardUnit
@@ -8156,7 +8156,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>City Building (ncb6).</summary>
+            /// <summary>City Building 6, ncb6.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncb6")]
             public class CityBuildingNcb6 : global::Moonwell.Objects.StandardUnit
@@ -8274,7 +8274,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>City Building (ncb7).</summary>
+            /// <summary>City Building 7, ncb7.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncb7")]
             public class CityBuildingNcb7 : global::Moonwell.Objects.StandardUnit
@@ -8392,7 +8392,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>City Building (ncb8).</summary>
+            /// <summary>City Building 8, ncb8.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncb8")]
             public class CityBuildingNcb8 : global::Moonwell.Objects.StandardUnit
@@ -8510,7 +8510,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>City Building (ncb9).</summary>
+            /// <summary>City Building 9, ncb9.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncb9")]
             public class CityBuildingNcb9 : global::Moonwell.Objects.StandardUnit
@@ -8628,7 +8628,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>City Building (ncba).</summary>
+            /// <summary>City Building 10, ncba.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncba")]
             public class CityBuildingNcba : global::Moonwell.Objects.StandardUnit
@@ -8746,7 +8746,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>City Building (ncbb).</summary>
+            /// <summary>City Building 11, ncbb.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncbb")]
             public class CityBuildingNcbb : global::Moonwell.Objects.StandardUnit
@@ -8864,7 +8864,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>City Building (ncbc).</summary>
+            /// <summary>City Building 12, ncbc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncbc")]
             public class CityBuildingNcbc : global::Moonwell.Objects.StandardUnit
@@ -8982,7 +8982,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>City Building (ncbd).</summary>
+            /// <summary>City Building 13, ncbd.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncbd")]
             public class CityBuildingNcbd : global::Moonwell.Objects.StandardUnit
@@ -9100,7 +9100,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>City Building (ncbe).</summary>
+            /// <summary>City Building 14, ncbe.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncbe")]
             public class CityBuildingNcbe : global::Moonwell.Objects.StandardUnit
@@ -9218,7 +9218,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>City Building (ncbf).</summary>
+            /// <summary>City Building 15, ncbf.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncbf")]
             public class CityBuildingNcbf : global::Moonwell.Objects.StandardUnit
@@ -9844,7 +9844,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\6x6SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\naga\\CoralBed\\CoralBed_portrait";
@@ -9993,7 +9993,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 9;
@@ -10160,7 +10160,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\6x6SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 4;
@@ -10301,7 +10301,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\6x6SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\demon\\CorruptedMoonWell\\CorruptedMoonWell_portrait";
@@ -10453,7 +10453,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\12x12TreeOfLife.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 1;
@@ -10616,7 +10616,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\12x12TreeOfLife.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 1;
@@ -10778,7 +10778,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\12x12TreeOfLife.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 1;
@@ -12429,7 +12429,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Dimensional Gate (ndke).</summary>
+            /// <summary>Dimensional Gate (facing southeast), ndke.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ndke")]
             public class DimensionalGateNdke : global::Moonwell.Objects.StandardUnit
@@ -12544,7 +12544,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Dimensional Gate (ndkw).</summary>
+            /// <summary>Dimensional Gate (facing southwest), ndkw.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ndkw")]
             public class DimensionalGateNdkw : global::Moonwell.Objects.StandardUnit
@@ -13798,7 +13798,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DragonTurtle()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Creeps.Abilities.SpikedShellANth, global::Moonwell.Objects.Naga.Abilities.HardenedSkin>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Creeps.Abilities.SpikedShell, global::Moonwell.Objects.Naga.Abilities.HardenedSkin>();
                     AcquisitionRange = 900f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -15031,7 +15031,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\6x6SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\orc\\TrollBurrow\\TrollBurrow_portrait";
@@ -16679,7 +16679,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Forsaken Villager (fvil).</summary>
+            /// <summary>Forsaken Villager (Male), fvil.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("fvil")]
             public class ForsakenVillagerFvil : global::Moonwell.Objects.StandardUnit
@@ -16824,7 +16824,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Forsaken Villager (fvlw).</summary>
+            /// <summary>Forsaken Villager (female), fvlw.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("fvlw")]
             public class ForsakenVillagerFvlw : global::Moonwell.Objects.StandardUnit
@@ -17072,7 +17072,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public FountainOfPower()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.LifeRegenerationAura, global::Moonwell.Objects.Creeps.Abilities.ManaRegenerationLifeRegenerationAura, global::Moonwell.Objects.Other.Abilities.Invulnerable>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.LifeRegenerationAura, global::Moonwell.Objects.Creeps.Abilities.ManaRegeneration, global::Moonwell.Objects.Other.Abilities.Invulnerable>();
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
@@ -17412,7 +17412,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Guard Lieutenant (Hct1).</summary>
+            /// <summary>Guard Lieutenant (Before Arthas), Hct1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Hct1")]
             public class GarekHct1 : global::Moonwell.Objects.StandardHero
@@ -17491,7 +17491,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.SweepingStrikeAHsw, global::Moonwell.Objects.Other.Abilities.UnyieldingGuardAHbd, global::Moonwell.Objects.Other.Abilities.ValiantChargeAHch, global::Moonwell.Objects.Other.Abilities.WarcryAHwc>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.SweepingStrike, global::Moonwell.Objects.Other.Abilities.UnyieldingGuard, global::Moonwell.Objects.Other.Abilities.ValiantCharge, global::Moonwell.Objects.Other.Abilities.Warcry>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -17662,7 +17662,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.SweepingStrikeAHsw, global::Moonwell.Objects.Other.Abilities.UnyieldingGuardAHbd, global::Moonwell.Objects.Other.Abilities.ValiantChargeAHch, global::Moonwell.Objects.Other.Abilities.WarcryAHwc>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.SweepingStrike, global::Moonwell.Objects.Other.Abilities.UnyieldingGuard, global::Moonwell.Objects.Other.Abilities.ValiantCharge, global::Moonwell.Objects.Other.Abilities.Warcry>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -17753,7 +17753,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Forsaken (Ugr2).</summary>
+            /// <summary>Forsaken (Upgraded), Ugr2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Ugr2")]
             public class GarekUgr2 : global::Moonwell.Objects.StandardHero
@@ -17832,7 +17832,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.RelentlessCleaveAUsw, global::Moonwell.Objects.Other.Abilities.UndyingDefianceAUbd, global::Moonwell.Objects.Other.Abilities.BatteringRam, global::Moonwell.Objects.Other.Abilities.GrimConvictionAUvg, global::Moonwell.Objects.Creeps.Abilities.AttributeBonusAaml>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.RelentlessCleave, global::Moonwell.Objects.Other.Abilities.UndyingDefiance, global::Moonwell.Objects.Other.Abilities.BatteringRam, global::Moonwell.Objects.Other.Abilities.GrimConviction, global::Moonwell.Objects.Creeps.Abilities.AttributeBonusAaml>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -17926,7 +17926,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Forsaken (Ugr3).</summary>
+            /// <summary>Forsaken (Light Form), Ugr3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Ugr3")]
             public class GarekUgr3 : global::Moonwell.Objects.StandardHero
@@ -18005,7 +18005,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.RelentlessCleaveAUsw, global::Moonwell.Objects.Other.Abilities.UndyingDefianceAUbd, global::Moonwell.Objects.Other.Abilities.BatteringRam, global::Moonwell.Objects.Other.Abilities.GrimConvictionAUvg, global::Moonwell.Objects.Creeps.Abilities.AttributeBonusAaml>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.RelentlessCleave, global::Moonwell.Objects.Other.Abilities.UndyingDefiance, global::Moonwell.Objects.Other.Abilities.BatteringRam, global::Moonwell.Objects.Other.Abilities.GrimConviction, global::Moonwell.Objects.Creeps.Abilities.AttributeBonusAaml>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -18178,7 +18178,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.RelentlessCleaveAUsw, global::Moonwell.Objects.Other.Abilities.UndyingDefianceAUbd, global::Moonwell.Objects.Other.Abilities.BatteringRam, global::Moonwell.Objects.Other.Abilities.GrimConvictionAUvg, global::Moonwell.Objects.Creeps.Abilities.AttributeBonusAaml>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.RelentlessCleave, global::Moonwell.Objects.Other.Abilities.UndyingDefiance, global::Moonwell.Objects.Other.Abilities.BatteringRam, global::Moonwell.Objects.Other.Abilities.GrimConviction, global::Moonwell.Objects.Creeps.Abilities.AttributeBonusAaml>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -19245,7 +19245,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Greater Spirit Beast (nsw3).</summary>
+            /// <summary>Greater Spirit Beast (Level 3), nsw3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nsw3")]
             public class GreaterSpiritBeast : global::Moonwell.Objects.StandardUnit
@@ -19560,7 +19560,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Blademaster (Opgh).</summary>
+            /// <summary>Blademaster (Possessed), Opgh.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Opgh")]
             public class GrommashHellscreamOpgh : global::Moonwell.Objects.StandardHero
@@ -20075,7 +20075,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>High Elf (nhef).</summary>
+            /// <summary>High Elf (Female), nhef.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nhef")]
             public class HighElfNhef : global::Moonwell.Objects.StandardUnit
@@ -20200,7 +20200,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>High Elf (nhem).</summary>
+            /// <summary>High Elf (Male), nhem.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nhem")]
             public class HighElfNhem : global::Moonwell.Objects.StandardUnit
@@ -20443,7 +20443,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>High Elven Farm (nef0).</summary>
+            /// <summary>High Elven Farm 1, nef0.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nef0")]
             public class HighElvenFarmNef0 : global::Moonwell.Objects.StandardUnit
@@ -20559,7 +20559,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>High Elven Farm (nef1).</summary>
+            /// <summary>High Elven Farm 2, nef1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nef1")]
             public class HighElvenFarmNef1 : global::Moonwell.Objects.StandardUnit
@@ -20675,7 +20675,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>High Elven Farm (nef2).</summary>
+            /// <summary>High Elven Farm 3, nef2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nef2")]
             public class HighElvenFarmNef2 : global::Moonwell.Objects.StandardUnit
@@ -20791,7 +20791,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>High Elven Farm (nef3).</summary>
+            /// <summary>High Elven Farm 4, nef3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nef3")]
             public class HighElvenFarmNef3 : global::Moonwell.Objects.StandardUnit
@@ -20907,7 +20907,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>High Elven Farm (nef4).</summary>
+            /// <summary>High Elven Farm 5, nef4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nef4")]
             public class HighElvenFarmNef4 : global::Moonwell.Objects.StandardUnit
@@ -21023,7 +21023,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>High Elven Farm (nef5).</summary>
+            /// <summary>High Elven Farm 6, nef5.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nef5")]
             public class HighElvenFarmNef5 : global::Moonwell.Objects.StandardUnit
@@ -21139,7 +21139,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>High Elven Farm (nef6).</summary>
+            /// <summary>High Elven Farm 7, nef6.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nef6")]
             public class HighElvenFarmNef6 : global::Moonwell.Objects.StandardUnit
@@ -21255,7 +21255,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>High Elven Farm (nef7).</summary>
+            /// <summary>High Elven Farm 8, nef7.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nef7")]
             public class HighElvenFarmNef7 : global::Moonwell.Objects.StandardUnit
@@ -22107,7 +22107,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\6x6SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 384f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\human\\HumanShipyard\\HumanShipyard_portrait";
@@ -22798,7 +22798,7 @@ namespace Moonwell.Objects
                     TintingColor1Red = 255;
                     TintingColor2Green = 255;
                     TintingColor3Blue = 255;
-                    Tooltip = "Purchase Icy Treasure Box, Build Treasure Box";
+                    Tooltip = "Purchase Icy Treasure Box";
                     TooltipExtended = "A treasure lies frozen within.";
                     UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
                     UseClickHelper = false;
@@ -22891,7 +22891,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.SacredAuraAHas, global::Moonwell.Objects.Other.Abilities.LightsMercyAHsf, global::Moonwell.Objects.Other.Abilities.MindControl, global::Moonwell.Objects.Other.Abilities.SurgeOfLightAHsl>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.SacredAura, global::Moonwell.Objects.Other.Abilities.LightsMercy, global::Moonwell.Objects.Other.Abilities.MindControl, global::Moonwell.Objects.Other.Abilities.SurgeOfLight>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -22983,7 +22983,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Shadow Priest (Ujsm).</summary>
+            /// <summary>Shadow Priest (Undead), Ujsm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Ujsm")]
             public class IlastarUjsm : global::Moonwell.Objects.StandardHero
@@ -23157,7 +23157,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Demon Hunter (Eevi).</summary>
+            /// <summary>Demon Hunter (Evil), Eevi.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Eevi")]
             public class IllidanEevi : global::Moonwell.Objects.StandardHero
@@ -23333,7 +23333,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Demon Hunter (Eevm).</summary>
+            /// <summary>Demon Hunter (Morphed), Eevm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Eevm")]
             public class IllidanEevm : global::Moonwell.Objects.StandardHero
@@ -23449,7 +23449,7 @@ namespace Moonwell.Objects
                     Model = "units\\nightelf\\EvilIllidan\\IllidanEvil";
                     ModelFileExtraVersions = 0;
                     Name = "Demon Hunter";
-                    NameEditorSuffix = "(Morphed),  (Evil)";
+                    NameEditorSuffix = "(Morphed)";
                     NormalSkin = "AInv,Ault,ANcl";
                     OccluderHeight = 0f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -23516,7 +23516,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Demon Hunter (Eidm).</summary>
+            /// <summary>Demon Hunter (Demon Form), Eidm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Eidm")]
             public class IllidanEidm : global::Moonwell.Objects.StandardHero
@@ -23872,7 +23872,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Demon Hunter (Eilm).</summary>
+            /// <summary>Demon Hunter (Morphed), Eilm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Eilm")]
             public class IllidanEilm : global::Moonwell.Objects.StandardHero
@@ -24874,7 +24874,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.ColdArrowsAHca, global::Moonwell.Objects.NightElf.Abilities.Scout, global::Moonwell.Objects.NightElf.Abilities.TrueshotAura, global::Moonwell.Objects.NightElf.Abilities.Starfall>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.ColdArrows, global::Moonwell.Objects.NightElf.Abilities.Scout, global::Moonwell.Objects.NightElf.Abilities.TrueshotAura, global::Moonwell.Objects.NightElf.Abilities.Starfall>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -25137,7 +25137,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Lich (Uclc).</summary>
+            /// <summary>Lich (Lich, cinematic), Uclc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Uclc")]
             public class KelThuzadUclc : global::Moonwell.Objects.StandardHero
@@ -25313,7 +25313,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Kel'Thuzad (uktg).</summary>
+            /// <summary>Kel'Thuzad (Ghost), uktg.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("uktg")]
             public class KelThuzadUktg : global::Moonwell.Objects.StandardUnit
@@ -25438,7 +25438,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Lich (Uktl).</summary>
+            /// <summary>Lich (Lich), Uktl.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Uktl")]
             public class KelThuzadUktl : global::Moonwell.Objects.StandardHero
@@ -25614,7 +25614,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Kel'Thuzad (uktn).</summary>
+            /// <summary>Kel'Thuzad (Necromancer), uktn.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("uktn")]
             public class KelThuzadUktn : global::Moonwell.Objects.StandardUnit
@@ -25756,7 +25756,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Warlock (Nkjx).</summary>
+            /// <summary>Warlock (Cinematic), Nkjx.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Nkjx")]
             public class KiljaedenNkjx : global::Moonwell.Objects.StandardHero
@@ -26091,7 +26091,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Kodo Beast (oosc).</summary>
+            /// <summary>Kodo Beast (Riderless), oosc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("oosc")]
             public class KodoBeast : global::Moonwell.Objects.StandardUnit
@@ -26457,7 +26457,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.ForkedLightningANfl, global::Moonwell.Objects.Creeps.Abilities.FrostArrows, global::Moonwell.Objects.Creeps.Abilities.ManaShieldANms, global::Moonwell.Objects.Creeps.Abilities.Tornado>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.ForkedLightning, global::Moonwell.Objects.Creeps.Abilities.FrostArrows, global::Moonwell.Objects.Creeps.Abilities.ManaShield, global::Moonwell.Objects.Creeps.Abilities.Tornado>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -26627,7 +26627,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.HeroicSlash, global::Moonwell.Objects.Other.Abilities.ApprehendAHen, global::Moonwell.Objects.Other.Abilities.InspireCourageAHic, global::Moonwell.Objects.Other.Abilities.RaiseTheBanner>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.HeroicSlash, global::Moonwell.Objects.Other.Abilities.Apprehend, global::Moonwell.Objects.Other.Abilities.InspireCourage, global::Moonwell.Objects.Other.Abilities.RaiseTheBanner>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -26718,7 +26718,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Fallen Captain (Uctl).</summary>
+            /// <summary>Fallen Captain (Evil), Uctl.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Uctl")]
             public class LandenUctl : global::Moonwell.Objects.StandardHero
@@ -26962,7 +26962,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.HeadsplitterAHhr, global::Moonwell.Objects.Other.Abilities.Provoke, global::Moonwell.Objects.Other.Abilities.GritAHgr, global::Moonwell.Objects.Other.Abilities.GuidingHand, global::Moonwell.Objects.Creeps.Abilities.AttributeBonusAaml>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Other.Abilities.Headsplitter, global::Moonwell.Objects.Other.Abilities.Provoke, global::Moonwell.Objects.Other.Abilities.Grit, global::Moonwell.Objects.Other.Abilities.GuidingHand, global::Moonwell.Objects.Creeps.Abilities.AttributeBonusAaml>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -27035,7 +27035,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Lesser Spirit Beast (nsw1).</summary>
+            /// <summary>Lesser Spirit Beast (Level 1), nsw1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nsw1")]
             public class LesserSpiritBeast : global::Moonwell.Objects.StandardUnit
@@ -27175,7 +27175,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Lich King (nzlc).</summary>
+            /// <summary>Lich King (cinematic campaign unit), nzlc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nzlc")]
             public class LichKing : global::Moonwell.Objects.StandardUnit
@@ -28020,7 +28020,7 @@ namespace Moonwell.Objects
                     TintingColor1Red = 255;
                     TintingColor2Green = 255;
                     TintingColor3Blue = 255;
-                    Tooltip = "Purchase Magic Vault, Build Magic Vault";
+                    Tooltip = "Purchase Magic Vault";
                     TooltipExtended = "A secret lies within every box.";
                     UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
                     UseClickHelper = false;
@@ -28278,7 +28278,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.RainOfFireANrf, global::Moonwell.Objects.Creeps.Abilities.HowlOfTerror, global::Moonwell.Objects.Creeps.Abilities.CleavingAttackANca, global::Moonwell.Objects.Creeps.Abilities.Doom>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.RainOfFire, global::Moonwell.Objects.Creeps.Abilities.HowlOfTerror, global::Moonwell.Objects.Creeps.Abilities.CleavingAttack, global::Moonwell.Objects.Creeps.Abilities.Doom>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -29317,7 +29317,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Orc.Abilities.ShockwaveAOsh, global::Moonwell.Objects.Human.Abilities.ThunderClap, global::Moonwell.Objects.Orc.Abilities.Earthquake, global::Moonwell.Objects.Creeps.Abilities.ReincarnationANrn>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Orc.Abilities.Shockwave, global::Moonwell.Objects.Human.Abilities.ThunderClap, global::Moonwell.Objects.Orc.Abilities.Earthquake, global::Moonwell.Objects.Creeps.Abilities.ReincarnationANrn>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -29837,7 +29837,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Medivh (nmdm).</summary>
+            /// <summary>Medivh (Raven Form), nmdm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmdm")]
             public class MedivhNmdm : global::Moonwell.Objects.StandardUnit
@@ -30896,7 +30896,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public NagaRoyalGuard()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SubmergeAsb2, global::Moonwell.Objects.Creeps.Abilities.CrushingWaveACcv, global::Moonwell.Objects.Creeps.Abilities.FrostBolt, global::Moonwell.Objects.Creeps.Abilities.SummonSeaElemental, global::Moonwell.Objects.Creeps.Abilities.ResistantSkinACsk>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SubmergeAsb2, global::Moonwell.Objects.Creeps.Abilities.CrushingWave, global::Moonwell.Objects.Creeps.Abilities.FrostBolt, global::Moonwell.Objects.Creeps.Abilities.SummonSeaElemental, global::Moonwell.Objects.Creeps.Abilities.ResistantSkinACsk>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -31636,7 +31636,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Night Elf Fishing Village (nfv0).</summary>
+            /// <summary>Night Elf Fishing Village (two story, southwest facing), nfv0.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nfv0")]
             public class NightElfFishingVillageNfv0 : global::Moonwell.Objects.StandardUnit
@@ -31752,7 +31752,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Night Elf Fishing Village (nfv1).</summary>
+            /// <summary>Night Elf Fishing Village (crested, southwest facing), nfv1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nfv1")]
             public class NightElfFishingVillageNfv1 : global::Moonwell.Objects.StandardUnit
@@ -31868,7 +31868,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Night Elf Fishing Village (nfv2).</summary>
+            /// <summary>Night Elf Fishing Village (one story), nfv2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nfv2")]
             public class NightElfFishingVillageNfv2 : global::Moonwell.Objects.StandardUnit
@@ -31984,7 +31984,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Night Elf Fishing Village (nfv3).</summary>
+            /// <summary>Night Elf Fishing Village (two story, southeast facing), nfv3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nfv3")]
             public class NightElfFishingVillageNfv3 : global::Moonwell.Objects.StandardUnit
@@ -32100,7 +32100,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Night Elf Fishing Village (nfv4).</summary>
+            /// <summary>Night Elf Fishing Village (crested, southeast facing), nfv4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nfv4")]
             public class NightElfFishingVillageNfv4 : global::Moonwell.Objects.StandardUnit
@@ -32216,7 +32216,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Night Elf Fishing Village (nvr0).</summary>
+            /// <summary>Night Elf Fishing Village (ruined, nvr0.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nvr0")]
             public class NightElfFishingVillageNvr0 : global::Moonwell.Objects.StandardUnit
@@ -32285,7 +32285,7 @@ namespace Moonwell.Objects
                     Model = "buildings\\other\\ElvenFishVillageBuildingRuined0\\ElvenFishVillageBuildingRuined0";
                     ModelFileExtraVersions = 0;
                     Name = "Night Elf Fishing Village";
-                    NameEditorSuffix = "(ruined, two story)";
+                    NameEditorSuffix = "(ruined";
                     NeutralBuildingShowsMinimapIcon = false;
                     OccluderHeight = 200f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -32332,7 +32332,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Night Elf Fishing Village (nvr1).</summary>
+            /// <summary>Night Elf Fishing Village (ruined, nvr1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nvr1")]
             public class NightElfFishingVillageNvr1 : global::Moonwell.Objects.StandardUnit
@@ -32401,7 +32401,7 @@ namespace Moonwell.Objects
                     Model = "buildings\\other\\ElvenFishVillageBuildingRuined1\\ElvenFishVillageBuildingRuined1";
                     ModelFileExtraVersions = 0;
                     Name = "Night Elf Fishing Village";
-                    NameEditorSuffix = "(ruined, one story)";
+                    NameEditorSuffix = "(ruined";
                     NeutralBuildingShowsMinimapIcon = false;
                     OccluderHeight = 200f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -32448,7 +32448,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Night Elf Fishing Village (nvr2).</summary>
+            /// <summary>Night Elf Fishing Village (ruined, nvr2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nvr2")]
             public class NightElfFishingVillageNvr2 : global::Moonwell.Objects.StandardUnit
@@ -32517,7 +32517,7 @@ namespace Moonwell.Objects
                     Model = "buildings\\other\\ElvenFishVillageBuildingRuined2\\ElvenFishVillageBuildingRuined2";
                     ModelFileExtraVersions = 0;
                     Name = "Night Elf Fishing Village";
-                    NameEditorSuffix = "(ruined, crested)";
+                    NameEditorSuffix = "(ruined";
                     NeutralBuildingShowsMinimapIcon = false;
                     OccluderHeight = 200f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -32909,7 +32909,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\6x6SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 384f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\NightElf\\NightElfShipyard\\NightElfShipyard_portrait";
@@ -33377,7 +33377,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Orc Juggernaught (zjug).</summary>
+            /// <summary>Orc Juggernaught (Cinematic), zjug.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("zjug")]
             public class OrcJuggernaughtZjug : global::Moonwell.Objects.StandardUnit
@@ -33594,7 +33594,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\8x8SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 384f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\other\\GoblinShipyard\\GoblinShipyard";
@@ -34387,7 +34387,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Orc.Abilities.ShockwaveAOsh, global::Moonwell.Objects.Human.Abilities.ThunderClap, global::Moonwell.Objects.Orc.Abilities.Earthquake, global::Moonwell.Objects.Creeps.Abilities.ReincarnationANrn>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Orc.Abilities.Shockwave, global::Moonwell.Objects.Human.Abilities.ThunderClap, global::Moonwell.Objects.Orc.Abilities.Earthquake, global::Moonwell.Objects.Creeps.Abilities.ReincarnationANrn>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -34992,7 +34992,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Hedge Mage (Urff).</summary>
+            /// <summary>Hedge Mage (On Foot), Urff.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Urff")]
             public class RasFrostwhisperUrff : global::Moonwell.Objects.StandardHero
@@ -35859,7 +35859,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Resurrection Stone (nbse).</summary>
+            /// <summary>Resurrection Stone (southeast facing), nbse.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nbse")]
             public class ResurrectionStoneNbse : global::Moonwell.Objects.StandardUnit
@@ -35976,7 +35976,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Resurrection Stone (nbsw).</summary>
+            /// <summary>Resurrection Stone (southwest facing), nbsw.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nbsw")]
             public class ResurrectionStoneNbsw : global::Moonwell.Objects.StandardUnit
@@ -36480,7 +36480,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Orc.Abilities.HealingWave, global::Moonwell.Objects.Orc.Abilities.Hex, global::Moonwell.Objects.Orc.Abilities.SerpentWardArsw, global::Moonwell.Objects.Orc.Abilities.VoodooSpirits, global::Moonwell.Objects.Creeps.Abilities.AttributeBonus>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Orc.Abilities.HealingWaveANhw, global::Moonwell.Objects.Orc.Abilities.HexANhx, global::Moonwell.Objects.Orc.Abilities.SerpentWardArsw, global::Moonwell.Objects.Orc.Abilities.VoodooSpirits, global::Moonwell.Objects.Creeps.Abilities.AttributeBonus>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -37068,7 +37068,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sapphiron (ubdd).</summary>
+            /// <summary>Sapphiron (undead), ubdd.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ubdd")]
             public class SapphironUbdd : global::Moonwell.Objects.StandardUnit
@@ -37229,7 +37229,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sapphiron (ubdr).</summary>
+            /// <summary>Sapphiron (living), ubdr.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ubdr")]
             public class SapphironUbdr : global::Moonwell.Objects.StandardUnit
@@ -38252,7 +38252,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\naga\\ShrineOfAshjara\\ShrineOfAshjara_portrait";
@@ -38468,7 +38468,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Death Knight (Uzkf).</summary>
+            /// <summary>Death Knight (On Foot), Uzkf.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Uzkf")]
             public class SirZeliekUzkf : global::Moonwell.Objects.StandardHero
@@ -39584,7 +39584,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\naga\\SpawningGrounds\\SpawningGrounds_portrait";
@@ -39630,7 +39630,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Spirit Beast (nsw2).</summary>
+            /// <summary>Spirit Beast (Level 2), nsw2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nsw2")]
             public class SpiritBeast : global::Moonwell.Objects.StandardUnit
@@ -41375,7 +41375,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.SilenceANsi, global::Moonwell.Objects.Creeps.Abilities.BlackArrowANba, global::Moonwell.Objects.Creeps.Abilities.LifeDrainANdr, global::Moonwell.Objects.Creeps.Abilities.CharmANch>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.Silence, global::Moonwell.Objects.Creeps.Abilities.BlackArrow, global::Moonwell.Objects.Creeps.Abilities.LifeDrain, global::Moonwell.Objects.Creeps.Abilities.Charm>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -41550,7 +41550,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.ColdArrowsAHca, global::Moonwell.Objects.NightElf.Abilities.Scout, global::Moonwell.Objects.NightElf.Abilities.TrueshotAura, global::Moonwell.Objects.NightElf.Abilities.Starfall>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.ColdArrows, global::Moonwell.Objects.NightElf.Abilities.Scout, global::Moonwell.Objects.NightElf.Abilities.TrueshotAura, global::Moonwell.Objects.NightElf.Abilities.Starfall>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -41640,7 +41640,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sylvanas Windrunner (uswb).</summary>
+            /// <summary>Sylvanas Windrunner (Banshee), uswb.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("uswb")]
             public class SylvanasWindrunnerUswb : global::Moonwell.Objects.StandardUnit
@@ -41876,7 +41876,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\16x16Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\naga\\TempleofTides\\TempleofTides_portrait";
@@ -42552,7 +42552,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Far Seer (Oths).</summary>
+            /// <summary>Far Seer (Unmounted), Oths.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Oths")]
             public class ThrallOths : global::Moonwell.Objects.StandardHero
@@ -42997,7 +42997,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\4x4SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\naga\\TidalGuardian\\TidalGuardian_portrait";
@@ -43180,7 +43180,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public TotemOfBattle()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.HealingWardAura, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.ItemTotemOgreMagiBloodlust>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.HealingWardAura, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.ItemTotemOgreMagiBloodlust>();
                     AcquisitionRange = 900f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -43850,7 +43850,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 384f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\undead\\UndeadShipyard\\UndeadShipyard_portrait";
@@ -44272,7 +44272,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Undead.Abilities.Sleep, global::Moonwell.Objects.Undead.Abilities.VampiricAura, global::Moonwell.Objects.Creeps.Abilities.RainOfFireANrf, global::Moonwell.Objects.Creeps.Abilities.Doom>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Undead.Abilities.Sleep, global::Moonwell.Objects.Undead.Abilities.VampiricAura, global::Moonwell.Objects.Creeps.Abilities.RainOfFire, global::Moonwell.Objects.Creeps.Abilities.Doom>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -44366,7 +44366,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Villager (nvil).</summary>
+            /// <summary>Villager (Male), nvil.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nvil")]
             public class VillagerNvil : global::Moonwell.Objects.StandardUnit
@@ -44490,7 +44490,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Villager (nvl2).</summary>
+            /// <summary>Villager (Male 2), nvl2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nvl2")]
             public class VillagerNvl2 : global::Moonwell.Objects.StandardUnit
@@ -44614,7 +44614,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Villager (nvlw).</summary>
+            /// <summary>Villager (Female), nvlw.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nvlw")]
             public class VillagerNvlw : global::Moonwell.Objects.StandardUnit
@@ -45155,7 +45155,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Wind Rider (ownr).</summary>
+            /// <summary>Wind Rider (Riderless), ownr.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ownr")]
             public class WindRider : global::Moonwell.Objects.StandardUnit
@@ -45292,7 +45292,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Wind Rider Cage (nwc1).</summary>
+            /// <summary>Wind Rider Cage (1), nwc1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nwc1")]
             public class WindRiderCageNwc1 : global::Moonwell.Objects.StandardUnit
@@ -45407,7 +45407,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Wind Rider Cage (nwc2).</summary>
+            /// <summary>Wind Rider Cage (2), nwc2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nwc2")]
             public class WindRiderCageNwc2 : global::Moonwell.Objects.StandardUnit
@@ -45522,7 +45522,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Wind Rider Cage (nwc3).</summary>
+            /// <summary>Wind Rider Cage (3), nwc3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nwc3")]
             public class WindRiderCageNwc3 : global::Moonwell.Objects.StandardUnit
@@ -45636,7 +45636,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Wind Rider Cage (nwc4).</summary>
+            /// <summary>Wind Rider Cage (4), nwc4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nwc4")]
             public class WindRiderCageNwc4 : global::Moonwell.Objects.StandardUnit
@@ -45750,7 +45750,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Worker (nhew).</summary>
+            /// <summary>Worker (Blood Elf), nhew.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nhew")]
             public class Worker : global::Moonwell.Objects.StandardUnit
@@ -46051,7 +46051,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Zombie (nzof).</summary>
+            /// <summary>Zombie Female, nzof.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nzof")]
             public class ZombieNzof : global::Moonwell.Objects.StandardUnit
@@ -46333,7 +46333,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Zone Indicator (nzin).</summary>
+            /// <summary>Zone Indicator (Custom Campaign), nzin.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nzin")]
             public class ZoneIndicator : global::Moonwell.Objects.StandardUnit

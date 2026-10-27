@@ -32,7 +32,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Apprehend (BHaa).</summary>
+            /// <summary>Apprehend (Air), BHaa.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BHaa")]
             public class Apprehend : global::Moonwell.Objects.StandardBuff
@@ -48,7 +48,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Apprehend (BHag).</summary>
+            /// <summary>Apprehend (Ground), BHag.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BHag")]
             public class ApprehendBHag : global::Moonwell.Objects.StandardBuff
@@ -66,7 +66,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Apprehend (BHap).</summary>
+            /// <summary>Apprehend (AoE), BHap.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BHap")]
             public class ApprehendBHap : global::Moonwell.Objects.StandardBuff
@@ -505,7 +505,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Cold Arrows (BHca).</summary>
+            /// <summary>Cold Arrows (Non-stacking), BHca.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BHca")]
             public class ColdArrows : global::Moonwell.Objects.StandardBuff
@@ -522,7 +522,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Cold Arrows (Bcsd).</summary>
+            /// <summary>Cold Arrows (Stacking), Bcsd.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Bcsd")]
             public class ColdArrowsBcsd : global::Moonwell.Objects.StandardBuff
@@ -539,7 +539,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Cold Arrows (Bcsi).</summary>
+            /// <summary>Cold Arrows (Info), Bcsi.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Bcsi")]
             public class ColdArrowsBcsi : global::Moonwell.Objects.StandardBuff
@@ -554,7 +554,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Consecration (BHce).</summary>
+            /// <summary>Consecration (Hostile), BHce.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BHce")]
             public class Consecration : global::Moonwell.Objects.StandardBuff
@@ -591,7 +591,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Consecration (BHcf).</summary>
+            /// <summary>Consecration (Friendly), BHcf.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BHcf")]
             public class ConsecrationBHcf : global::Moonwell.Objects.StandardBuff
@@ -763,7 +763,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Deathseeker Arrows (BUdb).</summary>
+            /// <summary>Deathseeker Arrows (Target), BUdb.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BUdb")]
             public class DeathseekerArrows : global::Moonwell.Objects.StandardBuff
@@ -804,13 +804,30 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Doom (BNdi).</summary>
+            /// <summary>Doom (BNdo).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("BNdi")]
+            [global::Moonwell.Objects.Standard("BNdo")]
             public class Doom : global::Moonwell.Objects.StandardBuff
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Doom()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDoom.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    Target = "Abilities\\Spells\\Other\\Doom\\DoomTarget.mdl";
+                    Tooltip = "Doom";
+                    TooltipExtended = "This unit has been stricken with Doom; it cannot cast spells and will take damage until it dies, and a Demon will spawn from its corpse. Doom cannot be dispelled or cancelled.";
+                }
+            }
+
+            /// <summary>Doom (Minion), BNdi.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("BNdi")]
+            public class DoomBNdi : global::Moonwell.Objects.StandardBuff
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DoomBNdi()
                 {
                     EditorSuffix = "(Minion)";
                     Effect = "Abilities\\Spells\\Other\\Doom\\DoomDeath.mdl";
@@ -819,23 +836,6 @@ namespace Moonwell.Objects
                     Target = "Abilities\\Spells\\Other\\Doom\\DoomDeath.mdl";
                     Tooltip = "Doom";
                     TooltipExtended = "This unit has been stricken with Doom; it will take damage until it dies, and a Demon will spawn from its corpse. Doom cannot be dispelled or cancelled.";
-                }
-            }
-
-            /// <summary>Doom (BNdo).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("BNdo")]
-            public class DoomBNdo : global::Moonwell.Objects.StandardBuff
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public DoomBNdo()
-                {
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNDoom.blp";
-                    IsAnEffect = false;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    Target = "Abilities\\Spells\\Other\\Doom\\DoomTarget.mdl";
-                    Tooltip = "Doom";
-                    TooltipExtended = "This unit has been stricken with Doom; it cannot cast spells and will take damage until it dies, and a Demon will spawn from its corpse. Doom cannot be dispelled or cancelled.";
                 }
             }
 
@@ -873,7 +873,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Echoing Flame (Bgr1).</summary>
+            /// <summary>Echoing Flame (Non-stacking), Bgr1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Bgr1")]
             public class EchoingFlame : global::Moonwell.Objects.StandardBuff
@@ -891,7 +891,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Echoing Flame (Bgr2).</summary>
+            /// <summary>Echoing Flame (Stacking), Bgr2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Bgr2")]
             public class EchoingFlameBgr2 : global::Moonwell.Objects.StandardBuff
@@ -1053,7 +1053,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Guiding Hand (BHgh).</summary>
+            /// <summary>Guiding Hand (Caster), BHgh.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BHgh")]
             public class GuidingHand : global::Moonwell.Objects.StandardBuff
@@ -1072,7 +1072,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Guiding Hand (BHgu).</summary>
+            /// <summary>Guiding Hand (Target), BHgu.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BHgu")]
             public class GuidingHandBHgu : global::Moonwell.Objects.StandardBuff
@@ -1123,7 +1123,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Headsplitter (BHhh).</summary>
+            /// <summary>Headsplitter (Target), BHhh.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BHhh")]
             public class Headsplitter : global::Moonwell.Objects.StandardBuff
@@ -1140,7 +1140,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Headsplitter (BHhr).</summary>
+            /// <summary>Headsplitter (Caster), BHhr.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BHhr")]
             public class HeadsplitterBHhr : global::Moonwell.Objects.StandardBuff
@@ -1648,7 +1648,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Parasite (BNpm).</summary>
+            /// <summary>Parasite (Minion), BNpm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BNpm")]
             public class ParasiteBNpm : global::Moonwell.Objects.StandardBuff
@@ -1665,7 +1665,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Permanent Immolation (BNpi).</summary>
+            /// <summary>Permanent Immolation (Neutral Hostile 1), BNpi.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BNpi")]
             public class PermanentImmolation : global::Moonwell.Objects.StandardBuff
@@ -1682,7 +1682,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Permanent Immolation (Bpig).</summary>
+            /// <summary>Permanent Immolation (Neutral Hostile 2), Bpig.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Bpig")]
             public class PermanentImmolationBpig : global::Moonwell.Objects.StandardBuff
@@ -1734,7 +1734,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Poison (Bpoi).</summary>
+            /// <summary>Poison (Non-stacking), Bpoi.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Bpoi")]
             public class Poison : global::Moonwell.Objects.StandardBuff
@@ -1753,7 +1753,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Poison (Bpsd).</summary>
+            /// <summary>Poison (Stacking), Bpsd.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Bpsd")]
             public class PoisonBpsd : global::Moonwell.Objects.StandardBuff
@@ -1786,7 +1786,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Poisoned Arrows (BApa).</summary>
+            /// <summary>Poisoned Arrows (Stacking), BApa.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BApa")]
             public class PoisonedArrows : global::Moonwell.Objects.StandardBuff
@@ -1822,7 +1822,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Provoke (BHhc).</summary>
+            /// <summary>Provoke (Caster), BHhc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BHhc")]
             public class Provoke : global::Moonwell.Objects.StandardBuff
@@ -1842,7 +1842,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Provoke (BHht).</summary>
+            /// <summary>Provoke (Taunt), BHht.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BHht")]
             public class ProvokeBHht : global::Moonwell.Objects.StandardBuff
@@ -2014,7 +2014,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Rejuvenation (BIrg).</summary>
+            /// <summary>Rejuvenation (Item), BIrg.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BIrg")]
             public class Rejuvenation : global::Moonwell.Objects.StandardBuff
@@ -2068,7 +2068,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sacred Aura (BHas).</summary>
+            /// <summary>Sacred Aura (Friendly), BHas.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BHas")]
             public class SacredAura : global::Moonwell.Objects.StandardBuff
@@ -2207,7 +2207,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Smashed! (BImc).</summary>
+            /// <summary>Smashed! (Target), BImc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BImc")]
             public class Smashed : global::Moonwell.Objects.StandardBuff
@@ -2247,7 +2247,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Soul Lantern (BUla).</summary>
+            /// <summary>Soul Lantern (Ally), BUla.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BUla")]
             public class SoulLantern : global::Moonwell.Objects.StandardBuff
@@ -2266,7 +2266,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Soul Lantern (BUlc).</summary>
+            /// <summary>Soul Lantern (Caster), BUlc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BUlc")]
             public class SoulLanternBUlc : global::Moonwell.Objects.StandardBuff
@@ -2284,7 +2284,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Soul Lantern (BUle).</summary>
+            /// <summary>Soul Lantern (Enemy), BUle.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BUle")]
             public class SoulLanternBUle : global::Moonwell.Objects.StandardBuff
@@ -2384,13 +2384,31 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Stunned (BPSE).</summary>
+            /// <summary>Stunned (BSTN).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("BPSE")]
+            [global::Moonwell.Objects.Standard("BSTN")]
             public class Stunned : global::Moonwell.Objects.StandardBuff
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Stunned()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNStun.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    Target = "Abilities\\Spells\\Human\\Thunderclap\\ThunderclapTarget.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                    Tooltip = "Stunned";
+                    TooltipExtended = "This unit is stunned; it cannot move, attack or cast spells.";
+                }
+            }
+
+            /// <summary>Stunned (Pause), BPSE.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("BPSE")]
+            public class StunnedBPSE : global::Moonwell.Objects.StandardBuff
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public StunnedBPSE()
                 {
                     EditorSuffix = "(Pause)";
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNStun.blp";
@@ -2400,24 +2418,6 @@ namespace Moonwell.Objects
                     TargetAttachmentPoint1 = "overhead";
                     Tooltip = "Stunned";
                     TooltipExtended = "This unit will not move.";
-                }
-            }
-
-            /// <summary>Stunned (BSTN).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("BSTN")]
-            public class StunnedBSTN : global::Moonwell.Objects.StandardBuff
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public StunnedBSTN()
-                {
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNStun.blp";
-                    IsAnEffect = false;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    Target = "Abilities\\Spells\\Human\\Thunderclap\\ThunderclapTarget.mdl";
-                    TargetAttachmentPoint1 = "overhead";
-                    Tooltip = "Stunned";
-                    TooltipExtended = "This unit is stunned; it cannot move, attack or cast spells.";
                 }
             }
 
@@ -2606,7 +2606,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Tornado (BNto).</summary>
+            /// <summary>Tornado (Timed Life), BNto.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BNto")]
             public class Tornado : global::Moonwell.Objects.StandardBuff
@@ -2622,7 +2622,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Tornado (Basl).</summary>
+            /// <summary>Tornado (Slow Aura), Basl.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Basl")]
             public class TornadoBasl : global::Moonwell.Objects.StandardBuff

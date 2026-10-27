@@ -1,7 +1,7 @@
 using System.Text;
 using War3Net.IO.Slk;
 
-namespace Moonwell.Generator.Objects;
+namespace Moonwell.GameData;
 
 /// <summary>The seven kinds of standard game object.</summary>
 public enum Kind
@@ -131,10 +131,13 @@ public sealed class ExportTables
         return tables;
     }
 
-    /// <summary>Adds the labels of a locale file; a key an earlier file has keeps its label.</summary>
+    /// <summary>
+    /// Adds the labels of a locale file; a key an earlier file has keeps its label, and so does a key given twice in one
+    /// file: <c>WESTRING_UE_TARGETTYPE_SELF</c> is "Self", and later "Shelf".
+    /// </summary>
     private void ReadLabels(string relative)
     {
-        var text = ReadSections(Require(relative, null), out _);
+        var text = ReadSections(Require(relative, null), out _, firstWins: true);
         if (text.TryGetValue(LabelsSection, out var section))
         {
             foreach (var label in section)
@@ -522,11 +525,13 @@ public sealed class ExportTables
     /// <summary>
     /// A <c>[section]</c> and <c>key=value</c> text file. A line that is blank, starts with <c>//</c> or has no
     /// <c>=</c> is ignored; a value wrapped in one pair of quotes loses them and its key is in
-    /// <paramref name="wrapped"/> (by section). A section repeated in the file is merged.
+    /// <paramref name="wrapped"/> (by section). A section repeated in the file is merged. A key given twice in a section
+    /// takes the later value, or with <paramref name="firstWins"/> the first.
     /// </summary>
     private static Dictionary<string, Dictionary<string, string>> ReadSections(
         string path,
-        out Dictionary<string, HashSet<string>> wrapped)
+        out Dictionary<string, HashSet<string>> wrapped,
+        bool firstWins = false)
     {
         var sections = new Dictionary<string, Dictionary<string, string>>(StringComparer.Ordinal);
         wrapped = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
@@ -557,6 +562,11 @@ public sealed class ExportTables
             if (section != null && wrappedKeys != null && equals >= 0)
             {
                 var key = line.Substring(0, equals).Trim();
+                if (firstWins && section.ContainsKey(key))
+                {
+                    continue;
+                }
+
                 var text = line.Substring(equals + 1).Trim();
                 var value = Unquote(text);
                 section[key] = value;

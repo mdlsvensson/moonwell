@@ -95,7 +95,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\10x10Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\nightelf\\AltarOfElders\\AltarOfElders_portrait";
@@ -249,7 +249,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 4;
@@ -411,7 +411,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 5;
@@ -572,7 +572,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 3;
@@ -734,7 +734,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\12x12Simple.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 6;
@@ -902,7 +902,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\6x6SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 4;
@@ -1109,7 +1109,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public AvatarOfVengeance()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.NightElf.Abilities.Sphere, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin, global::Moonwell.Objects.NightElf.Abilities.SpiritOfVengeance, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.NightElf.Abilities.Sphere, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin, global::Moonwell.Objects.NightElf.Abilities.SpiritOfVengeance, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -1494,7 +1494,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\8x8SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\nightelf\\ChimaeraRoost\\ChimaeraRoost_portrait";
@@ -1725,7 +1725,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Demon Hunter (Edmm).</summary>
+            /// <summary>Demon Hunter (Demon Form), Edmm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Edmm")]
             public class DemonHunterEdmm : global::Moonwell.Objects.StandardHero
@@ -1918,7 +1918,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Druid of the Claw (edcm).</summary>
+            /// <summary>Druid of the Claw (Bear Form), edcm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("edcm")]
             public class DruidOfTheClaw : global::Moonwell.Objects.StandardUnit
@@ -1926,7 +1926,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DruidOfTheClaw()
                 {
-                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.BearForm, global::Moonwell.Objects.NightElf.Abilities.Roar, global::Moonwell.Objects.Other.Abilities.UnitInventory, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
+                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.BearForm, global::Moonwell.Objects.NightElf.Abilities.RoarAra2, global::Moonwell.Objects.Other.Abilities.UnitInventory, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2075,7 +2075,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Druid of the Claw (edoc).</summary>
+            /// <summary>Druid of the Claw (Night Elf Form), edoc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("edoc")]
             public class DruidOfTheClawEdoc : global::Moonwell.Objects.StandardUnit
@@ -2083,7 +2083,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DruidOfTheClawEdoc()
                 {
-                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.BearForm, global::Moonwell.Objects.NightElf.Abilities.Rejuvenation, global::Moonwell.Objects.NightElf.Abilities.RoarAroa, global::Moonwell.Objects.Other.Abilities.UnitInventory, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
+                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.BearForm, global::Moonwell.Objects.NightElf.Abilities.Rejuvenation, global::Moonwell.Objects.NightElf.Abilities.Roar, global::Moonwell.Objects.Other.Abilities.UnitInventory, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2230,7 +2230,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Druid of the Talon (edot).</summary>
+            /// <summary>Druid of the Talon (Night Elf Form), edot.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("edot")]
             public class DruidOfTheTalon : global::Moonwell.Objects.StandardUnit
@@ -2238,7 +2238,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DruidOfTheTalon()
                 {
-                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.Cyclone, global::Moonwell.Objects.NightElf.Abilities.StormCrowForm, global::Moonwell.Objects.NightElf.Abilities.FaerieFireAfae, global::Moonwell.Objects.Other.Abilities.UnitInventory, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
+                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.Cyclone, global::Moonwell.Objects.NightElf.Abilities.StormCrowForm, global::Moonwell.Objects.NightElf.Abilities.FaerieFire, global::Moonwell.Objects.Other.Abilities.UnitInventory, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
                     AcquisitionRange = 700f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2288,7 +2288,7 @@ namespace Moonwell.Objects
                     DamageSides = 3;
                     DeathTimeSeconds = 4.335f;
                     DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
-                    DefaultActiveAbility.Set<global::Moonwell.Objects.NightElf.Abilities.FaerieFireAfae>();
+                    DefaultActiveAbility.Set<global::Moonwell.Objects.NightElf.Abilities.FaerieFire>();
                     DefenseType = global::Moonwell.DefenseType.None;
                     DefenseUpgradeBonus = 2;
                     DependencyEquivalents.Set<global::Moonwell.Objects.NightElf.Units.DruidOfTheTalonEdtm>();
@@ -2387,7 +2387,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Druid of the Talon (edtm).</summary>
+            /// <summary>Druid of the Talon (Storm Crow Form), edtm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("edtm")]
             public class DruidOfTheTalonEdtm : global::Moonwell.Objects.StandardUnit
@@ -2395,7 +2395,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DruidOfTheTalonEdtm()
                 {
-                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.StormCrowForm, global::Moonwell.Objects.NightElf.Abilities.FaerieFire, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
+                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.StormCrowForm, global::Moonwell.Objects.NightElf.Abilities.FaerieFireAfa2, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2445,7 +2445,7 @@ namespace Moonwell.Objects
                     DamageSides = 7;
                     DeathTimeSeconds = 4.335f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
-                    DefaultActiveAbility.Set<global::Moonwell.Objects.NightElf.Abilities.FaerieFireAfae>();
+                    DefaultActiveAbility.Set<global::Moonwell.Objects.NightElf.Abilities.FaerieFire>();
                     DefenseType = global::Moonwell.DefenseType.None;
                     DefenseUpgradeBonus = 2;
                     ElevationSamplePoints = 2;
@@ -2774,7 +2774,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\16x16Goldmine.tga";
                     PlaceableInEditor = false;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\nightelf\\EntangledGoldMine\\EntangledGoldMine_portrait";
@@ -3517,7 +3517,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\8x8SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\nightelf\\HuntersHall\\HuntersHall_portrait";
@@ -3983,7 +3983,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\6x6SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\nightelf\\MoonWell\\MoonWell_portrait";
@@ -4184,7 +4184,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Owl Scout (now2).</summary>
+            /// <summary>Owl Scout (Level 2), now2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("now2")]
             public class OwlScout : global::Moonwell.Objects.StandardUnit
@@ -4192,7 +4192,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public OwlScout()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Invulnerable, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Other.Abilities.TrueSightAdtg>();
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Invulnerable, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Other.Abilities.TrueSightAdtg>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -4309,7 +4309,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Owl Scout (now3).</summary>
+            /// <summary>Owl Scout (Level 3), now3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("now3")]
             public class OwlScoutNow3 : global::Moonwell.Objects.StandardUnit
@@ -4317,7 +4317,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public OwlScoutNow3()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Invulnerable, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Other.Abilities.TrueSightAdtg>();
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Invulnerable, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Other.Abilities.TrueSightAdtg>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -4433,7 +4433,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Owl Scout (nowl).</summary>
+            /// <summary>Owl Scout (Level 1), nowl.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nowl")]
             public class OwlScoutNowl : global::Moonwell.Objects.StandardUnit
@@ -4441,7 +4441,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public OwlScoutNowl()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Invulnerable, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Other.Abilities.TrueSightAdtg>();
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Invulnerable, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Other.Abilities.TrueSightAdtg>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -5132,7 +5132,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\12x12TreeOfLife.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 7;
@@ -5296,7 +5296,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\12x12TreeOfLife.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 8;
@@ -5460,7 +5460,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 3;
                     PathingMap = "PathTextures\\12x12TreeOfLife.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     Priority = 6;

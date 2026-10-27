@@ -648,7 +648,7 @@ namespace Moonwell.Objects.Tests
             Assert.Equal(float.Parse(Base("AHtb", "Htb1:2"), System.Globalization.CultureInfo.InvariantCulture), bolt.Damage[2]);
             Assert.Equal(Base("AHtb", "atp1:3"), bolt.Tooltip[3]);
 
-            Assert.True(new Talon().DefaultActiveAbility.Is<Moonwell.Objects.NightElf.Abilities.FaerieFireAfae>());
+            Assert.True(new Talon().DefaultActiveAbility.Is<Moonwell.Objects.NightElf.Abilities.FaerieFire>());
             Assert.Empty(DeclaredOf(new Talon()));
         }
 
@@ -697,11 +697,12 @@ namespace Moonwell.Objects.Tests
                     var generic = property.PropertyType.IsGenericType ? property.PropertyType.GetGenericTypeDefinition() : null;
                     if (generic == typeof(ObjectList<>))
                     {
-                        // The property reads level 1's list of a field with levels.
+                        // The property reads level 1's list of a field with levels, each entry trimmed ("Aspo, Aspt").
                         if (level <= 1)
                         {
                             var entries = (IReadOnlyList<object>)property.PropertyType.GetProperty("Entries", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(read)!;
-                            Assert.True(text.Split(',').Distinct().SequenceEqual(entries.Select(Id)), where);
+                            var ids = text.Split(',').Select(id => id.Trim()).Where(id => id.Length > 0).Distinct();
+                            Assert.True(ids.SequenceEqual(entries.Select(Id)), where);
                         }
                     }
                     else if (generic == typeof(ObjectRef<>))
@@ -714,6 +715,12 @@ namespace Moonwell.Objects.Tests
                     }
                     else if (generic == typeof(Levels<>))
                     {
+                        // The constructor sets an ability's levels up to its count; the values past it are the build's to read.
+                        if (Values.Value[id].TryGetProperty("alev", out var count) && level > int.Parse(count.GetString()!))
+                        {
+                            continue;
+                        }
+
                         var element = property.PropertyType.GetGenericArguments()[0];
                         var expected = parse.MakeGenericMethod(element).Invoke(null, new object?[] { text });
                         var one = property.PropertyType.GetProperty("Item")!.GetValue(read, new object[] { level });

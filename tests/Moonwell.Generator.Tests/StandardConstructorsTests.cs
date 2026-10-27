@@ -1,3 +1,4 @@
+using Moonwell.GameData;
 using Moonwell.Generator.Objects;
 
 namespace Moonwell.Generator.Tests;
@@ -281,6 +282,21 @@ public class StandardConstructorsTests
                 "Abilities.Add(\"hfoo\");",
                 "Abilities.Add<global::Moonwell.Objects.Human.Abilities.Ability2>();",
                 "Trains.Set<global::Moonwell.Objects.Human.Units.Footman>();",
+            },
+            lines);
+    }
+
+    [Fact]
+    public void a_list_entry_is_trimmed_and_an_empty_one_dropped()
+    {
+        // The Hydra's abilities are "Aspo, Aspt", with a space after the comma.
+        var lines = UnitLines(new Dictionary<string, string> { ["uabi"] = "A001, A002,,  zzzz" });
+
+        Assert.Equal(
+            new[]
+            {
+                "Abilities.Set<global::Moonwell.Objects.Human.Abilities.Ability1, global::Moonwell.Objects.Human.Abilities.Ability2>();",
+                "Abilities.Add(\"zzzz\");",
             },
             lines);
     }

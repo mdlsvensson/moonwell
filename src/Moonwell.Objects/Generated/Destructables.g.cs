@@ -1224,7 +1224,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Cliff Cave Gate (DTc1).</summary>
+        /// <summary>Cliff Cave Gate (1), DTc1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("DTc1")]
         public class CliffCaveGate : global::Moonwell.Objects.StandardDestructable
@@ -1285,7 +1285,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Cliff Cave Gate (DTc2).</summary>
+        /// <summary>Cliff Cave Gate (2), DTc2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("DTc2")]
         public class CliffCaveGateDTc2 : global::Moonwell.Objects.StandardDestructable
@@ -1641,7 +1641,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Demonic Gate (ATg1).</summary>
+        /// <summary>Demonic Gate (Horizontal), ATg1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ATg1")]
         public class DemonicGate : global::Moonwell.Objects.StandardDestructable
@@ -1702,7 +1702,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Demonic Gate (ATg2).</summary>
+        /// <summary>Demonic Gate (Diagonal 1), ATg2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ATg2")]
         public class DemonicGateATg2 : global::Moonwell.Objects.StandardDestructable
@@ -1763,7 +1763,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Demonic Gate (ATg3).</summary>
+        /// <summary>Demonic Gate (Vertical), ATg3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ATg3")]
         public class DemonicGateATg3 : global::Moonwell.Objects.StandardDestructable
@@ -1824,7 +1824,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Demonic Gate (ATg4).</summary>
+        /// <summary>Demonic Gate (Diagonal 2), ATg4.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ATg4")]
         public class DemonicGateATg4 : global::Moonwell.Objects.StandardDestructable
@@ -1885,7 +1885,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Dungeon Gate (DTg1).</summary>
+        /// <summary>Dungeon Gate (Horizontal), DTg1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("DTg1")]
         public class DungeonGate : global::Moonwell.Objects.StandardDestructable
@@ -1946,7 +1946,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Dungeon Gate (DTg2).</summary>
+        /// <summary>Dungeon Gate (Diagonal 1), DTg2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("DTg2")]
         public class DungeonGateDTg2 : global::Moonwell.Objects.StandardDestructable
@@ -2007,7 +2007,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Dungeon Gate (DTg3).</summary>
+        /// <summary>Dungeon Gate (Vertical), DTg3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("DTg3")]
         public class DungeonGateDTg3 : global::Moonwell.Objects.StandardDestructable
@@ -2068,7 +2068,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Dungeon Gate (DTg4).</summary>
+        /// <summary>Dungeon Gate (Diagonal 2), DTg4.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("DTg4")]
         public class DungeonGateDTg4 : global::Moonwell.Objects.StandardDestructable
@@ -2310,7 +2310,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Elevator (DTrf).</summary>
+        /// <summary>Elevator (1), DTrf.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("DTrf")]
         public class Elevator : global::Moonwell.Objects.StandardDestructable
@@ -2372,7 +2372,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Elevator (DTrx).</summary>
+        /// <summary>Elevator (2), DTrx.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("DTrx")]
         public class ElevatorDTrx : global::Moonwell.Objects.StandardDestructable
@@ -2551,7 +2551,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Elven Gate (LTe1).</summary>
+        /// <summary>Elven Gate (Horizontal), LTe1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTe1")]
         public class ElvenGate : global::Moonwell.Objects.StandardDestructable
@@ -2612,7 +2612,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Elven Gate (LTe2).</summary>
+        /// <summary>Elven Gate (Diagonal 1), LTe2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTe2")]
         public class ElvenGateLTe2 : global::Moonwell.Objects.StandardDestructable
@@ -2673,7 +2673,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Elven Gate (LTe3).</summary>
+        /// <summary>Elven Gate (Vertical), LTe3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTe3")]
         public class ElvenGateLTe3 : global::Moonwell.Objects.StandardDestructable
@@ -2734,7 +2734,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Elven Gate (LTe4).</summary>
+        /// <summary>Elven Gate (Diagonal 2), LTe4.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTe4")]
         public class ElvenGateLTe4 : global::Moonwell.Objects.StandardDestructable
@@ -2795,7 +2795,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Extra Wide Natural Bridge (YT48).</summary>
+        /// <summary>Extra Wide Natural Bridge (Vertical), YT48.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT48")]
         public class ExtraWideNaturalBridge : global::Moonwell.Objects.StandardDestructable
@@ -2857,7 +2857,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Extra Wide Natural Bridge (YT49).</summary>
+        /// <summary>Extra Wide Natural Bridge (Diagonal 1), YT49.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT49")]
         public class ExtraWideNaturalBridgeYT49 : global::Moonwell.Objects.StandardDestructable
@@ -2919,7 +2919,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Extra Wide Natural Bridge (YT50).</summary>
+        /// <summary>Extra Wide Natural Bridge (Horizontal), YT50.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT50")]
         public class ExtraWideNaturalBridgeYT50 : global::Moonwell.Objects.StandardDestructable
@@ -2981,7 +2981,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Extra Wide Natural Bridge (YT51).</summary>
+        /// <summary>Extra Wide Natural Bridge (Diagonal 2), YT51.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT51")]
         public class ExtraWideNaturalBridgeYT51 : global::Moonwell.Objects.StandardDestructable
@@ -3348,7 +3348,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Force Bridge (DTs0).</summary>
+        /// <summary>Force Bridge (Vertical), DTs0.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("DTs0")]
         public class ForceBridge : global::Moonwell.Objects.StandardDestructable
@@ -3410,7 +3410,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Force Bridge (DTs1).</summary>
+        /// <summary>Force Bridge (Diagonal 1), DTs1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("DTs1")]
         public class ForceBridgeDTs1 : global::Moonwell.Objects.StandardDestructable
@@ -3472,7 +3472,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Force Bridge (DTs2).</summary>
+        /// <summary>Force Bridge (Horizontal), DTs2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("DTs2")]
         public class ForceBridgeDTs2 : global::Moonwell.Objects.StandardDestructable
@@ -3534,7 +3534,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Force Bridge (DTs3).</summary>
+        /// <summary>Force Bridge (Diagonal 2), DTs3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("DTs3")]
         public class ForceBridgeDTs3 : global::Moonwell.Objects.StandardDestructable
@@ -3774,7 +3774,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Gate (LTg1).</summary>
+        /// <summary>Gate (Horizontal), LTg1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTg1")]
         public class Gate : global::Moonwell.Objects.StandardDestructable
@@ -3835,7 +3835,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Gate (LTg2).</summary>
+        /// <summary>Gate (Diagonal 1), LTg2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTg2")]
         public class GateLTg2 : global::Moonwell.Objects.StandardDestructable
@@ -3896,7 +3896,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Gate (LTg3).</summary>
+        /// <summary>Gate (Vertical), LTg3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTg3")]
         public class GateLTg3 : global::Moonwell.Objects.StandardDestructable
@@ -3957,7 +3957,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Gate (LTg4).</summary>
+        /// <summary>Gate (Diagonal 2), LTg4.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTg4")]
         public class GateLTg4 : global::Moonwell.Objects.StandardDestructable
@@ -4136,7 +4136,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Ice Bridge (ITi2).</summary>
+        /// <summary>Ice Bridge (Diagonal 1), ITi2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITi2")]
         public class IceBridge : global::Moonwell.Objects.StandardDestructable
@@ -4198,7 +4198,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Ice Bridge (ITi3).</summary>
+        /// <summary>Ice Bridge (Horizontal), ITi3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITi3")]
         public class IceBridgeITi3 : global::Moonwell.Objects.StandardDestructable
@@ -4260,7 +4260,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Ice Bridge (ITi4).</summary>
+        /// <summary>Ice Bridge (Diagonal 2), ITi4.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITi4")]
         public class IceBridgeITi4 : global::Moonwell.Objects.StandardDestructable
@@ -4322,7 +4322,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Ice Bridge (ITib).</summary>
+        /// <summary>Ice Bridge (Vertical), ITib.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITib")]
         public class IceBridgeITib : global::Moonwell.Objects.StandardDestructable
@@ -4616,7 +4616,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Ice Rock Gate (ITx1).</summary>
+        /// <summary>Ice Rock Gate (Horizontal), ITx1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITx1")]
         public class IceRockGate : global::Moonwell.Objects.StandardDestructable
@@ -4677,7 +4677,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Ice Rock Gate (ITx2).</summary>
+        /// <summary>Ice Rock Gate (Diagonal 1), ITx2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITx2")]
         public class IceRockGateITx2 : global::Moonwell.Objects.StandardDestructable
@@ -4738,7 +4738,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Ice Rock Gate (ITx3).</summary>
+        /// <summary>Ice Rock Gate (Vertical), ITx3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITx3")]
         public class IceRockGateITx3 : global::Moonwell.Objects.StandardDestructable
@@ -4799,7 +4799,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Ice Rock Gate (ITx4).</summary>
+        /// <summary>Ice Rock Gate (Diagonal 2), ITx4.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITx4")]
         public class IceRockGateITx4 : global::Moonwell.Objects.StandardDestructable
@@ -5269,7 +5269,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Icy Gate (ITg1).</summary>
+        /// <summary>Icy Gate (Horizontal), ITg1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITg1")]
         public class IcyGate : global::Moonwell.Objects.StandardDestructable
@@ -5330,7 +5330,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Icy Gate (ITg2).</summary>
+        /// <summary>Icy Gate (Diagonal 1), ITg2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITg2")]
         public class IcyGateITg2 : global::Moonwell.Objects.StandardDestructable
@@ -5391,7 +5391,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Icy Gate (ITg3).</summary>
+        /// <summary>Icy Gate (Vertical), ITg3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITg3")]
         public class IcyGateITg3 : global::Moonwell.Objects.StandardDestructable
@@ -5452,7 +5452,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Icy Gate (ITg4).</summary>
+        /// <summary>Icy Gate (Diagonal 2), ITg4.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITg4")]
         public class IcyGateITg4 : global::Moonwell.Objects.StandardDestructable
@@ -5689,7 +5689,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Iron Gate (DTg5).</summary>
+        /// <summary>Iron Gate (Horizontal), DTg5.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("DTg5")]
         public class IronGate : global::Moonwell.Objects.StandardDestructable
@@ -5750,7 +5750,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Iron Gate (DTg6).</summary>
+        /// <summary>Iron Gate (Diagonal 1), DTg6.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("DTg6")]
         public class IronGateDTg6 : global::Moonwell.Objects.StandardDestructable
@@ -5811,7 +5811,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Iron Gate (DTg7).</summary>
+        /// <summary>Iron Gate (Vertical), DTg7.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("DTg7")]
         public class IronGateDTg7 : global::Moonwell.Objects.StandardDestructable
@@ -5872,7 +5872,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Iron Gate (DTg8).</summary>
+        /// <summary>Iron Gate (Diagonal 2), DTg8.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("DTg8")]
         public class IronGateDTg8 : global::Moonwell.Objects.StandardDestructable
@@ -6107,7 +6107,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Last Hope Bridge (LTtc).</summary>
+        /// <summary>Last Hope Bridge (Vertical), LTtc.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTtc")]
         public class LastHopeBridge : global::Moonwell.Objects.StandardDestructable
@@ -6169,7 +6169,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Last Hope Bridge (LTtx).</summary>
+        /// <summary>Last Hope Bridge (Horizontal), LTtx.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTtx")]
         public class LastHopeBridgeLTtx : global::Moonwell.Objects.StandardDestructable
@@ -6520,7 +6520,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Elven Bridge (EB04).</summary>
+        /// <summary>Long Elven Bridge (Vertical), EB04.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("EB04")]
         public class LongElvenBridge : global::Moonwell.Objects.StandardDestructable
@@ -6582,7 +6582,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Elven Bridge (EB05).</summary>
+        /// <summary>Long Elven Bridge (Diagonal 1), EB05.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("EB05")]
         public class LongElvenBridgeEB05 : global::Moonwell.Objects.StandardDestructable
@@ -6644,7 +6644,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Elven Bridge (EB06).</summary>
+        /// <summary>Long Elven Bridge (Horizontal), EB06.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("EB06")]
         public class LongElvenBridgeEB06 : global::Moonwell.Objects.StandardDestructable
@@ -6706,7 +6706,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Elven Bridge (EB07).</summary>
+        /// <summary>Long Elven Bridge (Diagonal 2), EB07.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("EB07")]
         public class LongElvenBridgeEB07 : global::Moonwell.Objects.StandardDestructable
@@ -6768,7 +6768,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Natural Bridge (YT04).</summary>
+        /// <summary>Long Natural Bridge (Vertical), YT04.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT04")]
         public class LongNaturalBridge : global::Moonwell.Objects.StandardDestructable
@@ -6830,7 +6830,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Natural Bridge (YT05).</summary>
+        /// <summary>Long Natural Bridge (Diagonal 1), YT05.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT05")]
         public class LongNaturalBridgeYT05 : global::Moonwell.Objects.StandardDestructable
@@ -6892,7 +6892,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Natural Bridge (YT06).</summary>
+        /// <summary>Long Natural Bridge (Horizontal), YT06.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT06")]
         public class LongNaturalBridgeYT06 : global::Moonwell.Objects.StandardDestructable
@@ -6954,7 +6954,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Natural Bridge (YT07).</summary>
+        /// <summary>Long Natural Bridge (Diagonal 2), YT07.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT07")]
         public class LongNaturalBridgeYT07 : global::Moonwell.Objects.StandardDestructable
@@ -7016,7 +7016,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Natural Bridge (YT28).</summary>
+        /// <summary>Long Natural Bridge (Vertical), YT28.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT28")]
         public class LongNaturalBridgeYT28 : global::Moonwell.Objects.StandardDestructable
@@ -7078,7 +7078,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Natural Bridge (YT29).</summary>
+        /// <summary>Long Natural Bridge (Diagonal 1), YT29.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT29")]
         public class LongNaturalBridgeYT29 : global::Moonwell.Objects.StandardDestructable
@@ -7140,7 +7140,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Natural Bridge (YT30).</summary>
+        /// <summary>Long Natural Bridge (Horizontal), YT30.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT30")]
         public class LongNaturalBridgeYT30 : global::Moonwell.Objects.StandardDestructable
@@ -7202,7 +7202,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Natural Bridge (YT31).</summary>
+        /// <summary>Long Natural Bridge (Diagonal 2), YT31.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT31")]
         public class LongNaturalBridgeYT31 : global::Moonwell.Objects.StandardDestructable
@@ -7264,7 +7264,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Night Elven Wooden Bridge (NB04).</summary>
+        /// <summary>Long Night Elven Wooden Bridge (Vertical), NB04.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("NB04")]
         public class LongNightElvenWoodenBridge : global::Moonwell.Objects.StandardDestructable
@@ -7326,7 +7326,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Night Elven Wooden Bridge (NB05).</summary>
+        /// <summary>Long Night Elven Wooden Bridge (Diagonal 1), NB05.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("NB05")]
         public class LongNightElvenWoodenBridgeNB05 : global::Moonwell.Objects.StandardDestructable
@@ -7388,7 +7388,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Night Elven Wooden Bridge (NB06).</summary>
+        /// <summary>Long Night Elven Wooden Bridge (Horizontal), NB06.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("NB06")]
         public class LongNightElvenWoodenBridgeNB06 : global::Moonwell.Objects.StandardDestructable
@@ -7450,7 +7450,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Night Elven Wooden Bridge (NB07).</summary>
+        /// <summary>Long Night Elven Wooden Bridge (Diagonal 2), NB07.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("NB07")]
         public class LongNightElvenWoodenBridgeNB07 : global::Moonwell.Objects.StandardDestructable
@@ -7512,7 +7512,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Overgrown Bridge (OG04).</summary>
+        /// <summary>Long Overgrown Bridge (Vertical), OG04.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("OG04")]
         public class LongOvergrownBridge : global::Moonwell.Objects.StandardDestructable
@@ -7573,7 +7573,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Overgrown Bridge (OG05).</summary>
+        /// <summary>Long Overgrown Bridge (Diagonal 1), OG05.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("OG05")]
         public class LongOvergrownBridgeOG05 : global::Moonwell.Objects.StandardDestructable
@@ -7634,7 +7634,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Overgrown Bridge (OG06).</summary>
+        /// <summary>Long Overgrown Bridge (Horizontal), OG06.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("OG06")]
         public class LongOvergrownBridgeOG06 : global::Moonwell.Objects.StandardDestructable
@@ -7695,7 +7695,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Overgrown Bridge (OG07).</summary>
+        /// <summary>Long Overgrown Bridge (Diagonal 2), OG07.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("OG07")]
         public class LongOvergrownBridgeOG07 : global::Moonwell.Objects.StandardDestructable
@@ -7756,7 +7756,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Rickety Wooden Bridge (RW04).</summary>
+        /// <summary>Long Rickety Wooden Bridge (Vertical), RW04.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("RW04")]
         public class LongRicketyWoodenBridge : global::Moonwell.Objects.StandardDestructable
@@ -7818,7 +7818,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Rickety Wooden Bridge (RW05).</summary>
+        /// <summary>Long Rickety Wooden Bridge (Diagonal 1), RW05.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("RW05")]
         public class LongRicketyWoodenBridgeRW05 : global::Moonwell.Objects.StandardDestructable
@@ -7880,7 +7880,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Rickety Wooden Bridge (RW06).</summary>
+        /// <summary>Long Rickety Wooden Bridge (Horizontal), RW06.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("RW06")]
         public class LongRicketyWoodenBridgeRW06 : global::Moonwell.Objects.StandardDestructable
@@ -7942,7 +7942,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Rickety Wooden Bridge (RW07).</summary>
+        /// <summary>Long Rickety Wooden Bridge (Diagonal 2), RW07.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("RW07")]
         public class LongRicketyWoodenBridgeRW07 : global::Moonwell.Objects.StandardDestructable
@@ -8004,7 +8004,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Stone Bridge (YT16).</summary>
+        /// <summary>Long Stone Bridge (Vertical), YT16.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT16")]
         public class LongStoneBridge : global::Moonwell.Objects.StandardDestructable
@@ -8066,7 +8066,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Stone Bridge (YT17).</summary>
+        /// <summary>Long Stone Bridge (Diagonal 1), YT17.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT17")]
         public class LongStoneBridgeYT17 : global::Moonwell.Objects.StandardDestructable
@@ -8128,7 +8128,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Stone Bridge (YT18).</summary>
+        /// <summary>Long Stone Bridge (Horizontal), YT18.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT18")]
         public class LongStoneBridgeYT18 : global::Moonwell.Objects.StandardDestructable
@@ -8190,7 +8190,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Stone Bridge (YT19).</summary>
+        /// <summary>Long Stone Bridge (Diagonal 2), YT19.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT19")]
         public class LongStoneBridgeYT19 : global::Moonwell.Objects.StandardDestructable
@@ -8252,7 +8252,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Stone Bridge (YT40).</summary>
+        /// <summary>Long Stone Bridge (Vertical), YT40.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT40")]
         public class LongStoneBridgeYT40 : global::Moonwell.Objects.StandardDestructable
@@ -8314,7 +8314,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Stone Bridge (YT41).</summary>
+        /// <summary>Long Stone Bridge (Diagonal 1), YT41.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT41")]
         public class LongStoneBridgeYT41 : global::Moonwell.Objects.StandardDestructable
@@ -8376,7 +8376,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Stone Bridge (YT42).</summary>
+        /// <summary>Long Stone Bridge (Horizontal), YT42.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT42")]
         public class LongStoneBridgeYT42 : global::Moonwell.Objects.StandardDestructable
@@ -8438,7 +8438,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Stone Bridge (YT43).</summary>
+        /// <summary>Long Stone Bridge (Diagonal 2), YT43.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT43")]
         public class LongStoneBridgeYT43 : global::Moonwell.Objects.StandardDestructable
@@ -8500,7 +8500,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Stratholme Bridge (YY16).</summary>
+        /// <summary>Long Stratholme Bridge (Vertical), YY16.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YY16")]
         public class LongStratholmeBridge : global::Moonwell.Objects.StandardDestructable
@@ -8562,7 +8562,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Stratholme Bridge (YY17).</summary>
+        /// <summary>Long Stratholme Bridge (Diagonal 1), YY17.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YY17")]
         public class LongStratholmeBridgeYY17 : global::Moonwell.Objects.StandardDestructable
@@ -8624,7 +8624,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Stratholme Bridge (YY18).</summary>
+        /// <summary>Long Stratholme Bridge (Horizontal), YY18.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YY18")]
         public class LongStratholmeBridgeYY18 : global::Moonwell.Objects.StandardDestructable
@@ -8686,7 +8686,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Stratholme Bridge (YY19).</summary>
+        /// <summary>Long Stratholme Bridge (Diagonal 2), YY19.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YY19")]
         public class LongStratholmeBridgeYY19 : global::Moonwell.Objects.StandardDestructable
@@ -8748,7 +8748,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Undercity Bridge (UB01).</summary>
+        /// <summary>Long Undercity Bridge (Vertical), UB01.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("UB01")]
         public class LongUndercityBridge : global::Moonwell.Objects.StandardDestructable
@@ -8809,7 +8809,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Undercity Bridge (UB02).</summary>
+        /// <summary>Long Undercity Bridge (Diagonal 1), UB02.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("UB02")]
         public class LongUndercityBridgeUB02 : global::Moonwell.Objects.StandardDestructable
@@ -8870,7 +8870,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Undercity Bridge (UB03).</summary>
+        /// <summary>Long Undercity Bridge (Horizontal), UB03.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("UB03")]
         public class LongUndercityBridgeUB03 : global::Moonwell.Objects.StandardDestructable
@@ -8931,7 +8931,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Undercity Bridge (UB04).</summary>
+        /// <summary>Long Undercity Bridge (Diagonal 2), UB04.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("UB04")]
         public class LongUndercityBridgeUB04 : global::Moonwell.Objects.StandardDestructable
@@ -8992,7 +8992,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Wooden Bridge (LT04).</summary>
+        /// <summary>Long Wooden Bridge (Vertical), LT04.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LT04")]
         public class LongWoodenBridge : global::Moonwell.Objects.StandardDestructable
@@ -9054,7 +9054,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Wooden Bridge (LT05).</summary>
+        /// <summary>Long Wooden Bridge (Diagonal 1), LT05.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LT05")]
         public class LongWoodenBridgeLT05 : global::Moonwell.Objects.StandardDestructable
@@ -9116,7 +9116,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Wooden Bridge (LT06).</summary>
+        /// <summary>Long Wooden Bridge (Horizontal), LT06.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LT06")]
         public class LongWoodenBridgeLT06 : global::Moonwell.Objects.StandardDestructable
@@ -9178,7 +9178,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Long Wooden Bridge (LT07).</summary>
+        /// <summary>Long Wooden Bridge (Diagonal 2), LT07.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LT07")]
         public class LongWoodenBridgeLT07 : global::Moonwell.Objects.StandardDestructable
@@ -9792,9 +9792,9 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Magical Pen (XTm5).</summary>
+        /// <summary>Magical Pen (XTmp).</summary>
         /// @CSharpLua.Ignore
-        [global::Moonwell.Objects.Standard("XTm5")]
+        [global::Moonwell.Objects.Standard("XTmp")]
         public class MagicalPen : global::Moonwell.Objects.StandardDestructable
         {
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
@@ -9807,7 +9807,6 @@ namespace Moonwell.Objects
                 Category = "D";
                 CliffHeight = 0;
                 Death = "MagicalCellDeathSound";
-                EditorSuffix = "WESTRING_EDITORSUFFIX_ANGLED";
                 ElevationSampleRadius = 50f;
                 FatLineOfSight = false;
                 FixedRotation = -1f;
@@ -9825,14 +9824,14 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 1f;
-                Model = "Doodads\\Terrain\\DalaranMagicalPen45\\DalaranMagicalPen45";
+                Model = "Doodads\\Terrain\\DalaranMagicalPen\\DalaranMagicalPen";
                 ModelFileHasLightweightModel = false;
                 ModelFilePortrait = "Doodads\\Terrain\\Portraits\\DalaranMagicalPen_portrait\\DalaranMagicalPen_portrait";
                 ModelFileVariations = 1;
-                Name = "WESTRING_DEST_ANGLED_MAGICAL_PEN";
+                Name = "WESTRING_DEST_MAGICAL_PEN";
                 OcclusionHeight = 0f;
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
-                PathingTexture = "PathTextures\\12x10Pen45Path.tga";
+                PathingTexture = "PathTextures\\8x8PenPath.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
                 RepairGoldCost = 0;
@@ -9913,7 +9912,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Magical Pen Wall (XTx5).</summary>
+        /// <summary>Magical Pen Wall (Angled), XTx5.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("XTx5")]
         public class MagicalPenWallXTx5 : global::Moonwell.Objects.StandardDestructable
@@ -9974,13 +9973,13 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Magical Pen (XTmp).</summary>
+        /// <summary>Magical Pen (Angled), XTm5.</summary>
         /// @CSharpLua.Ignore
-        [global::Moonwell.Objects.Standard("XTmp")]
-        public class MagicalPenXTmp : global::Moonwell.Objects.StandardDestructable
+        [global::Moonwell.Objects.Standard("XTm5")]
+        public class MagicalPenXTm5 : global::Moonwell.Objects.StandardDestructable
         {
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-            public MagicalPenXTmp()
+            public MagicalPenXTm5()
             {
                 AllowCustomTeamColor = false;
                 ArmorType = global::Moonwell.Objects.ArmorType.Stone;
@@ -9989,6 +9988,7 @@ namespace Moonwell.Objects
                 Category = "D";
                 CliffHeight = 0;
                 Death = "MagicalCellDeathSound";
+                EditorSuffix = "WESTRING_EDITORSUFFIX_ANGLED";
                 ElevationSampleRadius = 50f;
                 FatLineOfSight = false;
                 FixedRotation = -1f;
@@ -10006,14 +10006,14 @@ namespace Moonwell.Objects
                 MinimapShow = false;
                 MinimapUseCustomColor = false;
                 MinimumScale = 1f;
-                Model = "Doodads\\Terrain\\DalaranMagicalPen\\DalaranMagicalPen";
+                Model = "Doodads\\Terrain\\DalaranMagicalPen45\\DalaranMagicalPen45";
                 ModelFileHasLightweightModel = false;
                 ModelFilePortrait = "Doodads\\Terrain\\Portraits\\DalaranMagicalPen_portrait\\DalaranMagicalPen_portrait";
                 ModelFileVariations = 1;
-                Name = "WESTRING_DEST_MAGICAL_PEN";
+                Name = "WESTRING_DEST_ANGLED_MAGICAL_PEN";
                 OcclusionHeight = 0f;
                 OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
-                PathingTexture = "PathTextures\\8x8PenPath.tga";
+                PathingTexture = "PathTextures\\12x10Pen45Path.tga";
                 PlaceableOnCliffs = true;
                 PlaceableOnWater = true;
                 RepairGoldCost = 0;
@@ -10034,7 +10034,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Massive Ruined Gate (ZTsg).</summary>
+        /// <summary>Massive Ruined Gate (Vertical), ZTsg.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTsg")]
         public class MassiveRuinedGate : global::Moonwell.Objects.StandardDestructable
@@ -10095,7 +10095,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Massive Ruined Gate (ZTsx).</summary>
+        /// <summary>Massive Ruined Gate (Horizontal), ZTsx.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTsx")]
         public class MassiveRuinedGateZTsx : global::Moonwell.Objects.StandardDestructable
@@ -11739,7 +11739,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Rolling Stone Door (ITd1).</summary>
+        /// <summary>Rolling Stone Door (Horizontal 1), ITd1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITd1")]
         public class RollingStoneDoor : global::Moonwell.Objects.StandardDestructable
@@ -11802,7 +11802,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Rolling Stone Door (ITd2).</summary>
+        /// <summary>Rolling Stone Door (Vertical 1), ITd2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITd2")]
         public class RollingStoneDoorITd2 : global::Moonwell.Objects.StandardDestructable
@@ -11865,7 +11865,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Rolling Stone Door (ITd3).</summary>
+        /// <summary>Rolling Stone Door (Horizontal 2), ITd3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITd3")]
         public class RollingStoneDoorITd3 : global::Moonwell.Objects.StandardDestructable
@@ -11928,7 +11928,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Rolling Stone Door (ITd4).</summary>
+        /// <summary>Rolling Stone Door (Vertical 2), ITd4.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITd4")]
         public class RollingStoneDoorITd4 : global::Moonwell.Objects.StandardDestructable
@@ -11991,7 +11991,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Rolling Stone Door (ZTd1).</summary>
+        /// <summary>Rolling Stone Door (Horizontal 1), ZTd1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTd1")]
         public class RollingStoneDoorZTd1 : global::Moonwell.Objects.StandardDestructable
@@ -12054,7 +12054,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Rolling Stone Door (ZTd2).</summary>
+        /// <summary>Rolling Stone Door (Vertical 1), ZTd2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTd2")]
         public class RollingStoneDoorZTd2 : global::Moonwell.Objects.StandardDestructable
@@ -12117,7 +12117,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Rolling Stone Door (ZTd3).</summary>
+        /// <summary>Rolling Stone Door (Horizontal 2), ZTd3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTd3")]
         public class RollingStoneDoorZTd3 : global::Moonwell.Objects.StandardDestructable
@@ -12180,7 +12180,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Rolling Stone Door (ZTd4).</summary>
+        /// <summary>Rolling Stone Door (Vertical 2), ZTd4.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTd4")]
         public class RollingStoneDoorZTd4 : global::Moonwell.Objects.StandardDestructable
@@ -12243,7 +12243,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Rolling Stone Door (ZTd5).</summary>
+        /// <summary>Rolling Stone Door (Horizontal 3), ZTd5.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTd5")]
         public class RollingStoneDoorZTd5 : global::Moonwell.Objects.StandardDestructable
@@ -12306,7 +12306,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Rolling Stone Door (ZTd6).</summary>
+        /// <summary>Rolling Stone Door (Vertical 3), ZTd6.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTd6")]
         public class RollingStoneDoorZTd6 : global::Moonwell.Objects.StandardDestructable
@@ -12369,7 +12369,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Rolling Stone Door (ZTd7).</summary>
+        /// <summary>Rolling Stone Door (Horizontal 4), ZTd7.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTd7")]
         public class RollingStoneDoorZTd7 : global::Moonwell.Objects.StandardDestructable
@@ -12432,7 +12432,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Rolling Stone Door (ZTd8).</summary>
+        /// <summary>Rolling Stone Door (Vertical 4), ZTd8.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTd8")]
         public class RollingStoneDoorZTd8 : global::Moonwell.Objects.StandardDestructable
@@ -12495,7 +12495,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Ruined Gate (ZTg1).</summary>
+        /// <summary>Ruined Gate (Horizontal), ZTg1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTg1")]
         public class RuinedGate : global::Moonwell.Objects.StandardDestructable
@@ -12556,7 +12556,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Ruined Gate (ZTg2).</summary>
+        /// <summary>Ruined Gate (Diagonal 1), ZTg2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTg2")]
         public class RuinedGateZTg2 : global::Moonwell.Objects.StandardDestructable
@@ -12617,7 +12617,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Ruined Gate (ZTg3).</summary>
+        /// <summary>Ruined Gate (Vertical), ZTg3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTg3")]
         public class RuinedGateZTg3 : global::Moonwell.Objects.StandardDestructable
@@ -12678,7 +12678,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Ruined Gate (ZTg4).</summary>
+        /// <summary>Ruined Gate (Diagonal 2), ZTg4.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTg4")]
         public class RuinedGateZTg4 : global::Moonwell.Objects.StandardDestructable
@@ -13097,7 +13097,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Elven Bridge (EB00).</summary>
+        /// <summary>Short Elven Bridge (Vertical), EB00.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("EB00")]
         public class ShortElvenBridge : global::Moonwell.Objects.StandardDestructable
@@ -13159,7 +13159,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Elven Bridge (EB01).</summary>
+        /// <summary>Short Elven Bridge (Diagonal 1), EB01.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("EB01")]
         public class ShortElvenBridgeEB01 : global::Moonwell.Objects.StandardDestructable
@@ -13221,7 +13221,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Elven Bridge (EB02).</summary>
+        /// <summary>Short Elven Bridge (Horizontal), EB02.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("EB02")]
         public class ShortElvenBridgeEB02 : global::Moonwell.Objects.StandardDestructable
@@ -13283,7 +13283,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Elven Bridge (EB03).</summary>
+        /// <summary>Short Elven Bridge (Diagonal 2), EB03.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("EB03")]
         public class ShortElvenBridgeEB03 : global::Moonwell.Objects.StandardDestructable
@@ -13345,7 +13345,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Natural Bridge (YT00).</summary>
+        /// <summary>Short Natural Bridge (Vertical), YT00.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT00")]
         public class ShortNaturalBridge : global::Moonwell.Objects.StandardDestructable
@@ -13407,7 +13407,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Natural Bridge (YT01).</summary>
+        /// <summary>Short Natural Bridge (Diagonal 1), YT01.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT01")]
         public class ShortNaturalBridgeYT01 : global::Moonwell.Objects.StandardDestructable
@@ -13469,7 +13469,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Natural Bridge (YT02).</summary>
+        /// <summary>Short Natural Bridge (Horizontal), YT02.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT02")]
         public class ShortNaturalBridgeYT02 : global::Moonwell.Objects.StandardDestructable
@@ -13531,7 +13531,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Natural Bridge (YT03).</summary>
+        /// <summary>Short Natural Bridge (Diagonal 2), YT03.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT03")]
         public class ShortNaturalBridgeYT03 : global::Moonwell.Objects.StandardDestructable
@@ -13593,7 +13593,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Natural Bridge (YT24).</summary>
+        /// <summary>Short Natural Bridge (Vertical), YT24.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT24")]
         public class ShortNaturalBridgeYT24 : global::Moonwell.Objects.StandardDestructable
@@ -13655,7 +13655,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Natural Bridge (YT25).</summary>
+        /// <summary>Short Natural Bridge (Diagonal 1), YT25.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT25")]
         public class ShortNaturalBridgeYT25 : global::Moonwell.Objects.StandardDestructable
@@ -13717,7 +13717,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Natural Bridge (YT26).</summary>
+        /// <summary>Short Natural Bridge (Horizontal), YT26.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT26")]
         public class ShortNaturalBridgeYT26 : global::Moonwell.Objects.StandardDestructable
@@ -13779,7 +13779,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Natural Bridge (YT27).</summary>
+        /// <summary>Short Natural Bridge (Diagonal 2), YT27.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT27")]
         public class ShortNaturalBridgeYT27 : global::Moonwell.Objects.StandardDestructable
@@ -13841,7 +13841,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Night Elven Wooden Bridge (NB00).</summary>
+        /// <summary>Short Night Elven Wooden Bridge (Vertical), NB00.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("NB00")]
         public class ShortNightElvenWoodenBridge : global::Moonwell.Objects.StandardDestructable
@@ -13903,7 +13903,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Night Elven Wooden Bridge (NB01).</summary>
+        /// <summary>Short Night Elven Wooden Bridge (Diagonal 1), NB01.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("NB01")]
         public class ShortNightElvenWoodenBridgeNB01 : global::Moonwell.Objects.StandardDestructable
@@ -13965,7 +13965,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Night Elven Wooden Bridge (NB02).</summary>
+        /// <summary>Short Night Elven Wooden Bridge (Horizontal), NB02.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("NB02")]
         public class ShortNightElvenWoodenBridgeNB02 : global::Moonwell.Objects.StandardDestructable
@@ -14027,7 +14027,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Night Elven Wooden Bridge (NB03).</summary>
+        /// <summary>Short Night Elven Wooden Bridge (Diagonal 2), NB03.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("NB03")]
         public class ShortNightElvenWoodenBridgeNB03 : global::Moonwell.Objects.StandardDestructable
@@ -14089,7 +14089,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Overgrown Bridge (OG00).</summary>
+        /// <summary>Short Overgrown Bridge (Vertical), OG00.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("OG00")]
         public class ShortOvergrownBridge : global::Moonwell.Objects.StandardDestructable
@@ -14150,7 +14150,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Overgrown Bridge (OG01).</summary>
+        /// <summary>Short Overgrown Bridge (Diagonal 1), OG01.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("OG01")]
         public class ShortOvergrownBridgeOG01 : global::Moonwell.Objects.StandardDestructable
@@ -14211,7 +14211,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Overgrown Bridge (OG02).</summary>
+        /// <summary>Short Overgrown Bridge (Horizontal), OG02.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("OG02")]
         public class ShortOvergrownBridgeOG02 : global::Moonwell.Objects.StandardDestructable
@@ -14272,7 +14272,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Overgrown Bridge (OG03).</summary>
+        /// <summary>Short Overgrown Bridge (Diagonal 2), OG03.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("OG03")]
         public class ShortOvergrownBridgeOG03 : global::Moonwell.Objects.StandardDestructable
@@ -14333,7 +14333,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Rickety Wooden Bridge (RW00).</summary>
+        /// <summary>Short Rickety Wooden Bridge (Vertical), RW00.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("RW00")]
         public class ShortRicketyWoodenBridge : global::Moonwell.Objects.StandardDestructable
@@ -14395,7 +14395,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Rickety Wooden Bridge (RW01).</summary>
+        /// <summary>Short Rickety Wooden Bridge (Diagonal 1), RW01.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("RW01")]
         public class ShortRicketyWoodenBridgeRW01 : global::Moonwell.Objects.StandardDestructable
@@ -14457,7 +14457,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Rickety Wooden Bridge (RW02).</summary>
+        /// <summary>Short Rickety Wooden Bridge (Horizontal), RW02.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("RW02")]
         public class ShortRicketyWoodenBridgeRW02 : global::Moonwell.Objects.StandardDestructable
@@ -14519,7 +14519,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Rickety Wooden Bridge (RW03).</summary>
+        /// <summary>Short Rickety Wooden Bridge (Diagonal 2), RW03.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("RW03")]
         public class ShortRicketyWoodenBridgeRW03 : global::Moonwell.Objects.StandardDestructable
@@ -14581,7 +14581,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Stone Bridge (YT12).</summary>
+        /// <summary>Short Stone Bridge (Vertical), YT12.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT12")]
         public class ShortStoneBridge : global::Moonwell.Objects.StandardDestructable
@@ -14643,7 +14643,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Stone Bridge (YT13).</summary>
+        /// <summary>Short Stone Bridge (Diagonal 1), YT13.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT13")]
         public class ShortStoneBridgeYT13 : global::Moonwell.Objects.StandardDestructable
@@ -14705,7 +14705,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Stone Bridge (YT14).</summary>
+        /// <summary>Short Stone Bridge (Horizontal), YT14.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT14")]
         public class ShortStoneBridgeYT14 : global::Moonwell.Objects.StandardDestructable
@@ -14767,7 +14767,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Stone Bridge (YT15).</summary>
+        /// <summary>Short Stone Bridge (Diagonal 2), YT15.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT15")]
         public class ShortStoneBridgeYT15 : global::Moonwell.Objects.StandardDestructable
@@ -14829,7 +14829,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Stone Bridge (YT36).</summary>
+        /// <summary>Short Stone Bridge (Vertical), YT36.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT36")]
         public class ShortStoneBridgeYT36 : global::Moonwell.Objects.StandardDestructable
@@ -14891,7 +14891,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Stone Bridge (YT37).</summary>
+        /// <summary>Short Stone Bridge (Diagonal 1), YT37.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT37")]
         public class ShortStoneBridgeYT37 : global::Moonwell.Objects.StandardDestructable
@@ -14953,7 +14953,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Stone Bridge (YT38).</summary>
+        /// <summary>Short Stone Bridge (Horizontal), YT38.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT38")]
         public class ShortStoneBridgeYT38 : global::Moonwell.Objects.StandardDestructable
@@ -15015,7 +15015,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Stone Bridge (YT39).</summary>
+        /// <summary>Short Stone Bridge (Diagonal 2), YT39.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT39")]
         public class ShortStoneBridgeYT39 : global::Moonwell.Objects.StandardDestructable
@@ -15077,7 +15077,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Stratholme Bridge (YY12).</summary>
+        /// <summary>Short Stratholme Bridge (Vertical), YY12.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YY12")]
         public class ShortStratholmeBridge : global::Moonwell.Objects.StandardDestructable
@@ -15139,7 +15139,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Stratholme Bridge (YY13).</summary>
+        /// <summary>Short Stratholme Bridge (Diagonal 1), YY13.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YY13")]
         public class ShortStratholmeBridgeYY13 : global::Moonwell.Objects.StandardDestructable
@@ -15201,7 +15201,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Stratholme Bridge (YY14).</summary>
+        /// <summary>Short Stratholme Bridge (Horizontal), YY14.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YY14")]
         public class ShortStratholmeBridgeYY14 : global::Moonwell.Objects.StandardDestructable
@@ -15263,7 +15263,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Stratholme Bridge (YY15).</summary>
+        /// <summary>Short Stratholme Bridge (Diagonal 2), YY15.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YY15")]
         public class ShortStratholmeBridgeYY15 : global::Moonwell.Objects.StandardDestructable
@@ -15325,7 +15325,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Wooden Bridge (LT00).</summary>
+        /// <summary>Short Wooden Bridge (Vertical), LT00.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LT00")]
         public class ShortWoodenBridge : global::Moonwell.Objects.StandardDestructable
@@ -15387,7 +15387,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Wooden Bridge (LT01).</summary>
+        /// <summary>Short Wooden Bridge (Diagonal 1), LT01.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LT01")]
         public class ShortWoodenBridgeLT01 : global::Moonwell.Objects.StandardDestructable
@@ -15449,7 +15449,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Wooden Bridge (LT02).</summary>
+        /// <summary>Short Wooden Bridge (Horizontal), LT02.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LT02")]
         public class ShortWoodenBridgeLT02 : global::Moonwell.Objects.StandardDestructable
@@ -15511,7 +15511,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Short Wooden Bridge (LT03).</summary>
+        /// <summary>Short Wooden Bridge (Diagonal 2), LT03.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LT03")]
         public class ShortWoodenBridgeLT03 : global::Moonwell.Objects.StandardDestructable
@@ -15750,7 +15750,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Ramp (LTr1).</summary>
+        /// <summary>Stone Ramp (Bottom Left), LTr1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTr1")]
         public class StoneRamp : global::Moonwell.Objects.StandardDestructable
@@ -15812,7 +15812,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Ramp (LTr2).</summary>
+        /// <summary>Stone Ramp (Top Left), LTr2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTr2")]
         public class StoneRampLTr2 : global::Moonwell.Objects.StandardDestructable
@@ -15874,7 +15874,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Ramp (LTr3).</summary>
+        /// <summary>Stone Ramp (Top Right), LTr3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTr3")]
         public class StoneRampLTr3 : global::Moonwell.Objects.StandardDestructable
@@ -15936,7 +15936,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Ramp (LTr4).</summary>
+        /// <summary>Stone Ramp (Bottom Right), LTr4.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTr4")]
         public class StoneRampLTr4 : global::Moonwell.Objects.StandardDestructable
@@ -15998,7 +15998,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Ramp (LTr5).</summary>
+        /// <summary>Stone Ramp (Bottom Left 2), LTr5.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTr5")]
         public class StoneRampLTr5 : global::Moonwell.Objects.StandardDestructable
@@ -16060,7 +16060,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Ramp (LTr6).</summary>
+        /// <summary>Stone Ramp (Top Left 2), LTr6.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTr6")]
         public class StoneRampLTr6 : global::Moonwell.Objects.StandardDestructable
@@ -16122,7 +16122,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Ramp (LTr7).</summary>
+        /// <summary>Stone Ramp (Top Right 2), LTr7.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTr7")]
         public class StoneRampLTr7 : global::Moonwell.Objects.StandardDestructable
@@ -16184,7 +16184,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Ramp (LTr8).</summary>
+        /// <summary>Stone Ramp (Bottom Right 2), LTr8.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTr8")]
         public class StoneRampLTr8 : global::Moonwell.Objects.StandardDestructable
@@ -16246,7 +16246,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Ramp (LTs1).</summary>
+        /// <summary>Stone Ramp (Bottom Left), LTs1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTs1")]
         public class StoneRampLTs1 : global::Moonwell.Objects.StandardDestructable
@@ -16308,7 +16308,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Ramp (LTs2).</summary>
+        /// <summary>Stone Ramp (Top Left), LTs2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTs2")]
         public class StoneRampLTs2 : global::Moonwell.Objects.StandardDestructable
@@ -16370,7 +16370,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Ramp (LTs3).</summary>
+        /// <summary>Stone Ramp (Top Right), LTs3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTs3")]
         public class StoneRampLTs3 : global::Moonwell.Objects.StandardDestructable
@@ -16432,7 +16432,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Ramp (LTs4).</summary>
+        /// <summary>Stone Ramp (Bottom Right), LTs4.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTs4")]
         public class StoneRampLTs4 : global::Moonwell.Objects.StandardDestructable
@@ -16494,7 +16494,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Ramp (LTs5).</summary>
+        /// <summary>Stone Ramp (Bottom Left 2), LTs5.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTs5")]
         public class StoneRampLTs5 : global::Moonwell.Objects.StandardDestructable
@@ -16556,7 +16556,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Ramp (LTs6).</summary>
+        /// <summary>Stone Ramp (Top Left 2), LTs6.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTs6")]
         public class StoneRampLTs6 : global::Moonwell.Objects.StandardDestructable
@@ -16618,7 +16618,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Ramp (LTs7).</summary>
+        /// <summary>Stone Ramp (Top Right 2), LTs7.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTs7")]
         public class StoneRampLTs7 : global::Moonwell.Objects.StandardDestructable
@@ -16680,7 +16680,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Ramp (LTs8).</summary>
+        /// <summary>Stone Ramp (Bottom Right 2), LTs8.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTs8")]
         public class StoneRampLTs8 : global::Moonwell.Objects.StandardDestructable
@@ -16742,7 +16742,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Wall (ITw0).</summary>
+        /// <summary>Stone Wall (Horizontal), ITw0.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITw0")]
         public class StoneWall : global::Moonwell.Objects.StandardDestructable
@@ -16801,7 +16801,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Wall (ITw1).</summary>
+        /// <summary>Stone Wall (Diagonal 2), ITw1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITw1")]
         public class StoneWallITw1 : global::Moonwell.Objects.StandardDestructable
@@ -16860,7 +16860,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Wall (ITw2).</summary>
+        /// <summary>Stone Wall (Vertical), ITw2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITw2")]
         public class StoneWallITw2 : global::Moonwell.Objects.StandardDestructable
@@ -16919,7 +16919,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Wall (ITw3).</summary>
+        /// <summary>Stone Wall (Diagonal 1), ITw3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ITw3")]
         public class StoneWallITw3 : global::Moonwell.Objects.StandardDestructable
@@ -16978,7 +16978,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Wall (LTw0).</summary>
+        /// <summary>Stone Wall (Horizontal), LTw0.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTw0")]
         public class StoneWallLTw0 : global::Moonwell.Objects.StandardDestructable
@@ -17037,7 +17037,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Wall (LTw1).</summary>
+        /// <summary>Stone Wall (Diagonal 2), LTw1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTw1")]
         public class StoneWallLTw1 : global::Moonwell.Objects.StandardDestructable
@@ -17096,7 +17096,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Wall (LTw2).</summary>
+        /// <summary>Stone Wall (Vertical), LTw2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTw2")]
         public class StoneWallLTw2 : global::Moonwell.Objects.StandardDestructable
@@ -17155,7 +17155,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Wall (LTw3).</summary>
+        /// <summary>Stone Wall (Diagonal 1), LTw3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTw3")]
         public class StoneWallLTw3 : global::Moonwell.Objects.StandardDestructable
@@ -17214,7 +17214,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Wall (ZTw0).</summary>
+        /// <summary>Stone Wall (Horizontal), ZTw0.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTw0")]
         public class StoneWallZTw0 : global::Moonwell.Objects.StandardDestructable
@@ -17273,7 +17273,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Wall (ZTw1).</summary>
+        /// <summary>Stone Wall (Diagonal 2), ZTw1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTw1")]
         public class StoneWallZTw1 : global::Moonwell.Objects.StandardDestructable
@@ -17332,7 +17332,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Wall (ZTw2).</summary>
+        /// <summary>Stone Wall (Vertical), ZTw2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTw2")]
         public class StoneWallZTw2 : global::Moonwell.Objects.StandardDestructable
@@ -17391,7 +17391,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Stone Wall (ZTw3).</summary>
+        /// <summary>Stone Wall (Diagonal 1), ZTw3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ZTw3")]
         public class StoneWallZTw3 : global::Moonwell.Objects.StandardDestructable
@@ -17571,7 +17571,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Tree Bridge (ATt0).</summary>
+        /// <summary>Tree Bridge (Horizontal), ATt0.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ATt0")]
         public class TreeBridge : global::Moonwell.Objects.StandardDestructable
@@ -17633,7 +17633,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Tree Bridge (ATt1).</summary>
+        /// <summary>Tree Bridge (Vertical), ATt1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ATt1")]
         public class TreeBridgeATt1 : global::Moonwell.Objects.StandardDestructable
@@ -17695,7 +17695,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Tree Bridge (LTt0).</summary>
+        /// <summary>Tree Bridge (Vertical), LTt0.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTt0")]
         public class TreeBridgeLTt0 : global::Moonwell.Objects.StandardDestructable
@@ -17757,7 +17757,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Tree Bridge (LTt1).</summary>
+        /// <summary>Tree Bridge (Horizontal), LTt1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTt1")]
         public class TreeBridgeLTt1 : global::Moonwell.Objects.StandardDestructable
@@ -17819,7 +17819,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Tree Bridge (LTt2).</summary>
+        /// <summary>Tree Bridge (Vertical), LTt2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTt2")]
         public class TreeBridgeLTt2 : global::Moonwell.Objects.StandardDestructable
@@ -17881,7 +17881,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Tree Bridge (LTt3).</summary>
+        /// <summary>Tree Bridge (Horizontal), LTt3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTt3")]
         public class TreeBridgeLTt3 : global::Moonwell.Objects.StandardDestructable
@@ -17943,7 +17943,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Tree Bridge (LTt4).</summary>
+        /// <summary>Tree Bridge (Vertical), LTt4.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTt4")]
         public class TreeBridgeLTt4 : global::Moonwell.Objects.StandardDestructable
@@ -18005,7 +18005,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Tree Bridge (LTt5).</summary>
+        /// <summary>Tree Bridge (Horizontal), LTt5.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LTt5")]
         public class TreeBridgeLTt5 : global::Moonwell.Objects.StandardDestructable
@@ -18363,7 +18363,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Elven Bridge (EB08).</summary>
+        /// <summary>Wide Elven Bridge (Vertical), EB08.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("EB08")]
         public class WideElvenBridge : global::Moonwell.Objects.StandardDestructable
@@ -18425,7 +18425,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Elven Bridge (EB09).</summary>
+        /// <summary>Wide Elven Bridge (Diagonal 1), EB09.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("EB09")]
         public class WideElvenBridgeEB09 : global::Moonwell.Objects.StandardDestructable
@@ -18487,7 +18487,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Elven Bridge (EB10).</summary>
+        /// <summary>Wide Elven Bridge (Horizontal), EB10.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("EB10")]
         public class WideElvenBridgeEB10 : global::Moonwell.Objects.StandardDestructable
@@ -18549,7 +18549,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Elven Bridge (EB11).</summary>
+        /// <summary>Wide Elven Bridge (Diagonal 2), EB11.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("EB11")]
         public class WideElvenBridgeEB11 : global::Moonwell.Objects.StandardDestructable
@@ -18611,7 +18611,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Natural Bridge (YT08).</summary>
+        /// <summary>Wide Natural Bridge (Vertical), YT08.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT08")]
         public class WideNaturalBridge : global::Moonwell.Objects.StandardDestructable
@@ -18673,7 +18673,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Natural Bridge (YT09).</summary>
+        /// <summary>Wide Natural Bridge (Diagonal 1), YT09.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT09")]
         public class WideNaturalBridgeYT09 : global::Moonwell.Objects.StandardDestructable
@@ -18735,7 +18735,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Natural Bridge (YT10).</summary>
+        /// <summary>Wide Natural Bridge (Horizontal), YT10.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT10")]
         public class WideNaturalBridgeYT10 : global::Moonwell.Objects.StandardDestructable
@@ -18797,7 +18797,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Natural Bridge (YT11).</summary>
+        /// <summary>Wide Natural Bridge (Diagonal 2), YT11.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT11")]
         public class WideNaturalBridgeYT11 : global::Moonwell.Objects.StandardDestructable
@@ -18859,7 +18859,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Natural Bridge (YT32).</summary>
+        /// <summary>Wide Natural Bridge (Vertical), YT32.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT32")]
         public class WideNaturalBridgeYT32 : global::Moonwell.Objects.StandardDestructable
@@ -18921,7 +18921,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Natural Bridge (YT33).</summary>
+        /// <summary>Wide Natural Bridge (Diagonal 1), YT33.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT33")]
         public class WideNaturalBridgeYT33 : global::Moonwell.Objects.StandardDestructable
@@ -18983,7 +18983,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Natural Bridge (YT34).</summary>
+        /// <summary>Wide Natural Bridge (Horizontal), YT34.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT34")]
         public class WideNaturalBridgeYT34 : global::Moonwell.Objects.StandardDestructable
@@ -19045,7 +19045,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Natural Bridge (YT35).</summary>
+        /// <summary>Wide Natural Bridge (Diagonal 2), YT35.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT35")]
         public class WideNaturalBridgeYT35 : global::Moonwell.Objects.StandardDestructable
@@ -19107,7 +19107,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Night Elven Wooden Bridge (NB08).</summary>
+        /// <summary>Wide Night Elven Wooden Bridge (Vertical), NB08.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("NB08")]
         public class WideNightElvenWoodenBridge : global::Moonwell.Objects.StandardDestructable
@@ -19169,7 +19169,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Night Elven Wooden Bridge (NB09).</summary>
+        /// <summary>Wide Night Elven Wooden Bridge (Diagonal 1), NB09.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("NB09")]
         public class WideNightElvenWoodenBridgeNB09 : global::Moonwell.Objects.StandardDestructable
@@ -19231,7 +19231,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Night Elven Wooden Bridge (NB10).</summary>
+        /// <summary>Wide Night Elven Wooden Bridge (Horizontal), NB10.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("NB10")]
         public class WideNightElvenWoodenBridgeNB10 : global::Moonwell.Objects.StandardDestructable
@@ -19293,7 +19293,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Night Elven Wooden Bridge (NB11).</summary>
+        /// <summary>Wide Night Elven Wooden Bridge (Diagonal 2), NB11.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("NB11")]
         public class WideNightElvenWoodenBridgeNB11 : global::Moonwell.Objects.StandardDestructable
@@ -19355,7 +19355,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Overgrown Bridge (OG08).</summary>
+        /// <summary>Wide Overgrown Bridge (Vertical), OG08.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("OG08")]
         public class WideOvergrownBridge : global::Moonwell.Objects.StandardDestructable
@@ -19416,7 +19416,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Overgrown Bridge (OG09).</summary>
+        /// <summary>Wide Overgrown Bridge (Diagonal 1), OG09.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("OG09")]
         public class WideOvergrownBridgeOG09 : global::Moonwell.Objects.StandardDestructable
@@ -19477,7 +19477,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Overgrown Bridge (OG10).</summary>
+        /// <summary>Wide Overgrown Bridge (Horizontal), OG10.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("OG10")]
         public class WideOvergrownBridgeOG10 : global::Moonwell.Objects.StandardDestructable
@@ -19538,7 +19538,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Overgrown Bridge (OG11).</summary>
+        /// <summary>Wide Overgrown Bridge (Diagonal 2), OG11.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("OG11")]
         public class WideOvergrownBridgeOG11 : global::Moonwell.Objects.StandardDestructable
@@ -19599,7 +19599,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Rickety Wooden Bridge (RW08).</summary>
+        /// <summary>Wide Rickety Wooden Bridge (Vertical), RW08.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("RW08")]
         public class WideRicketyWoodenBridge : global::Moonwell.Objects.StandardDestructable
@@ -19661,7 +19661,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Rickety Wooden Bridge (RW09).</summary>
+        /// <summary>Wide Rickety Wooden Bridge (Diagonal 1), RW09.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("RW09")]
         public class WideRicketyWoodenBridgeRW09 : global::Moonwell.Objects.StandardDestructable
@@ -19723,7 +19723,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Rickety Wooden Bridge (RW10).</summary>
+        /// <summary>Wide Rickety Wooden Bridge (Horizontal), RW10.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("RW10")]
         public class WideRicketyWoodenBridgeRW10 : global::Moonwell.Objects.StandardDestructable
@@ -19785,7 +19785,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Rickety Wooden Bridge (RW11).</summary>
+        /// <summary>Wide Rickety Wooden Bridge (Diagonal 2), RW11.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("RW11")]
         public class WideRicketyWoodenBridgeRW11 : global::Moonwell.Objects.StandardDestructable
@@ -19847,7 +19847,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Stone Bridge (YT20).</summary>
+        /// <summary>Wide Stone Bridge (Vertical), YT20.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT20")]
         public class WideStoneBridge : global::Moonwell.Objects.StandardDestructable
@@ -19909,7 +19909,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Stone Bridge (YT21).</summary>
+        /// <summary>Wide Stone Bridge (Diagonal 1), YT21.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT21")]
         public class WideStoneBridgeYT21 : global::Moonwell.Objects.StandardDestructable
@@ -19971,7 +19971,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Stone Bridge (YT22).</summary>
+        /// <summary>Wide Stone Bridge (Horizontal), YT22.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT22")]
         public class WideStoneBridgeYT22 : global::Moonwell.Objects.StandardDestructable
@@ -20033,7 +20033,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Stone Bridge (YT23).</summary>
+        /// <summary>Wide Stone Bridge (Diagonal 2), YT23.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT23")]
         public class WideStoneBridgeYT23 : global::Moonwell.Objects.StandardDestructable
@@ -20095,7 +20095,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Stone Bridge (YT44).</summary>
+        /// <summary>Wide Stone Bridge (Vertical), YT44.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT44")]
         public class WideStoneBridgeYT44 : global::Moonwell.Objects.StandardDestructable
@@ -20157,7 +20157,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Stone Bridge (YT45).</summary>
+        /// <summary>Wide Stone Bridge (Diagonal 1), YT45.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT45")]
         public class WideStoneBridgeYT45 : global::Moonwell.Objects.StandardDestructable
@@ -20219,7 +20219,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Stone Bridge (YT46).</summary>
+        /// <summary>Wide Stone Bridge (Horizontal), YT46.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT46")]
         public class WideStoneBridgeYT46 : global::Moonwell.Objects.StandardDestructable
@@ -20281,7 +20281,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Stone Bridge (YT47).</summary>
+        /// <summary>Wide Stone Bridge (Diagonal 2), YT47.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YT47")]
         public class WideStoneBridgeYT47 : global::Moonwell.Objects.StandardDestructable
@@ -20343,7 +20343,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Stratholme Bridge (YY20).</summary>
+        /// <summary>Wide Stratholme Bridge (Vertical), YY20.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YY20")]
         public class WideStratholmeBridge : global::Moonwell.Objects.StandardDestructable
@@ -20405,7 +20405,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Stratholme Bridge (YY21).</summary>
+        /// <summary>Wide Stratholme Bridge (Diagonal 1), YY21.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YY21")]
         public class WideStratholmeBridgeYY21 : global::Moonwell.Objects.StandardDestructable
@@ -20467,7 +20467,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Stratholme Bridge (YY22).</summary>
+        /// <summary>Wide Stratholme Bridge (Horizontal), YY22.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YY22")]
         public class WideStratholmeBridgeYY22 : global::Moonwell.Objects.StandardDestructable
@@ -20529,7 +20529,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Stratholme Bridge (YY23).</summary>
+        /// <summary>Wide Stratholme Bridge (Diagonal 2), YY23.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("YY23")]
         public class WideStratholmeBridgeYY23 : global::Moonwell.Objects.StandardDestructable
@@ -20591,7 +20591,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Wooden Bridge (LT08).</summary>
+        /// <summary>Wide Wooden Bridge (Vertical), LT08.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LT08")]
         public class WideWoodenBridge : global::Moonwell.Objects.StandardDestructable
@@ -20653,7 +20653,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Wooden Bridge (LT09).</summary>
+        /// <summary>Wide Wooden Bridge (Diagonal 1), LT09.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LT09")]
         public class WideWoodenBridgeLT09 : global::Moonwell.Objects.StandardDestructable
@@ -20715,7 +20715,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Wooden Bridge (LT10).</summary>
+        /// <summary>Wide Wooden Bridge (Horizontal), LT10.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LT10")]
         public class WideWoodenBridgeLT10 : global::Moonwell.Objects.StandardDestructable
@@ -20777,7 +20777,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Wide Wooden Bridge (LT11).</summary>
+        /// <summary>Wide Wooden Bridge (Diagonal 2), LT11.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("LT11")]
         public class WideWoodenBridgeLT11 : global::Moonwell.Objects.StandardDestructable

@@ -66,7 +66,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The hero's experience. Setting it makes the game give the levels that come with it, with the level-up effect. Once the game has removed the hero, the last value read or set, and setting does nothing.</summary>
+        /// <summary>The hero's experience. Setting a higher value makes the game give the levels that come with it, with the level-up effect (SetHeroXP, which only raises; it stops at the last level's experience). Setting a lower value lowers the experience but keeps the level (AddHeroXP with a negative amount); SetLevel lowers the level. A read after a set gives what the game took. Once the game has removed the hero, the last value read or set, and setting does nothing.</summary>
         [LocalSafe]
         public int Experience
         {
@@ -95,18 +95,41 @@ namespace Moonwell
             {
                 if (!IsGone)
                 {
-                    lastExperience = value;
-                    Runtime.World.SetExperience(Handle, value, true);
+                    // SetHeroXP only raises (seen 10-21); a negative AddHeroXP lowers the experience and keeps the level.
+                    var now = Runtime.World.ExperienceOf(Handle);
+                    if (value < now)
+                    {
+                        Runtime.World.AddExperience(Handle, value - now, true);
+                    }
+                    else
+                    {
+                        Runtime.World.SetExperience(Handle, value, true);
+                    }
+
+                    // The last value is what the game took, which the getter keeps.
+                    lastExperience = Experience;
                 }
             }
         }
 
-        /// <summary>Gives the hero a level (SetHeroLevel), with the level-up effect unless showEffect is false. Level reads it. Does nothing once the hero is gone.</summary>
+        /// <summary>Gives the hero a level, as blizzard.j's SetHeroLevelBJ does: a higher one with the level-up effect unless showEffect is false (SetHeroLevel, which only raises, and gives the hero that level's experience; it stops at the last level), a lower one by taking the levels away (UnitStripHeroLevel). Level and Experience read what the game took. Does nothing once the hero is gone.</summary>
         public void SetLevel(int level, bool showEffect = true)
         {
             if (!IsGone)
             {
-                Runtime.World.LevelHero(Handle, level, showEffect);
+                var now = Runtime.World.LevelOf(Handle);
+                if (level > now)
+                {
+                    Runtime.World.LevelHero(Handle, level, showEffect);
+                }
+                else if (level < now)
+                {
+                    Runtime.World.StripLevels(Handle, now - level);
+                }
+
+                // The last values are what the game took, which the getters keep.
+                lastLevel = Level;
+                lastExperience = Experience;
             }
         }
 

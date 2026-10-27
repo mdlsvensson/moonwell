@@ -13,6 +13,7 @@ namespace Fails
             Components.Add(new CallsHelper());
             Components.Add(new TimerThrows());
             Components.Add(new ReadsProperty());
+            Components.Add(new EveryZero());
         }
     }
 }

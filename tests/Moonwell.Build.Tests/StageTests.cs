@@ -6,29 +6,56 @@ using Xunit;
 
 namespace Moonwell.Build.Tests
 {
+    /// <summary>
+    /// A copy of the Sample compiled as a map without objects, for the staging tests. The Sample declares objects, and the Lua
+    /// compile of a map without objects reads the stubs of Moonwell.Objects that only a full build writes into the build
+    /// folder, so the copy is built in full first. The repository's own Fixtures/Sample is not built.
+    /// </summary>
+    public sealed class StagedSample : IDisposable
+    {
+        private readonly TestFolders folders = new TestFolders();
+
+        public StagedSample()
+        {
+            var folder = folders.TemporaryCopyOfSample();
+            MapBuild.Run(folder, new BuildOptions(), TextWriter.Null);
+            Project = MapProject.Find(folder);
+            var assembly = DotnetBuild.Run(Project, false, TextWriter.Null);
+            var settings = MapSettingsReader.Read(assembly, Project);
+            Map = SourceMap.Open(Project, settings, TextWriter.Null);
+            EntryWriter.Write(Project, settings);
+            LuaCompiler.Compile(Project, Map, assembly, false);
+        }
+
+        public MapProject Project { get; }
+
+        public War3Net.Build.Map Map { get; }
+
+        public void Dispose()
+        {
+            folders.Dispose();
+        }
+    }
+
     [Collection("Sample")]
-    public sealed class StageTests : IDisposable
+    public sealed class StageTests : IClassFixture<StagedSample>, IDisposable
     {
         private static readonly string[] DroppedFiles = { "war3map.j" };
 
-        private static readonly Lazy<(MapProject Project, War3Net.Build.Map Map)> CompiledSample =
-            new Lazy<(MapProject, War3Net.Build.Map)>(() =>
-            {
-                var project = MapProject.Find(TestFolders.Fixture("Sample"));
-                var assembly = DotnetBuild.Run(project, false, TextWriter.Null);
-                var settings = MapSettingsReader.Read(assembly, project);
-                var map = SourceMap.Open(project, settings, TextWriter.Null);
-                EntryWriter.Write(project, settings);
-                LuaCompiler.Compile(project, map, assembly, false);
-                return (project, map);
-            });
+        private readonly (MapProject Project, War3Net.Build.Map Map) compiledSample;
 
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
+
+        public StageTests(StagedSample staged, ITestOutputHelper output)
+        {
+            compiledSample = (staged.Project, staged.Map);
+            folders = new TestFolders(output);
+        }
 
         [Fact]
         public void source_map_is_untouched()
         {
-            var (project, map) = CompiledSample.Value;
+            var (project, map) = compiledSample;
             var before = Hashes(project.MapFolder).Concat(Hashes(project.AssetsFolder)).ToList();
             Assert.NotEmpty(before);
 
@@ -42,7 +69,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void staged_files()
         {
-            var (project, map) = CompiledSample.Value;
+            var (project, map) = compiledSample;
 
             Stage.WriteWithoutObjects(project, map, TextWriter.Null);
 
@@ -82,7 +109,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void info_has_settings()
         {
-            var (project, map) = CompiledSample.Value;
+            var (project, map) = compiledSample;
 
             Stage.WriteWithoutObjects(project, map, TextWriter.Null);
 
@@ -122,6 +149,24 @@ namespace Moonwell.Build.Tests
 
             Assert.Equal("STRING 1 { replaced }", File.ReadAllText(Path.Combine(project.StagedFolder, "war3map.wts")));
             Assert.Contains(@"note: assets\war3map.wts replaces the map's file", log.ToString());
+        }
+
+        [Theory]
+        [InlineData("assets", @"Ljud\Hälsning.txt", "ä")]
+        [InlineData("assets", "Pris€.txt", "€")]
+        [InlineData("map", @"war3mapImported\Öga.mdx", "Ö")]
+        public void a_file_named_past_ascii_is_refused_naming_it(string folder, string file, string letter)
+        {
+            // War3Net hashes a name's UTF-16 letters, the game its bytes; from U+0200 War3Net cannot pack the name at all.
+            var project = MapProject.Find(folders.TemporaryCopyOfSample());
+            var map = OpenWithPlaceholderScript(project);
+            var path = Path.Combine(folder == "map" ? project.MapFolder : project.AssetsFolder, file);
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.WriteAllText(path, "x");
+
+            var error = Assert.Throws<BuildException>(() => Stage.WriteWithoutObjects(project, map, TextWriter.Null));
+
+            Assert.Equal($@"{folder}\{file} has ""{letter}"" in its name; a file in the map must be named with ASCII characters only, so rename it", error.Message);
         }
 
         [Fact]

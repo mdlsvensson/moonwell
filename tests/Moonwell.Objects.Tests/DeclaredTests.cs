@@ -227,7 +227,7 @@ namespace Moonwell.Objects.Tests
     {
         public OddPathing()
         {
-            PlacementRequires = (PathingListPrevent)64;
+            PlacementRequires = (PathingRequire)64;
         }
     }
 
@@ -786,7 +786,7 @@ namespace Moonwell.Objects.Tests
                 "OddDeath.DeathType is 9; Death Type (udea) allows only the values of DeathType",
                 Assert.Throws<FieldRuleException>(() => new OddDeath()).Message);
             Assert.Equal(
-                "OddPathing.PlacementRequires is 64; Placement Requires (upap) allows only the values of PathingListPrevent and their combinations",
+                "OddPathing.PlacementRequires is 64; Placement Requires (upap) allows only the values of PathingRequire and their combinations",
                 Assert.Throws<FieldRuleException>(() => new OddPathing()).Message);
             Assert.Equal(
                 "LiftedOddAttack.AttackType is 42; Attack 1 - Attack Type (ua1t) allows only the values of AttackType",

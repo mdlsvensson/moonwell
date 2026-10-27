@@ -62,6 +62,12 @@ namespace Moonwell.Build
         {
             var script = map.Script ?? throw new BuildException("the map has no script to stage");
 
+            CheckNames("map", project.MapFolder);
+            if (Directory.Exists(project.AssetsFolder))
+            {
+                CheckNames("assets", project.AssetsFolder);
+            }
+
             if (Directory.Exists(project.StagedFolder))
             {
                 Directory.Delete(project.StagedFolder, true);
@@ -97,6 +103,22 @@ namespace Moonwell.Build
                     }
 
                     Copy(project.AssetsFolder, file, project.StagedFolder);
+                }
+            }
+        }
+
+        // War3Net packs a file under a hash of its name's UTF-16 letters, and Storm, the game's archive reader, hashes the name's bytes:
+        // the two agree on ASCII only. From U+0200 War3Net cannot pack the name at all.
+        private static void CheckNames(string folderName, string folder)
+        {
+            foreach (var file in RelativeFiles(folder))
+            {
+                foreach (var letter in file.EnumerateRunes())
+                {
+                    if (letter.Value < ' ' || letter.Value > '~')
+                    {
+                        throw new BuildException($@"{folderName}\{file} has ""{letter}"" in its name; a file in the map must be named with ASCII characters only, so rename it");
+                    }
                 }
             }
         }

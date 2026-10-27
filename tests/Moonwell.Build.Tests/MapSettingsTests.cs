@@ -7,6 +7,13 @@ namespace Moonwell.Build.Tests
     {
         private readonly List<string> temporaryFolders = new List<string>();
 
+        private readonly ITestOutputHelper output;
+
+        public MapSettingsTests(ITestOutputHelper output)
+        {
+            this.output = output;
+        }
+
         [Fact]
         public void reads_the_sample()
         {
@@ -56,7 +63,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void static_field_game_call_names_line()
         {
-            using var folders = new TestFolders();
+            using var folders = new TestFolders(output);
             var folder = folders.TemporaryCopyOfSample();
             File.WriteAllText(
                 Path.Combine(folder, "Map.cs"),
@@ -88,7 +95,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void hiding_property_is_read_from_the_map_base()
         {
-            using var folders = new TestFolders();
+            using var folders = new TestFolders(output);
             var folder = folders.TemporaryCopyOfSample();
             File.WriteAllText(
                 Path.Combine(folder, "Map.cs"),

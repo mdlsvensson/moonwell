@@ -26,7 +26,8 @@ public enum NativeTag
 /// Tags each native and blizzard.j function. Natives are tagged by the lists and name rules below; a native none of
 /// them covers changes state, so a new patch's natives are rejected inside <c>Local.For</c> until they are listed.
 /// A blizzard.j function takes the handle and state tags of what its body calls, and changes state when it sets a
-/// global; it is machine-local when it returns a value and calls a machine-local native. It desyncs when, inside its
+/// global; it is machine-local when it returns a value and calls a machine-local native (except the few whose value is
+/// known to be the same everywhere, <see cref="SyncedResults"/>). It desyncs when, inside its
 /// own <c>if</c> on <c>GetLocalPlayer()</c>, it creates a handle or calls a native known to desync there, or when it
 /// calls a function that desyncs. Other state changes in Blizzard's local blocks (pausing for a dialog, setting bj_
 /// globals, fog and occlusion) are left to Blizzard; map code still may not make them inside <c>Local.For</c>.
@@ -92,6 +93,10 @@ public static partial class NativeTags
         "ShowImage", "ShowUbersplat", "SetTerrainFog", "SetTerrainFogEx", "ResetTerrainFog",
         "MultiboardDisplay", "MultiboardMinimize", "LeaderboardDisplay", "TimerDialogDisplay",
         "Preload", "PreloadGenClear", "PreloadGenStart", "PreloadGenEnd",
+        // They send this machine's value (sync data, a stored gamecache value, the selection) to every machine:
+        // running in local code is what they are for.
+        "BlzSendSyncData", "SyncStoredInteger", "SyncStoredReal", "SyncStoredBoolean", "SyncStoredUnit", "SyncStoredString",
+        "SyncSelections",
     };
 
     /// <summary>Natives that desync when run in local code, whatever their callback does: ForGroup and ForForce by
@@ -100,6 +105,17 @@ public static partial class NativeTags
     private static readonly HashSet<string> DesyncInLocal = new(StringComparer.Ordinal)
     {
         "ForGroup", "ForForce", "EnumDestructablesInRect", "EnumItemsInRect",
+    };
+
+    /// <summary>
+    /// blizzard.j functions that return a value and call a machine-local native, whose value is still the same on every
+    /// machine: AddLightningLoc returns the lightning AddLightningEx made (only its z, from GetLocationZ, differs),
+    /// MoveLightningLoc returns MoveLightningEx's success, and the two dialogue functions return true (the localised
+    /// strings go to the screen in their own local block). They still create handles and change state.
+    /// </summary>
+    private static readonly HashSet<string> SyncedResults = new(StringComparer.Ordinal)
+    {
+        "AddLightningLoc", "MoveLightningLoc", "PlayDialogueFromSpeakerEx", "PlayDialogueFromSpeakerTypeEx",
     };
 
     /// <summary>Name prefixes of local-safe natives: frame, text-tag, filter and camera setters, effect looks.</summary>
@@ -242,7 +258,7 @@ public static partial class NativeTags
 
             // A function that returns nothing keeps what it read (comparing the local player is how it keeps its
             // work local, and localised strings go to the screen); one that returns a value may return it.
-            if (function.Returns != "nothing")
+            if (function.Returns != "nothing" && !SyncedResults.Contains(function.Name))
             {
                 tag |= callee & NativeTag.MachineLocal;
             }

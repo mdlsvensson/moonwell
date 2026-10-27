@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using Moonwell.GameData;
 
 namespace Moonwell.Generator.Objects;
 
@@ -17,7 +18,9 @@ namespace Moonwell.Generator.Objects;
 /// </para>
 /// <para>
 /// A field with a value for each level is <c>Name = Levels(...)</c> when its levels from 1 have values with no gap,
-/// else one <c>Set("id", level, value)</c> for each level that has one. A list is <c>Name.Set&lt;...&gt;()</c> of up to
+/// else one <c>Set("id", level, value)</c> for each level that has one; only levels up to the object's level count
+/// (its <c>LevelCount</c>) are set, not the values an ability's table holds past it. A list (its entries trimmed, an empty one left
+/// out) is <c>Name.Set&lt;...&gt;()</c> of up to
 /// eight standard classes, then <c>Name.Add&lt;...&gt;()</c> for each further one; an id with no standard class of
 /// the list's kind is <c>Name.Add("id")</c> in its place. A reference is <c>Name.Set&lt;...&gt;()</c>, or
 /// <c>Name.Set("id")</c> for an id with no class. A list or reference with a value for each level has the one of level
@@ -90,15 +93,24 @@ public sealed class StandardConstructors
             used[id] = field;
         }
 
+        var count = LevelCountOf(obj);
         foreach (var field in used.Values.OrderBy(f => f.Name, StringComparer.Ordinal).ThenBy(f => f.Id, StringComparer.Ordinal))
         {
-            Add(lines, obj, field);
+            Add(lines, obj, field, count);
         }
 
         return lines;
     }
 
-    private void Add(List<string> lines, StandardObject obj, Field field)
+    // The object's level count, the value of its kind's field named LevelCount; null for a kind or object without one.
+    private int? LevelCountOf(StandardObject obj)
+    {
+        var field = fields[obj.Kind].FirstOrDefault(candidate => candidate.Name == "LevelCount");
+        return field != null && obj.Values.TryGetValue(field.Id, out var text)
+            && int.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out var count) ? count : null;
+    }
+
+    private void Add(List<string> lines, StandardObject obj, Field field, int? count)
     {
         switch (field.Type)
         {
@@ -138,8 +150,18 @@ public sealed class StandardConstructors
         {
             if (key.StartsWith(prefix, StringComparison.Ordinal))
             {
-                levels[int.Parse(key.AsSpan(prefix.Length), NumberStyles.None, CultureInfo.InvariantCulture)] = text;
+                var level = int.Parse(key.AsSpan(prefix.Length), NumberStyles.None, CultureInfo.InvariantCulture);
+                if (count == null || level <= count)
+                {
+                    levels[level] = text;
+                }
             }
+        }
+
+        // An ability of no levels has values past its count only.
+        if (levels.Count == 0)
+        {
+            return;
         }
 
         if (levels.Keys.SequenceEqual(Enumerable.Range(1, levels.Count)))
@@ -160,9 +182,10 @@ public sealed class StandardConstructors
         return obj.Values.TryGetValue(field.Id, out var text) || obj.Values.TryGetValue(field.Id + ":1", out text) ? text : null;
     }
 
+    // The entries trimmed, an empty one left out: the Hydra's standard abilities are "Aspo, Aspt".
     private void AddList(List<string> lines, Field field, string text)
     {
-        var entries = text.Split(',');
+        var entries = text.Split(',').Select(entry => entry.Trim()).Where(entry => entry.Length > 0).ToArray();
         var first = entries.TakeWhile(entry => ClassOf(entry, field) != null).Take(MostInSet).Select(entry => ClassOf(entry, field)!).ToList();
         if (first.Count > 0)
         {

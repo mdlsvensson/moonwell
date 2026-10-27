@@ -79,7 +79,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Building Damage Aura (Atdg).</summary>
+            /// <summary>Building Damage Aura (Tornado), Atdg.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Atdg")]
             public class BuildingDamageAura : global::Moonwell.Objects.StandardAbility
@@ -167,7 +167,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Cyclone()
                 {
-                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.CycloneBcyc, global::Moonwell.Objects.NightElf.Buffs.Cyclone>();
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.Cyclone, global::Moonwell.Objects.NightElf.Buffs.CycloneBcy2>();
                     ButtonPositionNormalX = 2;
                     ButtonPositionNormalY = 2;
                     CanBeDispelled = Levels(true);
@@ -311,7 +311,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Frost Armor (ACfu).</summary>
+            /// <summary>Frost Armor (Autocast) (Neutral Hostile), ACfu.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ACfu")]
             public class FrostArmor : global::Moonwell.Objects.StandardAbility
@@ -572,7 +572,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Slow Aura (Aasl).</summary>
+            /// <summary>Slow Aura (Tornado), Aasl.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aasl")]
             public class SlowAura : global::Moonwell.Objects.StandardAbility
@@ -736,7 +736,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Tornado Spin (Atsp).</summary>
+            /// <summary>Tornado Spin (Tornado), Atsp.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Atsp")]
             public class TornadoSpin : global::Moonwell.Objects.StandardAbility
@@ -786,7 +786,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Tornado Wander (Atwa).</summary>
+            /// <summary>Tornado Wander (Tornado), Atwa.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Atwa")]
             public class TornadoWander : global::Moonwell.Objects.StandardAbility

@@ -6,12 +6,16 @@ namespace Moonwell.Engine
     /// <summary>The game as the input package sees it, through the game's natives; the only class of the package that calls them.</summary>
     internal sealed class NativeInputWorld : IInputWorld
     {
-        /// <summary>Makes the three triggers of a player's mouse: its moves, its presses and its releases.</summary>
-        public void ListenMouse(player p, Action moved, Action pressed, Action released)
+        /// <summary>Makes the triggers of a player's mouse: its moves (none when moved is null), its presses and its releases.</summary>
+        public void ListenMouse(player p, Action? moved, Action pressed, Action released)
         {
-            var move = Natives.CreateTrigger();
-            Natives.TriggerRegisterPlayerEvent(move, p, Natives.EVENT_PLAYER_MOUSE_MOVE);
-            Natives.TriggerAddAction(move, moved);
+            if (moved != null)
+            {
+                var move = Natives.CreateTrigger();
+                Natives.TriggerRegisterPlayerEvent(move, p, Natives.EVENT_PLAYER_MOUSE_MOVE);
+                Natives.TriggerAddAction(move, moved);
+            }
+
             var press = Natives.CreateTrigger();
             Natives.TriggerRegisterPlayerEvent(press, p, Natives.EVENT_PLAYER_MOUSE_DOWN);
             Natives.TriggerAddAction(press, pressed);

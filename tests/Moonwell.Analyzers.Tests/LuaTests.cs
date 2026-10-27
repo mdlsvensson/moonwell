@@ -234,4 +234,51 @@ public class LuaTests
             "'(lightning)data' checks that a value is a lightning, which the game's Lua cannot: there a cast throws and is, as or a pattern gives false or null, even for a lightning; keep the handle in a field or variable of type lightning, or in a class of your own",
             MapCode.Message("object data = u; var bolt = (lightning)data;"));
     }
+
+    [Fact]
+    public void handle_checks_through_foreach_and_linq_are_rejected()
+    {
+        var found = MapCode.Check("""
+            var widgets = new List<widget>();
+            var units = new List<unit>();
+            var a = widgets.OfType<unit>().ToList();
+            var b = widgets.Cast<unit>().ToList();
+            foreach (unit x in widgets) { }
+            var c = units.OfType<unit>().Count();
+            var d = units.Cast<unit>().Count();
+            var e = units.Cast<widget>().Count();
+            foreach (widget w in units) { }
+            foreach (var y in widgets) { }
+            """);
+
+        Assert.Equal(new[]
+        {
+            "MW0035: widgets.OfType<unit>()",
+            "MW0035: widgets.Cast<unit>()",
+            "MW0035: unit x",
+            "MW0035: units.OfType<unit>()",
+            "MW0035: units.Cast<widget>()",
+        }, found);
+    }
+
+    [Fact]
+    public void joining_moonwell_objects_enums_is_rejected()
+    {
+        Assert.Equal(new[] { "MW0010: armors", "MW0010: armors", "MW0010: list", "MW0010: ArmorType.Metal", "MW0010: ArmorType.Flesh" }, MapCode.CheckFile("""
+            using System.Collections.Generic;
+            using Moonwell.Objects;
+
+            namespace Map
+            {
+                public static class Use
+                {
+                    public static string Run(List<ArmorType> armors, ArmorType[] list)
+                    {
+                        return string.Join(", ", armors) + string.Concat(armors) + string.Join(", ", list)
+                            + string.Join(", ", ArmorType.Metal, ArmorType.Flesh) + string.Join(", ", new[] { 1, 2 });
+                    }
+                }
+            }
+            """));
+    }
 }

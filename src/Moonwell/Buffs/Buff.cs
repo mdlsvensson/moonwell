@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Moonwell
 {
@@ -8,7 +9,7 @@ namespace Moonwell
         /// <summary>The timer that ends the buff; a refresh ends it and starts a new one. Null when the buff has no expiry.</summary>
         internal Timer? expiry;
 
-        /// <summary>The seconds the buff lasts; 0 until it is removed.</summary>
+        /// <summary>The seconds the buff lasts; 0, the default, lasts until it is removed. A refresh gives the buff there the duration of the new apply, from the refresh on.</summary>
         [LocalSafe]
         public float Duration { get; protected set; } = 0.0f;
 
@@ -53,10 +54,9 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Ends the buffs on a unit that its death ends, newest first; Inbound calls it after the death's reactions.</summary>
-        internal static void EndOnDeath(Unit unit)
+        /// <summary>Ends the buffs a death ends, newest first, of those that were on the unit as it died (Inbound takes them at the start of the death, and calls this after its reactions): a buff the reactions applied has not seen the death and stays.</summary>
+        internal static void EndOnDeath(List<Buff> found)
         {
-            var found = unit.GetAll<Buff>();
             for (var i = found.Count - 1; i >= 0; i--)
             {
                 if (found[i].EndsOnDeath)
@@ -92,12 +92,19 @@ namespace Moonwell
             CallApply();
         }
 
-        /// <summary>Gives a buff already on its unit a new expiry, and runs OnApply again.</summary>
-        internal void Reapply()
+        /// <summary>Refreshes a buff already on its unit with a new apply of its class (decision 66): it takes the new buff's duration and the source, starts its expiry again for that duration (a duration of 0 lasts until it is removed), and runs OnApply again. Its other values, and what it has counted, stay its own; the new buff is dropped.</summary>
+        internal void Refresh(Buff from, Unit? source)
         {
+            Source = source;
+            Duration = from.Duration;
             if (Duration > 0.0f)
             {
                 StartExpiry();
+            }
+            else if (expiry != null)
+            {
+                expiry.End();
+                expiry = null;
             }
 
             CallApply();
@@ -139,7 +146,7 @@ namespace Moonwell
             return false;
         }
 
-        /// <summary>Shows the buff on its unit through its carrier ability, when a display is registered for its class.</summary>
+        /// <summary>Shows the buff on its unit through its carrier ability, when a display is registered for its class. The carrier is made permanent, as a morph (Metamorphosis, Bear Form) takes away an ability code added that is not, and its icon with it (seen 10-26).</summary>
         private void Show()
         {
             var carrier = ObjectTypes.CarrierOf(this);
@@ -150,6 +157,7 @@ namespace Moonwell
 
             Runtime.World.AddAbility(Unit.Handle, carrier);
             Runtime.World.HideAbility(Unit.Handle, carrier);
+            Runtime.World.MakeAbilityPermanent(Unit.Handle, carrier);
         }
 
         /// <summary>Ends the expiry timer the buff has, if any, and starts a new one for its duration.</summary>

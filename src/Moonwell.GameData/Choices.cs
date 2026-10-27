@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Moonwell.Generator.Objects;
+namespace Moonwell.GameData;
 
 /// <summary>How the values of a choice type make one field value.</summary>
 public enum ChoiceForm
@@ -37,6 +37,9 @@ public sealed record ChoiceType(string Type, string Name, ChoiceForm Form, strin
     /// <summary>True when the enum is core Moonwell's (<c>Moonwell.AttackType</c>), not one of <c>Moonwell.Objects</c>: see <see cref="Choices.IsCore"/>.</summary>
     public bool Core => Choices.IsCore(Type);
 
+    /// <summary>True for a placement type, whose members are named as World Editor shows them: see <see cref="Choices.IsPlacement"/>.</summary>
+    public bool Placement => Choices.IsPlacement(Type);
+
     /// <summary>The enum as generated C# names it: <c>global::Moonwell.AttackType</c>, <c>global::Moonwell.Objects.Targets</c>.</summary>
     public string TypeName => (Core ? "global::Moonwell." : "global::Moonwell.Objects.") + Name;
 }
@@ -46,7 +49,8 @@ public sealed record ChoiceType(string Type, string Name, ChoiceForm Form, strin
 /// <para>
 /// A member is named by its text (<c>magic</c> is <c>Magic</c>), with the word breaks of its label when the label
 /// spells the same letters (<c>notself</c>, labelled <c>Not self</c>, is <c>NotSelf</c>); a text with a digit or no
-/// letter (<c>AS01</c>, <c>3</c>, <c>_</c>) is named by its label alone.
+/// letter (<c>AS01</c>, <c>3</c>, <c>_</c>) is named by its label alone. A placement type's enum and members are named
+/// as World Editor shows them (<see cref="IsPlacement"/>).
 /// </para>
 /// <para>
 /// A value the data spells as a whole number has that number (the game's numbers of <c>defenseTypeInt</c> are not in
@@ -72,11 +76,22 @@ public static class Choices
     // Moonwell.Objects (CSharp.lua problem C19), so a map has one of each, in namespace Moonwell.
     private static readonly HashSet<string> CoreTypes = new(StringComparer.Ordinal) { "attackType", "defenseType" };
 
+    // The placement types and the names of their enums (decision 70). The game stores World Editor's "Placement Requires"
+    // (upap) as preventPlace, of type pathingListPrevent, and "Placement Prevented By" (upar) as requirePlace, of type
+    // pathingListRequire; World Editor shows each value as its opposite ("unbuildable" as "Buildable", "blighted" as
+    // "Unblighted"). Each enum is named for the field World Editor shows, and its members by World Editor's labels; the
+    // object file keeps the game's texts, so PlacementRequires = PathingRequire.Buildable writes "unbuildable".
+    private static readonly Dictionary<string, string> PlacementTypes = new(StringComparer.Ordinal)
+    {
+        ["pathingListPrevent"] = "PathingRequire",
+        ["pathingListRequire"] = "PathingPrevent",
+    };
+
     /// <summary>
     /// Whether the enum of a metadata type is core Moonwell's (<c>attackType</c> is <c>Moonwell.AttackType</c>), written by
     /// hand in <c>src/Moonwell/Types</c> and compiled to the map's Lua with its names, rather than generated into
     /// <c>Moonwell.Objects</c>. The fields hold the core enum, and <c>Moonwell.Objects</c> keeps the game's texts of its
-    /// members (<see cref="ObjectsWriter.Choices"/>).
+    /// members (<c>ObjectsWriter.Choices</c> in Moonwell's generator).
     /// </summary>
     public static bool IsCore(string type)
     {
@@ -84,11 +99,21 @@ public static class Choices
     }
 
     /// <summary>
+    /// Whether a metadata type is one of the placement fields' (<c>pathingListPrevent</c>, <c>pathingListRequire</c>), whose
+    /// values World Editor shows as their opposites: its enum is named for the field World Editor shows (<c>PathingRequire</c>
+    /// for Placement Requires) and each member by World Editor's label (<c>Buildable</c> for the game's <c>unbuildable</c>).
+    /// </summary>
+    public static bool IsPlacement(string type)
+    {
+        return PlacementTypes.ContainsKey(type);
+    }
+
+    /// <summary>
     /// Fails unless the core enum of <paramref name="choice"/> has the members the game's data gives, by name and number in
     /// its order: the generated fields and the game's texts take the data's.
     /// </summary>
     /// <param name="choice">A core choice type.</param>
-    /// <param name="members">The core enum's members in order (<see cref="RuntimeMembers.EnumMembers"/>); null when Moonwell has no such enum.</param>
+    /// <param name="members">The core enum's members in order (<c>RuntimeMembers.EnumMembers</c> in Moonwell's generator); null when Moonwell has no such enum.</param>
     /// <exception cref="InvalidOperationException">The members differ, or there is no enum.</exception>
     public static void CheckCore(ChoiceType choice, IReadOnlyList<(string Name, int Value)>? members)
     {
@@ -170,7 +195,7 @@ public static class Choices
             }
 
             var shown = Shown(entry.Label.Length == 0 ? "" : label(entry.Label));
-            var name = MemberName(entry.Text, shown);
+            var name = IsPlacement(type) ? FieldNames.FromLabel(shown) : MemberName(entry.Text, shown);
             if (name.Length == 0)
             {
                 throw new InvalidOperationException($"{type}: the value {entry.Text} has no name; it has no letter and no label");
@@ -253,9 +278,17 @@ public static class Choices
         return result;
     }
 
-    /// <summary>The enum's name: the type's in PascalCase, and a type ending in List names its values in the plural (<c>targetList</c> is <c>Targets</c>).</summary>
+    /// <summary>
+    /// The enum's name: the type's in PascalCase, and a type ending in List names its values in the plural (<c>targetList</c>
+    /// is <c>Targets</c>); a placement type's is the field's World Editor shows (<c>pathingListPrevent</c> is <c>PathingRequire</c>).
+    /// </summary>
     public static string EnumName(string type)
     {
+        if (PlacementTypes.TryGetValue(type, out var placement))
+        {
+            return placement;
+        }
+
         var name = type.EndsWith("List", StringComparison.Ordinal) ? type.Substring(0, type.Length - 4) + "s" : type;
         return char.ToUpperInvariant(name[0]) + name.Substring(1);
     }

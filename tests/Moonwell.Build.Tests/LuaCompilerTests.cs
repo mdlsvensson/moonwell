@@ -8,12 +8,13 @@ namespace Moonwell.Build.Tests
     public sealed class LuaCompilerTests : IDisposable
     {
         private readonly SampleBuilds builds;
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
         private readonly List<string> temporaryFolders = new List<string>();
 
-        public LuaCompilerTests(SampleBuilds builds)
+        public LuaCompilerTests(SampleBuilds builds, ITestOutputHelper output)
         {
             this.builds = builds;
+            folders = new TestFolders(output);
         }
 
         [Fact]
@@ -54,6 +55,53 @@ namespace Moonwell.Build.Tests
 
             Assert.Contains("sample: started (release)", script);
             Assert.DoesNotContain("sample: started (development)", script);
+        }
+
+        [Fact]
+        public void the_lua_has_the_symbols_dotnet_build_defines()
+        {
+            // dotnet build defines TRACE, and DEBUG or RELEASE; CSharp.lua defines __CSharpLua__ itself.
+            var folder = folders.TemporaryCopyOfSample();
+            File.WriteAllText(Path.Combine(folder, "Symbols.cs"), """
+                namespace Sample
+                {
+                    public static class Symbols
+                    {
+                        public static void Show()
+                        {
+                #if RELEASE
+                            Moonwell.Natives.DisplayTextToPlayer(Moonwell.Natives.Player(0), 0f, 0f, "symbols: release");
+                #else
+                            Moonwell.Natives.DisplayTextToPlayer(Moonwell.Natives.Player(0), 0f, 0f, "symbols: not release");
+                #endif
+                #if TRACE
+                            Moonwell.Natives.DisplayTextToPlayer(Moonwell.Natives.Player(0), 0f, 0f, "symbols: trace");
+                #endif
+                #if __CSharpLua__
+                            Moonwell.Natives.DisplayTextToPlayer(Moonwell.Natives.Player(0), 0f, 0f, "symbols: csharplua");
+                #endif
+                        }
+                    }
+                }
+                """);
+
+            foreach (var release in new[] { false, true })
+            {
+                MapBuild.Run(folder, new BuildOptions { Release = release }, TextWriter.Null);
+
+                var script = File.ReadAllText(Path.Combine(folder, "build", "Sample", "war3map.lua"));
+                Assert.Equal(release, script.Contains("\"symbols: release\"", StringComparison.Ordinal));
+                Assert.Equal(!release, script.Contains("\"symbols: not release\"", StringComparison.Ordinal));
+                Assert.Contains("\"symbols: trace\"", script);
+                Assert.Contains("\"symbols: csharplua\"", script);
+
+                // The line marks see the same code: each statement CSharp.lua compiles has its line.
+                var marked = File.ReadAllText(Path.Combine(folder, "build", "marked", "Symbols.cs"));
+                foreach (var text in new[] { release ? "symbols: release" : "symbols: not release", "symbols: trace", "symbols: csharplua" })
+                {
+                    Assert.Matches(@"/\*\[\[--@mw \d+:\d+\]\]\*/ Moonwell\.Natives\.DisplayTextToPlayer\([^\n]*""" + text + @"""", marked);
+                }
+            }
         }
 
         [Fact]
@@ -188,6 +236,35 @@ namespace Moonwell.Build.Tests
                 Assert.Matches(@"player:Print\(""sample: a footman, facing "" \.\. System\.toString\(270\.0( --\[\[Unit\.DefaultFacing\]\])?\), -1\.0\)", script);
                 Assert.Contains("Moonwell.Unit.Create(Moonwell.ObjectTypes.FourCC(\"hfoo\"), player, 0.0, 0.0, 270.0)", script);
             }
+        }
+
+        [Fact]
+        public void numerics_the_map_uses_stay_in_the_script()
+        {
+            // The Sample names no System.Numerics, so its script has none of CSharp.lua's numerics files.
+            Assert.DoesNotContain("System.defStc(\"System.Numerics.Vector2\"", builds.Development.Script);
+
+            // CSharp.lua names the namespace through an alias at the top of the file (local SystemNumerics = System.Numerics).
+            var folder = folders.TemporaryCopyOfSample();
+            File.WriteAllText(Path.Combine(folder, "Numerics.cs"), """
+                namespace Sample
+                {
+                    public static class Numerics
+                    {
+                        public static float Length()
+                        {
+                            var v = new System.Numerics.Vector2(3f, 4f);
+                            return v.Length();
+                        }
+                    }
+                }
+                """);
+
+            MapBuild.Run(folder, new BuildOptions(), TextWriter.Null);
+
+            var script = File.ReadAllText(Path.Combine(folder, "build", "Sample", "war3map.lua"));
+            Assert.Contains("local SystemNumerics = System.Numerics", script);
+            Assert.Contains("System.defStc(\"System.Numerics.Vector2\"", script);
         }
 
         [Fact]

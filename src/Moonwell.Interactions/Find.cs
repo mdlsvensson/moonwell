@@ -7,11 +7,12 @@ namespace Moonwell
     /// <summary>
     /// Finds the things that have a place in a range, a rect, a polygon, along a line, and the closest. T is a class: Unit, Item,
     /// Destructable, Gizmo, a map's gizmo class, or Actor for all of them. A search keeps what is of the class T, has a place
-    /// (a unit that is alive, shown and not loaded; an item on the ground; a destructable that is alive; a gizmo that has not
-    /// ended), has its centre inside the shape, and is accepted by the filter. Each shape has a form that returns a new list, for
-    /// a cast or a click, and a form that fills a list the map keeps (cleared first, returns the count), for code that runs
-    /// often. Results come in the grid's order, the same on every machine; Closest gives the nearest first and keeps the grid's
-    /// order among things at the same distance. Inside Local.For a search reads and changes nothing: it tracks no kind, and keeps no place it reads.
+    /// (a unit that is alive, shown and not loaded; an item on the ground; a destructable that is alive; a gizmo that is not
+    /// ending, so not in its OnLeave), has its centre inside the shape, and is accepted by the filter. Each shape has a form
+    /// that returns a new list, for a cast or a click, and a form that fills a list the map keeps (cleared first, returns the
+    /// count), for code that runs often. Results come in the grid's order, the same on every machine; Closest gives the
+    /// nearest first and keeps the grid's order among things at the same distance. Inside Local.For a search reads and
+    /// changes nothing: it tracks no kind, and keeps no place it reads.
     /// </summary>
     public static class Find
     {

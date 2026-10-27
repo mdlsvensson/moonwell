@@ -14,13 +14,198 @@ namespace Moonwell.Objects
         /// @CSharpLua.Ignore
         public static partial class Units
         {
-            /// <summary>Alchemist (Nal2).</summary>
+            /// <summary>Alchemist (Nalc).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Nal2")]
+            [global::Moonwell.Objects.Standard("Nalc")]
             public class Alchemist : global::Moonwell.Objects.StandardHero
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Alchemist()
+                {
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
+                    AcquisitionRange = 500f;
+                    Agility = 10;
+                    AgilityPerLevel = 1f;
+                    AllowCustomTeamColor = false;
+                    AnimationBlendTimeSeconds = 0.15f;
+                    AnimationCastBackswing = 0.5f;
+                    AnimationCastPoint = 0.4f;
+                    AnimationRunSpeed = 290f;
+                    AnimationWalkSpeed = 290f;
+                    Armor = 0;
+                    ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
+                    Attack1AnimationBackswingPoint = 0.65f;
+                    Attack1AnimationDamagePoint = 0.35f;
+                    Attack1DamageLossFactor = 0f;
+                    Attack1DamageSpillDistance = 0f;
+                    Attack1DamageSpillRadius = 0f;
+                    Attack1MaximumNumberOfTargets = 1;
+                    Attack1ProjectileArc = 0.15f;
+                    Attack1ProjectileArt = "Abilities\\Weapons\\BrewmasterMissile\\BrewmasterMissile.mdl";
+                    Attack1ProjectileSpeed = 900;
+                    Attack1RangeMotionBuffer = 250f;
+                    Attack1ShowUI = true;
+                    Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
+                    Attack1WeaponSound = global::Moonwell.Objects.CombatSound.WoodHeavyBash;
+                    Attack1WeaponType = global::Moonwell.Objects.WeaponType.Normal;
+                    Attack2AnimationBackswingPoint = 0.65f;
+                    Attack2AnimationDamagePoint = 0.35f;
+                    Attack2AttackType = global::Moonwell.AttackType.Hero;
+                    Attack2CooldownTime = 2.5f;
+                    Attack2DamageBase = 0;
+                    Attack2DamageLossFactor = 0f;
+                    Attack2DamageNumberOfDice = 3;
+                    Attack2DamageSidesPerDie = 10;
+                    Attack2DamageSpillDistance = 0f;
+                    Attack2DamageSpillRadius = 0f;
+                    Attack2MaximumNumberOfTargets = 1;
+                    Attack2Range = 500;
+                    Attack2RangeMotionBuffer = 250f;
+                    Attack2ShowUI = true;
+                    Attack2TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
+                    Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
+                    AttackCooldown = 2.5f;
+                    AttackRange = 100;
+                    AttackType = global::Moonwell.AttackType.Hero;
+                    AttacksEnabled = global::Moonwell.Objects.AttackBits.Both;
+                    BuildTime = 55;
+                    ButtonPositionX = 3;
+                    ButtonPositionY = 2;
+                    CanDropItemsOnDeath = true;
+                    CanFlee = true;
+                    CategorizationCampaign = false;
+                    CategorizationSpecial = false;
+                    CollisionSize = 32f;
+                    Damage = 0;
+                    DamageDice = 3;
+                    DamageSides = 10;
+                    DeathTimeSeconds = 3.67f;
+                    DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
+                    DefenseType = global::Moonwell.DefenseType.Hero;
+                    DefenseUpgradeBonus = 0;
+                    DependencyEquivalents.Set<global::Moonwell.Objects.Creeps.Units.AlchemistNalm, global::Moonwell.Objects.Creeps.Units.AlchemistNal2, global::Moonwell.Objects.Creeps.Units.AlchemistNal3>();
+                    ElevationSampleRadius = 50f;
+                    FlyHeight = 0f;
+                    FogOfWarSampleRadius = 0f;
+                    Food = 5;
+                    FormationRank = 0;
+                    GoldBountyAwardedBase = 30;
+                    GoldBountyAwardedNumberOfDice = 8;
+                    GoldBountyAwardedSidesPerDie = 3;
+                    GoldCost = 425;
+                    GroupSeparationEnabled = false;
+                    GroupSeparationGroupNumber = 0;
+                    GroupSeparationParameter = 0;
+                    GroupSeparationPriority = 0;
+                    HasTilesetSpecificData = false;
+                    HasWaterShadow = true;
+                    HeightMinimum = 0f;
+                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.HealingSpray, global::Moonwell.Objects.Creeps.Abilities.AcidBomb, global::Moonwell.Objects.Creeps.Abilities.ChemicalRage, global::Moonwell.Objects.Creeps.Abilities.Transmute>();
+                    HeroHideHeroDeathMessage = false;
+                    HeroHideHeroInterfaceIcon = false;
+                    HeroHideHeroMinimapDisplay = false;
+                    HeroSkin = "ANhs,ANab,ANcr,ANtm";
+                    HideMinimapDisplay = false;
+                    HitPointRegen = 0.25f;
+                    HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Hotkey = "X";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroAlchemist.blp";
+                    IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-alchemist.blp";
+                    Intelligence = 18;
+                    IntelligencePerLevel = 2f;
+                    IsABuilding = false;
+                    Set("ulev", 5);
+                    LumberBountyAwardedBase = 0;
+                    LumberBountyAwardedNumberOfDice = 0;
+                    LumberBountyAwardedSidesPerDie = 0;
+                    LumberCost = 135;
+                    Set("umpi", 100);
+                    ManaRegen = 0.01f;
+                    Set("uhpm", 100);
+                    Set("umpm", 0);
+                    MaximumPitchAngleDegrees = 10f;
+                    MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Creeps\\HeroGoblinAlchemist\\HeroGoblinAlchemist";
+                    ModelFileExtraVersions = 0;
+                    Name = "Alchemist";
+                    NormalSkin = "AInv";
+                    OccluderHeight = 0f;
+                    OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
+                    OrientationInterpolation = 5;
+                    PlaceableInEditor = true;
+                    PointValue = 100;
+                    PrimaryAttribute = global::Moonwell.Objects.AttributeType.STR;
+                    Priority = 9;
+                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZSwimming = 0f;
+                    ProjectileLaunchX = 0f;
+                    ProjectileLaunchY = 0f;
+                    ProjectileLaunchZ = 180f;
+                    ProjectileLaunchZSwimming = 0f;
+                    ProperNames = "Razzil Naypolm,Niffy Gurglebeaker,Ezzel Darkbrewer,Lapis Concocter,Savvy Foulmixer,Fictious Warpotion";
+                    ProperNamesUsed = 6;
+                    PropulsionWindowDegrees = 60f;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RepairGoldCost = 425;
+                    RepairLumberCost = 135;
+                    RepairTime = 55;
+                    RequiredAnimationNamesAttachments = "large";
+                    RequirementsTier2.Add("TWN2");
+                    RequirementsTier2.Add("TALT");
+                    RequirementsTier3.Add("TWN3");
+                    RequirementsTier3.Add("TALT");
+                    RequirementsTiersUsed = 3;
+                    Requires.Add("TALT");
+                    Scale = 0.85f;
+                    ScaleProjectiles = true;
+                    SelectionCircleHeight = 0f;
+                    SelectionCircleOnWater = false;
+                    SelectionScale = 2f;
+                    ShadowImageCenterX = 50f;
+                    ShadowImageCenterY = 50f;
+                    ShadowImageHeight = 140f;
+                    ShadowImageUnit = global::Moonwell.Objects.ShadowImage.Shadow;
+                    ShadowImageWidth = 140f;
+                    ShowAirToGroundIndicators = false;
+                    SightRadiusNight = 800;
+                    SightRange = 1800;
+                    Sleeps = false;
+                    Special = "Objects\\Spawnmodels\\Human\\HumanLargeDeathExplode\\HumanLargeDeathExplode.mdl";
+                    Speed = 290;
+                    SpeedMaximum = 0;
+                    SpeedMinimum = 0;
+                    StockInitialAfterStartDelay = 1;
+                    StockMaximum = 1;
+                    StockReplenishInterval = 0;
+                    StockStartDelay = 135;
+                    Strength = 25;
+                    StrengthPerLevel = 3.3f;
+                    TargetedAs = global::Moonwell.Objects.Targets.Ground;
+                    TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
+                    Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
+                    Tooltip = "Summon Alchemist";
+                    TooltipAwaken = "Revive Alchemist";
+                    TooltipExtended = "Warrior Hero, known for offensive and defensive versatility. Can learn Healing Spray, Chemical Rage, Acid Bomb and Transmute.|n|n|cffffcc00Attacks land and air units.|r";
+                    TooltipRevive = "Revive Alchemist";
+                    TransportedSize = 1;
+                    TurnRate = 0.6f;
+                    Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitSoundSet = "HeroGoblinAlchemist";
+                    UseClickHelper = false;
+                    UseExtendedLineOfSight = false;
+                }
+            }
+
+            /// <summary>Alchemist (Morph level 2), Nal2.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("Nal2")]
+            public class AlchemistNal2 : global::Moonwell.Objects.StandardHero
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public AlchemistNal2()
                 {
                     Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
                     AcquisitionRange = 500f;
@@ -199,7 +384,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Alchemist (Nal3).</summary>
+            /// <summary>Alchemist (Morph level 3), Nal3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Nal3")]
             public class AlchemistNal3 : global::Moonwell.Objects.StandardHero
@@ -384,192 +569,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Alchemist (Nalc).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Nalc")]
-            public class AlchemistNalc : global::Moonwell.Objects.StandardHero
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public AlchemistNalc()
-                {
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
-                    AcquisitionRange = 500f;
-                    Agility = 10;
-                    AgilityPerLevel = 1f;
-                    AllowCustomTeamColor = false;
-                    AnimationBlendTimeSeconds = 0.15f;
-                    AnimationCastBackswing = 0.5f;
-                    AnimationCastPoint = 0.4f;
-                    AnimationRunSpeed = 290f;
-                    AnimationWalkSpeed = 290f;
-                    Armor = 0;
-                    ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
-                    Attack1AnimationBackswingPoint = 0.65f;
-                    Attack1AnimationDamagePoint = 0.35f;
-                    Attack1DamageLossFactor = 0f;
-                    Attack1DamageSpillDistance = 0f;
-                    Attack1DamageSpillRadius = 0f;
-                    Attack1MaximumNumberOfTargets = 1;
-                    Attack1ProjectileArc = 0.15f;
-                    Attack1ProjectileArt = "Abilities\\Weapons\\BrewmasterMissile\\BrewmasterMissile.mdl";
-                    Attack1ProjectileSpeed = 900;
-                    Attack1RangeMotionBuffer = 250f;
-                    Attack1ShowUI = true;
-                    Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
-                    Attack1WeaponSound = global::Moonwell.Objects.CombatSound.WoodHeavyBash;
-                    Attack1WeaponType = global::Moonwell.Objects.WeaponType.Normal;
-                    Attack2AnimationBackswingPoint = 0.65f;
-                    Attack2AnimationDamagePoint = 0.35f;
-                    Attack2AttackType = global::Moonwell.AttackType.Hero;
-                    Attack2CooldownTime = 2.5f;
-                    Attack2DamageBase = 0;
-                    Attack2DamageLossFactor = 0f;
-                    Attack2DamageNumberOfDice = 3;
-                    Attack2DamageSidesPerDie = 10;
-                    Attack2DamageSpillDistance = 0f;
-                    Attack2DamageSpillRadius = 0f;
-                    Attack2MaximumNumberOfTargets = 1;
-                    Attack2Range = 500;
-                    Attack2RangeMotionBuffer = 250f;
-                    Attack2ShowUI = true;
-                    Attack2TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
-                    Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
-                    AttackCooldown = 2.5f;
-                    AttackRange = 100;
-                    AttackType = global::Moonwell.AttackType.Hero;
-                    AttacksEnabled = global::Moonwell.Objects.AttackBits.Both;
-                    BuildTime = 55;
-                    ButtonPositionX = 3;
-                    ButtonPositionY = 2;
-                    CanDropItemsOnDeath = true;
-                    CanFlee = true;
-                    CategorizationCampaign = false;
-                    CategorizationSpecial = false;
-                    CollisionSize = 32f;
-                    Damage = 0;
-                    DamageDice = 3;
-                    DamageSides = 10;
-                    DeathTimeSeconds = 3.67f;
-                    DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.DefenseType.Hero;
-                    DefenseUpgradeBonus = 0;
-                    DependencyEquivalents.Set<global::Moonwell.Objects.Creeps.Units.AlchemistNalm, global::Moonwell.Objects.Creeps.Units.Alchemist, global::Moonwell.Objects.Creeps.Units.AlchemistNal3>();
-                    ElevationSampleRadius = 50f;
-                    FlyHeight = 0f;
-                    FogOfWarSampleRadius = 0f;
-                    Food = 5;
-                    FormationRank = 0;
-                    GoldBountyAwardedBase = 30;
-                    GoldBountyAwardedNumberOfDice = 8;
-                    GoldBountyAwardedSidesPerDie = 3;
-                    GoldCost = 425;
-                    GroupSeparationEnabled = false;
-                    GroupSeparationGroupNumber = 0;
-                    GroupSeparationParameter = 0;
-                    GroupSeparationPriority = 0;
-                    HasTilesetSpecificData = false;
-                    HasWaterShadow = true;
-                    HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.HealingSpray, global::Moonwell.Objects.Creeps.Abilities.AcidBomb, global::Moonwell.Objects.Creeps.Abilities.ChemicalRage, global::Moonwell.Objects.Creeps.Abilities.Transmute>();
-                    HeroHideHeroDeathMessage = false;
-                    HeroHideHeroInterfaceIcon = false;
-                    HeroHideHeroMinimapDisplay = false;
-                    HeroSkin = "ANhs,ANab,ANcr,ANtm";
-                    HideMinimapDisplay = false;
-                    HitPointRegen = 0.25f;
-                    HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
-                    Hotkey = "X";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroAlchemist.blp";
-                    IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-alchemist.blp";
-                    Intelligence = 18;
-                    IntelligencePerLevel = 2f;
-                    IsABuilding = false;
-                    Set("ulev", 5);
-                    LumberBountyAwardedBase = 0;
-                    LumberBountyAwardedNumberOfDice = 0;
-                    LumberBountyAwardedSidesPerDie = 0;
-                    LumberCost = 135;
-                    Set("umpi", 100);
-                    ManaRegen = 0.01f;
-                    Set("uhpm", 100);
-                    Set("umpm", 0);
-                    MaximumPitchAngleDegrees = 10f;
-                    MaximumRollAngleDegrees = 10f;
-                    Model = "Units\\Creeps\\HeroGoblinAlchemist\\HeroGoblinAlchemist";
-                    ModelFileExtraVersions = 0;
-                    Name = "Alchemist";
-                    NormalSkin = "AInv";
-                    OccluderHeight = 0f;
-                    OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
-                    OrientationInterpolation = 5;
-                    PlaceableInEditor = true;
-                    PointValue = 100;
-                    PrimaryAttribute = global::Moonwell.Objects.AttributeType.STR;
-                    Priority = 9;
-                    ProjectileImpactZ = 60f;
-                    ProjectileImpactZSwimming = 0f;
-                    ProjectileLaunchX = 0f;
-                    ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 180f;
-                    ProjectileLaunchZSwimming = 0f;
-                    ProperNames = "Razzil Naypolm,Niffy Gurglebeaker,Ezzel Darkbrewer,Lapis Concocter,Savvy Foulmixer,Fictious Warpotion";
-                    ProperNamesUsed = 6;
-                    PropulsionWindowDegrees = 60f;
-                    Race = global::Moonwell.Objects.UnitRace.Creeps;
-                    RepairGoldCost = 425;
-                    RepairLumberCost = 135;
-                    RepairTime = 55;
-                    RequiredAnimationNamesAttachments = "large";
-                    RequirementsTier2.Add("TWN2");
-                    RequirementsTier2.Add("TALT");
-                    RequirementsTier3.Add("TWN3");
-                    RequirementsTier3.Add("TALT");
-                    RequirementsTiersUsed = 3;
-                    Requires.Add("TALT");
-                    Scale = 0.85f;
-                    ScaleProjectiles = true;
-                    SelectionCircleHeight = 0f;
-                    SelectionCircleOnWater = false;
-                    SelectionScale = 2f;
-                    ShadowImageCenterX = 50f;
-                    ShadowImageCenterY = 50f;
-                    ShadowImageHeight = 140f;
-                    ShadowImageUnit = global::Moonwell.Objects.ShadowImage.Shadow;
-                    ShadowImageWidth = 140f;
-                    ShowAirToGroundIndicators = false;
-                    SightRadiusNight = 800;
-                    SightRange = 1800;
-                    Sleeps = false;
-                    Special = "Objects\\Spawnmodels\\Human\\HumanLargeDeathExplode\\HumanLargeDeathExplode.mdl";
-                    Speed = 290;
-                    SpeedMaximum = 0;
-                    SpeedMinimum = 0;
-                    StockInitialAfterStartDelay = 1;
-                    StockMaximum = 1;
-                    StockReplenishInterval = 0;
-                    StockStartDelay = 135;
-                    Strength = 25;
-                    StrengthPerLevel = 3.3f;
-                    TargetedAs = global::Moonwell.Objects.Targets.Ground;
-                    TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
-                    Tilesets = "*";
-                    TintingColor1Red = 255;
-                    TintingColor2Green = 255;
-                    TintingColor3Blue = 255;
-                    Tooltip = "Summon Alchemist";
-                    TooltipAwaken = "Revive Alchemist";
-                    TooltipExtended = "Warrior Hero, known for offensive and defensive versatility. Can learn Healing Spray, Chemical Rage, Acid Bomb and Transmute.|n|n|cffffcc00Attacks land and air units.|r";
-                    TooltipRevive = "Revive Alchemist";
-                    TransportedSize = 1;
-                    TurnRate = 0.6f;
-                    Type = global::Moonwell.Objects.MoveType.Foot;
-                    UnitSoundSet = "HeroGoblinAlchemist";
-                    UseClickHelper = false;
-                    UseExtendedLineOfSight = false;
-                }
-            }
-
-            /// <summary>Alchemist (Nalm).</summary>
+            /// <summary>Alchemist (Morph level 1), Nalm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Nalm")]
             public class AlchemistNalm : global::Moonwell.Objects.StandardHero
@@ -919,7 +919,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public AncientSasquatch()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SlamACtc, global::Moonwell.Objects.Creeps.Abilities.ForceOfNature, global::Moonwell.Objects.Creeps.Abilities.Reincarnation>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SlamACtc, global::Moonwell.Objects.Creeps.Abilities.ForceOfNature, global::Moonwell.Objects.Creeps.Abilities.ReincarnationACrn>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -1065,7 +1065,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public AncientWendigo()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.WarStompAwrs, global::Moonwell.Objects.Creeps.Abilities.Bash, global::Moonwell.Objects.Creeps.Abilities.Reincarnation>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.WarStompAwrs, global::Moonwell.Objects.Creeps.Abilities.Bash, global::Moonwell.Objects.Creeps.Abilities.ReincarnationACrn>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2233,7 +2233,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public BattleGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2368,7 +2368,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Bear (ngz1).</summary>
+            /// <summary>Bear (Level 1), ngz1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ngz1")]
             public class Bear : global::Moonwell.Objects.StandardUnit
@@ -2695,7 +2695,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public BerserkElemental()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.FrostNova>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.FrostNova>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2995,7 +2995,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public BlackDragon()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -3754,7 +3754,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Bloodfiend()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.CleavingAttack>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.CleavingAttackACce>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.2f;
@@ -3900,7 +3900,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public BlueDragon()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Undead.Abilities.FrostAttackAfrc, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Undead.Abilities.FrostAttackAfrc, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -5196,7 +5196,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.BreathOfFireANbf, global::Moonwell.Objects.Creeps.Abilities.DrunkenHaze, global::Moonwell.Objects.Creeps.Abilities.DrunkenBrawler, global::Moonwell.Objects.Creeps.Abilities.StormEarthAndFire>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.BreathOfFire, global::Moonwell.Objects.Creeps.Abilities.DrunkenHaze, global::Moonwell.Objects.Creeps.Abilities.DrunkenBrawler, global::Moonwell.Objects.Creeps.Abilities.StormEarthAndFire>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -5448,7 +5448,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public BronzeDragon()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.NightElf.Abilities.LightningAttack, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.NightElf.Abilities.LightningAttack, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -6789,7 +6789,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public CentaurKhan()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.EnduranceAura, global::Moonwell.Objects.Creeps.Abilities.Reincarnation, global::Moonwell.Objects.Creeps.Abilities.WarStompAwrs>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.EnduranceAura, global::Moonwell.Objects.Creeps.Abilities.ReincarnationACrn, global::Moonwell.Objects.Creeps.Abilities.WarStompAwrs>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -7871,7 +7871,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.SilenceANsi, global::Moonwell.Objects.Creeps.Abilities.BlackArrowANba, global::Moonwell.Objects.Creeps.Abilities.LifeDrainANdr, global::Moonwell.Objects.Creeps.Abilities.CharmANch>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.Silence, global::Moonwell.Objects.Creeps.Abilities.BlackArrow, global::Moonwell.Objects.Creeps.Abilities.LifeDrain, global::Moonwell.Objects.Creeps.Abilities.Charm>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -8265,7 +8265,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DarkTrollHighPriest()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.AbolishMagicACdm, global::Moonwell.Objects.Creeps.Abilities.HealAnh2, global::Moonwell.Objects.Creeps.Abilities.Sleep>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.AbolishMagicACdm, global::Moonwell.Objects.Creeps.Abilities.HealAnh2, global::Moonwell.Objects.Creeps.Abilities.SleepACsl>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -9305,7 +9305,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DeeplordRevenant()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.CrushingWaveACcv, global::Moonwell.Objects.Creeps.Abilities.FrostArmor>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.CrushingWave, global::Moonwell.Objects.Creeps.Abilities.FrostArmor>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -9455,7 +9455,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DefenderGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -11084,7 +11084,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DragonTurtle()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.CrushingWave, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.SpikedShell>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.CrushingWaveACc2, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.SpikedShellANt2>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -11238,7 +11238,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Earth()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.Pulverize, global::Moonwell.Objects.Creeps.Abilities.Taunt, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.Pulverize, global::Moonwell.Objects.Creeps.Abilities.Taunt, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -11376,7 +11376,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public EarthNpn6()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.Pulverize, global::Moonwell.Objects.Creeps.Abilities.Taunt, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.Pulverize, global::Moonwell.Objects.Creeps.Abilities.Taunt, global::Moonwell.Objects.Creeps.Abilities.ResistantSkin>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -11564,7 +11564,7 @@ namespace Moonwell.Objects
                     DamageSides = 10;
                     DeathTimeSeconds = 2.33f;
                     DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
-                    DefaultActiveAbility.Set<global::Moonwell.Objects.NightElf.Abilities.FaerieFireAfae>();
+                    DefaultActiveAbility.Set<global::Moonwell.Objects.NightElf.Abilities.FaerieFire>();
                     DefenseType = global::Moonwell.DefenseType.Large;
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = true;
@@ -11957,7 +11957,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public ElderVoidwalker()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.ForkedLightning, global::Moonwell.Objects.Creeps.Abilities.DevourMagic>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.ForkedLightningACfl, global::Moonwell.Objects.Creeps.Abilities.DevourMagic>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.3f;
@@ -12395,7 +12395,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public EnragedElemental()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -12988,7 +12988,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public EredarSorcerer()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.AbolishMagicACdm, global::Moonwell.Objects.Creeps.Abilities.Sleep>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.AbolishMagicACdm, global::Moonwell.Objects.Creeps.Abilities.SleepACsl>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -13144,7 +13144,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public EredarWarlock()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.Bash, global::Moonwell.Objects.Creeps.Abilities.FingerOfPainACfd, global::Moonwell.Objects.Creeps.Abilities.ManaShield>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.Bash, global::Moonwell.Objects.Creeps.Abilities.FingerOfPainACfd, global::Moonwell.Objects.Creeps.Abilities.ManaShieldACmf>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -13298,7 +13298,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public FacelessOneDeathbringer()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.AnimateDead, global::Moonwell.Objects.Creeps.Abilities.Silence>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.AnimateDead, global::Moonwell.Objects.Creeps.Abilities.SilenceACsi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -13467,7 +13467,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public FacelessOneTerror()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.Sleep, global::Moonwell.Objects.Creeps.Abilities.ManaShield>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SleepACsl, global::Moonwell.Objects.Creeps.Abilities.ManaShieldACmf>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -14072,7 +14072,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public FelRavager()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.BlackArrow, global::Moonwell.Objects.Creeps.Abilities.DevourMagic>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.BlackArrowACbk, global::Moonwell.Objects.Creeps.Abilities.DevourMagic>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -14114,7 +14114,7 @@ namespace Moonwell.Objects
                     DamageSides = 6;
                     DeathTimeSeconds = 2.67f;
                     DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
-                    DefaultActiveAbility.Set<global::Moonwell.Objects.Creeps.Abilities.BlackArrowANba>();
+                    DefaultActiveAbility.Set<global::Moonwell.Objects.Creeps.Abilities.BlackArrow>();
                     DefenseType = global::Moonwell.DefenseType.Large;
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = true;
@@ -14857,7 +14857,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.Incinerate, global::Moonwell.Objects.Creeps.Abilities.SoulBurn, global::Moonwell.Objects.Creeps.Abilities.SummonLavaSpawn, global::Moonwell.Objects.Creeps.Abilities.Volcano>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.IncinerateANia, global::Moonwell.Objects.Creeps.Abilities.SoulBurn, global::Moonwell.Objects.Creeps.Abilities.SummonLavaSpawn, global::Moonwell.Objects.Creeps.Abilities.Volcano>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -15986,7 +15986,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public ForgottenOne()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.Firebolt, global::Moonwell.Objects.Creeps.Abilities.Charm, global::Moonwell.Objects.Creeps.Abilities.SpawnTentacle>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.Firebolt, global::Moonwell.Objects.Creeps.Abilities.CharmACch, global::Moonwell.Objects.Creeps.Abilities.SpawnTentacle>();
                     AcquisitionRange = 650f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -17244,7 +17244,7 @@ namespace Moonwell.Objects
                     DamageSides = 5;
                     DeathTimeSeconds = 3f;
                     DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
-                    DefaultActiveAbility.Set<global::Moonwell.Objects.NightElf.Abilities.FaerieFireAfae>();
+                    DefaultActiveAbility.Set<global::Moonwell.Objects.NightElf.Abilities.FaerieFire>();
                     DefenseType = global::Moonwell.DefenseType.Large;
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = true;
@@ -17498,7 +17498,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public GargantuanSeaTurtle()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpikedShellANth>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpikedShell>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -18079,7 +18079,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public GiantSeaTurtle()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpikedShellANth>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpikedShell>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -18642,174 +18642,6 @@ namespace Moonwell.Objects
                     TurnRate = 0.6f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
                     UnitSoundSet = "SpiritWolf";
-                    UseClickHelper = false;
-                    UseExtendedLineOfSight = false;
-                }
-            }
-
-            /// <summary>Merchant (Nglx).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Nglx")]
-            public class GlixXizzix : global::Moonwell.Objects.StandardHero
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public GlixXizzix()
-                {
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
-                    AcquisitionRange = 500f;
-                    Agility = 15;
-                    AgilityPerLevel = 1f;
-                    AllowCustomTeamColor = false;
-                    AnimationBlendTimeSeconds = 0.15f;
-                    AnimationCastBackswing = 0.5f;
-                    AnimationCastPoint = 0.53f;
-                    AnimationRunSpeed = 290f;
-                    AnimationWalkSpeed = 290f;
-                    Armor = 1;
-                    ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
-                    Attack1AnimationBackswingPoint = 0.65f;
-                    Attack1AnimationDamagePoint = 0.35f;
-                    Attack1DamageLossFactor = 0f;
-                    Attack1DamageSpillDistance = 0f;
-                    Attack1DamageSpillRadius = 0f;
-                    Attack1MaximumNumberOfTargets = 1;
-                    Attack1RangeMotionBuffer = 250f;
-                    Attack1ShowUI = true;
-                    Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
-                    Attack1WeaponSound = global::Moonwell.Objects.CombatSound.WoodHeavyBash;
-                    Attack1WeaponType = global::Moonwell.Objects.WeaponType.Normal;
-                    Attack2AnimationBackswingPoint = 0.65f;
-                    Attack2AnimationDamagePoint = 0.35f;
-                    Attack2AttackType = global::Moonwell.AttackType.Hero;
-                    Attack2CooldownTime = 2f;
-                    Attack2DamageBase = 0;
-                    Attack2DamageLossFactor = 0f;
-                    Attack2DamageNumberOfDice = 2;
-                    Attack2DamageSidesPerDie = 4;
-                    Attack2DamageSpillDistance = 0f;
-                    Attack2DamageSpillRadius = 0f;
-                    Attack2MaximumNumberOfTargets = 1;
-                    Attack2Range = 500;
-                    Attack2RangeMotionBuffer = 250f;
-                    Attack2ShowUI = true;
-                    Attack2TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
-                    Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
-                    AttackCooldown = 2f;
-                    AttackRange = 128;
-                    AttackType = global::Moonwell.AttackType.Hero;
-                    AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
-                    BuildTime = 55;
-                    CanDropItemsOnDeath = true;
-                    CanFlee = true;
-                    CategorizationCampaign = false;
-                    CategorizationSpecial = false;
-                    CollisionSize = 32f;
-                    Damage = 0;
-                    DamageDice = 2;
-                    DamageSides = 4;
-                    DeathTimeSeconds = 2.5f;
-                    DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.DefenseType.Hero;
-                    DefenseUpgradeBonus = 0;
-                    ElevationSampleRadius = 50f;
-                    FlyHeight = 0f;
-                    FogOfWarSampleRadius = 0f;
-                    Food = 5;
-                    FormationRank = 0;
-                    GoldBountyAwardedBase = 30;
-                    GoldBountyAwardedNumberOfDice = 8;
-                    GoldBountyAwardedSidesPerDie = 3;
-                    GoldCost = 425;
-                    GroupSeparationEnabled = false;
-                    GroupSeparationGroupNumber = 0;
-                    GroupSeparationParameter = 0;
-                    GroupSeparationPriority = 0;
-                    HasTilesetSpecificData = false;
-                    HasWaterShadow = true;
-                    HeightMinimum = 0f;
-                    HeroHideHeroDeathMessage = false;
-                    HeroHideHeroInterfaceIcon = false;
-                    HeroHideHeroMinimapDisplay = false;
-                    HideMinimapDisplay = false;
-                    HitPointRegen = 0.25f;
-                    HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
-                    Hotkey = "C";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroTinker.blp";
-                    IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-tinker.blp";
-                    Intelligence = 20;
-                    IntelligencePerLevel = 2.6f;
-                    IsABuilding = false;
-                    Set("ulev", 5);
-                    LumberBountyAwardedBase = 0;
-                    LumberBountyAwardedNumberOfDice = 0;
-                    LumberBountyAwardedSidesPerDie = 0;
-                    LumberCost = 135;
-                    Set("umpi", 100);
-                    ManaRegen = 0.01f;
-                    Set("uhpm", 100);
-                    Set("umpm", 0);
-                    MaximumPitchAngleDegrees = 10f;
-                    MaximumRollAngleDegrees = 10f;
-                    Model = "Units\\Other\\Glix\\Glix";
-                    ModelFileExtraVersions = 0;
-                    Name = "Merchant";
-                    NormalSkin = "AInv";
-                    OccluderHeight = 0f;
-                    OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
-                    OrientationInterpolation = 5;
-                    PlaceableInEditor = true;
-                    PointValue = 100;
-                    PrimaryAttribute = global::Moonwell.Objects.AttributeType.INT;
-                    Priority = 9;
-                    ProjectileImpactZ = 60f;
-                    ProjectileImpactZSwimming = 0f;
-                    ProjectileLaunchX = 0f;
-                    ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 143f;
-                    ProjectileLaunchZSwimming = 0f;
-                    ProperNames = "Glix Xizzix";
-                    ProperNamesUsed = 6;
-                    PropulsionWindowDegrees = 60f;
-                    Race = global::Moonwell.Objects.UnitRace.Creeps;
-                    RepairGoldCost = 425;
-                    RepairLumberCost = 135;
-                    RepairTime = 55;
-                    Scale = 1f;
-                    ScaleProjectiles = true;
-                    SelectionCircleHeight = 0f;
-                    SelectionCircleOnWater = false;
-                    SelectionScale = 2f;
-                    ShadowImageCenterX = 72f;
-                    ShadowImageCenterY = 72f;
-                    ShadowImageHeight = 220f;
-                    ShadowImageUnit = global::Moonwell.Objects.ShadowImage.Shadow;
-                    ShadowImageWidth = 220f;
-                    ShowAirToGroundIndicators = false;
-                    SightRadiusNight = 800;
-                    SightRange = 1800;
-                    Sleeps = false;
-                    Special = "Objects\\Spawnmodels\\Human\\HumanLargeDeathExplode\\HumanLargeDeathExplode.mdl";
-                    Speed = 290;
-                    SpeedMaximum = 0;
-                    SpeedMinimum = 0;
-                    StockInitialAfterStartDelay = 1;
-                    StockMaximum = 1;
-                    StockReplenishInterval = 0;
-                    StockStartDelay = 135;
-                    Strength = 22;
-                    StrengthPerLevel = 2.4f;
-                    TargetedAs = global::Moonwell.Objects.Targets.Ground;
-                    TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
-                    Tilesets = "*";
-                    TintingColor1Red = 255;
-                    TintingColor2Green = 255;
-                    TintingColor3Blue = 255;
-                    TooltipAwaken = "Revive Merchant";
-                    TooltipRevive = "Revive Merchant";
-                    TransportedSize = 1;
-                    TurnRate = 0.6f;
-                    Type = global::Moonwell.Objects.MoveType.Foot;
-                    UnitSoundSet = "HeroTinker";
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
                 }
@@ -19849,7 +19681,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public GraniteGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder, global::Moonwell.Objects.Creeps.Abilities.SlamACtc>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder, global::Moonwell.Objects.Creeps.Abilities.SlamACtc>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -20162,7 +19994,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public GreenDragon()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -20631,7 +20463,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public GuardianGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder, global::Moonwell.Objects.Creeps.Abilities.SlamACtc>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder, global::Moonwell.Objects.Creeps.Abilities.SlamACtc>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -21229,7 +21061,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public HarpyStormHag()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.Curse, global::Moonwell.Objects.Creeps.Abilities.Sleep>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.Curse, global::Moonwell.Objects.Creeps.Abilities.SleepACsl>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -21425,7 +21257,7 @@ namespace Moonwell.Objects
                     DamageSides = 5;
                     DeathTimeSeconds = 3f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
-                    DefaultActiveAbility.Set<global::Moonwell.Objects.NightElf.Abilities.FaerieFireAfae>();
+                    DefaultActiveAbility.Set<global::Moonwell.Objects.NightElf.Abilities.FaerieFire>();
                     DefenseType = global::Moonwell.DefenseType.Small;
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = true;
@@ -21679,8 +21511,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Hydra()
                 {
-                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.SlowPoison>();
-                    Abilities.Add(" Aspt");
+                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.SlowPoison, global::Moonwell.Objects.Creeps.Abilities.SpawnHydraHatchling>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -23450,7 +23281,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public InfernalMachine()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.BreathOfFire, global::Moonwell.Objects.Creeps.Abilities.UnholyAura>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.BreathOfFireACbc, global::Moonwell.Objects.Creeps.Abilities.UnholyAura>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -24773,7 +24604,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public MagnataurDestroyer()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.FrostBolt, global::Moonwell.Objects.Creeps.Abilities.SlamACtc>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.FrostBolt, global::Moonwell.Objects.Creeps.Abilities.SlamACtc>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -24934,7 +24765,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public MagnataurReaver()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.FrostBolt>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.FrostBolt>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -25095,7 +24926,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public MagnataurWarrior()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -25241,7 +25072,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public MaidenOfPain()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.LifeDrain, global::Moonwell.Objects.Creeps.Abilities.ACss>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.LifeDrainACdr, global::Moonwell.Objects.Creeps.Abilities.ACss>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -25974,7 +25805,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public MakruraTidalLord()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.CleavingAttack, global::Moonwell.Objects.Creeps.Abilities.DevotionAura>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.CleavingAttackACce, global::Moonwell.Objects.Creeps.Abilities.DevotionAura>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -26406,6 +26237,174 @@ namespace Moonwell.Objects
                 }
             }
 
+            /// <summary>Merchant (Nglx).</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("Nglx")]
+            public class Merchant : global::Moonwell.Objects.StandardHero
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Merchant()
+                {
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
+                    AcquisitionRange = 500f;
+                    Agility = 15;
+                    AgilityPerLevel = 1f;
+                    AllowCustomTeamColor = false;
+                    AnimationBlendTimeSeconds = 0.15f;
+                    AnimationCastBackswing = 0.5f;
+                    AnimationCastPoint = 0.53f;
+                    AnimationRunSpeed = 290f;
+                    AnimationWalkSpeed = 290f;
+                    Armor = 1;
+                    ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
+                    Attack1AnimationBackswingPoint = 0.65f;
+                    Attack1AnimationDamagePoint = 0.35f;
+                    Attack1DamageLossFactor = 0f;
+                    Attack1DamageSpillDistance = 0f;
+                    Attack1DamageSpillRadius = 0f;
+                    Attack1MaximumNumberOfTargets = 1;
+                    Attack1RangeMotionBuffer = 250f;
+                    Attack1ShowUI = true;
+                    Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
+                    Attack1WeaponSound = global::Moonwell.Objects.CombatSound.WoodHeavyBash;
+                    Attack1WeaponType = global::Moonwell.Objects.WeaponType.Normal;
+                    Attack2AnimationBackswingPoint = 0.65f;
+                    Attack2AnimationDamagePoint = 0.35f;
+                    Attack2AttackType = global::Moonwell.AttackType.Hero;
+                    Attack2CooldownTime = 2f;
+                    Attack2DamageBase = 0;
+                    Attack2DamageLossFactor = 0f;
+                    Attack2DamageNumberOfDice = 2;
+                    Attack2DamageSidesPerDie = 4;
+                    Attack2DamageSpillDistance = 0f;
+                    Attack2DamageSpillRadius = 0f;
+                    Attack2MaximumNumberOfTargets = 1;
+                    Attack2Range = 500;
+                    Attack2RangeMotionBuffer = 250f;
+                    Attack2ShowUI = true;
+                    Attack2TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
+                    Attack2WeaponType = global::Moonwell.Objects.WeaponType.Missile;
+                    AttackCooldown = 2f;
+                    AttackRange = 128;
+                    AttackType = global::Moonwell.AttackType.Hero;
+                    AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
+                    BuildTime = 55;
+                    CanDropItemsOnDeath = true;
+                    CanFlee = true;
+                    CategorizationCampaign = false;
+                    CategorizationSpecial = false;
+                    CollisionSize = 32f;
+                    Damage = 0;
+                    DamageDice = 2;
+                    DamageSides = 4;
+                    DeathTimeSeconds = 2.5f;
+                    DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
+                    DefenseType = global::Moonwell.DefenseType.Hero;
+                    DefenseUpgradeBonus = 0;
+                    ElevationSampleRadius = 50f;
+                    FlyHeight = 0f;
+                    FogOfWarSampleRadius = 0f;
+                    Food = 5;
+                    FormationRank = 0;
+                    GoldBountyAwardedBase = 30;
+                    GoldBountyAwardedNumberOfDice = 8;
+                    GoldBountyAwardedSidesPerDie = 3;
+                    GoldCost = 425;
+                    GroupSeparationEnabled = false;
+                    GroupSeparationGroupNumber = 0;
+                    GroupSeparationParameter = 0;
+                    GroupSeparationPriority = 0;
+                    HasTilesetSpecificData = false;
+                    HasWaterShadow = true;
+                    HeightMinimum = 0f;
+                    HeroHideHeroDeathMessage = false;
+                    HeroHideHeroInterfaceIcon = false;
+                    HeroHideHeroMinimapDisplay = false;
+                    HideMinimapDisplay = false;
+                    HitPointRegen = 0.25f;
+                    HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Hotkey = "C";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeroTinker.blp";
+                    IconScoreScreen = "UI\\Glues\\ScoreScreen\\scorescreen-hero-tinker.blp";
+                    Intelligence = 20;
+                    IntelligencePerLevel = 2.6f;
+                    IsABuilding = false;
+                    Set("ulev", 5);
+                    LumberBountyAwardedBase = 0;
+                    LumberBountyAwardedNumberOfDice = 0;
+                    LumberBountyAwardedSidesPerDie = 0;
+                    LumberCost = 135;
+                    Set("umpi", 100);
+                    ManaRegen = 0.01f;
+                    Set("uhpm", 100);
+                    Set("umpm", 0);
+                    MaximumPitchAngleDegrees = 10f;
+                    MaximumRollAngleDegrees = 10f;
+                    Model = "Units\\Other\\Glix\\Glix";
+                    ModelFileExtraVersions = 0;
+                    Name = "Merchant";
+                    NormalSkin = "AInv";
+                    OccluderHeight = 0f;
+                    OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
+                    OrientationInterpolation = 5;
+                    PlaceableInEditor = true;
+                    PointValue = 100;
+                    PrimaryAttribute = global::Moonwell.Objects.AttributeType.INT;
+                    Priority = 9;
+                    ProjectileImpactZ = 60f;
+                    ProjectileImpactZSwimming = 0f;
+                    ProjectileLaunchX = 0f;
+                    ProjectileLaunchY = 0f;
+                    ProjectileLaunchZ = 143f;
+                    ProjectileLaunchZSwimming = 0f;
+                    ProperNames = "Glix Xizzix";
+                    ProperNamesUsed = 6;
+                    PropulsionWindowDegrees = 60f;
+                    Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RepairGoldCost = 425;
+                    RepairLumberCost = 135;
+                    RepairTime = 55;
+                    Scale = 1f;
+                    ScaleProjectiles = true;
+                    SelectionCircleHeight = 0f;
+                    SelectionCircleOnWater = false;
+                    SelectionScale = 2f;
+                    ShadowImageCenterX = 72f;
+                    ShadowImageCenterY = 72f;
+                    ShadowImageHeight = 220f;
+                    ShadowImageUnit = global::Moonwell.Objects.ShadowImage.Shadow;
+                    ShadowImageWidth = 220f;
+                    ShowAirToGroundIndicators = false;
+                    SightRadiusNight = 800;
+                    SightRange = 1800;
+                    Sleeps = false;
+                    Special = "Objects\\Spawnmodels\\Human\\HumanLargeDeathExplode\\HumanLargeDeathExplode.mdl";
+                    Speed = 290;
+                    SpeedMaximum = 0;
+                    SpeedMinimum = 0;
+                    StockInitialAfterStartDelay = 1;
+                    StockMaximum = 1;
+                    StockReplenishInterval = 0;
+                    StockStartDelay = 135;
+                    Strength = 22;
+                    StrengthPerLevel = 2.4f;
+                    TargetedAs = global::Moonwell.Objects.Targets.Ground;
+                    TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
+                    Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
+                    TooltipAwaken = "Revive Merchant";
+                    TooltipRevive = "Revive Merchant";
+                    TransportedSize = 1;
+                    TurnRate = 0.6f;
+                    Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitSoundSet = "HeroTinker";
+                    UseClickHelper = false;
+                    UseExtendedLineOfSight = false;
+                }
+            }
+
             /// <summary>Monster Lure (nlur).</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nlur")]
@@ -26533,7 +26532,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public MossCoveredGraniteGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder, global::Moonwell.Objects.Creeps.Abilities.SlamACtc>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder, global::Moonwell.Objects.Creeps.Abilities.SlamACtc>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -26692,7 +26691,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public MudGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.Slow>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.Slow>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -28522,7 +28521,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.RainOfFireANrf>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.RainOfFire>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -29501,7 +29500,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public NetherDragon()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.Cripple>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.Cripple>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -30566,7 +30565,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Overlord()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.HowlOfTerrorAcht, global::Moonwell.Objects.Creeps.Abilities.CleavingAttack, global::Moonwell.Objects.Creeps.Abilities.VampiricAura>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.HowlOfTerrorAcht, global::Moonwell.Objects.Creeps.Abilities.CleavingAttackACce, global::Moonwell.Objects.Creeps.Abilities.VampiricAura>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -30931,7 +30930,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.RainOfFireANrf, global::Moonwell.Objects.Creeps.Abilities.HowlOfTerror, global::Moonwell.Objects.Creeps.Abilities.CleavingAttackANca, global::Moonwell.Objects.Creeps.Abilities.Doom>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.RainOfFire, global::Moonwell.Objects.Creeps.Abilities.HowlOfTerror, global::Moonwell.Objects.Creeps.Abilities.CleavingAttack, global::Moonwell.Objects.Creeps.Abilities.Doom>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -32502,7 +32501,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public QueenOfSuffering()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.DeathCoil, global::Moonwell.Objects.Creeps.Abilities.UnholyAura, global::Moonwell.Objects.Creeps.Abilities.Charm>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.DeathCoil, global::Moonwell.Objects.Creeps.Abilities.UnholyAura, global::Moonwell.Objects.Creeps.Abilities.CharmACch>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -32932,7 +32931,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Raging Bear (ngz2).</summary>
+            /// <summary>Raging Bear (Level 2), ngz2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ngz2")]
             public class RagingBear : global::Moonwell.Objects.StandardUnit
@@ -33656,7 +33655,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public RedDragon()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour, global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -34854,7 +34853,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public RockGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi, global::Moonwell.Objects.Creeps.Abilities.HurlBoulder>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -35612,7 +35611,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SalamanderLord()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.Immolation, global::Moonwell.Objects.Creeps.Abilities.RainOfFire, global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.Immolation, global::Moonwell.Objects.Creeps.Abilities.RainOfFireACrf, global::Moonwell.Objects.Orc.Abilities.DevourCargo, global::Moonwell.Objects.Creeps.Abilities.Devour>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -37666,7 +37665,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SeaTurtle()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpikedShellANth>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpikedShell>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -37812,7 +37811,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SeaTurtleHatchling()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpikedShellANth>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpikedShell>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -38035,7 +38034,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.ForkedLightningANfl, global::Moonwell.Objects.Creeps.Abilities.FrostArrows, global::Moonwell.Objects.Creeps.Abilities.ManaShieldANms, global::Moonwell.Objects.Creeps.Abilities.Tornado>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.ForkedLightning, global::Moonwell.Objects.Creeps.Abilities.FrostArrows, global::Moonwell.Objects.Creeps.Abilities.ManaShield, global::Moonwell.Objects.Creeps.Abilities.Tornado>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -38217,7 +38216,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.ForkedLightningANfl, global::Moonwell.Objects.Creeps.Abilities.FrostArrows, global::Moonwell.Objects.Creeps.Abilities.ManaShieldANms, global::Moonwell.Objects.Creeps.Abilities.Tornado>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.ForkedLightning, global::Moonwell.Objects.Creeps.Abilities.FrostArrows, global::Moonwell.Objects.Creeps.Abilities.ManaShield, global::Moonwell.Objects.Creeps.Abilities.Tornado>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -38469,7 +38468,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SiegeGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -38612,7 +38611,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SkeletalMarksman()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.ColdArrows>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.ColdArrowsACcw>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -41057,7 +41056,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Spirit Bear (ngz3).</summary>
+            /// <summary>Spirit Bear (Level 3), ngz3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ngz3")]
             public class SpiritBear : global::Moonwell.Objects.StandardUnit
@@ -42942,7 +42941,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Thunder Lizard (nthl).</summary>
+            /// <summary>Thunder Lizard 2, nthl.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nthl")]
             public class ThunderLizard : global::Moonwell.Objects.StandardUnit
@@ -43246,7 +43245,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Tinker()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory, global::Moonwell.Objects.Creeps.Abilities.DemolishANde>();
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory, global::Moonwell.Objects.Creeps.Abilities.Demolish>();
                     AcquisitionRange = 500f;
                     Agility = 15;
                     AgilityPerLevel = 1f;
@@ -43323,7 +43322,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.PocketFactoryANsy, global::Moonwell.Objects.Creeps.Abilities.ClusterRocketsANcs, global::Moonwell.Objects.Creeps.Abilities.EngineeringUpgrade, global::Moonwell.Objects.Creeps.Abilities.RoboGoblinANrg>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.PocketFactory, global::Moonwell.Objects.Creeps.Abilities.ClusterRockets, global::Moonwell.Objects.Creeps.Abilities.EngineeringUpgrade, global::Moonwell.Objects.Creeps.Abilities.RoboGoblin>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -43510,7 +43509,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.PocketFactoryANsy, global::Moonwell.Objects.Creeps.Abilities.ClusterRocketsANcs, global::Moonwell.Objects.Creeps.Abilities.EngineeringUpgrade, global::Moonwell.Objects.Creeps.Abilities.RoboGoblinANrg>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Creeps.Abilities.PocketFactory, global::Moonwell.Objects.Creeps.Abilities.ClusterRockets, global::Moonwell.Objects.Creeps.Abilities.EngineeringUpgrade, global::Moonwell.Objects.Creeps.Abilities.RoboGoblin>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -45356,7 +45355,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public VileTormentor()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.Silence>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SilenceACsi>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -45505,7 +45504,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Voidwalker()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.ColdArrows>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.ColdArrowsACcw>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.3f;
@@ -45552,7 +45551,7 @@ namespace Moonwell.Objects
                     DamageSides = 5;
                     DeathTimeSeconds = 2.67f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
-                    DefaultActiveAbility.Set<global::Moonwell.Objects.Creeps.Abilities.ColdArrowsAHca>();
+                    DefaultActiveAbility.Set<global::Moonwell.Objects.Creeps.Abilities.ColdArrows>();
                     DefenseType = global::Moonwell.DefenseType.Medium;
                     DefenseUpgradeBonus = 2;
                     DisplayAsNeutralHostile = true;
@@ -45658,7 +45657,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public WarGolem()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.SpellImmunityACmi>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -45937,7 +45936,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Watery Minion (ncfs).</summary>
+            /// <summary>Watery Minion (Level 1), ncfs.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ncfs")]
             public class WateryMinion : global::Moonwell.Objects.StandardUnit
@@ -46081,7 +46080,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Watery Minion (nsns).</summary>
+            /// <summary>Watery Minion (Level 3), nsns.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nsns")]
             public class WateryMinionNsns : global::Moonwell.Objects.StandardUnit
@@ -46234,7 +46233,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Watery Minion (ntws).</summary>
+            /// <summary>Watery Minion (Level 2), ntws.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ntws")]
             public class WateryMinionNtws : global::Moonwell.Objects.StandardUnit

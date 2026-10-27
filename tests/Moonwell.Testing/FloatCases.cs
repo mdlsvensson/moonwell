@@ -59,6 +59,19 @@ namespace Moonwell.Testing
             Expect.Equal("float", NumberType(Facing(90f)), "an argument");
         }
 
+        /// <summary>A unit's most life and most mana are whole numbers kept as floats: set, then read once the unit is gone.</summary>
+        public static void UnitWholeValues(FakeWorld world)
+        {
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            unit.MaxLife = 420.7f;
+            unit.MaxMana = 99.5f;
+            unit.Remove();
+            Expect.Near(420.0f, unit.MaxLife, "the most life kept");
+            Expect.Equal("float", NumberType(unit.MaxLife), "the most life kept");
+            Expect.Near(99.0f, unit.MaxMana, "the most mana kept");
+            Expect.Equal("float", NumberType(unit.MaxMana), "the most mana kept");
+        }
+
         /// <summary>An int made a float at run time is a float, as each line run 4 saw in the game as an integer.</summary>
         public static void Converted(FakeWorld world)
         {

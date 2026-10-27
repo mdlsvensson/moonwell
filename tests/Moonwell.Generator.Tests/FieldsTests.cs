@@ -1,3 +1,4 @@
+using Moonwell.GameData;
 using Moonwell.Generator.Objects;
 
 namespace Moonwell.Generator.Tests;
@@ -13,6 +14,28 @@ public class FieldsTests
     private static Field Find(IReadOnlyList<Field> fields, string id)
     {
         return fields.Single(f => f.Id == id);
+    }
+
+    [Fact]
+    public void an_abilitys_fields_are_those_listed_by_its_id_or_its_code_and_one_listed_by_id_wins_its_column()
+    {
+        static Field Specific(string id, string column, params string[] specific)
+        {
+            return new Field(Kind.Ability, id, id, FieldType.Int, null, true, 1, false, specific, column);
+        }
+
+        var fields = new[]
+        {
+            Specific("Car1", "DataA{level}", "Sch2", "Sch3"),
+            Specific("Lsh1", "DataA{level}", "Alsh"),
+            Specific("Idps", "DataA{level}", "AIls"),
+            Specific("Lsh2", "DataB{level}", "Alsh"),
+        };
+
+        Assert.Equal(new[] { "Car1" }, Fields.SpecificOf(fields, "Sch3", "Amtc").Select(field => field.Id));
+        Assert.Equal(new[] { "Idps", "Lsh2" }, Fields.SpecificOf(fields, "AIls", "Alsh").Select(field => field.Id));
+        Assert.Equal(new[] { "Lsh1", "Lsh2" }, Fields.SpecificOf(fields, "Alsh", "Alsh").Select(field => field.Id));
+        Assert.Empty(Fields.SpecificOf(fields, "Aabc", null));
     }
 
     [Theory]
@@ -240,7 +263,7 @@ public class FieldsTests
         Assert.Equal("Buttonpos[0]", Find(Fields.Of(tables, Kind.Unit), "ubpx").Column);
         Assert.Equal("Buttonpos[1]", Find(Fields.Of(tables, Kind.Unit), "ubpy").Column);
         Assert.Equal("Buttonpos[1]", Find(Fields.Of(tables, Kind.Ability), "abpy").Column);
-        Assert.Equal("Name", Find(Fields.Of(tables, Kind.Unit), "unam").Column);
+        Assert.Equal("Name[0]", Find(Fields.Of(tables, Kind.Unit), "unam").Column);
         Assert.Equal("Requires", Find(Fields.Of(tables, Kind.Upgrade), "greq").Column);
         Assert.Equal("Name", Find(Fields.Of(tables, Kind.Destructable), "bnam").Column);
     }

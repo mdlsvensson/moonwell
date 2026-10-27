@@ -323,10 +323,10 @@ public class FieldRulesTests
     public void a_flags_choice_may_combine_members_but_not_use_a_bit_no_member_has()
     {
         Assert.Equal(
-            new[] { "Mage.PlacementRequires is 1024; Placement Requires (upap) allows only the values of PathingListPrevent and their combinations" },
+            new[] { "Mage.PlacementRequires is 1024; Placement Requires (upap) allows only the values of PathingRequire and their combinations" },
             Messages(Archmage("""
-                PlacementRequires = PathingListPrevent.Unbuildable | PathingListPrevent.Unflyable;
-                PlacementRequires = (PathingListPrevent)(1 << 10);
+                PlacementRequires = PathingRequire.Buildable | PathingRequire.AirPathable;
+                PlacementRequires = (PathingRequire)(1 << 10);
                 """)));
     }
 

@@ -57,6 +57,11 @@ namespace Moonwell.Engine
         /// <summary>Runs the next step: first the hook before the gizmos, if one is set, and then what is due at it, in three passes, each in the order it was put on its list (the order of the last runs, not the order things were made). Each pass runs what was on its list when the step began; what a step schedules is for a later step. A due that is not due until a later turn of the ring is passed over, and one with nothing more to run is dropped.</summary>
         public void Run()
         {
+#if DEBUG
+            // While the debug mode is on, the step is timed with os.clock for its statistics.
+            var timed = DebugSession.IsOn;
+            var started = timed ? DebugSession.Clock() : 0.0f;
+#endif
             StepNow++;
             Running = true;
             var step = StepNow;
@@ -86,6 +91,10 @@ namespace Moonwell.Engine
             {
                 Running = false;
             }
+#if DEBUG
+
+            InteractionsView.StepRan(timed ? DebugSession.Clock() - started : 0.0f);
+#endif
         }
 
         /// <summary>Runs the hook before the gizmos, and reports an error it throws as the physics package's; the step goes on. Apart from Run so that a step with no hook builds no closure for it.</summary>

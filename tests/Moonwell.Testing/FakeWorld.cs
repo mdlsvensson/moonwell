@@ -12,6 +12,13 @@ namespace Moonwell.Testing
         /// <summary>The absolute time of the pending wake request; null when there is none.</summary>
         public float? WakeAt;
 
+        /// <summary>
+        /// How many seconds after the time asked for Advance delivers each wake; 0, the default, delivers it on time. The game wakes a
+        /// timer at a frame, not at the exact time asked for: timers were seen running 0.0001 s off, and the time of slow frames is
+        /// made up later in bursts.
+        /// </summary>
+        public float WakeLate;
+
         /// <summary>The slot of the player at this machine.</summary>
         public int LocalSlot;
 
@@ -47,6 +54,9 @@ namespace Moonwell.Testing
 
         /// <summary>The destructable each damage to a destructable went to.</summary>
         public List<destructable> DealtToDestructableTargets = new List<destructable>();
+
+        /// <summary>The type ids SpawnUnit and SpawnItem make nothing of, as the game for an id it has no object for.</summary>
+        public List<int> Unmakeable = new List<int>();
 
         /// <summary>Whether the game deals no damage the runtime asks for, as for a target that cannot take it.</summary>
         public bool RefuseDamage;
@@ -93,6 +103,15 @@ namespace Moonwell.Testing
         /// <summary>Whether each unit the world made is a hero.</summary>
         private readonly Dictionary<unit, bool> heroes = new Dictionary<unit, bool>();
 
+        /// <summary>The units made illusions.</summary>
+        private readonly HashSet<unit> illusions = new HashSet<unit>();
+
+        /// <summary>The abilities code gave each unit, which a morph takes away unless they are permanent.</summary>
+        private readonly Dictionary<unit, List<int>> addedAbilities = new Dictionary<unit, List<int>>();
+
+        /// <summary>The abilities made permanent on each unit.</summary>
+        private readonly Dictionary<unit, HashSet<int>> permanentAbilities = new Dictionary<unit, HashSet<int>>();
+
         /// <summary>The ability levels of each unit, keyed by ability id.</summary>
         private readonly Dictionary<unit, Dictionary<int, int>> abilityLevels = new Dictionary<unit, Dictionary<int, int>>();
 
@@ -128,6 +147,9 @@ namespace Moonwell.Testing
 
         /// <summary>The drops of units the runtime removed (RemoveUnit): the game fires them after the call (seen 10-21), so they wait for the next Advance. The items are removed with the unit.</summary>
         private readonly List<KeyValuePair<unit, item>> pendingDrops = new List<KeyValuePair<unit, item>>();
+
+        /// <summary>The units removed by the runtime in this frame, whose type id still reads until the next Advance.</summary>
+        private readonly List<unit> pendingRemovals = new List<unit>();
 
         /// <summary>The units the game has removed but whose handles still answer: every number reads 0, as the game gives in the quarter second before the sweep.</summary>
         private readonly HashSet<unit> vanishedUnits = new HashSet<unit>();
@@ -405,19 +427,31 @@ namespace Moonwell.Testing
             return null;
         }
 
-        /// <summary>Moves time forward by the seconds, calling Runtime.Wake at each wake request on the way.</summary>
+        /// <summary>Moves time forward by the seconds, calling Runtime.Wake at each wake request on the way, WakeLate after the time it asked for. The frame of the last calls ends first: the drops that waited for it fire, and the units removed in it read type id 0.</summary>
         public void Advance(float seconds)
         {
             var target = Time + seconds;
             DeliverPendingDrops();
-            while (WakeAt.HasValue && WakeAt.Value <= target + 0.001f)
+            EndPendingRemovals();
+            while (WakeAt.HasValue && WakeAt.Value + WakeLate <= target + 0.001f)
             {
-                Time = WakeAt.Value;
+                Time = WakeAt.Value + WakeLate;
                 WakeAt = null;
                 Runtime.Wake();
             }
 
             Time = target;
+        }
+
+        /// <summary>Makes the units removed in the frame that ends read type id 0.</summary>
+        private void EndPendingRemovals()
+        {
+            foreach (var removed in pendingRemovals)
+            {
+                unitTypes[removed] = 0;
+            }
+
+            pendingRemovals.Clear();
         }
 
         /// <summary>Fires the drop events that waited for the end of the call that removed their unit, when they are listened for, and then removes the items with the unit.</summary>
@@ -441,16 +475,31 @@ namespace Moonwell.Testing
             }
         }
 
-        /// <summary>The game seconds since the world was made.</summary>
+        /// <summary>The game seconds since the world was made; in a development build, Moonwell's time on its clock (Runtime.Clock), as NativeWorld's.</summary>
         public float Now()
         {
+#if DEBUG
+            return Runtime.Clock.Now(Time);
+#else
             return Time;
+#endif
         }
 
-        /// <summary>Requests a wake the seconds from now; replaces any earlier request.</summary>
+        /// <summary>Requests a wake the seconds from now; replaces any earlier request. In a development build the seconds are Moonwell's, and a request while its clock is halted drops the wake until the clock re-arms it, as NativeWorld's.</summary>
         public void WakeIn(float seconds)
         {
+#if DEBUG
+            if (Runtime.Clock.Arm(seconds, out var gameSeconds))
+            {
+                WakeAt = Time + gameSeconds;
+            }
+            else
+            {
+                WakeAt = null;
+            }
+#else
             WakeAt = Time + seconds;
+#endif
         }
 
         /// <summary>Records that the runtime asked to hear an event, once.</summary>
@@ -641,16 +690,29 @@ namespace Moonwell.Testing
             return new List<destructable>(PlacedDestructables);
         }
 
-        /// <summary>Makes a unit owned by the owner's slot, and keeps the facing in LastFacing; the place is not kept.</summary>
+        /// <summary>Makes a unit owned by the owner's slot at the place, and keeps the facing in LastFacing; null for a type in Unmakeable, as the game's CreateUnit gives for a type it cannot make.</summary>
         public unit SpawnUnit(player owner, int typeId, float x, float y, float facing)
         {
             LastFacing = facing;
-            return NewUnit(typeId, SlotOf(owner));
+            if (Unmakeable.Contains(typeId))
+            {
+                return null!;
+            }
+
+            var created = NewUnit(typeId, SlotOf(owner));
+            unitXs[created] = x;
+            unitYs[created] = y;
+            return created;
         }
 
-        /// <summary>Makes an item; the place is not kept.</summary>
+        /// <summary>Makes an item at the place; null for a type in Unmakeable, as the game's CreateItem gives for a type it cannot make.</summary>
         public item SpawnItem(int typeId, float x, float y)
         {
+            if (Unmakeable.Contains(typeId))
+            {
+                return null!;
+            }
+
             var created = NewItem(typeId);
             itemPlaces[created] = new float[] { x, y };
             return created;
@@ -691,7 +753,7 @@ namespace Moonwell.Testing
             return 0;
         }
 
-        /// <summary>Records a unit removed by the runtime, and reads its type id as 0. The unit's items leave its slots inside the call, at its place; their drop events come after the call, at the next Advance, and the items are removed with the unit (seen 10-21 for a hero).</summary>
+        /// <summary>Records a unit removed by the runtime. Its type id still reads in this frame, as the game's does after RemoveUnit, and reads 0 from the next Advance, after the drop events (seen 10-21: 0 by 0.05 s later; seen 10-26: the drops fire after the call while it still reads). The unit's items leave its slots inside the call, at its place; their drop events come after the call, at the next Advance, and the items are removed with the unit (seen 10-21 for a hero).</summary>
         public void DeleteUnit(unit unit)
         {
             RemovedUnits.Add(unit);
@@ -709,7 +771,7 @@ namespace Moonwell.Testing
                 }
             }
 
-            unitTypes[unit] = 0;
+            pendingRemovals.Add(unit);
         }
 
         /// <summary>Puts an item that leaves a unit's slots on the ground at the unit's place.</summary>
@@ -766,6 +828,19 @@ namespace Moonwell.Testing
         {
             Refuse();
             return heroes.TryGetValue(unit, out var hero) && hero;
+        }
+
+        /// <summary>Whether a unit was made an illusion with MakeIllusion.</summary>
+        public bool IsIllusion(unit unit)
+        {
+            Refuse();
+            return illusions.Contains(unit);
+        }
+
+        /// <summary>Makes a unit an illusion, as Mirror Image makes one of its hero, with the hero's type id (seen 10-26).</summary>
+        public void MakeIllusion(unit u)
+        {
+            illusions.Add(u);
         }
 
         /// <summary>The player owning a unit; null for a vanished unit, slot 0 for a unit the world did not make.</summary>
@@ -911,10 +986,11 @@ namespace Moonwell.Testing
             return !IsAllyOf(source, other);
         }
 
-        /// <summary>Records an add-ability call.</summary>
+        /// <summary>Records an add-ability call, and keeps the ability among those code gave the unit.</summary>
         public void AddAbility(unit unit, int abilityId)
         {
             AbilityCalls.Add("add " + abilityId);
+            AddedTo(unit).Add(abilityId);
             if (abilityId == CrowForm)
             {
                 crowFormed.Add(unit);
@@ -927,14 +1003,60 @@ namespace Moonwell.Testing
             AbilityCalls.Add("hide " + abilityId);
         }
 
-        /// <summary>Records a remove-ability call.</summary>
+        /// <summary>Records a make-permanent call, and keeps the ability through a morph.</summary>
+        public void MakeAbilityPermanent(unit unit, int abilityId)
+        {
+            AbilityCalls.Add("permanent " + abilityId);
+            if (!permanentAbilities.TryGetValue(unit, out var permanent))
+            {
+                permanent = new HashSet<int>();
+                permanentAbilities[unit] = permanent;
+            }
+
+            permanent.Add(abilityId);
+        }
+
+        /// <summary>Records a remove-ability call, and takes the ability from those code gave the unit.</summary>
         public void RemoveAbility(unit unit, int abilityId)
         {
             AbilityCalls.Add("remove " + abilityId);
+            AddedTo(unit).Remove(abilityId);
             if (abilityId == CrowForm && crowFormed.Remove(unit))
             {
                 floaters.Add(unit);
             }
+        }
+
+        /// <summary>Morphs a unit as Metamorphosis or Bear Form does: it loses each ability code gave it that was not made permanent (seen 10-26), and each is recorded as "stripped".</summary>
+        public void Morph(unit u)
+        {
+            var added = AddedTo(u);
+            for (var i = added.Count - 1; i >= 0; i--)
+            {
+                if (!permanentAbilities.TryGetValue(u, out var permanent) || !permanent.Contains(added[i]))
+                {
+                    AbilityCalls.Add("stripped " + added[i]);
+                    added.RemoveAt(i);
+                }
+            }
+        }
+
+        /// <summary>Whether a unit has an ability code gave it, not removed or stripped by a morph since.</summary>
+        public bool HasAddedAbility(unit u, int abilityId)
+        {
+            return AddedTo(u).Contains(abilityId);
+        }
+
+        /// <summary>The abilities code gave a unit, in the order given.</summary>
+        private List<int> AddedTo(unit u)
+        {
+            if (!addedAbilities.TryGetValue(u, out var added))
+            {
+                added = new List<int>();
+                addedAbilities[u] = added;
+            }
+
+            return added;
         }
 
         /// <summary>The id of Crow Form (Amrf), whose adding and removing lets a ground unit show a fly height.</summary>
@@ -1171,6 +1293,14 @@ namespace Moonwell.Testing
             return Kept(unitYs, unit);
         }
 
+        /// <summary>Sets the player of a unit and records "owner" with the slot and True, since the unit's colour changes too.</summary>
+        public void SetOwner(unit unit, player player)
+        {
+            NoteGone(unit);
+            unitSlots[unit] = SlotOf(player);
+            UnitCalls.Add("owner " + SlotOf(player) + " True");
+        }
+
         /// <summary>Puts a unit at the place, and records a "move".</summary>
         public void MoveUnit(unit unit, float x, float y)
         {
@@ -1282,7 +1412,7 @@ namespace Moonwell.Testing
             }
         }
 
-        /// <summary>The calls that changed a hero, in turn, as a word and its values: "experience 500 True", "level 5 True", "strength 30 True", "skill-points 3", "revive 100 200 True".</summary>
+        /// <summary>The calls that changed a hero, in turn, as a word and its values: "experience 500 True", "add-experience -200 True", "level 5 True", "strip 3", "strength 30 True", "skill-points 3", "revive 100 200 True".</summary>
         public List<string> HeroCalls = new List<string>();
 
         /// <summary>The experience of each hero, 0 until set.</summary>
@@ -1322,20 +1452,44 @@ namespace Moonwell.Testing
             return !vanishedUnits.Contains(hero) && experiences.TryGetValue(hero, out var experience) ? experience : 0;
         }
 
-        /// <summary>Sets the experience of a hero, and records an "experience".</summary>
+        /// <summary>Sets the experience of a hero, and records an "experience". It only raises, as SetHeroXP (seen 10-21): a lower value changes nothing. The levels that come with it are not given here.</summary>
         public void SetExperience(unit hero, int experience, bool showEffect)
         {
             NoteGone(hero);
             HeroCalls.Add("experience " + experience + " " + Flag(showEffect));
-            experiences[hero] = experience;
+            if (experience > ExperienceOf(hero))
+            {
+                experiences[hero] = experience;
+            }
         }
 
-        /// <summary>Gives a hero the level, and records a "level".</summary>
+        /// <summary>Adds experience to a hero, or takes it with a negative amount, and records an "add-experience": AddHeroXP with -400 lowers the experience but not the level (seen 10-21); it stops at 0 (assumed).</summary>
+        public void AddExperience(unit hero, int experience, bool showEffect)
+        {
+            NoteGone(hero);
+            HeroCalls.Add("add-experience " + experience + " " + Flag(showEffect));
+            var now = ExperienceOf(hero) + experience;
+            experiences[hero] = now < 0 ? 0 : now;
+        }
+
+        /// <summary>Gives a hero the level, and records a "level". It only raises, as SetHeroLevel (seen 10-21): a lower level changes nothing. The experience of the level is not given here.</summary>
         public void LevelHero(unit hero, int level, bool showEffect)
         {
             NoteGone(hero);
             HeroCalls.Add("level " + level + " " + Flag(showEffect));
-            levels[hero] = level;
+            if (level > LevelOf(hero))
+            {
+                levels[hero] = level;
+            }
+        }
+
+        /// <summary>Takes levels from a hero, down to 1, and records a "strip": UnitStripHeroLevel lowers the level (seen). What it does to the experience is not modelled.</summary>
+        public void StripLevels(unit hero, int count)
+        {
+            NoteGone(hero);
+            HeroCalls.Add("strip " + count);
+            var now = LevelOf(hero) - count;
+            levels[hero] = now < 1 ? 1 : now;
         }
 
         /// <summary>A stat of a hero, 0 until set: which is 0 for strength, 1 for agility and 2 for intelligence.</summary>

@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Moonwell.GameData;
 using Moonwell.Generator.Objects;
 
 namespace Moonwell.Generator.Tests;
@@ -100,6 +101,37 @@ public class ChoicesTests
 
         Assert.Equal(ChoiceForm.List, choice.Form);
         Assert.Equal(new[] { 1, 2 }, choice.Members.Select(m => m.Value));
+    }
+
+    [Fact]
+    public void a_placement_type_is_named_as_world_editor_shows_it_and_keeps_the_games_texts()
+    {
+        // Decision 70: World Editor's "Placement Requires" (upap) is the game's preventPlace, of type pathingListPrevent, and
+        // shows "unbuildable" as "Buildable"; "Placement Prevented By" (upar) is requirePlace, of type pathingListRequire.
+        var labels = new Dictionary<string, string>
+        {
+            ["WESTRING_UE_PATHINGTYPE_PREVENT_BLIGHTED"] = "Unblighted",
+            ["WESTRING_UE_PATHINGTYPE_PREVENT_UNBUILDABLE"] = "Buildable",
+            ["WESTRING_UE_PATHINGTYPE_PREVENT_UNFLYABLE"] = "Air-pathable",
+        };
+        var entries = new[]
+        {
+            Entry(0, "blighted", "WESTRING_UE_PATHINGTYPE_PREVENT_BLIGHTED"),
+            Entry(1, "unbuildable", "WESTRING_UE_PATHINGTYPE_PREVENT_UNBUILDABLE"),
+            Entry(2, "unflyable", "WESTRING_UE_PATHINGTYPE_PREVENT_UNFLYABLE"),
+        };
+
+        var requires = Choices.Make("pathingListPrevent", "string", entries, key => labels[key]);
+        var prevents = Choices.Make("pathingListRequire", "string", entries, key => labels[key]);
+
+        Assert.Equal("PathingRequire", requires.Name);
+        Assert.Equal("PathingPrevent", prevents.Name);
+        Assert.True(requires.Placement);
+        Assert.Equal(new[] { "Unblighted", "Buildable", "AirPathable" }, requires.Members.Select(m => m.Name));
+        Assert.Equal(new[] { "blighted", "unbuildable", "unflyable" }, requires.Members.Select(m => m.Text));
+        Assert.Equal(new[] { 1, 2, 4 }, requires.Members.Select(m => m.Value));
+        Assert.Equal(requires.Members.Select(m => m.Name), prevents.Members.Select(m => m.Name));
+        Assert.False(Choices.Make("targetList", "string", entries, key => labels[key]).Placement);
     }
 
     [Fact]

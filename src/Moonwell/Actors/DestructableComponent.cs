@@ -20,7 +20,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>The destructable this component is on.</summary>
+        /// <summary>The destructable this component is on; null before the component is added, though its type does not say so (read it from OnAdded on).</summary>
         [LocalSafe]
         public Destructable Destructable => (Destructable)Actor;
 

@@ -21,7 +21,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>A unit enters the map: it is taken in when its type is registered, or when a component wants to hear of entries.</summary>
+        /// <summary>A unit enters the map: it is taken in when its type is registered, when a component wants to hear of entries, or once the interactions package tracks units (KnownUnits.EveryUnit).</summary>
         internal static void Entered(unit handle)
         {
             if (KnownUnits.Find(handle) != null)
@@ -29,9 +29,9 @@ namespace Moonwell
                 return;
             }
 
-            if (ObjectTypes.UnitMaker(Runtime.World.UnitTypeId(handle)) != null || Events.Wants(Hook.OnUnitCreated))
+            if (KnownUnits.EveryUnit || ObjectTypes.UnitMaker(Runtime.World.UnitTypeId(handle)) != null || Events.Wants(Hook.OnUnitCreated))
             {
-                KnownUnits.TakeIn(handle, null);
+                KnownUnits.TakeIn(handle, null, true);
             }
         }
 
@@ -232,7 +232,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>A unit dies: its type's OnDeath and components, then the killer's OnKill and components, then the map's and the players' reactions, then the buffs a death ends end; a killer equal to the dying unit counts as none.</summary>
+        /// <summary>A unit dies: its type's OnDeath and components, then the killer's OnKill and components, then the map's and the players' reactions, then the buffs a death ends end, of those on the unit as it died; a killer equal to the dying unit counts as none.</summary>
         internal static void Died(unit dying, unit? killer)
         {
             unit? slain = killer == dying ? null : killer;
@@ -247,6 +247,8 @@ namespace Moonwell
                 return;
             }
 
+            // The buffs the death ends are those on the unit now, which see it; one its reactions apply stays.
+            var buffs = dead.GetAll<Buff>();
             Unit? slayer = slain == null ? null : Unit.Of(slain);
             var deadSlot = dead.Player.Slot;
             var slayerSlot = slayer == null ? -1 : slayer.Player.Slot;
@@ -272,7 +274,7 @@ namespace Moonwell
                 }
             }
 
-            Buff.EndOnDeath(dead);
+            Buff.EndOnDeath(buffs);
         }
 
         /// <summary>A unit's spell takes effect: its previous cast ends, the ability and the caster see the new cast, then the map's and the caster's player's reactions run.</summary>
@@ -596,13 +598,13 @@ namespace Moonwell
             hit.EndDispatch();
         }
 
-        /// <summary>Runs OnDeath on a unit, then on its components, in add order.</summary>
+        /// <summary>Runs OnDeath on a unit, then on its components, in add order. The unit's own OnDeath runs with the game as the current owner (decision 64): death is not an end, and its corpse can go at any time, so what it makes, such as a respawn timer, must not end with it.</summary>
         private static void Dying(Unit dead, Unit? killer)
         {
             if (!dead.HasEnded && (dead.Mask & Hook.OnDeath) != 0)
             {
                 var previous = Owner.current;
-                Owner.current = dead;
+                Owner.current = Game.Instance;
                 try
                 {
                     dead.OnDeath(killer);
@@ -744,13 +746,13 @@ namespace Moonwell
             actor.EndDispatch();
         }
 
-        /// <summary>Runs OnCast on an ability, with the cast as the current owner, unless the ability has ended or does not override it.</summary>
+        /// <summary>Runs OnCast on an ability, with the ability as the current owner (decision 63), unless the ability has ended or does not override it: what it makes runs on after the spell ends, and work that stops with a channel names the cast.</summary>
         private static void AbilityCast(Ability ability, Cast cast)
         {
             if (!ability.HasEnded && (ability.Mask & Hook.OnCast) != 0)
             {
                 var previous = Owner.current;
-                Owner.current = cast;
+                Owner.current = ability;
                 try
                 {
                     ability.OnCast(cast);

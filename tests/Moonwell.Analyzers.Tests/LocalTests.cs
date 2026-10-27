@@ -87,6 +87,24 @@ public class LocalTests
     }
 
     [Fact]
+    public void debug_mode_select_and_halt_are_rejected_inside()
+    {
+        var found = MapCode.Check("""
+            var unit = Unit.Of(u)!;
+            Local.For(p, () =>
+            {
+                var on = DebugMode.IsOn;
+                var selected = DebugMode.Selected;
+                var mine = DebugMode.IsSelected(unit);
+                DebugMode.Select(unit);
+                DebugMode.Halt();
+            });
+            """);
+
+        Assert.Equal(new[] { "MW0001: DebugMode.Select(unit)", "MW0001: DebugMode.Halt()" }, found);
+    }
+
+    [Fact]
     public void damage_package_members_need_local_safe()
     {
         var found = MapCode.Check("""
@@ -559,11 +577,12 @@ public class LocalTests
     }
 
     [Fact]
-    public void sync_unchecked_silences_a_method_and_trusts_it_when_followed()
+    public void sync_unchecked_silences_a_method_and_is_still_followed_from_local_for()
     {
         var found = MapCode.Check(
             """
             Local.For(p, () => Trusted());
+            Local.For(p, [SyncUnchecked] () => Trusted());
             Unchecked(p);
             """,
             """
@@ -583,7 +602,41 @@ public class LocalTests
                 }
             """);
 
-        Assert.Empty(found);
+        // The attribute silences the method's own body; a block that runs it is silenced on the block.
+        Assert.Equal(new[] { "MW0001: Trusted()" }, found);
+    }
+
+    [Fact]
+    public void sync_unchecked_for_a_double_does_not_hide_a_unit_made_inside_local_for()
+    {
+        var found = MapCode.Check("Local.For(p, () => Average(p));", """
+                [SyncUnchecked]
+                private static float Average(Player who)
+                {
+                    double total = 0;
+                    Natives.CreateUnit(who.Handle, 0, 0f, 0f, 0f);
+                    return (float)total;
+                }
+            """);
+
+        Assert.Equal(new[] { "MW0001: Average(p)" }, found);
+    }
+
+    [Fact]
+    public void sync_unchecked_does_not_silence_decimal()
+    {
+        var found = MapCode.Check("Money();", """
+                [SyncUnchecked]
+                private static decimal Money()
+                {
+                    decimal m = 0.1m;
+                    var n = (decimal)2;
+                    long big = 1L;
+                    return m + n;
+                }
+            """);
+
+        Assert.Equal(new[] { "MW0005: Money", "MW0005: m", "MW0005: 0.1m", "MW0005: n", "MW0005: (decimal)2" }, found);
     }
 
     [Fact]
@@ -742,6 +795,73 @@ public class LocalTests
             var unit = Unit.Of(u)!;
             var copy = unit.Default;
             var name = copy.Name;
+            """));
+    }
+
+    [Fact]
+    public void the_sync_natives_are_allowed_inside()
+    {
+        // Sending this machine's value to every machine is what they are for.
+        Assert.Empty(MapCode.Check("""
+            Local.For(p, () =>
+            {
+                var sent = Natives.BlzSendSyncData("cam", Natives.R2S(Natives.GetCameraTargetPositionX()));
+                Natives.SyncStoredInteger(null!, "a", "b");
+                Natives.SyncStoredReal(null!, "a", "b");
+                Natives.SyncStoredBoolean(null!, "a", "b");
+                Natives.SyncStoredUnit(null!, "a", "b");
+                Natives.SyncStoredString(null!, "a", "b");
+                Natives.SyncSelections();
+            });
+            """));
+    }
+
+    [Fact]
+    public void a_pattern_on_another_units_name_in_a_constructor_is_mw0002()
+    {
+        // Wave 1: every pattern input counted as the object itself.
+        Assert.Equal(new[] { "MW0002: Name", "MW0002: Name", "MW0002: Name" }, MapCode.CheckFile("""
+            using Moonwell;
+            using Moonwell.Objects;
+
+            namespace Map
+            {
+                public class Mage : Human.Units.Footman
+                {
+                    public Mage(Unit other, Unit[] party)
+                    {
+                        var guard = other is Unit { Name: "Guard" };
+                        var kind = other switch { { Name: "Guard" } => 1, _ => 0 };
+                        var first = party is [{ Name: "Guard" }, ..];
+                        var self = this is { Name: "Mage" };
+                    }
+                }
+            }
+            """));
+    }
+
+    [Fact]
+    public void helpers_whose_result_is_the_same_on_every_machine_are_allowed_outside()
+    {
+        // AddLightningLoc's lightning is the same handle everywhere (only its z differs), MoveLightningLoc gives
+        // MoveLightningEx's success and the dialogue functions return true.
+        Assert.Empty(MapCode.Check("""
+            var bolt = Natives.AddLightningLoc("CLPB", null!, null!);
+            var moved = Natives.MoveLightningLoc(bolt, null!, null!);
+            var said = Natives.PlayDialogueFromSpeakerEx(null!, u, 0, null!, 0, 0f, false);
+            var told = Natives.PlayDialogueFromSpeakerTypeEx(null!, p.Handle, 0, null!, null!, 0, 0f, false);
+            """));
+    }
+
+    [Fact]
+    public void helpers_whose_result_is_the_same_on_every_machine_still_change_the_game_inside()
+    {
+        Assert.Equal(new[] { "MW0001: Natives.AddLightningLoc(\"CLPB\", null!, null!)", "MW0001: Natives.MoveLightningLoc(null!, null!, null!)" }, MapCode.Check("""
+            Local.For(p, () =>
+            {
+                Natives.AddLightningLoc("CLPB", null!, null!);
+                Natives.MoveLightningLoc(null!, null!, null!);
+            });
             """));
     }
 }

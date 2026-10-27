@@ -4,7 +4,7 @@ using Moonwell.Hosting;
 
 namespace Moonwell.Testing
 {
-    /// <summary>The fake game the areas package's cases run against: regions that remember the rects and cells they were given, enter, leave, death and revive events a case sends by hand, units at points, and units without a place.</summary>
+    /// <summary>The fake game the areas package's cases run against: regions that remember the rects and cells they were given and cover points from them as the game does, enter, leave, death and revive events a case sends by hand or by walking a unit, units at points, and units without a place.</summary>
     public sealed class FakeAreaWorld : IAreaWorld
     {
         /// <summary>What a fake region remembers.</summary>
@@ -74,6 +74,78 @@ namespace Moonwell.Testing
             one.X = x;
             one.Y = y;
             standing.Add(one);
+        }
+
+        /// <summary>
+        /// Whether a region covers a point as the game's region does: it is whole 32 cells on multiples of 32 from 0 (seen
+        /// 10-25), each cell it was given, and for each rect every cell from the one holding its min corner to the one
+        /// holding its max corner, so a max edge on the 32 grid takes the cell past it (<c>RegionAddRect</c> of (0, 0)-(256,
+        /// 256) covers 0 to 288, seen 10-26).
+        /// </summary>
+        public bool Covers(Made region, float x, float y)
+        {
+            var column = MathF.Floor(x / 32f);
+            var row = MathF.Floor(y / 32f);
+            for (var i = 0; i < region.Cells.Count; i += 2)
+            {
+                if (MathF.Floor(region.Cells[i] / 32f) == column && MathF.Floor(region.Cells[i + 1] / 32f) == row)
+                {
+                    return true;
+                }
+            }
+
+            for (var i = 0; i < region.Rects.Count; i += 4)
+            {
+                if (column >= MathF.Floor(region.Rects[i] / 32f) && column <= MathF.Floor(region.Rects[i + 2] / 32f)
+                    && row >= MathF.Floor(region.Rects[i + 1] / 32f) && row <= MathF.Floor(region.Rects[i + 3] / 32f))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Moves a unit to a point, as <c>SetUnitX</c> and <c>SetUnitY</c> do in the game: each region that is not destroyed
+        /// and held the unit but no longer covers the point sends a leave event, then each that covers it and did not hold
+        /// it an enter event, in the order the regions were made (the order their triggers were made, which the game
+        /// follows). The point is the unit's for UnitsIn too.
+        /// </summary>
+        public void Walk(unit target, float x, float y)
+        {
+            var found = false;
+            for (var i = 0; i < standing.Count; i++)
+            {
+                if (standing[i].Unit == target)
+                {
+                    standing[i].X = x;
+                    standing[i].Y = y;
+                    found = true;
+                }
+            }
+
+            if (!found)
+            {
+                Stand(target, x, y);
+            }
+
+            var made = new List<Made>(Regions);
+            for (var i = 0; i < made.Count; i++)
+            {
+                if (!made[i].Destroyed && made[i].Inside.Contains(target) && !Covers(made[i], x, y))
+                {
+                    Leave(made[i], target);
+                }
+            }
+
+            for (var i = 0; i < made.Count; i++)
+            {
+                if (!made[i].Destroyed && !made[i].Inside.Contains(target) && Covers(made[i], x, y))
+                {
+                    Enter(made[i], target);
+                }
+            }
         }
 
         /// <summary>Sends an enter event for a unit into a region, and puts the unit inside it.</summary>

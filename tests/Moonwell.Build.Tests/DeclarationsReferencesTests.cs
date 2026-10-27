@@ -6,7 +6,12 @@ namespace Moonwell.Build.Tests
     /// <summary>What the map's built assembly refers to, read from its metadata.</summary>
     public sealed class DeclarationsReferencesTests : IDisposable
     {
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
+
+        public DeclarationsReferencesTests(ITestOutputHelper output)
+        {
+            folders = new TestFolders(output);
+        }
 
         public void Dispose()
         {

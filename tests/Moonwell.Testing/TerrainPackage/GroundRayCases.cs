@@ -57,7 +57,7 @@ namespace Moonwell.Testing
             Expect.Near(164f / 328f, hit.Fraction, "fraction");
         }
 
-        /// <summary>A segment that starts under the ground hits at its start, with the normal straight up.</summary>
+        /// <summary>A segment that starts under the ground hits at its start, with the normal straight up; one on the ground hits only when it goes down.</summary>
         public static void StartsUnder(FakeWorld world)
         {
             OneTile(GridText.Tile(GridText.Corner(0f, 2), GridText.Corner(0f, 2), GridText.Corner(0f, 2), GridText.Corner(0f, 2)));
@@ -66,8 +66,9 @@ namespace Moonwell.Testing
             Expect.Near(0f, hit.Fraction, "fraction");
             Expect.True(hit.Point == new Vector3(30f, 40f, -10f), "at the start");
             Expect.True(hit.Normal == Vector3.UnitZ, "straight up");
-            Expect.True(Terrain.Raycast(new Vector3(30f, 40f, 0f), new Vector3(30f, 40f, 50f), out var onGround), "on the ground is under");
-            Expect.Near(0f, onGround.Fraction, "on the ground: fraction");
+            Expect.True(!Terrain.Raycast(new Vector3(30f, 40f, 0f), new Vector3(30f, 40f, 50f), out _), "on the ground and rising: no hit");
+            Expect.True(Terrain.Raycast(new Vector3(30f, 40f, 0f), new Vector3(30f, 40f, -50f), out var onGround), "on the ground and going down: a hit");
+            Expect.Near(0f, onGround.Fraction, "on the ground and going down: fraction");
         }
 
         /// <summary>A segment of no length hits when it is under the ground and misses when it is over it.</summary>

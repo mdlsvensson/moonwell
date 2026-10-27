@@ -53,9 +53,11 @@ namespace Moonwell
 
         /// <summary>
         /// The ground's height at a point, from the map's terrain: the four corners of its tile blended, in every tile,
-        /// cliff tiles included. Deformations (spells and the like) are not in it; <c>LocalHeight</c> sees them. A
-        /// point outside the map reads the edge. On a bridge it reads the water or ground beneath (the game's
-        /// <c>GetLocationZ</c>, <c>LocalHeight</c>, reads the deck).
+        /// cliff tiles included. It is the game's at the corners, and rough between them on steep ground and within 128
+        /// of a cliff (on Lost Temple the game's heights between corners differed from such a blend by up to 77 away from
+        /// cliffs and 96 near one); how the game blends inside a tile has not been measured. Deformations (spells and the
+        /// like) are not in it; <c>LocalHeight</c> sees them. A point outside the map reads the edge. On a bridge it reads
+        /// the water or ground beneath (the game's <c>GetLocationZ</c>, <c>LocalHeight</c>, reads the deck).
         /// </summary>
         [LocalSafe]
         public static float Height(float x, float y)
@@ -98,9 +100,14 @@ namespace Moonwell
         /// <summary>
         /// The first place the segment from <paramref name="from"/> to <paramref name="to"/> meets the ground (the
         /// blended <c>Height</c>), with the ground's <c>Normal</c> there. Sampled every 32 along its length, so a ridge
-        /// narrower than that can be stepped over. A segment that starts at or under the ground hits at fraction 0 with
-        /// the normal straight up (so does one of zero length that is under it); one that stays above it, or leaves the
-        /// map over its edge (which reads flat), gives false and an empty hit, and makes nothing.
+        /// narrower than that can be stepped over. A map can move its missile to a hit's point and bounce or slide it
+        /// there: a segment that starts on the ground (within 0.02 of it) hits it only where it goes under by more than
+        /// 0.01 and deeper than it started, and the hit is put on the ground there; one that rises or runs along it does
+        /// not hit it. A segment that starts deeper under the ground hits at fraction 0 with the normal straight up (so
+        /// does one of zero length that is under it); one that stays above it gives false and an empty hit, and makes
+        /// nothing. Only the part of the segment over the map's grid (the whole map, its unplayable edge included) is cast,
+        /// from where it comes in over the edge: past the edge it meets nothing, so a long segment reads the ground at most
+        /// about 2,700 times, across the largest map (about 25 ms in the game).
         /// </summary>
         [LocalSafe]
         public static bool Raycast(Vector3 from, Vector3 to, out TerrainHit hit)

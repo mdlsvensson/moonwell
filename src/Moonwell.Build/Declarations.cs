@@ -159,9 +159,9 @@ namespace Moonwell.Build
                 .ToList();
             CheckReplaces(candidates);
 
-            // A hero's MaxLife, MaxMana and Mana read in a constructor are its totals, by the map's gameplay constants. The data of a map
-            // with no objects has none, and reads them as its base fields.
-            var bonus = ReferenceEquals(standard, StandardData.Empty) ? new HeroBonus(0f, 0f) : MapMisc.Read(project.MapFolder, standard.Misc(set));
+            // A hero's MaxLife, MaxMana and Mana read in a constructor are its totals, by the map's gameplay constants (from the file the
+            // built map holds). The data of a map with no objects has none, and reads them as its base fields.
+            var bonus = ReferenceEquals(standard, StandardData.Empty) ? new HeroBonus(0f, 0f) : MapMisc.Read(MapMisc.FolderOf(project), standard.Misc(set));
             var standardValues = objects.GetType("Moonwell.Objects.StandardValues", true)!;
             var values = standardValues.GetProperty("Read", BindingFlags.Public | BindingFlags.Static)!;
             var heroBonus = standardValues.GetProperty("HeroBonus", BindingFlags.Public | BindingFlags.Static)!;

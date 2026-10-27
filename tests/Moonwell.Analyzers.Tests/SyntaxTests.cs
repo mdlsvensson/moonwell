@@ -29,9 +29,6 @@ public class SyntaxTests
     // MW0018: patterns that give the wrong answer
     [InlineData("MW0018", "var bx = new Box(); var b = bx is { Inner.X: 9 };", "Inner.X: 9")]
     [InlineData("MW0018", "(int, int) t = (1, 2); var b = t is (1, _);", "(1, _)")]
-    // MW0019: --N
-    [InlineData("MW0019", "var a = -N;", "-N")]
-    [InlineData("MW0019", "var a = unchecked(-int.MinValue);", "-int.MinValue")]
     // MW0020: a struct changed through a copy of an element
     [InlineData("MW0020", "var arr = new Pt[1]; var c = arr[0]; c.X = 6;", "arr[0]")]
     [InlineData("MW0020", "var l = new List<Pt> { new Pt() }; var c = l[0]; c.X++;", "l[0]")]
@@ -56,6 +53,7 @@ public class SyntaxTests
     [InlineData("MW0026", "var f = (params int[] xs) => xs.Length;", "params int[] xs")]
     // MW0027: strings
     [InlineData("MW0027", "var n = \"a--b\".Split(\"--\").Length;", "\"a--b\".Split(\"--\")")]
+    [InlineData("MW0027", "var n = \"a, b\".Split(new[] { \", \" }, StringSplitOptions.None).Length;", "\"a, b\".Split(new[] { \", \" }, StringSplitOptions.None)")]
     [InlineData("MW0027", "var b = \"abc\".StartsWith('a');", "\"abc\".StartsWith('a')")]
     [InlineData("MW0027", "var b = \"abc\".EndsWith('c');", "\"abc\".EndsWith('c')")]
     [InlineData("MW0027", "var i = \"abc\".IndexOf(\"B\", StringComparison.OrdinalIgnoreCase);", "\"abc\".IndexOf(\"B\", StringComparison.OrdinalIgnoreCase)")]
@@ -65,6 +63,9 @@ public class SyntaxTests
     [InlineData("MW0028", "char c = 'a'; var s = string.Format(\"{0}\", c);", "c")]
     [InlineData("MW0028", "var c = Color.Green; Console.WriteLine(c);", "c")]
     [InlineData("MW0028", "var sb = new System.Text.StringBuilder(); sb.Append((object)Color.Green);", "Color.Green")]
+    [InlineData("MW0028", "char c = 'a'; var e = Color.Green; var s = string.Join(\",\", c, e);", "c")]
+    [InlineData("MW0028", "char c = 'a'; var e = Color.Green; var s = string.Join(\",\", c, e);", "e")]
+    [InlineData("MW0028", "char c = 'a'; var s = string.Format(\"{0}{1}{2}{3}\", c, 1, 2, 3);", "c")]
     // MW0029: catch
     [InlineData("MW0029", "try { } catch (NullReferenceException) { }", "NullReferenceException")]
     [InlineData("MW0029", "try { } catch (IndexOutOfRangeException) { }", "IndexOutOfRangeException")]
@@ -82,6 +83,8 @@ public class SyntaxTests
     [InlineData("MW0030", "var q = new Queue<int>(); q.TryPeek(out var x);", "TryPeek")]
     [InlineData("MW0030", "var s = new Stack<int>(); s.TryPop(out var x);", "TryPop")]
     [InlineData("MW0030", "var h = new HashSet<int>(); var b = h.SetEquals(new[] { 1 });", "SetEquals")]
+    [InlineData("MW0030", "ISet<int> h = new HashSet<int>(); var b = h.SetEquals(new[] { 1 });", "SetEquals")]
+    [InlineData("MW0030", "IReadOnlySet<int> h = new HashSet<int>(); var b = h.SetEquals(new[] { 1 });", "SetEquals")]
     [InlineData("MW0030", "var c = StringComparer.Ordinal;", "StringComparer")]
     [InlineData("MW0030", "var g = Guid.NewGuid();", "Guid")]
     [InlineData("MW0030", "var n = Environment.NewLine;", "NewLine")]
@@ -170,6 +173,17 @@ public class SyntaxTests
     }
 
     [Fact]
+    public void a_minus_before_a_negative_constant_is_allowed()
+    {
+        var found = MapCode.Check("""
+            var a = -N;
+            var b = unchecked(-int.MinValue);
+            var c = -(N);
+            """, Types);
+        Assert.Empty(found);
+    }
+
+    [Fact]
     public void initializers_read_in_one_statement_are_allowed()
     {
         var found = MapCode.Check("""
@@ -247,5 +261,91 @@ public class SyntaxTests
         Assert.Equal(
             "Split(string) runs out of memory in the game's Lua; split on a char",
             MapCode.Message("var n = \"a--b\".Split(\"--\").Length;").Replace("'\"a--b\".Split(\"--\")' ", string.Empty));
+    }
+
+    private const string Structs = """
+            struct In { public int X; }
+            struct Pt2
+            {
+                public int X;
+                public In Inner;
+                public void Move() { X++; }
+                public void Shift() { Move(); }
+                public int Read() => X;
+                public readonly int Twice() => X * 2;
+            }
+            class Holder { public int X; }
+            struct WithRef { public Holder H; }
+            static void Bump(ref Pt2 p) { p.X++; }
+    """;
+
+    [Fact]
+    public void a_struct_element_changed_through_a_method_a_nested_field_or_ref_is_mw0020()
+    {
+        var found = MapCode.Check("""
+            var arr = new Pt2[2];
+            var f = arr[1];
+            f.Move();
+            var g = arr[0];
+            g.Inner.X = 4;
+            var h = arr[0];
+            Bump(ref h);
+            var list = new List<Pt2> { new Pt2() };
+            var k = list[0];
+            k.Inner.X++;
+            var s = arr[1];
+            s.Shift();
+            """, Structs);
+
+        Assert.Equal(new[] { "MW0020: arr[1]", "MW0020: arr[0]", "MW0020: arr[0]", "MW0020: list[0]", "MW0020: arr[1]" }, found);
+    }
+
+    [Fact]
+    public void reading_a_struct_element_copy_or_changing_what_it_points_at_is_accepted()
+    {
+        Assert.Empty(MapCode.Check("""
+            var arr = new Pt2[2];
+            var a = arr[0];
+            var n = a.Read() + a.Twice() + a.X + a.Inner.X;
+            var refs = new WithRef[1];
+            var r = refs[0];
+            r.H.X = 3;
+            """, Structs));
+    }
+
+    [Fact]
+    public void a_struct_element_copy_written_back_is_accepted()
+    {
+        Assert.Empty(MapCode.Check("""
+            var arr = new Pt2[2];
+            var c = arr[0];
+            c.X = 6;
+            c.Move();
+            arr[0] = c;
+            var list = new List<Pt2> { new Pt2() };
+            var i = 0;
+            var d = list[i];
+            d.Inner.X = 1;
+            list[i] = d;
+            """, Structs));
+    }
+
+    [Fact]
+    public void a_struct_element_read_or_moved_before_the_write_back_is_mw0020()
+    {
+        var found = MapCode.Check("""
+            var arr = new Pt2[2];
+            var c = arr[0];
+            c.X = 6;
+            var seen = arr[0].X;
+            arr[0] = c;
+            var i = 0;
+            var d = arr[i];
+            d.X = 1;
+            i++;
+            arr[i] = d;
+            """, Structs);
+
+        Assert.Equal(new[] { "MW0020: arr[0]", "MW0020: arr[i]" }, found);
     }
 }

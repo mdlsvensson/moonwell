@@ -14,7 +14,7 @@ namespace Moonwell.Objects
         /// @CSharpLua.Ignore
         public static partial class Units
         {
-            /// <summary>Berserk Quilbeast (nqb4).</summary>
+            /// <summary>Berserk Quilbeast (Level 4), nqb4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nqb4")]
             public class BerserkQuilbeast : global::Moonwell.Objects.StandardUnit
@@ -644,7 +644,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Centaur Tent (nct1).</summary>
+            /// <summary>Centaur Tent (2), nct1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nct1")]
             public class CentaurTentNct1 : global::Moonwell.Objects.StandardUnit
@@ -762,7 +762,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Centaur Tent (nct2).</summary>
+            /// <summary>Centaur Tent (3), nct2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nct2")]
             public class CentaurTentNct2 : global::Moonwell.Objects.StandardUnit
@@ -1579,7 +1579,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Dire Quilbeast (nqb2).</summary>
+            /// <summary>Dire Quilbeast (Level 2), nqb2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nqb2")]
             public class DireQuilbeast : global::Moonwell.Objects.StandardUnit
@@ -1959,7 +1959,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Draenei Hut (ndh1).</summary>
+            /// <summary>Draenei Hut 2, ndh1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ndh1")]
             public class DraeneiHutNdh1 : global::Moonwell.Objects.StandardUnit
@@ -2330,7 +2330,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Forest Troll Hut (nfh1).</summary>
+            /// <summary>Forest Troll Hut 2, nfh1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nfh1")]
             public class ForestTrollHutNfh1 : global::Moonwell.Objects.StandardUnit
@@ -2576,7 +2576,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public FountainOfMana()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Invulnerable, global::Moonwell.Objects.Creeps.Abilities.ManaRegenerationLifeRegenerationAura>();
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.Invulnerable, global::Moonwell.Objects.Creeps.Abilities.ManaRegeneration>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2688,13 +2688,130 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Furbolg Hut (nfr1).</summary>
+            /// <summary>Furbolg Hut (nfr2).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("nfr1")]
+            [global::Moonwell.Objects.Standard("nfr2")]
             public class FurbolgHut : global::Moonwell.Objects.StandardUnit
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public FurbolgHut()
+                {
+                    AcquisitionRange = 500f;
+                    AllowCustomTeamColor = false;
+                    AnimationBlendTimeSeconds = 0.15f;
+                    AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 200f;
+                    AnimationWalkSpeed = 200f;
+                    Armor = 0;
+                    ArmorType = global::Moonwell.Objects.ArmorType.Wood;
+                    Attack1DamageLossFactor = 0f;
+                    Attack1DamageSpillDistance = 0f;
+                    Attack1DamageSpillRadius = 0f;
+                    Attack1MaximumNumberOfTargets = 1;
+                    Attack1ShowUI = true;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
+                    Attack2DamageLossFactor = 0f;
+                    Attack2DamageSpillDistance = 0f;
+                    Attack2DamageSpillRadius = 0f;
+                    Attack2MaximumNumberOfTargets = 1;
+                    Attack2ShowUI = true;
+                    AttackCooldown = 0f;
+                    AttackType = global::Moonwell.AttackType.Normal;
+                    AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
+                    BuildTime = 3;
+                    CanBeBuiltOn = false;
+                    CanBuildOn = false;
+                    CanDropItemsOnDeath = true;
+                    CanFlee = true;
+                    CategorizationCampaign = false;
+                    CategorizationSpecial = true;
+                    CollisionSize = 50f;
+                    DeathTimeSeconds = 3f;
+                    DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
+                    DefenseUpgradeBonus = 2;
+                    Description = "A hollowed-out log that some Furbolgs call home.";
+                    DisplayAsNeutralHostile = false;
+                    ElevationSamplePoints = 4;
+                    ElevationSampleRadius = 50f;
+                    FlyHeight = 0f;
+                    FogOfWarSampleRadius = 0f;
+                    ForceBuildingHitPointsDisplay = false;
+                    GoldBountyAwardedBase = 0;
+                    GoldBountyAwardedNumberOfDice = 0;
+                    GoldBountyAwardedSidesPerDie = 0;
+                    GoldCost = 0;
+                    GroundTexture = "OSMA";
+                    HasTilesetSpecificData = false;
+                    HasWaterShadow = true;
+                    HeightMinimum = 0f;
+                    HideMinimapDisplay = false;
+                    HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
+                    IsABuilding = true;
+                    LumberBountyAwardedBase = 0;
+                    LumberBountyAwardedNumberOfDice = 0;
+                    LumberBountyAwardedSidesPerDie = 0;
+                    LumberCost = 0;
+                    MaxLife = 125;
+                    MaximumPitchAngleDegrees = 7f;
+                    MaximumRollAngleDegrees = 7f;
+                    Model = "buildings\\other\\FurbolgHut2\\FurbolgHut2";
+                    ModelFileExtraVersions = 0;
+                    Name = "Furbolg Hut";
+                    NeutralBuildingShowsMinimapIcon = false;
+                    OccluderHeight = 200f;
+                    OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
+                    OrientationInterpolation = 0;
+                    PathingMap = "PathTextures\\8x8SimpleSolid.tga";
+                    PlaceableInEditor = true;
+                    PlacementRequiresWaterRadius = 0f;
+                    PointValue = 100;
+                    PortraitModelFile = "buildings\\other\\FurbolgHut2\\FurbolgHut2_portrait";
+                    Priority = 1;
+                    ProjectileImpactZ = 120f;
+                    ProjectileImpactZSwimming = 0f;
+                    ProjectileLaunchX = 0f;
+                    ProjectileLaunchY = 0f;
+                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZSwimming = 0f;
+                    PropulsionWindowDegrees = 60f;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    RepairGoldCost = 0;
+                    RepairLumberCost = 0;
+                    RepairTime = 3;
+                    Scale = 0.9f;
+                    ScaleProjectiles = true;
+                    SelectionCircleHeight = 0f;
+                    SelectionCircleOnWater = false;
+                    SelectionScale = 3.5f;
+                    ShadowTextureBuilding = "BuildingShadowSmall";
+                    SightRadiusNight = 0;
+                    SightRange = 0;
+                    Sleeps = false;
+                    SpeedMaximum = 0;
+                    SpeedMinimum = 0;
+                    TargetedAs = global::Moonwell.Objects.Targets.Structure;
+                    TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
+                    Tilesets = "A,C";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
+                    Tooltip = "Build Furbolg Hut";
+                    UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
+                    UnitSoundSet = "FurbolgHut";
+                    UseClickHelper = false;
+                    UseExtendedLineOfSight = false;
+                }
+            }
+
+            /// <summary>Furbolg Hut 2, nfr1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("nfr1")]
+            public class FurbolgHutNfr1 : global::Moonwell.Objects.StandardUnit
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public FurbolgHutNfr1()
                 {
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
@@ -2782,123 +2899,6 @@ namespace Moonwell.Objects
                     RepairLumberCost = 0;
                     RepairTime = 3;
                     Scale = 1f;
-                    ScaleProjectiles = true;
-                    SelectionCircleHeight = 0f;
-                    SelectionCircleOnWater = false;
-                    SelectionScale = 3.5f;
-                    ShadowTextureBuilding = "BuildingShadowSmall";
-                    SightRadiusNight = 0;
-                    SightRange = 0;
-                    Sleeps = false;
-                    SpeedMaximum = 0;
-                    SpeedMinimum = 0;
-                    TargetedAs = global::Moonwell.Objects.Targets.Structure;
-                    TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
-                    Tilesets = "A,C";
-                    TintingColor1Red = 255;
-                    TintingColor2Green = 255;
-                    TintingColor3Blue = 255;
-                    Tooltip = "Build Furbolg Hut";
-                    UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
-                    UnitSoundSet = "FurbolgHut";
-                    UseClickHelper = false;
-                    UseExtendedLineOfSight = false;
-                }
-            }
-
-            /// <summary>Furbolg Hut (nfr2).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("nfr2")]
-            public class FurbolgHutNfr2 : global::Moonwell.Objects.StandardUnit
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public FurbolgHutNfr2()
-                {
-                    AcquisitionRange = 500f;
-                    AllowCustomTeamColor = false;
-                    AnimationBlendTimeSeconds = 0.15f;
-                    AnimationCastBackswing = 0.51f;
-                    AnimationRunSpeed = 200f;
-                    AnimationWalkSpeed = 200f;
-                    Armor = 0;
-                    ArmorType = global::Moonwell.Objects.ArmorType.Wood;
-                    Attack1DamageLossFactor = 0f;
-                    Attack1DamageSpillDistance = 0f;
-                    Attack1DamageSpillRadius = 0f;
-                    Attack1MaximumNumberOfTargets = 1;
-                    Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.AttackType.Normal;
-                    Attack2DamageLossFactor = 0f;
-                    Attack2DamageSpillDistance = 0f;
-                    Attack2DamageSpillRadius = 0f;
-                    Attack2MaximumNumberOfTargets = 1;
-                    Attack2ShowUI = true;
-                    AttackCooldown = 0f;
-                    AttackType = global::Moonwell.AttackType.Normal;
-                    AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
-                    BuildTime = 3;
-                    CanBeBuiltOn = false;
-                    CanBuildOn = false;
-                    CanDropItemsOnDeath = true;
-                    CanFlee = true;
-                    CategorizationCampaign = false;
-                    CategorizationSpecial = true;
-                    CollisionSize = 50f;
-                    DeathTimeSeconds = 3f;
-                    DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.DefenseType.Fort;
-                    DefenseUpgradeBonus = 2;
-                    Description = "A hollowed-out log that some Furbolgs call home.";
-                    DisplayAsNeutralHostile = false;
-                    ElevationSamplePoints = 4;
-                    ElevationSampleRadius = 50f;
-                    FlyHeight = 0f;
-                    FogOfWarSampleRadius = 0f;
-                    ForceBuildingHitPointsDisplay = false;
-                    GoldBountyAwardedBase = 0;
-                    GoldBountyAwardedNumberOfDice = 0;
-                    GoldBountyAwardedSidesPerDie = 0;
-                    GoldCost = 0;
-                    GroundTexture = "OSMA";
-                    HasTilesetSpecificData = false;
-                    HasWaterShadow = true;
-                    HeightMinimum = 0f;
-                    HideMinimapDisplay = false;
-                    HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
-                    IsABuilding = true;
-                    LumberBountyAwardedBase = 0;
-                    LumberBountyAwardedNumberOfDice = 0;
-                    LumberBountyAwardedSidesPerDie = 0;
-                    LumberCost = 0;
-                    MaxLife = 125;
-                    MaximumPitchAngleDegrees = 7f;
-                    MaximumRollAngleDegrees = 7f;
-                    Model = "buildings\\other\\FurbolgHut2\\FurbolgHut2";
-                    ModelFileExtraVersions = 0;
-                    Name = "Furbolg Hut";
-                    NeutralBuildingShowsMinimapIcon = false;
-                    OccluderHeight = 200f;
-                    OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
-                    OrientationInterpolation = 0;
-                    PathingMap = "PathTextures\\8x8SimpleSolid.tga";
-                    PlaceableInEditor = true;
-                    PlacementRequiresWaterRadius = 0f;
-                    PointValue = 100;
-                    PortraitModelFile = "buildings\\other\\FurbolgHut2\\FurbolgHut2_portrait";
-                    Priority = 1;
-                    ProjectileImpactZ = 120f;
-                    ProjectileImpactZSwimming = 0f;
-                    ProjectileLaunchX = 0f;
-                    ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
-                    ProjectileLaunchZSwimming = 0f;
-                    PropulsionWindowDegrees = 60f;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    RepairGoldCost = 0;
-                    RepairLumberCost = 0;
-                    RepairTime = 3;
-                    Scale = 0.9f;
                     ScaleProjectiles = true;
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
@@ -3040,7 +3040,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Gnoll Hut (ngt2).</summary>
+            /// <summary>Gnoll Hut 2, ngt2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ngt2")]
             public class GnollHutNgt2 : global::Moonwell.Objects.StandardUnit
@@ -3483,7 +3483,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\8x8SimpleSolid.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unwalkable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.GroundPathable;
                     PlacementRequiresWaterRadius = 384f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\other\\GoblinShipyard\\GoblinShipyard_portrait";
@@ -3606,7 +3606,7 @@ namespace Moonwell.Objects
                     OrientationInterpolation = 0;
                     PathingMap = "PathTextures\\16x16Goldmine.tga";
                     PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingListPrevent.Unbuildable;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
                     PlacementRequiresWaterRadius = 0f;
                     PointValue = 100;
                     PortraitModelFile = "buildings\\other\\GoldMine\\GoldMine_portrait";
@@ -4047,13 +4047,130 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Harpy Nest (nhn2).</summary>
+            /// <summary>Harpy Nest (nhns).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("nhn2")]
+            [global::Moonwell.Objects.Standard("nhns")]
             public class HarpyNest : global::Moonwell.Objects.StandardUnit
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public HarpyNest()
+                {
+                    AcquisitionRange = 500f;
+                    AllowCustomTeamColor = false;
+                    AnimationBlendTimeSeconds = 0.15f;
+                    AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 200f;
+                    AnimationWalkSpeed = 200f;
+                    Armor = 0;
+                    ArmorType = global::Moonwell.Objects.ArmorType.Wood;
+                    Attack1DamageLossFactor = 0f;
+                    Attack1DamageSpillDistance = 0f;
+                    Attack1DamageSpillRadius = 0f;
+                    Attack1MaximumNumberOfTargets = 1;
+                    Attack1ShowUI = true;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
+                    Attack2DamageLossFactor = 0f;
+                    Attack2DamageSpillDistance = 0f;
+                    Attack2DamageSpillRadius = 0f;
+                    Attack2MaximumNumberOfTargets = 1;
+                    Attack2ShowUI = true;
+                    AttackCooldown = 0f;
+                    AttackType = global::Moonwell.AttackType.Normal;
+                    AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
+                    BuildTime = 3;
+                    CanBeBuiltOn = false;
+                    CanBuildOn = false;
+                    CanDropItemsOnDeath = true;
+                    CanFlee = true;
+                    CategorizationCampaign = false;
+                    CategorizationSpecial = true;
+                    CollisionSize = 50f;
+                    DeathTimeSeconds = 3f;
+                    DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
+                    DefenseUpgradeBonus = 2;
+                    Description = "A nest whose wooden frame is sparsely covered with a layer of debris.";
+                    DisplayAsNeutralHostile = false;
+                    ElevationSamplePoints = 4;
+                    ElevationSampleRadius = 50f;
+                    FlyHeight = 0f;
+                    FogOfWarSampleRadius = 0f;
+                    ForceBuildingHitPointsDisplay = false;
+                    GoldBountyAwardedBase = 0;
+                    GoldBountyAwardedNumberOfDice = 0;
+                    GoldBountyAwardedSidesPerDie = 0;
+                    GoldCost = 0;
+                    GroundTexture = "OSMA";
+                    HasTilesetSpecificData = false;
+                    HasWaterShadow = true;
+                    HeightMinimum = 0f;
+                    HideMinimapDisplay = false;
+                    HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
+                    IsABuilding = true;
+                    LumberBountyAwardedBase = 0;
+                    LumberBountyAwardedNumberOfDice = 0;
+                    LumberBountyAwardedSidesPerDie = 0;
+                    LumberCost = 0;
+                    MaxLife = 125;
+                    MaximumPitchAngleDegrees = 7f;
+                    MaximumRollAngleDegrees = 7f;
+                    Model = "buildings\\other\\HarpyNest\\HarpyNest";
+                    ModelFileExtraVersions = 0;
+                    Name = "Harpy Nest";
+                    NeutralBuildingShowsMinimapIcon = false;
+                    OccluderHeight = 0f;
+                    OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
+                    OrientationInterpolation = 0;
+                    PathingMap = "PathTextures\\8x8SimpleSolid.tga";
+                    PlaceableInEditor = true;
+                    PlacementRequiresWaterRadius = 0f;
+                    PointValue = 100;
+                    PortraitModelFile = "buildings\\other\\HarpyNest\\HarpyNest_portrait";
+                    Priority = 1;
+                    ProjectileImpactZ = 120f;
+                    ProjectileImpactZSwimming = 0f;
+                    ProjectileLaunchX = 0f;
+                    ProjectileLaunchY = 0f;
+                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZSwimming = 0f;
+                    PropulsionWindowDegrees = 60f;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    RepairGoldCost = 0;
+                    RepairLumberCost = 0;
+                    RepairTime = 3;
+                    Scale = 0.8f;
+                    ScaleProjectiles = true;
+                    SelectionCircleHeight = 0f;
+                    SelectionCircleOnWater = false;
+                    SelectionScale = 3.5f;
+                    ShadowTextureBuilding = "BuildingShadowSmall";
+                    SightRadiusNight = 500;
+                    SightRange = 500;
+                    Sleeps = false;
+                    SpeedMaximum = 0;
+                    SpeedMinimum = 0;
+                    TargetedAs = global::Moonwell.Objects.Targets.Structure;
+                    TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
+                    Tilesets = "B";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
+                    Tooltip = "Build Harpy Nest";
+                    UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
+                    UnitSoundSet = "HarpyNest";
+                    UseClickHelper = false;
+                    UseExtendedLineOfSight = false;
+                }
+            }
+
+            /// <summary>Harpy Nest 2, nhn2.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("nhn2")]
+            public class HarpyNestNhn2 : global::Moonwell.Objects.StandardUnit
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public HarpyNestNhn2()
                 {
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
@@ -4165,124 +4282,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Harpy Nest (nhns).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("nhns")]
-            public class HarpyNestNhns : global::Moonwell.Objects.StandardUnit
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public HarpyNestNhns()
-                {
-                    AcquisitionRange = 500f;
-                    AllowCustomTeamColor = false;
-                    AnimationBlendTimeSeconds = 0.15f;
-                    AnimationCastBackswing = 0.51f;
-                    AnimationRunSpeed = 200f;
-                    AnimationWalkSpeed = 200f;
-                    Armor = 0;
-                    ArmorType = global::Moonwell.Objects.ArmorType.Wood;
-                    Attack1DamageLossFactor = 0f;
-                    Attack1DamageSpillDistance = 0f;
-                    Attack1DamageSpillRadius = 0f;
-                    Attack1MaximumNumberOfTargets = 1;
-                    Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.AttackType.Normal;
-                    Attack2DamageLossFactor = 0f;
-                    Attack2DamageSpillDistance = 0f;
-                    Attack2DamageSpillRadius = 0f;
-                    Attack2MaximumNumberOfTargets = 1;
-                    Attack2ShowUI = true;
-                    AttackCooldown = 0f;
-                    AttackType = global::Moonwell.AttackType.Normal;
-                    AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
-                    BuildTime = 3;
-                    CanBeBuiltOn = false;
-                    CanBuildOn = false;
-                    CanDropItemsOnDeath = true;
-                    CanFlee = true;
-                    CategorizationCampaign = false;
-                    CategorizationSpecial = true;
-                    CollisionSize = 50f;
-                    DeathTimeSeconds = 3f;
-                    DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.DefenseType.Fort;
-                    DefenseUpgradeBonus = 2;
-                    Description = "A nest whose wooden frame is sparsely covered with a layer of debris.";
-                    DisplayAsNeutralHostile = false;
-                    ElevationSamplePoints = 4;
-                    ElevationSampleRadius = 50f;
-                    FlyHeight = 0f;
-                    FogOfWarSampleRadius = 0f;
-                    ForceBuildingHitPointsDisplay = false;
-                    GoldBountyAwardedBase = 0;
-                    GoldBountyAwardedNumberOfDice = 0;
-                    GoldBountyAwardedSidesPerDie = 0;
-                    GoldCost = 0;
-                    GroundTexture = "OSMA";
-                    HasTilesetSpecificData = false;
-                    HasWaterShadow = true;
-                    HeightMinimum = 0f;
-                    HideMinimapDisplay = false;
-                    HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
-                    IsABuilding = true;
-                    LumberBountyAwardedBase = 0;
-                    LumberBountyAwardedNumberOfDice = 0;
-                    LumberBountyAwardedSidesPerDie = 0;
-                    LumberCost = 0;
-                    MaxLife = 125;
-                    MaximumPitchAngleDegrees = 7f;
-                    MaximumRollAngleDegrees = 7f;
-                    Model = "buildings\\other\\HarpyNest\\HarpyNest";
-                    ModelFileExtraVersions = 0;
-                    Name = "Harpy Nest";
-                    NeutralBuildingShowsMinimapIcon = false;
-                    OccluderHeight = 0f;
-                    OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
-                    OrientationInterpolation = 0;
-                    PathingMap = "PathTextures\\8x8SimpleSolid.tga";
-                    PlaceableInEditor = true;
-                    PlacementRequiresWaterRadius = 0f;
-                    PointValue = 100;
-                    PortraitModelFile = "buildings\\other\\HarpyNest\\HarpyNest_portrait";
-                    Priority = 1;
-                    ProjectileImpactZ = 120f;
-                    ProjectileImpactZSwimming = 0f;
-                    ProjectileLaunchX = 0f;
-                    ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
-                    ProjectileLaunchZSwimming = 0f;
-                    PropulsionWindowDegrees = 60f;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    RepairGoldCost = 0;
-                    RepairLumberCost = 0;
-                    RepairTime = 3;
-                    Scale = 0.8f;
-                    ScaleProjectiles = true;
-                    SelectionCircleHeight = 0f;
-                    SelectionCircleOnWater = false;
-                    SelectionScale = 3.5f;
-                    ShadowTextureBuilding = "BuildingShadowSmall";
-                    SightRadiusNight = 500;
-                    SightRange = 500;
-                    Sleeps = false;
-                    SpeedMaximum = 0;
-                    SpeedMinimum = 0;
-                    TargetedAs = global::Moonwell.Objects.Targets.Structure;
-                    TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
-                    Tilesets = "B";
-                    TintingColor1Red = 255;
-                    TintingColor2Green = 255;
-                    TintingColor3Blue = 255;
-                    Tooltip = "Build Harpy Nest";
-                    UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
-                    UnitSoundSet = "HarpyNest";
-                    UseClickHelper = false;
-                    UseExtendedLineOfSight = false;
-                }
-            }
-
-            /// <summary>Hawk (nwe1).</summary>
+            /// <summary>Hawk (Level 1), nwe1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nwe1")]
             public class Hawk : global::Moonwell.Objects.StandardUnit
@@ -4412,13 +4412,129 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Ice Troll Hut (nth0).</summary>
+            /// <summary>Ice Troll Hut (nth1).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("nth0")]
+            [global::Moonwell.Objects.Standard("nth1")]
             public class IceTrollHut : global::Moonwell.Objects.StandardUnit
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public IceTrollHut()
+                {
+                    AcquisitionRange = 500f;
+                    AllowCustomTeamColor = false;
+                    AnimationBlendTimeSeconds = 0.15f;
+                    AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 200f;
+                    AnimationWalkSpeed = 200f;
+                    Armor = 0;
+                    ArmorType = global::Moonwell.Objects.ArmorType.Wood;
+                    Attack1DamageLossFactor = 0f;
+                    Attack1DamageSpillDistance = 0f;
+                    Attack1DamageSpillRadius = 0f;
+                    Attack1MaximumNumberOfTargets = 1;
+                    Attack1ShowUI = true;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
+                    Attack2DamageLossFactor = 0f;
+                    Attack2DamageSpillDistance = 0f;
+                    Attack2DamageSpillRadius = 0f;
+                    Attack2MaximumNumberOfTargets = 1;
+                    Attack2ShowUI = true;
+                    AttackCooldown = 0f;
+                    AttackType = global::Moonwell.AttackType.Normal;
+                    AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
+                    BuildTime = 3;
+                    CanBeBuiltOn = false;
+                    CanBuildOn = false;
+                    CanDropItemsOnDeath = true;
+                    CanFlee = true;
+                    CategorizationCampaign = false;
+                    CategorizationSpecial = true;
+                    CollisionSize = 50f;
+                    DeathTimeSeconds = 3f;
+                    DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
+                    DefenseUpgradeBonus = 2;
+                    Description = "A snow-covered dwelling that some Trolls call home.";
+                    DisplayAsNeutralHostile = false;
+                    ElevationSamplePoints = 4;
+                    ElevationSampleRadius = 50f;
+                    FlyHeight = 0f;
+                    FogOfWarSampleRadius = 0f;
+                    ForceBuildingHitPointsDisplay = false;
+                    GoldBountyAwardedBase = 0;
+                    GoldBountyAwardedNumberOfDice = 0;
+                    GoldBountyAwardedSidesPerDie = 0;
+                    GoldCost = 0;
+                    HasTilesetSpecificData = false;
+                    HasWaterShadow = true;
+                    HeightMinimum = 0f;
+                    HideMinimapDisplay = false;
+                    HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
+                    IsABuilding = true;
+                    LumberBountyAwardedBase = 0;
+                    LumberBountyAwardedNumberOfDice = 0;
+                    LumberBountyAwardedSidesPerDie = 0;
+                    LumberCost = 0;
+                    MaxLife = 125;
+                    MaximumPitchAngleDegrees = 7f;
+                    MaximumRollAngleDegrees = 7f;
+                    Model = "buildings\\other\\IceTrollHut1\\IceTrollHut1";
+                    ModelFileExtraVersions = 0;
+                    Name = "Ice Troll Hut";
+                    NeutralBuildingShowsMinimapIcon = false;
+                    OccluderHeight = 200f;
+                    OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
+                    OrientationInterpolation = 0;
+                    PathingMap = "PathTextures\\6x6SimpleSolid.tga";
+                    PlaceableInEditor = true;
+                    PlacementRequiresWaterRadius = 0f;
+                    PointValue = 100;
+                    PortraitModelFile = "buildings\\other\\IceTrollHut1\\IceTrollHut1_portrait";
+                    Priority = 1;
+                    ProjectileImpactZ = 120f;
+                    ProjectileImpactZSwimming = 0f;
+                    ProjectileLaunchX = 0f;
+                    ProjectileLaunchY = 0f;
+                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZSwimming = 0f;
+                    PropulsionWindowDegrees = 60f;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    RepairGoldCost = 0;
+                    RepairLumberCost = 0;
+                    RepairTime = 3;
+                    Scale = 1f;
+                    ScaleProjectiles = true;
+                    SelectionCircleHeight = 0f;
+                    SelectionCircleOnWater = false;
+                    SelectionScale = 3.5f;
+                    ShadowTextureBuilding = "BuildingShadowSmall";
+                    SightRadiusNight = 0;
+                    SightRange = 0;
+                    Sleeps = false;
+                    SpeedMaximum = 0;
+                    SpeedMinimum = 0;
+                    TargetedAs = global::Moonwell.Objects.Targets.Structure;
+                    TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
+                    Tilesets = "N";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
+                    Tooltip = "Build Ice Troll Hut";
+                    UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
+                    UnitSoundSet = "IceTrollHut1";
+                    UseClickHelper = false;
+                    UseExtendedLineOfSight = false;
+                }
+            }
+
+            /// <summary>Ice Troll Hut 2, nth0.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("nth0")]
+            public class IceTrollHutNth0 : global::Moonwell.Objects.StandardUnit
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public IceTrollHutNth0()
                 {
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
@@ -4524,122 +4640,6 @@ namespace Moonwell.Objects
                     Tooltip = "Build Ice Troll Hut";
                     UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
                     UnitSoundSet = "IceTrollHut0";
-                    UseClickHelper = false;
-                    UseExtendedLineOfSight = false;
-                }
-            }
-
-            /// <summary>Ice Troll Hut (nth1).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("nth1")]
-            public class IceTrollHutNth1 : global::Moonwell.Objects.StandardUnit
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public IceTrollHutNth1()
-                {
-                    AcquisitionRange = 500f;
-                    AllowCustomTeamColor = false;
-                    AnimationBlendTimeSeconds = 0.15f;
-                    AnimationCastBackswing = 0.51f;
-                    AnimationRunSpeed = 200f;
-                    AnimationWalkSpeed = 200f;
-                    Armor = 0;
-                    ArmorType = global::Moonwell.Objects.ArmorType.Wood;
-                    Attack1DamageLossFactor = 0f;
-                    Attack1DamageSpillDistance = 0f;
-                    Attack1DamageSpillRadius = 0f;
-                    Attack1MaximumNumberOfTargets = 1;
-                    Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.AttackType.Normal;
-                    Attack2DamageLossFactor = 0f;
-                    Attack2DamageSpillDistance = 0f;
-                    Attack2DamageSpillRadius = 0f;
-                    Attack2MaximumNumberOfTargets = 1;
-                    Attack2ShowUI = true;
-                    AttackCooldown = 0f;
-                    AttackType = global::Moonwell.AttackType.Normal;
-                    AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
-                    BuildTime = 3;
-                    CanBeBuiltOn = false;
-                    CanBuildOn = false;
-                    CanDropItemsOnDeath = true;
-                    CanFlee = true;
-                    CategorizationCampaign = false;
-                    CategorizationSpecial = true;
-                    CollisionSize = 50f;
-                    DeathTimeSeconds = 3f;
-                    DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
-                    DefenseType = global::Moonwell.DefenseType.Fort;
-                    DefenseUpgradeBonus = 2;
-                    Description = "A snow-covered dwelling that some Trolls call home.";
-                    DisplayAsNeutralHostile = false;
-                    ElevationSamplePoints = 4;
-                    ElevationSampleRadius = 50f;
-                    FlyHeight = 0f;
-                    FogOfWarSampleRadius = 0f;
-                    ForceBuildingHitPointsDisplay = false;
-                    GoldBountyAwardedBase = 0;
-                    GoldBountyAwardedNumberOfDice = 0;
-                    GoldBountyAwardedSidesPerDie = 0;
-                    GoldCost = 0;
-                    HasTilesetSpecificData = false;
-                    HasWaterShadow = true;
-                    HeightMinimum = 0f;
-                    HideMinimapDisplay = false;
-                    HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGenericCreepBuilding.blp";
-                    IsABuilding = true;
-                    LumberBountyAwardedBase = 0;
-                    LumberBountyAwardedNumberOfDice = 0;
-                    LumberBountyAwardedSidesPerDie = 0;
-                    LumberCost = 0;
-                    MaxLife = 125;
-                    MaximumPitchAngleDegrees = 7f;
-                    MaximumRollAngleDegrees = 7f;
-                    Model = "buildings\\other\\IceTrollHut1\\IceTrollHut1";
-                    ModelFileExtraVersions = 0;
-                    Name = "Ice Troll Hut";
-                    NeutralBuildingShowsMinimapIcon = false;
-                    OccluderHeight = 200f;
-                    OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
-                    OrientationInterpolation = 0;
-                    PathingMap = "PathTextures\\6x6SimpleSolid.tga";
-                    PlaceableInEditor = true;
-                    PlacementRequiresWaterRadius = 0f;
-                    PointValue = 100;
-                    PortraitModelFile = "buildings\\other\\IceTrollHut1\\IceTrollHut1_portrait";
-                    Priority = 1;
-                    ProjectileImpactZ = 120f;
-                    ProjectileImpactZSwimming = 0f;
-                    ProjectileLaunchX = 0f;
-                    ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
-                    ProjectileLaunchZSwimming = 0f;
-                    PropulsionWindowDegrees = 60f;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    RepairGoldCost = 0;
-                    RepairLumberCost = 0;
-                    RepairTime = 3;
-                    Scale = 1f;
-                    ScaleProjectiles = true;
-                    SelectionCircleHeight = 0f;
-                    SelectionCircleOnWater = false;
-                    SelectionScale = 3.5f;
-                    ShadowTextureBuilding = "BuildingShadowSmall";
-                    SightRadiusNight = 0;
-                    SightRange = 0;
-                    Sleeps = false;
-                    SpeedMaximum = 0;
-                    SpeedMinimum = 0;
-                    TargetedAs = global::Moonwell.Objects.Targets.Structure;
-                    TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
-                    Tilesets = "N";
-                    TintingColor1Red = 255;
-                    TintingColor2Green = 255;
-                    TintingColor3Blue = 255;
-                    Tooltip = "Build Ice Troll Hut";
-                    UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
-                    UnitSoundSet = "IceTrollHut1";
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
                 }
@@ -5501,7 +5501,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Lava Spawn (nlv1).</summary>
+            /// <summary>Lava Spawn (Level 1), nlv1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nlv1")]
             public class LavaSpawn : global::Moonwell.Objects.StandardUnit
@@ -5648,7 +5648,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Lava Spawn (nlv2).</summary>
+            /// <summary>Lava Spawn (Level 2), nlv2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nlv2")]
             public class LavaSpawnNlv2 : global::Moonwell.Objects.StandardUnit
@@ -5796,7 +5796,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Lava Spawn (nlv3).</summary>
+            /// <summary>Lava Spawn (Level 3), nlv3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nlv3")]
             public class LavaSpawnNlv3 : global::Moonwell.Objects.StandardUnit
@@ -6203,7 +6203,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mercenary Camp (nmer).</summary>
+            /// <summary>Mercenary Camp (Lordaeron Summer), nmer.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmer")]
             public class MercenaryCamp : global::Moonwell.Objects.StandardUnit
@@ -6325,7 +6325,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mercenary Camp (nmr0).</summary>
+            /// <summary>Mercenary Camp (Village), nmr0.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmr0")]
             public class MercenaryCampNmr0 : global::Moonwell.Objects.StandardUnit
@@ -6447,7 +6447,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mercenary Camp (nmr2).</summary>
+            /// <summary>Mercenary Camp (Lordaeron Fall), nmr2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmr2")]
             public class MercenaryCampNmr2 : global::Moonwell.Objects.StandardUnit
@@ -6569,7 +6569,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mercenary Camp (nmr3).</summary>
+            /// <summary>Mercenary Camp (Lordaeron Winter), nmr3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmr3")]
             public class MercenaryCampNmr3 : global::Moonwell.Objects.StandardUnit
@@ -6691,7 +6691,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mercenary Camp (nmr4).</summary>
+            /// <summary>Mercenary Camp (Barrens), nmr4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmr4")]
             public class MercenaryCampNmr4 : global::Moonwell.Objects.StandardUnit
@@ -6813,7 +6813,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mercenary Camp (nmr5).</summary>
+            /// <summary>Mercenary Camp (Ashenvale), nmr5.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmr5")]
             public class MercenaryCampNmr5 : global::Moonwell.Objects.StandardUnit
@@ -6935,7 +6935,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mercenary Camp (nmr6).</summary>
+            /// <summary>Mercenary Camp (Felwood), nmr6.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmr6")]
             public class MercenaryCampNmr6 : global::Moonwell.Objects.StandardUnit
@@ -7057,7 +7057,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mercenary Camp (nmr7).</summary>
+            /// <summary>Mercenary Camp (Northrend), nmr7.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmr7")]
             public class MercenaryCampNmr7 : global::Moonwell.Objects.StandardUnit
@@ -7179,7 +7179,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mercenary Camp (nmr8).</summary>
+            /// <summary>Mercenary Camp (Cityscape), nmr8.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmr8")]
             public class MercenaryCampNmr8 : global::Moonwell.Objects.StandardUnit
@@ -7301,7 +7301,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mercenary Camp (nmr9).</summary>
+            /// <summary>Mercenary Camp (Dalaran), nmr9.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmr9")]
             public class MercenaryCampNmr9 : global::Moonwell.Objects.StandardUnit
@@ -7423,7 +7423,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mercenary Camp (nmra).</summary>
+            /// <summary>Mercenary Camp (Dungeon), nmra.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmra")]
             public class MercenaryCampNmra : global::Moonwell.Objects.StandardUnit
@@ -7545,7 +7545,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mercenary Camp (nmrb).</summary>
+            /// <summary>Mercenary Camp (Underground), nmrb.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmrb")]
             public class MercenaryCampNmrb : global::Moonwell.Objects.StandardUnit
@@ -7667,7 +7667,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mercenary Camp (nmrc).</summary>
+            /// <summary>Mercenary Camp (Sunken Ruins), nmrc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmrc")]
             public class MercenaryCampNmrc : global::Moonwell.Objects.StandardUnit
@@ -7789,7 +7789,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mercenary Camp (nmrd).</summary>
+            /// <summary>Mercenary Camp (Icecrown Glacier), nmrd.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmrd")]
             public class MercenaryCampNmrd : global::Moonwell.Objects.StandardUnit
@@ -7911,7 +7911,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mercenary Camp (nmre).</summary>
+            /// <summary>Mercenary Camp (Outland), nmre.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmre")]
             public class MercenaryCampNmre : global::Moonwell.Objects.StandardUnit
@@ -8033,7 +8033,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mercenary Camp (nmrf).</summary>
+            /// <summary>Mercenary Camp (Black Citadel), nmrf.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmrf")]
             public class MercenaryCampNmrf : global::Moonwell.Objects.StandardUnit
@@ -8155,7 +8155,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Misha (ngz4).</summary>
+            /// <summary>Misha (Level 4), ngz4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ngz4")]
             public class Misha : global::Moonwell.Objects.StandardUnit
@@ -8296,7 +8296,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Misha (ngza).</summary>
+            /// <summary>Misha (Level 3), ngza.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ngza")]
             public class MishaNgza : global::Moonwell.Objects.StandardUnit
@@ -8437,7 +8437,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Misha (ngzc).</summary>
+            /// <summary>Misha (Level 1), ngzc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ngzc")]
             public class MishaNgzc : global::Moonwell.Objects.StandardUnit
@@ -8578,7 +8578,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Misha (ngzd).</summary>
+            /// <summary>Misha (Level 2), ngzd.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ngzd")]
             public class MishaNgzd : global::Moonwell.Objects.StandardUnit
@@ -8719,7 +8719,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mur'gul Hut (nmg0).</summary>
+            /// <summary>Mur'gul Hut 0, nmg0.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmg0")]
             public class MurgulHut : global::Moonwell.Objects.StandardUnit
@@ -8837,7 +8837,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mur'gul Hut (nmg1).</summary>
+            /// <summary>Mur'gul Hut 1, nmg1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmg1")]
             public class MurgulHutNmg1 : global::Moonwell.Objects.StandardUnit
@@ -8955,7 +8955,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Murloc Hut (nmg2).</summary>
+            /// <summary>Murloc Hut 2, nmg2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmg2")]
             public class MurlocHut : global::Moonwell.Objects.StandardUnit
@@ -9073,7 +9073,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Murloc Hut (nmh0).</summary>
+            /// <summary>Murloc Hut 0, nmh0.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmh0")]
             public class MurlocHutNmh0 : global::Moonwell.Objects.StandardUnit
@@ -9191,7 +9191,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Murloc Hut (nmh1).</summary>
+            /// <summary>Murloc Hut 1, nmh1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nmh1")]
             public class MurlocHutNmh1 : global::Moonwell.Objects.StandardUnit
@@ -9550,7 +9550,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Pocket Factory (nfa1).</summary>
+            /// <summary>Pocket Factory (Level 2), nfa1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nfa1")]
             public class PocketFactory : global::Moonwell.Objects.StandardUnit
@@ -9675,7 +9675,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Pocket Factory (nfa2).</summary>
+            /// <summary>Pocket Factory (Level 3), nfa2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nfa2")]
             public class PocketFactoryNfa2 : global::Moonwell.Objects.StandardUnit
@@ -9800,7 +9800,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Pocket Factory (nfac).</summary>
+            /// <summary>Pocket Factory (Level 1), nfac.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nfac")]
             public class PocketFactoryNfac : global::Moonwell.Objects.StandardUnit
@@ -9925,7 +9925,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Quilbeast (nqb1).</summary>
+            /// <summary>Quilbeast (Level 1), nqb1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nqb1")]
             public class Quilbeast : global::Moonwell.Objects.StandardUnit
@@ -10064,7 +10064,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Raging Quilbeast (nqb3).</summary>
+            /// <summary>Raging Quilbeast (Level 3), nqb3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nqb3")]
             public class RagingQuilbeast : global::Moonwell.Objects.StandardUnit
@@ -10616,7 +10616,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Spirit Hawk (nwe3).</summary>
+            /// <summary>Spirit Hawk (Level 3), nwe3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nwe3")]
             public class SpiritHawk : global::Moonwell.Objects.StandardUnit
@@ -10882,7 +10882,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Tauren Tent (ntt2).</summary>
+            /// <summary>Tauren Tent 2, ntt2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ntt2")]
             public class TaurenTentNtt2 : global::Moonwell.Objects.StandardUnit
@@ -11100,7 +11100,7 @@ namespace Moonwell.Objects
                     SelectionCircleHeight = 0f;
                     SelectionCircleOnWater = false;
                     SelectionScale = 6f;
-                    SellsUnits.Set<global::Moonwell.Objects.Creeps.Units.AlchemistNalc, global::Moonwell.Objects.Creeps.Units.TinkerNtin, global::Moonwell.Objects.Creeps.Units.Firelord, global::Moonwell.Objects.Creeps.Units.SeaWitch, global::Moonwell.Objects.Creeps.Units.DarkRanger, global::Moonwell.Objects.Creeps.Units.Brewmaster, global::Moonwell.Objects.Creeps.Units.PitLord, global::Moonwell.Objects.Creeps.Units.Beastmaster>();
+                    SellsUnits.Set<global::Moonwell.Objects.Creeps.Units.Alchemist, global::Moonwell.Objects.Creeps.Units.TinkerNtin, global::Moonwell.Objects.Creeps.Units.Firelord, global::Moonwell.Objects.Creeps.Units.SeaWitch, global::Moonwell.Objects.Creeps.Units.DarkRanger, global::Moonwell.Objects.Creeps.Units.Brewmaster, global::Moonwell.Objects.Creeps.Units.PitLord, global::Moonwell.Objects.Creeps.Units.Beastmaster>();
                     SellsUnits.Add<global::Moonwell.Objects.Creeps.Units.ForsakenPaladin>();
                     ShadowTextureBuilding = "BuildingShadowSmall";
                     SightRadiusNight = 500;
@@ -11239,7 +11239,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Tent (ntn2).</summary>
+            /// <summary>Tent 2, ntn2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ntn2")]
             public class TentNtn2 : global::Moonwell.Objects.StandardUnit
@@ -11357,7 +11357,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Tent (ntn3).</summary>
+            /// <summary>Tent 3, ntn3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ntn3")]
             public class TentNtn3 : global::Moonwell.Objects.StandardUnit
@@ -11475,7 +11475,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Thunder Hawk (nwe2).</summary>
+            /// <summary>Thunder Hawk (Level 2), nwe2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nwe2")]
             public class ThunderHawk : global::Moonwell.Objects.StandardUnit

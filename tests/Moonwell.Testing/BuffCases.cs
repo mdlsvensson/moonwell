@@ -106,16 +106,16 @@ namespace Moonwell.Testing
             Expect.Equal(2, target.GetAll<SourceBurn>().Count, "the burns after the second source");
         }
 
-        /// <summary>A registered buff shows through its carrier ability when the first one is on, and is removed with its carrier when the last one ends.</summary>
+        /// <summary>A registered buff shows through its carrier ability when the first one is on, made permanent so a morph keeps it, and is removed with its carrier when the last one ends.</summary>
         public static void Display(FakeWorld world)
         {
             ObjectTypes.BuffDisplay<SeparateBurn>(ObjectTypes.FourCC("B000"), ObjectTypes.FourCC("A00B"));
             var target = Target(world);
             target.Apply(new SeparateBurn());
             target.Apply(new SeparateBurn());
-            ExpectCalls(world, new string[] { "add " + ObjectTypes.FourCC("A00B"), "hide " + ObjectTypes.FourCC("A00B") }, "the calls while both are on");
+            ExpectCalls(world, new string[] { "add " + ObjectTypes.FourCC("A00B"), "hide " + ObjectTypes.FourCC("A00B"), "permanent " + ObjectTypes.FourCC("A00B") }, "the calls while both are on");
             world.Advance(3.1f);
-            ExpectCalls(world, new string[] { "add " + ObjectTypes.FourCC("A00B"), "hide " + ObjectTypes.FourCC("A00B"), "remove " + ObjectTypes.FourCC("A00B"), "remove " + ObjectTypes.FourCC("B000") }, "the calls after both have expired");
+            ExpectCalls(world, new string[] { "add " + ObjectTypes.FourCC("A00B"), "hide " + ObjectTypes.FourCC("A00B"), "permanent " + ObjectTypes.FourCC("A00B"), "remove " + ObjectTypes.FourCC("A00B"), "remove " + ObjectTypes.FourCC("B000") }, "the calls after both have expired");
         }
 
         /// <summary>When the unit is removed, the buff is removed without expiring.</summary>

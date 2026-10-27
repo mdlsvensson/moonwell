@@ -10,7 +10,12 @@ namespace Moonwell.Build.Tests
 {
     public sealed class PlaceWriterTests : IDisposable
     {
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
+
+        public PlaceWriterTests(ITestOutputHelper output)
+        {
+            folders = new TestFolders(output);
+        }
 
         public void Dispose()
         {

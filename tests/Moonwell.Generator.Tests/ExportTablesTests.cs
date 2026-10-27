@@ -1,4 +1,4 @@
-using Moonwell.Generator.Objects;
+using Moonwell.GameData;
 
 namespace Moonwell.Generator.Tests;
 
@@ -259,6 +259,17 @@ public class ExportTablesTests
         Assert.Equal("Summer Tree Wall", tables.Label("WESTRING_DEST_SUMMER_TREE_WALL"));
         Assert.Equal("Lilypad", tables.Label("WESTRING_DOOD_LPLP"));
         Assert.Equal("Lilypad", tables.Label("WESTRING_DOOD_lplp"));
+    }
+
+    [Fact]
+    public void a_label_given_twice_in_one_file_keeps_the_first()
+    {
+        // worldeditstrings.txt gives WESTRING_UE_TARGETTYPE_SELF as "Self", and later as "Shelf".
+        using var copy = new TempExport(MiniExport());
+        var path = Path.Combine(copy.Folder, "_locales", "enus.w3mod", "ui", "worldeditstrings.txt");
+        File.AppendAllText(path, "\r\nWESTRING_TEST_TWICE=Self\r\nWESTRING_TEST_TWICE=Shelf\r\n");
+
+        Assert.Equal("Self", ExportTables.Read(copy.Folder).Label("WESTRING_TEST_TWICE"));
     }
 
     [Fact]

@@ -313,7 +313,7 @@ public class ConstructorTests
     }
 
     [Fact]
-    public void a_units_level_set_in_a_declared_class_constructor_and_its_lambdas_is_accepted()
+    public void a_units_level_set_in_a_declared_class_constructor_and_its_local_functions_is_accepted()
     {
         Assert.Empty(MapCode.CheckFile("""
             using System;
@@ -343,13 +343,35 @@ public class ConstructorTests
                     public Captain()
                     {
                         base.Level = 5;
-                        Action later = () => Level = 6;
                         Wrap();
 
                         void Wrap()
                         {
                             Level = 7;
                         }
+                    }
+                }
+            }
+            """));
+    }
+
+    [Fact]
+    public void a_units_level_set_in_a_lambda_in_a_constructor_is_mw0015()
+    {
+        // The lambda runs later in the game, where setting the level does nothing.
+        Assert.Equal(new[] { "MW0015: Level", "MW0015: Level" }, MapCode.CheckFile("""
+            using System;
+            using Moonwell;
+            using Moonwell.Objects;
+
+            namespace Map
+            {
+                public class Captain : Human.Units.Footman
+                {
+                    public Captain()
+                    {
+                        Action later = () => Level = 6;
+                        Action<int> set = delegate (int level) { Level = level; };
                     }
                 }
             }

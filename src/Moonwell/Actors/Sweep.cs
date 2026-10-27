@@ -3,9 +3,10 @@ namespace Moonwell
     /// <summary>Finds the units, items and destructables the game has removed, which fire no event, and ends them. A timer runs it every 0.25 seconds.</summary>
     internal static class Sweep
     {
-        /// <summary>Ends each live unit, item and destructable whose type id reads 0, which means the game has removed it.</summary>
+        /// <summary>Ends each live unit, item and destructable whose type id reads 0, which means the game has removed it, and forgets the handles of the units the runtime removed once theirs reads 0.</summary>
         internal static void Run()
         {
+            KnownUnits.ForgetRemoved();
             var units = KnownUnits.Live.Snapshot();
             for (var i = 0; i < units.Count; i++)
             {

@@ -16,10 +16,18 @@ namespace Moonwell
         /// <summary>The scheduler that runs the timers; set by Reset.</summary>
         internal static Scheduler Scheduler = null!;
 
+#if DEBUG
+        /// <summary>Moonwell's clock in a development build, which the world's Now and WakeIn go through; set by Reset.</summary>
+        internal static DebugClock Clock = null!;
+#endif
+
         /// <summary>Makes a world the runtime's world and clears the state of every task.</summary>
         internal static void Reset(IWorld world)
         {
             World = world;
+#if DEBUG
+            Clock = new DebugClock();
+#endif
             Errors.Reset();
             Scheduler = new Scheduler();
             Hooks.Reset();
@@ -32,6 +40,12 @@ namespace Moonwell
             KnownDestructables.Reset();
             ObjectTypes.Reset();
             Owner.current = null;
+#if DEBUG
+            DebugSession.Reset();
+            DebugViews.Reset();
+            DebugPanel.Reset();
+            DebugStats.Reset();
+#endif
             Timer.Every(0.25f, Sweep.Run, Game.Instance);
         }
 
@@ -45,6 +59,9 @@ namespace Moonwell
         public static void Start(Action setup)
         {
             Reset(new NativeWorld());
+#if DEBUG
+            DebugSession.Install(new NativeDebugWorld((NativeWorld)World));
+#endif
             NativeWorld.Later(() => Begin(setup));
         }
 
@@ -77,8 +94,8 @@ namespace Moonwell
             Events.Need(Hook.OnPickedUp | Hook.OnDropped);
         }
 
-        /// <summary>Runs the setup, then takes in what is already in the world and starts the game's components.</summary>
-        private static void Begin(Action setup)
+        /// <summary>Runs the setup, then takes in what is already in the world and starts the game's components; internal for the cases.</summary>
+        internal static void Begin(Action setup)
         {
             ListenForCarriers();
             var previous = Owner.current;
@@ -98,7 +115,7 @@ namespace Moonwell
             {
                 try
                 {
-                    KnownUnits.TakeIn(handle, null);
+                    KnownUnits.TakeIn(handle, null, true);
                 }
                 catch (Exception error)
                 {

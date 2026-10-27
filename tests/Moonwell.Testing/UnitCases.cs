@@ -128,6 +128,25 @@ namespace Moonwell.Testing
             Expect.Equal(1, unit.Player.Slot, "the owner's slot after the sweep");
         }
 
+        /// <summary>A unit's player is set in the game, with the unit's colour changed to the new player's; once the unit is gone, setting does nothing.</summary>
+        public static void PlayerSet(FakeWorld world)
+        {
+            var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"), slot: 1);
+            var unit = Unit.Of(handle)!;
+
+            unit.Player = Player.Get(3);
+
+            Expect.Equal(3, unit.Player.Slot, "the new player");
+            Expect.Equal(3, world.SlotOf(world.OwnerOf(handle)), "the game's player");
+            Expect.Equal("owner 3 True", world.UnitCalls[world.UnitCalls.Count - 1], "the call changes the colour");
+
+            unit.Remove();
+            var calls = world.UnitCalls.Count;
+            unit.Player = Player.Get(5);
+            Expect.Equal(3, unit.Player.Slot, "the last player once gone");
+            Expect.Equal(calls, world.UnitCalls.Count, "no call once gone");
+        }
+
         /// <summary>A unit's life, most life, mana and most mana are the game's: read and set, each apart.</summary>
         public static void LifeAndMana(FakeWorld world)
         {
@@ -682,6 +701,18 @@ namespace Moonwell.Testing
             ObjectTypes.Unit(ObjectTypes.FourCC("H001"), () => new TestHero());
             var made = Unit.Create<TestHero>(Player.Get(0), 0f, 0f, 0f);
             Expect.Equal(ObjectTypes.FourCC("H001"), made.TypeId, "the type id");
+        }
+
+        /// <summary>Unit.Create puts the unit at the x and y it is given, made by its class or by its type id.</summary>
+        public static void CreatePlace(FakeWorld world)
+        {
+            ObjectTypes.Unit(ObjectTypes.FourCC("H001"), () => new TestHero());
+            var made = Unit.Create<TestHero>(Player.Get(0), 30f, -40f);
+            Expect.Near(30f, made.X, "the x of Create<T>");
+            Expect.Near(-40f, made.Y, "the y of Create<T>");
+            var plain = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(1), -75f, 120f);
+            Expect.Near(-75f, plain.X, "the x of Create with a type id");
+            Expect.Near(120f, plain.Y, "the y of Create with a type id");
         }
 
         /// <summary>When two units' OnLeave throw, the sweep still ends both, and the error is logged.</summary>

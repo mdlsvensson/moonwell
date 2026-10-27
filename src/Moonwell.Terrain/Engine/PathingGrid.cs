@@ -5,9 +5,11 @@ namespace Moonwell.Engine
 {
     /// <summary>
     /// What the game says units can do on the ground, kept a cell of 32 by 32 at a time from the grid's first corner. A
-    /// cell is read at its centre, four calls to the world, into one number: walkable 1, flyable 2, buildable 4, water
-    /// 8. The cells are read a block of 16 by 16 at a time, the first time one of them is asked for, so a map pays only
-    /// for the ground it looks at; <c>Refresh</c> drops blocks so the next ask reads them again.
+    /// cell is read at its centre, four calls to the world, into four bits: walkable 1, flyable 2, buildable 4, water 8;
+    /// eight cells share a number, the first in its lowest bits, so a block keeps 32 numbers where it kept 256 (a fully
+    /// read grid of the largest map is about an eighth of the 59 MB it was). The cells are read a block of 16 by 16 at a
+    /// time, the first time one of them is asked for, so a map pays only for the ground it looks at; <c>Refresh</c> drops
+    /// blocks so the next ask reads them again.
     /// </summary>
     internal sealed class PathingGrid
     {
@@ -28,6 +30,9 @@ namespace Moonwell.Engine
 
         /// <summary>Side as a power of two: a cell's block is its column and row shifted down by it.</summary>
         private const int SideBits = 4;
+
+        /// <summary>The numbers a block keeps: eight cells of four bits to a number, which a 32-bit integer of the game's Lua holds.</summary>
+        private const int Numbers = Side * Side / 8;
 
         /// <summary>The width of a cell, which is also how finely the game's pathing is kept.</summary>
         private const float CellSize = 32f;
@@ -50,7 +55,7 @@ namespace Moonwell.Engine
         /// <summary>The blocks across the grid, the last one maybe partial.</summary>
         private readonly int blocksAcross;
 
-        /// <summary>The flags of each block, indexed by the block; null until it is read.</summary>
+        /// <summary>The flags of each block, indexed by the block, eight cells to a number; null until it is read.</summary>
         private readonly int[]?[] blocks;
 
         /// <summary>Makes a grid over the area of a height grid of this many corners (a tile is 4 cells), reading nothing yet.</summary>
@@ -65,7 +70,7 @@ namespace Moonwell.Engine
             blocks = new int[blocksAcross * ((rows + Side - 1) / Side)][];
         }
 
-        /// <summary>The flags of the cell that holds a point, which is first kept inside the grid. A pushed unit asks it every step, so it is written out in one: Cell for the column and the row, then the block and the slot by shifts and masks (the column and row are 0 or more), read from the slots.</summary>
+        /// <summary>The flags of the cell that holds a point, which is first kept inside the grid. A pushed unit asks it every step, so it is written out in one: Cell for the column and the row, then the block, the number and the cell's four bits in it by shifts and masks (the column and row are 0 or more), read from the slots.</summary>
         internal int Flags(float x, float y)
         {
             var across = (x - left) / CellSize;
@@ -98,7 +103,8 @@ namespace Moonwell.Engine
                 blocks[block] = Read(column >> SideBits << SideBits, row >> SideBits << SideBits);
             }
 
-            return Slots.At(Slots.At(blocks, block)!, (row & (Side - 1)) * Side + (column & (Side - 1)));
+            var cell = (row & (Side - 1)) * Side + (column & (Side - 1));
+            return (Slots.At(Slots.At(blocks, block)!, cell >> 3) >> ((cell & 7) * 4)) & 15;
         }
 
         /// <summary>Drops every block an area touches (the area kept inside the grid), so the next read of one reads it again.</summary>
@@ -134,10 +140,10 @@ namespace Moonwell.Engine
             return Slots.Whole(cells);
         }
 
-        /// <summary>Reads the cells of a block, whose first cell is at a column and a row; the cells past the grid's edge are not read.</summary>
+        /// <summary>Reads the cells of a block, whose first cell is at a column and a row, eight to a number; the cells past the grid's edge are not read.</summary>
         private int[] Read(int firstColumn, int firstRow)
         {
-            var flags = new int[Side * Side];
+            var flags = new int[Numbers];
             for (var dj = 0; dj < Side && firstRow + dj < rows; dj++)
             {
                 var y = bottom + (firstRow + dj) * CellSize + CellSize / 2f;
@@ -165,7 +171,8 @@ namespace Moonwell.Engine
                         cell |= Water;
                     }
 
-                    flags[dj * Side + di] = cell;
+                    var at = dj * Side + di;
+                    flags[at >> 3] |= cell << ((at & 7) * 4);
                 }
             }
 

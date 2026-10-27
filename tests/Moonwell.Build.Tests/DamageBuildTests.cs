@@ -8,11 +8,12 @@ namespace Moonwell.Build.Tests
     public sealed class DamageBuildTests : IDisposable
     {
         private readonly SampleBuilds builds;
-        private readonly TestFolders folders = new TestFolders();
+        private readonly TestFolders folders;
 
-        public DamageBuildTests(SampleBuilds builds)
+        public DamageBuildTests(SampleBuilds builds, ITestOutputHelper output)
         {
             this.builds = builds;
+            folders = new TestFolders(output);
         }
 
         public void Dispose()
@@ -54,7 +55,7 @@ namespace Moonwell.Build.Tests
             Assert.DoesNotContain("DamageSystem", script);
             Assert.DoesNotContain("Moonwell.Hit", script);
             Assert.DoesNotContain("EVENT_PLAYER_UNIT_DAMAGING", script);
-            var main = File.ReadAllText(Path.Combine(TestFolders.Fixture("Sample"), "build", "generated", "MapMain.g.cs"));
+            var main = File.ReadAllText(Path.Combine(builds.Folder, "build", "generated", "MapMain.g.cs"));
             Assert.DoesNotContain("DamageSystem", main);
         }
     }

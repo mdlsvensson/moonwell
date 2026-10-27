@@ -1,4 +1,4 @@
-namespace Moonwell.Generator.Objects;
+namespace Moonwell.GameData;
 
 /// <summary>
 /// The shared fields: a field whose live value is a member of the runtime class (<c>umpm</c> is <c>Unit.MaxMana</c>), and

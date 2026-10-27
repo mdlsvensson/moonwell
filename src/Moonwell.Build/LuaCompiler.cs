@@ -12,7 +12,7 @@ namespace Moonwell.Build
         /// <param name="project">The map project.</param>
         /// <param name="map">The opened source map.</param>
         /// <param name="targetPath">The map's built assembly; the Moonwell libraries are next to it.</param>
-        /// <param name="release">True drops <c>DEBUG</c> code and comments.</param>
+        /// <param name="release">True compiles with <c>RELEASE</c> in place of <c>DEBUG</c>, and drops comments.</param>
         /// <returns>The script, also set on <paramref name="map"/>.</returns>
         /// <exception cref="BuildException">Common.j and Blizzard.j are missing or the C# does not compile to Lua.</exception>
         public static string Compile(MapProject project, War3Net.Build.Map map, string targetPath, bool release)
@@ -30,7 +30,7 @@ namespace Moonwell.Build
         /// <param name="project">The map project.</param>
         /// <param name="map">The opened source map.</param>
         /// <param name="targetPath">The map's built assembly; the Moonwell libraries are next to it.</param>
-        /// <param name="release">True drops <c>DEBUG</c> code and comments.</param>
+        /// <param name="release">True compiles with <c>RELEASE</c> in place of <c>DEBUG</c>, and drops comments.</param>
         /// <param name="declarations">What the map declares and the classes it uses.</param>
         /// <param name="ids">The object id of each declared class.</param>
         /// <param name="standard">The standard data.</param>
@@ -87,9 +87,11 @@ namespace Moonwell.Build
                 libraries.Add(path);
             }
 
-            // MOONWELL_LUA leaves out the generated classes of Moonwell.Objects; CSharp.lua compiles the build's stubs of them instead.
-            var symbols = release ? new[] { "MOONWELL_LUA" } : new[] { "DEBUG", "MOONWELL_LUA" };
-            var marked = MarkedProject.Stage(project, symbols);
+            // The symbols dotnet build defines (TRACE, and DEBUG or RELEASE), so the Lua runs the code the map's assembly has. MOONWELL_LUA
+            // leaves out the generated classes of Moonwell.Objects; CSharp.lua compiles the build's stubs of them instead. CSharp.lua defines
+            // __CSharpLua__ itself, and the line marks parse with it too, so that they see the code CSharp.lua compiles.
+            var symbols = release ? new[] { "TRACE", "RELEASE", "MOONWELL_LUA" } : new[] { "TRACE", "DEBUG", "MOONWELL_LUA" };
+            var marked = MarkedProject.Stage(project, symbols.Append("__CSharpLua__"));
             files = marked.Files;
             var compiler = new Compiler(marked.ProjectFile, project.GeneratedFolder, string.Empty, null!, null!, "*", "-define:" + string.Join(";", symbols), false, null!, string.Empty)
             {
