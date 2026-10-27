@@ -1305,7 +1305,8 @@ namespace Moonwell.Engine
         /// other (either refusing, nothing, and it is not asked again until they part); each is put where they met, at the
         /// velocity it met at; OnImpact on the first and its components, then on the second, each Impact with the normal out
         /// of the other and the speed they closed at, and the outcome the missile's own MissileContact gives; then each takes
-        /// its own outcome. Missiles take no damage. What the pair does next; the seconds to wait for Later.
+        /// its own outcome. A side whose MissileContact is None reacts to nothing and flies on, and the other meets it as a
+        /// thing that does not move. Missiles take no damage. What the pair does next; the seconds to wait for Later.
         /// </summary>
         private static int Meet(Missile first, Missile second, Touch touch, out float wait)
         {
@@ -1505,14 +1506,23 @@ namespace Moonwell.Engine
 
             // The outcomes, from the velocities the reactions left. A bounce keeps the two bouncinesses multiplied and
             // square-rooted, and the change is shared by mass: the heavier changes less; one with no mass against one with
-            // mass takes all of it; two with none share it evenly.
+            // mass takes all of it; two with none share it evenly. A None side is met as something that does not move: the
+            // other takes all of it.
             into = (first.vx - second.vx) * nx + (first.vy - second.vy) * ny + (first.vz - second.vz) * nz;
             var both = first.bounciness * second.bounciness;
             var keep = both > 0.0f ? Trig.Sqrt(both) : 0.0f;
             var massA = first.mass;
             var massB = second.mass;
             float shareA;
-            if (massA > 0.0f && massB > 0.0f)
+            if (!reactsB)
+            {
+                shareA = 1.0f;
+            }
+            else if (!reactsA)
+            {
+                shareA = 0.0f;
+            }
+            else if (massA > 0.0f && massB > 0.0f)
             {
                 shareA = massB / (massA + massB);
             }
@@ -1532,9 +1542,10 @@ namespace Moonwell.Engine
             var change = into < 0.0f ? -(1.0f + keep) * into : 0.0f;
             var passA = Take(first, entryA, impactA.contact, hitAX, hitAY, hitAZ, pointX, pointY, pointZ, nx, ny, nz, change * shareA, lateA, aX1, aY1, aZ1);
             var passB = Take(second, entryB, impactB.contact, hitBX, hitBY, hitBZ, pointX, pointY, pointZ, -nx, -ny, -nz, change * (1.0f - shareA), lateB, bX1, bY1, bZ1);
-            if (passA || passB)
+            if ((passA && reactsA) || (passB && reactsB))
             {
-                // Neither reacts to the other again until they have parted.
+                // Neither reacts to the other again until they have parted. A None side flies on, but that is not a Pass:
+                // a Bounce side meets it again while they touch, as it would a thing that does not move.
                 touch.passed = true;
             }
 

@@ -316,6 +316,34 @@ namespace Moonwell.Testing
             return ball;
         }
 
+        /// <summary>
+        /// A Bounce bolt and a None bolt head on at 600 each, of the same Mass: the None bolt is met as something that does
+        /// not move, so the Bounce bolt takes all the change, leaving at 1,200 (their closing speed of 1,200 kept by half, the
+        /// two bouncinesses multiplied and square-rooted, less the None bolt's 600), and the None bolt flies on as it was.
+        /// The pair is not marked as passed. The same with the None bolt made first. The Bounce bolt took only its share by
+        /// mass, half, as if the other moved too, and the pair was marked passed, so it was not met again until they parted.
+        /// </summary>
+        public static void BounceNone(FakeWorld world)
+        {
+            Fresh();
+            var bouncer = ShotAt("bouncer", Contact.Bounce, 400.0f, 500.0f, 600.0f);
+            var quiet = ShotAt("quiet", Contact.None, 700.0f, 500.0f, -600.0f);
+            UntilImpacts(world, bouncer, 1, 64);
+            Expect.Equal(1, bouncer.Impacts.Count, "the Bounce bolt met the None bolt");
+            Within(-1200.0f, bouncer.VX, 0.5f, "and took all the change");
+            Within(-600.0f, quiet.VX, 0.0f, "the None bolt flies on as it was");
+            Expect.Equal(0, quiet.Impacts.Count, "reacting to nothing");
+            Expect.True(bouncer.meetTouches != null && bouncer.meetTouches.Count == 1 && !bouncer.meetTouches[0].passed, "the pair is not marked as passed");
+
+            var first = ShotAt("first", Contact.None, 400.0f, 900.0f, 600.0f);
+            var later = ShotAt("later", Contact.Bounce, 700.0f, 900.0f, -600.0f);
+            UntilImpacts(world, later, 1, 64);
+            Expect.Equal(1, later.Impacts.Count, "the later Bounce bolt met the earlier None bolt");
+            Within(1200.0f, later.VX, 0.5f, "and took all the change");
+            Within(600.0f, first.VX, 0.0f, "the None bolt flies on as it was");
+            Expect.True(later.meetTouches != null && later.meetTouches.Count == 1 && !later.meetTouches[0].passed, "the pair is not marked as passed");
+        }
+
         /// <summary>Places a Bounce ball on the ground that slides to rest, and steps until it rests.</summary>
         private static Shot Resting(FakeWorld world, float x, float y)
         {
