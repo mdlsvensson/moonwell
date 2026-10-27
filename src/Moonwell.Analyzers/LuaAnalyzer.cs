@@ -80,6 +80,18 @@ public sealed class LuaAnalyzer : DiagnosticAnalyzer
             }
         }
 
+        // string.Join(", ", armors) and string.Concat(armors) make text of each item with its ToString.
+        if (method is { Name: "Join" or "Concat", ContainingType.SpecialType: SpecialType.System_String })
+        {
+            foreach (var argument in invocation.ArgumentList.Arguments)
+            {
+                if (Choice(ItemType(context.SemanticModel.GetTypeInfo(argument.Expression, context.CancellationToken).Type)) is { } items)
+                {
+                    Report(context, argument.Expression, items);
+                }
+            }
+        }
+
         Boxed(context, invocation, method);
     }
 

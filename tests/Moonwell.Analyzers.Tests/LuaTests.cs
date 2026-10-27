@@ -260,4 +260,25 @@ public class LuaTests
             "MW0035: units.Cast<widget>()",
         }, found);
     }
+
+    [Fact]
+    public void joining_moonwell_objects_enums_is_rejected()
+    {
+        Assert.Equal(new[] { "MW0010: armors", "MW0010: armors", "MW0010: list", "MW0010: ArmorType.Metal", "MW0010: ArmorType.Flesh" }, MapCode.CheckFile("""
+            using System.Collections.Generic;
+            using Moonwell.Objects;
+
+            namespace Map
+            {
+                public static class Use
+                {
+                    public static string Run(List<ArmorType> armors, ArmorType[] list)
+                    {
+                        return string.Join(", ", armors) + string.Concat(armors) + string.Join(", ", list)
+                            + string.Join(", ", ArmorType.Metal, ArmorType.Flesh) + string.Join(", ", new[] { 1, 2 });
+                    }
+                }
+            }
+            """));
+    }
 }
