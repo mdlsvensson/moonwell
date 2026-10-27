@@ -404,7 +404,9 @@ public class StandardObjectsTests
         Assert.Equal("Arpb", holyLight.Code);
         Assert.DoesNotContain("acas:1", holyLight.Values.Keys);
         Assert.Contains("acdn:1", holyLight.Values.Keys);
-        Assert.DoesNotContain("Hhb1:1", holyLight.Values.Keys);
+
+        // Hhb1 lists AHhb, which is the ability's id: it applies whatever the code.
+        Assert.Contains("Hhb1:1", holyLight.Values.Keys);
         Assert.Equal("0", Find(abilities, "AHtb").Values["acas:1"]);
     }
 
@@ -427,6 +429,20 @@ public class StandardObjectsTests
         copy.Replace("_locales/enus.w3mod/units/humanupgradestrings.txt", "[Rhme]", "Name=", "EditorSuffix=(First),(Second)\r\nName=");
 
         Assert.Equal("(First)", Find(Of(copy.Tables(), Kind.Upgrade), "Rhme").EditorSuffix);
+    }
+
+    [Fact]
+    public void a_field_listed_by_the_abilitys_own_id_applies_and_takes_its_column_from_one_listed_by_the_code()
+    {
+        // As Cargo Capacity lists Sch2 to Sch5, not their code Amtc; and as AIls has Idps (by id), not Lsh1 (by code), on DataA.
+        using var copy = new Copy();
+        copy.Replace("units/abilitydata.slk", "C;X1;Y3;K\"AHhb\"", "C;X2;K\"AHhb\"", "C;X2;K\"AHtb\"");
+
+        var holyLight = Find(Of(copy.Tables(), Kind.Ability), "AHhb");
+
+        Assert.Equal("AHtb", holyLight.Code);
+        Assert.Equal("200", holyLight.Values["Hhb1:1"]);
+        Assert.DoesNotContain(holyLight.Values.Keys, key => key.StartsWith("Htb1", StringComparison.Ordinal));
     }
 
     [Fact]

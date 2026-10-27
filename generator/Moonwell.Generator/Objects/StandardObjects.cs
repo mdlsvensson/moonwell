@@ -50,10 +50,10 @@ public sealed record StandardObject(
 /// <remarks>
 /// <para>
 /// A field applies to a unit by its use flags (a building by <c>useBuilding</c>, a hero by <c>useHero</c>, any other
-/// unit by <c>useUnit</c>; a unit is a building when its <c>isbldg</c> is 1); to an ability when the ability's
-/// <c>code</c> is in the field's <c>Specific</c>, or, for a common field, is not in the metadata's
-/// <c>notSpecific</c>; and to every object of another kind. Two fields of one ability that share a column, such as a
-/// common <c>Area</c> and a specific one, both get the value.
+/// unit by <c>useUnit</c>; a unit is a building when its <c>isbldg</c> is 1); to an ability when it is one of
+/// <see cref="Fields.SpecificOf"/> the ability (its id or its <c>code</c> is in the field's <c>Specific</c>), or, for a
+/// common field, when its <c>code</c> is not in the metadata's <c>notSpecific</c>; and to every object of another kind.
+/// Two fields of one ability that share a column, such as a common <c>Area</c> and a specific one, both get the value.
 /// </para>
 /// <para>
 /// An object exists under a balance set when <see cref="ExportTables.Present"/> says so. Its level count is the
@@ -377,14 +377,15 @@ public static class StandardObjects
 
         public Field Field { get; }
 
-        public bool Applies(Kind kind, string? code, bool hero, bool building)
+        /// <param name="own">For an ability, the ids of the fields specific to it (<see cref="Fields.SpecificOf"/>).</param>
+        public bool Applies(Kind kind, string? code, bool hero, bool building, IReadOnlySet<string>? own)
         {
             switch (kind)
             {
                 case Kind.Unit:
                     return building ? _building : hero ? _hero : _unit;
                 case Kind.Ability:
-                    return _specific.Count > 0 ? _specific.Contains(code ?? "") : !_notSpecific.Contains(code ?? "");
+                    return _specific.Count > 0 ? own != null && own.Contains(Field.Id) : !_notSpecific.Contains(code ?? "");
                 default:
                     return true;
             }
@@ -462,6 +463,7 @@ public static class StandardObjects
     {
         private readonly Kind _kind;
         private readonly List<FieldPlan> _plans;
+        private readonly List<Field> _fields;
         private readonly FieldPlan? _levels;
         private readonly List<string> _nameIds = new();
         private readonly string? _suffixId;
@@ -470,6 +472,7 @@ public static class StandardObjects
         {
             _kind = kind;
             _plans = plans;
+            _fields = plans.Select(plan => plan.Field).ToList();
             string? name = null;
             string? tooltip = null;
             foreach (var plan in plans)
@@ -511,10 +514,13 @@ public static class StandardObjects
             var hero = IsHero(_kind, id);
             var building = _kind == Kind.Unit && Clean(row.Get("isbldg")) == "1";
             var levels = LevelCount(row);
+            var own = _kind == Kind.Ability
+                ? new HashSet<string>(Fields.SpecificOf(_fields, id, code).Select(field => field.Id), StringComparer.Ordinal)
+                : null;
             var values = new Dictionary<string, string>(StringComparer.Ordinal);
             foreach (var plan in _plans)
             {
-                if (plan.Applies(_kind, code, hero, building))
+                if (plan.Applies(_kind, code, hero, building, own))
                 {
                     plan.Read(row, levels, values);
                 }

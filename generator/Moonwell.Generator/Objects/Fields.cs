@@ -75,7 +75,10 @@ public sealed record FieldRules(
 /// <param name="PerLevel">True when the field has a value for each level of the object.</param>
 /// <param name="DataPointer">An ability's data field letter as a number (<c>DataA</c> is 1), else 0.</param>
 /// <param name="Skin">True when the game keeps the field's value in the skin files, which every player sees.</param>
-/// <param name="Specific">The ability codes the field belongs to; empty for a field of every ability.</param>
+/// <param name="Specific">
+/// The abilities the field belongs to, by code or by the ability's own id (see <see cref="Fields.SpecificOf"/>); empty for a
+/// field of every ability.
+/// </param>
 /// <param name="Column">How the field's values are keyed in <see cref="ObjectRows.Values"/>; see <see cref="Fields"/>.</param>
 /// <param name="HeroOnly">
 /// True for a unit field only heroes have (<c>useHero</c> without <c>useUnit</c> or <c>useBuilding</c>); false for
@@ -164,6 +167,22 @@ public static class Fields
         }
 
         var mentioned = kind == Kind.Ability ? MentionedAbilities(rows) : new List<string>();
+        var aliases = kind == Kind.Ability ? Aliases(tables, mentioned) : new Dictionary<string, List<string>>();
+
+        // The columns of the fields that list each ability by id or code: a field listed by a code gives way on such a column.
+        var listedColumns = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
+        foreach (var row in rows)
+        {
+            foreach (var entry in Split(Value(row, "useSpecific")))
+            {
+                if (!listedColumns.TryGetValue(entry, out var taken))
+                {
+                    listedColumns[entry] = taken = new HashSet<string>(StringComparer.Ordinal);
+                }
+
+                taken.Add(ColumnOf(row, Number(row, "repeat"), Number(row, "data"), perField));
+            }
+        }
         var handPicked = FieldNames.HandPicked(kind);
         var fields = new List<Field>();
         var candidates = new List<NameCandidate>();
@@ -214,7 +233,8 @@ public static class Fields
                 StoreOf(Value(row, "type")),
                 RulesOf(row, LabelOf(tables, row)),
                 choice));
-            candidates.Add(new NameCandidate(row.Id, name!, listed, GroupsOf(kind, row, specific, mentioned), member != null));
+            var column = ColumnOf(row, repeat, pointer, perField);
+            candidates.Add(new NameCandidate(row.Id, name!, listed, GroupsOf(kind, row, specific, mentioned, aliases, column, listedColumns), member != null));
         }
 
         var names = FieldNames.Assign(candidates, reserved);
@@ -225,6 +245,74 @@ public static class Fields
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// The fields specific to one ability, in the order of <paramref name="fields"/>: those whose <see cref="Field.Specific"/>
+    /// lists the ability's id or its code. The metadata lists some fields by the ability's own id, not its code: Cargo
+    /// Capacity (<c>Car1</c>) lists Sch2 to Sch5, whose code is Amtc or Acar. A field listed by the code gives way to one
+    /// listed by the id that has its column: AIls (code Alsh) has Idps, listed by its id, on DataA, not Lsh1.
+    /// </summary>
+    /// <param name="fields">The ability fields.</param>
+    /// <param name="id">The ability's id.</param>
+    /// <param name="code">The ability's code, the ability it behaves as; null for none.</param>
+    public static IReadOnlyList<Field> SpecificOf(IReadOnlyList<Field> fields, string id, string? code)
+    {
+        var taken = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var field in fields)
+        {
+            if (field.Specific.Contains(id, StringComparer.Ordinal))
+            {
+                taken.Add(field.Column);
+            }
+        }
+
+        var own = new List<Field>();
+        foreach (var field in fields)
+        {
+            if (field.Specific.Contains(id, StringComparer.Ordinal)
+                || (code != null && field.Specific.Contains(code, StringComparer.Ordinal) && !taken.Contains(field.Column)))
+            {
+                own.Add(field);
+            }
+        }
+
+        return own;
+    }
+
+    /// <summary>
+    /// For each ability code, the ids of the other abilities that behave as it and that a metadata row names by id
+    /// (<paramref name="mentioned"/>): such an ability's class has the fields of its code and of its id, so they must not
+    /// share a name. From the base tables and every balance set.
+    /// </summary>
+    private static Dictionary<string, List<string>> Aliases(ExportTables tables, List<string> mentioned)
+    {
+        var named = new HashSet<string>(mentioned, StringComparer.Ordinal);
+        var aliases = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var set in new string?[] { null }.Concat(tables.Sets))
+        {
+            foreach (var row in tables.Objects(Kind.Ability, set))
+            {
+                if (!named.Contains(row.Id) || !row.Values.TryGetValue("code", out var cell) || !seen.Add(row.Id))
+                {
+                    continue;
+                }
+
+                var code = cell.Trim();
+                if (code.Length > 0 && code != row.Id)
+                {
+                    if (!aliases.TryGetValue(code, out var ids))
+                    {
+                        aliases[code] = ids = new List<string>();
+                    }
+
+                    ids.Add(row.Id);
+                }
+            }
+        }
+
+        return aliases;
     }
 
     private static bool Applies(Kind kind, MetaRow row)
@@ -541,10 +629,19 @@ public static class Fields
 
     /// <summary>
     /// The classes a field is a property of, for telling which fields can meet in one class: a unit field is in the
-    /// unit, hero and building classes it is used by; an ability field is in the classes of its specific abilities,
-    /// or in every ability's class; any other field is in its kind's one class.
+    /// unit, hero and building classes it is used by; an ability field is in the classes of its specific abilities
+    /// (and of the abilities named by id that behave as one of them, <paramref name="aliases"/>, unless a field listed by
+    /// that id has its <paramref name="column"/>: see <see cref="SpecificOf"/>), or in every ability's class; any other
+    /// field is in its kind's one class.
     /// </summary>
-    private static List<string> GroupsOf(Kind kind, MetaRow row, List<string> specific, List<string> mentioned)
+    private static List<string> GroupsOf(
+        Kind kind,
+        MetaRow row,
+        List<string> specific,
+        List<string> mentioned,
+        Dictionary<string, List<string>> aliases,
+        string column,
+        Dictionary<string, HashSet<string>> listedColumns)
     {
         var groups = new List<string>();
         switch (kind)
@@ -561,6 +658,15 @@ public static class Fields
                 break;
             case Kind.Ability when specific.Count > 0:
                 groups.AddRange(specific);
+                foreach (var code in specific)
+                {
+                    if (aliases.TryGetValue(code, out var ids))
+                    {
+                        groups.AddRange(ids.Where(id => !groups.Contains(id)
+                            && !(listedColumns.TryGetValue(id, out var taken) && taken.Contains(column))));
+                    }
+                }
+
                 break;
             case Kind.Ability:
                 var not = Split(Value(row, "notSpecific"));

@@ -525,6 +525,30 @@ public class ObjectsWriterTests
     }
 
     [Fact]
+    public void an_ability_class_has_the_fields_listed_by_its_id_and_by_its_code()
+    {
+        var tables = MiniExport();
+        var fields = Fields.Of(tables, Kind.Ability);
+        var bolt = Find(StandardObjects.Of(tables, Kind.Ability, fields), "AHtb");
+        var empty = new Dictionary<string, string>();
+
+        // An ability AHhb that behaves as Storm Bolt: Hhb1 lists its id; Htb1 lists its code but has the same column.
+        var holy = ObjectsWriter.Group(
+            "Moonwell.Objects.Human.Abilities",
+            new[] { (bolt with { Id = "AHhb", Values = empty }, new ClassName("Moonwell.Objects.Human.Abilities", "HolyBolt")) },
+            fields);
+        Assert.Contains("[global::Moonwell.Objects.Field(\"Hhb1\"", holy);
+        Assert.DoesNotContain("\"Htb1\"", holy);
+
+        // An ability of another id with Storm Bolt's code has Htb1, listed by the code.
+        var copy = ObjectsWriter.Group(
+            "Moonwell.Objects.Human.Abilities",
+            new[] { (bolt with { Id = "AHxx", Values = empty }, new ClassName("Moonwell.Objects.Human.Abilities", "OtherBolt")) },
+            fields);
+        Assert.Contains("[global::Moonwell.Objects.Field(\"Htb1\"", copy);
+    }
+
+    [Fact]
     public void classes_are_ordered_by_name()
     {
         var tables = MiniExport();
