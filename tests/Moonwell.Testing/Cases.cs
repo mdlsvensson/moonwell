@@ -44,6 +44,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "lifecycle.unit-created-only-when-it-comes-in", Run = LifecycleCases.UnitCreatedOnlyWhenItComesIn });
             list.Add(new Case { Name = "lifecycle.ended-owner-runs-neither-created-nor-leave", Run = LifecycleCases.EndedOwnerRunsNeitherCreatedNorLeave });
             list.Add(new Case { Name = "lifecycle.buff-carrier-survives-morph", Run = LifecycleCases.BuffCarrierSurvivesMorph });
+            list.Add(new Case { Name = "lifecycle.buff-applied-in-death-stays", Run = LifecycleCases.BuffAppliedInDeathStays });
         }
 
         /// <summary>Adds the debug mode's cases; they exist only in a development build, as the debug mode does.</summary>

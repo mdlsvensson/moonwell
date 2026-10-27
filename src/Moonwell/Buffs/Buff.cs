@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Moonwell
 {
@@ -53,10 +54,9 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Ends the buffs on a unit that its death ends, newest first; Inbound calls it after the death's reactions.</summary>
-        internal static void EndOnDeath(Unit unit)
+        /// <summary>Ends the buffs a death ends, newest first, of those that were on the unit as it died (Inbound takes them at the start of the death, and calls this after its reactions): a buff the reactions applied has not seen the death and stays.</summary>
+        internal static void EndOnDeath(List<Buff> found)
         {
-            var found = unit.GetAll<Buff>();
             for (var i = found.Count - 1; i >= 0; i--)
             {
                 if (found[i].EndsOnDeath)

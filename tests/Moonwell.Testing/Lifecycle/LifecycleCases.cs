@@ -383,6 +383,17 @@ namespace Moonwell.Testing
             Expect.True(world.HasAddedAbility(handle, carrier), "the buff's carrier after the morph: " + string.Join(", ", world.AbilityCalls));
         }
 
+        /// <summary>A death ends the buffs that were on the unit as it died, after they have seen it; a buff the death's own reactions apply has not seen the death and stays.</summary>
+        public static void BuffAppliedInDeathStays(FakeWorld world)
+        {
+            ObjectTypes.Unit(ObjectTypes.FourCC("h0MO"), () => new Mourned());
+            var unit = (Mourned)Unit.Of(world.NewUnit(ObjectTypes.FourCC("h0MO")))!;
+            var before = unit.Apply(new Lasting());
+            Inbound.Died(unit.Handle, null);
+            Expect.True(before.HasEnded, "the buff that was on before the death has ended");
+            Expect.True(unit.Mark != null && !unit.Mark.HasEnded, "the buff OnDeath applied stays");
+        }
+
         /// <summary>A timer adopted by a second owner is refused, in every build: it is reported and stays with its first owner (decision 74).</summary>
         public static void AdoptAgainRefused(FakeWorld world)
         {

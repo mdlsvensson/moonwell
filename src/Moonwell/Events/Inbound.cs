@@ -232,7 +232,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>A unit dies: its type's OnDeath and components, then the killer's OnKill and components, then the map's and the players' reactions, then the buffs a death ends end; a killer equal to the dying unit counts as none.</summary>
+        /// <summary>A unit dies: its type's OnDeath and components, then the killer's OnKill and components, then the map's and the players' reactions, then the buffs a death ends end, of those on the unit as it died; a killer equal to the dying unit counts as none.</summary>
         internal static void Died(unit dying, unit? killer)
         {
             unit? slain = killer == dying ? null : killer;
@@ -247,6 +247,8 @@ namespace Moonwell
                 return;
             }
 
+            // The buffs the death ends are those on the unit now, which see it; one its reactions apply stays.
+            var buffs = dead.GetAll<Buff>();
             Unit? slayer = slain == null ? null : Unit.Of(slain);
             var deadSlot = dead.Player.Slot;
             var slayerSlot = slayer == null ? -1 : slayer.Player.Slot;
@@ -272,7 +274,7 @@ namespace Moonwell
                 }
             }
 
-            Buff.EndOnDeath(dead);
+            Buff.EndOnDeath(buffs);
         }
 
         /// <summary>A unit's spell takes effect: its previous cast ends, the ability and the caster see the new cast, then the map's and the caster's player's reactions run.</summary>
