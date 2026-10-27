@@ -188,7 +188,8 @@ public sealed class KillCounter : UnitComponent
   actor only: adding it to a second, applying a buff that is on a unit already, or removing a component from an actor
   it is not on is reported and refused, in a release build too.
 - Reactions to the whole map (`OnGameStart`, `OnUnitCreated`, `OnUnitDied`, `OnUnitCast`, `OnLeave`) go on a game or
-  player component. `OnUnitCreated` runs once for each unit, when it comes into the game; a unit's own is `OnCreated`.
+  player component. `OnUnitCreated` runs once for each unit, when it comes into the game (one that came in before
+  anything wanted it runs none); a unit's own is `OnCreated`.
 - A reaction's parameters say the role: `OnPickedUp(Unit carrierUnit)`, `OnUnitDied(Unit dyingUnit, Unit? killerUnit)`,
   `OnKill(Unit killedUnit)`. The killer is null when no unit's damage killed: `Kill()` or `Life = 0` from code, timed
   life running out, or a unit's own damage.

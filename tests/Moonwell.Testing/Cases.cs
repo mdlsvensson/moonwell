@@ -41,6 +41,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "lifecycle.hero-lowered", Run = LifecycleCases.HeroLowered });
             list.Add(new Case { Name = "lifecycle.helper-named-like-reaction", Run = LifecycleCases.HelperNamedLikeReaction });
             list.Add(new Case { Name = "lifecycle.hiding-method-is-no-reaction", Run = LifecycleCases.HidingMethodIsNoReaction });
+            list.Add(new Case { Name = "lifecycle.unit-created-only-when-it-comes-in", Run = LifecycleCases.UnitCreatedOnlyWhenItComesIn });
         }
 
         /// <summary>Adds the debug mode's cases; they exist only in a development build, as the debug mode does.</summary>

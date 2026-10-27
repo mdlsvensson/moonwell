@@ -328,6 +328,30 @@ namespace Moonwell.Testing
             Expect.Equal(0, Hiding.Calls, "the hiding method's calls after a damage");
         }
 
+        /// <summary>OnUnitCreated runs for a unit as it comes into the game (it enters, Unit.Create makes it, or it is there at the start), not when Moonwell takes it in later: a unit that came in while nothing wanted OnUnitCreated, first hit two minutes later, and one taken in when units are first asked for, run none.</summary>
+        public static void UnitCreatedOnlyWhenItComesIn(FakeWorld world)
+        {
+            var old = FootmanAt(world, 0.0f, 0.0f);
+            Inbound.Entered(old);
+            var source = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo"), slot: 1))!;
+            world.Advance(60.0f);
+            var watch = Game.Instance.Add(new CreatedWatch());
+            var unseen = FootmanAt(world, 50.0f, 0.0f);
+            world.Advance(60.0f);
+            Inbound.Damaged(old, source.Handle, 10.0f, true);
+            Expect.True(KnownUnits.Find(old) != null, "the old unit is taken in when it is first hit");
+            Interactions.Install(new FakeInteractionWorld());
+            Find.InRange<Unit>(0.0f, 0.0f, 100.0f);
+            Expect.True(KnownUnits.Find(unseen) != null, "the unit already in the world is taken in when units are first asked for");
+            Expect.Equal(0, watch.Seen.Count, "OnUnitCreated's runs for units taken in long after they came in");
+
+            var entering = FootmanAt(world, 0.0f, 50.0f);
+            Inbound.Entered(entering);
+            var made = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(0), 0.0f, 0.0f);
+            Expect.Equal(2, watch.Seen.Count, "OnUnitCreated's runs for a unit that enters and one Unit.Create makes");
+            Expect.True(watch.Seen[0] == KnownUnits.Find(entering) && watch.Seen[1] == made, "the units OnUnitCreated was given");
+        }
+
         /// <summary>A timer adopted by a second owner is refused, in every build: it is reported and stays with its first owner (decision 74).</summary>
         public static void AdoptAgainRefused(FakeWorld world)
         {

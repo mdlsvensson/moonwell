@@ -832,7 +832,7 @@ namespace Moonwell
                 return null;
             }
 
-            return KnownUnits.TakeIn(handle, null);
+            return KnownUnits.TakeIn(handle, null, false);
         }
 
         /// <summary>The facing of a unit made without one, in degrees: the game's bj_UNIT_FACING.</summary>
@@ -842,7 +842,7 @@ namespace Moonwell
         public static Unit Create(int typeId, Player player, float x, float y, float facing = DefaultFacing, Owner? owner = null)
         {
             var handle = Runtime.World.SpawnUnit(player.Handle, typeId, x, y, facing);
-            var made = KnownUnits.TakeIn(handle, owner)!;
+            var made = KnownUnits.TakeIn(handle, owner, true)!;
             if (owner != null && made.Owner == null)
             {
                 owner.Adopt(made);

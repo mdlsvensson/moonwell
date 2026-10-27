@@ -31,7 +31,7 @@ namespace Moonwell
 
             if (KnownUnits.EveryUnit || ObjectTypes.UnitMaker(Runtime.World.UnitTypeId(handle)) != null || Events.Wants(Hook.OnUnitCreated))
             {
-                KnownUnits.TakeIn(handle, null);
+                KnownUnits.TakeIn(handle, null, true);
             }
         }
 
