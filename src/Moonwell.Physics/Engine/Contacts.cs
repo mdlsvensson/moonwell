@@ -1784,7 +1784,7 @@ namespace Moonwell.Engine
                 var at = t0 > 0.0f ? (t0 < 1.0f ? t0 : 1.0f) : 0.0f;
                 float qx;
                 float qy;
-                Nearest(ax + at * dx, ay + at * dy, x1, y1, ex, ey, length, out qx, out qy);
+                Nearest(ax + at * dx, ay + at * dy, x1, y1, ex, ey, out qx, out qy);
                 top = Ground.Height(qx, qy) + height + radius;
                 if (dz == 0.0f)
                 {
@@ -1817,7 +1817,7 @@ namespace Moonwell.Engine
             var cy = ay + t * dy;
             float px;
             float py;
-            Nearest(cx, cy, x1, y1, ex, ey, length, out px, out py);
+            Nearest(cx, cy, x1, y1, ex, ey, out px, out py);
             var ox = cx - px;
             var oy = cy - py;
             var off = Trig.Sqrt(ox * ox + oy * oy);
@@ -1939,7 +1939,7 @@ namespace Moonwell.Engine
             var ey = y2 - y1;
             float qx;
             float qy;
-            Nearest(x, y, x1, y1, ex, ey, Trig.Sqrt(ex * ex + ey * ey), out qx, out qy);
+            Nearest(x, y, x1, y1, ex, ey, out qx, out qy);
             var ox = x - qx;
             var oy = y - qy;
             var off = Trig.Sqrt(ox * ox + oy * oy);
@@ -1959,10 +1959,11 @@ namespace Moonwell.Engine
             y = qy + ny * radius;
         }
 
-        /// <summary>The nearest point of a wall from (x1, y1) along (ex, ey), of a length, to a point.</summary>
-        private static void Nearest(float x, float y, float x1, float y1, float ex, float ey, float length, out float qx, out float qy)
+        /// <summary>The nearest point of a wall from (x1, y1) along (ex, ey) to a point. It divides by the wall's length squared as it is, not by a square root squared: the game's square root, off by up to 2 parts in 100,000, put the point off along the wall by as much, which tilted a bounce's normal.</summary>
+        private static void Nearest(float x, float y, float x1, float y1, float ex, float ey, out float qx, out float qy)
         {
-            var along = length > Tiny ? ((x - x1) * ex + (y - y1) * ey) / (length * length) : 0.0f;
+            var square = ex * ex + ey * ey;
+            var along = square > Tiny * Tiny ? ((x - x1) * ex + (y - y1) * ey) / square : 0.0f;
             if (along < 0.0f)
             {
                 along = 0.0f;
@@ -1991,7 +1992,7 @@ namespace Moonwell.Engine
             var by = entry.Y;
             float qx;
             float qy;
-            Nearest(bx, by, x1, y1, ex, ey, Trig.Sqrt(ex * ex + ey * ey), out qx, out qy);
+            Nearest(bx, by, x1, y1, ex, ey, out qx, out qy);
             var ox = bx - qx;
             var oy = by - qy;
             var near = missile.radius + Skin;
