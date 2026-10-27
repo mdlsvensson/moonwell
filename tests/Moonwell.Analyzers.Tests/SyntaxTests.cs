@@ -70,6 +70,8 @@ public class SyntaxTests
     [InlineData("MW0029", "try { } catch (NullReferenceException) { }", "NullReferenceException")]
     [InlineData("MW0029", "try { } catch (IndexOutOfRangeException) { }", "IndexOutOfRangeException")]
     [InlineData("MW0029", "try { } catch (Exception e) when (e is InvalidOperationException ioe) { }", "InvalidOperationException ioe")]
+    [InlineData("MW0029", "int a = 5, b = 0; try { var r = a % b; } catch (DivideByZeroException) { }", "DivideByZeroException")]
+    [InlineData("MW0029", "int a = 5; try { a %= 0; } catch (DivideByZeroException) { }", "DivideByZeroException")]
     // MW0030: members the Lua core does not have
     [InlineData("MW0030", "var q = new[] { 1 }.Append(2);", "Append")]
     [InlineData("MW0030", "var q = new[] { 1 }.TakeLast(1);", "TakeLast")]
@@ -80,6 +82,8 @@ public class SyntaxTests
     [InlineData("MW0030", "var d = new Dictionary<int, int>(); var v = d.GetValueOrDefault(1);", "GetValueOrDefault")]
     [InlineData("MW0030", "var d = new Dictionary<int, int>(); d.Remove(1, out var v);", "Remove")]
     [InlineData("MW0030", "var d = new Dictionary<int, int>(); var l = d.ToList();", "ToList")]
+    [InlineData("MW0030", "Dictionary<int, int>? d = new(); var l = d?.ToArray();", "ToArray")]
+    [InlineData("MW0030", "IReadOnlyDictionary<int, int> d = new Dictionary<int, int>(); var l = Enumerable.ToList(d);", "ToList")]
     [InlineData("MW0030", "var q = new Queue<int>(); q.TryPeek(out var x);", "TryPeek")]
     [InlineData("MW0030", "var s = new Stack<int>(); s.TryPop(out var x);", "TryPop")]
     [InlineData("MW0030", "var h = new HashSet<int>(); var b = h.SetEquals(new[] { 1 });", "SetEquals")]
@@ -162,6 +166,8 @@ public class SyntaxTests
             var q = new Queue<int>(); q.TryDequeue(out var first);
             var linq = list.Where(x => x > 1).Select(x => x * 2).OrderBy(x => x).Concat(list).Distinct().ToList();
             try { } catch (InvalidOperationException) { } catch (ArgumentException e) when (e.Message == "x") { } catch (Exception) { }
+            try { var share = 6 / list.Count; var part = 5f % 0f; } catch (DivideByZeroException) { }
+            var map = new OrderedMap<string, int>(); var pairs = map.ToList(); var all = Enumerable.ToArray(map);
             var un = unchecked(1 + 2);
             var big = 5; var cast = checked((byte)big);
             var mode = Mode.A | Mode.B; var has2 = mode.HasFlag(Mode.A) && (mode & Mode.B) != 0;

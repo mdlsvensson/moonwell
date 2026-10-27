@@ -660,12 +660,29 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
     private static void CatchType(SyntaxNodeAnalysisContext context)
     {
         var declaration = (CatchDeclarationSyntax)context.Node;
-        if (context.SemanticModel.GetTypeInfo(declaration.Type, context.CancellationToken).Type is { Name: "NullReferenceException" or "IndexOutOfRangeException", ContainingNamespace: { Name: "System", ContainingNamespace.IsGlobalNamespace: true } } type)
+        var type = context.SemanticModel.GetTypeInfo(declaration.Type, context.CancellationToken).Type;
+        if (type is not { ContainingNamespace: { Name: "System", ContainingNamespace.IsGlobalNamespace: true } })
+        {
+            return;
+        }
+
+        if (type.Name is "NullReferenceException" or "IndexOutOfRangeException")
         {
             context.ReportDiagnostic(Diagnostic.Create(Rules.CatchForm, declaration.Type.GetLocation(),
                 "catch (" + type.Name + ") may never catch in the game's Lua: a null dereference or an array index out of range is a plain Exception there; catch (Exception), or test for null and the length first"));
         }
+        // An integer / by zero throws DivideByZeroException there too; only % is a plain Lua error.
+        else if (type.Name == "DivideByZeroException" && declaration.Parent is CatchClauseSyntax { Parent: TryStatementSyntax tryStatement }
+            && tryStatement.Block.DescendantNodes().Any(node => IsIntegerModulo(node, context)))
+        {
+            context.ReportDiagnostic(Diagnostic.Create(Rules.CatchForm, declaration.Type.GetLocation(),
+                "catch (DivideByZeroException) does not catch % by zero in the game's Lua, which is a plain Exception there; catch (Exception), or test the divisor first"));
+        }
     }
+
+    private static bool IsIntegerModulo(SyntaxNode node, SyntaxNodeAnalysisContext context) =>
+        node is BinaryExpressionSyntax { RawKind: (int)SyntaxKind.ModuloExpression } or AssignmentExpressionSyntax { RawKind: (int)SyntaxKind.ModuloAssignmentExpression }
+        && context.SemanticModel.GetTypeInfo(node, context.CancellationToken).Type?.SpecialType is SpecialType.System_Int32 or SpecialType.System_Int64 or SpecialType.System_UInt32 or SpecialType.System_Int16 or SpecialType.System_Byte or SpecialType.System_SByte or SpecialType.System_UInt16 or SpecialType.System_UInt64;
 
     private static void CatchFilter(SyntaxNodeAnalysisContext context)
     {
@@ -820,11 +837,33 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(Diagnostic.Create(Rules.LuaMember, name.GetLocation(), name.Identifier.Text, "leaves the out value nil in the game's Lua; read it with TryGetValue first"));
         }
         else if (key is "System.Linq.Enumerable.ToList" or "System.Linq.Enumerable.ToArray"
-            && method.TypeArguments.FirstOrDefault() is INamedTypeSymbol { Name: "KeyValuePair", ContainingNamespace.Name: "Generic" })
+            && method.TypeArguments.FirstOrDefault() is INamedTypeSymbol { Name: "KeyValuePair", ContainingNamespace.Name: "Generic" }
+            && !IsCompiledCollection(ReceiverType(name, method, context)))
         {
             context.ReportDiagnostic(Diagnostic.Create(Rules.LuaMember, name.GetLocation(), name.Identifier.Text, "of a Dictionary gives pairs without their Key in the game's Lua; copy with new Dictionary<,>(d), or Select the key and value"));
         }
     }
+
+    // The collection a LINQ call reads: d in d.ToList(), d?.ToList() and Enumerable.ToList(d).
+    private static ITypeSymbol? ReceiverType(SimpleNameSyntax name, IMethodSymbol method, SyntaxNodeAnalysisContext context)
+    {
+        ExpressionSyntax? receiver = method.ReducedFrom != null
+            ? name.Parent switch
+            {
+                MemberAccessExpressionSyntax access => access.Expression,
+                MemberBindingExpressionSyntax => name.FirstAncestorOrSelf<ConditionalAccessExpressionSyntax>()?.Expression,
+                _ => null,
+            }
+            : (name.Parent?.Parent as InvocationExpressionSyntax ?? name.Parent as InvocationExpressionSyntax)?.ArgumentList.Arguments.FirstOrDefault()?.Expression;
+        return receiver == null ? null : context.SemanticModel.GetTypeInfo(receiver, context.CancellationToken).Type;
+    }
+
+    // A class or struct of the map or of Moonwell (OrderedMap) is compiled from C#, so its pairs keep their Key; only the
+    // Lua core's own collections, such as Dictionary, and an interface that may be one give pairs without it.
+    private static bool IsCompiledCollection(ITypeSymbol? type) =>
+        type is { TypeKind: TypeKind.Class or TypeKind.Struct }
+        && type.ContainingNamespace?.ToDisplayString() is { } space
+        && space != "System" && !space.StartsWith("System.", System.StringComparison.Ordinal);
 
     private static string Full(INamedTypeSymbol type) =>
         (type.ContainingType != null ? Full(type.ContainingType) + "+" : type.ContainingNamespace.ToDisplayString() + ".") + type.MetadataName;

@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using CSharpLua;
 using Microsoft.CodeAnalysis;
 using War3Net.Build;
@@ -113,6 +114,11 @@ namespace Moonwell.Build
                 // CSharp.lua's own translation errors; a Roslyn error comes back as a result below.
                 throw new BuildException(marked.Unstage(failure.Message));
             }
+            catch (BugErrorException failure)
+            {
+                // CSharp.lua stops on a form it cannot compile ("a" + true + null); say where, in the project's file.
+                throw new BuildException(marked.Unstage(CompilerStop(failure)));
+            }
             catch (InvalidOperationException failure) when (map.Info is null || map.Environment is null)
             {
                 // The fork's script builder refuses a map with no info or no environment file (W2).
@@ -137,6 +143,16 @@ namespace Moonwell.Build
             var script = ScriptLibraries.Trim(map.Script ?? throw new BuildException("CSharp.lua wrote no script"));
 
             return script;
+        }
+
+        // CSharp.lua's message starts with Roslyn's SourceLocation(path@line:column) of the statement it stopped in, or of the
+        // class for a member with no statements. The build gives path(line): the marked copy's line marks move the column.
+        private static string CompilerStop(BugErrorException failure)
+        {
+            var at = Regex.Match(failure.Message, @"^SourceLocation\((.+)@(\d+):\d+\)");
+            var where = at.Success ? $"{at.Groups[1].Value}({at.Groups[2].Value}): " : string.Empty;
+            var cause = failure.InnerException is { } error ? $" ({error.GetType().Name}: {error.Message})" : string.Empty;
+            return where + "CSharp.lua cannot compile this code" + cause + "; write it another way. The guide's section \"C# the game's Lua cannot run\" lists the forms known to stop it";
         }
     }
 }
