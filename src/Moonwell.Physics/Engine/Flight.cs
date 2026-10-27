@@ -100,6 +100,7 @@ namespace Moonwell.Engine
                 return;
             }
 
+            missile.fell = true;
             var vx = missile.vx;
             var vy = missile.vy;
             var vz = missile.vz;
@@ -406,6 +407,7 @@ namespace Moonwell.Engine
         {
             var radius = missile.radius;
             var into = vx * nx + vy * ny + vz * nz;
+            missile.fell = false;
             grid.Move(entry, hitX, hitY);
             missile.z = hitZ + radius;
             missile.groundRead = false;
@@ -531,6 +533,7 @@ namespace Moonwell.Engine
                 return false;
             }
 
+            missile.fell = false;
             vx -= into * nx;
             vy -= into * ny;
             vz -= into * nz;
@@ -591,6 +594,7 @@ namespace Moonwell.Engine
                 if (free > follow + LiftOff)
                 {
                     // Over a crest: the ground falls away faster than it would fall, so it flies.
+                    missile.fell = true;
                     z = free;
                     vz -= fall * step;
                     missile.rolling = false;

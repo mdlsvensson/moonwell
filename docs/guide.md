@@ -509,6 +509,8 @@ target.Knockback(caster.AngleTo(target), 300f, 0.5f); // 300 away over half a se
   and `WallContact` are `None` (not checked). The others are `Bounce`, `Pass` and, for ground and walls, `Slide`.
 - **At a contact**: the missile's `OnImpact` and its components'; then `OnStruck` of `IMissileTarget` on a unit, so the
   defender has the last word (a shield sets `impact.Contact` to `Bounce`); then the damage; then the outcome.
+- A `Bounce` or `Slide` that something keeps pulling onto the ground or into a wall, such as a slope's gravity, goes on
+  along it for the rest of its step with no impact, as the loop in Maths does after a hit; it does not stand still.
 - **Ownership**: a missile belongs to the game unless `Fire` or `Create` is given an `owner`, so one fired in a spell
   outlives the cast. `OnImpact` runs with the missile's owner.
 - **Knockback** keeps the unit's order. It stops at trees, cliffs, walls (`Wall.Create`) and a bridge's rail; a stopped

@@ -212,6 +212,78 @@ namespace Moonwell.Testing
             Within(520.0f, Read(across, 0, 2), 0.01f, "y");
         }
 
+        /// <summary>
+        /// A ball lying against a wall across a slope of 1 in 2, with Gravity 800 and Friction 20, is pulled into the wall by
+        /// the slope at every step and goes on down along it, as the guide's loop goes on after a hit for the rest of the
+        /// step: a few impacts in its first half second (a bounce off the wall sends a Bounce into the slope), then none; it
+        /// is still for no more than one step, and stays on its own side of the wall and on the ground. So rolling
+        /// (GroundContact and WallContact Slide), and going along the ground (both Bounce). Left where it met the wall, it
+        /// met it again at the start of the next step and stood there.
+        /// </summary>
+        public static void SlideUnderGravity(FakeWorld world)
+        {
+            AlongWall(world, Contact.Slide, Contact.Slide, "rolling: ");
+            AlongWall(world, Contact.Bounce, Contact.Bounce, "Bounce: ");
+        }
+
+        /// <summary>Lays a ball with the given contacts against the wall from (200, 100) to (1400, 1300), on ground that rises 64 a tile of 128 along x, and checks it goes down along the wall for 3 seconds.</summary>
+        private static void AlongWall(FakeWorld world, Contact ground, Contact side, string what)
+        {
+            Interactions.Install(new FakeInteractionWorld());
+            Physics.Install(new FakePhysicsWorld());
+            var row = "";
+            for (var i = 0; i < 16; i++)
+            {
+                row = row + GridText.Corner(i * 64.0f, 2);
+            }
+
+            var text = "";
+            for (var i = 0; i < 16; i++)
+            {
+                text = text + row;
+            }
+
+            Terrain.Install(new FakeTerrainWorld(), 16, 16, 0.0f, 0.0f, text);
+            Wall.Create(200.0f, 100.0f, 1400.0f, 1300.0f);
+            var ball = new Ball();
+            ball.GroundContact = ground;
+            ball.WallContact = side;
+            ball.Gravity = 800.0f;
+            ball.Friction = 20.0f;
+
+            // Its radius from the wall's line, y = x - 100, on the side the ground falls toward the wall from.
+            var x = 1000.0f + 16.0f * 0.70710678f;
+            var y = 900.0f - 16.0f * 0.70710678f;
+            Missile.Create(ball, x, y, Physics.GroundHeight(x, y) + 16.0f);
+            var still = 0;
+            var settled = 0;
+            for (var i = 0; i < 96; i++)
+            {
+                if (i == 16)
+                {
+                    settled = ball.Impacts;
+                }
+
+                var lastX = ball.X;
+                var lastY = ball.Y;
+                Steps(world, 1);
+                if (ball.X == lastX && ball.Y == lastY)
+                {
+                    still++;
+                }
+
+                var off = (ball.X - ball.Y - 100.0f) * 0.70710678f;
+                Expect.True(off > 15.99f, what + "on its own side of the wall, its radius off, at step " + i + ": " + off);
+                Within(Physics.GroundHeight(ball.X, ball.Y) + 16.0f, ball.Z, 1.0f, what + "on the ground, at step " + i);
+            }
+
+            Expect.True(settled <= 3, what + "it met the wall, and the ground after a bounce off it, a few times at first; " + settled + " impacts");
+            Expect.Equal(settled, ball.Impacts, what + "then none: it went on along the wall");
+            Expect.True(still <= 1, what + "still at " + still + " steps");
+            var along = (x - ball.X + y - ball.Y) * 0.70710678f;
+            Expect.True(along > 800.0f, what + "went on down along the wall: " + along);
+        }
+
         /// <summary>A footman pushed at 600 into a wall across its way stops short of it, its collision size off, and OnSlammed runs once with the normal out of the wall.</summary>
         public static void Push(FakeWorld world)
         {

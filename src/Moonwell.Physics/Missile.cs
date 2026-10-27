@@ -264,6 +264,9 @@ namespace Moonwell
         /// <summary>Whether it rolls along the ground: a Slide that has slowed.</summary>
         internal bool rolling;
 
+        /// <summary>Whether its move this step was a free fall, gravity taken for the whole step: a contact later in the step gives back the part after it. False once it met the ground or rolled along it this step, whose velocity is the ground's.</summary>
+        internal bool fell;
+
         /// <summary>Whether it lies still on the ground; it moves again when something gives it a velocity.</summary>
         internal bool resting;
 

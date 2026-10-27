@@ -596,7 +596,9 @@ namespace Moonwell.Engine
             // The velocity where it met the thing: gravity has acted only for the part of the step before.
             var vx = missile.vx;
             var vy = missile.vy;
-            var late = dx * dx + dy * dy > 0.0f || dz != 0.0f ? missile.gravity * Interactions.Current().Step * (1.0f - t) : 0.0f;
+            // Only a move that was a free fall took the step's gravity whole: one that met the ground or rolled along it this
+            // step has the ground's velocity, and none is given back.
+            var late = (dx * dx + dy * dy > 0.0f || dz != 0.0f) && missile.fell ? missile.gravity * Interactions.Current().Step * (1.0f - t) : 0.0f;
             var vz = missile.vz + late;
             var into = (vx - otherVX) * nx + (vy - otherVY) * ny + vz * nz;
             var now = Tracking.StepNow;
@@ -622,6 +624,24 @@ namespace Moonwell.Engine
             {
                 // It touched the thing at the last check and is not moving into it: it is leaving, as after a bounce.
                 return Through;
+            }
+
+            var wall = touch.wall;
+            if (wall != null && nz == 0.0f && into < 0.0f && touch.contacted && now - touch.lastTouch <= Recent && (setting == Contact.Bounce || setting == Contact.Slide) && -into < Settle + (missile.rolling ? Physics.Current().Gravity : missile.gravity) * Interactions.Current().Step)
+            {
+                // Back at a wall's side soon after touching it, slowly, as a slope pulls a rolling ball into it at every
+                // step: it goes on along the side with no impact, to the end of its move put back out at the side, as the
+                // guide's loop goes on after a hit for the rest of the step. Left where it met the wall, it would meet it
+                // again at the start of the next step, and stand there.
+                touch.touching = true;
+                touch.lastTouch = now;
+                missile.vx = vx - into * nx;
+                missile.vy = vy - into * ny;
+                Beside(wall, radius, nx, ny, ref bx, ref by);
+                grid.Move(entry, bx, by);
+                Placed(missile, bx, by, bz);
+                Flight.Place(missile, world, bx, by, bz);
+                return Go;
             }
 
             touch.touching = true;
@@ -1905,6 +1925,38 @@ namespace Moonwell.Engine
             {
                 t1 = to;
             }
+        }
+
+        /// <summary>Puts a ball's middle at (x, y) back out at a wall's side, its radius from the wall, when it is nearer: away from the nearest point of the wall, or along the normal (nx, ny) when it is on the wall's line or past it.</summary>
+        private static void Beside(Wall wall, float radius, float nx, float ny, ref float x, ref float y)
+        {
+            float x1;
+            float y1;
+            float x2;
+            float y2;
+            Ends(wall, out x1, out y1, out x2, out y2);
+            var ex = x2 - x1;
+            var ey = y2 - y1;
+            float qx;
+            float qy;
+            Nearest(x, y, x1, y1, ex, ey, Trig.Sqrt(ex * ex + ey * ey), out qx, out qy);
+            var ox = x - qx;
+            var oy = y - qy;
+            var off = Trig.Sqrt(ox * ox + oy * oy);
+            if (off >= radius)
+            {
+                return;
+            }
+
+            if (off > Tiny && ox * nx + oy * ny > 0.0f)
+            {
+                x = qx + ox / off * radius;
+                y = qy + oy / off * radius;
+                return;
+            }
+
+            x = qx + nx * radius;
+            y = qy + ny * radius;
         }
 
         /// <summary>The nearest point of a wall from (x1, y1) along (ex, ey), of a length, to a point.</summary>

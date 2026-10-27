@@ -362,6 +362,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "wall.fast", Run = WallCases.Fast });
             list.Add(new Case { Name = "wall.push", Run = WallCases.Push });
             list.Add(new Case { Name = "wall.checks", Run = WallCases.Checks });
+            list.Add(new Case { Name = "wall.slide-under-gravity", Run = WallCases.SlideUnderGravity });
             list.Add(new Case { Name = "deck.height", Run = DeckCases.Height });
             list.Add(new Case { Name = "deck.turned-scaled", Run = DeckCases.TurnedScaled });
             list.Add(new Case { Name = "deck.over-water", Run = DeckCases.OverWater });
