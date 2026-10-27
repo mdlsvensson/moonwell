@@ -275,6 +275,9 @@ namespace Moonwell.Testing
         {
             list.Add(new Case { Name = "audit.areas.fake-covers-as-the-game", Run = AuditAreaCases.FakeCoversAsTheGame });
             list.Add(new Case { Name = "audit.areas.fake-walks", Run = AuditAreaCases.FakeWalks });
+            list.Add(new Case { Name = "audit.areas.small-circle", Run = AuditAreaCases.SmallCircle });
+            list.Add(new Case { Name = "audit.areas.thin-polygon", Run = AuditAreaCases.ThinPolygon });
+            list.Add(new Case { Name = "audit.areas.centre-cell-always", Run = AuditAreaCases.CentreCellAlways });
         }
 
         /// <summary>Adds the input package's cases.</summary>

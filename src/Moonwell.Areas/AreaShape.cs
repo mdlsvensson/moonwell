@@ -7,8 +7,9 @@ namespace Moonwell
     /// A shape on the map that an area covers: a World Editor region, a rect, a polygon, a circle, or several of those
     /// together. It never changes once made. <c>Contains</c> tests the true shape, but the game sees an area in whole
     /// 32 by 32 cells: a rect is rounded out to whole cells, and a polygon or a circle is the cells whose centre is
-    /// inside it. So a unit can be inside the shape by <c>Contains</c> and not yet in the area, or the other way round,
-    /// within a cell of its edge.
+    /// inside it, and always the cell its own centre is in. So a unit can be inside the shape by <c>Contains</c> and not
+    /// yet in the area, or the other way round, within a cell of its edge; a circle of radius under 23 or a polygon
+    /// thinner than a cell may be only the one cell its centre is in.
     /// </summary>
     public sealed class AreaShape
     {
@@ -84,14 +85,14 @@ namespace Moonwell
             return new AreaShape(ShapeKind.Rect, bounds, true, null, null, bounds.Center, 0f, new AreaShape[0]);
         }
 
-        /// <summary>A polygon. The game gives the area the 32 cells whose centre is inside the polygon; <c>Contains</c> tests the true polygon. The game is given one cell for each 32 by 32 square inside it, so a very large polygon makes a very large region.</summary>
+        /// <summary>A polygon. The game gives the area the 32 cells whose centre is inside the polygon, and the cell its centroid is in, so a thin one is not left without cells (a band thinner than a cell may be only that one); <c>Contains</c> tests the true polygon. The centroid of a polygon bent round on itself (a U) can be outside it, and its cell is added all the same. The game is given one cell for each 32 by 32 square inside it, so a very large polygon makes a very large region.</summary>
         [LocalSafe]
         public static AreaShape Polygon(Polygon polygon)
         {
             return new AreaShape(ShapeKind.Polygon, polygon.Bounds, true, null, polygon, polygon.Center, 0f, new AreaShape[0]);
         }
 
-        /// <summary>A circle. The game gives the area the 32 cells whose centre is inside the circle; <c>Contains</c> tests the true circle. A radius that is not above 0 throws ArgumentException. The game is given one cell for each 32 by 32 square inside it, so a radius of 4,096 makes about 51,000 cells.</summary>
+        /// <summary>A circle. The game gives the area the 32 cells whose centre is inside the circle, and always the cell its centre is in, so a small one is that one cell (a radius under 23 at a cell's corner holds no cell's centre); <c>Contains</c> tests the true circle. A radius that is not above 0 throws ArgumentException. The game is given one cell for each 32 by 32 square inside it, so a radius of 4,096 makes about 51,000 cells.</summary>
         [LocalSafe]
         public static AreaShape Circle(Vector2 center, float radius)
         {
