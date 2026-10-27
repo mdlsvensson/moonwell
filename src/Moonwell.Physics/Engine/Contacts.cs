@@ -80,7 +80,7 @@ namespace Moonwell.Engine
         /// <summary>The largest radius of an item: they are all the same.</summary>
         private static float largestItem;
 
-        /// <summary>The farthest any missile has reached in a step since a missile first started missile checks, its radius plus its move, at least FirstMissile; the missile checks' range covers it.</summary>
+        /// <summary>The farthest any missile has reached in a step since a missile first started missile checks, its radius plus its move, at least FirstMissile; the missile checks' range covers it. Every missile counts, with missile checks or not, as one with none is still met by those that have them; and it is never lowered, so one fast missile (a bolt at 3,000 a second reaches 110) widens every missile's checks against missiles from then on. That costs only more pairs looked at, not a contact.</summary>
         private static float largestMissile;
 
         /// <summary>Whether any missile has started checks against other missiles since the install, so the pass sets their range each step and every missile's reach counts toward the farthest.</summary>

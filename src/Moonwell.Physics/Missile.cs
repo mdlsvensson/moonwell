@@ -492,7 +492,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>What it does on meeting another missile: None, the default, does not check missiles at all and reacts to none (a missile that checks missiles still meets it, and it flies on as it was); Stop, Bounce and Pass as UnitContact (Slide is Bounce). Two missiles meet once, through the one made first; each takes its own outcome, and a bounce keeps the two Bouncinesses multiplied and square-rooted, shared by Mass. Set to another than None after Create, the checks start then.</summary>
+        /// <summary>What it does on meeting another missile: None, the default, does not check missiles at all and reacts to none (a missile that checks missiles still meets it, and it flies on as it was); Stop, Bounce and Pass as UnitContact (Slide is Bounce). Two missiles meet once, through the one made first; each takes its own outcome, and a bounce keeps the two Bouncinesses multiplied and square-rooted, shared by Mass (one meeting a None side takes all of it). Set to another than None after Create, the checks start then. Once any missile checks missiles, the range of those checks covers the farthest any missile has moved in a step since, so one fast missile makes every missile's checks look at more pairs.</summary>
         [LocalSafe]
         public Contact MissileContact
         {
