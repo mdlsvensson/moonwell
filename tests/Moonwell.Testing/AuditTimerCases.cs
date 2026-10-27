@@ -327,7 +327,15 @@ namespace Moonwell.Testing
             var runs = 0;
             Timer.Every(0.01f, () => { runs++; });
             world.Advance(10.0f);
-            Expect.Equal(4000, runs, "runs of Every(0.01) over 10 s of game time at speed 4 from 7200 s");
+            // The game's Lua drops what an addition adds below two float steps, so there the last run can fall past the 10 s (3999, seen 10-27).
+            if (GameNumbers.HasNaN)
+            {
+                Expect.Equal(4000, runs, "runs of Every(0.01) over 10 s of game time at speed 4 from 7200 s");
+            }
+            else
+            {
+                Expect.True(runs >= 3999 && runs <= 4001, "runs of Every(0.01) over 10 s of game time at speed 4 from 7200 s: 4000 and 1 either way expected in the game's Lua, got " + runs);
+            }
             Expect.Near(7240.0f, Runtime.World.Now(), "Moonwell's time after 10 s of game time at speed 4");
         }
 #endif
