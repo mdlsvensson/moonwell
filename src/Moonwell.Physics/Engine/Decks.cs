@@ -179,6 +179,28 @@ namespace Moonwell.Engine
             return Pick(x, y, 0.0f, false, out height) != null;
         }
 
+        /// <summary>Whether a living deck is at a point, whatever its height there: Under's test with no height read, for the points of a pushed unit's edge.</summary>
+        internal static bool Covers(float x, float y)
+        {
+            var list = decks;
+            if (list == null)
+            {
+                return false;
+            }
+
+            var length = list.Count;
+            for (var i = 0; i < length; i++)
+            {
+                var deck = Raw.At(list, i);
+                if (deck.living && x >= deck.minX && x <= deck.maxX && y >= deck.minY && y <= deck.maxY && deck.Covers(x, y))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>Gives the normal of the deck a height was read from at a point, of length 1; false when the height there is the terrain's.</summary>
         internal static bool Normal(float x, float y, float z, out float nx, out float ny, out float nz)
         {

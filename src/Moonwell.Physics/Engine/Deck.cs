@@ -126,6 +126,14 @@ namespace Moonwell.Engine
             return true;
         }
 
+        /// <summary>Whether a point is on the deck, its nearest cell having one: Height's test, with no height blended.</summary>
+        internal bool Covers(float px, float py)
+        {
+            float u;
+            float v;
+            return Locate(px, py, out u, out v) && values[(int)(v + 0.5f) * columns + (int)(u + 0.5f)] != Decks.None;
+        }
+
         /// <summary>Gives the direction straight out of the deck at a point on it, of length 1: from the blend of its cells, or straight up at its edge, where fewer than four cells around the point have a deck.</summary>
         internal void Normal(float px, float py, out float nx, out float ny, out float nz)
         {

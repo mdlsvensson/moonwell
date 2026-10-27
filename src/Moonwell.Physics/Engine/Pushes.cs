@@ -589,11 +589,10 @@ namespace Moonwell.Engine
             return Holds(centreX + offsetX, centreY + offsetY, deck) || !Holds(fromX + offsetX, fromY + offsetY, deck);
         }
 
-        /// <summary>Whether a point holds the body of a unit on a deck of a height: it is on a deck, or the ground there is within DeckStep of that height.</summary>
+        /// <summary>Whether a point holds the body of a unit on a deck of a height: a deck is there (its height is not read: the middle's checks see the heights), or the ground there is within DeckStep of that height.</summary>
         private static bool Holds(float x, float y, float deck)
         {
-            float height;
-            return OnDeck(x, y, out height) || Near(Terrain.Height(x, y), deck);
+            return Decks.Covers(x, y) || Near(Terrain.Height(x, y), deck);
         }
 
         /// <summary>Whether a point is on a deck, which is above the terrain there, and the deck's height; false off every deck, or where the terrain is higher (a deck's end, in a bank).</summary>
