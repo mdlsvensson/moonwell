@@ -29,7 +29,7 @@ namespace Moonwell.Engine
         /// <summary>The step of the cycle the place was last read at; -1 before it was read.</summary>
         public int ReadStep = -1;
 
-        /// <summary>Whether the thing has a place now: a unit that is alive, not hidden and not loaded; an item on the ground; a destructable that is alive; a gizmo that has not ended.</summary>
+        /// <summary>Whether the thing has a place now: a unit that is alive, not hidden and not loaded; an item on the ground; a destructable that is alive; a gizmo that has not begun to end, so not in its OnLeave.</summary>
         public bool HasPlace;
 
         /// <summary>Whether the thing has begun to end: it has no place from then on, and no read gives it one again.</summary>

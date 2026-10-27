@@ -390,7 +390,7 @@ namespace Moonwell.Engine
             return entry != null && !entry.Ended ? entry : null;
         }
 
-        /// <summary>Reads the place of an entry, at most once a step: whether it has a place, and where, and its cell follows. A unit has a place when it is alive, not hidden and not loaded; an item when it is not carried and is visible; a destructable when it is alive, and it is not read for where, as it does not move; a gizmo always, until it ends. An entry that has ended is left alone. Outside a running step, as when a button asks, there is no step to read once in: every ask reads. Inside one, a thing that moves after it was read is seen at its old place until the next step.</summary>
+        /// <summary>Reads the place of an entry, at most once a step: whether it has a place, and where, and its cell follows. A unit has a place when it is alive, not hidden and not loaded; an item when it is not carried and is visible; a destructable when it is alive, and it is not read for where, as it does not move; a gizmo always, until it begins to end (its OnLeave runs with no place). An entry that has ended is left alone. Outside a running step, as when a button asks, there is no step to read once in: every ask reads. Inside one, a thing that moves after it was read is seen at its old place until the next step.</summary>
         public static void ReadNow(Entry entry)
         {
             if (entry.Ended)
