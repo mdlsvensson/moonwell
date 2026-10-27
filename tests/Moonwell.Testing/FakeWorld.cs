@@ -91,6 +91,9 @@ namespace Moonwell.Testing
         /// <summary>Whether each unit the world made is a hero.</summary>
         private readonly Dictionary<unit, bool> heroes = new Dictionary<unit, bool>();
 
+        /// <summary>The units made illusions.</summary>
+        private readonly HashSet<unit> illusions = new HashSet<unit>();
+
         /// <summary>The ability levels of each unit, keyed by ability id.</summary>
         private readonly Dictionary<unit, Dictionary<int, int>> abilityLevels = new Dictionary<unit, Dictionary<int, int>>();
 
@@ -773,6 +776,19 @@ namespace Moonwell.Testing
         {
             Refuse();
             return heroes.TryGetValue(unit, out var hero) && hero;
+        }
+
+        /// <summary>Whether a unit was made an illusion with MakeIllusion.</summary>
+        public bool IsIllusion(unit unit)
+        {
+            Refuse();
+            return illusions.Contains(unit);
+        }
+
+        /// <summary>Makes a unit an illusion, as Mirror Image makes one of its hero, with the hero's type id (seen 10-26).</summary>
+        public void MakeIllusion(unit u)
+        {
+            illusions.Add(u);
         }
 
         /// <summary>The player owning a unit; null for a vanished unit, slot 0 for a unit the world did not make.</summary>

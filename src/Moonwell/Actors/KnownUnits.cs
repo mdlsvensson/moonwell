@@ -26,7 +26,7 @@ namespace Moonwell
             return null;
         }
 
-        /// <summary>Takes a game unit in: makes its object, adds its starting components, and runs OnCreated and the map's OnUnitCreated.</summary>
+        /// <summary>Takes a game unit in: makes its object, adds its starting components, and runs OnCreated and the map's OnUnitCreated. An illusion is taken in as a plain unit, not as its type's class, with no starting components and no OnCreated (decision 77).</summary>
         internal static Unit? TakeIn(unit handle, Owner? owner)
         {
             var existing = Find(handle);
@@ -41,10 +41,12 @@ namespace Moonwell
                 return null;
             }
 
-            var maker = ObjectTypes.UnitMaker(typeId);
+            var illusion = Runtime.World.IsIllusion(handle);
+            var maker = illusion ? null : ObjectTypes.UnitMaker(typeId);
             var made = maker != null ? maker() : Plain(Runtime.World.IsHero(handle));
             made.Handle = handle;
             made.TypeId = typeId;
+            made.IsIllusion = illusion;
             made.owner = Runtime.World.OwnerOf(handle);
             known[handle] = made;
             Live.Add(made);
@@ -56,7 +58,7 @@ namespace Moonwell
                 made.Add(made.StartComponents[i]);
             }
 
-            if (!made.HasEnded)
+            if (!made.HasEnded && !illusion)
             {
                 var previous = Owner.current;
                 Owner.current = made;

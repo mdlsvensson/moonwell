@@ -98,6 +98,9 @@ namespace Moonwell.Hosting
         /// <summary>Whether a unit is a hero.</summary>
         bool IsHero(unit unit);
 
+        /// <summary>Whether a unit is an illusion, as Mirror Image and a Wand of Illusion make.</summary>
+        bool IsIllusion(unit unit);
+
         /// <summary>The player that owns a unit; null a while after the game has removed it.</summary>
         player OwnerOf(unit unit);
 

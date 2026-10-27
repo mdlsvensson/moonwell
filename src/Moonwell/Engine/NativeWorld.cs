@@ -406,6 +406,12 @@ namespace Moonwell.Engine
             return Natives.IsUnitType(unit, Natives.UNIT_TYPE_HERO);
         }
 
+        /// <summary>Whether a unit is an illusion: IsUnitIllusion.</summary>
+        public bool IsIllusion(unit unit)
+        {
+            return Natives.IsUnitIllusion(unit);
+        }
+
         /// <summary>The player that owns a unit.</summary>
         public player OwnerOf(unit unit)
         {

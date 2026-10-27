@@ -46,6 +46,10 @@ namespace Moonwell
         [LocalSafe]
         public int TypeId { get; internal set; }
 
+        /// <summary>Whether the unit is an illusion (Mirror Image, a Wand of Illusion), as the game read it when the unit was taken in. An illusion has its hero's type id but is taken in as a plain unit, not as the hero's class: it has none of the class's starting components and runs no OnCreated. Map-wide reactions (OnUnitCreated, OnUnitDied) still see it.</summary>
+        [LocalSafe]
+        public bool IsIllusion { get; internal set; }
+
         /// <summary>The default object of the unit's type, as Unreal's class default object: the values its class declares (a type no class of the map's declares, its values as World Editor made them, standard where World Editor left them), the same whatever this unit's are now and once it is gone. One per type, shared by its units, with no handle; it is gone, so its live actions do nothing.</summary>
         [LocalSafe]
         public Unit Default => ObjectTypes.DefaultOf(this, DeclaredTypeId);

@@ -140,5 +140,24 @@ namespace Moonwell.Testing
             Expect.True(kept.Has<Chilled>(), "the buff stays on the unit after its pair parted");
             Expect.True(!removed.Has<Chilled>(), "the buff OnPart removed");
         }
+
+        /// <summary>A Mirror Image of a hero of a class enters with the hero's type id (seen 10-26): it is taken in as a plain unit, a Hero and not the class, with none of the class's starting components and no OnCreated, and IsIllusion reads true; OnUnitCreated still sees it (decision 77).</summary>
+        public static void IllusionIsPlain(FakeWorld world)
+        {
+            CountedHero.Created = 0;
+            var id = ObjectTypes.FourCC("H0IL");
+            ObjectTypes.Unit(id, () => new CountedHero());
+            var watch = Game.Instance.Add(new CreatedWatch());
+            var hero = Unit.Of(world.NewUnit(id, hero: true))!;
+            var image = world.NewUnit(id, hero: true);
+            world.MakeIllusion(image);
+            Inbound.Entered(image);
+            var taken = KnownUnits.Find(image);
+            Expect.True(taken != null, "the illusion is taken in");
+            Expect.Equal("Hero " + id + " True 0", Names.NameOf(taken!) + " " + taken!.TypeId + " " + taken.IsIllusion + " " + taken.ComponentCount, "the illusion's class, type id, IsIllusion and components");
+            Expect.Equal(1, CountedHero.Created, "OnCreated's runs: the hero's only");
+            Expect.True(!hero.IsIllusion && hero is CountedHero && hero.ComponentCount == 1, "the hero itself is of its class, with its component, and no illusion");
+            Expect.True(watch.Seen.Contains(taken), "OnUnitCreated sees the illusion");
+        }
     }
 }
