@@ -449,7 +449,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>AIad.</summary>
+            /// <summary>(Item), AIad.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIad")]
             public class AIad : global::Moonwell.Objects.StandardAbility
@@ -500,7 +500,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>AIae.</summary>
+            /// <summary>(Item), AIae.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIae")]
             public class AIae : global::Moonwell.Objects.StandardAbility
@@ -552,7 +552,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>AIar.</summary>
+            /// <summary>(Item), AIar.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIar")]
             public class AIar : global::Moonwell.Objects.StandardAbility
@@ -621,7 +621,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>AIau.</summary>
+            /// <summary>(Item), AIau.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIau")]
             public class AIau : global::Moonwell.Objects.StandardAbility
@@ -682,7 +682,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>AIav.</summary>
+            /// <summary>(Item), AIav.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIav")]
             public class AIav : global::Moonwell.Objects.StandardAbility
@@ -724,7 +724,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>AIba.</summary>
+            /// <summary>(Item), AIba.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIba")]
             public class AIba : global::Moonwell.Objects.StandardAbility
@@ -838,7 +838,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>AIcd.</summary>
+            /// <summary>(Item), AIcd.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIcd")]
             public class AIcd : global::Moonwell.Objects.StandardAbility
@@ -997,7 +997,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>AIin.</summary>
+            /// <summary>(Item), AIin.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIin")]
             public class AIin : global::Moonwell.Objects.StandardAbility
@@ -1069,7 +1069,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>AIrn.</summary>
+            /// <summary>(Lesser), AIrn.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIrn")]
             public class AIrn : global::Moonwell.Objects.StandardAbility
@@ -1130,7 +1130,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>AIwd.</summary>
+            /// <summary>(Item), AIwd.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIwd")]
             public class AIwd : global::Moonwell.Objects.StandardAbility
@@ -1208,7 +1208,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>AOE damage upon death (Adda).</summary>
+            /// <summary>AOE damage upon death (Sapper), Adda.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Adda")]
             public class AOEDamageUponDeath : global::Moonwell.Objects.StandardAbility
@@ -1276,7 +1276,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>AOE damage upon death (Amnx).</summary>
+            /// <summary>AOE damage upon death (Goblin Mine), Amnx.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Amnx")]
             public class AOEDamageUponDeathAmnx : global::Moonwell.Objects.StandardAbility
@@ -1344,7 +1344,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>AOE damage upon death (Amnz).</summary>
+            /// <summary>AOE damage upon death (Big Mine), Amnz.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Amnz")]
             public class AOEDamageUponDeathAmnz : global::Moonwell.Objects.StandardAbility
@@ -1463,7 +1463,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Acid Bomb (Afab).</summary>
+            /// <summary>Acid Bomb (Forsaken), Afab.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Afab")]
             public class AcidBomb : global::Moonwell.Objects.StandardAbility
@@ -1566,7 +1566,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Against All Odds (LT4b).</summary>
+            /// <summary>Against All Odds (Fake Landen Talent), LT4b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("LT4b")]
             public class AgainstAllOdds : global::Moonwell.Objects.StandardAbility
@@ -1715,7 +1715,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>All Brawn (UT5c).</summary>
+            /// <summary>All Brawn (UGarekTalent), UT5c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT5c")]
             public class AllBrawn : global::Moonwell.Objects.StandardAbility
@@ -1788,13 +1788,126 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Apprehend (AHap).</summary>
+            /// <summary>Apprehend (AHen).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHap")]
+            [global::Moonwell.Objects.Standard("AHen")]
             public class Apprehend : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Apprehend()
+                {
+                    AirUnitHeight = Levels(200f, 200f, 200f);
+                    AirUnitLowerDuration = Levels(0.6f, 0.6f, 0.6f);
+                    AnimationNames = "spell,throw";
+                    AttackSpeedReductionPercent = Levels(0.3f, 0.45f, 0.6f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Apprehend, global::Moonwell.Objects.Other.Buffs.ApprehendBHag>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(20f, 15f, 10f);
+                    Duration = Levels(8f, 10f, 15f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(1.5f, 3f, 5f);
+                    Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNApprehend.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNApprehend.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "W";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(65, 65, 65);
+                    MeleeAttackRange = Levels(128f, 128f, 128f);
+                    MissileArt = "Abilities\\Spells\\Orc\\Ensnare\\EnsnareMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1500;
+                    Name = "Apprehend";
+                    Order = "apprehend";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    Range = Levels(500f, 500f, 500f);
+                    RequiredLevel = 0;
+                    StunDuration = Levels(0.1f, 0.1f, 0.1f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Apprehend - [|cffffcc00Level 1|r]", "Apprehend - [|cffffcc00Level 2|r]", "Apprehend - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Throw a net at an enemy, ensnaring them. Ensnared units have their attack rate reduced by <AHen,DataE1,%>% and cannot move.|nLasts <AHen,Dur1> seconds.", "Throw a net at an enemy, ensnaring them. Ensnared units have their attack rate reduced by <AHen,DataE2,%>% and cannot move.|nLasts <AHen,Dur2> seconds.", "Throw a net at an enemy, ensnaring them. Ensnared units have their attack rate reduced by <AHen,DataE3,%>% and cannot move.|nLasts <AHen,Dur3> seconds.");
+                    TooltipLearn = "Learn Apprehend - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Throw a net at an enemy, ensnaring them and reducing their attack rate. |n|n|cffffcc00Level 1|r - <AHen,DataE1,%>% attack rate, <AHen,Dur1> seconds. |n|cffffcc00Level 2|r - <AHen,DataE2,%>% attack rate, <AHen,Dur2> seconds.|n|cffffcc00Level 3|r - <AHen,DataE3,%>% attack rate, <AHen,Dur3> seconds.";
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>Ens1</c>.</summary>
+                [global::Moonwell.Objects.Field("Ens1", Label = "Air Unit Lower Duration")]
+                [global::Moonwell.Objects.Limits(0.001, 300)]
+                public global::Moonwell.Objects.Levels<float> AirUnitLowerDuration
+                {
+                    get { return Fields.GetLevels<float>(this, "Ens1"); }
+                    protected set { Fields.Put("Ens1", value); }
+                }
+
+                /// <summary>The field <c>Ens2</c>.</summary>
+                [global::Moonwell.Objects.Field("Ens2", Label = "Air Unit Height")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> AirUnitHeight
+                {
+                    get { return Fields.GetLevels<float>(this, "Ens2"); }
+                    protected set { Fields.Put("Ens2", value); }
+                }
+
+                /// <summary>The field <c>Ens3</c>.</summary>
+                [global::Moonwell.Objects.Field("Ens3", Label = "Melee Attack Range")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> MeleeAttackRange
+                {
+                    get { return Fields.GetLevels<float>(this, "Ens3"); }
+                    protected set { Fields.Put("Ens3", value); }
+                }
+
+                /// <summary>The field <c>Ens4</c>.</summary>
+                [global::Moonwell.Objects.Field("Ens4", Label = "Stun Duration")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> StunDuration
+                {
+                    get { return Fields.GetLevels<float>(this, "Ens4"); }
+                    protected set { Fields.Put("Ens4", value); }
+                }
+
+                /// <summary>The field <c>Ens5</c>.</summary>
+                [global::Moonwell.Objects.Field("Ens5", Label = "Attack Speed Reduction Percent")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> AttackSpeedReductionPercent
+                {
+                    get { return Fields.GetLevels<float>(this, "Ens5"); }
+                    protected set { Fields.Put("Ens5", value); }
+                }
+
+                /// <summary>The field <c>Ens6</c>.</summary>
+                [global::Moonwell.Objects.Field("Ens6", Label = "Bonus Damage Taken Percent")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> BonusDamageTakenPercent
+                {
+                    get { return Fields.GetLevels<float>(this, "Ens6"); }
+                    protected set { Fields.Put("Ens6", value); }
+                }
+
+                /// <summary>The field <c>Ens7</c>.</summary>
+                [global::Moonwell.Objects.Field("Ens7", Label = "Silences When Ensnared")]
+                public global::Moonwell.Objects.Levels<bool> SilencesWhenEnsnared
+                {
+                    get { return Fields.GetLevels<bool>(this, "Ens7"); }
+                    protected set { Fields.Put("Ens7", value); }
+                }
+            }
+
+            /// <summary>Apprehend (Talent 1), AHap.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AHap")]
+            public class ApprehendAHap : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ApprehendAHap()
                 {
                     AnimationNames = "spell,throw";
                     Area = Levels(200f, 275f, 350f);
@@ -1836,7 +1949,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Apprehend (AHe2).</summary>
+            /// <summary>Apprehend (Talent 2), AHe2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHe2")]
             public class ApprehendAHe2 : global::Moonwell.Objects.StandardAbility
@@ -1950,7 +2063,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Apprehend (AHe3).</summary>
+            /// <summary>Apprehend (Talent 3), AHe3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHe3")]
             public class ApprehendAHe3 : global::Moonwell.Objects.StandardAbility
@@ -2065,120 +2178,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Apprehend (AHen).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHen")]
-            public class ApprehendAHen : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public ApprehendAHen()
-                {
-                    AirUnitHeight = Levels(200f, 200f, 200f);
-                    AirUnitLowerDuration = Levels(0.6f, 0.6f, 0.6f);
-                    AnimationNames = "spell,throw";
-                    AttackSpeedReductionPercent = Levels(0.3f, 0.45f, 0.6f);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Apprehend, global::Moonwell.Objects.Other.Buffs.ApprehendBHag>();
-                    ButtonPositionNormalX = 1;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 1;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f, 0f, 0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(20f, 15f, 10f);
-                    Duration = Levels(8f, 10f, 15f);
-                    HeroAbility = true;
-                    HeroDuration = Levels(1.5f, 3f, 5f);
-                    Hotkey = "W";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNApprehend.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNApprehend.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "W";
-                    LevelCount = 3;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(65, 65, 65);
-                    MeleeAttackRange = Levels(128f, 128f, 128f);
-                    MissileArt = "Abilities\\Spells\\Orc\\Ensnare\\EnsnareMissile.mdl";
-                    MissileHomingEnabled = true;
-                    MissileSpeed = 1500;
-                    Name = "Apprehend";
-                    Order = "apprehend";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    Range = Levels(500f, 500f, 500f);
-                    RequiredLevel = 0;
-                    StunDuration = Levels(0.1f, 0.1f, 0.1f);
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
-                    Tooltip = Levels("Apprehend - [|cffffcc00Level 1|r]", "Apprehend - [|cffffcc00Level 2|r]", "Apprehend - [|cffffcc00Level 3|r]");
-                    TooltipExtended = Levels("Throw a net at an enemy, ensnaring them. Ensnared units have their attack rate reduced by <AHen,DataE1,%>% and cannot move.|nLasts <AHen,Dur1> seconds.", "Throw a net at an enemy, ensnaring them. Ensnared units have their attack rate reduced by <AHen,DataE2,%>% and cannot move.|nLasts <AHen,Dur2> seconds.", "Throw a net at an enemy, ensnaring them. Ensnared units have their attack rate reduced by <AHen,DataE3,%>% and cannot move.|nLasts <AHen,Dur3> seconds.");
-                    TooltipLearn = "Learn Apprehend - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Throw a net at an enemy, ensnaring them and reducing their attack rate. |n|n|cffffcc00Level 1|r - <AHen,DataE1,%>% attack rate, <AHen,Dur1> seconds. |n|cffffcc00Level 2|r - <AHen,DataE2,%>% attack rate, <AHen,Dur2> seconds.|n|cffffcc00Level 3|r - <AHen,DataE3,%>% attack rate, <AHen,Dur3> seconds.";
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>Ens1</c>.</summary>
-                [global::Moonwell.Objects.Field("Ens1", Label = "Air Unit Lower Duration")]
-                [global::Moonwell.Objects.Limits(0.001, 300)]
-                public global::Moonwell.Objects.Levels<float> AirUnitLowerDuration
-                {
-                    get { return Fields.GetLevels<float>(this, "Ens1"); }
-                    protected set { Fields.Put("Ens1", value); }
-                }
-
-                /// <summary>The field <c>Ens2</c>.</summary>
-                [global::Moonwell.Objects.Field("Ens2", Label = "Air Unit Height")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> AirUnitHeight
-                {
-                    get { return Fields.GetLevels<float>(this, "Ens2"); }
-                    protected set { Fields.Put("Ens2", value); }
-                }
-
-                /// <summary>The field <c>Ens3</c>.</summary>
-                [global::Moonwell.Objects.Field("Ens3", Label = "Melee Attack Range")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> MeleeAttackRange
-                {
-                    get { return Fields.GetLevels<float>(this, "Ens3"); }
-                    protected set { Fields.Put("Ens3", value); }
-                }
-
-                /// <summary>The field <c>Ens4</c>.</summary>
-                [global::Moonwell.Objects.Field("Ens4", Label = "Stun Duration")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> StunDuration
-                {
-                    get { return Fields.GetLevels<float>(this, "Ens4"); }
-                    protected set { Fields.Put("Ens4", value); }
-                }
-
-                /// <summary>The field <c>Ens5</c>.</summary>
-                [global::Moonwell.Objects.Field("Ens5", Label = "Attack Speed Reduction Percent")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> AttackSpeedReductionPercent
-                {
-                    get { return Fields.GetLevels<float>(this, "Ens5"); }
-                    protected set { Fields.Put("Ens5", value); }
-                }
-
-                /// <summary>The field <c>Ens6</c>.</summary>
-                [global::Moonwell.Objects.Field("Ens6", Label = "Bonus Damage Taken Percent")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> BonusDamageTakenPercent
-                {
-                    get { return Fields.GetLevels<float>(this, "Ens6"); }
-                    protected set { Fields.Put("Ens6", value); }
-                }
-
-                /// <summary>The field <c>Ens7</c>.</summary>
-                [global::Moonwell.Objects.Field("Ens7", Label = "Silences When Ensnared")]
-                public global::Moonwell.Objects.Levels<bool> SilencesWhenEnsnared
-                {
-                    get { return Fields.GetLevels<bool>(this, "Ens7"); }
-                    protected set { Fields.Put("Ens7", value); }
-                }
-            }
-
-            /// <summary>Arcane Archer (AT5b).</summary>
+            /// <summary>Arcane Archer (AnyaTalent), AT5b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT5b")]
             public class ArcaneArcher : global::Moonwell.Objects.StandardAbility
@@ -2255,7 +2255,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Avatar (ANav).</summary>
+            /// <summary>Avatar (Neutral), ANav.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ANav")]
             public class Avatar : global::Moonwell.Objects.StandardAbility
@@ -2473,13 +2473,136 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Banshee's Wail (AUi1).</summary>
+            /// <summary>Banshee's Wail (AUwc).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AUi1")]
+            [global::Moonwell.Objects.Standard("AUwc")]
             public class BansheesWail : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public BansheesWail()
+                {
+                    Area = Levels(800f, 800f, 800f);
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    Caster = "Abilities\\Spells\\Undead\\BansheesWail\\BansheesWailCaster.mdl";
+                    CheckDependencies = true;
+                    Cooldown = Levels(120f, 120f, 120f);
+                    DamageReturnFactor = Levels(0f, 0f, 0f);
+                    DamageReturnThreshold = Levels(20f, 20f, 20f);
+                    Duration = Levels(30f, 30f, 30f);
+                    EffectSoundLooping = "BansheesWailSwarmLoop";
+                    FlatManaGain = Levels(0f, 0f, 0f);
+                    HealingRadius = Levels(0f, 0f, 0f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(30f, 30f, 30f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBansheesCall.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNBansheesCall.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 6;
+                    ManaCost = Levels(150, 150, 150);
+                    MaxSwarmUnitsPerTarget = Levels(7, 7, 9);
+                    Name = "Banshee's Wail";
+                    NumberOfSwarmUnits = Levels(5, 7, 9);
+                    Order = "Locustswarm";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    RequiredLevel = 6;
+                    SwarmUnitType.Set<global::Moonwell.Objects.Campaign.Units.BansheeUfrb>();
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground);
+                    Tooltip = Levels("Banshee's Wail - [|cffffcc00Level 1|r]", "Banshee's Wail - [|cffffcc00Level 2|r]", "Banshee's Wail - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Anya summons <AUwc,DataA1> Banshees to attack nearby enemies. Banshee attacks apply a debuff that increases Magic Damage taken by <Amda,DataA1,%>%. |nLasts <AUwc,HeroDur1> seconds.", "Anya summons <AUwc,DataA2> Banshees to attack nearby enemies. Banshee attacks apply a debuff that increases Magic Damage taken by <Amda,DataA1,%>%. |nLasts <AUwc,HeroDur2> seconds.", "Anya summons <AUwc,DataA3> Banshees to attack nearby enemies. Banshee attacks apply a debuff that increases Magic Damage taken by <Amda,DataA1,%>%. |nLasts <AUwc,HeroDur3> seconds.");
+                    TooltipLearn = "Learn Banshee's Wail - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Anya summons Banshees to attack nearby enemies. Banshee attacks apply a debuff that increases Magic Damage taken by <Amda,DataA1,%>%.|n|n|cffffcc00Level 1|r - <AUwc,DataA1> Banshees. |n|cffffcc00Level 2|r - <AUwc,DataA2> Banshees. |n|cffffcc00Level 3|r - <AUwc,DataA3> Banshees.";
+                    UnitReleaseIntervalSeconds = Levels(0.2f, 0.2f, 0.2f);
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>Uls1</c>.</summary>
+                [global::Moonwell.Objects.Field("Uls1", Label = "Number of Swarm Units")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<int> NumberOfSwarmUnits
+                {
+                    get { return Fields.GetLevels<int>(this, "Uls1"); }
+                    protected set { Fields.Put("Uls1", value); }
+                }
+
+                /// <summary>The field <c>Uls2</c>.</summary>
+                [global::Moonwell.Objects.Field("Uls2", Label = "Unit Release Interval (seconds)")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> UnitReleaseIntervalSeconds
+                {
+                    get { return Fields.GetLevels<float>(this, "Uls2"); }
+                    protected set { Fields.Put("Uls2", value); }
+                }
+
+                /// <summary>The field <c>Uls3</c>.</summary>
+                [global::Moonwell.Objects.Field("Uls3", Label = "Max Swarm Units Per Target")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<int> MaxSwarmUnitsPerTarget
+                {
+                    get { return Fields.GetLevels<int>(this, "Uls3"); }
+                    protected set { Fields.Put("Uls3", value); }
+                }
+
+                /// <summary>The field <c>Uls4</c>.</summary>
+                [global::Moonwell.Objects.Field("Uls4", Label = "Damage Return Factor")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<float> DamageReturnFactor
+                {
+                    get { return Fields.GetLevels<float>(this, "Uls4"); }
+                    protected set { Fields.Put("Uls4", value); }
+                }
+
+                /// <summary>The field <c>Uls5</c>.</summary>
+                [global::Moonwell.Objects.Field("Uls5", Label = "Damage Return Threshold")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> DamageReturnThreshold
+                {
+                    get { return Fields.GetLevels<float>(this, "Uls5"); }
+                    protected set { Fields.Put("Uls5", value); }
+                }
+
+                /// <summary>The field <c>Ulsu</c>.</summary>
+                [global::Moonwell.Objects.Field("Ulsu", Label = "Swarm Unit Type")]
+                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> SwarmUnitType
+                {
+                    get { return Fields.GetRef<global::Moonwell.Unit>("Ulsu"); }
+                }
+
+                /// <summary>The field <c>bns6</c>.</summary>
+                [global::Moonwell.Objects.Field("bns6", Label = "Flat Mana Gain")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> FlatManaGain
+                {
+                    get { return Fields.GetLevels<float>(this, "bns6"); }
+                    protected set { Fields.Put("bns6", value); }
+                }
+
+                /// <summary>The field <c>bns7</c>.</summary>
+                [global::Moonwell.Objects.Field("bns7", Label = "Healing Radius")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> HealingRadius
+                {
+                    get { return Fields.GetLevels<float>(this, "bns7"); }
+                    protected set { Fields.Put("bns7", value); }
+                }
+            }
+
+            /// <summary>Banshee's Wail (Talent 1), AUi1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AUi1")]
+            public class BansheesWailAUi1 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public BansheesWailAUi1()
                 {
                     Area = Levels(800f, 800f, 800f);
                     ButtonPositionNormalX = 3;
@@ -2597,7 +2720,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Banshee's Wail (AUi2).</summary>
+            /// <summary>Banshee's Wail (Talent 2), AUi2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUi2")]
             public class BansheesWailAUi2 : global::Moonwell.Objects.StandardAbility
@@ -2721,7 +2844,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Banshee's Wail (AUi3).</summary>
+            /// <summary>Banshee's Wail (Talent 3), AUi3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUi3")]
             public class BansheesWailAUi3 : global::Moonwell.Objects.StandardAbility
@@ -2845,130 +2968,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Banshee's Wail (AUwc).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AUwc")]
-            public class BansheesWailAUwc : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public BansheesWailAUwc()
-                {
-                    Area = Levels(800f, 800f, 800f);
-                    ButtonPositionNormalX = 3;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 3;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f, 0f, 0f);
-                    Caster = "Abilities\\Spells\\Undead\\BansheesWail\\BansheesWailCaster.mdl";
-                    CheckDependencies = true;
-                    Cooldown = Levels(120f, 120f, 120f);
-                    DamageReturnFactor = Levels(0f, 0f, 0f);
-                    DamageReturnThreshold = Levels(20f, 20f, 20f);
-                    Duration = Levels(30f, 30f, 30f);
-                    EffectSoundLooping = "BansheesWailSwarmLoop";
-                    FlatManaGain = Levels(0f, 0f, 0f);
-                    HealingRadius = Levels(0f, 0f, 0f);
-                    HeroAbility = true;
-                    HeroDuration = Levels(30f, 30f, 30f);
-                    Hotkey = "R";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNBansheesCall.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNBansheesCall.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "R";
-                    LevelCount = 3;
-                    LevelSkipRequirement = 6;
-                    ManaCost = Levels(150, 150, 150);
-                    MaxSwarmUnitsPerTarget = Levels(7, 7, 9);
-                    Name = "Banshee's Wail";
-                    NumberOfSwarmUnits = Levels(5, 7, 9);
-                    Order = "Locustswarm";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    RequiredLevel = 6;
-                    SwarmUnitType.Set<global::Moonwell.Objects.Campaign.Units.BansheeUfrb>();
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground);
-                    Tooltip = Levels("Banshee's Wail - [|cffffcc00Level 1|r]", "Banshee's Wail - [|cffffcc00Level 2|r]", "Banshee's Wail - [|cffffcc00Level 3|r]");
-                    TooltipExtended = Levels("Anya summons <AUwc,DataA1> Banshees to attack nearby enemies. Banshee attacks apply a debuff that increases Magic Damage taken by <Amda,DataA1,%>%. |nLasts <AUwc,HeroDur1> seconds.", "Anya summons <AUwc,DataA2> Banshees to attack nearby enemies. Banshee attacks apply a debuff that increases Magic Damage taken by <Amda,DataA1,%>%. |nLasts <AUwc,HeroDur2> seconds.", "Anya summons <AUwc,DataA3> Banshees to attack nearby enemies. Banshee attacks apply a debuff that increases Magic Damage taken by <Amda,DataA1,%>%. |nLasts <AUwc,HeroDur3> seconds.");
-                    TooltipLearn = "Learn Banshee's Wail - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Anya summons Banshees to attack nearby enemies. Banshee attacks apply a debuff that increases Magic Damage taken by <Amda,DataA1,%>%.|n|n|cffffcc00Level 1|r - <AUwc,DataA1> Banshees. |n|cffffcc00Level 2|r - <AUwc,DataA2> Banshees. |n|cffffcc00Level 3|r - <AUwc,DataA3> Banshees.";
-                    UnitReleaseIntervalSeconds = Levels(0.2f, 0.2f, 0.2f);
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>Uls1</c>.</summary>
-                [global::Moonwell.Objects.Field("Uls1", Label = "Number of Swarm Units")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> NumberOfSwarmUnits
-                {
-                    get { return Fields.GetLevels<int>(this, "Uls1"); }
-                    protected set { Fields.Put("Uls1", value); }
-                }
-
-                /// <summary>The field <c>Uls2</c>.</summary>
-                [global::Moonwell.Objects.Field("Uls2", Label = "Unit Release Interval (seconds)")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> UnitReleaseIntervalSeconds
-                {
-                    get { return Fields.GetLevels<float>(this, "Uls2"); }
-                    protected set { Fields.Put("Uls2", value); }
-                }
-
-                /// <summary>The field <c>Uls3</c>.</summary>
-                [global::Moonwell.Objects.Field("Uls3", Label = "Max Swarm Units Per Target")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> MaxSwarmUnitsPerTarget
-                {
-                    get { return Fields.GetLevels<int>(this, "Uls3"); }
-                    protected set { Fields.Put("Uls3", value); }
-                }
-
-                /// <summary>The field <c>Uls4</c>.</summary>
-                [global::Moonwell.Objects.Field("Uls4", Label = "Damage Return Factor")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<float> DamageReturnFactor
-                {
-                    get { return Fields.GetLevels<float>(this, "Uls4"); }
-                    protected set { Fields.Put("Uls4", value); }
-                }
-
-                /// <summary>The field <c>Uls5</c>.</summary>
-                [global::Moonwell.Objects.Field("Uls5", Label = "Damage Return Threshold")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> DamageReturnThreshold
-                {
-                    get { return Fields.GetLevels<float>(this, "Uls5"); }
-                    protected set { Fields.Put("Uls5", value); }
-                }
-
-                /// <summary>The field <c>Ulsu</c>.</summary>
-                [global::Moonwell.Objects.Field("Ulsu", Label = "Swarm Unit Type")]
-                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> SwarmUnitType
-                {
-                    get { return Fields.GetRef<global::Moonwell.Unit>("Ulsu"); }
-                }
-
-                /// <summary>The field <c>bns6</c>.</summary>
-                [global::Moonwell.Objects.Field("bns6", Label = "Flat Mana Gain")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> FlatManaGain
-                {
-                    get { return Fields.GetLevels<float>(this, "bns6"); }
-                    protected set { Fields.Put("bns6", value); }
-                }
-
-                /// <summary>The field <c>bns7</c>.</summary>
-                [global::Moonwell.Objects.Field("bns7", Label = "Healing Radius")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> HealingRadius
-                {
-                    get { return Fields.GetLevels<float>(this, "bns7"); }
-                    protected set { Fields.Put("bns7", value); }
-                }
-            }
-
-            /// <summary>Banshee's Wail (Amda).</summary>
+            /// <summary>Banshee's Wail (level 1), Amda.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Amda")]
             public class BansheesWailAmda : global::Moonwell.Objects.StandardAbility
@@ -3010,7 +3010,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Bash (AIbx).</summary>
+            /// <summary>Bash (item), AIbx.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIbx")]
             public class Bash : global::Moonwell.Objects.StandardAbility
@@ -3019,7 +3019,7 @@ namespace Moonwell.Objects
                 public Bash()
                 {
                     Area = Levels(0f);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stunned>();
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.StunnedBPSE>();
                     CastTime = Levels(0f);
                     ChanceToBash = Levels(15f);
                     ChanceToMiss = Levels(0f);
@@ -3227,7 +3227,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Battering Ram (AUr1).</summary>
+            /// <summary>Battering Ram (Talent 1), AUr1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUr1")]
             public class BatteringRamAUr1 : global::Moonwell.Objects.StandardAbility
@@ -3363,7 +3363,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Battering Ram (AUr2).</summary>
+            /// <summary>Battering Ram (Talent 2), AUr2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUr2")]
             public class BatteringRamAUr2 : global::Moonwell.Objects.StandardAbility
@@ -3501,7 +3501,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Battering Ram (AUr3).</summary>
+            /// <summary>Battering Ram (Talent 3), AUr3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUr3")]
             public class BatteringRamAUr3 : global::Moonwell.Objects.StandardAbility
@@ -3640,7 +3640,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Battle Fury (BT1a).</summary>
+            /// <summary>Battle Fury (LeonidTalent), BT1a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT1a")]
             public class BattleFury : global::Moonwell.Objects.StandardAbility
@@ -3648,7 +3648,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public BattleFury()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.HeadsplitterAHhr, global::Moonwell.Objects.Other.Abilities.Headsplitter>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.Headsplitter, global::Moonwell.Objects.Other.Abilities.HeadsplitterAHh1>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -3727,7 +3727,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Berserk (AIxk).</summary>
+            /// <summary>Berserk (item), AIxk.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIxk")]
             public class Berserk : global::Moonwell.Objects.StandardAbility
@@ -3789,7 +3789,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Blackened Soul (AT6c).</summary>
+            /// <summary>Blackened Soul (AnyaTalent), AT6c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT6c")]
             public class BlackenedSoul : global::Moonwell.Objects.StandardAbility
@@ -3851,7 +3851,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Blade Mastery (GT2c).</summary>
+            /// <summary>Blade Mastery (Garek Talent), GT2c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("GT2c")]
             public class BladeMastery : global::Moonwell.Objects.StandardAbility
@@ -3859,7 +3859,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public BladeMastery()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.UnyieldingGuardAHbd, global::Moonwell.Objects.Other.Abilities.UnyieldingGuardAHb3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.UnyieldingGuard, global::Moonwell.Objects.Other.Abilities.UnyieldingGuardAHb3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -3938,7 +3938,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Bladestorm (UT1c).</summary>
+            /// <summary>Bladestorm (UGarekTalent), UT1c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT1c")]
             public class Bladestorm : global::Moonwell.Objects.StandardAbility
@@ -3946,7 +3946,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Bladestorm()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.RelentlessCleaveAUsw, global::Moonwell.Objects.Other.Abilities.RelentlessCleaveAUs3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.RelentlessCleave, global::Moonwell.Objects.Other.Abilities.RelentlessCleaveAUs3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -4180,7 +4180,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Bloodthirst (UT1b).</summary>
+            /// <summary>Bloodthirst (UGarekTalent), UT1b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT1b")]
             public class Bloodthirst : global::Moonwell.Objects.StandardAbility
@@ -4188,7 +4188,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Bloodthirst()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.RelentlessCleaveAUsw, global::Moonwell.Objects.Other.Abilities.RelentlessCleaveAUs2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.RelentlessCleave, global::Moonwell.Objects.Other.Abilities.RelentlessCleaveAUs2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -4267,7 +4267,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Born Leader (LT3c).</summary>
+            /// <summary>Born Leader (Landen Talent), LT3c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("LT3c")]
             public class BornLeader : global::Moonwell.Objects.StandardAbility
@@ -4275,7 +4275,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public BornLeader()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.InspireCourageAHic, global::Moonwell.Objects.Other.Abilities.InspireCourageAHi3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.InspireCourage, global::Moonwell.Objects.Other.Abilities.InspireCourageAHi3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -4748,7 +4748,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Burrow Detection (Abdt).</summary>
+            /// <summary>Burrow Detection (Fliers, Obsolete), Abdt.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Abdt")]
             public class BurrowDetection : global::Moonwell.Objects.StandardAbility
@@ -4785,7 +4785,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Cargo Hold (Sch3).</summary>
+            /// <summary>Cargo Hold (Goblin Zeppelin), Sch3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Sch3")]
             public class CargoHold : global::Moonwell.Objects.StandardAbility
@@ -4873,7 +4873,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Cargo Hold (Sch5).</summary>
+            /// <summary>Cargo Hold (Ship), Sch5.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Sch5")]
             public class CargoHoldSch5 : global::Moonwell.Objects.StandardAbility
@@ -4904,7 +4904,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Chain Lightning (AIcl).</summary>
+            /// <summary>Chain Lightning (item), AIcl.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIcl")]
             public class ChainLightning : global::Moonwell.Objects.StandardAbility
@@ -5113,7 +5113,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Chemical Frenzy (Afuf).</summary>
+            /// <summary>Chemical Frenzy (Forsaken), Afuf.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Afuf")]
             public class ChemicalFrenzy : global::Moonwell.Objects.StandardAbility
@@ -5210,7 +5210,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Clarity of Mind (IT3b).</summary>
+            /// <summary>Clarity of Mind (IlastarTalent), IT3b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("IT3b")]
             public class ClarityOfMind : global::Moonwell.Objects.StandardAbility
@@ -5218,7 +5218,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public ClarityOfMind()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SacredAuraAHas, global::Moonwell.Objects.Other.Abilities.SacredAuraAHa2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SacredAura, global::Moonwell.Objects.Other.Abilities.SacredAuraAHa2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -5402,7 +5402,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Combat Tempo (GT4b).</summary>
+            /// <summary>Combat Tempo (Garek Talent), GT4b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("GT4b")]
             public class CombatTempo : global::Moonwell.Objects.StandardAbility
@@ -5410,7 +5410,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public CombatTempo()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.WarcryAHwc, global::Moonwell.Objects.Other.Abilities.AHw2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.Warcry, global::Moonwell.Objects.Other.Abilities.AHw2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -5489,7 +5489,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Control Magic (AIcm).</summary>
+            /// <summary>Control Magic (item), AIcm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIcm")]
             public class ControlMagic : global::Moonwell.Objects.StandardAbility
@@ -5556,7 +5556,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Counter Attack (UT2a).</summary>
+            /// <summary>Counter Attack (UGarekTalent), UT2a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT2a")]
             public class CounterAttack : global::Moonwell.Objects.StandardAbility
@@ -5564,7 +5564,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public CounterAttack()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.UndyingDefianceAUbd, global::Moonwell.Objects.Other.Abilities.UndyingDefiance>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.UndyingDefiance, global::Moonwell.Objects.Other.Abilities.UndyingDefianceAUb1>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -5643,7 +5643,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Crippling Blow (GT1a).</summary>
+            /// <summary>Crippling Blow (Garek Talent), GT1a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("GT1a")]
             public class CripplingBlow : global::Moonwell.Objects.StandardAbility
@@ -5651,7 +5651,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public CripplingBlow()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SweepingStrikeAHsw, global::Moonwell.Objects.Other.Abilities.SweepingStrike>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SweepingStrike, global::Moonwell.Objects.Other.Abilities.SweepingStrikeAHs1>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -5730,7 +5730,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Critical Strike (AIcs).</summary>
+            /// <summary>Critical Strike (item), AIcs.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIcs")]
             public class CriticalStrike : global::Moonwell.Objects.StandardAbility
@@ -5817,7 +5817,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Curse (Aacr).</summary>
+            /// <summary>Curse (Banshee's Wail), Aacr.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aacr")]
             public class Curse : global::Moonwell.Objects.StandardAbility
@@ -5857,7 +5857,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Curse of the Darkfallen (AT4b).</summary>
+            /// <summary>Curse of the Darkfallen (AnyaTalent), AT4b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT4b")]
             public class CurseOfTheDarkfallen : global::Moonwell.Objects.StandardAbility
@@ -5865,7 +5865,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public CurseOfTheDarkfallen()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.BansheesWailAUwc, global::Moonwell.Objects.Other.Abilities.BansheesWailAUi2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.BansheesWail, global::Moonwell.Objects.Other.Abilities.BansheesWailAUi2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -5944,7 +5944,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Curse Orb (Absc).</summary>
+            /// <summary>Curse Orb (Banshee's Wail), Absc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Absc")]
             public class CurseOrb : global::Moonwell.Objects.StandardAbility
@@ -6030,7 +6030,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Cyclone (AIcy).</summary>
+            /// <summary>Cyclone (Item), AIcy.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIcy")]
             public class Cyclone : global::Moonwell.Objects.StandardAbility
@@ -6038,7 +6038,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Cyclone()
                 {
-                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.CycloneBcyc, global::Moonwell.Objects.NightElf.Buffs.Cyclone>();
+                    Buffs.Set<global::Moonwell.Objects.NightElf.Buffs.Cyclone, global::Moonwell.Objects.NightElf.Buffs.CycloneBcy2>();
                     CanBeDispelled = Levels(true);
                     CastTime = Levels(0f);
                     CheckDependencies = false;
@@ -6149,7 +6149,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Deadeye (AT1c).</summary>
+            /// <summary>Deadeye (AnyaTalent), AT1c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT1c")]
             public class Deadeye : global::Moonwell.Objects.StandardAbility
@@ -6157,7 +6157,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Deadeye()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.WitheringFireAUwf, global::Moonwell.Objects.Other.Abilities.WitheringFireAUw3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.WitheringFire, global::Moonwell.Objects.Other.Abilities.WitheringFireAUw3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -6236,7 +6236,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Death Pact (AIdp).</summary>
+            /// <summary>Death Pact (item), AIdp.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIdp")]
             public class DeathPact : global::Moonwell.Objects.StandardAbility
@@ -6317,7 +6317,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Death Sentence (AT3a).</summary>
+            /// <summary>Death Sentence (AnyaTalent), AT3a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT3a")]
             public class DeathSentence : global::Moonwell.Objects.StandardAbility
@@ -6325,7 +6325,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DeathSentence()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.DeathseekerArrowsAUdb, global::Moonwell.Objects.Other.Abilities.DeathseekerArrows>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.DeathseekerArrows, global::Moonwell.Objects.Other.Abilities.DeathseekerArrowsAUd1>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -6404,7 +6404,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Deathmark (AT1b).</summary>
+            /// <summary>Deathmark (AnyaTalent), AT1b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT1b")]
             public class Deathmark : global::Moonwell.Objects.StandardAbility
@@ -6412,7 +6412,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Deathmark()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.WitheringFireAUwf, global::Moonwell.Objects.Other.Abilities.WitheringFireAUw2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.WitheringFire, global::Moonwell.Objects.Other.Abilities.WitheringFireAUw2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -6491,13 +6491,108 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Deathseeker Arrows (AUd1).</summary>
+            /// <summary>Deathseeker Arrows (AUdb).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AUd1")]
+            [global::Moonwell.Objects.Standard("AUdb")]
             public class DeathseekerArrows : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DeathseekerArrows()
+                {
+                    Area = Levels(0f, 0f, 0f, 0f, 0f);
+                    BonusAttackSpeedPerAttack = Levels(0f, 0f, 0f, 0f, 0f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.DeathseekerArrows>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f, 0f, 0f, 0f, 0f);
+                    Duration = Levels(5f, 5f, 5f, 5f, 5f);
+                    FlatDamage = Levels(80f, 115f, 150f, 185f, 220f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(5f, 5f, 5f, 5f, 5f);
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNDeathSeekerArrows.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNDeathSeekerArrows.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "E";
+                    LevelCount = 5;
+                    LevelSkipRequirement = 4;
+                    ManaCost = Levels(0, 0, 0, 0, 0);
+                    MaxAttackSpeedStacks = Levels(0, 0, 0, 0, 0);
+                    Name = "Deathseeker Arrows";
+                    PercentDamage = Levels(0f, 0f, 0f, 0f, 0f);
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    RequiredLevel = 1;
+                    StacksRequired = Levels(4, 4, 4, 4, 4);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Deathseeker Arrows - [|cffffcc00Level 1|r]", "Deathseeker Arrows - [|cffffcc00Level 2|r]", "Deathseeker Arrows - [|cffffcc00Level 3|r]", "Deathseeker Arrows - [|cffffcc00Level 4|r]", "Deathseeker Arrows - [|cffffcc00Level 5|r]");
+                    TooltipExtended = Levels("Every <AUdb,DataC1> attacks against a target deals <AUdb,DataA1> bonus damage.|nResets after <AUdb,Dur1> seconds.", "Every <AUdb,DataC2> attacks against a target deals <AUdb,DataA2> bonus damage.|nResets after <AUdb,Dur2> seconds.", "Every <AUdb,DataC3> attacks against a target deals <AUdb,DataA3> bonus damage.|nResets after <AUdb,Dur3> seconds.", "Every <AUdb,DataC4> attacks against a target deals <AUdb,DataA4> bonus damage.|nResets after <AUdb,Dur4> seconds.", "Every <AUdb,DataC5> attacks against a target deals <AUdb,DataA5> bonus damage.|nResets after <AUdb,Dur5> seconds.");
+                    TooltipLearn = "Learn Deathseeker Arrows - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Deal bonus damage after attacking a target several times.|n|n|cffffcc00Level 1|r - <AUdb,DataC1> attacks, <AUdb,DataA1> bonus damage. |n|cffffcc00Level 2|r - <AUdb,DataC2> attacks, <AUdb,DataA2> bonus damage. |n|cffffcc00Level 3|r - <AUdb,DataC3> attacks, <AUdb,DataA3> bonus damage.|n|cffffcc00Level 4|r - <AUdb,DataC4> attacks, <AUdb,DataA4> bonus damage.|n|cffffcc00Level 5|r - <AUdb,DataC5> attacks, <AUdb,DataA5> bonus damage.";
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>udb1</c>.</summary>
+                [global::Moonwell.Objects.Field("udb1", Label = "Flat Damage")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> FlatDamage
+                {
+                    get { return Fields.GetLevels<float>(this, "udb1"); }
+                    protected set { Fields.Put("udb1", value); }
+                }
+
+                /// <summary>The field <c>udb2</c>.</summary>
+                [global::Moonwell.Objects.Field("udb2", Label = "Percent Damage")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> PercentDamage
+                {
+                    get { return Fields.GetLevels<float>(this, "udb2"); }
+                    protected set { Fields.Put("udb2", value); }
+                }
+
+                /// <summary>The field <c>udb3</c>.</summary>
+                [global::Moonwell.Objects.Field("udb3", Label = "Stacks Required")]
+                [global::Moonwell.Objects.Limits(1, 100)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<int> StacksRequired
+                {
+                    get { return Fields.GetLevels<int>(this, "udb3"); }
+                    protected set { Fields.Put("udb3", value); }
+                }
+
+                /// <summary>The field <c>udb4</c>.</summary>
+                [global::Moonwell.Objects.Field("udb4", Label = "Bonus Attack Speed per Attack")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> BonusAttackSpeedPerAttack
+                {
+                    get { return Fields.GetLevels<float>(this, "udb4"); }
+                    protected set { Fields.Put("udb4", value); }
+                }
+
+                /// <summary>The field <c>udb5</c>.</summary>
+                [global::Moonwell.Objects.Field("udb5", Label = "Max Attack Speed Stacks")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<int> MaxAttackSpeedStacks
+                {
+                    get { return Fields.GetLevels<int>(this, "udb5"); }
+                    protected set { Fields.Put("udb5", value); }
+                }
+            }
+
+            /// <summary>Deathseeker Arrows (Talent 1), AUd1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AUd1")]
+            public class DeathseekerArrowsAUd1 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public DeathseekerArrowsAUd1()
                 {
                     Area = Levels(0f, 0f, 0f, 0f, 0f);
                     BonusAttackSpeedPerAttack = Levels(0f, 0f, 0f, 0f, 0f);
@@ -6587,7 +6682,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Deathseeker Arrows (AUd2).</summary>
+            /// <summary>Deathseeker Arrows (Talent 2), AUd2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUd2")]
             public class DeathseekerArrowsAUd2 : global::Moonwell.Objects.StandardAbility
@@ -6683,7 +6778,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Deathseeker Arrows (AUd3).</summary>
+            /// <summary>Deathseeker Arrows (Talent 3), AUd3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUd3")]
             public class DeathseekerArrowsAUd3 : global::Moonwell.Objects.StandardAbility
@@ -6779,102 +6874,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Deathseeker Arrows (AUdb).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AUdb")]
-            public class DeathseekerArrowsAUdb : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public DeathseekerArrowsAUdb()
-                {
-                    Area = Levels(0f, 0f, 0f, 0f, 0f);
-                    BonusAttackSpeedPerAttack = Levels(0f, 0f, 0f, 0f, 0f);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.DeathseekerArrows>();
-                    ButtonPositionNormalX = 2;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 2;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f, 0f, 0f, 0f, 0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(0f, 0f, 0f, 0f, 0f);
-                    Duration = Levels(5f, 5f, 5f, 5f, 5f);
-                    FlatDamage = Levels(80f, 115f, 150f, 185f, 220f);
-                    HeroAbility = true;
-                    HeroDuration = Levels(5f, 5f, 5f, 5f, 5f);
-                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNDeathSeekerArrows.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNDeathSeekerArrows.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "E";
-                    LevelCount = 5;
-                    LevelSkipRequirement = 4;
-                    ManaCost = Levels(0, 0, 0, 0, 0);
-                    MaxAttackSpeedStacks = Levels(0, 0, 0, 0, 0);
-                    Name = "Deathseeker Arrows";
-                    PercentDamage = Levels(0f, 0f, 0f, 0f, 0f);
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    RequiredLevel = 1;
-                    StacksRequired = Levels(4, 4, 4, 4, 4);
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral);
-                    Tooltip = Levels("Deathseeker Arrows - [|cffffcc00Level 1|r]", "Deathseeker Arrows - [|cffffcc00Level 2|r]", "Deathseeker Arrows - [|cffffcc00Level 3|r]", "Deathseeker Arrows - [|cffffcc00Level 4|r]", "Deathseeker Arrows - [|cffffcc00Level 5|r]");
-                    TooltipExtended = Levels("Every <AUdb,DataC1> attacks against a target deals <AUdb,DataA1> bonus damage.|nResets after <AUdb,Dur1> seconds.", "Every <AUdb,DataC2> attacks against a target deals <AUdb,DataA2> bonus damage.|nResets after <AUdb,Dur2> seconds.", "Every <AUdb,DataC3> attacks against a target deals <AUdb,DataA3> bonus damage.|nResets after <AUdb,Dur3> seconds.", "Every <AUdb,DataC4> attacks against a target deals <AUdb,DataA4> bonus damage.|nResets after <AUdb,Dur4> seconds.", "Every <AUdb,DataC5> attacks against a target deals <AUdb,DataA5> bonus damage.|nResets after <AUdb,Dur5> seconds.");
-                    TooltipLearn = "Learn Deathseeker Arrows - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Deal bonus damage after attacking a target several times.|n|n|cffffcc00Level 1|r - <AUdb,DataC1> attacks, <AUdb,DataA1> bonus damage. |n|cffffcc00Level 2|r - <AUdb,DataC2> attacks, <AUdb,DataA2> bonus damage. |n|cffffcc00Level 3|r - <AUdb,DataC3> attacks, <AUdb,DataA3> bonus damage.|n|cffffcc00Level 4|r - <AUdb,DataC4> attacks, <AUdb,DataA4> bonus damage.|n|cffffcc00Level 5|r - <AUdb,DataC5> attacks, <AUdb,DataA5> bonus damage.";
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>udb1</c>.</summary>
-                [global::Moonwell.Objects.Field("udb1", Label = "Flat Damage")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> FlatDamage
-                {
-                    get { return Fields.GetLevels<float>(this, "udb1"); }
-                    protected set { Fields.Put("udb1", value); }
-                }
-
-                /// <summary>The field <c>udb2</c>.</summary>
-                [global::Moonwell.Objects.Field("udb2", Label = "Percent Damage")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> PercentDamage
-                {
-                    get { return Fields.GetLevels<float>(this, "udb2"); }
-                    protected set { Fields.Put("udb2", value); }
-                }
-
-                /// <summary>The field <c>udb3</c>.</summary>
-                [global::Moonwell.Objects.Field("udb3", Label = "Stacks Required")]
-                [global::Moonwell.Objects.Limits(1, 100)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<int> StacksRequired
-                {
-                    get { return Fields.GetLevels<int>(this, "udb3"); }
-                    protected set { Fields.Put("udb3", value); }
-                }
-
-                /// <summary>The field <c>udb4</c>.</summary>
-                [global::Moonwell.Objects.Field("udb4", Label = "Bonus Attack Speed per Attack")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> BonusAttackSpeedPerAttack
-                {
-                    get { return Fields.GetLevels<float>(this, "udb4"); }
-                    protected set { Fields.Put("udb4", value); }
-                }
-
-                /// <summary>The field <c>udb5</c>.</summary>
-                [global::Moonwell.Objects.Field("udb5", Label = "Max Attack Speed Stacks")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<int> MaxAttackSpeedStacks
-                {
-                    get { return Fields.GetLevels<int>(this, "udb5"); }
-                    protected set { Fields.Put("udb5", value); }
-                }
-            }
-
-            /// <summary>Defend, Passive Defense (AIdd).</summary>
+            /// <summary>Defend, Passive Defense (item), AIdd.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIdd")]
             public class DefendPassiveDefense : global::Moonwell.Objects.StandardAbility
@@ -6985,7 +6985,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Discipline (BT6c).</summary>
+            /// <summary>Discipline (LeonidTalent), BT6c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT6c")]
             public class Discipline : global::Moonwell.Objects.StandardAbility
@@ -7038,7 +7038,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Dispel Magic (Asdi).</summary>
+            /// <summary>Dispel Magic (Scarlet Crusade), Asdi.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Asdi")]
             public class DispelMagic : global::Moonwell.Objects.StandardAbility
@@ -7097,7 +7097,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Divine Reservoir (IT4a).</summary>
+            /// <summary>Divine Reservoir (IlastarTalent), IT4a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("IT4a")]
             public class DivineReservoir : global::Moonwell.Objects.StandardAbility
@@ -7105,7 +7105,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DivineReservoir()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SurgeOfLightAHsl, global::Moonwell.Objects.Other.Abilities.SurgeOfLight>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SurgeOfLight, global::Moonwell.Objects.Other.Abilities.SurgeOfLightAHl1>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -7224,7 +7224,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Endurance (UT3a).</summary>
+            /// <summary>Endurance (UGarekTalent), UT3a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT3a")]
             public class Endurance : global::Moonwell.Objects.StandardAbility
@@ -7359,7 +7359,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Equipment Inventory (AInx).</summary>
+            /// <summary>Equipment Inventory (Hero), AInx.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AInx")]
             public class EquipmentInventory : global::Moonwell.Objects.StandardAbility
@@ -7395,7 +7395,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Evasion (AHes).</summary>
+            /// <summary>Evasion (Stacking), AHes.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHes")]
             public class Evasion : global::Moonwell.Objects.StandardAbility
@@ -7438,7 +7438,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Evasion (AIev).</summary>
+            /// <summary>Evasion (Item), AIev.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIev")]
             public class EvasionAIev : global::Moonwell.Objects.StandardAbility
@@ -7514,7 +7514,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Exposed Defenses (LT2c).</summary>
+            /// <summary>Exposed Defenses (Landen Talent), LT2c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("LT2c")]
             public class ExposedDefenses : global::Moonwell.Objects.StandardAbility
@@ -7522,7 +7522,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public ExposedDefenses()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.ApprehendAHen, global::Moonwell.Objects.Other.Abilities.ApprehendAHe3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.Apprehend, global::Moonwell.Objects.Other.Abilities.ApprehendAHe3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -7601,7 +7601,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Eye for Eye (BT2b).</summary>
+            /// <summary>Eye for Eye (LeonidTalent), BT2b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT2b")]
             public class EyeForEye : global::Moonwell.Objects.StandardAbility
@@ -7688,7 +7688,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Finger of Death (AIfz).</summary>
+            /// <summary>Finger of Death (item), AIfz.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIfz")]
             public class FingerOfDeath : global::Moonwell.Objects.StandardAbility
@@ -7750,7 +7750,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Fire Hands (AViq).</summary>
+            /// <summary>Fire Hands (VFX), AViq.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AViq")]
             public class FireHands : global::Moonwell.Objects.StandardAbility
@@ -7792,7 +7792,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Flame Strike (Asfs).</summary>
+            /// <summary>Flame Strike (Scarlet Crusade), Asfs.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Asfs")]
             public class FlameStrike : global::Moonwell.Objects.StandardAbility
@@ -7944,7 +7944,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Flow State (AT3b).</summary>
+            /// <summary>Flow State (AnyaTalent), AT3b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT3b")]
             public class FlowState : global::Moonwell.Objects.StandardAbility
@@ -7952,7 +7952,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public FlowState()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.DeathseekerArrowsAUdb, global::Moonwell.Objects.Other.Abilities.DeathseekerArrowsAUd2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.DeathseekerArrows, global::Moonwell.Objects.Other.Abilities.DeathseekerArrowsAUd2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -8031,7 +8031,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Forsaken Might (UT1a).</summary>
+            /// <summary>Forsaken Might (UGarekTalent), UT1a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT1a")]
             public class ForsakenMight : global::Moonwell.Objects.StandardAbility
@@ -8039,7 +8039,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public ForsakenMight()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.RelentlessCleaveAUsw, global::Moonwell.Objects.Other.Abilities.RelentlessCleave>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.RelentlessCleave, global::Moonwell.Objects.Other.Abilities.RelentlessCleaveAUs1>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -8118,7 +8118,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Furious Charge (UT3c).</summary>
+            /// <summary>Furious Charge (UGarekTalent), UT3c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT3c")]
             public class FuriousCharge : global::Moonwell.Objects.StandardAbility
@@ -8273,7 +8273,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Generic Item-Rejuv Effect (AIp2).</summary>
+            /// <summary>Generic Item-Rejuv Effect (II), AIp2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIp2")]
             public class GenericItemRejuvEffectAIp2 : global::Moonwell.Objects.StandardAbility
@@ -8302,7 +8302,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Generic Item-Rejuv Effect (AIp3).</summary>
+            /// <summary>Generic Item-Rejuv Effect (III), AIp3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIp3")]
             public class GenericItemRejuvEffectAIp3 : global::Moonwell.Objects.StandardAbility
@@ -8331,7 +8331,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Generic Item-Rejuv Effect (AIp4).</summary>
+            /// <summary>Generic Item-Rejuv Effect (IV), AIp4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIp4")]
             public class GenericItemRejuvEffectAIp4 : global::Moonwell.Objects.StandardAbility
@@ -8360,7 +8360,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Generic Item-Rejuv Effect (AIp5).</summary>
+            /// <summary>Generic Item-Rejuv Effect (V), AIp5.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIp5")]
             public class GenericItemRejuvEffectAIp5 : global::Moonwell.Objects.StandardAbility
@@ -8393,7 +8393,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Generic Item-Rejuv Effect (AIp6).</summary>
+            /// <summary>Generic Item-Rejuv Effect (VI), AIp6.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIp6")]
             public class GenericItemRejuvEffectAIp6 : global::Moonwell.Objects.StandardAbility
@@ -8538,7 +8538,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Grant Talent Point (ATap).</summary>
+            /// <summary>Grant Talent Point (Hero), ATap.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ATap")]
             public class GrantTalentPoint : global::Moonwell.Objects.StandardAbility
@@ -8618,13 +8618,118 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Grim Conviction (AUv1).</summary>
+            /// <summary>Grim Conviction (AUvg).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AUv1")]
+            [global::Moonwell.Objects.Standard("AUvg")]
             public class GrimConviction : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public GrimConviction()
+                {
+                    AnimationNames = "spell";
+                    Set("aare", 3, 200f);
+                    BonusLifeSteal = Levels(25, 30, 35);
+                    BonusResolve = Levels(25, 30, 35);
+                    BonusSpellVamp = Levels(0, 0, 0);
+                    BonusStrength = Levels(15, 25, 35);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.GrimConviction>();
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    Caster = "Abilities\\Spells\\undead\\grimconviction\\grimconvictioncaster.mdl";
+                    CheckDependencies = true;
+                    Cooldown = Levels(180f, 180f, 180f);
+                    DoubleBonusBelowHealth = Levels(0, 0, 0);
+                    Duration = Levels(20f, 20f, 20f);
+                    HealthCost = Levels(35, 35, 35);
+                    HeroAbility = true;
+                    HeroDuration = Levels(20f, 20f, 20f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNVengeance.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNVengeance.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 6;
+                    ManaCost = Levels(100, 100, 100);
+                    Name = "Grim Conviction";
+                    Order = "grimconviction";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    Range = Levels(0f, 0f, 0f);
+                    RequiredLevel = 6;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable);
+                    Tooltip = Levels("Grim Conviction - [|cffffcc00Level 1|r]", "Grim Conviction - [|cffffcc00Level 2|r]", "Grim Conviction - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Garek draws upon his inner strength, sacrificing <AUvg,DataA1>% of his current hit points to gain <AUvg,DataB1> bonus Strength, <AUvg,DataC1>% bonus Resolve, and <AUvg,DataD1>% Lifesteal.|nLasts <AUvg,Dur1> seconds.", "Garek draws upon his inner strength, sacrificing <AUvg,DataA2>% of his current hit points to gain <AUvg,DataB2> bonus Strength, <AUvg,DataC2>% bonus Resolve, and <AUvg,DataD2>% Lifesteal.|nLasts <AUvg,Dur2> seconds.", "Garek draws upon his inner strength, sacrificing <AUvg,DataA3>% of his current hit points to gain <AUvg,DataB3> bonus Strength, <AUvg,DataC3>% bonus Resolve, and <AUvg,DataD3>% Lifesteal.|nLasts <AUvg,Dur3> seconds.");
+                    TooltipLearn = "Learn Grim Conviction - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Garek draws upon his inner strength, sacrificing hit points to gain bonus Strength, Resolve, and Lifesteal. |n|n|cffffcc00Level 1|r - Costs <AUvg,DataA1>% hit points; gain <AUvg,DataB1> Strength, <AUvg,DataC1>% Resolve, <AUvg,DataD1>% Lifesteal for <AUvg,Dur1> seconds. |n|cffffcc00Level 2|r - Costs <AUvg,DataA2>% hit points; gain <AUvg,DataB2> Strength, <AUvg,DataC2>% Resolve, <AUvg,DataD2>% Lifesteal for <AUvg,Dur2> seconds. |n|cffffcc00Level 3|r - Costs <AUvg,DataA3>% hit points; gain <AUvg,DataB3> Strength, <AUvg,DataC3>% Resolve, <AUvg,DataD3>% Lifesteal for <AUvg,Dur3> seconds.";
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>uvg1</c>.</summary>
+                [global::Moonwell.Objects.Field("uvg1", Label = "% Health Cost")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<int> HealthCost
+                {
+                    get { return Fields.GetLevels<int>(this, "uvg1"); }
+                    protected set { Fields.Put("uvg1", value); }
+                }
+
+                /// <summary>The field <c>uvg2</c>.</summary>
+                [global::Moonwell.Objects.Field("uvg2", Label = "Bonus strength")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<int> BonusStrength
+                {
+                    get { return Fields.GetLevels<int>(this, "uvg2"); }
+                    protected set { Fields.Put("uvg2", value); }
+                }
+
+                /// <summary>The field <c>uvg3</c>.</summary>
+                [global::Moonwell.Objects.Field("uvg3", Label = "% Bonus Resolve")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<int> BonusResolve
+                {
+                    get { return Fields.GetLevels<int>(this, "uvg3"); }
+                    protected set { Fields.Put("uvg3", value); }
+                }
+
+                /// <summary>The field <c>uvg4</c>.</summary>
+                [global::Moonwell.Objects.Field("uvg4", Label = "% Bonus Life Steal")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<int> BonusLifeSteal
+                {
+                    get { return Fields.GetLevels<int>(this, "uvg4"); }
+                    protected set { Fields.Put("uvg4", value); }
+                }
+
+                /// <summary>The field <c>uvg5</c>.</summary>
+                [global::Moonwell.Objects.Field("uvg5", Label = "% Bonus Spell Vamp")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<int> BonusSpellVamp
+                {
+                    get { return Fields.GetLevels<int>(this, "uvg5"); }
+                    protected set { Fields.Put("uvg5", value); }
+                }
+
+                /// <summary>The field <c>uvg6</c>.</summary>
+                [global::Moonwell.Objects.Field("uvg6", Label = "Double Bonus Below health %")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<int> DoubleBonusBelowHealth
+                {
+                    get { return Fields.GetLevels<int>(this, "uvg6"); }
+                    protected set { Fields.Put("uvg6", value); }
+                }
+            }
+
+            /// <summary>Grim Conviction (Talent 1), AUv1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AUv1")]
+            public class GrimConvictionAUv1 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public GrimConvictionAUv1()
                 {
                     AnimationNames = "spell";
                     Set("aare", 3, 200f);
@@ -8724,7 +8829,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Grim Conviction (AUv2).</summary>
+            /// <summary>Grim Conviction (Talent 2), AUv2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUv2")]
             public class GrimConvictionAUv2 : global::Moonwell.Objects.StandardAbility
@@ -8830,7 +8935,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Grim Conviction (AUv3).</summary>
+            /// <summary>Grim Conviction (Talent 3), AUv3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUv3")]
             public class GrimConvictionAUv3 : global::Moonwell.Objects.StandardAbility
@@ -8936,118 +9041,94 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Grim Conviction (AUvg).</summary>
+            /// <summary>Grit (AHgr).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AUvg")]
-            public class GrimConvictionAUvg : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public GrimConvictionAUvg()
-                {
-                    AnimationNames = "spell";
-                    Set("aare", 3, 200f);
-                    BonusLifeSteal = Levels(25, 30, 35);
-                    BonusResolve = Levels(25, 30, 35);
-                    BonusSpellVamp = Levels(0, 0, 0);
-                    BonusStrength = Levels(15, 25, 35);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.GrimConviction>();
-                    ButtonPositionNormalX = 3;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 3;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f, 0f, 0f);
-                    Caster = "Abilities\\Spells\\undead\\grimconviction\\grimconvictioncaster.mdl";
-                    CheckDependencies = true;
-                    Cooldown = Levels(180f, 180f, 180f);
-                    DoubleBonusBelowHealth = Levels(0, 0, 0);
-                    Duration = Levels(20f, 20f, 20f);
-                    HealthCost = Levels(35, 35, 35);
-                    HeroAbility = true;
-                    HeroDuration = Levels(20f, 20f, 20f);
-                    Hotkey = "R";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNVengeance.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNVengeance.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "R";
-                    LevelCount = 3;
-                    LevelSkipRequirement = 6;
-                    ManaCost = Levels(100, 100, 100);
-                    Name = "Grim Conviction";
-                    Order = "grimconviction";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    Range = Levels(0f, 0f, 0f);
-                    RequiredLevel = 6;
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable);
-                    Tooltip = Levels("Grim Conviction - [|cffffcc00Level 1|r]", "Grim Conviction - [|cffffcc00Level 2|r]", "Grim Conviction - [|cffffcc00Level 3|r]");
-                    TooltipExtended = Levels("Garek draws upon his inner strength, sacrificing <AUvg,DataA1>% of his current hit points to gain <AUvg,DataB1> bonus Strength, <AUvg,DataC1>% bonus Resolve, and <AUvg,DataD1>% Lifesteal.|nLasts <AUvg,Dur1> seconds.", "Garek draws upon his inner strength, sacrificing <AUvg,DataA2>% of his current hit points to gain <AUvg,DataB2> bonus Strength, <AUvg,DataC2>% bonus Resolve, and <AUvg,DataD2>% Lifesteal.|nLasts <AUvg,Dur2> seconds.", "Garek draws upon his inner strength, sacrificing <AUvg,DataA3>% of his current hit points to gain <AUvg,DataB3> bonus Strength, <AUvg,DataC3>% bonus Resolve, and <AUvg,DataD3>% Lifesteal.|nLasts <AUvg,Dur3> seconds.");
-                    TooltipLearn = "Learn Grim Conviction - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Garek draws upon his inner strength, sacrificing hit points to gain bonus Strength, Resolve, and Lifesteal. |n|n|cffffcc00Level 1|r - Costs <AUvg,DataA1>% hit points; gain <AUvg,DataB1> Strength, <AUvg,DataC1>% Resolve, <AUvg,DataD1>% Lifesteal for <AUvg,Dur1> seconds. |n|cffffcc00Level 2|r - Costs <AUvg,DataA2>% hit points; gain <AUvg,DataB2> Strength, <AUvg,DataC2>% Resolve, <AUvg,DataD2>% Lifesteal for <AUvg,Dur2> seconds. |n|cffffcc00Level 3|r - Costs <AUvg,DataA3>% hit points; gain <AUvg,DataB3> Strength, <AUvg,DataC3>% Resolve, <AUvg,DataD3>% Lifesteal for <AUvg,Dur3> seconds.";
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>uvg1</c>.</summary>
-                [global::Moonwell.Objects.Field("uvg1", Label = "% Health Cost")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> HealthCost
-                {
-                    get { return Fields.GetLevels<int>(this, "uvg1"); }
-                    protected set { Fields.Put("uvg1", value); }
-                }
-
-                /// <summary>The field <c>uvg2</c>.</summary>
-                [global::Moonwell.Objects.Field("uvg2", Label = "Bonus strength")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<int> BonusStrength
-                {
-                    get { return Fields.GetLevels<int>(this, "uvg2"); }
-                    protected set { Fields.Put("uvg2", value); }
-                }
-
-                /// <summary>The field <c>uvg3</c>.</summary>
-                [global::Moonwell.Objects.Field("uvg3", Label = "% Bonus Resolve")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> BonusResolve
-                {
-                    get { return Fields.GetLevels<int>(this, "uvg3"); }
-                    protected set { Fields.Put("uvg3", value); }
-                }
-
-                /// <summary>The field <c>uvg4</c>.</summary>
-                [global::Moonwell.Objects.Field("uvg4", Label = "% Bonus Life Steal")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> BonusLifeSteal
-                {
-                    get { return Fields.GetLevels<int>(this, "uvg4"); }
-                    protected set { Fields.Put("uvg4", value); }
-                }
-
-                /// <summary>The field <c>uvg5</c>.</summary>
-                [global::Moonwell.Objects.Field("uvg5", Label = "% Bonus Spell Vamp")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> BonusSpellVamp
-                {
-                    get { return Fields.GetLevels<int>(this, "uvg5"); }
-                    protected set { Fields.Put("uvg5", value); }
-                }
-
-                /// <summary>The field <c>uvg6</c>.</summary>
-                [global::Moonwell.Objects.Field("uvg6", Label = "Double Bonus Below health %")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> DoubleBonusBelowHealth
-                {
-                    get { return Fields.GetLevels<int>(this, "uvg6"); }
-                    protected set { Fields.Put("uvg6", value); }
-                }
-            }
-
-            /// <summary>Grit (AHg1).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHg1")]
+            [global::Moonwell.Objects.Standard("AHgr")]
             public class Grit : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Grit()
+                {
+                    Area = Levels(0f, 0f, 0f, 0f, 0f);
+                    BonusAttackDamagePercentAtCap = Levels(0f, 0f, 0f, 0f, 0f);
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f, 0f, 0f, 0f, 0f);
+                    DefenseCap = Levels(15f, 15f, 15f, 15f, 15f);
+                    DefenseIncrease = Levels(0.25f, 0.5f, 0.75f, 1f, 1.25f);
+                    Duration = Levels(5f, 5f, 5f, 5f, 5f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(5f, 5f, 5f, 5f, 5f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNGrit.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNGrit.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "E";
+                    LevelCount = 5;
+                    LevelSkipRequirement = 4;
+                    MagicResistanceAtCap = Levels(0f, 0f, 0f, 0f, 0f);
+                    ManaCost = Levels(0, 0, 0, 0, 0);
+                    Name = "Grit";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    Range = Levels(0f, 0f, 0f, 0f, 0f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Neutral);
+                    Tooltip = Levels("Grit - [|cffffcc00Level 1|r]", "Grit - [|cffffcc00Level 2|r]", "Grit - [|cffffcc00Level 3|r]", "Grit - [|cffffcc00Level 4|r]", "Grit - [|cffffcc00Level 5|r]");
+                    TooltipExtended = Levels("Every attack against Leonid increases his armor by <AHgr,DataA1,.>, to a maximum of <AHgr,DataB1>. Resets after <AHgr,Dur1> seconds of not being attacked.", "Every attack against Leonid increases his armor by <AHgr,DataA2,.>, to a maximum of <AHgr,DataB2>. Resets after <AHgr,Dur2> seconds of not being attacked.", "Every attack against Leonid increases his armor by <AHgr,DataA3,.>, to a maximum of <AHgr,DataB3>. Resets after <AHgr,Dur3> seconds of not being attacked.", "Every attack against Leonid increases his armor by <AHgr,DataA4,.>, to a maximum of <AHgr,DataB4>. Resets after <AHgr,Dur4> seconds of not being attacked.", "Every attack against Leonid increases his armor by <AHgr,DataA5,.>, to a maximum of <AHgr,DataB5>. Resets after <AHgr,Dur5> seconds of not being attacked.");
+                    TooltipLearn = "Learn Grit - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Every attack against Leonid increases his armor for a short duration.|n|n|cffffcc00Level 1|r - <AHgr,DataA1,.> bonus armor per stack, maximum of <AHgr,DataB1> armor. Resets after <AHgr,Dur1> seconds.|n|cffffcc00Level 2|r - <AHgr,DataA2,.> bonus armor per stack, maximum of <AHgr,DataB2> armor. Resets after <AHgr,Dur2> seconds. |n|cffffcc00Level 3|r - <AHgr,DataA3,.> bonus armor per stack, maximum of <AHgr,DataB3> armor. Resets after <AHgr,Dur3> seconds.|n|cffffcc00Level 4|r - <AHgr,DataA4,.> bonus armor per stack, maximum of <AHgr,DataB4> armor. Resets after <AHgr,Dur4> seconds. |n|cffffcc00Level 5|r - <AHgr,DataA5,.> bonus armor per stack, maximum of <AHgr,DataB5> armor. Resets after <AHgr,Dur5> seconds.";
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>hgr1</c>.</summary>
+                [global::Moonwell.Objects.Field("hgr1", Label = "Defense Increase")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> DefenseIncrease
+                {
+                    get { return Fields.GetLevels<float>(this, "hgr1"); }
+                    protected set { Fields.Put("hgr1", value); }
+                }
+
+                /// <summary>The field <c>hgr2</c>.</summary>
+                [global::Moonwell.Objects.Field("hgr2", Label = "Defense Cap")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> DefenseCap
+                {
+                    get { return Fields.GetLevels<float>(this, "hgr2"); }
+                    protected set { Fields.Put("hgr2", value); }
+                }
+
+                /// <summary>The field <c>hgr3</c>.</summary>
+                [global::Moonwell.Objects.Field("hgr3", Label = "Magic Resistance At Cap")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> MagicResistanceAtCap
+                {
+                    get { return Fields.GetLevels<float>(this, "hgr3"); }
+                    protected set { Fields.Put("hgr3", value); }
+                }
+
+                /// <summary>The field <c>hgr4</c>.</summary>
+                [global::Moonwell.Objects.Field("hgr4", Label = "Bonus Attack Damage Percent At Cap")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> BonusAttackDamagePercentAtCap
+                {
+                    get { return Fields.GetLevels<float>(this, "hgr4"); }
+                    protected set { Fields.Put("hgr4", value); }
+                }
+            }
+
+            /// <summary>Grit (Talent 1), AHg1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AHg1")]
+            public class GritAHg1 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public GritAHg1()
                 {
                     Area = Levels(0f, 0f, 0f, 0f, 0f);
                     BonusAttackDamagePercentAtCap = Levels(10f, 15f, 20f, 25f, 30f);
@@ -9123,7 +9204,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Grit (AHg2).</summary>
+            /// <summary>Grit (Talent 2), AHg2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHg2")]
             public class GritAHg2 : global::Moonwell.Objects.StandardAbility
@@ -9205,7 +9286,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Grit (AHg3).</summary>
+            /// <summary>Grit (Talent 3), AHg3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHg3")]
             public class GritAHg3 : global::Moonwell.Objects.StandardAbility
@@ -9247,87 +9328,6 @@ namespace Moonwell.Objects
                     TooltipExtended = Levels("Every attack against Leonid increases his armor by <AHg3,DataA1,.>, to a maximum of <AHg3,DataB1>. Resets after <AHg3,Dur1> seconds of not being attacked.", "Every attack against Leonid increases his armor by <AHg3,DataA2,.>, to a maximum of <AHg3,DataB2>. Resets after <AHg3,Dur2> seconds of not being attacked.", "Every attack against Leonid increases his armor by <AHg3,DataA3,.>, to a maximum of <AHg3,DataB3>. Resets after <AHg3,Dur3> seconds of not being attacked.", "Every attack against Leonid increases his armor by <AHg3,DataA4,.>, to a maximum of <AHg3,DataB4>. Resets after <AHg3,Dur4> seconds of not being attacked.", "Every attack against Leonid increases his armor by <AHg3,DataA5,.>, to a maximum of <AHg3,DataB5>. Resets after <AHg3,Dur5> seconds of not being attacked.");
                     TooltipLearn = "Learn Grit - [|cffffcc00Level %d|r]";
                     TooltipLearnExtended = "Every attack against Leonid increases his armor for a short duration.|n|n|cffffcc00Level 1|r - <AHg3,DataA1,.> bonus armor per stack, maximum of <AHg3,DataB1> armor. Resets after <AHg3,Dur1> seconds.|n|cffffcc00Level 2|r - <AHg3,DataA2,.> bonus armor per stack, maximum of <AHg3,DataB2> armor. Resets after <AHg3,Dur2> seconds. |n|cffffcc00Level 3|r - <AHg3,DataA3,.> bonus armor per stack, maximum of <AHg3,DataB3> armor. Resets after <AHg3,Dur3> seconds.|n|cffffcc00Level 4|r - <AHg3,DataA4,.> bonus armor per stack, maximum of <AHg3,DataB4> armor. Resets after <AHg3,Dur4> seconds. |n|cffffcc00Level 5|r - <AHg3,DataA5,.> bonus armor per stack, maximum of <AHg3,DataB5> armor. Resets after <AHg3,Dur5> seconds.";
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>hgr1</c>.</summary>
-                [global::Moonwell.Objects.Field("hgr1", Label = "Defense Increase")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> DefenseIncrease
-                {
-                    get { return Fields.GetLevels<float>(this, "hgr1"); }
-                    protected set { Fields.Put("hgr1", value); }
-                }
-
-                /// <summary>The field <c>hgr2</c>.</summary>
-                [global::Moonwell.Objects.Field("hgr2", Label = "Defense Cap")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> DefenseCap
-                {
-                    get { return Fields.GetLevels<float>(this, "hgr2"); }
-                    protected set { Fields.Put("hgr2", value); }
-                }
-
-                /// <summary>The field <c>hgr3</c>.</summary>
-                [global::Moonwell.Objects.Field("hgr3", Label = "Magic Resistance At Cap")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> MagicResistanceAtCap
-                {
-                    get { return Fields.GetLevels<float>(this, "hgr3"); }
-                    protected set { Fields.Put("hgr3", value); }
-                }
-
-                /// <summary>The field <c>hgr4</c>.</summary>
-                [global::Moonwell.Objects.Field("hgr4", Label = "Bonus Attack Damage Percent At Cap")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> BonusAttackDamagePercentAtCap
-                {
-                    get { return Fields.GetLevels<float>(this, "hgr4"); }
-                    protected set { Fields.Put("hgr4", value); }
-                }
-            }
-
-            /// <summary>Grit (AHgr).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHgr")]
-            public class GritAHgr : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public GritAHgr()
-                {
-                    Area = Levels(0f, 0f, 0f, 0f, 0f);
-                    BonusAttackDamagePercentAtCap = Levels(0f, 0f, 0f, 0f, 0f);
-                    ButtonPositionNormalX = 2;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 2;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f, 0f, 0f, 0f, 0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(0f, 0f, 0f, 0f, 0f);
-                    DefenseCap = Levels(15f, 15f, 15f, 15f, 15f);
-                    DefenseIncrease = Levels(0.25f, 0.5f, 0.75f, 1f, 1.25f);
-                    Duration = Levels(5f, 5f, 5f, 5f, 5f);
-                    HeroAbility = true;
-                    HeroDuration = Levels(5f, 5f, 5f, 5f, 5f);
-                    Hotkey = "E";
-                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNGrit.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNGrit.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "E";
-                    LevelCount = 5;
-                    LevelSkipRequirement = 4;
-                    MagicResistanceAtCap = Levels(0f, 0f, 0f, 0f, 0f);
-                    ManaCost = Levels(0, 0, 0, 0, 0);
-                    Name = "Grit";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    Range = Levels(0f, 0f, 0f, 0f, 0f);
-                    RequiredLevel = 1;
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Neutral, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Neutral);
-                    Tooltip = Levels("Grit - [|cffffcc00Level 1|r]", "Grit - [|cffffcc00Level 2|r]", "Grit - [|cffffcc00Level 3|r]", "Grit - [|cffffcc00Level 4|r]", "Grit - [|cffffcc00Level 5|r]");
-                    TooltipExtended = Levels("Every attack against Leonid increases his armor by <AHgr,DataA1,.>, to a maximum of <AHgr,DataB1>. Resets after <AHgr,Dur1> seconds of not being attacked.", "Every attack against Leonid increases his armor by <AHgr,DataA2,.>, to a maximum of <AHgr,DataB2>. Resets after <AHgr,Dur2> seconds of not being attacked.", "Every attack against Leonid increases his armor by <AHgr,DataA3,.>, to a maximum of <AHgr,DataB3>. Resets after <AHgr,Dur3> seconds of not being attacked.", "Every attack against Leonid increases his armor by <AHgr,DataA4,.>, to a maximum of <AHgr,DataB4>. Resets after <AHgr,Dur4> seconds of not being attacked.", "Every attack against Leonid increases his armor by <AHgr,DataA5,.>, to a maximum of <AHgr,DataB5>. Resets after <AHgr,Dur5> seconds of not being attacked.");
-                    TooltipLearn = "Learn Grit - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Every attack against Leonid increases his armor for a short duration.|n|n|cffffcc00Level 1|r - <AHgr,DataA1,.> bonus armor per stack, maximum of <AHgr,DataB1> armor. Resets after <AHgr,Dur1> seconds.|n|cffffcc00Level 2|r - <AHgr,DataA2,.> bonus armor per stack, maximum of <AHgr,DataB2> armor. Resets after <AHgr,Dur2> seconds. |n|cffffcc00Level 3|r - <AHgr,DataA3,.> bonus armor per stack, maximum of <AHgr,DataB3> armor. Resets after <AHgr,Dur3> seconds.|n|cffffcc00Level 4|r - <AHgr,DataA4,.> bonus armor per stack, maximum of <AHgr,DataB4> armor. Resets after <AHgr,Dur4> seconds. |n|cffffcc00Level 5|r - <AHgr,DataA5,.> bonus armor per stack, maximum of <AHgr,DataB5> armor. Resets after <AHgr,Dur5> seconds.";
                     UseNewDefaultLevelCap = true;
                 }
 
@@ -9491,7 +9491,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Guiding Hand (AHq1).</summary>
+            /// <summary>Guiding Hand (Talent 1), AHq1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHq1")]
             public class GuidingHandAHq1 : global::Moonwell.Objects.StandardAbility
@@ -9615,7 +9615,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Guiding Hand (AHq2).</summary>
+            /// <summary>Guiding Hand (Talent 2), AHq2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHq2")]
             public class GuidingHandAHq2 : global::Moonwell.Objects.StandardAbility
@@ -9739,7 +9739,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Guiding Hand (AHq3).</summary>
+            /// <summary>Guiding Hand (Talent 3), AHq3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHq3")]
             public class GuidingHandAHq3 : global::Moonwell.Objects.StandardAbility
@@ -9863,7 +9863,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Guiding Light (AT2c).</summary>
+            /// <summary>Guiding Light (AnyaTalent), AT2c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT2c")]
             public class GuidingLight : global::Moonwell.Objects.StandardAbility
@@ -9871,7 +9871,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public GuidingLight()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SoulLanternAUla, global::Moonwell.Objects.Other.Abilities.SoulLanternAUl3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SoulLantern, global::Moonwell.Objects.Other.Abilities.SoulLanternAUl3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -9950,7 +9950,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Hand of Justice (BT4c).</summary>
+            /// <summary>Hand of Justice (LeonidTalent), BT4c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT4c")]
             public class HandOfJustice : global::Moonwell.Objects.StandardAbility
@@ -10037,7 +10037,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Hardened Skin (AHss).</summary>
+            /// <summary>Hardened Skin (Stacking), AHss.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHss")]
             public class HardenedSkin : global::Moonwell.Objects.StandardAbility
@@ -10119,7 +10119,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Harvest (ANha).</summary>
+            /// <summary>Harvest (Neutral),  (Gold and Lumber), ANha.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ANha")]
             public class Harvest : global::Moonwell.Objects.StandardAbility
@@ -10192,7 +10192,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Harvest (Ahar).</summary>
+            /// <summary>Harvest (Gold and Lumber), Ahar.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Ahar")]
             public class HarvestAhar : global::Moonwell.Objects.StandardAbility
@@ -10265,13 +10265,126 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Headsplitter (AHh1).</summary>
+            /// <summary>Headsplitter (AHhr).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHh1")]
+            [global::Moonwell.Objects.Standard("AHhr")]
             public class Headsplitter : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Headsplitter()
+                {
+                    AnimationNames = "attack,slam";
+                    Area = Levels(0f, 0f, 0f, 0f, 0f);
+                    BonusDamageDebuffDurationHero = Levels(0f, 0f, 0f, 0f, 0f);
+                    BonusDamageDebuffDurationNormal = Levels(0f, 0f, 0f, 0f, 0f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(10f, 10f, 10f, 10f, 10f);
+                    DamageBonus = Levels(100f, 150f, 200f, 250f, 300f);
+                    DebuffBonusDamageReceivedPercent = Levels(0f, 0f, 0f, 0f, 0f);
+                    Duration = Levels(7f, 7f, 7f, 7f, 7f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(7f, 7f, 7f, 7f, 7f);
+                    Hotkey = "Q";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeadsplitter.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNHeadsplitter.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "Q";
+                    LevelCount = 5;
+                    LevelSkipRequirement = 4;
+                    ManaCost = Levels(75, 75, 75, 75, 75);
+                    Name = "Headsplitter";
+                    Order = "headsplitter";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    RefreshesCooldownOnKill = Levels(false, false, false, false, false);
+                    RequiredLevel = 1;
+                    StunDurationHero = Levels(1f, 1.25f, 1.5f, 1.75f, 2f);
+                    StunDurationNormal = Levels(2f, 2.25f, 2.5f, 3f, 3.5f);
+                    Target = "Abilities\\Spells\\Other\\Headsplitter\\HeadsplitterTarget.mdl";
+                    TargetAttachmentPoint1 = "head";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies, global::Moonwell.Objects.Targets.Enemies, global::Moonwell.Objects.Targets.Enemies, global::Moonwell.Objects.Targets.Enemies, global::Moonwell.Objects.Targets.Enemies);
+                    Tooltip = Levels("Headsplitter - [|cffffcc00Level 1|r]", "Headsplitter - [|cffffcc00Level 2|r]", "Headsplitter - [|cffffcc00Level 3|r]", "Headsplitter - [|cffffcc00Level 4|r]", "Headsplitter - [|cffffcc00Level 5|r]");
+                    TooltipExtended = Levels("Empower the next attack, dealing <AHhr,DataA1> bonus damage and stunning the target for <AHhr,DataB1> seconds.", "Empower the next attack, dealing <AHhr,DataA2> bonus damage and stunning the target for <AHhr,DataB2> seconds.", "Empower the next attack, dealing <AHhr,DataA3> bonus damage and stunning the target for <AHhr,DataB3> seconds.", "Empower the next attack, dealing <AHhr,DataA4> bonus damage and stunning the target for <AHhr,DataB4> seconds.", "Empower the next attack, dealing <AHhr,DataA5> bonus damage and stunning the target for <AHhr,DataB5> seconds.");
+                    TooltipLearn = "Learn Headsplitter - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Empower the next attack, dealing bonus damage and stunning the target.|n|n|cffffcc00Level 1|r - <AHhr,DataA1> bonus damage, <AHhr,DataB1> second stun duration.|n|cffffcc00Level 2|r - <AHhr,DataA2> bonus damage, <AHhr,DataB2> second stun duration. |n|cffffcc00Level 3|r - <AHhr,DataA3> bonus damage, <AHhr,DataB3> second stun duration.|n|cffffcc00Level 4|r - <AHhr,DataA4> bonus damage, <AHhr,DataB4> second stun duration. |n|cffffcc00Level 5|r - <AHhr,DataA5> bonus damage, <AHhr,DataB5> second stun duration.";
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>hhr1</c>.</summary>
+                [global::Moonwell.Objects.Field("hhr1", Label = "Damage Bonus")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> DamageBonus
+                {
+                    get { return Fields.GetLevels<float>(this, "hhr1"); }
+                    protected set { Fields.Put("hhr1", value); }
+                }
+
+                /// <summary>The field <c>hhr2</c>.</summary>
+                [global::Moonwell.Objects.Field("hhr2", Label = "Stun Duration - Normal")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> StunDurationNormal
+                {
+                    get { return Fields.GetLevels<float>(this, "hhr2"); }
+                    protected set { Fields.Put("hhr2", value); }
+                }
+
+                /// <summary>The field <c>hhr3</c>.</summary>
+                [global::Moonwell.Objects.Field("hhr3", Label = "Stun Duration - Hero")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> StunDurationHero
+                {
+                    get { return Fields.GetLevels<float>(this, "hhr3"); }
+                    protected set { Fields.Put("hhr3", value); }
+                }
+
+                /// <summary>The field <c>hhr4</c>.</summary>
+                [global::Moonwell.Objects.Field("hhr4", Label = "Bonus Damage Debuff Duration - Normal")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> BonusDamageDebuffDurationNormal
+                {
+                    get { return Fields.GetLevels<float>(this, "hhr4"); }
+                    protected set { Fields.Put("hhr4", value); }
+                }
+
+                /// <summary>The field <c>hhr5</c>.</summary>
+                [global::Moonwell.Objects.Field("hhr5", Label = "Bonus Damage Debuff Duration - Hero")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> BonusDamageDebuffDurationHero
+                {
+                    get { return Fields.GetLevels<float>(this, "hhr5"); }
+                    protected set { Fields.Put("hhr5", value); }
+                }
+
+                /// <summary>The field <c>hhr6</c>.</summary>
+                [global::Moonwell.Objects.Field("hhr6", Label = "Debuff Bonus Damage Received Percent")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> DebuffBonusDamageReceivedPercent
+                {
+                    get { return Fields.GetLevels<float>(this, "hhr6"); }
+                    protected set { Fields.Put("hhr6", value); }
+                }
+
+                /// <summary>The field <c>hhr7</c>.</summary>
+                [global::Moonwell.Objects.Field("hhr7", Label = "Refreshes Cooldown On Kill")]
+                public global::Moonwell.Objects.Levels<bool> RefreshesCooldownOnKill
+                {
+                    get { return Fields.GetLevels<bool>(this, "hhr7"); }
+                    protected set { Fields.Put("hhr7", value); }
+                }
+            }
+
+            /// <summary>Headsplitter Talent 1, AHh1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AHh1")]
+            public class HeadsplitterAHh1 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public HeadsplitterAHh1()
                 {
                     AnimationNames = "attack,slam";
                     Area = Levels(0f, 0f, 0f, 0f, 0f);
@@ -10379,7 +10492,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Headsplitter (AHh2).</summary>
+            /// <summary>Headsplitter Talent 2, AHh2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHh2")]
             public class HeadsplitterAHh2 : global::Moonwell.Objects.StandardAbility
@@ -10493,7 +10606,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Headsplitter (AHh3).</summary>
+            /// <summary>Headsplitter (Talent 3), AHh3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHh3")]
             public class HeadsplitterAHh3 : global::Moonwell.Objects.StandardAbility
@@ -10608,120 +10721,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Headsplitter (AHhr).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHhr")]
-            public class HeadsplitterAHhr : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public HeadsplitterAHhr()
-                {
-                    AnimationNames = "attack,slam";
-                    Area = Levels(0f, 0f, 0f, 0f, 0f);
-                    BonusDamageDebuffDurationHero = Levels(0f, 0f, 0f, 0f, 0f);
-                    BonusDamageDebuffDurationNormal = Levels(0f, 0f, 0f, 0f, 0f);
-                    ButtonPositionNormalX = 0;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 0;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f, 0f, 0f, 0f, 0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(10f, 10f, 10f, 10f, 10f);
-                    DamageBonus = Levels(100f, 150f, 200f, 250f, 300f);
-                    DebuffBonusDamageReceivedPercent = Levels(0f, 0f, 0f, 0f, 0f);
-                    Duration = Levels(7f, 7f, 7f, 7f, 7f);
-                    HeroAbility = true;
-                    HeroDuration = Levels(7f, 7f, 7f, 7f, 7f);
-                    Hotkey = "Q";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNHeadsplitter.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNHeadsplitter.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "Q";
-                    LevelCount = 5;
-                    LevelSkipRequirement = 4;
-                    ManaCost = Levels(75, 75, 75, 75, 75);
-                    Name = "Headsplitter";
-                    Order = "headsplitter";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    RefreshesCooldownOnKill = Levels(false, false, false, false, false);
-                    RequiredLevel = 1;
-                    StunDurationHero = Levels(1f, 1.25f, 1.5f, 1.75f, 2f);
-                    StunDurationNormal = Levels(2f, 2.25f, 2.5f, 3f, 3.5f);
-                    Target = "Abilities\\Spells\\Other\\Headsplitter\\HeadsplitterTarget.mdl";
-                    TargetAttachmentPoint1 = "head";
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies, global::Moonwell.Objects.Targets.Enemies, global::Moonwell.Objects.Targets.Enemies, global::Moonwell.Objects.Targets.Enemies, global::Moonwell.Objects.Targets.Enemies);
-                    Tooltip = Levels("Headsplitter - [|cffffcc00Level 1|r]", "Headsplitter - [|cffffcc00Level 2|r]", "Headsplitter - [|cffffcc00Level 3|r]", "Headsplitter - [|cffffcc00Level 4|r]", "Headsplitter - [|cffffcc00Level 5|r]");
-                    TooltipExtended = Levels("Empower the next attack, dealing <AHhr,DataA1> bonus damage and stunning the target for <AHhr,DataB1> seconds.", "Empower the next attack, dealing <AHhr,DataA2> bonus damage and stunning the target for <AHhr,DataB2> seconds.", "Empower the next attack, dealing <AHhr,DataA3> bonus damage and stunning the target for <AHhr,DataB3> seconds.", "Empower the next attack, dealing <AHhr,DataA4> bonus damage and stunning the target for <AHhr,DataB4> seconds.", "Empower the next attack, dealing <AHhr,DataA5> bonus damage and stunning the target for <AHhr,DataB5> seconds.");
-                    TooltipLearn = "Learn Headsplitter - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Empower the next attack, dealing bonus damage and stunning the target.|n|n|cffffcc00Level 1|r - <AHhr,DataA1> bonus damage, <AHhr,DataB1> second stun duration.|n|cffffcc00Level 2|r - <AHhr,DataA2> bonus damage, <AHhr,DataB2> second stun duration. |n|cffffcc00Level 3|r - <AHhr,DataA3> bonus damage, <AHhr,DataB3> second stun duration.|n|cffffcc00Level 4|r - <AHhr,DataA4> bonus damage, <AHhr,DataB4> second stun duration. |n|cffffcc00Level 5|r - <AHhr,DataA5> bonus damage, <AHhr,DataB5> second stun duration.";
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>hhr1</c>.</summary>
-                [global::Moonwell.Objects.Field("hhr1", Label = "Damage Bonus")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> DamageBonus
-                {
-                    get { return Fields.GetLevels<float>(this, "hhr1"); }
-                    protected set { Fields.Put("hhr1", value); }
-                }
-
-                /// <summary>The field <c>hhr2</c>.</summary>
-                [global::Moonwell.Objects.Field("hhr2", Label = "Stun Duration - Normal")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> StunDurationNormal
-                {
-                    get { return Fields.GetLevels<float>(this, "hhr2"); }
-                    protected set { Fields.Put("hhr2", value); }
-                }
-
-                /// <summary>The field <c>hhr3</c>.</summary>
-                [global::Moonwell.Objects.Field("hhr3", Label = "Stun Duration - Hero")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> StunDurationHero
-                {
-                    get { return Fields.GetLevels<float>(this, "hhr3"); }
-                    protected set { Fields.Put("hhr3", value); }
-                }
-
-                /// <summary>The field <c>hhr4</c>.</summary>
-                [global::Moonwell.Objects.Field("hhr4", Label = "Bonus Damage Debuff Duration - Normal")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> BonusDamageDebuffDurationNormal
-                {
-                    get { return Fields.GetLevels<float>(this, "hhr4"); }
-                    protected set { Fields.Put("hhr4", value); }
-                }
-
-                /// <summary>The field <c>hhr5</c>.</summary>
-                [global::Moonwell.Objects.Field("hhr5", Label = "Bonus Damage Debuff Duration - Hero")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> BonusDamageDebuffDurationHero
-                {
-                    get { return Fields.GetLevels<float>(this, "hhr5"); }
-                    protected set { Fields.Put("hhr5", value); }
-                }
-
-                /// <summary>The field <c>hhr6</c>.</summary>
-                [global::Moonwell.Objects.Field("hhr6", Label = "Debuff Bonus Damage Received Percent")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> DebuffBonusDamageReceivedPercent
-                {
-                    get { return Fields.GetLevels<float>(this, "hhr6"); }
-                    protected set { Fields.Put("hhr6", value); }
-                }
-
-                /// <summary>The field <c>hhr7</c>.</summary>
-                [global::Moonwell.Objects.Field("hhr7", Label = "Refreshes Cooldown On Kill")]
-                public global::Moonwell.Objects.Levels<bool> RefreshesCooldownOnKill
-                {
-                    get { return Fields.GetLevels<bool>(this, "hhr7"); }
-                    protected set { Fields.Put("hhr7", value); }
-                }
-            }
-
-            /// <summary>Heal (Asea).</summary>
+            /// <summary>Heal (Scarlet Crusade), Asea.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Asea")]
             public class Heal : global::Moonwell.Objects.StandardAbility
@@ -10848,7 +10848,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Healing Spray (Afhs).</summary>
+            /// <summary>Healing Spray (Forsaken), Afhs.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Afhs")]
             public class HealingSpray : global::Moonwell.Objects.StandardAbility
@@ -10951,7 +10951,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Healing Ward (AIhw).</summary>
+            /// <summary>Healing Ward (Item), AIhw.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIhw")]
             public class HealingWard : global::Moonwell.Objects.StandardAbility
@@ -10992,7 +10992,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Heightened Reflexes (AT6b).</summary>
+            /// <summary>Heightened Reflexes (AnyaTalent), AT6b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT6b")]
             public class HeightenedReflexes : global::Moonwell.Objects.StandardAbility
@@ -11141,7 +11141,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Heroic Slash (AHv1).</summary>
+            /// <summary>Heroic Slash (Talent 1), AHv1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHv1")]
             public class HeroicSlashAHv1 : global::Moonwell.Objects.StandardAbility
@@ -11226,7 +11226,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Heroic Slash (AHv2).</summary>
+            /// <summary>Heroic Slash (Talent 2), AHv2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHv2")]
             public class HeroicSlashAHv2 : global::Moonwell.Objects.StandardAbility
@@ -11311,7 +11311,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Heroic Slash (AHv3).</summary>
+            /// <summary>Heroic Slash (Talent 3), AHv3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHv3")]
             public class HeroicSlashAHv3 : global::Moonwell.Objects.StandardAbility
@@ -11396,7 +11396,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Holy Light (AIhl).</summary>
+            /// <summary>Holy Light (item), AIhl.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIhl")]
             public class HolyLight : global::Moonwell.Objects.StandardAbility
@@ -11438,7 +11438,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Holy Light (IT4c).</summary>
+            /// <summary>Holy Light (IlastarTalent), IT4c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("IT4c")]
             public class HolyLightIT4c : global::Moonwell.Objects.StandardAbility
@@ -11446,7 +11446,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public HolyLightIT4c()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SurgeOfLightAHsl, global::Moonwell.Objects.Other.Abilities.SurgeOfLightAHl3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SurgeOfLight, global::Moonwell.Objects.Other.Abilities.SurgeOfLightAHl3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -11525,7 +11525,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Holy Nova (IT1b).</summary>
+            /// <summary>Holy Nova (IlastarTalent), IT1b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("IT1b")]
             public class HolyNova : global::Moonwell.Objects.StandardAbility
@@ -11533,7 +11533,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public HolyNova()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.LightsMercyAHsf, global::Moonwell.Objects.Other.Abilities.LightsMercyAHm2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.LightsMercy, global::Moonwell.Objects.Other.Abilities.LightsMercyAHm2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -11739,7 +11739,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Howling Tempest (AT4c).</summary>
+            /// <summary>Howling Tempest (AnyaTalent), AT4c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT4c")]
             public class HowlingTempest : global::Moonwell.Objects.StandardAbility
@@ -11747,7 +11747,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public HowlingTempest()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.BansheesWailAUwc, global::Moonwell.Objects.Other.Abilities.BansheesWailAUi3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.BansheesWail, global::Moonwell.Objects.Other.Abilities.BansheesWailAUi3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -11903,7 +11903,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Improved Armor (UT5a).</summary>
+            /// <summary>Improved Armor (UGarekTalent), UT5a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT5a")]
             public class ImprovedArmor : global::Moonwell.Objects.StandardAbility
@@ -11947,7 +11947,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Indomitable (BT2c).</summary>
+            /// <summary>Indomitable (LeonidTalent), BT2c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT2c")]
             public class Indomitable : global::Moonwell.Objects.StandardAbility
@@ -12034,7 +12034,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Inner Fire (Asif).</summary>
+            /// <summary>Inner Fire (Scarlet Crusade), Asif.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Asif")]
             public class InnerFire : global::Moonwell.Objects.StandardAbility
@@ -12120,7 +12120,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Inner Fire (UT4a).</summary>
+            /// <summary>Inner Fire (UGarekTalent), UT4a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT4a")]
             public class InnerFireUT4a : global::Moonwell.Objects.StandardAbility
@@ -12128,7 +12128,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public InnerFireUT4a()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.GrimConvictionAUvg, global::Moonwell.Objects.Other.Abilities.GrimConviction>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.GrimConviction, global::Moonwell.Objects.Other.Abilities.GrimConvictionAUv1>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -12207,13 +12207,97 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Inspire Courage (AHi1).</summary>
+            /// <summary>Inspire Courage (AHic).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHi1")]
+            [global::Moonwell.Objects.Standard("AHic")]
             public class InspireCourage : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public InspireCourage()
+                {
+                    AnimationNames = "spell,one";
+                    Area = Levels(500f, 500f, 500f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.InspireCourage>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    Caster = "Abilities\\Spells\\Human\\InspireCourage\\InspireCourageCaster.mdl";
+                    CheckDependencies = true;
+                    Cooldown = Levels(30f, 30f, 30f);
+                    Defense = Levels(3f, 7f, 10f);
+                    Duration = Levels(15f, 15f, 15f);
+                    Healing = Levels(0f, 0f, 0f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(15f, 15f, 15f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNInspireCourage.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNInspireCourage.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "E";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(75, 75, 75);
+                    Name = "Inspire Courage";
+                    Order = "inspirecourage";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    Range = Levels(0f, 0f, 0f);
+                    RemovesNegativeDebuffs = Levels(false, false, false);
+                    RequiredLevel = 1;
+                    SpellDamageResistance = Levels(0.15f, 0.25f, 0.35f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Inspire Courage - [|cffffcc00Level 1|r]", "Inspire Courage - [|cffffcc00Level 2|r]", "Inspire Courage - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Landen inspires his allies, increasing their armor by <AHic,DataA1> and Magic Resistance by <AHic,DataB1,%>%.|nLasts <AHic,Dur1> seconds.", "Landen inspires his allies, increasing their armor by <AHic,DataA2> and Magic Resistance by <AHic,DataB2,%>%.|nLasts <AHic,Dur2> seconds.", "Landen inspires his allies, increasing their armor by <AHic,DataA3> and Magic Resistance by <AHic,DataB3,%>%.|nLasts <AHic,Dur3> seconds.");
+                    TooltipLearn = "Learn Inspire Courage - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Nearby friendly units gain increased armor and Magic Resistance for a duration.|n|n|cffffcc00Level 1|r - <AHic,DataA1> armor, <AHic,DataB1,%>% Magic Resistance for <AHic,Dur1> seconds. |n|cffffcc00Level 2|r - <AHic,DataA2> armor, <AHic,DataB2,%>% Magic Resistance for <AHic,Dur2> seconds. |n|cffffcc00Level 3|r - <AHic,DataA3> armor, <AHic,DataB3,%>% Magic Resistance for <AHic,Dur3> seconds.";
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>hic1</c>.</summary>
+                [global::Moonwell.Objects.Field("hic1", Label = "Defense")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> Defense
+                {
+                    get { return Fields.GetLevels<float>(this, "hic1"); }
+                    protected set { Fields.Put("hic1", value); }
+                }
+
+                /// <summary>The field <c>hic2</c>.</summary>
+                [global::Moonwell.Objects.Field("hic2", Label = "Spell Damage Resistance")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> SpellDamageResistance
+                {
+                    get { return Fields.GetLevels<float>(this, "hic2"); }
+                    protected set { Fields.Put("hic2", value); }
+                }
+
+                /// <summary>The field <c>hic3</c>.</summary>
+                [global::Moonwell.Objects.Field("hic3", Label = "Removes Negative Debuffs")]
+                public global::Moonwell.Objects.Levels<bool> RemovesNegativeDebuffs
+                {
+                    get { return Fields.GetLevels<bool>(this, "hic3"); }
+                    protected set { Fields.Put("hic3", value); }
+                }
+
+                /// <summary>The field <c>hic4</c>.</summary>
+                [global::Moonwell.Objects.Field("hic4", Label = "Healing")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> Healing
+                {
+                    get { return Fields.GetLevels<float>(this, "hic4"); }
+                    protected set { Fields.Put("hic4", value); }
+                }
+            }
+
+            /// <summary>Inspire Courage (Talent 1), AHi1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AHi1")]
+            public class InspireCourageAHi1 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public InspireCourageAHi1()
                 {
                     AnimationNames = "spell,one";
                     Area = Levels(500f, 500f, 500f);
@@ -12292,7 +12376,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Inspire Courage (AHi2).</summary>
+            /// <summary>Inspire Courage (Talent 2), AHi2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHi2")]
             public class InspireCourageAHi2 : global::Moonwell.Objects.StandardAbility
@@ -12377,7 +12461,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Inspire Courage (AHi3).</summary>
+            /// <summary>Inspire Courage (Talent 3), AHi3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHi3")]
             public class InspireCourageAHi3 : global::Moonwell.Objects.StandardAbility
@@ -12462,91 +12546,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Inspire Courage (AHic).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHic")]
-            public class InspireCourageAHic : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public InspireCourageAHic()
-                {
-                    AnimationNames = "spell,one";
-                    Area = Levels(500f, 500f, 500f);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.InspireCourage>();
-                    ButtonPositionNormalX = 2;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 2;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f, 0f, 0f);
-                    Caster = "Abilities\\Spells\\Human\\InspireCourage\\InspireCourageCaster.mdl";
-                    CheckDependencies = true;
-                    Cooldown = Levels(30f, 30f, 30f);
-                    Defense = Levels(3f, 7f, 10f);
-                    Duration = Levels(15f, 15f, 15f);
-                    Healing = Levels(0f, 0f, 0f);
-                    HeroAbility = true;
-                    HeroDuration = Levels(15f, 15f, 15f);
-                    Hotkey = "E";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNInspireCourage.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNInspireCourage.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "E";
-                    LevelCount = 3;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(75, 75, 75);
-                    Name = "Inspire Courage";
-                    Order = "inspirecourage";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    Range = Levels(0f, 0f, 0f);
-                    RemovesNegativeDebuffs = Levels(false, false, false);
-                    RequiredLevel = 1;
-                    SpellDamageResistance = Levels(0.15f, 0.25f, 0.35f);
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend);
-                    Tooltip = Levels("Inspire Courage - [|cffffcc00Level 1|r]", "Inspire Courage - [|cffffcc00Level 2|r]", "Inspire Courage - [|cffffcc00Level 3|r]");
-                    TooltipExtended = Levels("Landen inspires his allies, increasing their armor by <AHic,DataA1> and Magic Resistance by <AHic,DataB1,%>%.|nLasts <AHic,Dur1> seconds.", "Landen inspires his allies, increasing their armor by <AHic,DataA2> and Magic Resistance by <AHic,DataB2,%>%.|nLasts <AHic,Dur2> seconds.", "Landen inspires his allies, increasing their armor by <AHic,DataA3> and Magic Resistance by <AHic,DataB3,%>%.|nLasts <AHic,Dur3> seconds.");
-                    TooltipLearn = "Learn Inspire Courage - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Nearby friendly units gain increased armor and Magic Resistance for a duration.|n|n|cffffcc00Level 1|r - <AHic,DataA1> armor, <AHic,DataB1,%>% Magic Resistance for <AHic,Dur1> seconds. |n|cffffcc00Level 2|r - <AHic,DataA2> armor, <AHic,DataB2,%>% Magic Resistance for <AHic,Dur2> seconds. |n|cffffcc00Level 3|r - <AHic,DataA3> armor, <AHic,DataB3,%>% Magic Resistance for <AHic,Dur3> seconds.";
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>hic1</c>.</summary>
-                [global::Moonwell.Objects.Field("hic1", Label = "Defense")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> Defense
-                {
-                    get { return Fields.GetLevels<float>(this, "hic1"); }
-                    protected set { Fields.Put("hic1", value); }
-                }
-
-                /// <summary>The field <c>hic2</c>.</summary>
-                [global::Moonwell.Objects.Field("hic2", Label = "Spell Damage Resistance")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> SpellDamageResistance
-                {
-                    get { return Fields.GetLevels<float>(this, "hic2"); }
-                    protected set { Fields.Put("hic2", value); }
-                }
-
-                /// <summary>The field <c>hic3</c>.</summary>
-                [global::Moonwell.Objects.Field("hic3", Label = "Removes Negative Debuffs")]
-                public global::Moonwell.Objects.Levels<bool> RemovesNegativeDebuffs
-                {
-                    get { return Fields.GetLevels<bool>(this, "hic3"); }
-                    protected set { Fields.Put("hic3", value); }
-                }
-
-                /// <summary>The field <c>hic4</c>.</summary>
-                [global::Moonwell.Objects.Field("hic4", Label = "Healing")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> Healing
-                {
-                    get { return Fields.GetLevels<float>(this, "hic4"); }
-                    protected set { Fields.Put("hic4", value); }
-                }
-            }
-
-            /// <summary>Into the Fray! (GT3a).</summary>
+            /// <summary>Into the Fray! (Garek Talent), GT3a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("GT3a")]
             public class IntoTheFray : global::Moonwell.Objects.StandardAbility
@@ -12554,7 +12554,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public IntoTheFray()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.ValiantChargeAHch, global::Moonwell.Objects.Other.Abilities.ValiantCharge>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.ValiantCharge, global::Moonwell.Objects.Other.Abilities.ValiantChargeAHc1>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -12633,7 +12633,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Inventory (AInv).</summary>
+            /// <summary>Inventory (Hero), AInv.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AInv")]
             public class Inventory : global::Moonwell.Objects.StandardAbility
@@ -12706,7 +12706,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Invulnerable (Avul).</summary>
+            /// <summary>Invulnerable (Neutral), Avul.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Avul")]
             public class Invulnerable : global::Moonwell.Objects.StandardAbility
@@ -12733,7 +12733,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Iron Will (BT5a).</summary>
+            /// <summary>Iron Will (LeonidTalent), BT5a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT5a")]
             public class IronWill : global::Moonwell.Objects.StandardAbility
@@ -13389,7 +13389,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Agility Gain (AIgm).</summary>
+            /// <summary>Item Agility Gain (+2), AIgm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIgm")]
             public class ItemAgilityGainAIgm : global::Moonwell.Objects.StandardAbility
@@ -13600,7 +13600,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public ItemAntiMagicShell()
                 {
-                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.AntiMagicShellBams, global::Moonwell.Objects.Undead.Buffs.AntiMagicShell>();
+                    Buffs.Set<global::Moonwell.Objects.Undead.Buffs.AntiMagicShell, global::Moonwell.Objects.Undead.Buffs.AntiMagicShellBam2>();
                     CastTime = Levels(0f);
                     CheckDependencies = false;
                     Cooldown = Levels(30f);
@@ -13811,7 +13811,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Area Healing (AIhb).</summary>
+            /// <summary>Item Area Healing (Greater), AIhb.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIhb")]
             public class ItemAreaHealingAIhb : global::Moonwell.Objects.StandardAbility
@@ -13923,7 +13923,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Armor Bonus (AId0).</summary>
+            /// <summary>Item Armor Bonus (+10), AId0.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AId0")]
             public class ItemArmorBonus : global::Moonwell.Objects.StandardAbility
@@ -14034,7 +14034,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Armor Bonus (AId1).</summary>
+            /// <summary>Item Armor Bonus (+1), AId1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AId1")]
             public class ItemArmorBonusAId1 : global::Moonwell.Objects.StandardAbility
@@ -14071,7 +14071,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Armor Bonus (AId2).</summary>
+            /// <summary>Item Armor Bonus (+2), AId2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AId2")]
             public class ItemArmorBonusAId2 : global::Moonwell.Objects.StandardAbility
@@ -14109,7 +14109,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Armor Bonus (AId3).</summary>
+            /// <summary>Item Armor Bonus (+3), AId3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AId3")]
             public class ItemArmorBonusAId3 : global::Moonwell.Objects.StandardAbility
@@ -14147,7 +14147,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Armor Bonus (AId4).</summary>
+            /// <summary>Item Armor Bonus (+4), AId4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AId4")]
             public class ItemArmorBonusAId4 : global::Moonwell.Objects.StandardAbility
@@ -14185,7 +14185,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Armor Bonus (AId5).</summary>
+            /// <summary>Item Armor Bonus (+5), AId5.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AId5")]
             public class ItemArmorBonusAId5 : global::Moonwell.Objects.StandardAbility
@@ -14222,7 +14222,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Armor Bonus (AId6).</summary>
+            /// <summary>Item Armor Bonus (+6), AId6.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AId6")]
             public class ItemArmorBonusAId6 : global::Moonwell.Objects.StandardAbility
@@ -14259,7 +14259,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Armor Bonus (AId7).</summary>
+            /// <summary>Item Armor Bonus (+7), AId7.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AId7")]
             public class ItemArmorBonusAId7 : global::Moonwell.Objects.StandardAbility
@@ -14296,7 +14296,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Armor Bonus (AId8).</summary>
+            /// <summary>Item Armor Bonus (+8), AId8.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AId8")]
             public class ItemArmorBonusAId8 : global::Moonwell.Objects.StandardAbility
@@ -15556,7 +15556,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Attack Fire Bonus (AIgd).</summary>
+            /// <summary>Item Attack Fire Bonus (Gul'dan), AIgd.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIgd")]
             public class ItemAttackFireBonusAIgd : global::Moonwell.Objects.StandardAbility
@@ -16419,7 +16419,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Attack Speed Bonus (AIs2).</summary>
+            /// <summary>Item Attack Speed Bonus (Fix), AIs2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIs2")]
             public class ItemAttackSpeedBonus : global::Moonwell.Objects.StandardAbility
@@ -16642,7 +16642,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Attack Speed Bonus (AIsx).</summary>
+            /// <summary>Item Attack Speed Bonus (Gloves of Haste), AIsx.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIsx")]
             public class ItemAttackSpeedBonusAIsx : global::Moonwell.Objects.StandardAbility
@@ -17190,7 +17190,7 @@ namespace Moonwell.Objects
                 public ItemBash10()
                 {
                     Area = Levels(0f);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stunned>();
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.StunnedBPSE>();
                     CastTime = Levels(0f);
                     ChanceToBash = Levels(5f);
                     ChanceToMiss = Levels(0f);
@@ -17269,7 +17269,7 @@ namespace Moonwell.Objects
                 public ItemBash15()
                 {
                     Area = Levels(0f);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stunned>();
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.StunnedBPSE>();
                     CastTime = Levels(0f);
                     ChanceToBash = Levels(8f);
                     ChanceToMiss = Levels(0f);
@@ -18804,7 +18804,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public ItemBorelgoreAttack()
                 {
-                    Ability.Set<global::Moonwell.Objects.Other.Abilities.ItemStrengthGainAIsm>();
+                    Ability.Set<global::Moonwell.Objects.Other.Abilities.ItemStrengthGain>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -19910,13 +19910,41 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Capture The Flag (AIfe).</summary>
+            /// <summary>Item Capture The Flag (AIfl).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AIfe")]
+            [global::Moonwell.Objects.Standard("AIfl")]
             public class ItemCaptureTheFlag : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public ItemCaptureTheFlag()
+                {
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    ItemAbility = true;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Item Capture The Flag";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    RequiredLevel = 0;
+                    Target = "UI\\Feedback\\RallyPoint\\RallyPoint.mdl";
+                    TargetAttachmentPoint1 = "hand,right";
+                    UseNewDefaultLevelCap = false;
+                }
+            }
+
+            /// <summary>Item Capture The Flag (Undead), AIfe.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AIfe")]
+            public class ItemCaptureTheFlagAIfe : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ItemCaptureTheFlagAIfe()
                 {
                     CastTime = Levels(0f);
                     CheckDependencies = false;
@@ -19940,35 +19968,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Capture The Flag (AIfl).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AIfl")]
-            public class ItemCaptureTheFlagAIfl : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public ItemCaptureTheFlagAIfl()
-                {
-                    CastTime = Levels(0f);
-                    CheckDependencies = false;
-                    Cooldown = Levels(0f);
-                    Duration = Levels(0f);
-                    HeroAbility = false;
-                    HeroDuration = Levels(0f);
-                    ItemAbility = true;
-                    LevelCount = 1;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(0);
-                    Name = "Item Capture The Flag";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    RequiredLevel = 0;
-                    Target = "UI\\Feedback\\RallyPoint\\RallyPoint.mdl";
-                    TargetAttachmentPoint1 = "hand,right";
-                    UseNewDefaultLevelCap = false;
-                }
-            }
-
-            /// <summary>Item Capture The Flag (AIfm).</summary>
+            /// <summary>Item Capture The Flag (Human), AIfm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIfm")]
             public class ItemCaptureTheFlagAIfm : global::Moonwell.Objects.StandardAbility
@@ -19998,7 +19998,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Capture The Flag (AIfn).</summary>
+            /// <summary>Item Capture The Flag (Night Elf), AIfn.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIfn")]
             public class ItemCaptureTheFlagAIfn : global::Moonwell.Objects.StandardAbility
@@ -20028,7 +20028,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Capture The Flag (AIfo).</summary>
+            /// <summary>Item Capture The Flag (Orc), AIfo.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIfo")]
             public class ItemCaptureTheFlagAIfo : global::Moonwell.Objects.StandardAbility
@@ -22777,7 +22777,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Damage Bonus (AIat).</summary>
+            /// <summary>Item Damage Bonus (+3), AIat.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIat")]
             public class ItemDamageBonus : global::Moonwell.Objects.StandardAbility
@@ -23000,7 +23000,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Damage Bonus (AIt6).</summary>
+            /// <summary>Item Damage Bonus (+6), AIt6.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIt6")]
             public class ItemDamageBonusAIt6 : global::Moonwell.Objects.StandardAbility
@@ -23038,7 +23038,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Damage Bonus (AIt9).</summary>
+            /// <summary>Item Damage Bonus (+9), AIt9.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIt9")]
             public class ItemDamageBonusAIt9 : global::Moonwell.Objects.StandardAbility
@@ -23076,7 +23076,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Damage Bonus (AItc).</summary>
+            /// <summary>Item Damage Bonus (+12), AItc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AItc")]
             public class ItemDamageBonusAItc : global::Moonwell.Objects.StandardAbility
@@ -23114,7 +23114,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Damage Bonus (AItf).</summary>
+            /// <summary>Item Damage Bonus (+15), AItf.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AItf")]
             public class ItemDamageBonusAItf : global::Moonwell.Objects.StandardAbility
@@ -23152,7 +23152,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Damage Bonus (AItg).</summary>
+            /// <summary>Item Damage Bonus (+1), AItg.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AItg")]
             public class ItemDamageBonusAItg : global::Moonwell.Objects.StandardAbility
@@ -23190,7 +23190,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Damage Bonus (AIth).</summary>
+            /// <summary>Item Damage Bonus (+2), AIth.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIth")]
             public class ItemDamageBonusAIth : global::Moonwell.Objects.StandardAbility
@@ -23228,7 +23228,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Damage Bonus (AIti).</summary>
+            /// <summary>Item Damage Bonus (+4), AIti.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIti")]
             public class ItemDamageBonusAIti : global::Moonwell.Objects.StandardAbility
@@ -23266,7 +23266,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Damage Bonus (AItj).</summary>
+            /// <summary>Item Damage Bonus (+5), AItj.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AItj")]
             public class ItemDamageBonusAItj : global::Moonwell.Objects.StandardAbility
@@ -23304,7 +23304,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Damage Bonus (AItk).</summary>
+            /// <summary>Item Damage Bonus (+7), AItk.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AItk")]
             public class ItemDamageBonusAItk : global::Moonwell.Objects.StandardAbility
@@ -23342,7 +23342,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Damage Bonus (AItl).</summary>
+            /// <summary>Item Damage Bonus (+8), AItl.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AItl")]
             public class ItemDamageBonusAItl : global::Moonwell.Objects.StandardAbility
@@ -23380,7 +23380,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Damage Bonus (AItn).</summary>
+            /// <summary>Item Damage Bonus (+10), AItn.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AItn")]
             public class ItemDamageBonusAItn : global::Moonwell.Objects.StandardAbility
@@ -23418,7 +23418,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Damage Bonus (AItx).</summary>
+            /// <summary>Item Damage Bonus (+20), AItx.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AItx")]
             public class ItemDamageBonusAItx : global::Moonwell.Objects.StandardAbility
@@ -24531,7 +24531,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Dispel (AIds).</summary>
+            /// <summary>Item Dispel (with cooldown), AIds.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIds")]
             public class ItemDispelAIds : global::Moonwell.Objects.StandardAbility
@@ -24848,7 +24848,7 @@ namespace Moonwell.Objects
                 {
                     AnimationNames = "spell,slam";
                     Area = Levels(250f);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stunned>();
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.StunnedBPSE>();
                     CastTime = Levels(0f);
                     Caster = "Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl";
                     CheckDependencies = false;
@@ -26142,7 +26142,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Evasion 10 (AIEu).</summary>
+            /// <summary>Item Evasion 10 (Item), AIEu.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIEu")]
             public class ItemEvasion10 : global::Moonwell.Objects.StandardAbility
@@ -26181,7 +26181,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Evasion 12 (AIEi).</summary>
+            /// <summary>Item Evasion 12 (Item), AIEi.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIEi")]
             public class ItemEvasion12 : global::Moonwell.Objects.StandardAbility
@@ -26220,7 +26220,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Evasion 2 (AIEq).</summary>
+            /// <summary>Item Evasion 2 (Item), AIEq.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIEq")]
             public class ItemEvasion2 : global::Moonwell.Objects.StandardAbility
@@ -26259,7 +26259,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Evasion 4 (AIEw).</summary>
+            /// <summary>Item Evasion 4 (Item), AIEw.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIEw")]
             public class ItemEvasion4 : global::Moonwell.Objects.StandardAbility
@@ -26298,7 +26298,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Evasion 5 (AIEr).</summary>
+            /// <summary>Item Evasion 5 (Item), AIEr.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIEr")]
             public class ItemEvasion5 : global::Moonwell.Objects.StandardAbility
@@ -26337,7 +26337,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Evasion 7 (AIEt).</summary>
+            /// <summary>Item Evasion 7 (Item), AIEt.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIEt")]
             public class ItemEvasion7 : global::Moonwell.Objects.StandardAbility
@@ -26376,7 +26376,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Evasion 8 (AIEy).</summary>
+            /// <summary>Item Evasion 8 (Item), AIEy.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIEy")]
             public class ItemEvasion8 : global::Moonwell.Objects.StandardAbility
@@ -26415,9 +26415,9 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Experience Gain (AIe2).</summary>
+            /// <summary>Item Experience Gain (AIem).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AIe2")]
+            [global::Moonwell.Objects.Standard("AIem")]
             public class ItemExperienceGain : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
@@ -26429,11 +26429,10 @@ namespace Moonwell.Objects
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
                     Duration = Levels(0f);
-                    EditorSuffix = "(Greater)";
-                    ExperienceGained = Levels(500);
+                    ExperienceGained = Levels(100);
                     HeroAbility = false;
                     HeroDuration = Levels(0f);
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNManual3.blp";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTomeBrown.blp";
                     ItemAbility = true;
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
@@ -26455,13 +26454,13 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Experience Gain (AIem).</summary>
+            /// <summary>Item Experience Gain (Greater), AIe2.</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AIem")]
-            public class ItemExperienceGainAIem : global::Moonwell.Objects.StandardAbility
+            [global::Moonwell.Objects.Standard("AIe2")]
+            public class ItemExperienceGainAIe2 : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public ItemExperienceGainAIem()
+                public ItemExperienceGainAIe2()
                 {
                     CastTime = Levels(0f);
                     Caster = "Abilities\\Spells\\Items\\AIem\\AIemTarget.mdl";
@@ -26469,10 +26468,11 @@ namespace Moonwell.Objects
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
                     Duration = Levels(0f);
-                    ExperienceGained = Levels(100);
+                    EditorSuffix = "(Greater)";
+                    ExperienceGained = Levels(500);
                     HeroAbility = false;
                     HeroDuration = Levels(0f);
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNTomeBrown.blp";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNManual3.blp";
                     ItemAbility = true;
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
@@ -26979,7 +26979,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Forked Lightning (AGZf).</summary>
+            /// <summary>Item Forked Lightning (Gnomish Zapper), AGZf.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AGZf")]
             public class ItemForkedLightning : global::Moonwell.Objects.StandardAbility
@@ -29324,7 +29324,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Healing (AIh1).</summary>
+            /// <summary>Item Healing (Lesser), AIh1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIh1")]
             public class ItemHealing : global::Moonwell.Objects.StandardAbility
@@ -29365,7 +29365,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Healing (AIh2).</summary>
+            /// <summary>Item Healing (Greater), AIh2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIh2")]
             public class ItemHealingAIh2 : global::Moonwell.Objects.StandardAbility
@@ -29406,7 +29406,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Healing (AIh4).</summary>
+            /// <summary>Item Healing (Ultimate), AIh4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIh4")]
             public class ItemHealingAIh4 : global::Moonwell.Objects.StandardAbility
@@ -29447,7 +29447,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Healing (AIh5).</summary>
+            /// <summary>Item Healing (Final), AIh5.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIh5")]
             public class ItemHealingAIh5 : global::Moonwell.Objects.StandardAbility
@@ -29488,7 +29488,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Healing (AIhx).</summary>
+            /// <summary>Item Healing (least), AIhx.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIhx")]
             public class ItemHealingAIhx : global::Moonwell.Objects.StandardAbility
@@ -30751,7 +30751,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AA12).</summary>
+            /// <summary>Item Hero Stat Bonus (+12 Agility), AA12.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AA12")]
             public class ItemHeroStatBonus : global::Moonwell.Objects.StandardAbility
@@ -30817,7 +30817,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AI10).</summary>
+            /// <summary>Item Hero Stat Bonus (+10 Intelligence), AI10.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AI10")]
             public class ItemHeroStatBonusAI10 : global::Moonwell.Objects.StandardAbility
@@ -30883,7 +30883,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AI11).</summary>
+            /// <summary>Item Hero Stat Bonus (+11 Intelligence), AI11.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AI11")]
             public class ItemHeroStatBonusAI11 : global::Moonwell.Objects.StandardAbility
@@ -30949,7 +30949,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AI12).</summary>
+            /// <summary>Item Hero Stat Bonus (+12 Intelligence), AI12.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AI12")]
             public class ItemHeroStatBonusAI12 : global::Moonwell.Objects.StandardAbility
@@ -31015,7 +31015,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIa1).</summary>
+            /// <summary>Item Hero Stat Bonus (+1 Agility), AIa1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIa1")]
             public class ItemHeroStatBonusAIa1 : global::Moonwell.Objects.StandardAbility
@@ -31081,7 +31081,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIa3).</summary>
+            /// <summary>Item Hero Stat Bonus (+3 Agility), AIa3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIa3")]
             public class ItemHeroStatBonusAIa3 : global::Moonwell.Objects.StandardAbility
@@ -31146,7 +31146,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIa4).</summary>
+            /// <summary>Item Hero Stat Bonus (+4 Agility), AIa4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIa4")]
             public class ItemHeroStatBonusAIa4 : global::Moonwell.Objects.StandardAbility
@@ -31211,7 +31211,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIa5).</summary>
+            /// <summary>Item Hero Stat Bonus (+5 Agility), AIa5.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIa5")]
             public class ItemHeroStatBonusAIa5 : global::Moonwell.Objects.StandardAbility
@@ -31276,7 +31276,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIa6).</summary>
+            /// <summary>Item Hero Stat Bonus (+6 Agility), AIa6.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIa6")]
             public class ItemHeroStatBonusAIa6 : global::Moonwell.Objects.StandardAbility
@@ -31342,7 +31342,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIa7).</summary>
+            /// <summary>Item Hero Stat Bonus (+7 Agility), AIa7.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIa7")]
             public class ItemHeroStatBonusAIa7 : global::Moonwell.Objects.StandardAbility
@@ -31408,7 +31408,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIa8).</summary>
+            /// <summary>Item Hero Stat Bonus (+8 Agility), AIa8.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIa8")]
             public class ItemHeroStatBonusAIa8 : global::Moonwell.Objects.StandardAbility
@@ -31474,7 +31474,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIaz).</summary>
+            /// <summary>Item Hero Stat Bonus (+10 Agility), AIaz.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIaz")]
             public class ItemHeroStatBonusAIaz : global::Moonwell.Objects.StandardAbility
@@ -31539,7 +31539,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIi1).</summary>
+            /// <summary>Item Hero Stat Bonus (+1 Intelligence), AIi1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIi1")]
             public class ItemHeroStatBonusAIi1 : global::Moonwell.Objects.StandardAbility
@@ -31605,7 +31605,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIi3).</summary>
+            /// <summary>Item Hero Stat Bonus (+3 Intelligence), AIi3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIi3")]
             public class ItemHeroStatBonusAIi3 : global::Moonwell.Objects.StandardAbility
@@ -31670,7 +31670,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIi4).</summary>
+            /// <summary>Item Hero Stat Bonus (+4 Intelligence), AIi4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIi4")]
             public class ItemHeroStatBonusAIi4 : global::Moonwell.Objects.StandardAbility
@@ -31735,7 +31735,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIi5).</summary>
+            /// <summary>Item Hero Stat Bonus (+5 Intelligence), AIi5.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIi5")]
             public class ItemHeroStatBonusAIi5 : global::Moonwell.Objects.StandardAbility
@@ -31800,7 +31800,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIi6).</summary>
+            /// <summary>Item Hero Stat Bonus (+6 Intelligence), AIi6.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIi6")]
             public class ItemHeroStatBonusAIi6 : global::Moonwell.Objects.StandardAbility
@@ -31866,7 +31866,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIi8).</summary>
+            /// <summary>Item Hero Stat Bonus (+8 Intelligence), AIi8.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIi8")]
             public class ItemHeroStatBonusAIi8 : global::Moonwell.Objects.StandardAbility
@@ -31932,7 +31932,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIs1).</summary>
+            /// <summary>Item Hero Stat Bonus (+1 Strength), AIs1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIs1")]
             public class ItemHeroStatBonusAIs1 : global::Moonwell.Objects.StandardAbility
@@ -31998,7 +31998,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIs3).</summary>
+            /// <summary>Item Hero Stat Bonus (+3 Strength), AIs3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIs3")]
             public class ItemHeroStatBonusAIs3 : global::Moonwell.Objects.StandardAbility
@@ -32063,7 +32063,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIs4).</summary>
+            /// <summary>Item Hero Stat Bonus (+4 Strength), AIs4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIs4")]
             public class ItemHeroStatBonusAIs4 : global::Moonwell.Objects.StandardAbility
@@ -32128,7 +32128,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIs5).</summary>
+            /// <summary>Item Hero Stat Bonus (+5 Strength), AIs5.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIs5")]
             public class ItemHeroStatBonusAIs5 : global::Moonwell.Objects.StandardAbility
@@ -32193,7 +32193,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIs6).</summary>
+            /// <summary>Item Hero Stat Bonus (+6 Strength), AIs6.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIs6")]
             public class ItemHeroStatBonusAIs6 : global::Moonwell.Objects.StandardAbility
@@ -32259,7 +32259,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIs7).</summary>
+            /// <summary>Item Hero Stat Bonus (+7 Strength), AIs7.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIs7")]
             public class ItemHeroStatBonusAIs7 : global::Moonwell.Objects.StandardAbility
@@ -32325,7 +32325,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIs8).</summary>
+            /// <summary>Item Hero Stat Bonus (+8 Strength), AIs8.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIs8")]
             public class ItemHeroStatBonusAIs8 : global::Moonwell.Objects.StandardAbility
@@ -32391,7 +32391,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIst).</summary>
+            /// <summary>Item Hero Stat Bonus (+2 Strength), AIst.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIst")]
             public class ItemHeroStatBonusAIst : global::Moonwell.Objects.StandardAbility
@@ -32457,7 +32457,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIx1).</summary>
+            /// <summary>Item Hero Stat Bonus (+1 All Stats), AIx1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIx1")]
             public class ItemHeroStatBonusAIx1 : global::Moonwell.Objects.StandardAbility
@@ -32523,7 +32523,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIx2).</summary>
+            /// <summary>Item Hero Stat Bonus (+2 All Stats), AIx2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIx2")]
             public class ItemHeroStatBonusAIx2 : global::Moonwell.Objects.StandardAbility
@@ -32589,7 +32589,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIx3).</summary>
+            /// <summary>Item Hero Stat Bonus (+3 All Stats), AIx3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIx3")]
             public class ItemHeroStatBonusAIx3 : global::Moonwell.Objects.StandardAbility
@@ -32654,7 +32654,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIx4).</summary>
+            /// <summary>Item Hero Stat Bonus (+4 All Stats), AIx4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIx4")]
             public class ItemHeroStatBonusAIx4 : global::Moonwell.Objects.StandardAbility
@@ -32719,7 +32719,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIx5).</summary>
+            /// <summary>Item Hero Stat Bonus (+5 All Stats), AIx5.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIx5")]
             public class ItemHeroStatBonusAIx5 : global::Moonwell.Objects.StandardAbility
@@ -32785,7 +32785,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIx6).</summary>
+            /// <summary>Item Hero Stat Bonus (+6 All Stats), AIx6.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIx6")]
             public class ItemHeroStatBonusAIx6 : global::Moonwell.Objects.StandardAbility
@@ -32851,7 +32851,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AIx7).</summary>
+            /// <summary>Item Hero Stat Bonus (+7 All Stats), AIx7.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIx7")]
             public class ItemHeroStatBonusAIx7 : global::Moonwell.Objects.StandardAbility
@@ -32917,7 +32917,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AS10).</summary>
+            /// <summary>Item Hero Stat Bonus (+10 Strength), AS10.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AS10")]
             public class ItemHeroStatBonusAS10 : global::Moonwell.Objects.StandardAbility
@@ -32983,7 +32983,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AS12).</summary>
+            /// <summary>Item Hero Stat Bonus (+12 Strength), AS12.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AS12")]
             public class ItemHeroStatBonusAS12 : global::Moonwell.Objects.StandardAbility
@@ -33049,7 +33049,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AS20).</summary>
+            /// <summary>Item Hero Stat Bonus (+20 Strength), AS20.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AS20")]
             public class ItemHeroStatBonusAS20 : global::Moonwell.Objects.StandardAbility
@@ -33115,7 +33115,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Hero Stat Bonus (AX10).</summary>
+            /// <summary>Item Hero Stat Bonus (+10 All Stats), AX10.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AX10")]
             public class ItemHeroStatBonusAX10 : global::Moonwell.Objects.StandardAbility
@@ -34490,7 +34490,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Intelligence Gain (AItm).</summary>
+            /// <summary>Item Intelligence Gain (+2), AItm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AItm")]
             public class ItemIntelligenceGainAItm : global::Moonwell.Objects.StandardAbility
@@ -35159,7 +35159,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Life Bonus (AIl1).</summary>
+            /// <summary>Item Life Bonus (Lesser), AIl1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIl1")]
             public class ItemLifeBonus : global::Moonwell.Objects.StandardAbility
@@ -35529,7 +35529,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Life Bonus (AIl2).</summary>
+            /// <summary>Item Life Bonus (Greater), AIl2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIl2")]
             public class ItemLifeBonusAIl2 : global::Moonwell.Objects.StandardAbility
@@ -35567,7 +35567,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Life Bonus (AIlf).</summary>
+            /// <summary>Item Life Bonus (Least), AIlf.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIlf")]
             public class ItemLifeBonusAIlf : global::Moonwell.Objects.StandardAbility
@@ -35604,7 +35604,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Life Bonus (AIlz).</summary>
+            /// <summary>Item Life Bonus (least), AIlz.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIlz")]
             public class ItemLifeBonusAIlz : global::Moonwell.Objects.StandardAbility
@@ -35678,7 +35678,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Life Regeneration (Arll).</summary>
+            /// <summary>Item Life Regeneration (Lesser), Arll.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Arll")]
             public class ItemLifeRegenerationArll : global::Moonwell.Objects.StandardAbility
@@ -36421,7 +36421,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Mana Bonus (AIbm).</summary>
+            /// <summary>Item Mana Bonus (Greater), AIbm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIbm")]
             public class ItemManaBonus : global::Moonwell.Objects.StandardAbility
@@ -36677,7 +36677,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Mana Bonus (AImb).</summary>
+            /// <summary>Item Mana Bonus (Least), AImb.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AImb")]
             public class ItemManaBonusAImb : global::Moonwell.Objects.StandardAbility
@@ -37219,7 +37219,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Mana Regain (AIm1).</summary>
+            /// <summary>Item Mana Regain (Lesser), AIm1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIm1")]
             public class ItemManaRegain : global::Moonwell.Objects.StandardAbility
@@ -37250,7 +37250,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Mana Regain (AIm2).</summary>
+            /// <summary>Item Mana Regain (Greater), AIm2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIm2")]
             public class ItemManaRegainAIm2 : global::Moonwell.Objects.StandardAbility
@@ -37281,7 +37281,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Mana Regain (AIm4).</summary>
+            /// <summary>Item Mana Regain (Ultimate), AIm4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIm4")]
             public class ItemManaRegainAIm4 : global::Moonwell.Objects.StandardAbility
@@ -38587,7 +38587,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Permanent Life Gain (AImh).</summary>
+            /// <summary>Item Permanent Life Gain (+50), AImh.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AImh")]
             public class ItemPermanentLifeGain : global::Moonwell.Objects.StandardAbility
@@ -38627,7 +38627,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Permanent Life Gain (AIpx).</summary>
+            /// <summary>Item Permanent Life Gain (lesser), AIpx.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIpx")]
             public class ItemPermanentLifeGainAIpx : global::Moonwell.Objects.StandardAbility
@@ -39613,7 +39613,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Purge (AIlp).</summary>
+            /// <summary>Item Purge (1), AIlp.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIlp")]
             public class ItemPurge : global::Moonwell.Objects.StandardAbility
@@ -39703,7 +39703,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Purge (AIpg).</summary>
+            /// <summary>Item Purge (2), AIpg.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIpg")]
             public class ItemPurgeAIpg : global::Moonwell.Objects.StandardAbility
@@ -39794,7 +39794,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Purge (AIps).</summary>
+            /// <summary>Item Purge (3), AIps.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIps")]
             public class ItemPurgeAIps : global::Moonwell.Objects.StandardAbility
@@ -39887,7 +39887,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Purge (AIpw).</summary>
+            /// <summary>Item Purge (Wand of Negation), AIpw.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIpw")]
             public class ItemPurgeAIpw : global::Moonwell.Objects.StandardAbility
@@ -40919,7 +40919,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Resurrection (AIrx).</summary>
+            /// <summary>Item Resurrection (cooldown), AIrx.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIrx")]
             public class ItemResurrectionAIrx : global::Moonwell.Objects.StandardAbility
@@ -42289,8 +42289,8 @@ namespace Moonwell.Objects
                     ManaCost = Levels(45);
                     MaximumCreepLevel = Levels(12);
                     MorphUnitsAir.Set<global::Moonwell.Objects.Critters.Units.FlyingSheep>();
-                    MorphUnitsAmphibious.Set<global::Moonwell.Objects.Critters.Units.Sheep>();
-                    MorphUnitsGround.Set<global::Moonwell.Objects.Critters.Units.SheepNshe>();
+                    MorphUnitsAmphibious.Set<global::Moonwell.Objects.Critters.Units.SheepNsha>();
+                    MorphUnitsGround.Set<global::Moonwell.Objects.Critters.Units.Sheep>();
                     MorphUnitsWater.Set<global::Moonwell.Objects.Critters.Units.SheepNshw>();
                     Name = "Item Shepherd's Curse";
                     Order = "channel";
@@ -42790,7 +42790,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Slow (AIos).</summary>
+            /// <summary>Item Slow (Orb Version), AIos.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIos")]
             public class ItemSlow : global::Moonwell.Objects.StandardAbility
@@ -46124,9 +46124,9 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Strength Gain (AInm).</summary>
+            /// <summary>Item Strength Gain (AIsm).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AInm")]
+            [global::Moonwell.Objects.Standard("AIsm")]
             public class ItemStrengthGain : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
@@ -46137,7 +46137,6 @@ namespace Moonwell.Objects
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
                     Duration = Levels(0f);
-                    EditorSuffix = "(+2)";
                     HeroAbility = false;
                     HeroDuration = Levels(0f);
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNTome.blp";
@@ -46150,7 +46149,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    StrengthBonus = Levels(2);
+                    StrengthBonus = Levels(1);
                     Target = "Abilities\\Spells\\Items\\AIsm\\AIsmTarget.mdl";
                     TargetAttachmentPoint1 = "origin";
                     UseNewDefaultLevelCap = false;
@@ -46192,19 +46191,20 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Strength Gain (AIsm).</summary>
+            /// <summary>Item Strength Gain (+2), AInm.</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AIsm")]
-            public class ItemStrengthGainAIsm : global::Moonwell.Objects.StandardAbility
+            [global::Moonwell.Objects.Standard("AInm")]
+            public class ItemStrengthGainAInm : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public ItemStrengthGainAIsm()
+                public ItemStrengthGainAInm()
                 {
                     AgilityBonus = Levels(0);
                     CastTime = Levels(0f);
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
                     Duration = Levels(0f);
+                    EditorSuffix = "(+2)";
                     HeroAbility = false;
                     HeroDuration = Levels(0f);
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNTome.blp";
@@ -46217,7 +46217,7 @@ namespace Moonwell.Objects
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
-                    StrengthBonus = Levels(1);
+                    StrengthBonus = Levels(2);
                     Target = "Abilities\\Spells\\Items\\AIsm\\AIsmTarget.mdl";
                     TargetAttachmentPoint1 = "origin";
                     UseNewDefaultLevelCap = false;
@@ -46873,7 +46873,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Temporary Area Armor Bonus (AIdb).</summary>
+            /// <summary>Item Temporary Area Armor Bonus (with Life &amp; Mana Healing), AIdb.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIdb")]
             public class ItemTemporaryAreaArmorBonusAIdb : global::Moonwell.Objects.StandardAbility
@@ -46938,7 +46938,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Temporary Invisibility (AIv1).</summary>
+            /// <summary>Item Temporary Invisibility (Lesser), AIv1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIv1")]
             public class ItemTemporaryInvisibility : global::Moonwell.Objects.StandardAbility
@@ -46969,7 +46969,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Temporary Invisibility (AIv2).</summary>
+            /// <summary>Item Temporary Invisibility (Greater), AIv2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIv2")]
             public class ItemTemporaryInvisibilityAIv2 : global::Moonwell.Objects.StandardAbility
@@ -47000,13 +47000,51 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Temporary Invulnerability (AIvg).</summary>
+            /// <summary>Item Temporary Invulnerability (AIvu).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AIvg")]
+            [global::Moonwell.Objects.Standard("AIvu")]
             public class ItemTemporaryInvulnerability : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public ItemTemporaryInvulnerability()
+                {
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Invulnerable>();
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(45f);
+                    Duration = Levels(15f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(15f);
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGreaterInvulneralbility.blp";
+                    IsMagicImmune = Levels(true);
+                    ItemAbility = true;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Item Temporary Invulnerability";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    RequiredLevel = 0;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Vulnerable);
+                    UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>AIvu</c>.</summary>
+                [global::Moonwell.Objects.Field("AIvu", Label = "Is Magic Immune")]
+                public global::Moonwell.Objects.Levels<bool> IsMagicImmune
+                {
+                    get { return Fields.GetLevels<bool>(this, "AIvu"); }
+                    protected set { Fields.Put("AIvu", value); }
+                }
+            }
+
+            /// <summary>Item Temporary Invulnerability (Divinity), AIvg.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AIvg")]
+            public class ItemTemporaryInvulnerabilityAIvg : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ItemTemporaryInvulnerabilityAIvg()
                 {
                     Buffs.Set<global::Moonwell.Objects.Other.Buffs.Invulnerable>();
                     CastTime = Levels(0f);
@@ -47039,7 +47077,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Item Temporary Invulnerability (AIvl).</summary>
+            /// <summary>Item Temporary Invulnerability (Lesser), AIvl.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIvl")]
             public class ItemTemporaryInvulnerabilityAIvl : global::Moonwell.Objects.StandardAbility
@@ -47056,44 +47094,6 @@ namespace Moonwell.Objects
                     HeroAbility = false;
                     HeroDuration = Levels(7f);
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNLesserInvulneralbility.blp";
-                    IsMagicImmune = Levels(true);
-                    ItemAbility = true;
-                    LevelCount = 1;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(0);
-                    Name = "Item Temporary Invulnerability";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    RequiredLevel = 0;
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Vulnerable);
-                    UseNewDefaultLevelCap = false;
-                }
-
-                /// <summary>The field <c>AIvu</c>.</summary>
-                [global::Moonwell.Objects.Field("AIvu", Label = "Is Magic Immune")]
-                public global::Moonwell.Objects.Levels<bool> IsMagicImmune
-                {
-                    get { return Fields.GetLevels<bool>(this, "AIvu"); }
-                    protected set { Fields.Put("AIvu", value); }
-                }
-            }
-
-            /// <summary>Item Temporary Invulnerability (AIvu).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AIvu")]
-            public class ItemTemporaryInvulnerabilityAIvu : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public ItemTemporaryInvulnerabilityAIvu()
-                {
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Invulnerable>();
-                    CastTime = Levels(0f);
-                    CheckDependencies = false;
-                    Cooldown = Levels(45f);
-                    Duration = Levels(15f);
-                    HeroAbility = false;
-                    HeroDuration = Levels(15f);
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGreaterInvulneralbility.blp";
                     IsMagicImmune = Levels(true);
                     ItemAbility = true;
                     LevelCount = 1;
@@ -48764,7 +48764,7 @@ namespace Moonwell.Objects
                 {
                     AnimationNames = "slam";
                     Area = Levels(250f);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stunned>();
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.StunnedBPSE>();
                     CastTime = Levels(0f);
                     Caster = "Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdl";
                     CheckDependencies = false;
@@ -48796,7 +48796,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Judgement (LT1b).</summary>
+            /// <summary>Judgement (Landen Talent), LT1b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("LT1b")]
             public class Judgement : global::Moonwell.Objects.StandardAbility
@@ -48883,7 +48883,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Juggernaut (BT6a).</summary>
+            /// <summary>Juggernaut (Leonid Talent), BT6a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT6a")]
             public class Juggernaut : global::Moonwell.Objects.StandardAbility
@@ -48956,7 +48956,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Last Stand (BT4a).</summary>
+            /// <summary>Last Stand (LeonidTalent), BT4a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT4a")]
             public class LastStand : global::Moonwell.Objects.StandardAbility
@@ -49043,7 +49043,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Least Healing (AIh3).</summary>
+            /// <summary>Least Healing (slow cooldown), AIh3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIh3")]
             public class LeastHealing : global::Moonwell.Objects.StandardAbility
@@ -49167,7 +49167,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Lightning Shield (AIls).</summary>
+            /// <summary>Lightning Shield (Item), AIls.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIls")]
             public class LightningShield : global::Moonwell.Objects.StandardAbility
@@ -49211,7 +49211,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Light's Grace (IT4b).</summary>
+            /// <summary>Light's Grace (IlastarTalent), IT4b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("IT4b")]
             public class LightsGrace : global::Moonwell.Objects.StandardAbility
@@ -49219,7 +49219,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public LightsGrace()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SurgeOfLightAHsl, global::Moonwell.Objects.Other.Abilities.SurgeOfLightAHl2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SurgeOfLight, global::Moonwell.Objects.Other.Abilities.SurgeOfLightAHl2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -49298,13 +49298,126 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Light's Mercy (AHm1).</summary>
+            /// <summary>Light's Mercy (AHsf).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHm1")]
+            [global::Moonwell.Objects.Standard("AHsf")]
             public class LightsMercy : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public LightsMercy()
+                {
+                    Area = Levels(200f, 200f, 200f);
+                    BonusDamageToSummons = Levels(0f, 0f, 0f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.LightsMercy>();
+                    BurnDamage = Levels(10f, 15f, 20f);
+                    BurnDamagePulseFrequency = Levels(1f, 1f, 1f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(15f, 15f, 15f);
+                    DispellMagicDealBonusDamageToSummoned = Levels(false, false, false);
+                    Duration = Levels(10f, 10f, 10f);
+                    EnableChainExplosion = Levels(false, false, false);
+                    ExplosionRadius = Levels(0f, 0f, 0f);
+                    HealAmountToAllyUnits = Levels(100f, 125f, 150f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(5f, 5f, 5f);
+                    Hotkey = "Q";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNLightsMercy.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNLightsMercy.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "Q";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100, 100, 100);
+                    Name = "Light's Mercy";
+                    Order = "lightsmercy";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    Range = Levels(800f, 800f, 800f);
+                    RequiredLevel = 1;
+                    Special = "Abilities\\Spells\\Human\\LightsMercy\\LightsMercy.mdl";
+                    Target = "Abilities\\Spells\\Human\\Heal\\HealTarget.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Light's Mercy - [|cffffcc00Level 1|r]", "Light's Mercy - [|cffffcc00Level 2|r]", "Light's Mercy - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Conjures holy fire onto a target area. Friendly living units are healed for <AHsf,DataD1> hit points, while enemy Undead units take <AHsf,DataA1> damage per second over <AHsf,Dur1> seconds.", "Conjures holy fire onto a target area. Friendly living units are healed for <AHsf,DataD2> hit points, while enemy Undead units take <AHsf,DataA2> damage per second over <AHsf,Dur2> seconds.", "Conjures holy fire onto a target area. Friendly living units are healed for <AHsf,DataD3> hit points, while enemy Undead units take <AHsf,DataA3> damage per second over <AHsf,Dur3> seconds.");
+                    TooltipLearn = "Learn Light's Mercy - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Conjures holy fire onto a target area, healing friendly living units and burning enemy Undead units. |n|n|cffffcc00Level 1|r - Heals <AHsf,DataD1> hit points, deals <AHsf,DataA1> damage per second for <AHsf,Dur1> seconds. |n|cffffcc00Level 2|r - Heals <AHsf,DataD2> hit points, deals <AHsf,DataA2> damage per second for <AHsf,Dur2> seconds. |n|cffffcc00Level 3|r - Heals <AHsf,DataD3> hit points, deals <AHsf,DataA3> damage per second for <AHsf,Dur3> seconds.";
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>hsf1</c>.</summary>
+                [global::Moonwell.Objects.Field("hsf1", Label = "Burn Damage")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> BurnDamage
+                {
+                    get { return Fields.GetLevels<float>(this, "hsf1"); }
+                    protected set { Fields.Put("hsf1", value); }
+                }
+
+                /// <summary>The field <c>hsf2</c>.</summary>
+                [global::Moonwell.Objects.Field("hsf2", Label = "Burn Damage Pulse Frequency")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> BurnDamagePulseFrequency
+                {
+                    get { return Fields.GetLevels<float>(this, "hsf2"); }
+                    protected set { Fields.Put("hsf2", value); }
+                }
+
+                /// <summary>The field <c>hsf3</c>.</summary>
+                [global::Moonwell.Objects.Field("hsf3", Label = "Bonus Damage To Summons")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> BonusDamageToSummons
+                {
+                    get { return Fields.GetLevels<float>(this, "hsf3"); }
+                    protected set { Fields.Put("hsf3", value); }
+                }
+
+                /// <summary>The field <c>hsf4</c>.</summary>
+                [global::Moonwell.Objects.Field("hsf4", Label = "Heal Amount to Ally Units")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> HealAmountToAllyUnits
+                {
+                    get { return Fields.GetLevels<float>(this, "hsf4"); }
+                    protected set { Fields.Put("hsf4", value); }
+                }
+
+                /// <summary>The field <c>hsf5</c>.</summary>
+                [global::Moonwell.Objects.Field("hsf5", Label = "Enable Chain Explosion")]
+                public global::Moonwell.Objects.Levels<bool> EnableChainExplosion
+                {
+                    get { return Fields.GetLevels<bool>(this, "hsf5"); }
+                    protected set { Fields.Put("hsf5", value); }
+                }
+
+                /// <summary>The field <c>hsf6</c>.</summary>
+                [global::Moonwell.Objects.Field("hsf6", Label = "Dispell Magic & Deal Bonus Damage to Summoned")]
+                public global::Moonwell.Objects.Levels<bool> DispellMagicDealBonusDamageToSummoned
+                {
+                    get { return Fields.GetLevels<bool>(this, "hsf6"); }
+                    protected set { Fields.Put("hsf6", value); }
+                }
+
+                /// <summary>The field <c>sfrd</c>.</summary>
+                [global::Moonwell.Objects.Field("sfrd", Label = "Explosion Radius")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ExplosionRadius
+                {
+                    get { return Fields.GetLevels<float>(this, "sfrd"); }
+                    protected set { Fields.Put("sfrd", value); }
+                }
+            }
+
+            /// <summary>Light's Mercy (Talent 1), AHm1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AHm1")]
+            public class LightsMercyAHm1 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public LightsMercyAHm1()
                 {
                     Area = Levels(200f, 200f, 200f);
                     BonusDamageToSummons = Levels(100f, 200f, 300f);
@@ -49410,7 +49523,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Light's Mercy (AHm2).</summary>
+            /// <summary>Light's Mercy (Talent 2), AHm2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHm2")]
             public class LightsMercyAHm2 : global::Moonwell.Objects.StandardAbility
@@ -49523,7 +49636,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Light's Mercy (AHm3).</summary>
+            /// <summary>Light's Mercy (Talent 3), AHm3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHm3")]
             public class LightsMercyAHm3 : global::Moonwell.Objects.StandardAbility
@@ -49634,120 +49747,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Light's Mercy (AHsf).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHsf")]
-            public class LightsMercyAHsf : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public LightsMercyAHsf()
-                {
-                    Area = Levels(200f, 200f, 200f);
-                    BonusDamageToSummons = Levels(0f, 0f, 0f);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.LightsMercy>();
-                    BurnDamage = Levels(10f, 15f, 20f);
-                    BurnDamagePulseFrequency = Levels(1f, 1f, 1f);
-                    ButtonPositionNormalX = 0;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 0;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f, 0f, 0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(15f, 15f, 15f);
-                    DispellMagicDealBonusDamageToSummoned = Levels(false, false, false);
-                    Duration = Levels(10f, 10f, 10f);
-                    EnableChainExplosion = Levels(false, false, false);
-                    ExplosionRadius = Levels(0f, 0f, 0f);
-                    HealAmountToAllyUnits = Levels(100f, 125f, 150f);
-                    HeroAbility = true;
-                    HeroDuration = Levels(5f, 5f, 5f);
-                    Hotkey = "Q";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNLightsMercy.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNLightsMercy.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "Q";
-                    LevelCount = 3;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(100, 100, 100);
-                    Name = "Light's Mercy";
-                    Order = "lightsmercy";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    Range = Levels(800f, 800f, 800f);
-                    RequiredLevel = 1;
-                    Special = "Abilities\\Spells\\Human\\LightsMercy\\LightsMercy.mdl";
-                    Target = "Abilities\\Spells\\Human\\Heal\\HealTarget.mdl";
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Friend);
-                    Tooltip = Levels("Light's Mercy - [|cffffcc00Level 1|r]", "Light's Mercy - [|cffffcc00Level 2|r]", "Light's Mercy - [|cffffcc00Level 3|r]");
-                    TooltipExtended = Levels("Conjures holy fire onto a target area. Friendly living units are healed for <AHsf,DataD1> hit points, while enemy Undead units take <AHsf,DataA1> damage per second over <AHsf,Dur1> seconds.", "Conjures holy fire onto a target area. Friendly living units are healed for <AHsf,DataD2> hit points, while enemy Undead units take <AHsf,DataA2> damage per second over <AHsf,Dur2> seconds.", "Conjures holy fire onto a target area. Friendly living units are healed for <AHsf,DataD3> hit points, while enemy Undead units take <AHsf,DataA3> damage per second over <AHsf,Dur3> seconds.");
-                    TooltipLearn = "Learn Light's Mercy - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Conjures holy fire onto a target area, healing friendly living units and burning enemy Undead units. |n|n|cffffcc00Level 1|r - Heals <AHsf,DataD1> hit points, deals <AHsf,DataA1> damage per second for <AHsf,Dur1> seconds. |n|cffffcc00Level 2|r - Heals <AHsf,DataD2> hit points, deals <AHsf,DataA2> damage per second for <AHsf,Dur2> seconds. |n|cffffcc00Level 3|r - Heals <AHsf,DataD3> hit points, deals <AHsf,DataA3> damage per second for <AHsf,Dur3> seconds.";
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>hsf1</c>.</summary>
-                [global::Moonwell.Objects.Field("hsf1", Label = "Burn Damage")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> BurnDamage
-                {
-                    get { return Fields.GetLevels<float>(this, "hsf1"); }
-                    protected set { Fields.Put("hsf1", value); }
-                }
-
-                /// <summary>The field <c>hsf2</c>.</summary>
-                [global::Moonwell.Objects.Field("hsf2", Label = "Burn Damage Pulse Frequency")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> BurnDamagePulseFrequency
-                {
-                    get { return Fields.GetLevels<float>(this, "hsf2"); }
-                    protected set { Fields.Put("hsf2", value); }
-                }
-
-                /// <summary>The field <c>hsf3</c>.</summary>
-                [global::Moonwell.Objects.Field("hsf3", Label = "Bonus Damage To Summons")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> BonusDamageToSummons
-                {
-                    get { return Fields.GetLevels<float>(this, "hsf3"); }
-                    protected set { Fields.Put("hsf3", value); }
-                }
-
-                /// <summary>The field <c>hsf4</c>.</summary>
-                [global::Moonwell.Objects.Field("hsf4", Label = "Heal Amount to Ally Units")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> HealAmountToAllyUnits
-                {
-                    get { return Fields.GetLevels<float>(this, "hsf4"); }
-                    protected set { Fields.Put("hsf4", value); }
-                }
-
-                /// <summary>The field <c>hsf5</c>.</summary>
-                [global::Moonwell.Objects.Field("hsf5", Label = "Enable Chain Explosion")]
-                public global::Moonwell.Objects.Levels<bool> EnableChainExplosion
-                {
-                    get { return Fields.GetLevels<bool>(this, "hsf5"); }
-                    protected set { Fields.Put("hsf5", value); }
-                }
-
-                /// <summary>The field <c>hsf6</c>.</summary>
-                [global::Moonwell.Objects.Field("hsf6", Label = "Dispell Magic & Deal Bonus Damage to Summoned")]
-                public global::Moonwell.Objects.Levels<bool> DispellMagicDealBonusDamageToSummoned
-                {
-                    get { return Fields.GetLevels<bool>(this, "hsf6"); }
-                    protected set { Fields.Put("hsf6", value); }
-                }
-
-                /// <summary>The field <c>sfrd</c>.</summary>
-                [global::Moonwell.Objects.Field("sfrd", Label = "Explosion Radius")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> ExplosionRadius
-                {
-                    get { return Fields.GetLevels<float>(this, "sfrd"); }
-                    protected set { Fields.Put("sfrd", value); }
-                }
-            }
-
-            /// <summary>Load (Aloa).</summary>
+            /// <summary>Load (Goblin Zeppelin), Aloa.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aloa")]
             public class Load : global::Moonwell.Objects.StandardAbility
@@ -49790,7 +49790,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Load (Slo3).</summary>
+            /// <summary>Load (Ships), Slo3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Slo3")]
             public class LoadSlo3 : global::Moonwell.Objects.StandardAbility
@@ -49833,7 +49833,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Marksmanship (AT5a).</summary>
+            /// <summary>Marksmanship (AnyaTalent), AT5a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT5a")]
             public class Marksmanship : global::Moonwell.Objects.StandardAbility
@@ -49908,7 +49908,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Martial Mastery (BT4b).</summary>
+            /// <summary>Martial Mastery (LeonidTalent), BT4b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT4b")]
             public class MartialMastery : global::Moonwell.Objects.StandardAbility
@@ -49995,7 +49995,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mass Arrest (LT2a).</summary>
+            /// <summary>Mass Arrest (Landen Talent), LT2a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("LT2a")]
             public class MassArrest : global::Moonwell.Objects.StandardAbility
@@ -50003,7 +50003,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public MassArrest()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.ApprehendAHen, global::Moonwell.Objects.Other.Abilities.ApprehendAHe2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.Apprehend, global::Moonwell.Objects.Other.Abilities.ApprehendAHe2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -50325,7 +50325,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Meteor Strike (BT1c).</summary>
+            /// <summary>Meteor Strike (LeonidTalent), BT1c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT1c")]
             public class MeteorStrike : global::Moonwell.Objects.StandardAbility
@@ -50333,7 +50333,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public MeteorStrike()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.HeadsplitterAHhr, global::Moonwell.Objects.Other.Abilities.HeadsplitterAHh3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.Headsplitter, global::Moonwell.Objects.Other.Abilities.HeadsplitterAHh3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -50412,7 +50412,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mighty Swing (UT6a).</summary>
+            /// <summary>Mighty Swing (UGarekTalent), UT6a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT6a")]
             public class MightySwing : global::Moonwell.Objects.StandardAbility
@@ -50553,7 +50553,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mind Control (AHz1).</summary>
+            /// <summary>Mind Control (Talent 1), AHz1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHz1")]
             public class MindControlAHz1 : global::Moonwell.Objects.StandardAbility
@@ -50648,7 +50648,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mind Control (AHz2).</summary>
+            /// <summary>Mind Control (Talent 2), AHz2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHz2")]
             public class MindControlAHz2 : global::Moonwell.Objects.StandardAbility
@@ -50743,7 +50743,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mind Control (AHz3).</summary>
+            /// <summary>Mind Control (Talent 3), AHz3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHz3")]
             public class MindControlAHz3 : global::Moonwell.Objects.StandardAbility
@@ -50839,7 +50839,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mindbreaker (IT2b).</summary>
+            /// <summary>Mindbreaker (IlastarTalent), IT2b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("IT2b")]
             public class Mindbreaker : global::Moonwell.Objects.StandardAbility
@@ -50926,7 +50926,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Mine - exploding (Amin).</summary>
+            /// <summary>Mine - exploding (Goblin Land Mine), Amin.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Amin")]
             public class MineExploding : global::Moonwell.Objects.StandardAbility
@@ -51319,7 +51319,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Parry (UT2b).</summary>
+            /// <summary>Parry (UGarekTalent), UT2b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT2b")]
             public class Parry : global::Moonwell.Objects.StandardAbility
@@ -51327,7 +51327,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Parry()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.UndyingDefianceAUbd, global::Moonwell.Objects.Other.Abilities.UndyingDefianceAUb2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.UndyingDefiance, global::Moonwell.Objects.Other.Abilities.UndyingDefianceAUb2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -51446,7 +51446,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Permanent Immolation (ANpi).</summary>
+            /// <summary>Permanent Immolation (Neutral Hostile 1), ANpi.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ANpi")]
             public class PermanentImmolation : global::Moonwell.Objects.StandardAbility
@@ -51511,7 +51511,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Permanent Immolation (Apig).</summary>
+            /// <summary>Permanent Immolation (Neutral Hostile 2), Apig.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Apig")]
             public class PermanentImmolationApig : global::Moonwell.Objects.StandardAbility
@@ -51611,7 +51611,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Perseverance (LT4a).</summary>
+            /// <summary>Perseverance (Fake Landen Talent), LT4a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("LT4a")]
             public class Perseverance : global::Moonwell.Objects.StandardAbility
@@ -51697,7 +51697,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Phoenix Fire (Apmf).</summary>
+            /// <summary>Phoenix Fire (flyer), Apmf.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Apmf")]
             public class PhoenixFire : global::Moonwell.Objects.StandardAbility
@@ -51762,13 +51762,88 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Poison Sting (Apo2).</summary>
+            /// <summary>Poison Sting (Apoi).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Apo2")]
+            [global::Moonwell.Objects.Standard("Apoi")]
             public class PoisonSting : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public PoisonSting()
+                {
+                    AttackSpeedFactor = Levels(0f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Poison, global::Moonwell.Objects.Other.Buffs.PoisonBpsd>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    DamagePerSecond = Levels(4f);
+                    Duration = Levels(10f);
+                    HeroAbility = false;
+                    HeroDuration = Levels(10f);
+                    Hotkey = "T";
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNPoisonSting.blp";
+                    ItemAbility = false;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    MissileArt = "Abilities\\Weapons\\PoisonSting\\PoisonStingMissile.mdl";
+                    MissileHomingEnabled = true;
+                    MissileSpeed = 1500;
+                    MovementSpeedFactor = Levels(0f);
+                    Name = "Poison Sting";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    RequiredLevel = 0;
+                    StackingType = Levels(global::Moonwell.Objects.StackFlags.Damage);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Organic);
+                    Tooltip = Levels("Poison Sting");
+                    UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Poi1</c>.</summary>
+                [global::Moonwell.Objects.Field("Poi1", Label = "Damage per Second")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> DamagePerSecond
+                {
+                    get { return Fields.GetLevels<float>(this, "Poi1"); }
+                    protected set { Fields.Put("Poi1", value); }
+                }
+
+                /// <summary>The field <c>Poi2</c>.</summary>
+                [global::Moonwell.Objects.Field("Poi2", Label = "Movement Speed Factor")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<float> MovementSpeedFactor
+                {
+                    get { return Fields.GetLevels<float>(this, "Poi2"); }
+                    protected set { Fields.Put("Poi2", value); }
+                }
+
+                /// <summary>The field <c>Poi3</c>.</summary>
+                [global::Moonwell.Objects.Field("Poi3", Label = "Attack Speed Factor")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<float> AttackSpeedFactor
+                {
+                    get { return Fields.GetLevels<float>(this, "Poi3"); }
+                    protected set { Fields.Put("Poi3", value); }
+                }
+
+                /// <summary>The field <c>Poi4</c>.</summary>
+                [global::Moonwell.Objects.Field("Poi4", Label = "Stacking Type")]
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.StackFlags> StackingType
+                {
+                    get { return Fields.GetLevels<global::Moonwell.Objects.StackFlags>(this, "Poi4"); }
+                    protected set { Fields.Put("Poi4", value); }
+                }
+            }
+
+            /// <summary>Poison Sting (Orb of Venom), Apo2.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("Apo2")]
+            public class PoisonStingApo2 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public PoisonStingApo2()
                 {
                     AttackSpeedFactor = Levels(0f);
                     Buffs.Add("BIpb");
@@ -51838,82 +51913,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Poison Sting (Apoi).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Apoi")]
-            public class PoisonStingApoi : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public PoisonStingApoi()
-                {
-                    AttackSpeedFactor = Levels(0f);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Poison, global::Moonwell.Objects.Other.Buffs.PoisonBpsd>();
-                    ButtonPositionNormalX = 0;
-                    ButtonPositionNormalY = 0;
-                    CastTime = Levels(0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(0f);
-                    DamagePerSecond = Levels(4f);
-                    Duration = Levels(10f);
-                    HeroAbility = false;
-                    HeroDuration = Levels(10f);
-                    Hotkey = "T";
-                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNPoisonSting.blp";
-                    ItemAbility = false;
-                    LevelCount = 1;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(0);
-                    MissileArt = "Abilities\\Weapons\\PoisonSting\\PoisonStingMissile.mdl";
-                    MissileHomingEnabled = true;
-                    MissileSpeed = 1500;
-                    MovementSpeedFactor = Levels(0f);
-                    Name = "Poison Sting";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    RequiredLevel = 0;
-                    StackingType = Levels(global::Moonwell.Objects.StackFlags.Damage);
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Organic);
-                    Tooltip = Levels("Poison Sting");
-                    UseNewDefaultLevelCap = false;
-                }
-
-                /// <summary>The field <c>Poi1</c>.</summary>
-                [global::Moonwell.Objects.Field("Poi1", Label = "Damage per Second")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> DamagePerSecond
-                {
-                    get { return Fields.GetLevels<float>(this, "Poi1"); }
-                    protected set { Fields.Put("Poi1", value); }
-                }
-
-                /// <summary>The field <c>Poi2</c>.</summary>
-                [global::Moonwell.Objects.Field("Poi2", Label = "Movement Speed Factor")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<float> MovementSpeedFactor
-                {
-                    get { return Fields.GetLevels<float>(this, "Poi2"); }
-                    protected set { Fields.Put("Poi2", value); }
-                }
-
-                /// <summary>The field <c>Poi3</c>.</summary>
-                [global::Moonwell.Objects.Field("Poi3", Label = "Attack Speed Factor")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<float> AttackSpeedFactor
-                {
-                    get { return Fields.GetLevels<float>(this, "Poi3"); }
-                    protected set { Fields.Put("Poi3", value); }
-                }
-
-                /// <summary>The field <c>Poi4</c>.</summary>
-                [global::Moonwell.Objects.Field("Poi4", Label = "Stacking Type")]
-                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.StackFlags> StackingType
-                {
-                    get { return Fields.GetLevels<global::Moonwell.Objects.StackFlags>(this, "Poi4"); }
-                    protected set { Fields.Put("Poi4", value); }
-                }
-            }
-
-            /// <summary>Poison-tipped Arrows (AT5c).</summary>
+            /// <summary>Poison-tipped Arrows (AnyaTalent), AT5c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT5c")]
             public class PoisonTippedArrows : global::Moonwell.Objects.StandardAbility
@@ -52170,7 +52170,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Press the Attack (LT1c).</summary>
+            /// <summary>Press the Attack (Landen Talent), LT1c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("LT1c")]
             public class PressTheAttack : global::Moonwell.Objects.StandardAbility
@@ -52339,7 +52339,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Provoke (AHu1).</summary>
+            /// <summary>Provoke (Talent 1), AHu1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHu1")]
             public class ProvokeAHu1 : global::Moonwell.Objects.StandardAbility
@@ -52422,7 +52422,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Provoke (AHu2).</summary>
+            /// <summary>Provoke (Talent 2), AHu2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHu2")]
             public class ProvokeAHu2 : global::Moonwell.Objects.StandardAbility
@@ -52505,7 +52505,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Provoke (AHu3).</summary>
+            /// <summary>Provoke (Talent 3), AHu3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHu3")]
             public class ProvokeAHu3 : global::Moonwell.Objects.StandardAbility
@@ -52711,7 +52711,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Purifying Flame (IT1a).</summary>
+            /// <summary>Purifying Flame (IlastarTalent), IT1a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("IT1a")]
             public class PurifyingFlame : global::Moonwell.Objects.StandardAbility
@@ -52719,7 +52719,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public PurifyingFlame()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.LightsMercyAHsf, global::Moonwell.Objects.Other.Abilities.LightsMercy>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.LightsMercy, global::Moonwell.Objects.Other.Abilities.LightsMercyAHm1>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -52798,7 +52798,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Quick Recovery (UT6b).</summary>
+            /// <summary>Quick Recovery (UGarekTalent), UT6b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT6b")]
             public class QuickRecovery : global::Moonwell.Objects.StandardAbility
@@ -52851,7 +52851,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Radiant Embrace (IT1c).</summary>
+            /// <summary>Radiant Embrace (IlastarTalent), IT1c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("IT1c")]
             public class RadiantEmbrace : global::Moonwell.Objects.StandardAbility
@@ -52859,7 +52859,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public RadiantEmbrace()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.LightsMercyAHsf, global::Moonwell.Objects.Other.Abilities.LightsMercyAHm3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.LightsMercy, global::Moonwell.Objects.Other.Abilities.LightsMercyAHm3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -52938,7 +52938,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Rain of Arrows (AT1a).</summary>
+            /// <summary>Rain of Arrows (AnyaTalent), AT1a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT1a")]
             public class RainOfArrows : global::Moonwell.Objects.StandardAbility
@@ -52946,7 +52946,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public RainOfArrows()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.WitheringFireAUwf, global::Moonwell.Objects.Other.Abilities.WitheringFire>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.WitheringFire, global::Moonwell.Objects.Other.Abilities.WitheringFireAUw1>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -53331,7 +53331,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Rally (LT3a).</summary>
+            /// <summary>Rally (Landen Talent), LT3a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("LT3a")]
             public class RallyLT3a : global::Moonwell.Objects.StandardAbility
@@ -53339,7 +53339,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public RallyLT3a()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.InspireCourageAHic, global::Moonwell.Objects.Other.Abilities.InspireCourage>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.InspireCourage, global::Moonwell.Objects.Other.Abilities.InspireCourageAHi1>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -53446,7 +53446,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Ranger's Dexterity (AT6a).</summary>
+            /// <summary>Ranger's Dexterity (AnyaTalent), AT6a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT6a")]
             public class RangersDexterity : global::Moonwell.Objects.StandardAbility
@@ -53519,7 +53519,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Reanimation (AInd).</summary>
+            /// <summary>Reanimation (special campaign item), AInd.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AInd")]
             public class Reanimation : global::Moonwell.Objects.StandardAbility
@@ -53610,7 +53610,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Reckless Abandon (BT2a).</summary>
+            /// <summary>Reckless Abandon (LeonidTalent), BT2a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT2a")]
             public class RecklessAbandon : global::Moonwell.Objects.StandardAbility
@@ -53697,7 +53697,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Regeneration Aura (AIgx).</summary>
+            /// <summary>Regeneration Aura (item), AIgx.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIgx")]
             public class RegenerationAura : global::Moonwell.Objects.StandardAbility
@@ -53747,13 +53747,235 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Relentless Cleave (AUs1).</summary>
+            /// <summary>Relentless Cleave (AUsw).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AUs1")]
+            [global::Moonwell.Objects.Standard("AUsw")]
             public class RelentlessCleave : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public RelentlessCleave()
+                {
+                    AnimationNames = "spell,slam";
+                    ArmorReduction = Levels(2f, 2f, 3f, 3f, 4f);
+                    AttackAngle = Levels(90f, 90f, 90f, 90f, 90f);
+                    AttackDistance = Levels(300f, 300f, 300f, 300f, 300f);
+                    AttackSpeedReduction = Levels(0, 0, 0, 0, 0);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.ArmorReduction>();
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f, 0f, 0f);
+                    Caster = "Abilities\\Spells\\Undead\\RelentlessCleave\\RelentlessCleave.mdl";
+                    CasterAttachmentPoint1 = "origin";
+                    CheckDependencies = true;
+                    Cooldown = Levels(13f, 13f, 13f, 13f, 13f);
+                    CooldownReductionOnHit = Levels(0f, 0f, 0f, 0f, 0f);
+                    Damage = Levels(100f, 150f, 200f, 250f, 300f);
+                    DamageByTargetMaxHealth = Levels(0f, 0f, 0f, 0f, 0f);
+                    DamageDelay = Levels(0.1f, 0.1f, 0.1f, 0.1f, 0.1f);
+                    DamageStrengthModifier = Levels(0, 0, 0, 0, 0);
+                    DurationArmorReduction = Levels(7f, 7f, 7f, 7f, 7f);
+                    DurationAttackSpeedReduction = Levels(0f, 0f, 0f, 0f, 0f);
+                    DurationDamageByTargetMaxHealth = Levels(0f, 0f, 0f, 0f, 0f);
+                    HealingPerTargetHit = Levels(25f, 35f, 45f, 55f, 65f);
+                    HeroAbility = true;
+                    HeroDurationArmorReduction = Levels(3.5f, 3.5f, 3.5f, 3.5f, 3.5f);
+                    HeroDurationAttackSpeedReduction = Levels(0f, 0f, 0f, 0f, 0f);
+                    HeroDurationDamageByTargetMaxHealth = Levels(0f, 0f, 0f, 0f, 0f);
+                    Hotkey = "Q";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRelentlessCleave.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNRelentlessCleave.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "Q";
+                    LevelCount = 5;
+                    LevelSkipRequirement = 4;
+                    ManaCost = Levels(75, 85, 95, 105, 115);
+                    MaxTargetHit = Levels(10, 10, 10, 10, 10);
+                    Name = "Relentless Cleave";
+                    Order = "relentlesscleave";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    Range = Levels(300f, 300f, 300f, 300f, 300f);
+                    RequiredLevel = 1;
+                    Target = "Abilities\\Spells\\Human\\RelentlessCleave\\RelentlessCleaveTarget.mdl";
+                    TargetAttachmentPoint1 = "chest";
+                    TargetAttachments = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable);
+                    Tooltip = Levels("Relentless Cleave - [|cffffcc00Level 1|r]", "Relentless Cleave - [|cffffcc00Level 2|r]", "Relentless Cleave - [|cffffcc00Level 3|r]", "Relentless Cleave - [|cffffcc00Level 4|r]", "Relentless Cleave - [|cffffcc00Level 5|r]");
+                    TooltipExtended = Levels("Strikes the target area, dealing <AUsw,DataA1> damage to enemy units, reducing their armor by <AUsw,DataG1>, and restoring <AUsw,DataE1> hit points per unit hit.", "Strikes the target area, dealing <AUsw,DataA2> damage to enemy units, reducing their armor by <AUsw,DataG2>, and restoring <AUsw,DataE2> hit points per unit hit.", "Strikes the target area, dealing <AUsw,DataA3> damage to enemy units, reducing their armor by <AUsw,DataG3>, and restoring <AUsw,DataE3> hit points per unit hit.", "Strikes the target area, dealing <AUsw,DataA4> damage to enemy units, reducing their armor by <AUsw,DataG4>, and restoring <AUsw,DataE4> hit points per unit hit.", "Strikes the target area, dealing <AUsw,DataA5> damage to enemy units, reducing their armor by <AUsw,DataG5>, and restoring <AUsw,DataE5> hit points per unit hit.");
+                    TooltipLearn = "Learn Relentless Cleave - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Strikes the target area, dealing damage, reducing armor and restoring hit points per unit hit. |n|n|cffffcc00Level 1|r - <AUsw,DataA1> damage, <AUsw,DataG1> armor reduction, <AUsw,DataE1> hit points. |n|cffffcc00Level 2|r - <AUsw,DataA2> damage, <AUsw,DataG2> armor reduction, <AUsw,DataE2> hit points. |n|cffffcc00Level 3|r - <AUsw,DataA3> damage, <AUsw,DataG3> armor reduction, <AUsw,DataE3> hit points. |n|cffffcc00Level 4|r - <AUsw,DataA4> damage, <AUsw,DataG4> armor reduction, <AUsw,DataE4> hit points. |n|cffffcc00Level 5|r - <AUsw,DataA5> damage, <AUsw,DataG5> armor reduction, <AUsw,DataE5> hit points.";
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>swp1</c>.</summary>
+                [global::Moonwell.Objects.Field("swp1", Label = "Damage")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> Damage
+                {
+                    get { return Fields.GetLevels<float>(this, "swp1"); }
+                    protected set { Fields.Put("swp1", value); }
+                }
+
+                /// <summary>The field <c>swp2</c>.</summary>
+                [global::Moonwell.Objects.Field("swp2", Label = "Attack Distance")]
+                [global::Moonwell.Objects.Limits(0, 1000)]
+                public global::Moonwell.Objects.Levels<float> AttackDistance
+                {
+                    get { return Fields.GetLevels<float>(this, "swp2"); }
+                    protected set { Fields.Put("swp2", value); }
+                }
+
+                /// <summary>The field <c>swp3</c>.</summary>
+                [global::Moonwell.Objects.Field("swp3", Label = "Attack Angle")]
+                [global::Moonwell.Objects.Limits(0, 360)]
+                public global::Moonwell.Objects.Levels<float> AttackAngle
+                {
+                    get { return Fields.GetLevels<float>(this, "swp3"); }
+                    protected set { Fields.Put("swp3", value); }
+                }
+
+                /// <summary>The field <c>swp4</c>.</summary>
+                [global::Moonwell.Objects.Field("swp4", Label = "Damage Delay")]
+                [global::Moonwell.Objects.Limits(0.001, 300)]
+                public global::Moonwell.Objects.Levels<float> DamageDelay
+                {
+                    get { return Fields.GetLevels<float>(this, "swp4"); }
+                    protected set { Fields.Put("swp4", value); }
+                }
+
+                /// <summary>The field <c>swp5</c>.</summary>
+                [global::Moonwell.Objects.Field("swp5", Label = "Damage Strength Modifier (%)")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<int> DamageStrengthModifier
+                {
+                    get { return Fields.GetLevels<int>(this, "swp5"); }
+                    protected set { Fields.Put("swp5", value); }
+                }
+
+                /// <summary>The field <c>swp6</c>.</summary>
+                [global::Moonwell.Objects.Field("swp6", Label = "Healing Per Target Hit")]
+                [global::Moonwell.Objects.Limits(0, 300)]
+                public global::Moonwell.Objects.Levels<float> HealingPerTargetHit
+                {
+                    get { return Fields.GetLevels<float>(this, "swp6"); }
+                    protected set { Fields.Put("swp6", value); }
+                }
+
+                /// <summary>The field <c>swp7</c>.</summary>
+                [global::Moonwell.Objects.Field("swp7", Label = "Max Target Hit")]
+                [global::Moonwell.Objects.Limits(0, 300)]
+                public global::Moonwell.Objects.Levels<int> MaxTargetHit
+                {
+                    get { return Fields.GetLevels<int>(this, "swp7"); }
+                    protected set { Fields.Put("swp7", value); }
+                }
+
+                /// <summary>The field <c>swp8</c>.</summary>
+                [global::Moonwell.Objects.Field("swp8", Label = "Armor Reduction")]
+                [global::Moonwell.Objects.Limits(0, 300)]
+                public global::Moonwell.Objects.Levels<float> ArmorReduction
+                {
+                    get { return Fields.GetLevels<float>(this, "swp8"); }
+                    protected set { Fields.Put("swp8", value); }
+                }
+
+                /// <summary>The field <c>swp9</c>.</summary>
+                [global::Moonwell.Objects.Field("swp9", Label = "Attack Speed Reduction (%)")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<int> AttackSpeedReduction
+                {
+                    get { return Fields.GetLevels<int>(this, "swp9"); }
+                    protected set { Fields.Put("swp9", value); }
+                }
+
+                /// <summary>The field <c>swpa</c>.</summary>
+                [global::Moonwell.Objects.Field("swpa", Label = "Damage By Target Max Health (%)")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<float> DamageByTargetMaxHealth
+                {
+                    get { return Fields.GetLevels<float>(this, "swpa"); }
+                    protected set { Fields.Put("swpa", value); }
+                }
+
+                /// <summary>The field <c>swpb</c>.</summary>
+                [global::Moonwell.Objects.Field("swpb", Label = "Cooldown Reduction On Hit")]
+                [global::Moonwell.Objects.Limits(0, 300)]
+                public global::Moonwell.Objects.Levels<float> CooldownReductionOnHit
+                {
+                    get { return Fields.GetLevels<float>(this, "swpb"); }
+                    protected set { Fields.Put("swpb", value); }
+                }
+
+                /// <summary>The field <c>swpc</c>.</summary>
+                [global::Moonwell.Objects.Field("swpc", Label = "Duration Armor Reduction")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> DurationArmorReduction
+                {
+                    get { return Fields.GetLevels<float>(this, "swpc"); }
+                    protected set { Fields.Put("swpc", value); }
+                }
+
+                /// <summary>The field <c>swpd</c>.</summary>
+                [global::Moonwell.Objects.Field("swpd", Label = "Hero Duration Armor Reduction")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> HeroDurationArmorReduction
+                {
+                    get { return Fields.GetLevels<float>(this, "swpd"); }
+                    protected set { Fields.Put("swpd", value); }
+                }
+
+                /// <summary>The field <c>swpe</c>.</summary>
+                [global::Moonwell.Objects.Field("swpe", Label = "Duration Attack Speed Reduction")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> DurationAttackSpeedReduction
+                {
+                    get { return Fields.GetLevels<float>(this, "swpe"); }
+                    protected set { Fields.Put("swpe", value); }
+                }
+
+                /// <summary>The field <c>swpf</c>.</summary>
+                [global::Moonwell.Objects.Field("swpf", Label = "Hero Duration Attack Speed Reduction")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> HeroDurationAttackSpeedReduction
+                {
+                    get { return Fields.GetLevels<float>(this, "swpf"); }
+                    protected set { Fields.Put("swpf", value); }
+                }
+
+                /// <summary>The field <c>swpg</c>.</summary>
+                [global::Moonwell.Objects.Field("swpg", Label = "Duration Damage By Target Max Health")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> DurationDamageByTargetMaxHealth
+                {
+                    get { return Fields.GetLevels<float>(this, "swpg"); }
+                    protected set { Fields.Put("swpg", value); }
+                }
+
+                /// <summary>The field <c>swph</c>.</summary>
+                [global::Moonwell.Objects.Field("swph", Label = "Hero Duration Damage By Target Max Health")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> HeroDurationDamageByTargetMaxHealth
+                {
+                    get { return Fields.GetLevels<float>(this, "swph"); }
+                    protected set { Fields.Put("swph", value); }
+                }
+            }
+
+            /// <summary>Relentless Cleave (Talent 1), AUs1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AUs1")]
+            public class RelentlessCleaveAUs1 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public RelentlessCleaveAUs1()
                 {
                     AnimationNames = "spell,slam";
                     ArmorReduction = Levels(2f, 2f, 3f, 3f, 4f);
@@ -53970,7 +54192,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Relentless Cleave (AUs2).</summary>
+            /// <summary>Relentless Cleave (Talent 2), AUs2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUs2")]
             public class RelentlessCleaveAUs2 : global::Moonwell.Objects.StandardAbility
@@ -54193,7 +54415,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Relentless Cleave (AUs3).</summary>
+            /// <summary>Relentless Cleave (Talent 3), AUs3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUs3")]
             public class RelentlessCleaveAUs3 : global::Moonwell.Objects.StandardAbility
@@ -54416,229 +54638,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Relentless Cleave (AUsw).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AUsw")]
-            public class RelentlessCleaveAUsw : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public RelentlessCleaveAUsw()
-                {
-                    AnimationNames = "spell,slam";
-                    ArmorReduction = Levels(2f, 2f, 3f, 3f, 4f);
-                    AttackAngle = Levels(90f, 90f, 90f, 90f, 90f);
-                    AttackDistance = Levels(300f, 300f, 300f, 300f, 300f);
-                    AttackSpeedReduction = Levels(0, 0, 0, 0, 0);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.ArmorReduction>();
-                    ButtonPositionNormalX = 0;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 0;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f, 0f, 0f, 0f, 0f);
-                    Caster = "Abilities\\Spells\\Undead\\RelentlessCleave\\RelentlessCleave.mdl";
-                    CasterAttachmentPoint1 = "origin";
-                    CheckDependencies = true;
-                    Cooldown = Levels(13f, 13f, 13f, 13f, 13f);
-                    CooldownReductionOnHit = Levels(0f, 0f, 0f, 0f, 0f);
-                    Damage = Levels(100f, 150f, 200f, 250f, 300f);
-                    DamageByTargetMaxHealth = Levels(0f, 0f, 0f, 0f, 0f);
-                    DamageDelay = Levels(0.1f, 0.1f, 0.1f, 0.1f, 0.1f);
-                    DamageStrengthModifier = Levels(0, 0, 0, 0, 0);
-                    DurationArmorReduction = Levels(7f, 7f, 7f, 7f, 7f);
-                    DurationAttackSpeedReduction = Levels(0f, 0f, 0f, 0f, 0f);
-                    DurationDamageByTargetMaxHealth = Levels(0f, 0f, 0f, 0f, 0f);
-                    HealingPerTargetHit = Levels(25f, 35f, 45f, 55f, 65f);
-                    HeroAbility = true;
-                    HeroDurationArmorReduction = Levels(3.5f, 3.5f, 3.5f, 3.5f, 3.5f);
-                    HeroDurationAttackSpeedReduction = Levels(0f, 0f, 0f, 0f, 0f);
-                    HeroDurationDamageByTargetMaxHealth = Levels(0f, 0f, 0f, 0f, 0f);
-                    Hotkey = "Q";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNRelentlessCleave.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNRelentlessCleave.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "Q";
-                    LevelCount = 5;
-                    LevelSkipRequirement = 4;
-                    ManaCost = Levels(75, 85, 95, 105, 115);
-                    MaxTargetHit = Levels(10, 10, 10, 10, 10);
-                    Name = "Relentless Cleave";
-                    Order = "relentlesscleave";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    Range = Levels(300f, 300f, 300f, 300f, 300f);
-                    RequiredLevel = 1;
-                    Target = "Abilities\\Spells\\Human\\RelentlessCleave\\RelentlessCleaveTarget.mdl";
-                    TargetAttachmentPoint1 = "chest";
-                    TargetAttachments = 1;
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable);
-                    Tooltip = Levels("Relentless Cleave - [|cffffcc00Level 1|r]", "Relentless Cleave - [|cffffcc00Level 2|r]", "Relentless Cleave - [|cffffcc00Level 3|r]", "Relentless Cleave - [|cffffcc00Level 4|r]", "Relentless Cleave - [|cffffcc00Level 5|r]");
-                    TooltipExtended = Levels("Strikes the target area, dealing <AUsw,DataA1> damage to enemy units, reducing their armor by <AUsw,DataG1>, and restoring <AUsw,DataE1> hit points per unit hit.", "Strikes the target area, dealing <AUsw,DataA2> damage to enemy units, reducing their armor by <AUsw,DataG2>, and restoring <AUsw,DataE2> hit points per unit hit.", "Strikes the target area, dealing <AUsw,DataA3> damage to enemy units, reducing their armor by <AUsw,DataG3>, and restoring <AUsw,DataE3> hit points per unit hit.", "Strikes the target area, dealing <AUsw,DataA4> damage to enemy units, reducing their armor by <AUsw,DataG4>, and restoring <AUsw,DataE4> hit points per unit hit.", "Strikes the target area, dealing <AUsw,DataA5> damage to enemy units, reducing their armor by <AUsw,DataG5>, and restoring <AUsw,DataE5> hit points per unit hit.");
-                    TooltipLearn = "Learn Relentless Cleave - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Strikes the target area, dealing damage, reducing armor and restoring hit points per unit hit. |n|n|cffffcc00Level 1|r - <AUsw,DataA1> damage, <AUsw,DataG1> armor reduction, <AUsw,DataE1> hit points. |n|cffffcc00Level 2|r - <AUsw,DataA2> damage, <AUsw,DataG2> armor reduction, <AUsw,DataE2> hit points. |n|cffffcc00Level 3|r - <AUsw,DataA3> damage, <AUsw,DataG3> armor reduction, <AUsw,DataE3> hit points. |n|cffffcc00Level 4|r - <AUsw,DataA4> damage, <AUsw,DataG4> armor reduction, <AUsw,DataE4> hit points. |n|cffffcc00Level 5|r - <AUsw,DataA5> damage, <AUsw,DataG5> armor reduction, <AUsw,DataE5> hit points.";
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>swp1</c>.</summary>
-                [global::Moonwell.Objects.Field("swp1", Label = "Damage")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> Damage
-                {
-                    get { return Fields.GetLevels<float>(this, "swp1"); }
-                    protected set { Fields.Put("swp1", value); }
-                }
-
-                /// <summary>The field <c>swp2</c>.</summary>
-                [global::Moonwell.Objects.Field("swp2", Label = "Attack Distance")]
-                [global::Moonwell.Objects.Limits(0, 1000)]
-                public global::Moonwell.Objects.Levels<float> AttackDistance
-                {
-                    get { return Fields.GetLevels<float>(this, "swp2"); }
-                    protected set { Fields.Put("swp2", value); }
-                }
-
-                /// <summary>The field <c>swp3</c>.</summary>
-                [global::Moonwell.Objects.Field("swp3", Label = "Attack Angle")]
-                [global::Moonwell.Objects.Limits(0, 360)]
-                public global::Moonwell.Objects.Levels<float> AttackAngle
-                {
-                    get { return Fields.GetLevels<float>(this, "swp3"); }
-                    protected set { Fields.Put("swp3", value); }
-                }
-
-                /// <summary>The field <c>swp4</c>.</summary>
-                [global::Moonwell.Objects.Field("swp4", Label = "Damage Delay")]
-                [global::Moonwell.Objects.Limits(0.001, 300)]
-                public global::Moonwell.Objects.Levels<float> DamageDelay
-                {
-                    get { return Fields.GetLevels<float>(this, "swp4"); }
-                    protected set { Fields.Put("swp4", value); }
-                }
-
-                /// <summary>The field <c>swp5</c>.</summary>
-                [global::Moonwell.Objects.Field("swp5", Label = "Damage Strength Modifier (%)")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> DamageStrengthModifier
-                {
-                    get { return Fields.GetLevels<int>(this, "swp5"); }
-                    protected set { Fields.Put("swp5", value); }
-                }
-
-                /// <summary>The field <c>swp6</c>.</summary>
-                [global::Moonwell.Objects.Field("swp6", Label = "Healing Per Target Hit")]
-                [global::Moonwell.Objects.Limits(0, 300)]
-                public global::Moonwell.Objects.Levels<float> HealingPerTargetHit
-                {
-                    get { return Fields.GetLevels<float>(this, "swp6"); }
-                    protected set { Fields.Put("swp6", value); }
-                }
-
-                /// <summary>The field <c>swp7</c>.</summary>
-                [global::Moonwell.Objects.Field("swp7", Label = "Max Target Hit")]
-                [global::Moonwell.Objects.Limits(0, 300)]
-                public global::Moonwell.Objects.Levels<int> MaxTargetHit
-                {
-                    get { return Fields.GetLevels<int>(this, "swp7"); }
-                    protected set { Fields.Put("swp7", value); }
-                }
-
-                /// <summary>The field <c>swp8</c>.</summary>
-                [global::Moonwell.Objects.Field("swp8", Label = "Armor Reduction")]
-                [global::Moonwell.Objects.Limits(0, 300)]
-                public global::Moonwell.Objects.Levels<float> ArmorReduction
-                {
-                    get { return Fields.GetLevels<float>(this, "swp8"); }
-                    protected set { Fields.Put("swp8", value); }
-                }
-
-                /// <summary>The field <c>swp9</c>.</summary>
-                [global::Moonwell.Objects.Field("swp9", Label = "Attack Speed Reduction (%)")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> AttackSpeedReduction
-                {
-                    get { return Fields.GetLevels<int>(this, "swp9"); }
-                    protected set { Fields.Put("swp9", value); }
-                }
-
-                /// <summary>The field <c>swpa</c>.</summary>
-                [global::Moonwell.Objects.Field("swpa", Label = "Damage By Target Max Health (%)")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<float> DamageByTargetMaxHealth
-                {
-                    get { return Fields.GetLevels<float>(this, "swpa"); }
-                    protected set { Fields.Put("swpa", value); }
-                }
-
-                /// <summary>The field <c>swpb</c>.</summary>
-                [global::Moonwell.Objects.Field("swpb", Label = "Cooldown Reduction On Hit")]
-                [global::Moonwell.Objects.Limits(0, 300)]
-                public global::Moonwell.Objects.Levels<float> CooldownReductionOnHit
-                {
-                    get { return Fields.GetLevels<float>(this, "swpb"); }
-                    protected set { Fields.Put("swpb", value); }
-                }
-
-                /// <summary>The field <c>swpc</c>.</summary>
-                [global::Moonwell.Objects.Field("swpc", Label = "Duration Armor Reduction")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> DurationArmorReduction
-                {
-                    get { return Fields.GetLevels<float>(this, "swpc"); }
-                    protected set { Fields.Put("swpc", value); }
-                }
-
-                /// <summary>The field <c>swpd</c>.</summary>
-                [global::Moonwell.Objects.Field("swpd", Label = "Hero Duration Armor Reduction")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> HeroDurationArmorReduction
-                {
-                    get { return Fields.GetLevels<float>(this, "swpd"); }
-                    protected set { Fields.Put("swpd", value); }
-                }
-
-                /// <summary>The field <c>swpe</c>.</summary>
-                [global::Moonwell.Objects.Field("swpe", Label = "Duration Attack Speed Reduction")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> DurationAttackSpeedReduction
-                {
-                    get { return Fields.GetLevels<float>(this, "swpe"); }
-                    protected set { Fields.Put("swpe", value); }
-                }
-
-                /// <summary>The field <c>swpf</c>.</summary>
-                [global::Moonwell.Objects.Field("swpf", Label = "Hero Duration Attack Speed Reduction")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> HeroDurationAttackSpeedReduction
-                {
-                    get { return Fields.GetLevels<float>(this, "swpf"); }
-                    protected set { Fields.Put("swpf", value); }
-                }
-
-                /// <summary>The field <c>swpg</c>.</summary>
-                [global::Moonwell.Objects.Field("swpg", Label = "Duration Damage By Target Max Health")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> DurationDamageByTargetMaxHealth
-                {
-                    get { return Fields.GetLevels<float>(this, "swpg"); }
-                    protected set { Fields.Put("swpg", value); }
-                }
-
-                /// <summary>The field <c>swph</c>.</summary>
-                [global::Moonwell.Objects.Field("swph", Label = "Hero Duration Damage By Target Max Health")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> HeroDurationDamageByTargetMaxHealth
-                {
-                    get { return Fields.GetLevels<float>(this, "swph"); }
-                    protected set { Fields.Put("swph", value); }
-                }
-            }
-
-            /// <summary>Rend Armor (GT1b).</summary>
+            /// <summary>Rend Armor (Garek Talent), GT1b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("GT1b")]
             public class RendArmor : global::Moonwell.Objects.StandardAbility
@@ -54646,7 +54646,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public RendArmor()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SweepingStrikeAHsw, global::Moonwell.Objects.Other.Abilities.SweepingStrikeAHs2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SweepingStrike, global::Moonwell.Objects.Other.Abilities.SweepingStrikeAHs2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -54725,7 +54725,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Renewed Vigor (LT4c).</summary>
+            /// <summary>Renewed Vigor (Fake Landen Talent), LT4c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("LT4c")]
             public class RenewedVigor : global::Moonwell.Objects.StandardAbility
@@ -54811,7 +54811,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Retaliation (GT2a).</summary>
+            /// <summary>Retaliation (Garek Talent), GT2a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("GT2a")]
             public class Retaliation : global::Moonwell.Objects.StandardAbility
@@ -54819,7 +54819,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Retaliation()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.UnyieldingGuardAHbd, global::Moonwell.Objects.Other.Abilities.UnyieldingGuard>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.UnyieldingGuard, global::Moonwell.Objects.Other.Abilities.UnyieldingGuardAHb1>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -54898,7 +54898,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Retribution (BT3a).</summary>
+            /// <summary>Retribution (LeonidTalent), BT3a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT3a")]
             public class Retribution : global::Moonwell.Objects.StandardAbility
@@ -54906,7 +54906,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Retribution()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.GritAHgr, global::Moonwell.Objects.Other.Abilities.Grit>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.Grit, global::Moonwell.Objects.Other.Abilities.GritAHg1>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -55202,7 +55202,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Riposte (GT2b).</summary>
+            /// <summary>Riposte (Garek Talent), GT2b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("GT2b")]
             public class Riposte : global::Moonwell.Objects.StandardAbility
@@ -55210,7 +55210,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Riposte()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.UnyieldingGuardAHbd, global::Moonwell.Objects.Other.Abilities.UnyieldingGuardAHb2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.UnyieldingGuard, global::Moonwell.Objects.Other.Abilities.UnyieldingGuardAHb2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -55289,7 +55289,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Ritual Dagger (AIdg).</summary>
+            /// <summary>Ritual Dagger (Instant Heal), AIdg.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIdg")]
             public class RitualDagger : global::Moonwell.Objects.StandardAbility
@@ -55369,7 +55369,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Ritual Dagger (AIg2).</summary>
+            /// <summary>Ritual Dagger (Regenerate), AIg2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIg2")]
             public class RitualDaggerAIg2 : global::Moonwell.Objects.StandardAbility
@@ -55448,7 +55448,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Roar (AIrr).</summary>
+            /// <summary>Roar (Item), AIrr.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIrr")]
             public class Roar : global::Moonwell.Objects.StandardAbility
@@ -55772,13 +55772,125 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sacred Aura (AHa1).</summary>
+            /// <summary>Sacred Aura (AHas).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHa1")]
+            [global::Moonwell.Objects.Standard("AHas")]
             public class SacredAura : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SacredAura()
+                {
+                    Area = Levels(900f, 900f, 900f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.SacredAura>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    CooldownIncreaseForEnemies = Levels(0f, 0f, 0f);
+                    CooldownReductionIncreaseForAllies = Levels(0f, 0f, 0f);
+                    Duration = Levels(0f);
+                    FlatManaRegenForAllies = Levels(0f, 0f, 0f);
+                    HealingDecreaseForEnemies = Levels(0f, 0f, 0f);
+                    HealingIncreaseForAllies = Levels(15f, 20f, 25f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNSacredAura.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSacredAura.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "E";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    MagicResistDecreaseForEnemies = Levels(0f, 0f, 0f);
+                    MagicResistIncreaseForAllies = Levels(0.15f, 0.25f, 0.35f);
+                    Name = "Sacred Aura";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    RequiredLevel = 1;
+                    Target = "Abilities/Spells/Other/SacredAura/SacredAura.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
+                    Tooltip = Levels("Sacred Aura - [|cffffcc00Level 1|r]", "Sacred Aura - [|cffffcc00Level 2|r]", "Sacred Aura - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Gives <AHas,DataA1,%>% Magic Resistance and <AHas,DataB1>% increased healing received to nearby friendly units.", "Gives <AHas,DataA2,%>% Magic Resistance and <AHas,DataB2>% increased healing received to nearby friendly units.", "Gives <AHas,DataA3,%>% Magic Resistance and <AHas,DataB3>% increased healing recieved to nearby friendly units.");
+                    TooltipLearn = "Learn Sacred Aura - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Gives additional Magic Resistance and increased healing received to nearby friendly units. |n|n|cffffcc00Level 1|r - <AHas,DataA1,%>% Magic Resistance, <AHas,DataB1>% increased healing received. |n|cffffcc00Level 2|r - <AHas,DataA2,%>% Magic Resistance, <AHas,DataB2>% increased healing received. |n|cffffcc00Level 3|r - <AHas,DataA3,%>% Magic Resistance, <AHas,DataB3>% increased healing received.";
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>hsa1</c>.</summary>
+                [global::Moonwell.Objects.Field("hsa1", Label = "% Magic Resist Increase for Allies")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<float> MagicResistIncreaseForAllies
+                {
+                    get { return Fields.GetLevels<float>(this, "hsa1"); }
+                    protected set { Fields.Put("hsa1", value); }
+                }
+
+                /// <summary>The field <c>hsa2</c>.</summary>
+                [global::Moonwell.Objects.Field("hsa2", Label = "% Healing Increase for Allies")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<float> HealingIncreaseForAllies
+                {
+                    get { return Fields.GetLevels<float>(this, "hsa2"); }
+                    protected set { Fields.Put("hsa2", value); }
+                }
+
+                /// <summary>The field <c>hsa3</c>.</summary>
+                [global::Moonwell.Objects.Field("hsa3", Label = "% Cooldown Reduction Increase for Allies")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<float> CooldownReductionIncreaseForAllies
+                {
+                    get { return Fields.GetLevels<float>(this, "hsa3"); }
+                    protected set { Fields.Put("hsa3", value); }
+                }
+
+                /// <summary>The field <c>hsa4</c>.</summary>
+                [global::Moonwell.Objects.Field("hsa4", Label = "% Magic Resist Decrease for Enemies")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<float> MagicResistDecreaseForEnemies
+                {
+                    get { return Fields.GetLevels<float>(this, "hsa4"); }
+                    protected set { Fields.Put("hsa4", value); }
+                }
+
+                /// <summary>The field <c>hsa5</c>.</summary>
+                [global::Moonwell.Objects.Field("hsa5", Label = "% Healing Decrease for Enemies")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<float> HealingDecreaseForEnemies
+                {
+                    get { return Fields.GetLevels<float>(this, "hsa5"); }
+                    protected set { Fields.Put("hsa5", value); }
+                }
+
+                /// <summary>The field <c>hsa6</c>.</summary>
+                [global::Moonwell.Objects.Field("hsa6", Label = "% Cooldown Increase for Enemies")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<float> CooldownIncreaseForEnemies
+                {
+                    get { return Fields.GetLevels<float>(this, "hsa6"); }
+                    protected set { Fields.Put("hsa6", value); }
+                }
+
+                /// <summary>The field <c>hsa7</c>.</summary>
+                [global::Moonwell.Objects.Field("hsa7", Label = "Flat Mana Regen for Allies")]
+                [global::Moonwell.Objects.Limits(0, 500)]
+                public global::Moonwell.Objects.Levels<float> FlatManaRegenForAllies
+                {
+                    get { return Fields.GetLevels<float>(this, "hsa7"); }
+                    protected set { Fields.Put("hsa7", value); }
+                }
+            }
+
+            /// <summary>Sacred Aura (Talent 1), AHa1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AHa1")]
+            public class SacredAuraAHa1 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SacredAuraAHa1()
                 {
                     Area = Levels(900f, 900f, 900f);
                     Buffs.Set<global::Moonwell.Objects.Other.Buffs.SacredAura>();
@@ -55885,7 +55997,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sacred Aura (AHa2).</summary>
+            /// <summary>Sacred Aura (Talent 2), AHa2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHa2")]
             public class SacredAuraAHa2 : global::Moonwell.Objects.StandardAbility
@@ -55998,7 +56110,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sacred Aura (AHa3).</summary>
+            /// <summary>Sacred Aura (Talent 3), AHa3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHa3")]
             public class SacredAuraAHa3 : global::Moonwell.Objects.StandardAbility
@@ -56111,119 +56223,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sacred Aura (AHas).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHas")]
-            public class SacredAuraAHas : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public SacredAuraAHas()
-                {
-                    Area = Levels(900f, 900f, 900f);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.SacredAura>();
-                    ButtonPositionNormalX = 2;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 2;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(0f);
-                    CooldownIncreaseForEnemies = Levels(0f, 0f, 0f);
-                    CooldownReductionIncreaseForAllies = Levels(0f, 0f, 0f);
-                    Duration = Levels(0f);
-                    FlatManaRegenForAllies = Levels(0f, 0f, 0f);
-                    HealingDecreaseForEnemies = Levels(0f, 0f, 0f);
-                    HealingIncreaseForAllies = Levels(15f, 20f, 25f);
-                    HeroAbility = true;
-                    HeroDuration = Levels(0f);
-                    Hotkey = "E";
-                    Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNSacredAura.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSacredAura.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "E";
-                    LevelCount = 3;
-                    LevelSkipRequirement = 0;
-                    MagicResistDecreaseForEnemies = Levels(0f, 0f, 0f);
-                    MagicResistIncreaseForAllies = Levels(0.15f, 0.25f, 0.35f);
-                    Name = "Sacred Aura";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    RequiredLevel = 1;
-                    Target = "Abilities/Spells/Other/SacredAura/SacredAura.mdl";
-                    TargetAttachmentPoint1 = "origin";
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
-                    Tooltip = Levels("Sacred Aura - [|cffffcc00Level 1|r]", "Sacred Aura - [|cffffcc00Level 2|r]", "Sacred Aura - [|cffffcc00Level 3|r]");
-                    TooltipExtended = Levels("Gives <AHas,DataA1,%>% Magic Resistance and <AHas,DataB1>% increased healing received to nearby friendly units.", "Gives <AHas,DataA2,%>% Magic Resistance and <AHas,DataB2>% increased healing received to nearby friendly units.", "Gives <AHas,DataA3,%>% Magic Resistance and <AHas,DataB3>% increased healing recieved to nearby friendly units.");
-                    TooltipLearn = "Learn Sacred Aura - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Gives additional Magic Resistance and increased healing received to nearby friendly units. |n|n|cffffcc00Level 1|r - <AHas,DataA1,%>% Magic Resistance, <AHas,DataB1>% increased healing received. |n|cffffcc00Level 2|r - <AHas,DataA2,%>% Magic Resistance, <AHas,DataB2>% increased healing received. |n|cffffcc00Level 3|r - <AHas,DataA3,%>% Magic Resistance, <AHas,DataB3>% increased healing received.";
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>hsa1</c>.</summary>
-                [global::Moonwell.Objects.Field("hsa1", Label = "% Magic Resist Increase for Allies")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<float> MagicResistIncreaseForAllies
-                {
-                    get { return Fields.GetLevels<float>(this, "hsa1"); }
-                    protected set { Fields.Put("hsa1", value); }
-                }
-
-                /// <summary>The field <c>hsa2</c>.</summary>
-                [global::Moonwell.Objects.Field("hsa2", Label = "% Healing Increase for Allies")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<float> HealingIncreaseForAllies
-                {
-                    get { return Fields.GetLevels<float>(this, "hsa2"); }
-                    protected set { Fields.Put("hsa2", value); }
-                }
-
-                /// <summary>The field <c>hsa3</c>.</summary>
-                [global::Moonwell.Objects.Field("hsa3", Label = "% Cooldown Reduction Increase for Allies")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<float> CooldownReductionIncreaseForAllies
-                {
-                    get { return Fields.GetLevels<float>(this, "hsa3"); }
-                    protected set { Fields.Put("hsa3", value); }
-                }
-
-                /// <summary>The field <c>hsa4</c>.</summary>
-                [global::Moonwell.Objects.Field("hsa4", Label = "% Magic Resist Decrease for Enemies")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<float> MagicResistDecreaseForEnemies
-                {
-                    get { return Fields.GetLevels<float>(this, "hsa4"); }
-                    protected set { Fields.Put("hsa4", value); }
-                }
-
-                /// <summary>The field <c>hsa5</c>.</summary>
-                [global::Moonwell.Objects.Field("hsa5", Label = "% Healing Decrease for Enemies")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<float> HealingDecreaseForEnemies
-                {
-                    get { return Fields.GetLevels<float>(this, "hsa5"); }
-                    protected set { Fields.Put("hsa5", value); }
-                }
-
-                /// <summary>The field <c>hsa6</c>.</summary>
-                [global::Moonwell.Objects.Field("hsa6", Label = "% Cooldown Increase for Enemies")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<float> CooldownIncreaseForEnemies
-                {
-                    get { return Fields.GetLevels<float>(this, "hsa6"); }
-                    protected set { Fields.Put("hsa6", value); }
-                }
-
-                /// <summary>The field <c>hsa7</c>.</summary>
-                [global::Moonwell.Objects.Field("hsa7", Label = "Flat Mana Regen for Allies")]
-                [global::Moonwell.Objects.Limits(0, 500)]
-                public global::Moonwell.Objects.Levels<float> FlatManaRegenForAllies
-                {
-                    get { return Fields.GetLevels<float>(this, "hsa7"); }
-                    protected set { Fields.Put("hsa7", value); }
-                }
-            }
-
-            /// <summary>Sacred Rebuke (IT3a).</summary>
+            /// <summary>Sacred Rebuke (IlastarTalent), IT3a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("IT3a")]
             public class SacredRebuke : global::Moonwell.Objects.StandardAbility
@@ -56231,7 +56231,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SacredRebuke()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SacredAuraAHas, global::Moonwell.Objects.Other.Abilities.SacredAura>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SacredAura, global::Moonwell.Objects.Other.Abilities.SacredAuraAHa1>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -56382,7 +56382,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Second Wind (LT3b).</summary>
+            /// <summary>Second Wind (Landen Talent), LT3b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("LT3b")]
             public class SecondWind : global::Moonwell.Objects.StandardAbility
@@ -56390,7 +56390,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SecondWind()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.InspireCourageAHic, global::Moonwell.Objects.Other.Abilities.InspireCourageAHi2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.InspireCourage, global::Moonwell.Objects.Other.Abilities.InspireCourageAHi2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -56683,7 +56683,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sentry Ward (AIsw).</summary>
+            /// <summary>Sentry Ward (Item), AIsw.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIsw")]
             public class SentryWard : global::Moonwell.Objects.StandardAbility
@@ -56935,7 +56935,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Shop Indicator (AVsb).</summary>
+            /// <summary>Shop Indicator (VFX), AVsb.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AVsb")]
             public class ShopIndicator : global::Moonwell.Objects.StandardAbility
@@ -57071,7 +57071,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Shoulder Bash (GT3b).</summary>
+            /// <summary>Shoulder Bash (Garek Talent), GT3b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("GT3b")]
             public class ShoulderBash : global::Moonwell.Objects.StandardAbility
@@ -57079,7 +57079,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public ShoulderBash()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.ValiantChargeAHch, global::Moonwell.Objects.Other.Abilities.ValiantChargeAHc2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.ValiantCharge, global::Moonwell.Objects.Other.Abilities.ValiantChargeAHc2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -57262,7 +57262,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Slow Poison (AIsz).</summary>
+            /// <summary>Slow Poison (item), AIsz.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIsz")]
             public class SlowPoison : global::Moonwell.Objects.StandardAbility
@@ -57331,7 +57331,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Soul Burn (Assb).</summary>
+            /// <summary>Soul Burn (Scarlet Crusade), Assb.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Assb")]
             public class SoulBurn : global::Moonwell.Objects.StandardAbility
@@ -57418,7 +57418,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Soul Harvest (AT4a).</summary>
+            /// <summary>Soul Harvest (AnyaTalent), AT4a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT4a")]
             public class SoulHarvest : global::Moonwell.Objects.StandardAbility
@@ -57426,7 +57426,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SoulHarvest()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.BansheesWailAUwc, global::Moonwell.Objects.Other.Abilities.BansheesWail>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.BansheesWail, global::Moonwell.Objects.Other.Abilities.BansheesWailAUi1>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -57505,13 +57505,152 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Soul Lantern (AUl1).</summary>
+            /// <summary>Soul Lantern (AUla).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AUl1")]
+            [global::Moonwell.Objects.Standard("AUla")]
             public class SoulLantern : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SoulLantern()
+                {
+                    AllyHealingPerSecond = Levels(25f, 35f, 45f, 55f, 65f);
+                    AllyManaPerSecond = Levels(15f, 15f, 15f, 15f, 15f);
+                    AllyMovementSpeedPercent = Levels(0f, 0f, 0f, 0f, 0f);
+                    AllySpellAmpPercent = Levels(0f, 0f, 0f, 0f, 0f);
+                    AllySpellCritHitPercent = Levels(0f, 0f, 0f, 0f, 0f);
+                    AllySpellResistPercent = Levels(0f, 0f, 0f, 0f, 0f);
+                    Area = Levels(550f, 550f, 550f, 550f, 550f);
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    ButtonPositionTurnOffX = 1;
+                    ButtonPositionTurnOffY = 2;
+                    CastTime = Levels(0f, 0f, 0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(3f, 3f, 3f, 3f, 3f);
+                    Duration = Levels(0f, 0f, 0f, 0f, 0f);
+                    EffectSoundLooping = "DrainLoop";
+                    EnemyDamagePerSecond = Levels(0f, 0f, 0f, 0f, 0f);
+                    EnemyManaPerSecond = Levels(0f, 0f, 0f, 0f, 0f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f, 0f, 0f, 0f, 0f);
+                    Hotkey = "W";
+                    HotkeyTurnOff = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSoulLanternOn.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSoulLanternOn.blp";
+                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNSoulLanternOff.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "W";
+                    LevelCount = 5;
+                    LevelSkipRequirement = 4;
+                    LightningEffects = "VLST";
+                    ManaCost = Levels(15, 15, 15, 15, 15);
+                    Name = "Soul Lantern";
+                    OrderStringActivate = "soullantern";
+                    OrderStringDeactivate = "unsoullantern";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    Range = Levels(400f, 400f, 400f, 400f, 400f);
+                    RequiredLevel = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Allies | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Player | global::Moonwell.Objects.Targets.Self, global::Moonwell.Objects.Targets.Allies | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Player | global::Moonwell.Objects.Targets.Self, global::Moonwell.Objects.Targets.Allies | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Player | global::Moonwell.Objects.Targets.Self, global::Moonwell.Objects.Targets.Allies | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Player | global::Moonwell.Objects.Targets.Self, global::Moonwell.Objects.Targets.Allies | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Player | global::Moonwell.Objects.Targets.Self);
+                    Tooltip = Levels("Activate Soul Lantern - [|cffffcc00Level 1|r]", "Activate Soul Lantern - [|cffffcc00Level 2|r]", "Activate Soul Lantern - [|cffffcc00Level 3|r]", "Activate Soul Lantern - [|cffffcc00Level 4|r]", "Activate Soul Lantern - [|cffffcc00Level 5|r]");
+                    TooltipExtended = Levels("Create a tether between Anya and a friendly unit. Dispels negative debuffs on the target. While the tether is active, the target is healed for <AUla,DataB1> hit points per second.|nDrains <AUla,DataA1> mana per second until deactivated.", "Create a tether between Anya and a friendly unit. Dispels negative debuffs on the target. While the tether is active, the target is healed for <AUla,DataB2> hit points per second.|nDrains <AUla,DataA2> mana per second until deactivated.", "Create a tether between Anya and a friendly unit. Dispels negative debuffs on the target. While the tether is active, the target is healed for <AUla,DataB3> hit points per second.|nDrains <AUla,DataA3> mana per second until deactivated.", "Create a tether between Anya and a friendly unit. Dispels negative debuffs on the target. While the tether is active, the target is healed for <AUla,DataB4> hit points per second.|nDrains <AUla,DataA4> mana per second until deactivated.", "Create a tether between Anya and a friendly unit. Dispels negative debuffs on the target. While the tether is active, the target is healed for <AUla,DataB5> hit points per second.|nDrains <AUla,DataA5> mana per second until deactivated.");
+                    TooltipLearn = "Learn Soul Lantern - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Create a tether between Anya and a friendly unit, dispelling negative debuffs and healing the target.|nDrains mana until deactivated. |n|n|cffffcc00Level 1|r - <AUla,DataB1> hit points per second, drains <AUla,DataA1> mana per second. |n|cffffcc00Level 2|r - <AUla,DataB2> hit points per second, drains <AUla,DataA2> mana per second. |n|cffffcc00Level 3|r - <AUla,DataB3> hit points per second, drains <AUla,DataA3> mana per second. |n|cffffcc00Level 4|r - <AUla,DataB4> hit points per second, drains <AUla,DataA4> mana per second. |n|cffffcc00Level 5|r - <AUla,DataB5> hit points per second, drains <AUla,DataA5> mana per second.";
+                    TooltipTurnOff = Levels("Deactivate Soul Lantern - [|cffffcc00Level 1|r]", "Deactivate Soul Lantern - [|cffffcc00Level 2|r]", "Deactivate Soul Lantern - [|cffffcc00Level 3|r]", "Deactivate Soul Lantern - [|cffffcc00Level 4|r]", "Deactivate Soul Lantern - [|cffffcc00Level 5|r]");
+                    TooltipTurnOffExtended = Levels("Deactivate Soul Lantern to stop draining mana.");
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>ula1</c>.</summary>
+                [global::Moonwell.Objects.Field("ula1", Label = "Ally Mana Per Second")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> AllyManaPerSecond
+                {
+                    get { return Fields.GetLevels<float>(this, "ula1"); }
+                    protected set { Fields.Put("ula1", value); }
+                }
+
+                /// <summary>The field <c>ula2</c>.</summary>
+                [global::Moonwell.Objects.Field("ula2", Label = "Ally Healing Per Second")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> AllyHealingPerSecond
+                {
+                    get { return Fields.GetLevels<float>(this, "ula2"); }
+                    protected set { Fields.Put("ula2", value); }
+                }
+
+                /// <summary>The field <c>ula3</c>.</summary>
+                [global::Moonwell.Objects.Field("ula3", Label = "Ally Spell Resist Percent")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> AllySpellResistPercent
+                {
+                    get { return Fields.GetLevels<float>(this, "ula3"); }
+                    protected set { Fields.Put("ula3", value); }
+                }
+
+                /// <summary>The field <c>ula4</c>.</summary>
+                [global::Moonwell.Objects.Field("ula4", Label = "Ally Spell Amp Percent")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> AllySpellAmpPercent
+                {
+                    get { return Fields.GetLevels<float>(this, "ula4"); }
+                    protected set { Fields.Put("ula4", value); }
+                }
+
+                /// <summary>The field <c>ula5</c>.</summary>
+                [global::Moonwell.Objects.Field("ula5", Label = "Ally Spell Crit Hit Percent")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> AllySpellCritHitPercent
+                {
+                    get { return Fields.GetLevels<float>(this, "ula5"); }
+                    protected set { Fields.Put("ula5", value); }
+                }
+
+                /// <summary>The field <c>ula6</c>.</summary>
+                [global::Moonwell.Objects.Field("ula6", Label = "Ally Movement Speed Percent")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> AllyMovementSpeedPercent
+                {
+                    get { return Fields.GetLevels<float>(this, "ula6"); }
+                    protected set { Fields.Put("ula6", value); }
+                }
+
+                /// <summary>The field <c>ula7</c>.</summary>
+                [global::Moonwell.Objects.Field("ula7", Label = "Enemy Mana Per Second")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> EnemyManaPerSecond
+                {
+                    get { return Fields.GetLevels<float>(this, "ula7"); }
+                    protected set { Fields.Put("ula7", value); }
+                }
+
+                /// <summary>The field <c>ula8</c>.</summary>
+                [global::Moonwell.Objects.Field("ula8", Label = "Enemy Damage Per Second")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> EnemyDamagePerSecond
+                {
+                    get { return Fields.GetLevels<float>(this, "ula8"); }
+                    protected set { Fields.Put("ula8", value); }
+                }
+            }
+
+            /// <summary>Soul Lantern (Talent 1), AUl1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AUl1")]
+            public class SoulLanternAUl1 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SoulLanternAUl1()
                 {
                     AllyHealingPerSecond = Levels(25f, 35f, 45f, 55f, 65f);
                     AllyManaPerSecond = Levels(15f, 15f, 15f, 15f, 15f);
@@ -57645,7 +57784,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Soul Lantern (AUl2).</summary>
+            /// <summary>Soul Lantern (Talent 2), AUl2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUl2")]
             public class SoulLanternAUl2 : global::Moonwell.Objects.StandardAbility
@@ -57785,7 +57924,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Soul Lantern (AUl3).</summary>
+            /// <summary>Soul Lantern (Talent 3), AUl3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUl3")]
             public class SoulLanternAUl3 : global::Moonwell.Objects.StandardAbility
@@ -57925,146 +58064,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Soul Lantern (AUla).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AUla")]
-            public class SoulLanternAUla : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public SoulLanternAUla()
-                {
-                    AllyHealingPerSecond = Levels(25f, 35f, 45f, 55f, 65f);
-                    AllyManaPerSecond = Levels(15f, 15f, 15f, 15f, 15f);
-                    AllyMovementSpeedPercent = Levels(0f, 0f, 0f, 0f, 0f);
-                    AllySpellAmpPercent = Levels(0f, 0f, 0f, 0f, 0f);
-                    AllySpellCritHitPercent = Levels(0f, 0f, 0f, 0f, 0f);
-                    AllySpellResistPercent = Levels(0f, 0f, 0f, 0f, 0f);
-                    Area = Levels(550f, 550f, 550f, 550f, 550f);
-                    ButtonPositionNormalX = 1;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 1;
-                    ButtonPositionResearchY = 0;
-                    ButtonPositionTurnOffX = 1;
-                    ButtonPositionTurnOffY = 2;
-                    CastTime = Levels(0f, 0f, 0f, 0f, 0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(3f, 3f, 3f, 3f, 3f);
-                    Duration = Levels(0f, 0f, 0f, 0f, 0f);
-                    EffectSoundLooping = "DrainLoop";
-                    EnemyDamagePerSecond = Levels(0f, 0f, 0f, 0f, 0f);
-                    EnemyManaPerSecond = Levels(0f, 0f, 0f, 0f, 0f);
-                    HeroAbility = true;
-                    HeroDuration = Levels(0f, 0f, 0f, 0f, 0f);
-                    Hotkey = "W";
-                    HotkeyTurnOff = "W";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSoulLanternOn.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSoulLanternOn.blp";
-                    IconTurnOff = "ReplaceableTextures\\CommandButtons\\BTNSoulLanternOff.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "W";
-                    LevelCount = 5;
-                    LevelSkipRequirement = 4;
-                    LightningEffects = "VLST";
-                    ManaCost = Levels(15, 15, 15, 15, 15);
-                    Name = "Soul Lantern";
-                    OrderStringActivate = "soullantern";
-                    OrderStringDeactivate = "unsoullantern";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    Range = Levels(400f, 400f, 400f, 400f, 400f);
-                    RequiredLevel = 1;
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Allies | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Player | global::Moonwell.Objects.Targets.Self, global::Moonwell.Objects.Targets.Allies | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Player | global::Moonwell.Objects.Targets.Self, global::Moonwell.Objects.Targets.Allies | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Player | global::Moonwell.Objects.Targets.Self, global::Moonwell.Objects.Targets.Allies | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Player | global::Moonwell.Objects.Targets.Self, global::Moonwell.Objects.Targets.Allies | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Player | global::Moonwell.Objects.Targets.Self);
-                    Tooltip = Levels("Activate Soul Lantern - [|cffffcc00Level 1|r]", "Activate Soul Lantern - [|cffffcc00Level 2|r]", "Activate Soul Lantern - [|cffffcc00Level 3|r]", "Activate Soul Lantern - [|cffffcc00Level 4|r]", "Activate Soul Lantern - [|cffffcc00Level 5|r]");
-                    TooltipExtended = Levels("Create a tether between Anya and a friendly unit. Dispels negative debuffs on the target. While the tether is active, the target is healed for <AUla,DataB1> hit points per second.|nDrains <AUla,DataA1> mana per second until deactivated.", "Create a tether between Anya and a friendly unit. Dispels negative debuffs on the target. While the tether is active, the target is healed for <AUla,DataB2> hit points per second.|nDrains <AUla,DataA2> mana per second until deactivated.", "Create a tether between Anya and a friendly unit. Dispels negative debuffs on the target. While the tether is active, the target is healed for <AUla,DataB3> hit points per second.|nDrains <AUla,DataA3> mana per second until deactivated.", "Create a tether between Anya and a friendly unit. Dispels negative debuffs on the target. While the tether is active, the target is healed for <AUla,DataB4> hit points per second.|nDrains <AUla,DataA4> mana per second until deactivated.", "Create a tether between Anya and a friendly unit. Dispels negative debuffs on the target. While the tether is active, the target is healed for <AUla,DataB5> hit points per second.|nDrains <AUla,DataA5> mana per second until deactivated.");
-                    TooltipLearn = "Learn Soul Lantern - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Create a tether between Anya and a friendly unit, dispelling negative debuffs and healing the target.|nDrains mana until deactivated. |n|n|cffffcc00Level 1|r - <AUla,DataB1> hit points per second, drains <AUla,DataA1> mana per second. |n|cffffcc00Level 2|r - <AUla,DataB2> hit points per second, drains <AUla,DataA2> mana per second. |n|cffffcc00Level 3|r - <AUla,DataB3> hit points per second, drains <AUla,DataA3> mana per second. |n|cffffcc00Level 4|r - <AUla,DataB4> hit points per second, drains <AUla,DataA4> mana per second. |n|cffffcc00Level 5|r - <AUla,DataB5> hit points per second, drains <AUla,DataA5> mana per second.";
-                    TooltipTurnOff = Levels("Deactivate Soul Lantern - [|cffffcc00Level 1|r]", "Deactivate Soul Lantern - [|cffffcc00Level 2|r]", "Deactivate Soul Lantern - [|cffffcc00Level 3|r]", "Deactivate Soul Lantern - [|cffffcc00Level 4|r]", "Deactivate Soul Lantern - [|cffffcc00Level 5|r]");
-                    TooltipTurnOffExtended = Levels("Deactivate Soul Lantern to stop draining mana.");
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>ula1</c>.</summary>
-                [global::Moonwell.Objects.Field("ula1", Label = "Ally Mana Per Second")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> AllyManaPerSecond
-                {
-                    get { return Fields.GetLevels<float>(this, "ula1"); }
-                    protected set { Fields.Put("ula1", value); }
-                }
-
-                /// <summary>The field <c>ula2</c>.</summary>
-                [global::Moonwell.Objects.Field("ula2", Label = "Ally Healing Per Second")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> AllyHealingPerSecond
-                {
-                    get { return Fields.GetLevels<float>(this, "ula2"); }
-                    protected set { Fields.Put("ula2", value); }
-                }
-
-                /// <summary>The field <c>ula3</c>.</summary>
-                [global::Moonwell.Objects.Field("ula3", Label = "Ally Spell Resist Percent")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> AllySpellResistPercent
-                {
-                    get { return Fields.GetLevels<float>(this, "ula3"); }
-                    protected set { Fields.Put("ula3", value); }
-                }
-
-                /// <summary>The field <c>ula4</c>.</summary>
-                [global::Moonwell.Objects.Field("ula4", Label = "Ally Spell Amp Percent")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> AllySpellAmpPercent
-                {
-                    get { return Fields.GetLevels<float>(this, "ula4"); }
-                    protected set { Fields.Put("ula4", value); }
-                }
-
-                /// <summary>The field <c>ula5</c>.</summary>
-                [global::Moonwell.Objects.Field("ula5", Label = "Ally Spell Crit Hit Percent")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> AllySpellCritHitPercent
-                {
-                    get { return Fields.GetLevels<float>(this, "ula5"); }
-                    protected set { Fields.Put("ula5", value); }
-                }
-
-                /// <summary>The field <c>ula6</c>.</summary>
-                [global::Moonwell.Objects.Field("ula6", Label = "Ally Movement Speed Percent")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> AllyMovementSpeedPercent
-                {
-                    get { return Fields.GetLevels<float>(this, "ula6"); }
-                    protected set { Fields.Put("ula6", value); }
-                }
-
-                /// <summary>The field <c>ula7</c>.</summary>
-                [global::Moonwell.Objects.Field("ula7", Label = "Enemy Mana Per Second")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> EnemyManaPerSecond
-                {
-                    get { return Fields.GetLevels<float>(this, "ula7"); }
-                    protected set { Fields.Put("ula7", value); }
-                }
-
-                /// <summary>The field <c>ula8</c>.</summary>
-                [global::Moonwell.Objects.Field("ula8", Label = "Enemy Damage Per Second")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> EnemyDamagePerSecond
-                {
-                    get { return Fields.GetLevels<float>(this, "ula8"); }
-                    protected set { Fields.Put("ula8", value); }
-                }
-            }
-
-            /// <summary>Soulthirst (UT4b).</summary>
+            /// <summary>Soulthirst (UGarekTalent), UT4b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT4b")]
             public class Soulthirst : global::Moonwell.Objects.StandardAbility
@@ -58072,7 +58072,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Soulthirst()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.GrimConvictionAUvg, global::Moonwell.Objects.Other.Abilities.GrimConvictionAUv2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.GrimConviction, global::Moonwell.Objects.Other.Abilities.GrimConvictionAUv2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -58178,7 +58178,7 @@ namespace Moonwell.Objects
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
                     SharedSpellCooldown = Levels(true);
-                    SpellList.Set<global::Moonwell.Objects.NightElf.Abilities.EntanglingRoots, global::Moonwell.Objects.Human.Abilities.DispelMagic, global::Moonwell.Objects.NightElf.Abilities.RoarAroa>();
+                    SpellList.Set<global::Moonwell.Objects.NightElf.Abilities.EntanglingRoots, global::Moonwell.Objects.Human.Abilities.DispelMagic, global::Moonwell.Objects.NightElf.Abilities.Roar>();
                     UseNewDefaultLevelCap = false;
                 }
 
@@ -58318,7 +58318,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Spell Immunity (AImx).</summary>
+            /// <summary>Spell Immunity (Item), AImx.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AImx")]
             public class SpellImmunity : global::Moonwell.Objects.StandardAbility
@@ -58357,7 +58357,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Spell Shield (ANse).</summary>
+            /// <summary>Spell Shield (Rune), ANse.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ANse")]
             public class SpellShield : global::Moonwell.Objects.StandardAbility
@@ -58398,7 +58398,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Spell Shield (ANss).</summary>
+            /// <summary>Spell Shield (Amulet), ANss.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ANss")]
             public class SpellShieldANss : global::Moonwell.Objects.StandardAbility
@@ -58429,7 +58429,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Spirit Leech (AT2a).</summary>
+            /// <summary>Spirit Leech (AnyaTalent), AT2a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT2a")]
             public class SpiritLeech : global::Moonwell.Objects.StandardAbility
@@ -58437,7 +58437,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SpiritLeech()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SoulLanternAUla, global::Moonwell.Objects.Other.Abilities.SoulLantern>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SoulLantern, global::Moonwell.Objects.Other.Abilities.SoulLanternAUl1>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -58516,7 +58516,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Spirit Link (Aspp).</summary>
+            /// <summary>Spirit Link (Area), Aspp.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aspp")]
             public class SpiritLink : global::Moonwell.Objects.StandardAbility
@@ -58575,7 +58575,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Spiritual Renewal (IT3c).</summary>
+            /// <summary>Spiritual Renewal (IlastarTalent), IT3c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("IT3c")]
             public class SpiritualRenewal : global::Moonwell.Objects.StandardAbility
@@ -58583,7 +58583,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SpiritualRenewal()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SacredAuraAHas, global::Moonwell.Objects.Other.Abilities.SacredAuraAHa3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SacredAura, global::Moonwell.Objects.Other.Abilities.SacredAuraAHa3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -58847,7 +58847,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Staggering Impact (BT1b).</summary>
+            /// <summary>Staggering Impact (LeonidTalent), BT1b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT1b")]
             public class StaggeringImpact : global::Moonwell.Objects.StandardAbility
@@ -58855,7 +58855,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public StaggeringImpact()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.HeadsplitterAHhr, global::Moonwell.Objects.Other.Abilities.HeadsplitterAHh2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.Headsplitter, global::Moonwell.Objects.Other.Abilities.HeadsplitterAHh2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -58982,7 +58982,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Stamina Training (GT3c).</summary>
+            /// <summary>Stamina Training (Garek Talent), GT3c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("GT3c")]
             public class StaminaTrainingGT3c : global::Moonwell.Objects.StandardAbility
@@ -58990,7 +58990,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public StaminaTrainingGT3c()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.ValiantChargeAHch, global::Moonwell.Objects.Other.Abilities.ValiantChargeAHc3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.ValiantCharge, global::Moonwell.Objects.Other.Abilities.ValiantChargeAHc3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -59069,7 +59069,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Stat Details (ASde).</summary>
+            /// <summary>Stat Details (Hero), ASde.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ASde")]
             public class StatDetails : global::Moonwell.Objects.StandardAbility
@@ -59185,7 +59185,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Storm of Steel (GT1c).</summary>
+            /// <summary>Storm of Steel (Garek Talent), GT1c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("GT1c")]
             public class StormOfSteel : global::Moonwell.Objects.StandardAbility
@@ -59193,7 +59193,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public StormOfSteel()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SweepingStrikeAHsw, global::Moonwell.Objects.Other.Abilities.SweepingStrikeAHs3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SweepingStrike, global::Moonwell.Objects.Other.Abilities.SweepingStrikeAHs3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -59373,7 +59373,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Summon Headhunter (AIsh).</summary>
+            /// <summary>Summon Headhunter (item), AIsh.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIsh")]
             public class SummonHeadhunter : global::Moonwell.Objects.StandardAbility
@@ -59425,13 +59425,150 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Surge of Light (AHl1).</summary>
+            /// <summary>Surge of Light (AHsl).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHl1")]
+            [global::Moonwell.Objects.Standard("AHsl")]
             public class SurgeOfLight : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SurgeOfLight()
+                {
+                    AbilityPassiveRadius = Levels(800f);
+                    AllyPassiveCooldown = Levels(0f);
+                    AllyPassiveDuration = Levels(0f);
+                    AllyPassiveStatAmplify = Levels(100);
+                    Area = Levels(800f);
+                    AttackSpeedGain = Levels(50);
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    Caster = "Abilities\\Spells\\Human\\SurgeOfLight\\SurgeOfLightCast.mdl";
+                    CasterAttachmentPoint1 = "origin";
+                    CheckDependencies = true;
+                    Cooldown = Levels(90f);
+                    Duration = Levels(10f);
+                    HealPerSecondToAlly = Levels(0f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSurgeofLight.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSurgeofLight.blp";
+                    InstantHealToAlly = Levels(25f);
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(150);
+                    ManaRestoreToAlly = Levels(0f);
+                    MovementSpeedGain = Levels(50);
+                    Name = "Surge of Light";
+                    Order = "surgeoflight";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    Range = Levels(800f);
+                    RequiredLevel = 6;
+                    Special = "Abilities\\Spells\\Human\\SurgeOfLight\\SurgeOfLightPassive.mdl";
+                    SpecialAttachmentPoint = "chest";
+                    Target = "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdl";
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Allies | global::Moonwell.Objects.Targets.Self);
+                    Tooltip = Levels("Surge of Light");
+                    TooltipExtended = Levels("|cffffcc00Passive:|r Ilastar's attacks against enemies cast a Holy Bolt on the most damaged friendly unit within <AHsl,Area1> range, healing <AHsl,DataA1> hit points.|n|n|cffffcc00Active:|r Ilastar becomes imbued with the Light, increasing his attack rate by <AHsl,DataG1>% and movement speed by <AHsl,DataH1>%, and increasing the effectiveness of Holy Bolt by <AHsl,DataF1>%.|nLasts <AHsl,Dur1> seconds.");
+                    TooltipLearn = "Learn Surge of Light";
+                    TooltipLearnExtended = "|cffffcc00Passive:|r Ilastar's attacks against enemies cast a Holy Bolt on the most damaged friendly unit within <AHsl,Area1> range, healing <AHsl,DataA1> hit points.|n|n|cffffcc00Active:|r Ilastar becomes imbued with the Light, increasing his attack rate by <AHsl,DataG1>% and movement speed by <AHsl,DataH1>%, and increasing the effectiveness of Holy Bolt by <AHsl,DataF1>%.|nLasts <AHsl,Dur1> seconds.";
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>slrd</c>.</summary>
+                [global::Moonwell.Objects.Field("slrd", Label = "Ability Passive Radius")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> AbilityPassiveRadius
+                {
+                    get { return Fields.GetLevels<float>(this, "slrd"); }
+                    protected set { Fields.Put("slrd", value); }
+                }
+
+                /// <summary>The field <c>sol1</c>.</summary>
+                [global::Moonwell.Objects.Field("sol1", Label = "Instant Heal to Ally")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> InstantHealToAlly
+                {
+                    get { return Fields.GetLevels<float>(this, "sol1"); }
+                    protected set { Fields.Put("sol1", value); }
+                }
+
+                /// <summary>The field <c>sol2</c>.</summary>
+                [global::Moonwell.Objects.Field("sol2", Label = "Heal Per Second to Ally")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> HealPerSecondToAlly
+                {
+                    get { return Fields.GetLevels<float>(this, "sol2"); }
+                    protected set { Fields.Put("sol2", value); }
+                }
+
+                /// <summary>The field <c>sol3</c>.</summary>
+                [global::Moonwell.Objects.Field("sol3", Label = "Mana Restore to Ally")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ManaRestoreToAlly
+                {
+                    get { return Fields.GetLevels<float>(this, "sol3"); }
+                    protected set { Fields.Put("sol3", value); }
+                }
+
+                /// <summary>The field <c>sol4</c>.</summary>
+                [global::Moonwell.Objects.Field("sol4", Label = "Ally Passive Cooldown")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> AllyPassiveCooldown
+                {
+                    get { return Fields.GetLevels<float>(this, "sol4"); }
+                    protected set { Fields.Put("sol4", value); }
+                }
+
+                /// <summary>The field <c>sol5</c>.</summary>
+                [global::Moonwell.Objects.Field("sol5", Label = "Ally Passive Duration")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> AllyPassiveDuration
+                {
+                    get { return Fields.GetLevels<float>(this, "sol5"); }
+                    protected set { Fields.Put("sol5", value); }
+                }
+
+                /// <summary>The field <c>sol6</c>.</summary>
+                [global::Moonwell.Objects.Field("sol6", Label = "% Ally Passive Stat Amplify")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<int> AllyPassiveStatAmplify
+                {
+                    get { return Fields.GetLevels<int>(this, "sol6"); }
+                    protected set { Fields.Put("sol6", value); }
+                }
+
+                /// <summary>The field <c>sol7</c>.</summary>
+                [global::Moonwell.Objects.Field("sol7", Label = "% Attack Speed Gain")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<int> AttackSpeedGain
+                {
+                    get { return Fields.GetLevels<int>(this, "sol7"); }
+                    protected set { Fields.Put("sol7", value); }
+                }
+
+                /// <summary>The field <c>sol8</c>.</summary>
+                [global::Moonwell.Objects.Field("sol8", Label = "% Movement Speed Gain")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<int> MovementSpeedGain
+                {
+                    get { return Fields.GetLevels<int>(this, "sol8"); }
+                    protected set { Fields.Put("sol8", value); }
+                }
+            }
+
+            /// <summary>Surge of Light (Talent 1), AHl1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AHl1")]
+            public class SurgeOfLightAHl1 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SurgeOfLightAHl1()
                 {
                     AbilityPassiveRadius = Levels(800f);
                     AllyPassiveCooldown = Levels(0f);
@@ -59561,7 +59698,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Surge of Light (AHl2).</summary>
+            /// <summary>Surge of Light (Talent 2), AHl2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHl2")]
             public class SurgeOfLightAHl2 : global::Moonwell.Objects.StandardAbility
@@ -59697,7 +59834,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Surge of Light (AHl3).</summary>
+            /// <summary>Surge of Light (Talent 3), AHl3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHl3")]
             public class SurgeOfLightAHl3 : global::Moonwell.Objects.StandardAbility
@@ -59833,150 +59970,233 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Surge of Light (AHsl).</summary>
+            /// <summary>Sweeping Strike (AHsw).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHsl")]
-            public class SurgeOfLightAHsl : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public SurgeOfLightAHsl()
-                {
-                    AbilityPassiveRadius = Levels(800f);
-                    AllyPassiveCooldown = Levels(0f);
-                    AllyPassiveDuration = Levels(0f);
-                    AllyPassiveStatAmplify = Levels(100);
-                    Area = Levels(800f);
-                    AttackSpeedGain = Levels(50);
-                    ButtonPositionNormalX = 3;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 3;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f);
-                    Caster = "Abilities\\Spells\\Human\\SurgeOfLight\\SurgeOfLightCast.mdl";
-                    CasterAttachmentPoint1 = "origin";
-                    CheckDependencies = true;
-                    Cooldown = Levels(90f);
-                    Duration = Levels(10f);
-                    HealPerSecondToAlly = Levels(0f);
-                    HeroAbility = true;
-                    HeroDuration = Levels(0f);
-                    Hotkey = "R";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSurgeofLight.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSurgeofLight.blp";
-                    InstantHealToAlly = Levels(25f);
-                    ItemAbility = false;
-                    LearnHotkey = "R";
-                    LevelCount = 1;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(150);
-                    ManaRestoreToAlly = Levels(0f);
-                    MovementSpeedGain = Levels(50);
-                    Name = "Surge of Light";
-                    Order = "surgeoflight";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    Range = Levels(800f);
-                    RequiredLevel = 6;
-                    Special = "Abilities\\Spells\\Human\\SurgeOfLight\\SurgeOfLightPassive.mdl";
-                    SpecialAttachmentPoint = "chest";
-                    Target = "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdl";
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Allies | global::Moonwell.Objects.Targets.Self);
-                    Tooltip = Levels("Surge of Light");
-                    TooltipExtended = Levels("|cffffcc00Passive:|r Ilastar's attacks against enemies cast a Holy Bolt on the most damaged friendly unit within <AHsl,Area1> range, healing <AHsl,DataA1> hit points.|n|n|cffffcc00Active:|r Ilastar becomes imbued with the Light, increasing his attack rate by <AHsl,DataG1>% and movement speed by <AHsl,DataH1>%, and increasing the effectiveness of Holy Bolt by <AHsl,DataF1>%.|nLasts <AHsl,Dur1> seconds.");
-                    TooltipLearn = "Learn Surge of Light";
-                    TooltipLearnExtended = "|cffffcc00Passive:|r Ilastar's attacks against enemies cast a Holy Bolt on the most damaged friendly unit within <AHsl,Area1> range, healing <AHsl,DataA1> hit points.|n|n|cffffcc00Active:|r Ilastar becomes imbued with the Light, increasing his attack rate by <AHsl,DataG1>% and movement speed by <AHsl,DataH1>%, and increasing the effectiveness of Holy Bolt by <AHsl,DataF1>%.|nLasts <AHsl,Dur1> seconds.";
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>slrd</c>.</summary>
-                [global::Moonwell.Objects.Field("slrd", Label = "Ability Passive Radius")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> AbilityPassiveRadius
-                {
-                    get { return Fields.GetLevels<float>(this, "slrd"); }
-                    protected set { Fields.Put("slrd", value); }
-                }
-
-                /// <summary>The field <c>sol1</c>.</summary>
-                [global::Moonwell.Objects.Field("sol1", Label = "Instant Heal to Ally")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> InstantHealToAlly
-                {
-                    get { return Fields.GetLevels<float>(this, "sol1"); }
-                    protected set { Fields.Put("sol1", value); }
-                }
-
-                /// <summary>The field <c>sol2</c>.</summary>
-                [global::Moonwell.Objects.Field("sol2", Label = "Heal Per Second to Ally")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> HealPerSecondToAlly
-                {
-                    get { return Fields.GetLevels<float>(this, "sol2"); }
-                    protected set { Fields.Put("sol2", value); }
-                }
-
-                /// <summary>The field <c>sol3</c>.</summary>
-                [global::Moonwell.Objects.Field("sol3", Label = "Mana Restore to Ally")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> ManaRestoreToAlly
-                {
-                    get { return Fields.GetLevels<float>(this, "sol3"); }
-                    protected set { Fields.Put("sol3", value); }
-                }
-
-                /// <summary>The field <c>sol4</c>.</summary>
-                [global::Moonwell.Objects.Field("sol4", Label = "Ally Passive Cooldown")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> AllyPassiveCooldown
-                {
-                    get { return Fields.GetLevels<float>(this, "sol4"); }
-                    protected set { Fields.Put("sol4", value); }
-                }
-
-                /// <summary>The field <c>sol5</c>.</summary>
-                [global::Moonwell.Objects.Field("sol5", Label = "Ally Passive Duration")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> AllyPassiveDuration
-                {
-                    get { return Fields.GetLevels<float>(this, "sol5"); }
-                    protected set { Fields.Put("sol5", value); }
-                }
-
-                /// <summary>The field <c>sol6</c>.</summary>
-                [global::Moonwell.Objects.Field("sol6", Label = "% Ally Passive Stat Amplify")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> AllyPassiveStatAmplify
-                {
-                    get { return Fields.GetLevels<int>(this, "sol6"); }
-                    protected set { Fields.Put("sol6", value); }
-                }
-
-                /// <summary>The field <c>sol7</c>.</summary>
-                [global::Moonwell.Objects.Field("sol7", Label = "% Attack Speed Gain")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> AttackSpeedGain
-                {
-                    get { return Fields.GetLevels<int>(this, "sol7"); }
-                    protected set { Fields.Put("sol7", value); }
-                }
-
-                /// <summary>The field <c>sol8</c>.</summary>
-                [global::Moonwell.Objects.Field("sol8", Label = "% Movement Speed Gain")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> MovementSpeedGain
-                {
-                    get { return Fields.GetLevels<int>(this, "sol8"); }
-                    protected set { Fields.Put("sol8", value); }
-                }
-            }
-
-            /// <summary>Sweeping Strike (AHs1).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHs1")]
+            [global::Moonwell.Objects.Standard("AHsw")]
             public class SweepingStrike : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SweepingStrike()
+                {
+                    AnimationNames = "spell,slam";
+                    ArmorReduction = Levels(0f, 0f, 0f);
+                    AttackAngle = Levels(90f, 90f, 90f);
+                    AttackDistance = Levels(300f, 300f, 300f);
+                    AttackSpeedReduction = Levels(0, 0, 0);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 0;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    Caster = "Abilities\\Spells\\Human\\SweepingStrike\\SweepingStrike.mdl";
+                    CasterAttachmentPoint1 = "origin";
+                    CheckDependencies = true;
+                    Cooldown = Levels(15f, 15f, 15f);
+                    CooldownReductionOnHit = Levels(0f, 0f, 0f);
+                    Damage = Levels(100f, 150f, 200f);
+                    DamageByTargetMaxHealth = Levels(0f, 0f, 0f);
+                    DamageDelay = Levels(0.1f, 0.1f, 0.1f);
+                    DurationArmorReduction = Levels(7f, 7f, 7f);
+                    DurationAttackSpeedReduction = Levels(0f, 0f, 0f);
+                    DurationDamageByTargetMaxHealth = Levels(0f, 0f, 0f);
+                    HealingPerTargetHit = Levels(25f, 35f, 45f);
+                    HeroAbility = true;
+                    HeroDurationArmorReduction = Levels(5f, 5f, 5f);
+                    HeroDurationAttackSpeedReduction = Levels(0f, 0f, 0f);
+                    HeroDurationDamageByTargetMaxHealth = Levels(0f, 0f, 0f);
+                    Hotkey = "Q";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSweepingStrike.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSweepingStrike.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "Q";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100, 110, 120);
+                    MaxTargetHit = Levels(10, 10, 10);
+                    Name = "Sweeping Strike";
+                    Order = "sweepingstrike";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    Range = Levels(300f, 300f, 300f);
+                    RequiredLevel = 1;
+                    Target = "Abilities\\Spells\\Human\\SweepingStrike\\SweepingStrikeTarget.mdl";
+                    TargetAttachmentPoint1 = "chest";
+                    TargetAttachments = 1;
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable);
+                    Tooltip = Levels("Sweeping Strike - [|cffffcc00Level 1|r]", "Sweeping Strike - [|cffffcc00Level 2|r]", "Sweeping Strike - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Strikes the target area, dealing <AHsw,DataA1> damage to enemy units, and restoring <AHsw,DataE1> hit points per unit hit.", "Strikes the target area, dealing <AHsw,DataA2> damage to enemy units, and restoring <AHsw,DataE2> hit points per unit hit.", "Strikes the target area, dealing <AHsw,DataA3> damage to enemy units, and restoring <AHsw,DataE3> hit points per unit hit.");
+                    TooltipLearn = "Learn Sweeping Strike - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Strikes the target area, dealing damage and restoring hit points per enemy hit. |n|n|cffffcc00Level 1|r - <AHsw,DataA1> damage, <AHsw,DataE1> hit points. |n|cffffcc00Level 2|r - <AHsw,DataA2> damage, <AHsw,DataE2> hit points. |n|cffffcc00Level 3|r - <AHsw,DataA3> damage <AHsw,DataE3> hit points.";
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>swp1</c>.</summary>
+                [global::Moonwell.Objects.Field("swp1", Label = "Damage")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> Damage
+                {
+                    get { return Fields.GetLevels<float>(this, "swp1"); }
+                    protected set { Fields.Put("swp1", value); }
+                }
+
+                /// <summary>The field <c>swp2</c>.</summary>
+                [global::Moonwell.Objects.Field("swp2", Label = "Attack Distance")]
+                [global::Moonwell.Objects.Limits(0, 1000)]
+                public global::Moonwell.Objects.Levels<float> AttackDistance
+                {
+                    get { return Fields.GetLevels<float>(this, "swp2"); }
+                    protected set { Fields.Put("swp2", value); }
+                }
+
+                /// <summary>The field <c>swp3</c>.</summary>
+                [global::Moonwell.Objects.Field("swp3", Label = "Attack Angle")]
+                [global::Moonwell.Objects.Limits(0, 360)]
+                public global::Moonwell.Objects.Levels<float> AttackAngle
+                {
+                    get { return Fields.GetLevels<float>(this, "swp3"); }
+                    protected set { Fields.Put("swp3", value); }
+                }
+
+                /// <summary>The field <c>swp4</c>.</summary>
+                [global::Moonwell.Objects.Field("swp4", Label = "Damage Delay")]
+                [global::Moonwell.Objects.Limits(0.001, 300)]
+                public global::Moonwell.Objects.Levels<float> DamageDelay
+                {
+                    get { return Fields.GetLevels<float>(this, "swp4"); }
+                    protected set { Fields.Put("swp4", value); }
+                }
+
+                /// <summary>The field <c>swp5</c>.</summary>
+                [global::Moonwell.Objects.Field("swp5", Label = "Damage Strength Modifier (%)")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<int> DamageStrengthModifier
+                {
+                    get { return Fields.GetLevels<int>(this, "swp5"); }
+                    protected set { Fields.Put("swp5", value); }
+                }
+
+                /// <summary>The field <c>swp6</c>.</summary>
+                [global::Moonwell.Objects.Field("swp6", Label = "Healing Per Target Hit")]
+                [global::Moonwell.Objects.Limits(0, 300)]
+                public global::Moonwell.Objects.Levels<float> HealingPerTargetHit
+                {
+                    get { return Fields.GetLevels<float>(this, "swp6"); }
+                    protected set { Fields.Put("swp6", value); }
+                }
+
+                /// <summary>The field <c>swp7</c>.</summary>
+                [global::Moonwell.Objects.Field("swp7", Label = "Max Target Hit")]
+                [global::Moonwell.Objects.Limits(0, 300)]
+                public global::Moonwell.Objects.Levels<int> MaxTargetHit
+                {
+                    get { return Fields.GetLevels<int>(this, "swp7"); }
+                    protected set { Fields.Put("swp7", value); }
+                }
+
+                /// <summary>The field <c>swp8</c>.</summary>
+                [global::Moonwell.Objects.Field("swp8", Label = "Armor Reduction")]
+                [global::Moonwell.Objects.Limits(0, 300)]
+                public global::Moonwell.Objects.Levels<float> ArmorReduction
+                {
+                    get { return Fields.GetLevels<float>(this, "swp8"); }
+                    protected set { Fields.Put("swp8", value); }
+                }
+
+                /// <summary>The field <c>swp9</c>.</summary>
+                [global::Moonwell.Objects.Field("swp9", Label = "Attack Speed Reduction (%)")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<int> AttackSpeedReduction
+                {
+                    get { return Fields.GetLevels<int>(this, "swp9"); }
+                    protected set { Fields.Put("swp9", value); }
+                }
+
+                /// <summary>The field <c>swpa</c>.</summary>
+                [global::Moonwell.Objects.Field("swpa", Label = "Damage By Target Max Health (%)")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<float> DamageByTargetMaxHealth
+                {
+                    get { return Fields.GetLevels<float>(this, "swpa"); }
+                    protected set { Fields.Put("swpa", value); }
+                }
+
+                /// <summary>The field <c>swpb</c>.</summary>
+                [global::Moonwell.Objects.Field("swpb", Label = "Cooldown Reduction On Hit")]
+                [global::Moonwell.Objects.Limits(0, 300)]
+                public global::Moonwell.Objects.Levels<float> CooldownReductionOnHit
+                {
+                    get { return Fields.GetLevels<float>(this, "swpb"); }
+                    protected set { Fields.Put("swpb", value); }
+                }
+
+                /// <summary>The field <c>swpc</c>.</summary>
+                [global::Moonwell.Objects.Field("swpc", Label = "Duration Armor Reduction")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> DurationArmorReduction
+                {
+                    get { return Fields.GetLevels<float>(this, "swpc"); }
+                    protected set { Fields.Put("swpc", value); }
+                }
+
+                /// <summary>The field <c>swpd</c>.</summary>
+                [global::Moonwell.Objects.Field("swpd", Label = "Hero Duration Armor Reduction")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> HeroDurationArmorReduction
+                {
+                    get { return Fields.GetLevels<float>(this, "swpd"); }
+                    protected set { Fields.Put("swpd", value); }
+                }
+
+                /// <summary>The field <c>swpe</c>.</summary>
+                [global::Moonwell.Objects.Field("swpe", Label = "Duration Attack Speed Reduction")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> DurationAttackSpeedReduction
+                {
+                    get { return Fields.GetLevels<float>(this, "swpe"); }
+                    protected set { Fields.Put("swpe", value); }
+                }
+
+                /// <summary>The field <c>swpf</c>.</summary>
+                [global::Moonwell.Objects.Field("swpf", Label = "Hero Duration Attack Speed Reduction")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> HeroDurationAttackSpeedReduction
+                {
+                    get { return Fields.GetLevels<float>(this, "swpf"); }
+                    protected set { Fields.Put("swpf", value); }
+                }
+
+                /// <summary>The field <c>swpg</c>.</summary>
+                [global::Moonwell.Objects.Field("swpg", Label = "Duration Damage By Target Max Health")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> DurationDamageByTargetMaxHealth
+                {
+                    get { return Fields.GetLevels<float>(this, "swpg"); }
+                    protected set { Fields.Put("swpg", value); }
+                }
+
+                /// <summary>The field <c>swph</c>.</summary>
+                [global::Moonwell.Objects.Field("swph", Label = "Hero Duration Damage By Target Max Health")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> HeroDurationDamageByTargetMaxHealth
+                {
+                    get { return Fields.GetLevels<float>(this, "swph"); }
+                    protected set { Fields.Put("swph", value); }
+                }
+            }
+
+            /// <summary>Sweeping Strike (Talent 1), AHs1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AHs1")]
+            public class SweepingStrikeAHs1 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SweepingStrikeAHs1()
                 {
                     AnimationNames = "spell,slam";
                     ArmorReduction = Levels(0f, 0f, 0f);
@@ -60192,7 +60412,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sweeping Strike (AHs2).</summary>
+            /// <summary>Sweeping Strike (Talent 2), AHs2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHs2")]
             public class SweepingStrikeAHs2 : global::Moonwell.Objects.StandardAbility
@@ -60414,7 +60634,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sweeping Strike (AHs3).</summary>
+            /// <summary>Sweeping Strike (Talent 3), AHs3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHs3")]
             public class SweepingStrikeAHs3 : global::Moonwell.Objects.StandardAbility
@@ -60633,227 +60853,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Sweeping Strike (AHsw).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHsw")]
-            public class SweepingStrikeAHsw : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public SweepingStrikeAHsw()
-                {
-                    AnimationNames = "spell,slam";
-                    ArmorReduction = Levels(0f, 0f, 0f);
-                    AttackAngle = Levels(90f, 90f, 90f);
-                    AttackDistance = Levels(300f, 300f, 300f);
-                    AttackSpeedReduction = Levels(0, 0, 0);
-                    ButtonPositionNormalX = 0;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 0;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f, 0f, 0f);
-                    Caster = "Abilities\\Spells\\Human\\SweepingStrike\\SweepingStrike.mdl";
-                    CasterAttachmentPoint1 = "origin";
-                    CheckDependencies = true;
-                    Cooldown = Levels(15f, 15f, 15f);
-                    CooldownReductionOnHit = Levels(0f, 0f, 0f);
-                    Damage = Levels(100f, 150f, 200f);
-                    DamageByTargetMaxHealth = Levels(0f, 0f, 0f);
-                    DamageDelay = Levels(0.1f, 0.1f, 0.1f);
-                    DurationArmorReduction = Levels(7f, 7f, 7f);
-                    DurationAttackSpeedReduction = Levels(0f, 0f, 0f);
-                    DurationDamageByTargetMaxHealth = Levels(0f, 0f, 0f);
-                    HealingPerTargetHit = Levels(25f, 35f, 45f);
-                    HeroAbility = true;
-                    HeroDurationArmorReduction = Levels(5f, 5f, 5f);
-                    HeroDurationAttackSpeedReduction = Levels(0f, 0f, 0f);
-                    HeroDurationDamageByTargetMaxHealth = Levels(0f, 0f, 0f);
-                    Hotkey = "Q";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSweepingStrike.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNSweepingStrike.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "Q";
-                    LevelCount = 3;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(100, 110, 120);
-                    MaxTargetHit = Levels(10, 10, 10);
-                    Name = "Sweeping Strike";
-                    Order = "sweepingstrike";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    Range = Levels(300f, 300f, 300f);
-                    RequiredLevel = 1;
-                    Target = "Abilities\\Spells\\Human\\SweepingStrike\\SweepingStrikeTarget.mdl";
-                    TargetAttachmentPoint1 = "chest";
-                    TargetAttachments = 1;
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable);
-                    Tooltip = Levels("Sweeping Strike - [|cffffcc00Level 1|r]", "Sweeping Strike - [|cffffcc00Level 2|r]", "Sweeping Strike - [|cffffcc00Level 3|r]");
-                    TooltipExtended = Levels("Strikes the target area, dealing <AHsw,DataA1> damage to enemy units, and restoring <AHsw,DataE1> hit points per unit hit.", "Strikes the target area, dealing <AHsw,DataA2> damage to enemy units, and restoring <AHsw,DataE2> hit points per unit hit.", "Strikes the target area, dealing <AHsw,DataA3> damage to enemy units, and restoring <AHsw,DataE3> hit points per unit hit.");
-                    TooltipLearn = "Learn Sweeping Strike - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Strikes the target area, dealing damage and restoring hit points per enemy hit. |n|n|cffffcc00Level 1|r - <AHsw,DataA1> damage, <AHsw,DataE1> hit points. |n|cffffcc00Level 2|r - <AHsw,DataA2> damage, <AHsw,DataE2> hit points. |n|cffffcc00Level 3|r - <AHsw,DataA3> damage <AHsw,DataE3> hit points.";
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>swp1</c>.</summary>
-                [global::Moonwell.Objects.Field("swp1", Label = "Damage")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> Damage
-                {
-                    get { return Fields.GetLevels<float>(this, "swp1"); }
-                    protected set { Fields.Put("swp1", value); }
-                }
-
-                /// <summary>The field <c>swp2</c>.</summary>
-                [global::Moonwell.Objects.Field("swp2", Label = "Attack Distance")]
-                [global::Moonwell.Objects.Limits(0, 1000)]
-                public global::Moonwell.Objects.Levels<float> AttackDistance
-                {
-                    get { return Fields.GetLevels<float>(this, "swp2"); }
-                    protected set { Fields.Put("swp2", value); }
-                }
-
-                /// <summary>The field <c>swp3</c>.</summary>
-                [global::Moonwell.Objects.Field("swp3", Label = "Attack Angle")]
-                [global::Moonwell.Objects.Limits(0, 360)]
-                public global::Moonwell.Objects.Levels<float> AttackAngle
-                {
-                    get { return Fields.GetLevels<float>(this, "swp3"); }
-                    protected set { Fields.Put("swp3", value); }
-                }
-
-                /// <summary>The field <c>swp4</c>.</summary>
-                [global::Moonwell.Objects.Field("swp4", Label = "Damage Delay")]
-                [global::Moonwell.Objects.Limits(0.001, 300)]
-                public global::Moonwell.Objects.Levels<float> DamageDelay
-                {
-                    get { return Fields.GetLevels<float>(this, "swp4"); }
-                    protected set { Fields.Put("swp4", value); }
-                }
-
-                /// <summary>The field <c>swp5</c>.</summary>
-                [global::Moonwell.Objects.Field("swp5", Label = "Damage Strength Modifier (%)")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> DamageStrengthModifier
-                {
-                    get { return Fields.GetLevels<int>(this, "swp5"); }
-                    protected set { Fields.Put("swp5", value); }
-                }
-
-                /// <summary>The field <c>swp6</c>.</summary>
-                [global::Moonwell.Objects.Field("swp6", Label = "Healing Per Target Hit")]
-                [global::Moonwell.Objects.Limits(0, 300)]
-                public global::Moonwell.Objects.Levels<float> HealingPerTargetHit
-                {
-                    get { return Fields.GetLevels<float>(this, "swp6"); }
-                    protected set { Fields.Put("swp6", value); }
-                }
-
-                /// <summary>The field <c>swp7</c>.</summary>
-                [global::Moonwell.Objects.Field("swp7", Label = "Max Target Hit")]
-                [global::Moonwell.Objects.Limits(0, 300)]
-                public global::Moonwell.Objects.Levels<int> MaxTargetHit
-                {
-                    get { return Fields.GetLevels<int>(this, "swp7"); }
-                    protected set { Fields.Put("swp7", value); }
-                }
-
-                /// <summary>The field <c>swp8</c>.</summary>
-                [global::Moonwell.Objects.Field("swp8", Label = "Armor Reduction")]
-                [global::Moonwell.Objects.Limits(0, 300)]
-                public global::Moonwell.Objects.Levels<float> ArmorReduction
-                {
-                    get { return Fields.GetLevels<float>(this, "swp8"); }
-                    protected set { Fields.Put("swp8", value); }
-                }
-
-                /// <summary>The field <c>swp9</c>.</summary>
-                [global::Moonwell.Objects.Field("swp9", Label = "Attack Speed Reduction (%)")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<int> AttackSpeedReduction
-                {
-                    get { return Fields.GetLevels<int>(this, "swp9"); }
-                    protected set { Fields.Put("swp9", value); }
-                }
-
-                /// <summary>The field <c>swpa</c>.</summary>
-                [global::Moonwell.Objects.Field("swpa", Label = "Damage By Target Max Health (%)")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                public global::Moonwell.Objects.Levels<float> DamageByTargetMaxHealth
-                {
-                    get { return Fields.GetLevels<float>(this, "swpa"); }
-                    protected set { Fields.Put("swpa", value); }
-                }
-
-                /// <summary>The field <c>swpb</c>.</summary>
-                [global::Moonwell.Objects.Field("swpb", Label = "Cooldown Reduction On Hit")]
-                [global::Moonwell.Objects.Limits(0, 300)]
-                public global::Moonwell.Objects.Levels<float> CooldownReductionOnHit
-                {
-                    get { return Fields.GetLevels<float>(this, "swpb"); }
-                    protected set { Fields.Put("swpb", value); }
-                }
-
-                /// <summary>The field <c>swpc</c>.</summary>
-                [global::Moonwell.Objects.Field("swpc", Label = "Duration Armor Reduction")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> DurationArmorReduction
-                {
-                    get { return Fields.GetLevels<float>(this, "swpc"); }
-                    protected set { Fields.Put("swpc", value); }
-                }
-
-                /// <summary>The field <c>swpd</c>.</summary>
-                [global::Moonwell.Objects.Field("swpd", Label = "Hero Duration Armor Reduction")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> HeroDurationArmorReduction
-                {
-                    get { return Fields.GetLevels<float>(this, "swpd"); }
-                    protected set { Fields.Put("swpd", value); }
-                }
-
-                /// <summary>The field <c>swpe</c>.</summary>
-                [global::Moonwell.Objects.Field("swpe", Label = "Duration Attack Speed Reduction")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> DurationAttackSpeedReduction
-                {
-                    get { return Fields.GetLevels<float>(this, "swpe"); }
-                    protected set { Fields.Put("swpe", value); }
-                }
-
-                /// <summary>The field <c>swpf</c>.</summary>
-                [global::Moonwell.Objects.Field("swpf", Label = "Hero Duration Attack Speed Reduction")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> HeroDurationAttackSpeedReduction
-                {
-                    get { return Fields.GetLevels<float>(this, "swpf"); }
-                    protected set { Fields.Put("swpf", value); }
-                }
-
-                /// <summary>The field <c>swpg</c>.</summary>
-                [global::Moonwell.Objects.Field("swpg", Label = "Duration Damage By Target Max Health")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> DurationDamageByTargetMaxHealth
-                {
-                    get { return Fields.GetLevels<float>(this, "swpg"); }
-                    protected set { Fields.Put("swpg", value); }
-                }
-
-                /// <summary>The field <c>swph</c>.</summary>
-                [global::Moonwell.Objects.Field("swph", Label = "Hero Duration Damage By Target Max Health")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> HeroDurationDamageByTargetMaxHealth
-                {
-                    get { return Fields.GetLevels<float>(this, "swph"); }
-                    protected set { Fields.Put("swph", value); }
-                }
-            }
-
-            /// <summary>Swordsmanship (UT5b).</summary>
+            /// <summary>Swordsmanship (UGarekTalent), UT5b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT5b")]
             public class Swordsmanship : global::Moonwell.Objects.StandardAbility
@@ -60941,7 +60941,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Talents (ATal).</summary>
+            /// <summary>Talents (Hero), ATal.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ATal")]
             public class Talents : global::Moonwell.Objects.StandardAbility
@@ -60977,7 +60977,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Talents (AThg).</summary>
+            /// <summary>Talents (HGarek), AThg.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AThg")]
             public class TalentsAThg : global::Moonwell.Objects.StandardAbility
@@ -61013,7 +61013,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Talents (AThi).</summary>
+            /// <summary>Talents (Ilastar), AThi.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AThi")]
             public class TalentsAThi : global::Moonwell.Objects.StandardAbility
@@ -61049,7 +61049,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Talents (AThl).</summary>
+            /// <summary>Talents (Landen), AThl.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AThl")]
             public class TalentsAThl : global::Moonwell.Objects.StandardAbility
@@ -61085,7 +61085,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Talents (ATua).</summary>
+            /// <summary>Talents (Anya), ATua.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ATua")]
             public class TalentsATua : global::Moonwell.Objects.StandardAbility
@@ -61121,7 +61121,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Talents (ATug).</summary>
+            /// <summary>Talents (UGarek), ATug.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ATug")]
             public class TalentsATug : global::Moonwell.Objects.StandardAbility
@@ -61157,7 +61157,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Talents (ATul).</summary>
+            /// <summary>Talents (Leonid), ATul.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ATul")]
             public class TalentsATul : global::Moonwell.Objects.StandardAbility
@@ -61193,7 +61193,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Tenacity (BT3c).</summary>
+            /// <summary>Tenacity (LeonidTalent), BT3c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT3c")]
             public class Tenacity : global::Moonwell.Objects.StandardAbility
@@ -61201,7 +61201,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Tenacity()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.GritAHgr, global::Moonwell.Objects.Other.Abilities.GritAHg3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.Grit, global::Moonwell.Objects.Other.Abilities.GritAHg3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -61280,7 +61280,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>The Best Defense... (UT2c).</summary>
+            /// <summary>The Best Defense... (UGarekTalent), UT2c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT2c")]
             public class TheBestDefense : global::Moonwell.Objects.StandardAbility
@@ -61288,7 +61288,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public TheBestDefense()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.UndyingDefianceAUbd, global::Moonwell.Objects.Other.Abilities.UndyingDefianceAUb3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.UndyingDefiance, global::Moonwell.Objects.Other.Abilities.UndyingDefianceAUb3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -61367,7 +61367,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Thick Skin (BT6b).</summary>
+            /// <summary>Thick Skin (LeonidTalent), BT6b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT6b")]
             public class ThickSkin : global::Moonwell.Objects.StandardAbility
@@ -61421,7 +61421,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Thirst For Battle (UT3b).</summary>
+            /// <summary>Thirst For Battle (UGarekTalent), UT3b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT3b")]
             public class ThirstForBattle : global::Moonwell.Objects.StandardAbility
@@ -61508,7 +61508,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Thorn Shield (AUss).</summary>
+            /// <summary>Thorn Shield (Stacking), AUss.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUss")]
             public class ThornShield : global::Moonwell.Objects.StandardAbility
@@ -61663,7 +61663,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>True Sight (ANtr).</summary>
+            /// <summary>True Sight (Neutral 2), ANtr.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ANtr")]
             public class TrueSight : global::Moonwell.Objects.StandardAbility
@@ -61706,7 +61706,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>True Sight (Adtg).</summary>
+            /// <summary>True Sight (Neutral 1), Adtg.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Adtg")]
             public class TrueSightAdtg : global::Moonwell.Objects.StandardAbility
@@ -61749,7 +61749,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Ultravision (AIuv).</summary>
+            /// <summary>Ultravision (Item), AIuv.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIuv")]
             public class Ultravision : global::Moonwell.Objects.StandardAbility
@@ -61778,7 +61778,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Umbral Rupture (AT3c).</summary>
+            /// <summary>Umbral Rupture (AnyaTalent), AT3c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT3c")]
             public class UmbralRupture : global::Moonwell.Objects.StandardAbility
@@ -61786,7 +61786,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public UmbralRupture()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.DeathseekerArrowsAUdb, global::Moonwell.Objects.Other.Abilities.DeathseekerArrowsAUd3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.DeathseekerArrows, global::Moonwell.Objects.Other.Abilities.DeathseekerArrowsAUd3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -61865,7 +61865,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Unbreakable (GT4a).</summary>
+            /// <summary>Unbreakable (Garek Talent), GT4a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("GT4a")]
             public class Unbreakable : global::Moonwell.Objects.StandardAbility
@@ -61873,7 +61873,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Unbreakable()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.WarcryAHwc, global::Moonwell.Objects.Other.Abilities.Warcry>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.Warcry, global::Moonwell.Objects.Other.Abilities.WarcryAHw1>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -61952,7 +61952,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Unbreakable Spirit (BT3b).</summary>
+            /// <summary>Unbreakable Spirit (LeonidTalent), BT3b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT3b")]
             public class UnbreakableSpirit : global::Moonwell.Objects.StandardAbility
@@ -61960,7 +61960,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public UnbreakableSpirit()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.GritAHgr, global::Moonwell.Objects.Other.Abilities.GritAHg2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.Grit, global::Moonwell.Objects.Other.Abilities.GritAHg2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -62039,7 +62039,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Undead Vitality (BT5c).</summary>
+            /// <summary>Undead Vitality (LeonidTalent), BT5c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT5c")]
             public class UndeadVitality : global::Moonwell.Objects.StandardAbility
@@ -62083,13 +62083,142 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Undying Defiance (AUb1).</summary>
+            /// <summary>Undying Defiance (AUbd).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AUb1")]
+            [global::Moonwell.Objects.Standard("AUbd")]
             public class UndyingDefiance : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public UndyingDefiance()
+                {
+                    AnimationNames = "spell,one";
+                    Area = Levels(0f, 0f, 0f, 0f, 0f);
+                    AttackSpeedIncrease = Levels(30f, 35f, 40f, 45f, 50f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.UndyingDefiance, global::Moonwell.Objects.Other.Buffs.UndyingDefianceBonus>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(20f, 20f, 20f, 20f, 20f);
+                    DamageReduction = Levels(65f, 65f, 65f, 65f, 65f);
+                    Duration = Levels(10f, 10f, 10f, 10f, 10f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(10f, 10f, 10f, 10f, 10f);
+                    Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNUnyieldingGuardU.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNUnyieldingGuardU.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "W";
+                    LevelCount = 5;
+                    LevelSkipRequirement = 4;
+                    ManaCost = Levels(75, 75, 75, 75, 75);
+                    MovementSpeedReduction = Levels(40f, 35f, 30f, 25f, 20f);
+                    Name = "Undying Defiance";
+                    OnDamageTakenBonusDuration = Levels(3f, 3f, 3f, 3f, 3f);
+                    Order = "unyieldingguard";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    Range = Levels(0f, 0f, 0f, 0f, 0f);
+                    RequiredLevel = 1;
+                    Special = "Abilities\\Spells\\Undead\\UndyingDefiance\\UndyingDefianceTarget.mdl";
+                    SpecialAttachmentPoint = "origin";
+                    Tooltip = Levels("Undying Defiance - [|cffffcc00Level 1|r]", "Undying Defiance - [|cffffcc00Level 2|r]", "Undying Defiance - [|cffffcc00Level 3|r]", "Undying Defiance - [|cffffcc00Level 4|r]", "Undying Defiance - [|cffffcc00Level 5|r]");
+                    TooltipExtended = Levels("Enter a defensive stance, reducing incoming damage by <AUbd,DataA1>% and movement speed by <AUbd,DataB1>%. During this time, if Garek takes any damage, he gains <AUbd,DataC1>% attack rate for <AUbd,DataD1> seconds. |nLasts <AUbd,Dur1> seconds.", "Enter a defensive stance, reducing incoming damage by <AUbd,DataA2>% and movement speed by <AUbd,DataB2>%. During this time, if Garek takes any damage, he gains <AUbd,DataC2>% attack rate for <AUbd,DataD2> seconds. |nLasts <AUbd,Dur2> seconds.", "Enter a defensive stance, reducing incoming damage by <AUbd,DataA3>% and movement speed by <AUbd,DataB3>%. During this time, if Garek takes any damage, he gains <AUbd,DataC3>% attack rate for <AUbd,DataD3> seconds. |nLasts <AUbd,Dur3> seconds.", "Enter a defensive stance, reducing incoming damage by <AUbd,DataA4>% and movement speed by <AUbd,DataB4>%. During this time, if Garek takes any damage, he gains <AUbd,DataC4>% attack rate for <AUbd,DataD4> seconds. |nLasts <AUbd,Dur4> seconds.", "Enter a defensive stance, reducing incoming damage by <AUbd,DataA5>% and movement speed by <AUbd,DataB5>%. During this time, if Garek takes any damage, he gains <AUbd,DataC5>% attack rate for <AUbd,DataD5> seconds. |nLasts <AUbd,Dur5> seconds.");
+                    TooltipLearn = "Learn Undying Defiance - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Take reduced damage, at the cost of movement speed. Taking damage grants increased attack rate. |n|n|cffffcc00Level 1|r - <AUbd,DataA1>% reduced damage, <AUbd,DataB1>% reduced movement speed, <AUbd,DataC1>% attack rate for <AUbd,DataD1> seconds. Lasts <AUbd,Dur1> seconds. |n|cffffcc00Level 2|r - <AUbd,DataA2>% reduced damage, <AUbd,DataB2>% reduced movement speed, <AUbd,DataC2>% attack rate for <AUbd,DataD2> seconds. Lasts <AUbd,Dur2> seconds. |n|cffffcc00Level 3|r - <AUbd,DataA3>% reduced damage, <AUbd,DataB3>% reduced movement speed, <AUbd,DataC3>% attack rate for <AUbd,DataD3> seconds. Lasts <AUbd,Dur3> seconds. |n|cffffcc00Level 4|r - <AUbd,DataA4>% reduced damage, <AUbd,DataB4>% reduced movement speed, <AUbd,DataC4>% attack rate for <AUbd,DataD4> seconds. Lasts <AUbd,Dur4> seconds. |n|cffffcc00Level 5|r - <AUbd,DataA5>% reduced damage, <AUbd,DataB5>% reduced movement speed, <AUbd,DataC5>% attack rate for <AUbd,DataD5> seconds. Lasts <AUbd,Dur5> seconds.";
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>bld1</c>.</summary>
+                [global::Moonwell.Objects.Field("bld1", Label = "% Damage Reduction")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> DamageReduction
+                {
+                    get { return Fields.GetLevels<float>(this, "bld1"); }
+                    protected set { Fields.Put("bld1", value); }
+                }
+
+                /// <summary>The field <c>bld2</c>.</summary>
+                [global::Moonwell.Objects.Field("bld2", Label = "% Movement Speed reduction")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> MovementSpeedReduction
+                {
+                    get { return Fields.GetLevels<float>(this, "bld2"); }
+                    protected set { Fields.Put("bld2", value); }
+                }
+
+                /// <summary>The field <c>bld3</c>.</summary>
+                [global::Moonwell.Objects.Field("bld3", Label = "% Attack Speed Increase")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> AttackSpeedIncrease
+                {
+                    get { return Fields.GetLevels<float>(this, "bld3"); }
+                    protected set { Fields.Put("bld3", value); }
+                }
+
+                /// <summary>The field <c>bld4</c>.</summary>
+                [global::Moonwell.Objects.Field("bld4", Label = "On Damage Taken Bonus Duration")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> OnDamageTakenBonusDuration
+                {
+                    get { return Fields.GetLevels<float>(this, "bld4"); }
+                    protected set { Fields.Put("bld4", value); }
+                }
+
+                /// <summary>The field <c>bld5</c>.</summary>
+                [global::Moonwell.Objects.Field("bld5", Label = "Sweep Remaining Cooldown Reduction On Hit")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> SweepRemainingCooldownReductionOnHit
+                {
+                    get { return Fields.GetLevels<float>(this, "bld5"); }
+                    protected set { Fields.Put("bld5", value); }
+                }
+
+                /// <summary>The field <c>bld6</c>.</summary>
+                [global::Moonwell.Objects.Field("bld6", Label = "% Damage Reflection")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> DamageReflection
+                {
+                    get { return Fields.GetLevels<float>(this, "bld6"); }
+                    protected set { Fields.Put("bld6", value); }
+                }
+
+                /// <summary>The field <c>bld7</c>.</summary>
+                [global::Moonwell.Objects.Field("bld7", Label = "Flat Damage Reflection")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> FlatDamageReflection
+                {
+                    get { return Fields.GetLevels<float>(this, "bld7"); }
+                    protected set { Fields.Put("bld7", value); }
+                }
+
+                /// <summary>The field <c>bld8</c>.</summary>
+                [global::Moonwell.Objects.Field("bld8", Label = "% Ability Speed Increase")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> AbilitySpeedIncrease
+                {
+                    get { return Fields.GetLevels<float>(this, "bld8"); }
+                    protected set { Fields.Put("bld8", value); }
+                }
+            }
+
+            /// <summary>Undying Defiance (Talent 1), AUb1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AUb1")]
+            public class UndyingDefianceAUb1 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public UndyingDefianceAUb1()
                 {
                     AnimationNames = "spell,one";
                     Area = Levels(0f, 0f, 0f, 0f, 0f);
@@ -62214,7 +62343,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Undying Defiance (AUb2).</summary>
+            /// <summary>Undying Defiance (Talent 2), AUb2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUb2")]
             public class UndyingDefianceAUb2 : global::Moonwell.Objects.StandardAbility
@@ -62344,7 +62473,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Undying Defiance (AUb3).</summary>
+            /// <summary>Undying Defiance (Talent 3), AUb3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUb3")]
             public class UndyingDefianceAUb3 : global::Moonwell.Objects.StandardAbility
@@ -62475,136 +62604,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Undying Defiance (AUbd).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AUbd")]
-            public class UndyingDefianceAUbd : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public UndyingDefianceAUbd()
-                {
-                    AnimationNames = "spell,one";
-                    Area = Levels(0f, 0f, 0f, 0f, 0f);
-                    AttackSpeedIncrease = Levels(30f, 35f, 40f, 45f, 50f);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.UndyingDefiance, global::Moonwell.Objects.Other.Buffs.UndyingDefianceBonus>();
-                    ButtonPositionNormalX = 1;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 1;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f, 0f, 0f, 0f, 0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(20f, 20f, 20f, 20f, 20f);
-                    DamageReduction = Levels(65f, 65f, 65f, 65f, 65f);
-                    Duration = Levels(10f, 10f, 10f, 10f, 10f);
-                    HeroAbility = true;
-                    HeroDuration = Levels(10f, 10f, 10f, 10f, 10f);
-                    Hotkey = "W";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNUnyieldingGuardU.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNUnyieldingGuardU.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "W";
-                    LevelCount = 5;
-                    LevelSkipRequirement = 4;
-                    ManaCost = Levels(75, 75, 75, 75, 75);
-                    MovementSpeedReduction = Levels(40f, 35f, 30f, 25f, 20f);
-                    Name = "Undying Defiance";
-                    OnDamageTakenBonusDuration = Levels(3f, 3f, 3f, 3f, 3f);
-                    Order = "unyieldingguard";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    Range = Levels(0f, 0f, 0f, 0f, 0f);
-                    RequiredLevel = 1;
-                    Special = "Abilities\\Spells\\Undead\\UndyingDefiance\\UndyingDefianceTarget.mdl";
-                    SpecialAttachmentPoint = "origin";
-                    Tooltip = Levels("Undying Defiance - [|cffffcc00Level 1|r]", "Undying Defiance - [|cffffcc00Level 2|r]", "Undying Defiance - [|cffffcc00Level 3|r]", "Undying Defiance - [|cffffcc00Level 4|r]", "Undying Defiance - [|cffffcc00Level 5|r]");
-                    TooltipExtended = Levels("Enter a defensive stance, reducing incoming damage by <AUbd,DataA1>% and movement speed by <AUbd,DataB1>%. During this time, if Garek takes any damage, he gains <AUbd,DataC1>% attack rate for <AUbd,DataD1> seconds. |nLasts <AUbd,Dur1> seconds.", "Enter a defensive stance, reducing incoming damage by <AUbd,DataA2>% and movement speed by <AUbd,DataB2>%. During this time, if Garek takes any damage, he gains <AUbd,DataC2>% attack rate for <AUbd,DataD2> seconds. |nLasts <AUbd,Dur2> seconds.", "Enter a defensive stance, reducing incoming damage by <AUbd,DataA3>% and movement speed by <AUbd,DataB3>%. During this time, if Garek takes any damage, he gains <AUbd,DataC3>% attack rate for <AUbd,DataD3> seconds. |nLasts <AUbd,Dur3> seconds.", "Enter a defensive stance, reducing incoming damage by <AUbd,DataA4>% and movement speed by <AUbd,DataB4>%. During this time, if Garek takes any damage, he gains <AUbd,DataC4>% attack rate for <AUbd,DataD4> seconds. |nLasts <AUbd,Dur4> seconds.", "Enter a defensive stance, reducing incoming damage by <AUbd,DataA5>% and movement speed by <AUbd,DataB5>%. During this time, if Garek takes any damage, he gains <AUbd,DataC5>% attack rate for <AUbd,DataD5> seconds. |nLasts <AUbd,Dur5> seconds.");
-                    TooltipLearn = "Learn Undying Defiance - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Take reduced damage, at the cost of movement speed. Taking damage grants increased attack rate. |n|n|cffffcc00Level 1|r - <AUbd,DataA1>% reduced damage, <AUbd,DataB1>% reduced movement speed, <AUbd,DataC1>% attack rate for <AUbd,DataD1> seconds. Lasts <AUbd,Dur1> seconds. |n|cffffcc00Level 2|r - <AUbd,DataA2>% reduced damage, <AUbd,DataB2>% reduced movement speed, <AUbd,DataC2>% attack rate for <AUbd,DataD2> seconds. Lasts <AUbd,Dur2> seconds. |n|cffffcc00Level 3|r - <AUbd,DataA3>% reduced damage, <AUbd,DataB3>% reduced movement speed, <AUbd,DataC3>% attack rate for <AUbd,DataD3> seconds. Lasts <AUbd,Dur3> seconds. |n|cffffcc00Level 4|r - <AUbd,DataA4>% reduced damage, <AUbd,DataB4>% reduced movement speed, <AUbd,DataC4>% attack rate for <AUbd,DataD4> seconds. Lasts <AUbd,Dur4> seconds. |n|cffffcc00Level 5|r - <AUbd,DataA5>% reduced damage, <AUbd,DataB5>% reduced movement speed, <AUbd,DataC5>% attack rate for <AUbd,DataD5> seconds. Lasts <AUbd,Dur5> seconds.";
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>bld1</c>.</summary>
-                [global::Moonwell.Objects.Field("bld1", Label = "% Damage Reduction")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> DamageReduction
-                {
-                    get { return Fields.GetLevels<float>(this, "bld1"); }
-                    protected set { Fields.Put("bld1", value); }
-                }
-
-                /// <summary>The field <c>bld2</c>.</summary>
-                [global::Moonwell.Objects.Field("bld2", Label = "% Movement Speed reduction")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> MovementSpeedReduction
-                {
-                    get { return Fields.GetLevels<float>(this, "bld2"); }
-                    protected set { Fields.Put("bld2", value); }
-                }
-
-                /// <summary>The field <c>bld3</c>.</summary>
-                [global::Moonwell.Objects.Field("bld3", Label = "% Attack Speed Increase")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> AttackSpeedIncrease
-                {
-                    get { return Fields.GetLevels<float>(this, "bld3"); }
-                    protected set { Fields.Put("bld3", value); }
-                }
-
-                /// <summary>The field <c>bld4</c>.</summary>
-                [global::Moonwell.Objects.Field("bld4", Label = "On Damage Taken Bonus Duration")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> OnDamageTakenBonusDuration
-                {
-                    get { return Fields.GetLevels<float>(this, "bld4"); }
-                    protected set { Fields.Put("bld4", value); }
-                }
-
-                /// <summary>The field <c>bld5</c>.</summary>
-                [global::Moonwell.Objects.Field("bld5", Label = "Sweep Remaining Cooldown Reduction On Hit")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> SweepRemainingCooldownReductionOnHit
-                {
-                    get { return Fields.GetLevels<float>(this, "bld5"); }
-                    protected set { Fields.Put("bld5", value); }
-                }
-
-                /// <summary>The field <c>bld6</c>.</summary>
-                [global::Moonwell.Objects.Field("bld6", Label = "% Damage Reflection")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> DamageReflection
-                {
-                    get { return Fields.GetLevels<float>(this, "bld6"); }
-                    protected set { Fields.Put("bld6", value); }
-                }
-
-                /// <summary>The field <c>bld7</c>.</summary>
-                [global::Moonwell.Objects.Field("bld7", Label = "Flat Damage Reflection")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> FlatDamageReflection
-                {
-                    get { return Fields.GetLevels<float>(this, "bld7"); }
-                    protected set { Fields.Put("bld7", value); }
-                }
-
-                /// <summary>The field <c>bld8</c>.</summary>
-                [global::Moonwell.Objects.Field("bld8", Label = "% Ability Speed Increase")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> AbilitySpeedIncrease
-                {
-                    get { return Fields.GetLevels<float>(this, "bld8"); }
-                    protected set { Fields.Put("bld8", value); }
-                }
-            }
-
-            /// <summary>Unending Fury (UT4c).</summary>
+            /// <summary>Unending Fury (UGarekTalent), UT4c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT4c")]
             public class UnendingFury : global::Moonwell.Objects.StandardAbility
@@ -62612,7 +62612,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public UnendingFury()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.GrimConvictionAUvg, global::Moonwell.Objects.Other.Abilities.GrimConvictionAUv3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.GrimConviction, global::Moonwell.Objects.Other.Abilities.GrimConvictionAUv3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -62691,7 +62691,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Unholy Frenzy (AIuf).</summary>
+            /// <summary>Unholy Frenzy (item), AIuf.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIuf")]
             public class UnholyFrenzy : global::Moonwell.Objects.StandardAbility
@@ -62743,7 +62743,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Unit Inventory (Aien).</summary>
+            /// <summary>Unit Inventory (Night Elf), Aien.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aien")]
             public class UnitInventory : global::Moonwell.Objects.StandardAbility
@@ -62820,7 +62820,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Unit Inventory (Aihn).</summary>
+            /// <summary>Unit Inventory (Human), Aihn.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aihn")]
             public class UnitInventoryAihn : global::Moonwell.Objects.StandardAbility
@@ -62897,7 +62897,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Unit Inventory (Aion).</summary>
+            /// <summary>Unit Inventory (Orc), Aion.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aion")]
             public class UnitInventoryAion : global::Moonwell.Objects.StandardAbility
@@ -62974,7 +62974,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Unit Inventory (Aiun).</summary>
+            /// <summary>Unit Inventory (Undead), Aiun.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Aiun")]
             public class UnitInventoryAiun : global::Moonwell.Objects.StandardAbility
@@ -63051,7 +63051,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Unload (Adro).</summary>
+            /// <summary>Unload (Air Transports),  (Goblin Zeppelin), Adro.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Adro")]
             public class Unload : global::Moonwell.Objects.StandardAbility
@@ -63086,7 +63086,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Unload Instant (Adri).</summary>
+            /// <summary>Unload Instant (Entangled Mine), Adri.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Adri")]
             public class UnloadInstant : global::Moonwell.Objects.StandardAbility
@@ -63121,7 +63121,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Unload (Sdro).</summary>
+            /// <summary>Unload (Sea Transports), Sdro.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Sdro")]
             public class UnloadSdro : global::Moonwell.Objects.StandardAbility
@@ -63156,7 +63156,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Unstoppable Might (GT4c).</summary>
+            /// <summary>Unstoppable Might (Garek Talent), GT4c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("GT4c")]
             public class UnstoppableMight : global::Moonwell.Objects.StandardAbility
@@ -63164,7 +63164,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public UnstoppableMight()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.WarcryAHwc, global::Moonwell.Objects.Other.Abilities.AHw3>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.Warcry, global::Moonwell.Objects.Other.Abilities.AHw3>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -63243,7 +63243,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Unwilling Bomb (IT2a).</summary>
+            /// <summary>Unwilling Bomb (IlastarTalent), IT2a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("IT2a")]
             public class UnwillingBomb : global::Moonwell.Objects.StandardAbility
@@ -63330,13 +63330,142 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Unyielding Guard (AHb1).</summary>
+            /// <summary>Unyielding Guard (AHbd).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHb1")]
+            [global::Moonwell.Objects.Standard("AHbd")]
             public class UnyieldingGuard : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public UnyieldingGuard()
+                {
+                    AnimationNames = "spell,one";
+                    Area = Levels(0f, 0f, 0f);
+                    AttackSpeedIncrease = Levels(15f, 20f, 25f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.UnyieldingGuard, global::Moonwell.Objects.Other.Buffs.UnyieldingGuardBonus>();
+                    ButtonPositionNormalX = 1;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 1;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(20f, 20f, 20f);
+                    DamageReduction = Levels(40f, 50f, 60f);
+                    Duration = Levels(10f, 10f, 10f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(10f, 10f, 10f);
+                    Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNUnyieldingGuard.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNUnyieldingGuard.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "W";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(50, 50, 50);
+                    MovementSpeedReduction = Levels(40f, 40f, 40f);
+                    Name = "Unyielding Guard";
+                    OnDamageTakenBonusDuration = Levels(3f, 3f, 3f);
+                    Order = "unyieldingguard";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    Range = Levels(0f, 0f, 0f);
+                    RequiredLevel = 1;
+                    Special = "Abilities\\Spells\\Human\\BladeDance\\BladeDanceTarget.mdl";
+                    SpecialAttachmentPoint = "origin";
+                    Tooltip = Levels("Unyielding Guard - [|cffffcc00Level 1|r]", "Unyielding Guard - [|cffffcc00Level 2|r]", "Unyielding Guard - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Enter a defensive stance, reducing incoming damage by <AHbd,DataA1>% and movement speed by <AHbd,DataB1>%. During this time, if Garek takes any damage, he gains <AHbd,DataC1>% attack rate for <AHbd,DataD1> seconds. |nLasts <AHbd,Dur1> seconds.", "Enter a defensive stance, reducing incoming damage by <AHbd,DataA2>% and movement speed by <AHbd,DataB2>%. During this time, if Garek takes any damage, he gains <AHbd,DataC2>% attack rate for <AHbd,DataD2> seconds. |nLasts <AHbd,Dur2> seconds.", "Enter a defensive stance, reducing incoming damage by <AHbd,DataA3>% and movement speed by <AHbd,DataB3>%. During this time, if Garek takes any damage, he gains <AHbd,DataC3>% attack rate for <AHbd,DataD3> seconds. |nLasts <AHbd,Dur3> seconds.");
+                    TooltipLearn = "Learn Unyielding Guard - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Take reduced damage, at the cost of movement speed. Taking damage grants increased attack rate. |n|n|cffffcc00Level 1|r - <AHbd,DataA1>% reduced damage, <AHbd,DataB1>% reduced movement speed, <AHbd,DataC1>% attack rate for <AHbd,DataD1> seconds. Lasts <AHbd,Dur1> seconds. |n|cffffcc00Level 2|r - <AHbd,DataA2>% reduced damage, <AHbd,DataB2>% reduced movement speed, <AHbd,DataC2>% attack rate for <AHbd,DataD2> seconds. Lasts <AHbd,Dur2> seconds. |n|cffffcc00Level 3|r - <AHbd,DataA3>% reduced damage, <AHbd,DataB3>% reduced movement speed, <AHbd,DataC3>% attack rate for <AHbd,DataD3> seconds. Lasts <AHbd,Dur3> seconds.";
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>bld1</c>.</summary>
+                [global::Moonwell.Objects.Field("bld1", Label = "% Damage Reduction")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> DamageReduction
+                {
+                    get { return Fields.GetLevels<float>(this, "bld1"); }
+                    protected set { Fields.Put("bld1", value); }
+                }
+
+                /// <summary>The field <c>bld2</c>.</summary>
+                [global::Moonwell.Objects.Field("bld2", Label = "% Movement Speed reduction")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> MovementSpeedReduction
+                {
+                    get { return Fields.GetLevels<float>(this, "bld2"); }
+                    protected set { Fields.Put("bld2", value); }
+                }
+
+                /// <summary>The field <c>bld3</c>.</summary>
+                [global::Moonwell.Objects.Field("bld3", Label = "% Attack Speed Increase")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> AttackSpeedIncrease
+                {
+                    get { return Fields.GetLevels<float>(this, "bld3"); }
+                    protected set { Fields.Put("bld3", value); }
+                }
+
+                /// <summary>The field <c>bld4</c>.</summary>
+                [global::Moonwell.Objects.Field("bld4", Label = "On Damage Taken Bonus Duration")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> OnDamageTakenBonusDuration
+                {
+                    get { return Fields.GetLevels<float>(this, "bld4"); }
+                    protected set { Fields.Put("bld4", value); }
+                }
+
+                /// <summary>The field <c>bld5</c>.</summary>
+                [global::Moonwell.Objects.Field("bld5", Label = "Sweep Remaining Cooldown Reduction On Hit")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> SweepRemainingCooldownReductionOnHit
+                {
+                    get { return Fields.GetLevels<float>(this, "bld5"); }
+                    protected set { Fields.Put("bld5", value); }
+                }
+
+                /// <summary>The field <c>bld6</c>.</summary>
+                [global::Moonwell.Objects.Field("bld6", Label = "% Damage Reflection")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> DamageReflection
+                {
+                    get { return Fields.GetLevels<float>(this, "bld6"); }
+                    protected set { Fields.Put("bld6", value); }
+                }
+
+                /// <summary>The field <c>bld7</c>.</summary>
+                [global::Moonwell.Objects.Field("bld7", Label = "Flat Damage Reflection")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> FlatDamageReflection
+                {
+                    get { return Fields.GetLevels<float>(this, "bld7"); }
+                    protected set { Fields.Put("bld7", value); }
+                }
+
+                /// <summary>The field <c>bld8</c>.</summary>
+                [global::Moonwell.Objects.Field("bld8", Label = "% Ability Speed Increase")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> AbilitySpeedIncrease
+                {
+                    get { return Fields.GetLevels<float>(this, "bld8"); }
+                    protected set { Fields.Put("bld8", value); }
+                }
+            }
+
+            /// <summary>Unyielding Guard (Talent 1), AHb1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AHb1")]
+            public class UnyieldingGuardAHb1 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public UnyieldingGuardAHb1()
                 {
                     AnimationNames = "spell,one";
                     Area = Levels(0f, 0f, 0f);
@@ -63461,7 +63590,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Unyielding Guard (AHb2).</summary>
+            /// <summary>Unyielding Guard (Talent 2), AHb2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHb2")]
             public class UnyieldingGuardAHb2 : global::Moonwell.Objects.StandardAbility
@@ -63592,7 +63721,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Unyielding Guard (AHb3).</summary>
+            /// <summary>Unyielding Guard (Talent 3), AHb3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHb3")]
             public class UnyieldingGuardAHb3 : global::Moonwell.Objects.StandardAbility
@@ -63722,142 +63851,124 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Unyielding Guard (AHbd).</summary>
+            /// <summary>Valiant Charge (AHch).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHbd")]
-            public class UnyieldingGuardAHbd : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public UnyieldingGuardAHbd()
-                {
-                    AnimationNames = "spell,one";
-                    Area = Levels(0f, 0f, 0f);
-                    AttackSpeedIncrease = Levels(15f, 20f, 25f);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.UnyieldingGuard, global::Moonwell.Objects.Other.Buffs.UnyieldingGuardBonus>();
-                    ButtonPositionNormalX = 1;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 1;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f, 0f, 0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(20f, 20f, 20f);
-                    DamageReduction = Levels(40f, 50f, 60f);
-                    Duration = Levels(10f, 10f, 10f);
-                    HeroAbility = true;
-                    HeroDuration = Levels(10f, 10f, 10f);
-                    Hotkey = "W";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNUnyieldingGuard.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNUnyieldingGuard.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "W";
-                    LevelCount = 3;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(50, 50, 50);
-                    MovementSpeedReduction = Levels(40f, 40f, 40f);
-                    Name = "Unyielding Guard";
-                    OnDamageTakenBonusDuration = Levels(3f, 3f, 3f);
-                    Order = "unyieldingguard";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    Range = Levels(0f, 0f, 0f);
-                    RequiredLevel = 1;
-                    Special = "Abilities\\Spells\\Human\\BladeDance\\BladeDanceTarget.mdl";
-                    SpecialAttachmentPoint = "origin";
-                    Tooltip = Levels("Unyielding Guard - [|cffffcc00Level 1|r]", "Unyielding Guard - [|cffffcc00Level 2|r]", "Unyielding Guard - [|cffffcc00Level 3|r]");
-                    TooltipExtended = Levels("Enter a defensive stance, reducing incoming damage by <AHbd,DataA1>% and movement speed by <AHbd,DataB1>%. During this time, if Garek takes any damage, he gains <AHbd,DataC1>% attack rate for <AHbd,DataD1> seconds. |nLasts <AHbd,Dur1> seconds.", "Enter a defensive stance, reducing incoming damage by <AHbd,DataA2>% and movement speed by <AHbd,DataB2>%. During this time, if Garek takes any damage, he gains <AHbd,DataC2>% attack rate for <AHbd,DataD2> seconds. |nLasts <AHbd,Dur2> seconds.", "Enter a defensive stance, reducing incoming damage by <AHbd,DataA3>% and movement speed by <AHbd,DataB3>%. During this time, if Garek takes any damage, he gains <AHbd,DataC3>% attack rate for <AHbd,DataD3> seconds. |nLasts <AHbd,Dur3> seconds.");
-                    TooltipLearn = "Learn Unyielding Guard - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Take reduced damage, at the cost of movement speed. Taking damage grants increased attack rate. |n|n|cffffcc00Level 1|r - <AHbd,DataA1>% reduced damage, <AHbd,DataB1>% reduced movement speed, <AHbd,DataC1>% attack rate for <AHbd,DataD1> seconds. Lasts <AHbd,Dur1> seconds. |n|cffffcc00Level 2|r - <AHbd,DataA2>% reduced damage, <AHbd,DataB2>% reduced movement speed, <AHbd,DataC2>% attack rate for <AHbd,DataD2> seconds. Lasts <AHbd,Dur2> seconds. |n|cffffcc00Level 3|r - <AHbd,DataA3>% reduced damage, <AHbd,DataB3>% reduced movement speed, <AHbd,DataC3>% attack rate for <AHbd,DataD3> seconds. Lasts <AHbd,Dur3> seconds.";
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>bld1</c>.</summary>
-                [global::Moonwell.Objects.Field("bld1", Label = "% Damage Reduction")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> DamageReduction
-                {
-                    get { return Fields.GetLevels<float>(this, "bld1"); }
-                    protected set { Fields.Put("bld1", value); }
-                }
-
-                /// <summary>The field <c>bld2</c>.</summary>
-                [global::Moonwell.Objects.Field("bld2", Label = "% Movement Speed reduction")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> MovementSpeedReduction
-                {
-                    get { return Fields.GetLevels<float>(this, "bld2"); }
-                    protected set { Fields.Put("bld2", value); }
-                }
-
-                /// <summary>The field <c>bld3</c>.</summary>
-                [global::Moonwell.Objects.Field("bld3", Label = "% Attack Speed Increase")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> AttackSpeedIncrease
-                {
-                    get { return Fields.GetLevels<float>(this, "bld3"); }
-                    protected set { Fields.Put("bld3", value); }
-                }
-
-                /// <summary>The field <c>bld4</c>.</summary>
-                [global::Moonwell.Objects.Field("bld4", Label = "On Damage Taken Bonus Duration")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> OnDamageTakenBonusDuration
-                {
-                    get { return Fields.GetLevels<float>(this, "bld4"); }
-                    protected set { Fields.Put("bld4", value); }
-                }
-
-                /// <summary>The field <c>bld5</c>.</summary>
-                [global::Moonwell.Objects.Field("bld5", Label = "Sweep Remaining Cooldown Reduction On Hit")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> SweepRemainingCooldownReductionOnHit
-                {
-                    get { return Fields.GetLevels<float>(this, "bld5"); }
-                    protected set { Fields.Put("bld5", value); }
-                }
-
-                /// <summary>The field <c>bld6</c>.</summary>
-                [global::Moonwell.Objects.Field("bld6", Label = "% Damage Reflection")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> DamageReflection
-                {
-                    get { return Fields.GetLevels<float>(this, "bld6"); }
-                    protected set { Fields.Put("bld6", value); }
-                }
-
-                /// <summary>The field <c>bld7</c>.</summary>
-                [global::Moonwell.Objects.Field("bld7", Label = "Flat Damage Reflection")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> FlatDamageReflection
-                {
-                    get { return Fields.GetLevels<float>(this, "bld7"); }
-                    protected set { Fields.Put("bld7", value); }
-                }
-
-                /// <summary>The field <c>bld8</c>.</summary>
-                [global::Moonwell.Objects.Field("bld8", Label = "% Ability Speed Increase")]
-                [global::Moonwell.Objects.Limits(0, 100)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> AbilitySpeedIncrease
-                {
-                    get { return Fields.GetLevels<float>(this, "bld8"); }
-                    protected set { Fields.Put("bld8", value); }
-                }
-            }
-
-            /// <summary>Valiant Charge (AHc1).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHc1")]
+            [global::Moonwell.Objects.Standard("AHch")]
             public class ValiantCharge : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public ValiantCharge()
+                {
+                    AnimationNames = "spell,fast";
+                    Area = Levels(100f, 100f, 100f);
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.ValiantCharge>();
+                    ButtonPositionNormalX = 2;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 2;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f, 0f, 0f);
+                    Caster = "Abilities\\Spells\\Human\\valiantcharge\\valiantcharge.mdl";
+                    CasterAttachmentPoint1 = "origin";
+                    CheckDependencies = true;
+                    Cooldown = Levels(20f, 20f, 20f);
+                    DashDamage = Levels(100f, 125f, 150f);
+                    DashSpeed = Levels(1000f, 1000f, 1000f);
+                    Duration = Levels(1f, 2f, 3f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0.5f, 1f, 1.5f);
+                    Hotkey = "E";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNValiantCharge.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNValiantCharge.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "E";
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(100, 100, 100);
+                    Name = "Valiant Charge";
+                    Order = "valiantcharge";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    Range = Levels(500f, 500f, 500f);
+                    RequiredLevel = 1;
+                    TargetIntersectRadius = Levels(100f, 100f, 100f);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Vulnerable);
+                    Tooltip = Levels("Valiant Charge - [|cffffcc00Level 1|r]", "Valiant Charge - [|cffffcc00Level 2|r]", "Valiant Charge - [|cffffcc00Level 3|r]");
+                    TooltipExtended = Levels("Dashes towards a target point, dealing <AHch,DataB1> damage to enemy units hit along the way, and stunning them for <AHch,Dur1> seconds.", "Dashes towards a target point, dealing <AHch,DataB2> damage to enemy units hit along the way, and stunning them for <AHch,Dur2> seconds.", "Dashes towards a target point, dealing <AHch,DataB3> damage to enemy units hit along the way, and stunning them for <AHch,Dur3> seconds.");
+                    TooltipLearn = "Learn Valiant Charge - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Dash towards a target point, dealing damage and stunning enemy units.|n|n|cffffcc00Level 1|r - <AHch,DataB1> damage, <AHch,Dur1> second stun. |n|cffffcc00Level 2|r - <AHch,DataB2> damage, <AHch,Dur2> second stun. |n|cffffcc00Level 3|r - <AHch,DataB3> damage, <AHch,Dur3> second stun.";
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>chr1</c>.</summary>
+                [global::Moonwell.Objects.Field("chr1", Label = "Dash Speed")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> DashSpeed
+                {
+                    get { return Fields.GetLevels<float>(this, "chr1"); }
+                    protected set { Fields.Put("chr1", value); }
+                }
+
+                /// <summary>The field <c>chr2</c>.</summary>
+                [global::Moonwell.Objects.Field("chr2", Label = "Dash Damage")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> DashDamage
+                {
+                    get { return Fields.GetLevels<float>(this, "chr2"); }
+                    protected set { Fields.Put("chr2", value); }
+                }
+
+                /// <summary>The field <c>chr3</c>.</summary>
+                [global::Moonwell.Objects.Field("chr3", Label = "Bonus Critical Strike")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> BonusCriticalStrike
+                {
+                    get { return Fields.GetLevels<float>(this, "chr3"); }
+                    protected set { Fields.Put("chr3", value); }
+                }
+
+                /// <summary>The field <c>chr4</c>.</summary>
+                [global::Moonwell.Objects.Field("chr4", Label = "Normal - Bonus Critical Strike Duration")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> NormalBonusCriticalStrikeDuration
+                {
+                    get { return Fields.GetLevels<float>(this, "chr4"); }
+                    protected set { Fields.Put("chr4", value); }
+                }
+
+                /// <summary>The field <c>chr5</c>.</summary>
+                [global::Moonwell.Objects.Field("chr5", Label = "Hero - Bonus Critical Strike Duration")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> HeroBonusCriticalStrikeDuration
+                {
+                    get { return Fields.GetLevels<float>(this, "chr5"); }
+                    protected set { Fields.Put("chr5", value); }
+                }
+
+                /// <summary>The field <c>chr6</c>.</summary>
+                [global::Moonwell.Objects.Field("chr6", Label = "Remove Buffs On Ability Start")]
+                public global::Moonwell.Objects.Levels<bool> RemoveBuffsOnAbilityStart
+                {
+                    get { return Fields.GetLevels<bool>(this, "chr6"); }
+                    protected set { Fields.Put("chr6", value); }
+                }
+
+                /// <summary>The field <c>chra</c>.</summary>
+                [global::Moonwell.Objects.Field("chra", Label = "Target Intersect Radius")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> TargetIntersectRadius
+                {
+                    get { return Fields.GetLevels<float>(this, "chra"); }
+                    protected set { Fields.Put("chra", value); }
+                }
+            }
+
+            /// <summary>Valiant Charge (Talent 1), AHc1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AHc1")]
+            public class ValiantChargeAHc1 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ValiantChargeAHc1()
                 {
                     AnimationNames = "spell,fast";
                     Area = Levels(100f, 100f, 100f);
@@ -63966,7 +64077,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Valiant Charge (AHc2).</summary>
+            /// <summary>Valiant Charge (Talent 2), AHc2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHc2")]
             public class ValiantChargeAHc2 : global::Moonwell.Objects.StandardAbility
@@ -64078,7 +64189,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Valiant Charge (AHc3).</summary>
+            /// <summary>Valiant Charge (Talent 3), AHc3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHc3")]
             public class ValiantChargeAHc3 : global::Moonwell.Objects.StandardAbility
@@ -64191,118 +64302,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Valiant Charge (AHch).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHch")]
-            public class ValiantChargeAHch : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public ValiantChargeAHch()
-                {
-                    AnimationNames = "spell,fast";
-                    Area = Levels(100f, 100f, 100f);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.ValiantCharge>();
-                    ButtonPositionNormalX = 2;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 2;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f, 0f, 0f);
-                    Caster = "Abilities\\Spells\\Human\\valiantcharge\\valiantcharge.mdl";
-                    CasterAttachmentPoint1 = "origin";
-                    CheckDependencies = true;
-                    Cooldown = Levels(20f, 20f, 20f);
-                    DashDamage = Levels(100f, 125f, 150f);
-                    DashSpeed = Levels(1000f, 1000f, 1000f);
-                    Duration = Levels(1f, 2f, 3f);
-                    HeroAbility = true;
-                    HeroDuration = Levels(0.5f, 1f, 1.5f);
-                    Hotkey = "E";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNValiantCharge.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNValiantCharge.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "E";
-                    LevelCount = 3;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(100, 100, 100);
-                    Name = "Valiant Charge";
-                    Order = "valiantcharge";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    Range = Levels(500f, 500f, 500f);
-                    RequiredLevel = 1;
-                    TargetIntersectRadius = Levels(100f, 100f, 100f);
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Neutral | global::Moonwell.Objects.Targets.Vulnerable);
-                    Tooltip = Levels("Valiant Charge - [|cffffcc00Level 1|r]", "Valiant Charge - [|cffffcc00Level 2|r]", "Valiant Charge - [|cffffcc00Level 3|r]");
-                    TooltipExtended = Levels("Dashes towards a target point, dealing <AHch,DataB1> damage to enemy units hit along the way, and stunning them for <AHch,Dur1> seconds.", "Dashes towards a target point, dealing <AHch,DataB2> damage to enemy units hit along the way, and stunning them for <AHch,Dur2> seconds.", "Dashes towards a target point, dealing <AHch,DataB3> damage to enemy units hit along the way, and stunning them for <AHch,Dur3> seconds.");
-                    TooltipLearn = "Learn Valiant Charge - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Dash towards a target point, dealing damage and stunning enemy units.|n|n|cffffcc00Level 1|r - <AHch,DataB1> damage, <AHch,Dur1> second stun. |n|cffffcc00Level 2|r - <AHch,DataB2> damage, <AHch,Dur2> second stun. |n|cffffcc00Level 3|r - <AHch,DataB3> damage, <AHch,Dur3> second stun.";
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>chr1</c>.</summary>
-                [global::Moonwell.Objects.Field("chr1", Label = "Dash Speed")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> DashSpeed
-                {
-                    get { return Fields.GetLevels<float>(this, "chr1"); }
-                    protected set { Fields.Put("chr1", value); }
-                }
-
-                /// <summary>The field <c>chr2</c>.</summary>
-                [global::Moonwell.Objects.Field("chr2", Label = "Dash Damage")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> DashDamage
-                {
-                    get { return Fields.GetLevels<float>(this, "chr2"); }
-                    protected set { Fields.Put("chr2", value); }
-                }
-
-                /// <summary>The field <c>chr3</c>.</summary>
-                [global::Moonwell.Objects.Field("chr3", Label = "Bonus Critical Strike")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> BonusCriticalStrike
-                {
-                    get { return Fields.GetLevels<float>(this, "chr3"); }
-                    protected set { Fields.Put("chr3", value); }
-                }
-
-                /// <summary>The field <c>chr4</c>.</summary>
-                [global::Moonwell.Objects.Field("chr4", Label = "Normal - Bonus Critical Strike Duration")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> NormalBonusCriticalStrikeDuration
-                {
-                    get { return Fields.GetLevels<float>(this, "chr4"); }
-                    protected set { Fields.Put("chr4", value); }
-                }
-
-                /// <summary>The field <c>chr5</c>.</summary>
-                [global::Moonwell.Objects.Field("chr5", Label = "Hero - Bonus Critical Strike Duration")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> HeroBonusCriticalStrikeDuration
-                {
-                    get { return Fields.GetLevels<float>(this, "chr5"); }
-                    protected set { Fields.Put("chr5", value); }
-                }
-
-                /// <summary>The field <c>chr6</c>.</summary>
-                [global::Moonwell.Objects.Field("chr6", Label = "Remove Buffs On Ability Start")]
-                public global::Moonwell.Objects.Levels<bool> RemoveBuffsOnAbilityStart
-                {
-                    get { return Fields.GetLevels<bool>(this, "chr6"); }
-                    protected set { Fields.Put("chr6", value); }
-                }
-
-                /// <summary>The field <c>chra</c>.</summary>
-                [global::Moonwell.Objects.Field("chra", Label = "Target Intersect Radius")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> TargetIntersectRadius
-                {
-                    get { return Fields.GetLevels<float>(this, "chra"); }
-                    protected set { Fields.Put("chra", value); }
-                }
-            }
-
-            /// <summary>Valor's Reward (LT1a).</summary>
+            /// <summary>Valor's Reward (Landen Talent), LT1a.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("LT1a")]
             public class ValorsReward : global::Moonwell.Objects.StandardAbility
@@ -64449,7 +64449,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Veteran's Resilience (BT5b).</summary>
+            /// <summary>Veteran's Resilience (LeonidTalent), BT5b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BT5b")]
             public class VeteransResilience : global::Moonwell.Objects.StandardAbility
@@ -64502,7 +64502,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Voice of Authority (IT2c).</summary>
+            /// <summary>Voice of Authority (IlastarTalent), IT2c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("IT2c")]
             public class VoiceOfAuthority : global::Moonwell.Objects.StandardAbility
@@ -64619,7 +64619,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Wander (Awan).</summary>
+            /// <summary>Wander (Neutral), Awan.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Awan")]
             public class Wander : global::Moonwell.Objects.StandardAbility
@@ -64646,13 +64646,65 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Warcry (AHw1).</summary>
+            /// <summary>Warcry (AHwc).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHw1")]
+            [global::Moonwell.Objects.Standard("AHwc")]
             public class Warcry : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Warcry()
+                {
+                    AnimationNames = "spell,one";
+                    BonusAbilitiesList.Set<global::Moonwell.Objects.Other.Abilities.WarcryCleave, global::Moonwell.Objects.Other.Abilities.WarcryLifesteal, global::Moonwell.Objects.Other.Abilities.WarcryAbilityVamp>();
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.WarcryBHwc>();
+                    ButtonPositionNormalX = 3;
+                    ButtonPositionNormalY = 2;
+                    ButtonPositionResearchX = 3;
+                    ButtonPositionResearchY = 0;
+                    CastTime = Levels(0f);
+                    Caster = "Abilities\\Spells\\Human\\WarCry\\WarCryCaster.mdl";
+                    CasterAttachmentPoint1 = "origin";
+                    CheckDependencies = true;
+                    Cooldown = Levels(120f);
+                    Duration = Levels(20f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f);
+                    Hotkey = "R";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWarcry.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNWarcry.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "R";
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Warcry";
+                    Order = "warcry";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    RequiredLevel = 6;
+                    Tooltip = Levels("Warcry");
+                    TooltipExtended = Levels("Garek lets out a defiant battle cry, granting his attacks <AGca,DataA1,%>% cleave damage, <AGls,DataA1,%>% Lifesteal, and <AGsv,DataA1,%>% Ability Vamp. |nLasts <AHwc,Dur1> seconds.");
+                    TooltipLearn = "Learn Warcry";
+                    TooltipLearnExtended = "Garek lets out a defiant battle cry, granting his attacks <AGca,DataA1,%>% cleave damage, <AGls,DataA1,%>% Lifesteal, and <AGsv,DataA1,%>% Ability Vamp. |nLasts <AHwc,Dur1> seconds.";
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>hwc1</c>.</summary>
+                [global::Moonwell.Objects.Field("hwc1", Label = "Bonus Abilities List")]
+                [global::Moonwell.Objects.MaxEntries(99999)]
+                public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> BonusAbilitiesList
+                {
+                    get { return Fields.GetList<global::Moonwell.Ability>(this, "hwc1"); }
+                }
+            }
+
+            /// <summary>Warcry (Talent 3), AHw1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AHw1")]
+            public class WarcryAHw1 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public WarcryAHw1()
                 {
                     AnimationNames = "spell,one";
                     BonusAbilitiesList.Set<global::Moonwell.Objects.Other.Abilities.WarcryCleave, global::Moonwell.Objects.Other.Abilities.WarcryLifesteal, global::Moonwell.Objects.Other.Abilities.WarcryAbilityVamp, global::Moonwell.Objects.Other.Abilities.AHw4>();
@@ -64687,58 +64739,6 @@ namespace Moonwell.Objects
                     TooltipExtended = Levels("Garek lets out a defiant battle cry, granting his attacks <AHw8,DataA1,%>% cleave damage, <AHw6,DataA1,%>% Lifesteal, and <AHw7,DataA1> bonus Attack Damage. |nLasts <AHw3,Dur1> seconds.");
                     TooltipLearn = "Learn Warcry";
                     TooltipLearnExtended = "Garek lets out a defiant battle cry, granting his attacks <AHw8,DataA1,%>% cleave damage, <AHw6,DataA1,%>% Lifesteal, and <AHw7,DataA1> bonus Attack Damage. |nLasts <AHw3,Dur1> seconds.";
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>hwc1</c>.</summary>
-                [global::Moonwell.Objects.Field("hwc1", Label = "Bonus Abilities List")]
-                [global::Moonwell.Objects.MaxEntries(99999)]
-                public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> BonusAbilitiesList
-                {
-                    get { return Fields.GetList<global::Moonwell.Ability>(this, "hwc1"); }
-                }
-            }
-
-            /// <summary>Warcry (AHwc).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AHwc")]
-            public class WarcryAHwc : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public WarcryAHwc()
-                {
-                    AnimationNames = "spell,one";
-                    BonusAbilitiesList.Set<global::Moonwell.Objects.Other.Abilities.WarcryCleave, global::Moonwell.Objects.Other.Abilities.WarcryLifesteal, global::Moonwell.Objects.Other.Abilities.WarcryAbilityVamp>();
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.WarcryBHwc>();
-                    ButtonPositionNormalX = 3;
-                    ButtonPositionNormalY = 2;
-                    ButtonPositionResearchX = 3;
-                    ButtonPositionResearchY = 0;
-                    CastTime = Levels(0f);
-                    Caster = "Abilities\\Spells\\Human\\WarCry\\WarCryCaster.mdl";
-                    CasterAttachmentPoint1 = "origin";
-                    CheckDependencies = true;
-                    Cooldown = Levels(120f);
-                    Duration = Levels(20f);
-                    HeroAbility = true;
-                    HeroDuration = Levels(0f);
-                    Hotkey = "R";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWarcry.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNWarcry.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "R";
-                    LevelCount = 1;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(0);
-                    Name = "Warcry";
-                    Order = "warcry";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    RequiredLevel = 6;
-                    Tooltip = Levels("Warcry");
-                    TooltipExtended = Levels("Garek lets out a defiant battle cry, granting his attacks <AGca,DataA1,%>% cleave damage, <AGls,DataA1,%>% Lifesteal, and <AGsv,DataA1,%>% Ability Vamp. |nLasts <AHwc,Dur1> seconds.");
-                    TooltipLearn = "Learn Warcry";
-                    TooltipLearnExtended = "Garek lets out a defiant battle cry, granting his attacks <AGca,DataA1,%>% cleave damage, <AGls,DataA1,%>% Lifesteal, and <AGsv,DataA1,%>% Ability Vamp. |nLasts <AHwc,Dur1> seconds.";
                     UseNewDefaultLevelCap = true;
                 }
 
@@ -64874,7 +64874,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Warrior's Focus (UT6c).</summary>
+            /// <summary>Warrior's Focus (UGarekTalent), UT6c.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("UT6c")]
             public class WarriorsFocus : global::Moonwell.Objects.StandardAbility
@@ -64927,7 +64927,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Watery Minion (AIwm).</summary>
+            /// <summary>Watery Minion (item), AIwm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIwm")]
             public class WateryMinion : global::Moonwell.Objects.StandardAbility
@@ -65024,7 +65024,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Weighted Net (LT2b).</summary>
+            /// <summary>Weighted Net (Landen Talent), LT2b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("LT2b")]
             public class WeightedNet : global::Moonwell.Objects.StandardAbility
@@ -65032,7 +65032,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public WeightedNet()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.ApprehendAHen, global::Moonwell.Objects.Other.Abilities.Apprehend>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.Apprehend, global::Moonwell.Objects.Other.Abilities.ApprehendAHap>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;
@@ -65111,13 +65111,110 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Withering Fire (AUw1).</summary>
+            /// <summary>Withering Fire (AUwf).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AUw1")]
+            [global::Moonwell.Objects.Standard("AUwf")]
             public class WitheringFire : global::Moonwell.Objects.StandardAbility
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public WitheringFire()
+                {
+                    AnimationNames = "attack";
+                    Area = Levels(75f, 75f, 75f, 75f, 75f);
+                    ButtonPositionNormalX = 0;
+                    ButtonPositionNormalY = 2;
+                    CastTime = Levels(0f, 0f, 0f, 0f, 0f);
+                    ChargeRegenTime = Levels(10f, 10f, 10f, 10f, 10f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
+                    CooldownReductionOnAutoAttack = Levels(0f, 0f, 0f, 0f, 0f);
+                    Damage = Levels(100f, 150f, 175f, 200f, 250f);
+                    Duration = Levels(0f, 0f, 0f, 0f, 0f);
+                    HeroAbility = true;
+                    HeroDuration = Levels(0f, 0f, 0f, 0f, 0f);
+                    Hotkey = "Q";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWitheringFire.blp";
+                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNWitheringFire.blp";
+                    ItemAbility = false;
+                    LearnHotkey = "Q";
+                    LevelCount = 5;
+                    LevelSkipRequirement = 4;
+                    ManaCost = Levels(50, 60, 70, 80, 90);
+                    MaxCharges = Levels(2, 2, 3, 3, 4);
+                    MissileArt = "Abilities\\Spells\\Undead\\WitheringFire\\WitheringFireMissile.mdl";
+                    Name = "Withering Fire";
+                    Order = "witheringfire";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    Range = Levels(750f, 750f, 750f, 750f, 750f);
+                    RequiredLevel = 1;
+                    TargetArmorReduction = Levels(0, 0, 0, 0, 0);
+                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable);
+                    Tooltip = Levels("Withering Fire - [|cffffcc00Level 1|r]", "Withering Fire - [|cffffcc00Level 2|r]", "Withering Fire - [|cffffcc00Level 3|r]", "Withering Fire - [|cffffcc00Level 4|r]", "Withering Fire - [|cffffcc00Level 5|r]");
+                    TooltipExtended = Levels("Fires a magical arrow at a target area, dealing <AUwf,DataC1> damage. Applies a stack of Deathseeker Arrows to enemies hit.|n<AUwf,DataA1> charges, recharges every <AUwf,DataB1> seconds.", "Fires a magical arrow at a target area, dealing <AUwf,DataC2> damage. Applies a stack of Deathseeker Arrows to enemies hit.|n<AUwf,DataA2> charges, recharges every <AUwf,DataB2> seconds.", "Fires a magical arrow at a target area, dealing <AUwf,DataC3> damage. Applies a stack of Deathseeker Arrows to enemies hit.|n<AUwf,DataA3> charges, recharges every <AUwf,DataB3> seconds.", "Fires a magical arrow at a target area, dealing <AUwf,DataC4> damage. Applies a stack of Deathseeker Arrows to enemies hit.|n<AUwf,DataA4> charges, recharges every <AUwf,DataB4> seconds.", "Fires a magical arrow at a target area, dealing <AUwf,DataC5> damage. Applies a stack of Deathseeker Arrows to enemies hit.|n<AUwf,DataA5> charges, recharges every <AUwf,DataB5> seconds.");
+                    TooltipLearn = "Learn Withering Fire - [|cffffcc00Level %d|r]";
+                    TooltipLearnExtended = "Fire a magical arrow at a target area, dealing damage and applying a stack of Deathseeker Arrows to enemies hit.|n|n|cffffcc00Level 1|r - <AUwf,DataC1> damage, max <AUwf,DataA1> charges, recharges every <AUwf,DataB1> seconds. |n|cffffcc00Level 2|r - <AUwf,DataC2> damage, max <AUwf,DataA2> charges, recharges every <AUwf,DataB2> seconds. |n|cffffcc00Level 3|r - <AUwf,DataC3> damage, max <AUwf,DataA3> charges, recharges every <AUwf,DataB3> seconds.|n|cffffcc00Level 4|r - <AUwf,DataC4> damage, max <AUwf,DataA4> charges, recharges every <AUwf,DataB4> seconds.|n|cffffcc00Level 5|r - <AUwf,DataC5> damage, max <AUwf,DataA5> charges, recharges every <AUwf,DataB5> seconds.";
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>uwf1</c>.</summary>
+                [global::Moonwell.Objects.Field("uwf1", Label = "Max Charges")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<int> MaxCharges
+                {
+                    get { return Fields.GetLevels<int>(this, "uwf1"); }
+                    protected set { Fields.Put("uwf1", value); }
+                }
+
+                /// <summary>The field <c>uwf2</c>.</summary>
+                [global::Moonwell.Objects.Field("uwf2", Label = "Charge Regen Time")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> ChargeRegenTime
+                {
+                    get { return Fields.GetLevels<float>(this, "uwf2"); }
+                    protected set { Fields.Put("uwf2", value); }
+                }
+
+                /// <summary>The field <c>uwf3</c>.</summary>
+                [global::Moonwell.Objects.Field("uwf3", Label = "Damage")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> Damage
+                {
+                    get { return Fields.GetLevels<float>(this, "uwf3"); }
+                    protected set { Fields.Put("uwf3", value); }
+                }
+
+                /// <summary>The field <c>uwf4</c>.</summary>
+                [global::Moonwell.Objects.Field("uwf4", Label = "Target Armor Reduction")]
+                [global::Moonwell.Objects.Limits(0, 300)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<int> TargetArmorReduction
+                {
+                    get { return Fields.GetLevels<int>(this, "uwf4"); }
+                    protected set { Fields.Put("uwf4", value); }
+                }
+
+                /// <summary>The field <c>uwf5</c>.</summary>
+                [global::Moonwell.Objects.Field("uwf5", Label = "Cooldown Reduction On Auto Attack")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                [global::Moonwell.Objects.NonNegative]
+                public global::Moonwell.Objects.Levels<float> CooldownReductionOnAutoAttack
+                {
+                    get { return Fields.GetLevels<float>(this, "uwf5"); }
+                    protected set { Fields.Put("uwf5", value); }
+                }
+            }
+
+            /// <summary>Withering Fire (Talent 1), AUw1.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AUw1")]
+            public class WitheringFireAUw1 : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public WitheringFireAUw1()
                 {
                     AnimationNames = "attack";
                     Area = Levels(75f, 75f, 75f, 75f, 75f);
@@ -65208,7 +65305,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Withering Fire (AUw2).</summary>
+            /// <summary>Withering Fire (Talent 2), AUw2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUw2")]
             public class WitheringFireAUw2 : global::Moonwell.Objects.StandardAbility
@@ -65307,7 +65404,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Withering Fire (AUw3).</summary>
+            /// <summary>Withering Fire (Talent 3), AUw3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AUw3")]
             public class WitheringFireAUw3 : global::Moonwell.Objects.StandardAbility
@@ -65405,104 +65502,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Withering Fire (AUwf).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AUwf")]
-            public class WitheringFireAUwf : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public WitheringFireAUwf()
-                {
-                    AnimationNames = "attack";
-                    Area = Levels(75f, 75f, 75f, 75f, 75f);
-                    ButtonPositionNormalX = 0;
-                    ButtonPositionNormalY = 2;
-                    CastTime = Levels(0f, 0f, 0f, 0f, 0f);
-                    ChargeRegenTime = Levels(10f, 10f, 10f, 10f, 10f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(0.5f, 0.5f, 0.5f, 0.5f, 0.5f);
-                    CooldownReductionOnAutoAttack = Levels(0f, 0f, 0f, 0f, 0f);
-                    Damage = Levels(100f, 150f, 175f, 200f, 250f);
-                    Duration = Levels(0f, 0f, 0f, 0f, 0f);
-                    HeroAbility = true;
-                    HeroDuration = Levels(0f, 0f, 0f, 0f, 0f);
-                    Hotkey = "Q";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNWitheringFire.blp";
-                    IconResearch = "ReplaceableTextures\\CommandButtons\\BTNWitheringFire.blp";
-                    ItemAbility = false;
-                    LearnHotkey = "Q";
-                    LevelCount = 5;
-                    LevelSkipRequirement = 4;
-                    ManaCost = Levels(50, 60, 70, 80, 90);
-                    MaxCharges = Levels(2, 2, 3, 3, 4);
-                    MissileArt = "Abilities\\Spells\\Undead\\WitheringFire\\WitheringFireMissile.mdl";
-                    Name = "Withering Fire";
-                    Order = "witheringfire";
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    Range = Levels(750f, 750f, 750f, 750f, 750f);
-                    RequiredLevel = 1;
-                    TargetArmorReduction = Levels(0, 0, 0, 0, 0);
-                    TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable, global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Vulnerable);
-                    Tooltip = Levels("Withering Fire - [|cffffcc00Level 1|r]", "Withering Fire - [|cffffcc00Level 2|r]", "Withering Fire - [|cffffcc00Level 3|r]", "Withering Fire - [|cffffcc00Level 4|r]", "Withering Fire - [|cffffcc00Level 5|r]");
-                    TooltipExtended = Levels("Fires a magical arrow at a target area, dealing <AUwf,DataC1> damage. Applies a stack of Deathseeker Arrows to enemies hit.|n<AUwf,DataA1> charges, recharges every <AUwf,DataB1> seconds.", "Fires a magical arrow at a target area, dealing <AUwf,DataC2> damage. Applies a stack of Deathseeker Arrows to enemies hit.|n<AUwf,DataA2> charges, recharges every <AUwf,DataB2> seconds.", "Fires a magical arrow at a target area, dealing <AUwf,DataC3> damage. Applies a stack of Deathseeker Arrows to enemies hit.|n<AUwf,DataA3> charges, recharges every <AUwf,DataB3> seconds.", "Fires a magical arrow at a target area, dealing <AUwf,DataC4> damage. Applies a stack of Deathseeker Arrows to enemies hit.|n<AUwf,DataA4> charges, recharges every <AUwf,DataB4> seconds.", "Fires a magical arrow at a target area, dealing <AUwf,DataC5> damage. Applies a stack of Deathseeker Arrows to enemies hit.|n<AUwf,DataA5> charges, recharges every <AUwf,DataB5> seconds.");
-                    TooltipLearn = "Learn Withering Fire - [|cffffcc00Level %d|r]";
-                    TooltipLearnExtended = "Fire a magical arrow at a target area, dealing damage and applying a stack of Deathseeker Arrows to enemies hit.|n|n|cffffcc00Level 1|r - <AUwf,DataC1> damage, max <AUwf,DataA1> charges, recharges every <AUwf,DataB1> seconds. |n|cffffcc00Level 2|r - <AUwf,DataC2> damage, max <AUwf,DataA2> charges, recharges every <AUwf,DataB2> seconds. |n|cffffcc00Level 3|r - <AUwf,DataC3> damage, max <AUwf,DataA3> charges, recharges every <AUwf,DataB3> seconds.|n|cffffcc00Level 4|r - <AUwf,DataC4> damage, max <AUwf,DataA4> charges, recharges every <AUwf,DataB4> seconds.|n|cffffcc00Level 5|r - <AUwf,DataC5> damage, max <AUwf,DataA5> charges, recharges every <AUwf,DataB5> seconds.";
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>uwf1</c>.</summary>
-                [global::Moonwell.Objects.Field("uwf1", Label = "Max Charges")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<int> MaxCharges
-                {
-                    get { return Fields.GetLevels<int>(this, "uwf1"); }
-                    protected set { Fields.Put("uwf1", value); }
-                }
-
-                /// <summary>The field <c>uwf2</c>.</summary>
-                [global::Moonwell.Objects.Field("uwf2", Label = "Charge Regen Time")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> ChargeRegenTime
-                {
-                    get { return Fields.GetLevels<float>(this, "uwf2"); }
-                    protected set { Fields.Put("uwf2", value); }
-                }
-
-                /// <summary>The field <c>uwf3</c>.</summary>
-                [global::Moonwell.Objects.Field("uwf3", Label = "Damage")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> Damage
-                {
-                    get { return Fields.GetLevels<float>(this, "uwf3"); }
-                    protected set { Fields.Put("uwf3", value); }
-                }
-
-                /// <summary>The field <c>uwf4</c>.</summary>
-                [global::Moonwell.Objects.Field("uwf4", Label = "Target Armor Reduction")]
-                [global::Moonwell.Objects.Limits(0, 300)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<int> TargetArmorReduction
-                {
-                    get { return Fields.GetLevels<int>(this, "uwf4"); }
-                    protected set { Fields.Put("uwf4", value); }
-                }
-
-                /// <summary>The field <c>uwf5</c>.</summary>
-                [global::Moonwell.Objects.Field("uwf5", Label = "Cooldown Reduction On Auto Attack")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                [global::Moonwell.Objects.NonNegative]
-                public global::Moonwell.Objects.Levels<float> CooldownReductionOnAutoAttack
-                {
-                    get { return Fields.GetLevels<float>(this, "uwf5"); }
-                    protected set { Fields.Put("uwf5", value); }
-                }
-            }
-
-            /// <summary>Wraithguard (AT2b).</summary>
+            /// <summary>Wraithguard (AnyaTalent), AT2b.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AT2b")]
             public class Wraithguard : global::Moonwell.Objects.StandardAbility
@@ -65510,7 +65510,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Wraithguard()
                 {
-                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SoulLanternAUla, global::Moonwell.Objects.Other.Abilities.SoulLanternAUl2>();
+                    AbilityUpgrade1.Set<global::Moonwell.Objects.Other.Abilities.SoulLantern, global::Moonwell.Objects.Other.Abilities.SoulLanternAUl2>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = -11;
                     ButtonPositionTurnOffX = 0;

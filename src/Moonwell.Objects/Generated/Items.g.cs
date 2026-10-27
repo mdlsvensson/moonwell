@@ -19652,7 +19652,7 @@ namespace Moonwell.Objects
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
             public OrbOfVenom()
             {
-                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemAttackPoisonBonus, global::Moonwell.Objects.Other.Abilities.PoisonSting>();
+                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemAttackPoisonBonus, global::Moonwell.Objects.Other.Abilities.PoisonStingApo2>();
                 ActivelyUsed = false;
                 AllowCustomTeamColor = false;
                 ArmorType = global::Moonwell.Objects.ArmorType.Wood;
@@ -20650,7 +20650,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Potion of Divinity (pdi2).</summary>
+        /// <summary>Potion of Divinity (Invulnerability), pdi2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("pdi2")]
         public class PotionOfDivinity : global::Moonwell.Objects.StandardItem
@@ -20658,7 +20658,7 @@ namespace Moonwell.Objects
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
             public PotionOfDivinity()
             {
-                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporaryInvulnerability>();
+                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporaryInvulnerabilityAIvg>();
                 ActivelyUsed = true;
                 AllowCustomTeamColor = false;
                 ArmorType = global::Moonwell.Objects.ArmorType.Wood;
@@ -20667,7 +20667,7 @@ namespace Moonwell.Objects
                 CanBeSoldToMerchants = true;
                 Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
-                CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporaryInvulnerabilityAIvu>();
+                CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporaryInvulnerability>();
                 Description = "Turns Hero invulnerable.";
                 DroppedWhenCarrierDies = false;
                 EquipmentType = global::Moonwell.Objects.EquipmentType.None;
@@ -20705,7 +20705,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Potion of Divinity (pdiv).</summary>
+        /// <summary>Potion of Divinity (Divine Shield), pdiv.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("pdiv")]
         public class PotionOfDivinityPdiv : global::Moonwell.Objects.StandardItem
@@ -21041,7 +21041,7 @@ namespace Moonwell.Objects
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
             public PotionOfInvulnerability()
             {
-                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporaryInvulnerabilityAIvu>();
+                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporaryInvulnerability>();
                 ActivelyUsed = true;
                 AllowCustomTeamColor = false;
                 ArmorType = global::Moonwell.Objects.ArmorType.Wood;
@@ -21050,7 +21050,7 @@ namespace Moonwell.Objects
                 CanBeSoldToMerchants = true;
                 Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
-                CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporaryInvulnerabilityAIvu>();
+                CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporaryInvulnerability>();
                 Description = "Renders Hero temporarily invulnerable.";
                 DroppedWhenCarrierDies = false;
                 EquipmentType = global::Moonwell.Objects.EquipmentType.None;
@@ -21106,7 +21106,7 @@ namespace Moonwell.Objects
                 CanBeSoldToMerchants = true;
                 Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Purchasable;
-                CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporaryInvulnerabilityAIvu>();
+                CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemTemporaryInvulnerability>();
                 Description = "Renders Hero temporarily invulnerable.";
                 DroppedWhenCarrierDies = false;
                 EquipmentType = global::Moonwell.Objects.EquipmentType.None;
@@ -23028,7 +23028,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Ring of the Archmagi (ram1).</summary>
+        /// <summary>Ring of the Archmagi (version 1), ram1.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ram1")]
         public class RingOfTheArchmagi : global::Moonwell.Objects.StandardItem
@@ -23082,7 +23082,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Ring of the Archmagi (ram2).</summary>
+        /// <summary>Ring of the Archmagi (version 2), ram2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ram2")]
         public class RingOfTheArchmagiRam2 : global::Moonwell.Objects.StandardItem
@@ -23136,7 +23136,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Ring of the Archmagi (ram3).</summary>
+        /// <summary>Ring of the Archmagi (version 3), ram3.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ram3")]
         public class RingOfTheArchmagiRam3 : global::Moonwell.Objects.StandardItem
@@ -23190,7 +23190,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Ring of the Archmagi (ram4).</summary>
+        /// <summary>Ring of the Archmagi (version 4), ram4.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ram4")]
         public class RingOfTheArchmagiRam4 : global::Moonwell.Objects.StandardItem
@@ -25958,7 +25958,7 @@ namespace Moonwell.Objects
                 CanBeSoldToMerchants = true;
                 Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Charged;
-                CooldownGroup.Set<global::Moonwell.Objects.NightElf.Abilities.RoarAroa>();
+                CooldownGroup.Set<global::Moonwell.Objects.NightElf.Abilities.Roar>();
                 Description = "Boosts friendly unit combat damage.";
                 DroppedWhenCarrierDies = false;
                 EquipmentType = global::Moonwell.Objects.EquipmentType.None;
@@ -29260,7 +29260,7 @@ namespace Moonwell.Objects
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
-                CooldownGroup.Set<global::Moonwell.Objects.Undead.Abilities.AnimateDeadAUan>();
+                CooldownGroup.Set<global::Moonwell.Objects.Undead.Abilities.AnimateDead>();
                 Description = "Animates a corpse.";
                 DroppedWhenCarrierDies = false;
                 EquipmentType = global::Moonwell.Objects.EquipmentType.None;
@@ -29369,7 +29369,7 @@ namespace Moonwell.Objects
                 CanBeSoldByMerchants = true;
                 CanBeSoldToMerchants = true;
                 Classification = global::Moonwell.Objects.ItemClass.Permanent;
-                CooldownGroup.Set<global::Moonwell.Objects.Creeps.Abilities.SilenceANsi>();
+                CooldownGroup.Set<global::Moonwell.Objects.Creeps.Abilities.Silence>();
                 Description = "Stops enemy spellcasting.";
                 DroppedWhenCarrierDies = false;
                 EquipmentType = global::Moonwell.Objects.EquipmentType.None;
@@ -31765,7 +31765,7 @@ namespace Moonwell.Objects
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
             public TomeOfExperience()
             {
-                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemExperienceGainAIem>();
+                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemExperienceGain>();
                 ActivelyUsed = true;
                 AllowCustomTeamColor = false;
                 ArmorType = global::Moonwell.Objects.ArmorType.Wood;
@@ -31774,7 +31774,7 @@ namespace Moonwell.Objects
                 CanBeSoldToMerchants = true;
                 Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
-                CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemExperienceGainAIem>();
+                CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemExperienceGain>();
                 Description = "Gives bonus experience points.";
                 DroppedWhenCarrierDies = false;
                 EquipmentType = global::Moonwell.Objects.EquipmentType.None;
@@ -31819,7 +31819,7 @@ namespace Moonwell.Objects
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
             public TomeOfGreaterExperience()
             {
-                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemExperienceGain>();
+                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemExperienceGainAIe2>();
                 ActivelyUsed = true;
                 AllowCustomTeamColor = false;
                 ArmorType = global::Moonwell.Objects.ArmorType.Wood;
@@ -31828,7 +31828,7 @@ namespace Moonwell.Objects
                 CanBeSoldToMerchants = true;
                 Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Miscellaneous;
-                CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemExperienceGain>();
+                CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemExperienceGainAIe2>();
                 Description = "Gives bonus experience points.";
                 DroppedWhenCarrierDies = false;
                 EquipmentType = global::Moonwell.Objects.EquipmentType.None;
@@ -32250,7 +32250,7 @@ namespace Moonwell.Objects
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
             public TomeOfStrength()
             {
-                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemStrengthGainAIsm>();
+                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemStrengthGain>();
                 ActivelyUsed = true;
                 AllowCustomTeamColor = false;
                 ArmorType = global::Moonwell.Objects.ArmorType.Wood;
@@ -32261,7 +32261,7 @@ namespace Moonwell.Objects
                 CanBeSoldToMerchants = true;
                 Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.Campaign;
-                CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemStrengthGainAIsm>();
+                CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemStrengthGain>();
                 Description = "|cff82cdfcConsumable Item|r|nPermanently increases Strength.";
                 DroppedWhenCarrierDies = false;
                 EquipmentType = global::Moonwell.Objects.EquipmentType.None;
@@ -32305,7 +32305,7 @@ namespace Moonwell.Objects
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
             public TomeOfStrength2()
             {
-                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemStrengthGain>();
+                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemStrengthGainAInm>();
                 ActivelyUsed = true;
                 AllowCustomTeamColor = false;
                 ArmorType = global::Moonwell.Objects.ArmorType.Wood;
@@ -32314,7 +32314,7 @@ namespace Moonwell.Objects
                 CanBeSoldToMerchants = true;
                 Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
-                CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemStrengthGain>();
+                CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemStrengthGainAInm>();
                 Description = "Permanently increases Strength.";
                 DroppedWhenCarrierDies = false;
                 EquipmentType = global::Moonwell.Objects.EquipmentType.None;
@@ -32358,7 +32358,7 @@ namespace Moonwell.Objects
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
             public TomeOfStrengthTstr()
             {
-                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemStrengthGainAIsm>();
+                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemStrengthGain>();
                 ActivelyUsed = true;
                 AllowCustomTeamColor = false;
                 ArmorType = global::Moonwell.Objects.ArmorType.Wood;
@@ -32367,7 +32367,7 @@ namespace Moonwell.Objects
                 CanBeSoldToMerchants = true;
                 Charges = 1;
                 Classification = global::Moonwell.Objects.ItemClass.PowerUp;
-                CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemStrengthGainAIsm>();
+                CooldownGroup.Set<global::Moonwell.Objects.Other.Abilities.ItemStrengthGain>();
                 Description = "Permanently increases Strength.";
                 DroppedWhenCarrierDies = false;
                 EquipmentType = global::Moonwell.Objects.EquipmentType.None;
@@ -32626,7 +32626,7 @@ namespace Moonwell.Objects
             /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
             public UndeadFlag()
             {
-                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemCaptureTheFlag>();
+                Abilities.Set<global::Moonwell.Objects.Other.Abilities.ItemCaptureTheFlagAIfe>();
                 ActivelyUsed = false;
                 AllowCustomTeamColor = false;
                 ArmorType = global::Moonwell.Objects.ArmorType.Wood;
@@ -33994,7 +33994,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Warsong Battle Drums (war2).</summary>
+        /// <summary>Warsong Battle Drums (War Drums Aura), war2.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("war2")]
         public class WarsongBattleDrums : global::Moonwell.Objects.StandardItem
@@ -34048,7 +34048,7 @@ namespace Moonwell.Objects
             }
         }
 
-        /// <summary>Warsong Battle Drums (ward).</summary>
+        /// <summary>Warsong Battle Drums (Command Aura), ward.</summary>
         /// @CSharpLua.Ignore
         [global::Moonwell.Objects.Standard("ward")]
         public class WarsongBattleDrumsWard : global::Moonwell.Objects.StandardItem

@@ -62,7 +62,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Animal War Training (Ahan).</summary>
+            /// <summary>Animal War Training (Icon), Ahan.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Ahan")]
             public class AnimalWarTraining : global::Moonwell.Objects.StandardAbility
@@ -321,7 +321,7 @@ namespace Moonwell.Objects
                 public Bash()
                 {
                     Area = Levels(0f, 0f, 0f);
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stunned>();
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.StunnedBPSE>();
                     ButtonPositionNormalX = 2;
                     ButtonPositionNormalY = 2;
                     ButtonPositionResearchX = 2;
@@ -589,7 +589,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Call To Arms (Amic).</summary>
+            /// <summary>Call To Arms (Town Hall), Amic.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Amic")]
             public class CallToArms : global::Moonwell.Objects.StandardAbility
@@ -633,7 +633,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Call to Arms (Amil).</summary>
+            /// <summary>Call to Arms (Peasant), Amil.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Amil")]
             public class CallToArmsAmil : global::Moonwell.Objects.StandardAbility
@@ -690,7 +690,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Cargo Hold (Sch4).</summary>
+            /// <summary>Cargo Hold (Tank), Sch4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Sch4")]
             public class CargoHold : global::Moonwell.Objects.StandardAbility
@@ -1194,7 +1194,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Feedback (Afbk).</summary>
+            /// <summary>Feedback (Spellbreaker), Afbk.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Afbk")]
             public class Feedback : global::Moonwell.Objects.StandardAbility
@@ -1278,7 +1278,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Feedback (Afbt).</summary>
+            /// <summary>Feedback (Arcane Tower), Afbt.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Afbt")]
             public class FeedbackAfbt : global::Moonwell.Objects.StandardAbility
@@ -1850,7 +1850,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Improved Lumber Harvesting,Improved Lumber Harvesting,Advanced Lumber Harvesting (Ahlh).</summary>
+            /// <summary>Improved Lumber Harvesting,Improved Lumber Harvesting,Advanced Lumber Harvesting (Icon), Ahlh.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Ahlh")]
             public class ImprovedLumberHarvestingImprovedLumberHarvestingAdvancedLumberHarvesting : global::Moonwell.Objects.StandardAbility
@@ -2047,7 +2047,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Long Rifles (Ahri).</summary>
+            /// <summary>Long Rifles (Icon), Ahri.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Ahri")]
             public class LongRifles : global::Moonwell.Objects.StandardAbility
@@ -2198,7 +2198,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Magic Sentry (Adts).</summary>
+            /// <summary>Magic Sentry (Human Towers), Adts.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Adts")]
             public class MagicSentry : global::Moonwell.Objects.StandardAbility
@@ -2399,7 +2399,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Phoenix (Ahpe).</summary>
+            /// <summary>Phoenix (Icon), Ahpe.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Ahpe")]
             public class PhoenixAhpe : global::Moonwell.Objects.StandardAbility
@@ -2586,8 +2586,8 @@ namespace Moonwell.Objects
                     ManaCost = Levels(200);
                     MaximumCreepLevel = Levels(5);
                     MorphUnitsAir.Set<global::Moonwell.Objects.Critters.Units.FlyingSheep>();
-                    MorphUnitsAmphibious.Set<global::Moonwell.Objects.Critters.Units.Sheep>();
-                    MorphUnitsGround.Set<global::Moonwell.Objects.Critters.Units.SheepNshe>();
+                    MorphUnitsAmphibious.Set<global::Moonwell.Objects.Critters.Units.SheepNsha>();
+                    MorphUnitsGround.Set<global::Moonwell.Objects.Critters.Units.Sheep>();
                     MorphUnitsWater.Set<global::Moonwell.Objects.Critters.Units.SheepNshw>();
                     Name = "Polymorph";
                     Order = "polymorph";
@@ -2642,7 +2642,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Repair (Ahrp).</summary>
+            /// <summary>Repair (Human), Ahrp.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Ahrp")]
             public class Repair : global::Moonwell.Objects.StandardAbility
@@ -3185,7 +3185,7 @@ namespace Moonwell.Objects
                 public StormBolt()
                 {
                     AnimationNames = "spell,throw";
-                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.Stunned>();
+                    Buffs.Set<global::Moonwell.Objects.Other.Buffs.StunnedBPSE>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = 2;
                     ButtonPositionResearchX = 0;
@@ -3455,7 +3455,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>True Sight (Agyv).</summary>
+            /// <summary>True Sight (Flying Machine), Agyv.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Agyv")]
             public class TrueSight : global::Moonwell.Objects.StandardAbility

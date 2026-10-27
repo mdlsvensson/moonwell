@@ -1725,7 +1725,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Demon Hunter (Edmm).</summary>
+            /// <summary>Demon Hunter (Demon Form), Edmm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Edmm")]
             public class DemonHunterEdmm : global::Moonwell.Objects.StandardHero
@@ -1918,7 +1918,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Druid of the Claw (edcm).</summary>
+            /// <summary>Druid of the Claw (Bear Form), edcm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("edcm")]
             public class DruidOfTheClaw : global::Moonwell.Objects.StandardUnit
@@ -1926,7 +1926,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DruidOfTheClaw()
                 {
-                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.BearForm, global::Moonwell.Objects.NightElf.Abilities.Roar, global::Moonwell.Objects.Other.Abilities.UnitInventory, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
+                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.BearForm, global::Moonwell.Objects.NightElf.Abilities.RoarAra2, global::Moonwell.Objects.Other.Abilities.UnitInventory, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2075,7 +2075,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Druid of the Claw (edoc).</summary>
+            /// <summary>Druid of the Claw (Night Elf Form), edoc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("edoc")]
             public class DruidOfTheClawEdoc : global::Moonwell.Objects.StandardUnit
@@ -2083,7 +2083,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DruidOfTheClawEdoc()
                 {
-                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.BearForm, global::Moonwell.Objects.NightElf.Abilities.Rejuvenation, global::Moonwell.Objects.NightElf.Abilities.RoarAroa, global::Moonwell.Objects.Other.Abilities.UnitInventory, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
+                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.BearForm, global::Moonwell.Objects.NightElf.Abilities.Rejuvenation, global::Moonwell.Objects.NightElf.Abilities.Roar, global::Moonwell.Objects.Other.Abilities.UnitInventory, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2230,7 +2230,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Druid of the Talon (edot).</summary>
+            /// <summary>Druid of the Talon (Night Elf Form), edot.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("edot")]
             public class DruidOfTheTalon : global::Moonwell.Objects.StandardUnit
@@ -2238,7 +2238,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DruidOfTheTalon()
                 {
-                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.Cyclone, global::Moonwell.Objects.NightElf.Abilities.StormCrowForm, global::Moonwell.Objects.NightElf.Abilities.FaerieFireAfae, global::Moonwell.Objects.Other.Abilities.UnitInventory, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
+                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.Cyclone, global::Moonwell.Objects.NightElf.Abilities.StormCrowForm, global::Moonwell.Objects.NightElf.Abilities.FaerieFire, global::Moonwell.Objects.Other.Abilities.UnitInventory, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
                     AcquisitionRange = 700f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2288,7 +2288,7 @@ namespace Moonwell.Objects
                     DamageSides = 3;
                     DeathTimeSeconds = 4.335f;
                     DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
-                    DefaultActiveAbility.Set<global::Moonwell.Objects.NightElf.Abilities.FaerieFireAfae>();
+                    DefaultActiveAbility.Set<global::Moonwell.Objects.NightElf.Abilities.FaerieFire>();
                     DefenseType = global::Moonwell.DefenseType.None;
                     DefenseUpgradeBonus = 2;
                     DependencyEquivalents.Set<global::Moonwell.Objects.NightElf.Units.DruidOfTheTalonEdtm>();
@@ -2387,7 +2387,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Druid of the Talon (edtm).</summary>
+            /// <summary>Druid of the Talon (Storm Crow Form), edtm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("edtm")]
             public class DruidOfTheTalonEdtm : global::Moonwell.Objects.StandardUnit
@@ -2395,7 +2395,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DruidOfTheTalonEdtm()
                 {
-                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.StormCrowForm, global::Moonwell.Objects.NightElf.Abilities.FaerieFire, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
+                    Abilities.Set<global::Moonwell.Objects.NightElf.Abilities.StormCrowForm, global::Moonwell.Objects.NightElf.Abilities.FaerieFireAfa2, global::Moonwell.Objects.NightElf.Abilities.Ultravision>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2445,7 +2445,7 @@ namespace Moonwell.Objects
                     DamageSides = 7;
                     DeathTimeSeconds = 4.335f;
                     DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesNotDecay;
-                    DefaultActiveAbility.Set<global::Moonwell.Objects.NightElf.Abilities.FaerieFireAfae>();
+                    DefaultActiveAbility.Set<global::Moonwell.Objects.NightElf.Abilities.FaerieFire>();
                     DefenseType = global::Moonwell.DefenseType.None;
                     DefenseUpgradeBonus = 2;
                     ElevationSamplePoints = 2;
@@ -4184,7 +4184,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Owl Scout (now2).</summary>
+            /// <summary>Owl Scout (Level 2), now2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("now2")]
             public class OwlScout : global::Moonwell.Objects.StandardUnit
@@ -4309,7 +4309,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Owl Scout (now3).</summary>
+            /// <summary>Owl Scout (Level 3), now3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("now3")]
             public class OwlScoutNow3 : global::Moonwell.Objects.StandardUnit
@@ -4433,7 +4433,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Owl Scout (nowl).</summary>
+            /// <summary>Owl Scout (Level 1), nowl.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nowl")]
             public class OwlScoutNowl : global::Moonwell.Objects.StandardUnit

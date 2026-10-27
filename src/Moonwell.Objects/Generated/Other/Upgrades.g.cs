@@ -14,7 +14,7 @@ namespace Moonwell.Objects
         /// @CSharpLua.Ignore
         public static partial class Upgrades
         {
-            /// <summary>Glyph of Fortification (Rgfo).</summary>
+            /// <summary>Glyph of Fortification (Upgrade 1), Rgfo.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Rgfo")]
             public class GlyphOfFortification : global::Moonwell.Objects.StandardUpgrade
@@ -42,7 +42,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Glyph of Ultravision (Rguv).</summary>
+            /// <summary>Glyph of Ultravision (Upgrade), Rguv.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Rguv")]
             public class GlyphOfUltravision : global::Moonwell.Objects.StandardUpgrade

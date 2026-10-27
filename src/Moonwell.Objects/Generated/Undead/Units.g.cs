@@ -453,7 +453,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Banshee()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.AntiMagicShell, global::Moonwell.Objects.Undead.Abilities.Curse, global::Moonwell.Objects.Undead.Abilities.PossessionAps2, global::Moonwell.Objects.Other.Abilities.UnitInventoryAiun>();
+                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.AntiMagicShellAam2, global::Moonwell.Objects.Undead.Abilities.Curse, global::Moonwell.Objects.Undead.Abilities.PossessionAps2, global::Moonwell.Objects.Other.Abilities.UnitInventoryAiun>();
                     AcquisitionRange = 700f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -881,7 +881,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Burrowed Carrion Beetle (ucsB).</summary>
+            /// <summary>Burrowed Carrion Beetle (Level 2), ucsB.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ucsB")]
             public class BurrowedCarrionBeetle : global::Moonwell.Objects.StandardUnit
@@ -1006,7 +1006,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Burrowed Carrion Beetle (ucsC).</summary>
+            /// <summary>Burrowed Carrion Beetle (Level 3), ucsC.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ucsC")]
             public class BurrowedCarrionBeetleUcsC : global::Moonwell.Objects.StandardUnit
@@ -1270,7 +1270,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Carrion Beetle (ucs1).</summary>
+            /// <summary>Carrion Beetle (Level 1), ucs1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ucs1")]
             public class CarrionBeetle : global::Moonwell.Objects.StandardUnit
@@ -1408,7 +1408,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Carrion Beetle (ucs2).</summary>
+            /// <summary>Carrion Beetle (Level 2), ucs2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ucs2")]
             public class CarrionBeetleUcs2 : global::Moonwell.Objects.StandardUnit
@@ -1550,7 +1550,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Carrion Beetle (ucs3).</summary>
+            /// <summary>Carrion Beetle (Level 3), ucs3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("ucs3")]
             public class CarrionBeetleUcs3 : global::Moonwell.Objects.StandardUnit
@@ -2235,7 +2235,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Undead.Abilities.DeathCoil, global::Moonwell.Objects.Undead.Abilities.DeathPact, global::Moonwell.Objects.Undead.Abilities.UnholyAura, global::Moonwell.Objects.Undead.Abilities.AnimateDead>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Undead.Abilities.DeathCoil, global::Moonwell.Objects.Undead.Abilities.DeathPact, global::Moonwell.Objects.Undead.Abilities.UnholyAura, global::Moonwell.Objects.Undead.Abilities.AnimateDeadAUa2>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -4892,7 +4892,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Shade()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.TrueSight, global::Moonwell.Objects.Undead.Abilities.GhostAgho, global::Moonwell.Objects.Undead.Abilities.Shade>();
+                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.TrueSight, global::Moonwell.Objects.Undead.Abilities.Ghost, global::Moonwell.Objects.Undead.Abilities.Shade>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 1.5f;

@@ -14,7 +14,7 @@ namespace Moonwell.Objects
         /// @CSharpLua.Ignore
         public static partial class Units
         {
-            /// <summary>Doom Guard (nba2).</summary>
+            /// <summary>Doom Guard (Summoned), nba2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nba2")]
             public class DoomGuard : global::Moonwell.Objects.StandardUnit
@@ -22,7 +22,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DoomGuard()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.Cripple, global::Moonwell.Objects.Creeps.Abilities.DispelMagic, global::Moonwell.Objects.Creeps.Abilities.WarStompAwrs, global::Moonwell.Objects.Creeps.Abilities.RainOfFire, global::Moonwell.Objects.Creeps.Abilities.ResistantSkinACsk>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.Cripple, global::Moonwell.Objects.Creeps.Abilities.DispelMagic, global::Moonwell.Objects.Creeps.Abilities.WarStompAwrs, global::Moonwell.Objects.Creeps.Abilities.RainOfFireACrf, global::Moonwell.Objects.Creeps.Abilities.ResistantSkinACsk>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -182,7 +182,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Doom Guard (nbal).</summary>
+            /// <summary>Doom Guard (Standard), nbal.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nbal")]
             public class DoomGuardNbal : global::Moonwell.Objects.StandardUnit
@@ -190,7 +190,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public DoomGuardNbal()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.Cripple, global::Moonwell.Objects.Creeps.Abilities.DispelMagic, global::Moonwell.Objects.Creeps.Abilities.WarStompAwrs, global::Moonwell.Objects.Creeps.Abilities.RainOfFire, global::Moonwell.Objects.Creeps.Abilities.ResistantSkinACsk>();
+                    Abilities.Set<global::Moonwell.Objects.Creeps.Abilities.Cripple, global::Moonwell.Objects.Creeps.Abilities.DispelMagic, global::Moonwell.Objects.Creeps.Abilities.WarStompAwrs, global::Moonwell.Objects.Creeps.Abilities.RainOfFireACrf, global::Moonwell.Objects.Creeps.Abilities.ResistantSkinACsk>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;

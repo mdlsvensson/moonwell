@@ -14,7 +14,7 @@ namespace Moonwell.Objects
         /// @CSharpLua.Ignore
         public static partial class Upgrades
         {
-            /// <summary>Backpack (Rupm).</summary>
+            /// <summary>Backpack (Undead), Rupm.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Rupm")]
             public class Backpack : global::Moonwell.Objects.StandardUpgrade

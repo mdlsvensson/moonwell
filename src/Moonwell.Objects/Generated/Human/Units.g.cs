@@ -4922,7 +4922,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Runner (hrrh).</summary>
+            /// <summary>Runner High Elf, hrrh.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("hrrh")]
             public class Runner : global::Moonwell.Objects.StandardUnit
@@ -5370,7 +5370,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Siege Engine (hrtt).</summary>
+            /// <summary>Siege Engine (Barrage), hrtt.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("hrtt")]
             public class SiegeEngineHrtt : global::Moonwell.Objects.StandardUnit
@@ -6299,7 +6299,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Water Elemental (hwat).</summary>
+            /// <summary>Water Elemental (Level 1), hwat.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("hwat")]
             public class WaterElemental : global::Moonwell.Objects.StandardUnit
@@ -6445,7 +6445,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Water Elemental (hwt2).</summary>
+            /// <summary>Water Elemental (Level 2), hwt2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("hwt2")]
             public class WaterElementalHwt2 : global::Moonwell.Objects.StandardUnit
@@ -6592,7 +6592,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Water Elemental (hwt3).</summary>
+            /// <summary>Water Elemental (Level 3), hwt3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("hwt3")]
             public class WaterElementalHwt3 : global::Moonwell.Objects.StandardUnit

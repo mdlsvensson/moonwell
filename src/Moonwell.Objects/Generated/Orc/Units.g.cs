@@ -150,7 +150,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Baine()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.CorporealForm, global::Moonwell.Objects.Orc.Abilities.SpiritLink, global::Moonwell.Objects.Orc.Abilities.DisenchantAdcn, global::Moonwell.Objects.Orc.Abilities.AncestralSpirit, global::Moonwell.Objects.Other.Abilities.UnitInventoryAion, global::Moonwell.Objects.Creeps.Abilities.ResistantSkinACsk>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.CorporealForm, global::Moonwell.Objects.Orc.Abilities.SpiritLink, global::Moonwell.Objects.Orc.Abilities.Disenchant, global::Moonwell.Objects.Orc.Abilities.AncestralSpirit, global::Moonwell.Objects.Other.Abilities.UnitInventoryAion, global::Moonwell.Objects.Creeps.Abilities.ResistantSkinACsk>();
                     AcquisitionRange = 500f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -705,7 +705,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Berserker()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.Berserk, global::Moonwell.Objects.Other.Abilities.UnitInventoryAion, global::Moonwell.Objects.Orc.Abilities.BerserkerUpgrade, global::Moonwell.Objects.Orc.Abilities.TrollRegeneration>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.Berserk, global::Moonwell.Objects.Other.Abilities.UnitInventoryAion, global::Moonwell.Objects.Orc.Abilities.BerserkerUpgradeAobk, global::Moonwell.Objects.Orc.Abilities.TrollRegeneration>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -1329,7 +1329,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Dire Wolf (osw2).</summary>
+            /// <summary>Dire Wolf (Level 2), osw2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("osw2")]
             public class DireWolf : global::Moonwell.Objects.StandardUnit
@@ -2065,7 +2065,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Headhunter()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.BerserkerUpgradeSbsk, global::Moonwell.Objects.Other.Abilities.UnitInventoryAion, global::Moonwell.Objects.Orc.Abilities.Berserk, global::Moonwell.Objects.Orc.Abilities.BerserkerUpgrade, global::Moonwell.Objects.Orc.Abilities.TrollRegeneration>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.BerserkerUpgrade, global::Moonwell.Objects.Other.Abilities.UnitInventoryAion, global::Moonwell.Objects.Orc.Abilities.Berserk, global::Moonwell.Objects.Orc.Abilities.BerserkerUpgradeAobk, global::Moonwell.Objects.Orc.Abilities.TrollRegeneration>();
                     AcquisitionRange = 600f;
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
@@ -2792,7 +2792,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SentryWard()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.Detector, global::Moonwell.Objects.Undead.Abilities.Ghost, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.Detector, global::Moonwell.Objects.Undead.Abilities.GhostAeth, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
@@ -2904,7 +2904,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Serpent Ward (osp1).</summary>
+            /// <summary>Serpent Ward (Level 1), osp1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("osp1")]
             public class SerpentWard : global::Moonwell.Objects.StandardUnit
@@ -3043,7 +3043,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Serpent Ward (osp2).</summary>
+            /// <summary>Serpent Ward (Level 2), osp2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("osp2")]
             public class SerpentWardOsp2 : global::Moonwell.Objects.StandardUnit
@@ -3183,7 +3183,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Serpent Ward (osp3).</summary>
+            /// <summary>Serpent Ward (Level 3), osp3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("osp3")]
             public class SerpentWardOsp3 : global::Moonwell.Objects.StandardUnit
@@ -3323,7 +3323,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Serpent Ward (osp4).</summary>
+            /// <summary>Serpent Ward (Level 4), osp4.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("osp4")]
             public class SerpentWardOsp4 : global::Moonwell.Objects.StandardUnit
@@ -3553,7 +3553,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Orc.Abilities.HealingWaveAOhw, global::Moonwell.Objects.Orc.Abilities.HexAOhx, global::Moonwell.Objects.Orc.Abilities.SerpentWard, global::Moonwell.Objects.Orc.Abilities.BigBadVoodoo>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Orc.Abilities.HealingWave, global::Moonwell.Objects.Orc.Abilities.Hex, global::Moonwell.Objects.Orc.Abilities.SerpentWard, global::Moonwell.Objects.Orc.Abilities.BigBadVoodoo>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -3648,7 +3648,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Shadow Wolf (osw3).</summary>
+            /// <summary>Shadow Wolf (Level 3), osw3.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("osw3")]
             public class ShadowWolf : global::Moonwell.Objects.StandardUnit
@@ -4216,15 +4216,172 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Spirit Walker (ospm).</summary>
+            /// <summary>Spirit Walker (ospw).</summary>
             /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("ospm")]
+            [global::Moonwell.Objects.Standard("ospw")]
             public class SpiritWalker : global::Moonwell.Objects.StandardUnit
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SpiritWalker()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.CorporealForm, global::Moonwell.Objects.Orc.Abilities.SpiritLink, global::Moonwell.Objects.Orc.Abilities.DisenchantAdcn, global::Moonwell.Objects.Orc.Abilities.AncestralSpirit, global::Moonwell.Objects.Other.Abilities.UnitInventoryAion, global::Moonwell.Objects.Creeps.Abilities.ResistantSkinACsk>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.CorporealForm, global::Moonwell.Objects.Orc.Abilities.SpiritLink, global::Moonwell.Objects.Orc.Abilities.Disenchant, global::Moonwell.Objects.Orc.Abilities.AncestralSpirit, global::Moonwell.Objects.Other.Abilities.UnitInventoryAion, global::Moonwell.Objects.Creeps.Abilities.ResistantSkinACsk>();
+                    AcquisitionRange = 500f;
+                    AllowCustomTeamColor = false;
+                    AnimationBlendTimeSeconds = 0.15f;
+                    AnimationCastBackswing = 0.59f;
+                    AnimationCastPoint = 0.68f;
+                    AnimationRunSpeed = 270f;
+                    AnimationWalkSpeed = 270f;
+                    Armor = 0;
+                    ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
+                    Attack1AnimationBackswingPoint = 0.6f;
+                    Attack1AnimationDamagePoint = 0.5f;
+                    Attack1DamageLossFactor = 0f;
+                    Attack1DamageSpillDistance = 0f;
+                    Attack1DamageSpillRadius = 0f;
+                    Attack1MaximumNumberOfTargets = 1;
+                    Attack1ProjectileArc = 0f;
+                    Attack1ProjectileArt = "Abilities\\Weapons\\SorceressMissile\\SorceressMissile.mdl";
+                    Attack1ProjectileHomingEnabled = true;
+                    Attack1ProjectileSpeed = 900;
+                    Attack1RangeMotionBuffer = 250f;
+                    Attack1ShowUI = true;
+                    Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
+                    Attack1WeaponType = global::Moonwell.Objects.WeaponType.Missile;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
+                    Attack2DamageLossFactor = 0f;
+                    Attack2DamageSpillDistance = 0f;
+                    Attack2DamageSpillRadius = 0f;
+                    Attack2MaximumNumberOfTargets = 1;
+                    Attack2ShowUI = true;
+                    AttackCooldown = 1.75f;
+                    AttackRange = 400;
+                    AttackType = global::Moonwell.AttackType.Magic;
+                    AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
+                    BuildTime = 35;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 0;
+                    CanDropItemsOnDeath = true;
+                    CanFlee = true;
+                    CasterUpgradeArt = "UI\\Widgets\\Console\\Human\\infocard-spiritwalker.blp";
+                    CasterUpgradeNames = "Initiate, Adept, Master";
+                    CasterUpgradeTips = "\"- Ethereal Form|n- Spirit Link\",\"- Ethereal Form|n- Spirit Link|n- Disenchant\",\"- Ethereal Form|n- Spirit Link|n- Disenchant|n- Ancestral Spirit\"";
+                    CategorizationCampaign = false;
+                    CategorizationSpecial = false;
+                    CollisionSize = 32f;
+                    Damage = 16;
+                    DamageDice = 1;
+                    DamageSides = 6;
+                    DeathTimeSeconds = 2f;
+                    DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
+                    DefenseType = global::Moonwell.DefenseType.None;
+                    DefenseUpgradeBonus = 2;
+                    DependencyEquivalents.Set<global::Moonwell.Objects.Orc.Units.SpiritWalkerOspm>();
+                    ElevationSampleRadius = 50f;
+                    FlyHeight = 0f;
+                    FogOfWarSampleRadius = 0f;
+                    Food = 3;
+                    FormationRank = 2;
+                    GoldBountyAwardedBase = 30;
+                    GoldBountyAwardedNumberOfDice = 8;
+                    GoldBountyAwardedSidesPerDie = 3;
+                    GoldCost = 195;
+                    GroupSeparationEnabled = false;
+                    GroupSeparationGroupNumber = 0;
+                    GroupSeparationParameter = 0;
+                    GroupSeparationPriority = 0;
+                    HasTilesetSpecificData = false;
+                    HasWaterShadow = true;
+                    HeightMinimum = 0f;
+                    HideMinimapDisplay = false;
+                    HitPointRegen = 0.25f;
+                    HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
+                    Hotkey = "W";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSpiritWalker.blp";
+                    IsABuilding = false;
+                    Level = 3;
+                    LumberBountyAwardedBase = 0;
+                    LumberBountyAwardedNumberOfDice = 0;
+                    LumberBountyAwardedSidesPerDie = 0;
+                    LumberCost = 35;
+                    Mana = 100;
+                    ManaRegen = 1f;
+                    MaxLife = 500;
+                    MaxMana = 300;
+                    MaximumPitchAngleDegrees = 10f;
+                    MaximumRollAngleDegrees = 10f;
+                    Model = "units\\orc\\spiritwalker\\spiritwalker";
+                    ModelFileExtraVersions = 0;
+                    Name = "Spirit Walker";
+                    NormalSkin = "Acpf,Aspl,Adcn,Aast,Aion,ACsk";
+                    OccluderHeight = 0f;
+                    OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
+                    OrientationInterpolation = 4;
+                    PlaceableInEditor = true;
+                    PointValue = 100;
+                    Priority = 7;
+                    ProjectileImpactZ = 110f;
+                    ProjectileImpactZSwimming = 0f;
+                    ProjectileLaunchX = 10f;
+                    ProjectileLaunchY = 94f;
+                    ProjectileLaunchZ = 110f;
+                    ProjectileLaunchZSwimming = 0f;
+                    PropulsionWindowDegrees = 60f;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    RepairGoldCost = 195;
+                    RepairLumberCost = 35;
+                    RepairTime = 35;
+                    RequiredAnimationNamesAttachments = "medium";
+                    Scale = 0.8f;
+                    ScaleProjectiles = true;
+                    SelectionCircleHeight = 0f;
+                    SelectionCircleOnWater = false;
+                    SelectionScale = 1.15f;
+                    ShadowImageCenterX = 80f;
+                    ShadowImageCenterY = 80f;
+                    ShadowImageHeight = 190f;
+                    ShadowImageUnit = global::Moonwell.Objects.ShadowImage.Shadow;
+                    ShadowImageWidth = 190f;
+                    ShowAirToGroundIndicators = false;
+                    SightRadiusNight = 800;
+                    SightRange = 1400;
+                    Sleeps = false;
+                    Special = "Objects\\Spawnmodels\\Orc\\OrcLargeDeathExplode\\OrcLargeDeathExplode.mdl";
+                    Speed = 270;
+                    SpeedMaximum = 0;
+                    SpeedMinimum = 0;
+                    StockInitialAfterStartDelay = 1;
+                    StockMaximum = 3;
+                    StockReplenishInterval = 30;
+                    StockStartDelay = 0;
+                    TargetedAs = global::Moonwell.Objects.Targets.Ground;
+                    TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
+                    Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
+                    Tooltip = "Train Spirit Walker";
+                    TooltipExtended = "Mystical Tauren caster. Has Ethereal Form, which allows him to avoid physical damage. Also has Spirit Link, which allows units to distribute incoming damage. Can learn Disenchant, and Ancestral Spirit. |n|n|cffffcc00Attacks land and air units.|r";
+                    TransportedSize = 1;
+                    TurnRate = 0.5f;
+                    Type = global::Moonwell.Objects.MoveType.Foot;
+                    UnitClassification = global::Moonwell.Objects.UnitClass.Tauren;
+                    UnitSoundSet = "SpiritWalker";
+                    UpgradesUsed.Set<global::Moonwell.Objects.Orc.Upgrades.SpiritWalkerAdeptTraining, global::Moonwell.Objects.Orc.Upgrades.Backpack, global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
+                    UseClickHelper = false;
+                    UseExtendedLineOfSight = false;
+                }
+            }
+
+            /// <summary>Spirit Walker (Ethereal), ospm.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("ospm")]
+            public class SpiritWalkerOspm : global::Moonwell.Objects.StandardUnit
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SpiritWalkerOspm()
+                {
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.CorporealForm, global::Moonwell.Objects.Orc.Abilities.SpiritLink, global::Moonwell.Objects.Orc.Abilities.Disenchant, global::Moonwell.Objects.Orc.Abilities.AncestralSpirit, global::Moonwell.Objects.Other.Abilities.UnitInventoryAion, global::Moonwell.Objects.Creeps.Abilities.ResistantSkinACsk>();
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.59f;
@@ -4361,164 +4518,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Spirit Walker (ospw).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("ospw")]
-            public class SpiritWalkerOspw : global::Moonwell.Objects.StandardUnit
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public SpiritWalkerOspw()
-                {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.CorporealForm, global::Moonwell.Objects.Orc.Abilities.SpiritLink, global::Moonwell.Objects.Orc.Abilities.DisenchantAdcn, global::Moonwell.Objects.Orc.Abilities.AncestralSpirit, global::Moonwell.Objects.Other.Abilities.UnitInventoryAion, global::Moonwell.Objects.Creeps.Abilities.ResistantSkinACsk>();
-                    AcquisitionRange = 500f;
-                    AllowCustomTeamColor = false;
-                    AnimationBlendTimeSeconds = 0.15f;
-                    AnimationCastBackswing = 0.59f;
-                    AnimationCastPoint = 0.68f;
-                    AnimationRunSpeed = 270f;
-                    AnimationWalkSpeed = 270f;
-                    Armor = 0;
-                    ArmorType = global::Moonwell.Objects.ArmorType.Flesh;
-                    Attack1AnimationBackswingPoint = 0.6f;
-                    Attack1AnimationDamagePoint = 0.5f;
-                    Attack1DamageLossFactor = 0f;
-                    Attack1DamageSpillDistance = 0f;
-                    Attack1DamageSpillRadius = 0f;
-                    Attack1MaximumNumberOfTargets = 1;
-                    Attack1ProjectileArc = 0f;
-                    Attack1ProjectileArt = "Abilities\\Weapons\\SorceressMissile\\SorceressMissile.mdl";
-                    Attack1ProjectileHomingEnabled = true;
-                    Attack1ProjectileSpeed = 900;
-                    Attack1RangeMotionBuffer = 250f;
-                    Attack1ShowUI = true;
-                    Attack1TargetsAllowed = global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Debris | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Item | global::Moonwell.Objects.Targets.Structure | global::Moonwell.Objects.Targets.Ward;
-                    Attack1WeaponType = global::Moonwell.Objects.WeaponType.Missile;
-                    Attack2AttackType = global::Moonwell.AttackType.Normal;
-                    Attack2DamageLossFactor = 0f;
-                    Attack2DamageSpillDistance = 0f;
-                    Attack2DamageSpillRadius = 0f;
-                    Attack2MaximumNumberOfTargets = 1;
-                    Attack2ShowUI = true;
-                    AttackCooldown = 1.75f;
-                    AttackRange = 400;
-                    AttackType = global::Moonwell.AttackType.Magic;
-                    AttacksEnabled = global::Moonwell.Objects.AttackBits.Attack1Only;
-                    BuildTime = 35;
-                    ButtonPositionX = 0;
-                    ButtonPositionY = 0;
-                    CanDropItemsOnDeath = true;
-                    CanFlee = true;
-                    CasterUpgradeArt = "UI\\Widgets\\Console\\Human\\infocard-spiritwalker.blp";
-                    CasterUpgradeNames = "Initiate, Adept, Master";
-                    CasterUpgradeTips = "\"- Ethereal Form|n- Spirit Link\",\"- Ethereal Form|n- Spirit Link|n- Disenchant\",\"- Ethereal Form|n- Spirit Link|n- Disenchant|n- Ancestral Spirit\"";
-                    CategorizationCampaign = false;
-                    CategorizationSpecial = false;
-                    CollisionSize = 32f;
-                    Damage = 16;
-                    DamageDice = 1;
-                    DamageSides = 6;
-                    DeathTimeSeconds = 2f;
-                    DeathType = global::Moonwell.Objects.DeathType.CanRaiseDoesDecay;
-                    DefenseType = global::Moonwell.DefenseType.None;
-                    DefenseUpgradeBonus = 2;
-                    DependencyEquivalents.Set<global::Moonwell.Objects.Orc.Units.SpiritWalker>();
-                    ElevationSampleRadius = 50f;
-                    FlyHeight = 0f;
-                    FogOfWarSampleRadius = 0f;
-                    Food = 3;
-                    FormationRank = 2;
-                    GoldBountyAwardedBase = 30;
-                    GoldBountyAwardedNumberOfDice = 8;
-                    GoldBountyAwardedSidesPerDie = 3;
-                    GoldCost = 195;
-                    GroupSeparationEnabled = false;
-                    GroupSeparationGroupNumber = 0;
-                    GroupSeparationParameter = 0;
-                    GroupSeparationPriority = 0;
-                    HasTilesetSpecificData = false;
-                    HasWaterShadow = true;
-                    HeightMinimum = 0f;
-                    HideMinimapDisplay = false;
-                    HitPointRegen = 0.25f;
-                    HitPointsRegenerationType = global::Moonwell.Objects.RegenType.Always;
-                    Hotkey = "W";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSpiritWalker.blp";
-                    IsABuilding = false;
-                    Level = 3;
-                    LumberBountyAwardedBase = 0;
-                    LumberBountyAwardedNumberOfDice = 0;
-                    LumberBountyAwardedSidesPerDie = 0;
-                    LumberCost = 35;
-                    Mana = 100;
-                    ManaRegen = 1f;
-                    MaxLife = 500;
-                    MaxMana = 300;
-                    MaximumPitchAngleDegrees = 10f;
-                    MaximumRollAngleDegrees = 10f;
-                    Model = "units\\orc\\spiritwalker\\spiritwalker";
-                    ModelFileExtraVersions = 0;
-                    Name = "Spirit Walker";
-                    NormalSkin = "Acpf,Aspl,Adcn,Aast,Aion,ACsk";
-                    OccluderHeight = 0f;
-                    OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
-                    OrientationInterpolation = 4;
-                    PlaceableInEditor = true;
-                    PointValue = 100;
-                    Priority = 7;
-                    ProjectileImpactZ = 110f;
-                    ProjectileImpactZSwimming = 0f;
-                    ProjectileLaunchX = 10f;
-                    ProjectileLaunchY = 94f;
-                    ProjectileLaunchZ = 110f;
-                    ProjectileLaunchZSwimming = 0f;
-                    PropulsionWindowDegrees = 60f;
-                    Race = global::Moonwell.Objects.UnitRace.Orc;
-                    RepairGoldCost = 195;
-                    RepairLumberCost = 35;
-                    RepairTime = 35;
-                    RequiredAnimationNamesAttachments = "medium";
-                    Scale = 0.8f;
-                    ScaleProjectiles = true;
-                    SelectionCircleHeight = 0f;
-                    SelectionCircleOnWater = false;
-                    SelectionScale = 1.15f;
-                    ShadowImageCenterX = 80f;
-                    ShadowImageCenterY = 80f;
-                    ShadowImageHeight = 190f;
-                    ShadowImageUnit = global::Moonwell.Objects.ShadowImage.Shadow;
-                    ShadowImageWidth = 190f;
-                    ShowAirToGroundIndicators = false;
-                    SightRadiusNight = 800;
-                    SightRange = 1400;
-                    Sleeps = false;
-                    Special = "Objects\\Spawnmodels\\Orc\\OrcLargeDeathExplode\\OrcLargeDeathExplode.mdl";
-                    Speed = 270;
-                    SpeedMaximum = 0;
-                    SpeedMinimum = 0;
-                    StockInitialAfterStartDelay = 1;
-                    StockMaximum = 3;
-                    StockReplenishInterval = 30;
-                    StockStartDelay = 0;
-                    TargetedAs = global::Moonwell.Objects.Targets.Ground;
-                    TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
-                    Tilesets = "*";
-                    TintingColor1Red = 255;
-                    TintingColor2Green = 255;
-                    TintingColor3Blue = 255;
-                    Tooltip = "Train Spirit Walker";
-                    TooltipExtended = "Mystical Tauren caster. Has Ethereal Form, which allows him to avoid physical damage. Also has Spirit Link, which allows units to distribute incoming damage. Can learn Disenchant, and Ancestral Spirit. |n|n|cffffcc00Attacks land and air units.|r";
-                    TransportedSize = 1;
-                    TurnRate = 0.5f;
-                    Type = global::Moonwell.Objects.MoveType.Foot;
-                    UnitClassification = global::Moonwell.Objects.UnitClass.Tauren;
-                    UnitSoundSet = "SpiritWalker";
-                    UpgradesUsed.Set<global::Moonwell.Objects.Orc.Upgrades.SpiritWalkerAdeptTraining, global::Moonwell.Objects.Orc.Upgrades.Backpack, global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
-                    UseClickHelper = false;
-                    UseExtendedLineOfSight = false;
-                }
-            }
-
-            /// <summary>Spirit Wolf (osw1).</summary>
+            /// <summary>Spirit Wolf (Level 1), osw1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("osw1")]
             public class SpiritWolf : global::Moonwell.Objects.StandardUnit
@@ -4664,7 +4664,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public StasisTrap()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.Ghost, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
+                    Abilities.Set<global::Moonwell.Objects.Undead.Abilities.GhostAeth, global::Moonwell.Objects.Creeps.Abilities.SpellImmunity>();
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;
@@ -5137,7 +5137,7 @@ namespace Moonwell.Objects
                     HasTilesetSpecificData = false;
                     HasWaterShadow = true;
                     HeightMinimum = 0f;
-                    HeroAbilities.Set<global::Moonwell.Objects.Orc.Abilities.ShockwaveAOsh, global::Moonwell.Objects.Orc.Abilities.EnduranceAura, global::Moonwell.Objects.Orc.Abilities.ReincarnationAOre, global::Moonwell.Objects.Orc.Abilities.WarStompAOws>();
+                    HeroAbilities.Set<global::Moonwell.Objects.Orc.Abilities.Shockwave, global::Moonwell.Objects.Orc.Abilities.EnduranceAura, global::Moonwell.Objects.Orc.Abilities.Reincarnation, global::Moonwell.Objects.Orc.Abilities.WarStompAOws>();
                     HeroHideHeroDeathMessage = false;
                     HeroHideHeroInterfaceIcon = false;
                     HeroHideHeroMinimapDisplay = false;
@@ -5354,7 +5354,7 @@ namespace Moonwell.Objects
                     TintingColor3Blue = 255;
                     Tooltip = "Build Tauren Totem";
                     TooltipExtended = "Trains Spirit Walkers and Tauren. |nAlso contains upgrades for Spirit Walkers and Tauren.";
-                    Trains.Set<global::Moonwell.Objects.Orc.Units.Tauren, global::Moonwell.Objects.Orc.Units.SpiritWalker>();
+                    Trains.Set<global::Moonwell.Objects.Orc.Units.Tauren, global::Moonwell.Objects.Orc.Units.SpiritWalkerOspm>();
                     UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical;
                     UnitSoundSet = "TaurenTotem";
                     UpgradesUsed.Set<global::Moonwell.Objects.Orc.Upgrades.SpikedBarricades, global::Moonwell.Objects.Other.Upgrades.GlyphOfFortification>();
@@ -5767,7 +5767,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public WatcherWard()
                 {
-                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.Detector, global::Moonwell.Objects.Undead.Abilities.Ghost, global::Moonwell.Objects.Other.Abilities.Invulnerable>();
+                    Abilities.Set<global::Moonwell.Objects.Orc.Abilities.Detector, global::Moonwell.Objects.Undead.Abilities.GhostAeth, global::Moonwell.Objects.Other.Abilities.Invulnerable>();
                     AllowCustomTeamColor = false;
                     AnimationBlendTimeSeconds = 0.15f;
                     AnimationCastBackswing = 0.51f;

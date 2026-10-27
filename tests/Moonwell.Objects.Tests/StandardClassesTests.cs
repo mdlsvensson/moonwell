@@ -648,7 +648,7 @@ namespace Moonwell.Objects.Tests
             Assert.Equal(float.Parse(Base("AHtb", "Htb1:2"), System.Globalization.CultureInfo.InvariantCulture), bolt.Damage[2]);
             Assert.Equal(Base("AHtb", "atp1:3"), bolt.Tooltip[3]);
 
-            Assert.True(new Talon().DefaultActiveAbility.Is<Moonwell.Objects.NightElf.Abilities.FaerieFireAfae>());
+            Assert.True(new Talon().DefaultActiveAbility.Is<Moonwell.Objects.NightElf.Abilities.FaerieFire>());
             Assert.Empty(DeclaredOf(new Talon()));
         }
 
