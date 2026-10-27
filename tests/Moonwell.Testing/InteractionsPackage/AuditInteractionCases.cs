@@ -365,6 +365,94 @@ namespace Moonwell.Testing
             }
         }
 
+        /// <summary>A destructable that holds an interaction pairing with units is tracked alone: the destructables of the map are not taken in, until something asks for destructables. A Find of destructables inside Local.For lists the holder once; the first Find outside takes in the rest and keeps the holder's entry.</summary>
+        public static void DestructableHolderTrackedAlone(FakeWorld world)
+        {
+            Fresh();
+            for (var i = 0; i < 50; i++)
+            {
+                var other = world.NewDestructable(ObjectTypes.FourCC("dfoo"));
+                world.PlaceDestructable(other, (float)(i * 10), 500.0f);
+                world.PlacedDestructables.Add(other);
+            }
+
+            var handle = world.NewDestructable(ObjectTypes.FourCC("dfoo"));
+            world.PlaceDestructable(handle, 0.0f, 0.0f);
+            world.PlacedDestructables.Add(handle);
+            var barrel = Destructable.Of(handle)!;
+            var b = UnitAt(world, 100.0f, 0.0f);
+            var shine = new Shine();
+            shine.Tag = unit => unit == b ? "b" : "?";
+            barrel.Interact(shine);
+            Expect.Equal(2, Tracking.Count, "the barrel and the unit are tracked");
+            Expect.Equal(1, KnownDestructables.Live.Count, "no other destructable is taken in");
+            Expect.True(!Tracking.Asked(Tracking.DestructableKind), "destructables are not asked for");
+            Steps(world, 1);
+            ExpectLog(new string[] { "meet b" }, "the barrel meets b");
+            var local = new List<Destructable>();
+            Local.For(Player.Get(0), () => { local = Find.InRange<Destructable>(0.0f, 0.0f, 100.0f); });
+            Expect.Equal(1, local.Count, "inside Local.For a Find lists the barrel once");
+            var entry = Tracking.EntryOf(barrel);
+            var found = Find.InRange<Destructable>(0.0f, 0.0f, 100.0f);
+            Expect.Equal(1, found.Count, "the first Find outside finds the barrel once");
+            Expect.Equal(52, Tracking.Count, "and takes in the destructables of the map");
+            Expect.Same(entry, Tracking.EntryOf(barrel), "keeping the barrel's entry");
+            barrel.Remove();
+            ExpectLog(new string[] { "meet b", "part b" }, "the shine parts with b as the barrel goes");
+            Expect.True(shine.HasEnded, "and ends");
+        }
+
+        /// <summary>An item that holds an interaction is tracked alone: the items of the map are not, and no scan looks for new ones once a second.</summary>
+        public static void ItemHolderTrackedAlone(FakeWorld world)
+        {
+            Fresh();
+            for (var i = 0; i < 3; i++)
+            {
+                var lying = world.NewItem(ObjectTypes.FourCC("ofoo"));
+                world.MoveItem(lying, (float)(i * 10), 500.0f);
+                world.PlacedItems.Add(lying);
+            }
+
+            var handle = world.NewItem(ObjectTypes.FourCC("ofoo"));
+            world.MoveItem(handle, 0.0f, 0.0f);
+            world.PlacedItems.Add(handle);
+            var orb = Item.Of(handle)!;
+            var b = UnitAt(world, 100.0f, 0.0f);
+            var shine = new Shine();
+            shine.Tag = unit => unit == b ? "b" : "?";
+            orb.Interact(shine);
+            Expect.Equal(2, Tracking.Count, "the orb and the unit are tracked");
+            Expect.True(!Tracking.Asked(Tracking.ItemKind), "items are not asked for");
+            var dropped = world.NewItem(ObjectTypes.FourCC("ofoo"));
+            world.MoveItem(dropped, 50.0f, 60.0f);
+            world.PlacedItems.Add(dropped);
+            Steps(world, 64);
+            Expect.True(KnownItems.Find(dropped) == null, "no scan takes in a new ground item");
+            Expect.Equal(1, KnownItems.Live.Count, "nor the items lying there");
+            ExpectLog(new string[] { "meet b" }, "the orb meets b");
+            world.MoveItem(handle, 900.0f, 900.0f);
+            Steps(world, 4);
+            ExpectLog(new string[] { "meet b", "part b" }, "moved away, it parts with b");
+        }
+
+        /// <summary>A unit that holds an interaction with gizmos is tracked alone: the units of the map are not taken in.</summary>
+        public static void UnitHolderOfGizmosTrackedAlone(FakeWorld world)
+        {
+            Fresh();
+            UnitAt(world, 500.0f, 500.0f);
+            var a = UnitAt(world, 0.0f, 0.0f);
+            var well = Gizmo.Create(new Well(), 100.0f, 0.0f);
+            var census = a.Interact(new Census<Gizmo>());
+            Expect.Equal(2, Tracking.Count, "the holder and the well are tracked");
+            Expect.True(!Tracking.Asked(Tracking.UnitKind), "units are not asked for");
+            Steps(world, 1);
+            Expect.Equal(1, census.Met.Count, "the unit meets the well");
+            Expect.Same(well, census.Met[0], "that well");
+            a.Remove();
+            Expect.True(census.HasEnded, "the census ends with its holder");
+            Expect.Equal(1, Tracking.Count, "which is no longer tracked");
+        }
+
         /// <summary>In a gizmo's OnLeave the gizmo has no place: a Find from it does not see it, though it is still in its cell, and a gizmo beside it is found; it leaves the cell after.</summary>
         public static void GizmoLeaveHasNoPlace(FakeWorld world)
         {

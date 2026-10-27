@@ -4,7 +4,7 @@ using Moonwell.Hosting;
 
 namespace Moonwell.Engine
 {
-    /// <summary>What the package tracks: the entries it gives to things with a place, and the count of them that decides whether the cycle runs. Gizmos are always tracked; units, items and destructables are tracked once something asks for that kind, so a map that only finds gizmos tracks none of the game's things.</summary>
+    /// <summary>What the package tracks: the entries it gives to things with a place, and the count of them that decides whether the cycle runs. Gizmos are always tracked; units, items and destructables are tracked once something asks for that kind, so a map that only finds gizmos tracks none of the game's things. The holder of an interaction is tracked on its own, without asking for its kind.</summary>
     internal static class Tracking
     {
         /// <summary>The kind of a unit.</summary>
@@ -308,7 +308,7 @@ namespace Moonwell.Engine
             return kind == ItemKind ? itemsAsked : destructablesAsked;
         }
 
-        /// <summary>Adds, to the end of a list, an entry that is in no grid for each live thing of class T of a kind nobody has asked for, in the order the runtime took them in. It tracks nothing and keeps nothing: the entries are the search's own, to be dropped with it. For a search inside Local.For, which may not track a kind.</summary>
+        /// <summary>Adds, to the end of a list, an entry that is in no grid for each live thing of class T of a kind nobody has asked for, in the order the runtime took them in. It tracks nothing and keeps nothing: the entries are the search's own, to be dropped with it. A thing with an entry of its own, the holder of an interaction, is passed over, as the search takes it from the grid. For a search inside Local.For, which may not track a kind.</summary>
         public static void AddUntracked<T>(List<Entry> into)
             where T : Actor
         {
@@ -316,10 +316,11 @@ namespace Moonwell.Engine
             if (Covers(type, UnitKind) && !Asked(UnitKind))
             {
                 var live = KnownUnits.Live;
+                var holders = Interactions.IsInstalled && unitEntries.Count > 0;
                 for (var i = 0; i < live.Count; i++)
                 {
                     var unit = live[i];
-                    if (unit is T && !unit.IsGone && !unit.HasEnded && unit.Handle != null)
+                    if (unit is T && !unit.IsGone && !unit.HasEnded && unit.Handle != null && !(holders && unitEntries.ContainsKey(unit.Handle)))
                     {
                         into.Add(new Entry(0, unit, UnitKind));
                     }
@@ -329,10 +330,11 @@ namespace Moonwell.Engine
             if (Covers(type, ItemKind) && !Asked(ItemKind))
             {
                 var live = KnownItems.Live;
+                var holders = Interactions.IsInstalled && itemEntries.Count > 0;
                 for (var i = 0; i < live.Count; i++)
                 {
                     var item = live[i];
-                    if (item is T && !item.IsGone && !item.HasEnded && item.Handle != null)
+                    if (item is T && !item.IsGone && !item.HasEnded && item.Handle != null && !(holders && itemEntries.ContainsKey(item.Handle)))
                     {
                         into.Add(new Entry(0, item, ItemKind));
                     }
@@ -342,10 +344,11 @@ namespace Moonwell.Engine
             if (Covers(type, DestructableKind) && !Asked(DestructableKind))
             {
                 var live = KnownDestructables.Live;
+                var holders = Interactions.IsInstalled && destructableEntries.Count > 0;
                 for (var i = 0; i < live.Count; i++)
                 {
                     var destructable = live[i];
-                    if (destructable is T && !destructable.IsGone && !destructable.HasEnded)
+                    if (destructable is T && !destructable.IsGone && !destructable.HasEnded && !(holders && destructableEntries.ContainsKey(destructable.Handle)))
                     {
                         var entry = new Entry(0, destructable, DestructableKind);
                         entry.X = destructable.X;
@@ -632,14 +635,35 @@ namespace Moonwell.Engine
             }
         }
 
-        /// <summary>Tracks a unit, item or destructable of a kind asked for that the take-in hook has not brought in yet: one that starts an interaction in its OnCreated or a start component, which run before the runtime calls the hook. The hook after finds it tracked and passes it over. One that is ending, or a gizmo, is passed over.</summary>
-        public static void TakeInEarly(Actor thing)
+        /// <summary>The entry of the holder of an interaction, of a kind, given one of its own when it has none, without asking for its kind: a tree that holds an interaction is tracked alone, not with every destructable of the map, and an item alone starts no item scan. It also covers a unit, item or destructable that starts an interaction in its OnCreated or a start component, which run before the runtime calls the take-in hook; the hook after finds it tracked and passes it over, as the fill of its kind does when the kind is asked for later. Null for a gizmo with no entry and for a widget that is ending or has ended.</summary>
+        public static Entry? TrackHolder(Actor holder, int kind)
         {
-            var widget = thing as Widget;
-            if (widget != null && !widget.ending && !widget.HasEnded)
+            var entry = EntryOf(holder);
+            if (entry != null || kind == GizmoKind)
             {
-                TakenIn(widget);
+                return entry;
             }
+
+            var widget = (Widget)holder;
+            if (widget.ending || widget.HasEnded)
+            {
+                return null;
+            }
+
+            if (kind == UnitKind)
+            {
+                AddUnit((Unit)holder);
+            }
+            else if (kind == ItemKind)
+            {
+                AddItem((Item)holder);
+            }
+            else
+            {
+                AddDestructable((Destructable)holder);
+            }
+
+            return EntryOf(holder);
         }
 
         /// <summary>Core's hook for a widget ending: it leaves the grid and the cell checks at once, before its OnLeave runs. A widget the package never saw, such as one taken in before it was installed or one of a kind nobody asked for, is passed over.</summary>
