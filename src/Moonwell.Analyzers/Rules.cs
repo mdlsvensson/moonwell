@@ -125,7 +125,7 @@ public static class Rules
         LuaCategory,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "CSharp.lua checks a cast, is, as or a type pattern against the value's CSharp.lua class. A game handle is the game's own value (userdata), which has no such class, so a check for a handle type (unit, lightning, or a type parameter limited to one) never passes in the game: a cast throws an InvalidCastException, and is, as and patterns give false or null. A conversion to a handle type the value already is (unit to widget) checks nothing and works. The Lua cases do not show it: there the fake world's handles are CSharp.lua objects.");
+        description: "CSharp.lua checks a cast, is, as or a type pattern against the value's CSharp.lua class. A game handle is the game's own value (userdata), which has no such class, so a check for a handle type (unit, lightning, or a type parameter limited to one) never passes in the game: a cast throws an InvalidCastException, and is, as and patterns give false or null. A conversion to a handle type the value already is (unit to widget) checks nothing and works. The same checks hide in foreach (unit u in widgets), which casts each item, in OfType<unit>(), which tests each item with is, and in Cast<unit>() unless the items already are units. The Lua cases do not show it: there the fake world's handles are CSharp.lua objects.");
 
     /// <summary>The rules of C# that CSharp.lua cannot compile.</summary>
     public static ImmutableArray<DiagnosticDescriptor> Lua { get; } = ImmutableArray.Create(StaticNatives, ChoiceNames, HandleCheck);
