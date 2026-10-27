@@ -387,6 +387,11 @@ public static class ObjectsWriter
 
     private static string ChoiceSummary(ChoiceType choice)
     {
+        if (choice.Placement)
+        {
+            return $"Any of the values of the metadata type <c>{Xml(choice.Type)}</c>, named as World Editor shows them: the game stores each as its opposite, which the object file holds as a comma list (Buildable is \"unbuildable\"), and 0 is none of them.{NotNatives}";
+        }
+
         switch (choice.Form)
         {
             case ChoiceForm.List:
@@ -400,6 +405,11 @@ public static class ObjectsWriter
 
     private static string MemberSummary(ChoiceType choice, ChoiceMember member)
     {
+        if (choice.Placement)
+        {
+            return $"{Xml(member.Label)}: the game's \"{Xml(member.Text)}\".";
+        }
+
         var shown = Xml(member.Label.Length > 0 ? member.Label : member.Text) + ".";
         if (choice.Flags && member.Value != 0 && member.Name == "None")
         {
