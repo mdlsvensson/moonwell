@@ -784,4 +784,29 @@ public class LocalTests
             }
             """));
     }
+
+    [Fact]
+    public void helpers_whose_result_is_the_same_on_every_machine_are_allowed_outside()
+    {
+        // AddLightningLoc's lightning is the same handle everywhere (only its z differs), MoveLightningLoc gives
+        // MoveLightningEx's success and the dialogue functions return true.
+        Assert.Empty(MapCode.Check("""
+            var bolt = Natives.AddLightningLoc("CLPB", null!, null!);
+            var moved = Natives.MoveLightningLoc(bolt, null!, null!);
+            var said = Natives.PlayDialogueFromSpeakerEx(null!, u, 0, null!, 0, 0f, false);
+            var told = Natives.PlayDialogueFromSpeakerTypeEx(null!, p.Handle, 0, null!, null!, 0, 0f, false);
+            """));
+    }
+
+    [Fact]
+    public void helpers_whose_result_is_the_same_on_every_machine_still_change_the_game_inside()
+    {
+        Assert.Equal(new[] { "MW0001: Natives.AddLightningLoc(\"CLPB\", null!, null!)", "MW0001: Natives.MoveLightningLoc(null!, null!, null!)" }, MapCode.Check("""
+            Local.For(p, () =>
+            {
+                Natives.AddLightningLoc("CLPB", null!, null!);
+                Natives.MoveLightningLoc(null!, null!, null!);
+            });
+            """));
+    }
 }
