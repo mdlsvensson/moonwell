@@ -577,7 +577,8 @@ namespace Moonwell.Engine
         /// components, OnStruck on a unit, the damage and the outcome. Bounce keeps the missile's Bounciness times the
         /// surface's share (a wall's Bounciness, else 1); Slide on a wall bounces so too, and once it meets it slower than
         /// Settle loses the speed into it and slides along it, keeping the rest. What the
-        /// pair does next: Hold when refused, Through when no contact came of it or it passed, else Go.
+        /// pair does next: Hold when refused, Through when no contact came of it, it passed or it went on along a wall, else
+        /// Go.
         /// </summary>
         private static int Hit(Missile missile, Touch touch, ImpactKind kind, Actor other, Unit? unit, float t, bool inside, float nx, float ny, float nz, float top, float otherVX, float otherVY, Contact setting, float surface)
         {
@@ -632,7 +633,8 @@ namespace Moonwell.Engine
                 // Back at a wall's side soon after touching it, slowly, as a slope pulls a rolling ball into it at every
                 // step: it goes on along the side with no impact, to the end of its move put back out at the side, as the
                 // guide's loop goes on after a hit for the rest of the step. Left where it met the wall, it would meet it
-                // again at the start of the next step, and stand there.
+                // again at the start of the next step, and stand there. The walk goes on to the walls further along its
+                // move (Through): a second wall closing a corner ahead is met this step, not a step late from its far side.
                 touch.touching = true;
                 touch.lastTouch = now;
                 missile.vx = vx - into * nx;
@@ -641,7 +643,7 @@ namespace Moonwell.Engine
                 grid.Move(entry, bx, by);
                 Placed(missile, bx, by, bz);
                 Flight.Place(missile, world, bx, by, bz);
-                return Go;
+                return Through;
             }
 
             touch.touching = true;
@@ -1580,8 +1582,9 @@ namespace Moonwell.Engine
         /// A missile's walk down the walls, right after its move in the pass: its ball is swept along its move against each
         /// wall's upright strip, as tall as the wall above the ground (or endless), a wall whose box does not hold the move
         /// passed over in a few compares, before anything kept of it is looked up. The wall met first along the move is met;
-        /// after a Pass, or nothing, the walk goes on for the walls further along, each met at most once in it; after a Stop
-        /// or a bounce, which leave the ball where it met the wall, it ends. A wall the ball has left is forgotten.
+        /// after a Pass, a slow return to a wall's side that goes on along it, or nothing, the walk goes on for the walls
+        /// further along, each met at most once in it; after a Stop or a bounce, which leave the ball where it met the wall,
+        /// it ends. A wall the ball has left is forgotten.
         /// </summary>
         internal static void AgainstWalls(Missile missile)
         {

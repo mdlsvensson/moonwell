@@ -228,8 +228,8 @@ namespace Moonwell.Testing
             AlongWall(world, Contact.Bounce, Contact.Bounce, "Bounce: ");
         }
 
-        /// <summary>Lays a ball with the given contacts against the wall from (200, 100) to (1400, 1300), on ground that rises 64 a tile of 128 along x, and checks it goes down along the wall for 3 seconds.</summary>
-        private static void AlongWall(FakeWorld world, Contact ground, Contact side, string what)
+        /// <summary>Installs the packages on fakes with ground that rises 64 a tile of 128 along x, 16 by 16 tiles from (0, 0), and the wall from (200, 100) to (1400, 1300) across it.</summary>
+        private static void SlopeWithWall()
         {
             Interactions.Install(new FakeInteractionWorld());
             Physics.Install(new FakePhysicsWorld());
@@ -247,16 +247,29 @@ namespace Moonwell.Testing
 
             Terrain.Install(new FakeTerrainWorld(), 16, 16, 0.0f, 0.0f, text);
             Wall.Create(200.0f, 100.0f, 1400.0f, 1300.0f);
+        }
+
+        /// <summary>Lays a ball with the given contacts, Gravity 800 and Friction 20 against the slope's wall, its radius from the wall's line, y = x - 100, on the side the ground falls toward the wall from, and gives it back.</summary>
+        private static Ball AgainstSlopeWall(Contact ground, Contact side, out float x, out float y)
+        {
             var ball = new Ball();
             ball.GroundContact = ground;
             ball.WallContact = side;
             ball.Gravity = 800.0f;
             ball.Friction = 20.0f;
-
-            // Its radius from the wall's line, y = x - 100, on the side the ground falls toward the wall from.
-            var x = 1000.0f + 16.0f * 0.70710678f;
-            var y = 900.0f - 16.0f * 0.70710678f;
+            x = 1000.0f + 16.0f * 0.70710678f;
+            y = 900.0f - 16.0f * 0.70710678f;
             Missile.Create(ball, x, y, Physics.GroundHeight(x, y) + 16.0f);
+            return ball;
+        }
+
+        /// <summary>Lays a ball with the given contacts against the wall from (200, 100) to (1400, 1300), on ground that rises 64 a tile of 128 along x, and checks it goes down along the wall for 3 seconds.</summary>
+        private static void AlongWall(FakeWorld world, Contact ground, Contact side, string what)
+        {
+            SlopeWithWall();
+            float x;
+            float y;
+            var ball = AgainstSlopeWall(ground, side, out x, out y);
             var still = 0;
             var settled = 0;
             for (var i = 0; i < 96; i++)
@@ -284,6 +297,58 @@ namespace Moonwell.Testing
             Expect.True(still <= 1, what + "still at " + still + " steps");
             var along = (x - ball.X + y - ball.Y) * 0.70710678f;
             Expect.True(along > 800.0f, what + "went on down along the wall: " + along);
+        }
+
+        /// <summary>
+        /// The slide-under-gravity scene with a second wall from (300, 200) to (600, -100) across the ball's way, closing the
+        /// corner at (300, 200): the ball comes down along the first wall at about 640 a second, more than its radius a step,
+        /// and stays its radius off both walls for 8 seconds, ending in the corner; rolling, on the ground, and as a Bounce
+        /// not under it (sent back up the slope by the second wall, it hops along it). The slide along the first
+        /// wall ended the step's walk down the walls, so the second was met a step late, from its far side, and the ball went
+        /// through it. So rolling, and going along the ground as a Bounce.
+        /// </summary>
+        public static void SlideIntoCorner(FakeWorld world)
+        {
+            IntoCorner(world, Contact.Slide, Contact.Slide, "rolling: ");
+            IntoCorner(world, Contact.Bounce, Contact.Bounce, "Bounce: ");
+        }
+
+        /// <summary>Lays a ball with the given contacts against the slope's wall with the second wall across its way, and checks it stays off both for 8 seconds.</summary>
+        private static void IntoCorner(FakeWorld world, Contact ground, Contact side, string what)
+        {
+            SlopeWithWall();
+            Wall.Create(300.0f, 200.0f, 600.0f, -100.0f);
+            float x;
+            float y;
+            var ball = AgainstSlopeWall(ground, side, out x, out y);
+            var fastest = 0.0f;
+            for (var i = 0; i < 256; i++)
+            {
+                Steps(world, 1);
+                var speed = MathF.Sqrt(ball.VX * ball.VX + ball.VY * ball.VY);
+                if (speed > fastest)
+                {
+                    fastest = speed;
+                }
+
+                var offA = (ball.X - ball.Y - 100.0f) * 0.70710678f;
+                var offB = (ball.X + ball.Y - 500.0f) * 0.70710678f;
+                Expect.True(offA > 15.9f, what + "its radius off the first wall, at step " + i + ": " + offA);
+                Expect.True(offB > 15.9f, what + "its radius off the second wall, at step " + i + ": " + offB);
+                var floor = Physics.GroundHeight(ball.X, ball.Y) + 16.0f;
+                if (ground == Contact.Slide)
+                {
+                    Within(floor, ball.Z, 1.0f, what + "on the ground, at step " + i);
+                }
+                else
+                {
+                    // A Bounce sent back up the slope by the second wall hops along it.
+                    Expect.True(ball.Z > floor - 1.0f, what + "not under the ground, at step " + i + ": " + (ball.Z - floor));
+                }
+            }
+
+            Expect.True(fastest > 16.0f * 32.0f, what + "faster than its radius a step on the way: " + fastest);
+            Expect.True(ball.X < 360.0f && ball.Y < 240.0f, what + "in the corner at the end; at (" + ball.X + ", " + ball.Y + ")");
         }
 
         /// <summary>A footman pushed at 600 into a wall across its way stops short of it, its collision size off, and OnSlammed runs once with the normal out of the wall.</summary>
