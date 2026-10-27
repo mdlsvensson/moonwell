@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace Moonwell.Testing
 {
-    /// <summary>Cases for the missile components the package ships, Homing, Shadow and LoopingSound, with the default step of 1/32 second on flat ground at 0. A footman of the fake reads a collision size of 16, so it is 64 tall and its middle is 32 up.</summary>
+    /// <summary>Cases for the missile components the package ships, Homing, Shadow and LoopingSound, with the default step of 1/32 second on flat ground at 0. A footman of the fake reads a collision size of 16, so it is 48 tall and its middle is 24 up.</summary>
     public static class ComponentCases
     {
-        /// <summary>A footman's middle above the ground in the fake: half of 4 times its collision size of 16.</summary>
-        private const float Middle = 32.0f;
+        /// <summary>A footman's middle above the ground in the fake: half of 3 times its collision size of 16.</summary>
+        private const float Middle = 24.0f;
 
         /// <summary>The game's unit shadow.</summary>
         private const string UnitShadow = @"ReplaceableTextures\Shadows\Shadow.blp";

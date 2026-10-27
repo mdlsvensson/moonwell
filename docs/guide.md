@@ -508,6 +508,8 @@ target.Knockback(caster.AngleTo(target), 300f, 0.5f); // 300 away over half a se
   `Source` deals none. `Homing { TurnRate }` is given its target by `Fire(missile, unit)`.
 - **Contacts**: `UnitContact` and `GroundContact` are `Stop`; `DestructableContact`, `ItemContact`, `MissileContact`
   and `WallContact` are `None` (not checked). The others are `Bounce`, `Pass` and, for ground and walls, `Slide`.
+- A unit is met as an upright cylinder its collision size around and 3 times that tall (a footman 93, a tauren 144),
+  from the ground plus its fly height; a `Body` on the unit sets its own `Height`.
 - **At a contact**: the missile's `OnImpact` and its components'; then `OnStruck` of `IMissileTarget` on a unit, so the
   defender has the last word (a shield sets `impact.Contact` to `Bounce`); then the damage; then the outcome.
 - A `Bounce` or `Slide` that something keeps pulling onto the ground or into a wall, such as a slope's gravity, goes on

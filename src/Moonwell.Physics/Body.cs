@@ -3,13 +3,13 @@ namespace Moonwell
     /// <summary>
     /// A unit's body as the physics package sees it: how heavy it is, how tall, how fast a push on it slows, and whether it
     /// can be pushed at all. A class lists it in its constructor (<c>Components.Add(new Body { Mass = 40f })</c>); a unit
-    /// without one, or a value left unset, has the defaults: its collision size, 4 times that, 600 a second, movable. A
+    /// without one, or a value left unset, has the defaults: its collision size, 3 times that, 600 a second, movable. A
     /// structure is never pushed, whatever its Body says.
     /// </summary>
     public sealed class Body : UnitComponent
     {
         /// <summary>How many times its collision size a unit is tall unless Height is set.</summary>
-        internal const float HeightPerSize = 4.0f;
+        internal const float HeightPerSize = 3.0f;
 
         /// <summary>How fast a push slows unless Friction is set, in game units a second each second (ALICE's).</summary>
         internal const float DefaultFriction = 600.0f;
@@ -47,7 +47,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>How tall the unit is, from the ground plus its fly height, for what a missile meets; 4 times its collision size unless set. 0 on a Body that is on no unit yet.</summary>
+        /// <summary>How tall the unit is, from the ground plus its fly height, for what a missile meets; 3 times its collision size unless set. 0 on a Body that is on no unit yet.</summary>
         [LocalSafe]
         public float Height
         {

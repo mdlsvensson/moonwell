@@ -2,7 +2,7 @@ namespace Moonwell.Engine
 {
     /// <summary>
     /// The shapes the package sees things as, each an upright cylinder from the ground: a unit is its collision size around
-    /// and its Body's Height tall (4 times its collision size unless set), from the ground plus its fly height; a
+    /// and its Body's Height tall (3 times its collision size unless set), from the ground plus its fly height; a
     /// destructable is 64 around and 250 tall unless Physics.DestructableSize sized its type; an item is 40 around and 40
     /// tall. A missile is a ball of its Radius.
     /// </summary>
@@ -26,7 +26,7 @@ namespace Moonwell.Engine
             return Physics.World.CollisionSize(unit.Handle);
         }
 
-        /// <summary>A unit's height: its Body's Height, else 4 times its collision size.</summary>
+        /// <summary>A unit's height: its Body's Height, else 3 times its collision size.</summary>
         public static float UnitHeight(Unit unit)
         {
             var body = unit.Get<Body>();

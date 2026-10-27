@@ -284,7 +284,7 @@ namespace Moonwell.Testing
             Expect.True(arcing.Read[3] > 90.0f, "not on the ground beneath; at " + arcing.Read[3]);
         }
 
-        /// <summary>A footman on a deck stands on it: a missile falling onto it meets its top 64 above the deck, and Fire from it launches 60 above the deck.</summary>
+        /// <summary>A footman on a deck stands on it: a missile falling onto it meets its top 48 above the deck, and Fire from it launches 60 above the deck.</summary>
         public static void UnitOn(FakeWorld world)
         {
             FakeTerrainWorld terrain;
@@ -298,7 +298,7 @@ namespace Moonwell.Testing
             falling.VZ = -600.0f;
             Steps(world, 20);
             Expect.Equal(1, falling.Impacts.Count, "it met the footman once");
-            Within(194.0f, falling.Reads[3], 0.01f, "at its top, 64 above the deck");
+            Within(178.0f, falling.Reads[3], 0.01f, "at its top, 48 above the deck");
             var bolt = new Shot();
             bolt.Speed = 600.0f;
             footman.Fire(bolt, 800.0f, 512.0f);

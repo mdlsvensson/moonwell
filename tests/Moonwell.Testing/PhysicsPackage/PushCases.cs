@@ -387,7 +387,7 @@ namespace Moonwell.Testing
             Within(0.0f, building.PushVelocity().X, 0.0f, "no push velocity");
         }
 
-        /// <summary>Body: unset, its mass is the unit's collision size, its height 4 times it, its friction 600 and it is movable; a structure's is immovable. Set values are kept, the unit's height follows Body.Height, and a push slows at Body.Friction.</summary>
+        /// <summary>Body: unset, its mass is the unit's collision size, its height 3 times it, its friction 600 and it is movable; a structure's is immovable. Set values are kept, the unit's height follows Body.Height, and a push slows at Body.Friction.</summary>
         public static void BodyDefaults(FakeWorld world)
         {
             FakeTerrainWorld terrain;
@@ -397,10 +397,10 @@ namespace Moonwell.Testing
             Within(0.0f, loose.Mass, 0.0f, "a Body on no unit has no mass yet");
             var unit = FootmanAt(world, 512.0f, 512.0f);
             fake.Sizes[unit.Handle] = 24.0f;
-            Within(96.0f, Shapes.UnitHeight(unit), 0.0f, "with no Body a unit is 4 times its collision size tall");
+            Within(72.0f, Shapes.UnitHeight(unit), 0.0f, "with no Body a unit is 3 times its collision size tall");
             var body = unit.Add(new Body());
             Within(24.0f, body.Mass, 0.0f, "Mass: the collision size");
-            Within(96.0f, body.Height, 0.0f, "Height: 4 times it");
+            Within(72.0f, body.Height, 0.0f, "Height: 3 times it");
             Within(600.0f, body.Friction, 0.0f, "Friction: 600");
             Expect.True(!body.Immovable, "movable");
             body.Mass = 40.0f;

@@ -193,7 +193,7 @@ namespace Moonwell.Testing
 #endif
         }
 
-        /// <summary>Fired with no arc at a unit, it aims at the unit's middle, half its height of 4 times its collision size above the ground plus its fly height, and flies on past it.</summary>
+        /// <summary>Fired with no arc at a unit, it aims at the unit's middle, half its height of 3 times its collision size above the ground plus its fly height, and flies on past it.</summary>
         public static void AimUnit(FakeWorld world)
         {
             var fake = Fresh();
@@ -205,20 +205,20 @@ namespace Moonwell.Testing
             source.Fire(dart, target);
             Within(60.0f, dart.Z, 0.01f, "it leaves at the launch height");
             Within(1000.0f, dart.Speed, 0.01f, "at its speed");
-            Within((16.0f - 60.0f) / 500.0f, dart.VZ / dart.VX, 0.001f, "it aims at 16 up, the middle of a unit 32 tall");
+            Within((12.0f - 60.0f) / 500.0f, dart.VZ / dart.VX, 0.001f, "it aims at 12 up, the middle of a unit 24 tall");
             Steps(world, 16);
             Within(490.0f, dart.X, 10.0f, "near the unit after 16 steps");
-            Within(60.0f + dart.X * (16.0f - 60.0f) / 500.0f, dart.Z, 0.01f, "on the line through the unit's middle");
+            Within(60.0f + dart.X * (12.0f - 60.0f) / 500.0f, dart.Z, 0.01f, "on the line through the unit's middle");
             Steps(world, 32);
             Expect.True(!dart.HasEnded && dart.X > 1400.0f, "it flies on past");
-            Within(60.0f + dart.X * (16.0f - 60.0f) / 500.0f, dart.Z, 0.01f, "on the same line past it");
+            Within(60.0f + dart.X * (12.0f - 60.0f) / 500.0f, dart.Z, 0.01f, "on the same line past it");
             var flyer = UnitAt(world, 0.0f, 400.0f, 0.0f);
             world.SetFlyHeight(flyer.Handle, 100.0f);
             var second = new Dart();
             second.Speed = 1000.0f;
             source.Fire(second, flyer);
-            var length = MathF.Sqrt(400.0f * 400.0f + (100.0f + 32.0f - 60.0f) * (100.0f + 32.0f - 60.0f));
-            Within(1000.0f * (100.0f + 32.0f - 60.0f) / length, second.VZ, 0.05f, "a flyer's middle is its fly height and half its height up");
+            var length = MathF.Sqrt(400.0f * 400.0f + (100.0f + 24.0f - 60.0f) * (100.0f + 24.0f - 60.0f));
+            Within(1000.0f * (100.0f + 24.0f - 60.0f) / length, second.VZ, 0.05f, "a flyer's middle is its fly height and half its height up");
             Within(1000.0f * 400.0f / length, second.VY, 0.05f, "toward the flyer");
         }
 

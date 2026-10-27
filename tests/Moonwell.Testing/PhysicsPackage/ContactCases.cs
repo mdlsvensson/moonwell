@@ -4,7 +4,7 @@ using Moonwell.Engine;
 
 namespace Moonwell.Testing
 {
-    /// <summary>Cases for a missile's contacts with units, destructables and items: the swept test, CanHit, the order of the reactions, damage, the outcomes Stop, Bounce and Pass, shoves by mass, resting, sizes, and a missile ended inside its own contact; on flat ground 2,048 across with the default step of 1/32 second. A footman has collision size 16, so it is 64 tall and a ball of 16 meets it 32 from its middle.</summary>
+    /// <summary>Cases for a missile's contacts with units, destructables and items: the swept test, CanHit, the order of the reactions, damage, the outcomes Stop, Bounce and Pass, shoves by mass, resting, sizes, and a missile ended inside its own contact; on flat ground 2,048 across with the default step of 1/32 second. A footman has collision size 16, so it is 48 tall and a ball of 16 meets it 32 from its middle.</summary>
     public static class ContactCases
     {
         /// <summary>The type id the Struck class is registered with.</summary>
@@ -395,8 +395,8 @@ namespace Moonwell.Testing
         }
 
         /// <summary>
-        /// A bouncing bomb with damage dropped from 300 onto a standing footman's top (80 for its ball): it deals its damage at
-        /// its real bounces, a few, then settles on the top and deals no more, with no impact, sitting at 80. One dropped with
+        /// A bouncing bomb with damage dropped from 300 onto a standing footman's top (64 for its ball): it deals its damage at
+        /// its real bounces, a few, then settles on the top and deals no more, with no impact, sitting at 64. One dropped with
         /// a little speed along the ground settles, rolls off the top and stops on the ground, dealing no more.
         /// </summary>
         public static void SettlesOnTop(FakeWorld world)
@@ -417,7 +417,7 @@ namespace Moonwell.Testing
             Steps(world, 64);
             Expect.Equal(dealt, footman.Tags.Count, "no more damage while it sits");
             Expect.Equal(dealt, bomb.Impacts.Count, "and no impact");
-            Within(80.0f, bomb.Z, 0.5f, "it sits on the top");
+            Within(64.0f, bomb.Z, 0.5f, "it sits on the top");
             Expect.True(!bomb.HasEnded, "a bounce does not end it");
 
             var other = StruckAt(world, 500.0f, 800.0f, 1, "other");
@@ -483,14 +483,14 @@ namespace Moonwell.Testing
             Expect.Equal(0, wide.Met.Count, "33 off the middle: none");
         }
 
-        /// <summary>A missile that starts inside a unit meets it at its first step, once; one at a unit's middle with no velocity, whose normal would be zero, gets a normal of length 1 and no NaN.</summary>
+        /// <summary>A missile that starts at a unit's middle (24 up) meets it at its first step, once; one there with no velocity, whose normal would be zero, gets a normal of length 1 and no NaN.</summary>
         public static void Inside(FakeWorld world)
         {
             Fresh();
             FootmanAt(world, 500.0f, 500.0f, 1);
             var ball = new Shot();
             ball.UnitContact = Contact.Pass;
-            ShotAt(ball, 500.0f, 500.0f, 32.0f, 600.0f, 0.0f, 0.0f);
+            ShotAt(ball, 500.0f, 500.0f, 24.0f, 600.0f, 0.0f, 0.0f);
             Steps(world, 1);
             Expect.Equal(1, ball.Impacts.Count, "met at the first step");
             Within(-1.0f, Read(ball, 0, 4), 0.0001f, "a normal against its flight, as the middle gives none: x");
@@ -503,7 +503,7 @@ namespace Moonwell.Testing
             var still = new Shot();
             still.UnitContact = Contact.Bounce;
             still.Mass = 30.0f;
-            ShotAt(still, 500.0f, 800.0f, 32.0f, 0.0f, 0.0f, 0.0f);
+            ShotAt(still, 500.0f, 800.0f, 24.0f, 0.0f, 0.0f, 0.0f);
             Steps(world, 4);
             Expect.Equal(1, still.Impacts.Count, "the still one met it once");
             var nx = Read(still, 0, 4);
@@ -515,7 +515,7 @@ namespace Moonwell.Testing
             Expect.True(!float.IsNaN(still.X) && !float.IsNaN(still.Y) && !float.IsNaN(still.Z), "nor in its place");
         }
 
-        /// <summary>Grazing a footman's top (64 up), its ball's lowest point 2 under it, at 600 a second: one contact; 1 over it, none. Falling onto the top: one contact, with the normal up, at its height.</summary>
+        /// <summary>Grazing a footman's top (48 up, 3 times its collision size of 16), its ball's lowest point 2 under it, at 600 a second: one contact; 1 over it, none. Falling onto the top: one contact, with the normal up, at its height.</summary>
         public static void Top(FakeWorld world)
         {
             Fresh();
@@ -524,10 +524,10 @@ namespace Moonwell.Testing
             FootmanAt(world, 500.0f, 700.0f, 1);
             var grazing = new Shot();
             grazing.UnitContact = Contact.Pass;
-            ShotAt(grazing, 300.0f, 300.0f, 78.0f, 600.0f, 0.0f, 0.0f);
+            ShotAt(grazing, 300.0f, 300.0f, 62.0f, 600.0f, 0.0f, 0.0f);
             var over = new Shot();
             over.UnitContact = Contact.Pass;
-            ShotAt(over, 300.0f, 500.0f, 81.0f, 600.0f, 0.0f, 0.0f);
+            ShotAt(over, 300.0f, 500.0f, 65.0f, 600.0f, 0.0f, 0.0f);
             var falling = new Shot();
             falling.UnitContact = Contact.Pass;
             falling.GroundContact = Contact.None;
@@ -539,7 +539,7 @@ namespace Moonwell.Testing
             Within(0.0f, Read(falling, 0, 4), 0.0001f, "the normal up: x");
             Within(0.0f, Read(falling, 0, 5), 0.0001f, "y");
             Within(1.0f, Read(falling, 0, 6), 0.0001f, "z");
-            Within(64.0f, Read(falling, 0, 3), 0.01f, "at the top");
+            Within(48.0f, Read(falling, 0, 3), 0.01f, "at the top");
         }
 
         /// <summary>A ball resting on the ground pauses its contact checks: a unit put onto it is not asked about or met; given a velocity, it checks again and meets the unit.</summary>
