@@ -20,8 +20,20 @@ namespace Moonwell.Testing
             AddAreas(list);
             AddInput(list);
             AddLifecycle(list);
+            AddAuditDocs(list);
             AddDebug(list);
             return list;
+        }
+
+        /// <summary>Adds the cases for the full audit's doc fixes: OrderedMap and OrderedSet in a foreach.</summary>
+        private static void AddAuditDocs(List<Case> list)
+        {
+            list.Add(new Case { Name = "collections.set-foreach-keeps-order", Run = AuditDocsCases.SetForeachKeepsOrder });
+            list.Add(new Case { Name = "collections.set-foreach-change-throws", Run = AuditDocsCases.SetForeachChangeThrows });
+            list.Add(new Case { Name = "collections.map-foreach-keeps-order", Run = AuditDocsCases.MapForeachKeepsOrder });
+            list.Add(new Case { Name = "collections.map-foreach-change-throws", Run = AuditDocsCases.MapForeachChangeThrows });
+            list.Add(new Case { Name = "collections.foreach-left-early", Run = AuditDocsCases.ForeachLeftEarly });
+            list.Add(new Case { Name = "collections.linq", Run = AuditDocsCases.Linq });
         }
 
         /// <summary>Adds the cases for the full audit's fixes to core's lifecycle.</summary>

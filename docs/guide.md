@@ -491,6 +491,12 @@ which is in each player's language. The build rejects, as compile errors:
   `ICollection` (MW0004; use `OrderedMap` and `OrderedSet`), and `long`, `ulong`, `uint`, `double` and `decimal`
   (MW0005).
 
+`OrderedMap` and `OrderedSet` keep the order things were added in, the same on every machine. `foreach (var pair in map)`
+gives each key and its value in that order (`pair.Key` and `pair.Value`, or `foreach (var (key, value) in map)`), and
+LINQ works on both. A loop that adds or removes a key or an item throws: to change one as you go, loop over
+`set.Snapshot()`, or over a map by index from the end. In the game each pair is a small table, so code that runs every
+tick over many keys loops by index with `KeyAt` and `ValueAt`, which makes none.
+
 `[MachineLocal]` on a method of your own makes it code of one machine: its body is checked as a `Local.For` block, and
 calling it outside one is MW0002. Where the code runs on every machine anyway, on an override of Moonwell's
 (`OnGameStart`) or on a lambda given to `Timer.Every`, the attribute is MW0040. `[SyncUnchecked]` on a method turns the
