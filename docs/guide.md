@@ -232,8 +232,8 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 
 | Hero (a unit the game makes as a hero) | |
 |---|---|
-| `Experience` | read and set; the levels that come with it are given |
-| `SetLevel(level)`, `Revive(x, y)` | `showEffect:` turns the effect off |
+| `Experience` | read and set; a higher value gives the levels that come with it, a lower one keeps the level |
+| `SetLevel(level)`, `Revive(x, y)` | `showEffect:` turns the effect off; a lower level takes levels away |
 | `Strength`, `Agility`, `Intelligence` | the base, read and set |
 | `StrengthWithBonus`, `AgilityWithBonus`, `IntelligenceWithBonus` | with items and auras, read |
 | `SkillPoints` | read and set |

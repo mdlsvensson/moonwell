@@ -761,10 +761,22 @@ namespace Moonwell.Engine
             Natives.SetHeroXP(hero, experience, showEffect);
         }
 
+        /// <summary>Adds experience to a hero in the game, or takes it with a negative amount.</summary>
+        public void AddExperience(unit hero, int experience, bool showEffect)
+        {
+            Natives.AddHeroXP(hero, experience, showEffect);
+        }
+
         /// <summary>Gives a hero a level in the game.</summary>
         public void LevelHero(unit hero, int level, bool showEffect)
         {
             Natives.SetHeroLevel(hero, level, showEffect);
+        }
+
+        /// <summary>Takes levels from a hero in the game.</summary>
+        public void StripLevels(unit hero, int levels)
+        {
+            Natives.UnitStripHeroLevel(hero, levels);
         }
 
         /// <summary>A hero's strength, from the game.</summary>

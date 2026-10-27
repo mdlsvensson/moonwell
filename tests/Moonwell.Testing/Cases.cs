@@ -38,6 +38,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "lifecycle.adopt-again-refused", Run = LifecycleCases.AdoptAgainRefused });
             list.Add(new Case { Name = "lifecycle.removed-hero-drop-makes-no-second", Run = LifecycleCases.RemovedHeroDropMakesNoSecond });
             list.Add(new Case { Name = "lifecycle.created-and-removed-enter-makes-no-second", Run = LifecycleCases.CreatedAndRemovedEnterMakesNoSecond });
+            list.Add(new Case { Name = "lifecycle.hero-lowered", Run = LifecycleCases.HeroLowered });
         }
 
         /// <summary>Adds the debug mode's cases; they exist only in a development build, as the debug mode does.</summary>
