@@ -352,6 +352,24 @@ namespace Moonwell.Testing
             Expect.True(watch.Seen[0] == KnownUnits.Find(entering) && watch.Seen[1] == made, "the units OnUnitCreated was given");
         }
 
+        /// <summary>A unit and an item of a class created for an owner that has already ended are made in the game and end at once: they run neither OnCreated nor OnLeave, so code that pairs the two stays even.</summary>
+        public static void EndedOwnerRunsNeitherCreatedNorLeave(FakeWorld world)
+        {
+            CountedHero.Created = 0;
+            CountedHero.Left = 0;
+            CountedItem.Created = 0;
+            CountedItem.Left = 0;
+            ObjectTypes.Unit(ObjectTypes.FourCC("H0EO"), () => new CountedHero());
+            ObjectTypes.Item(ObjectTypes.FourCC("I0EO"), () => new CountedItem());
+            var owner = Game.Instance.Add(new CreatedWatch());
+            owner.End();
+            var unit = Unit.Create<CountedHero>(Player.Get(0), 0.0f, 0.0f, owner: owner);
+            var item = Item.Create<CountedItem>(0.0f, 0.0f, owner: owner);
+            Expect.True(unit.HasEnded && item.HasEnded, "the unit and the item have ended");
+            Expect.True(world.RemovedUnits.Contains(unit.Handle) && world.RemovedItems.Contains(item.Handle), "the unit and the item are removed from the game");
+            Expect.Equal("0 0 0 0", CountedHero.Created + " " + CountedHero.Left + " " + CountedItem.Created + " " + CountedItem.Left, "the unit's OnCreated and OnLeave runs, and the item's");
+        }
+
         /// <summary>A timer adopted by a second owner is refused, in every build: it is reported and stays with its first owner (decision 74).</summary>
         public static void AdoptAgainRefused(FakeWorld world)
         {

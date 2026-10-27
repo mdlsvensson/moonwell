@@ -67,6 +67,13 @@ namespace Moonwell
                 made.Add(made.StartComponents[i]);
             }
 
+            // From here the unit has come in: its OnLeave and the ending listeners run when it ends. One that ended before
+            // (an owner that has ended ends it at once) runs neither OnCreated nor OnLeave.
+            if (!made.HasEnded)
+            {
+                made.entered = true;
+            }
+
             if (!made.HasEnded && !illusion)
             {
                 var previous = Owner.current;
