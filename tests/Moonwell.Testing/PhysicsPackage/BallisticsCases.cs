@@ -37,7 +37,8 @@ namespace Moonwell.Testing
         {
             Vector3 velocity;
             Expect.True(Ballistics.Velocity(from, to, speed, high, gravity, out velocity), what + ": a launch is found");
-            Expect.True(Math.Abs(velocity.Length - speed) < 0.01f, what + ": it has the speed");
+            // In the game's own Lua, whose square roots are off by up to about 2 parts in 100,000, within 2 parts in 10,000 more.
+            Expect.True(Math.Abs(velocity.Length - speed) < (GameNumbers.HasNaN ? 0.01f : 0.01f + speed * 0.0002f), what + ": it has the speed");
             var pass = ClosestPass(from, velocity, gravity, to);
             Expect.True(pass < Reach, what + ": it passes within " + Reach + " of the point, passes by " + pass);
         }

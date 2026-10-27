@@ -112,10 +112,11 @@ namespace Moonwell.Testing
             }
         }
 
-        /// <summary>Fails unless two floats are within a tolerance.</summary>
+        /// <summary>Fails unless two floats are within a tolerance; in the game's own Lua, whose square roots and trig are off by up to about 2 parts in 100,000, within it and 2 parts in 10,000 of the expected value, as Expect.Near.</summary>
         private static void Within(float expected, float actual, float tolerance, string what)
         {
-            Expect.True(Math.Abs(expected - actual) <= tolerance, what + ": expected " + expected + " within " + tolerance + ", was " + actual);
+            var allowed = GameNumbers.HasNaN ? tolerance : tolerance + Math.Abs(expected) * 0.0002f;
+            Expect.True(Math.Abs(expected - actual) <= allowed, what + ": expected " + expected + " within " + allowed + ", was " + actual);
         }
 
         /// <summary>What an impact read inside OnImpact: index 0 kind, 1 to 3 the point, 4 to 6 the normal, 7 the speed.</summary>

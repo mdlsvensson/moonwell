@@ -101,10 +101,11 @@ namespace Moonwell.Testing
             return count;
         }
 
-        /// <summary>Fails unless two floats are within a tolerance.</summary>
+        /// <summary>Fails unless two floats are within a tolerance; in the game's own Lua, whose square roots and trig are off by up to about 2 parts in 100,000, within it and 2 parts in 10,000 of the expected value, as Expect.Near.</summary>
         private static void Within(float expected, float actual, float tolerance, string what)
         {
-            Expect.True(Math.Abs(expected - actual) <= tolerance, what + ": expected " + expected + " within " + tolerance + ", was " + actual);
+            var allowed = GameNumbers.HasNaN ? tolerance : tolerance + Math.Abs(expected) * 0.0002f;
+            Expect.True(Math.Abs(expected - actual) <= allowed, what + ": expected " + expected + " within " + allowed + ", was " + actual);
         }
 
         /// <summary>Knockback 300 over half a second: 1,200 a second along the angle, slowing evenly; it ends 300 away within 4 at 0.5 s, within a step, with no OnSlammed. OnPushed runs once, with no pusher and the unit current. The cycle's timer runs for it with nothing tracked, and stops once it ends.</summary>
