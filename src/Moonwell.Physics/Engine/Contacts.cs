@@ -2197,7 +2197,7 @@ namespace Moonwell.Engine
             RecheckAccepts = false;
         }
 
-        /// <summary>Refuses a placed bridge, which is ground where its deck is, not an upright cylinder.</summary>
+        /// <summary>Refuses a placed bridge, which is ground where its deck is, not an upright cylinder: while any deck lives (Decks.count, the living decks, which also spares the look-up when there is none), a placed bridge is refused living or not. With no deck living every destructable is met, so a bridge brought back to life, whose deck is not ground again, meets missiles as a cylinder only then.</summary>
         public override bool Accepts(Destructable other)
         {
             return Decks.count == 0 || !Decks.IsBridge(other);
