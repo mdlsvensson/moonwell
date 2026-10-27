@@ -396,6 +396,8 @@ var near = Find.InRange<Unit>(x, y, 500f);                // a new list; or Find
   not hidden, not loaded), a visible item on the ground, a live destructable and a gizmo have a place; `OnPart` runs
   once, when a pair ends. A timer a pair's reactions make is the pair's and ends when it parts; a buff or component
   they add is the unit's, so `OnPart` removes it, as `FrostAura` does.
+- A thing moved far in one jump (a teleport, a unit unloaded or revived, an item dropped far from where it was picked
+  up) is found at its new place within `CellCheck` (0.1 s). A pair whose holder and other moved together stays paired.
 - From the first interaction or `Find` that asks for units, Moonwell takes in every unit in the game, and each one
   that comes in after, also those the game makes with no code of the map (trained, summoned, made by a native).
 - `Find` has `InRange`, `InRect`, `InPolygon`, `AlongLine` and `Closest`. Each gives a new list, or fills a list the

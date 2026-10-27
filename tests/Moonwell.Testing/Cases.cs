@@ -16,6 +16,7 @@ namespace Moonwell.Testing
             AddLast(list);
             AddMaths(list);
             AddInteractions(list);
+            AddAuditInteractions(list);
             AddTerrain(list);
             AddAreas(list);
             AddInput(list);
@@ -226,6 +227,14 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.pair.data-and-since", Run = PairCases.DataAndSince });
             list.Add(new Case { Name = "interactions.pair.pair-owns", Run = PairCases.PairOwns });
             list.Add(new Case { Name = "interactions.tree", Run = TreeCases.Tree });
+        }
+
+        /// <summary>Adds the cases for the full audit's fixes to the interactions package.</summary>
+        private static void AddAuditInteractions(List<Case> list)
+        {
+            list.Add(new Case { Name = "interactions.audit.teleport-together-stays-paired", Run = AuditInteractionCases.TeleportTogetherStaysPaired });
+            list.Add(new Case { Name = "interactions.audit.teleport-together-keeps-stop", Run = AuditInteractionCases.TeleportTogetherKeepsStop });
+            list.Add(new Case { Name = "interactions.audit.teleport-apart-parts", Run = AuditInteractionCases.TeleportApartParts });
         }
 
         /// <summary>Adds the areas package's cases.</summary>

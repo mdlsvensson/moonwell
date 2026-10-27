@@ -30,8 +30,8 @@ namespace Moonwell
         /// <summary>How many checks have run; a pair or a stopped other kept at a check is marked with it.</summary>
         internal int checks;
 
-        /// <summary>The entry ids of the others whose pair was stopped and that have not been out of range since, in the order they were stopped; null until a pair is stopped.</summary>
-        internal List<int>? stopped;
+        /// <summary>The entries of the others whose pair was stopped and that have not been out of range since, in the order they were stopped; null until a pair is stopped.</summary>
+        internal List<Entry>? stopped;
 
         /// <summary>The check at which each stopped other was last kept, by its entry id; a lookup only.</summary>
         internal Dictionary<int, int>? stoppedSeen;
@@ -275,13 +275,13 @@ namespace Moonwell
         {
             if (stopped == null || stoppedSeen == null)
             {
-                stopped = new List<int>();
+                stopped = new List<Entry>();
                 stoppedSeen = new Dictionary<int, int>();
             }
 
             if (!stoppedSeen.ContainsKey(other.Id))
             {
-                stopped.Add(other.Id);
+                stopped.Add(other);
             }
 
             stoppedSeen[other.Id] = checks;
@@ -302,8 +302,8 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Forgets the stopped others that were not kept at this check, so they meet again when next in range; all of them when every other is out of reach.</summary>
-        internal void ForgetStopped(bool all)
+        /// <summary>Forgets the stopped others that were not kept at this check, so they meet again when next in range. One the check did not collect is read directly first, as for a pair (StillNear): within range of the holder's place it is kept.</summary>
+        internal void ForgetStopped(float hx, float hy, float limit)
         {
             if (stopped == null || stoppedSeen == null)
             {
@@ -314,19 +314,45 @@ namespace Moonwell
             var count = stopped.Count;
             for (var i = 0; i < count; i++)
             {
-                var id = Raw.At(stopped, i);
-                if (!all && stoppedSeen[id] == checks)
+                var other = Raw.At(stopped, i);
+                if (stoppedSeen[other.Id] == checks || StillNear(other, hx, hy, limit))
                 {
-                    Raw.Put(stopped, kept, id);
+                    Raw.Put(stopped, kept, other);
                     kept++;
                 }
                 else
                 {
-                    stoppedSeen.Remove(id);
+                    stoppedSeen.Remove(other.Id);
                 }
             }
 
             Raw.Truncate(stopped, kept);
+        }
+
+        /// <summary>Forgets every stopped other, as at a check of a holder with no place, when every other is out of reach.</summary>
+        internal void ForgetAllStopped()
+        {
+            if (stopped == null || stoppedSeen == null)
+            {
+                return;
+            }
+
+            stopped.Clear();
+            stoppedSeen.Clear();
+        }
+
+        /// <summary>Whether an other that a check did not collect is within range of the holder's place all the same, given the squared range: it is read directly, at most once a step as every read is. A unit or item moved further than Slack in one jump (a teleport, both moved by code) is still in the cell it was last read in until its cell check, so the check's box can miss it while it stands next to the holder.</summary>
+        internal static bool StillNear(Entry other, float hx, float hy, float limit)
+        {
+            Tracking.ReadNow(other);
+            if (!other.HasPlace)
+            {
+                return false;
+            }
+
+            var dx = other.X - hx;
+            var dy = other.Y - hy;
+            return dx * dx + dy * dy <= limit;
         }
 
         /// <summary>Ends the checks, forgets the holder, and parts the pairs, newest first; the interaction's other children end after.</summary>
@@ -473,8 +499,9 @@ namespace Moonwell
         /// <summary>
         /// The check at a tick, in this order. The holder is read; with no place every pair parts and the check ends. The
         /// things within Range plus Slack are collected, and those of class TOther, not the holder, with a place and within
-        /// Range are kept. The pairs whose other is not kept part, in meeting order; a stopped other that is not kept is
-        /// forgotten. The kept pairs tick, in meeting order, unless paused or waiting. The kept others with no pair, in the
+        /// Range are kept. The pairs whose other is not kept part, in meeting order, unless a direct read of the other finds
+        /// it within Range (one moved far in one jump is still in the cell it was last read in); a stopped other that is not
+        /// kept is forgotten, after the same direct read. The kept pairs tick, in meeting order, unless paused or waiting. The kept others with no pair, in the
         /// grid's order, are asked about unless stopped, and those accepted meet and tick. After any reaction that pauses or
         /// ends the interaction or ends its holder, the check stops. An error the package's own code raises stops the check
         /// and is given back, and the cycle's due reports it as ClassName.Check; a reaction's error is reported where it runs.
@@ -501,7 +528,7 @@ namespace Moonwell
             if (!home.HasPlace)
             {
                 PartAll();
-                ForgetStopped(true);
+                ForgetAllStopped();
                 return;
             }
 
@@ -572,6 +599,14 @@ namespace Moonwell
                     continue;
                 }
 
+                // An other moved far in one jump may stand in range from a cell the box did not take in.
+                var other = pair.otherEntry;
+                if (StillNear(other, hx, hy, limit))
+                {
+                    pair.Keep(checks, hx, hy, other.X, other.Y);
+                    continue;
+                }
+
                 pair.End();
                 if (Over)
                 {
@@ -579,7 +614,7 @@ namespace Moonwell
                 }
             }
 
-            ForgetStopped(false);
+            ForgetStopped(hx, hy, limit);
             Pairing.Release(walkStart);
             WalkPairs();
             walkEnd = walk.Count;
