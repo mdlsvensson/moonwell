@@ -357,6 +357,17 @@ namespace Moonwell.Engine
                     vy -= 2.0f * leaving * ny;
                     vz -= 2.0f * leaving * nz;
                 }
+
+                if (missile.groundContact == Contact.Bounce)
+                {
+                    // A Bounce keeps the step's gravity along the ground, as the guide's loop keeps it when it slides on
+                    // after a hit: without it, a Bounce on a slope meets it at the start of every step and stands where it
+                    // is. A Slide that comes along the ground rolls, and Roll pulls it down the slope against its Friction.
+                    var pull = missile.gravity * step;
+                    vx += pull * nz * nx;
+                    vy += pull * nz * ny;
+                    vz -= pull * (1.0f - nz * nz);
+                }
             }
 
             Meet(missile, grid, world, entry, hitX, hitY, hitZ, nx, ny, nz, vx, vy, vz, x, y, z, again);

@@ -174,6 +174,36 @@ namespace Moonwell.Testing
             Expect.True(!ball.HasEnded, "a bounce does not end it");
         }
 
+        /// <summary>
+        /// A Bounce lying on a slope of 1 in 2 with Gravity 800 and no velocity goes on down it along the ground, as the guide's
+        /// loop goes on after a hit: it meets the ground at the start of every step, and keeps the step's gravity along the
+        /// ground. With the step's gravity taken away whole, it stood where it lay.
+        /// </summary>
+        public static void BounceUnderGravity(FakeWorld world)
+        {
+            var heights = new float[16];
+            for (var i = 0; i < heights.Length; i++)
+            {
+                heights[i] = i * 64.0f;
+            }
+
+            Along(heights);
+            var ball = new Ball();
+            ball.GroundContact = Contact.Bounce;
+            ball.Gravity = 800.0f;
+            Missile.Create(ball, 1000.0f, 64.0f, Physics.GroundHeight(1000.0f, 64.0f) + 16.0f);
+            for (var i = 0; i < 64; i++)
+            {
+                Steps(world, 1);
+                Within(Physics.GroundHeight(ball.X, ball.Y) + 16.0f, ball.Z, 0.5f, "on the ground, at step " + i);
+            }
+
+            Expect.Equal(0, ball.Impacts, "it goes along the ground with no impact");
+            Expect.True(1000.0f - ball.X > 300.0f, "slid on down the slope: " + (1000.0f - ball.X) + " along x from where it lay");
+            Within(64.0f, ball.Y, 0.001f, "straight down it");
+            Expect.True(ball.VX < -300.0f, "and still speeding down it; VX " + ball.VX);
+        }
+
         /// <summary>Before OnImpact runs, VX, VY and VZ read the velocity where it met the ground; the outcome works from the velocity OnImpact leaves, so a Bounce whose reaction sets VZ to 0 does not bounce up.</summary>
         public static void ImpactVelocity(FakeWorld world)
         {
