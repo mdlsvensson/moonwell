@@ -436,10 +436,30 @@ The `Natives` class has every native of the game for what Moonwell does not cove
 ## Multiplayer
 
 Code that differs between players' machines goes in `Local.For(player, () => ...)`, as Smite reads a unit's name,
-which is in each player's language. The build rejects, as compile
-errors, a change to the game inside it, a machine-local read outside it, `GetHandleId`, looping over a `Dictionary` or
-`HashSet` (use `OrderedMap` and `OrderedSet`), and `long`, `ulong`, `uint` and `double`. `[SyncUnchecked]` on a method
-turns the checks off in it.
+which is in each player's language. The build rejects, as compile errors:
+
+- A change to the game inside it (MW0001). The analyzer follows what the block runs: your methods and their
+  overrides, the classes it makes or first touches (their field initializers and static constructors), operators, a
+  `using`'s `Dispose`, a `foreach`'s enumerator, and the delegates it runs. A lambda you hand on through a parameter
+  of your own (`ShowTo(p, () => ...)`, where `ShowTo` gives it to `Local.For`) is checked as part of the block; calling
+  that parameter outside `Local.For` too is MW0040. A delegate it cannot follow (a list's element, a library's
+  result) is MW0039: write the lambda in place.
+- A machine-local read outside it (MW0002): the local player, the camera, the mouse's screen position, frame text,
+  localised names, and .NET's own clock and addresses (`DateTime.Now`, `Environment.TickCount`, a `Stopwatch`'s
+  reading, `GetHashCode` of a handle or of a class without its own, a handle turned into text).
+- `new Random()` without a seed, anywhere (MW0038): it reseeds the game's own random generator with each machine's
+  clock. Use `Natives.GetRandomInt`, or `new Random(seed)` with a seed every machine shares.
+- `GetHandleId` (MW0003), looping over a `Dictionary` or `HashSet`, or one held as `IDictionary`, `ISet` or an
+  `ICollection` (MW0004; use `OrderedMap` and `OrderedSet`), and `long`, `ulong`, `uint`, `double` and `decimal`
+  (MW0005).
+
+`[MachineLocal]` on a method of your own makes it code of one machine: its body is checked as a `Local.For` block, and
+calling it outside one is MW0002. Where the code runs on every machine anyway, on an override of Moonwell's
+(`OnGameStart`) or on a lambda given to `Timer.Every`, the attribute is MW0040. `[SyncUnchecked]` on a method turns the
+checks off in its own body, except `decimal`; `Local.For` still follows a method so marked, so a block whose changes are
+meant is marked itself: `Local.For(p, [SyncUnchecked] () => ...)`. `Natives.BlzSendSyncData` inside `Local.For` sends a
+machine-local value to every machine. Not checked: a C# field written inside `Local.For` and read by code that runs on
+every machine.
 
 ## C# the game's Lua cannot run
 
@@ -451,24 +471,23 @@ in Lua and comparing what they printed.
 
 | Rule | Rejects | Write instead |
 |---|---|---|
-| MW0005 | `decimal` (with `long`, `ulong`, `uint`, `double`) | `int` or `float` |
+| MW0005 | `decimal` (`long`, `ulong`, `uint` and `double` are under Multiplayer) | `int` or `float` |
 | MW0017 | in a `switch` expression: `> 10 =>`, `int =>`, `var n`, `not 1`; in any pattern: `(...)`, a name inside `{ X: int y }`, `not null` inside `{ }`, `.. var rest` | a `when` on a named variable (`int n when n > 10`), or an `if` |
 | MW0018 | `x is (1, _)`, `p is Pt(var a, var b)`, `p is { Inner.X: 9 }` | `{ X: 1 }`, a `switch`, `{ Inner: { X: 9 } }` |
-| MW0020 | `var c = arr[0]; c.X = 6;` on a struct (it changes `arr[0]`) | make a new struct, or write `c` back |
+| MW0020 | `var c = arr[0];` on a struct, then `c.X = 6`, `c.Inner.X = 6`, `c.Move()` or `Bump(ref c)` (it changes `arr[0]`) | make a new struct, or write `c` back with `arr[0] = c` |
 | MW0022 | `var (a, b) = (1, 2)`, `(x[0], x[1]) = (x[1], x[0])`, a tuple turned into text | `(int a, int b) = (1, 2)`, a temporary, its items |
 | MW0023 | a user-defined `++`, `--`, `operator true/false`; `static abstract`; a record deriving from a record; one class implementing `IG<int>` and `IG<string>`; `with` on an anonymous type | a method; an ordinary class |
 | MW0024 | `a[1..3]`, `s[1..]`, `list[^1]`, `Index`, `Range` (`array[^1]` is fine) | `Substring`, `Skip`/`Take`, `list[list.Count - 1]` |
 | MW0025 | a `ref` return, `ref int r = ref First(a)`, `ref int r = ref a[i]` | index the array each time |
 | MW0026 | `params List<int>`, `params` in a lambda | `params int[]` |
-| MW0027 | `s.Split("--")` (runs out of memory), `StartsWith('a')`, `EndsWith('a')`, ignore-case `IndexOf`/`StartsWith`/`EndsWith`, `"abc".Reverse()` | split on a char, a string argument, lower-case both |
+| MW0027 | `s.Split("--")` (runs out of memory), `s.Split(new[] { ", " }, options)` (never ends), `StartsWith('a')`, `EndsWith('a')`, ignore-case `IndexOf`/`StartsWith`/`EndsWith`, `"abc".Reverse()` | split on a char, a string argument, lower-case both |
 | MW0028 | a `char` or an enum given to `string.Format`, `Console.WriteLine(object)`, `StringBuilder.Append(object)`, `string.Join` (shown as its number) | `.ToString()` |
 | MW0029 | `catch (NullReferenceException)`, `catch (IndexOutOfRangeException)`, a pattern variable in a `catch ... when` | `catch (Exception)`, test first |
-| MW0030 | a library member the Lua core lacks: `StringComparer`, `Guid`, `Task`/`await`, `Range`, LINQ `Append`/`Prepend`/`Zip`/`TakeLast`/`ToHashSet`/`Chunk`, `List.ConvertAll`, `StringBuilder.Replace`/`Insert`, `Dictionary.GetValueOrDefault`, `TryPeek`/`TryPop`, `Environment.NewLine`, and more (the rule's description lists them); also `HashSet.SetEquals`, `Math.DivRem`, `d.Remove(k, out v)` and `ToList()` of a `Dictionary`, which give wrong answers | `TryGetValue`, `"
-"`, a loop |
+| MW0030 | a library member the Lua core lacks: `StringComparer`, `Guid`, `Task`/`await`, `Range`, LINQ `Append`/`Prepend`/`Zip`/`TakeLast`/`ToHashSet`/`Chunk`, `List.ConvertAll`, `StringBuilder.Replace`/`Insert`, `Dictionary.GetValueOrDefault`, `TryPeek`/`TryPop`, `Environment.NewLine`, `Random.Shared`, and more (the rule's description lists them); also `SetEquals` (of a `HashSet`, an `ISet` or an `IReadOnlySet`), `Math.DivRem`, `d.Remove(k, out v)` and `ToList()` of a `Dictionary`, which give wrong answers | `TryGetValue`, `"\n"`, a loop |
 | MW0031 | `checked(a + b)`, `checked { }` (an overflow is never detected) | test the range yourself |
 | MW0032 | `Enum.Parse`, `Enum.GetValues`/`GetNames`, `ToString("D")` on an enum, a `[Flags]` combination turned into text, `(Color)5 + "x"` | a `switch` on the value, `HasFlag` |
 | MW0034 | two `using var` in one block (disposed in the wrong order) | nested `using ( ) { }` |
-| MW0035 | `(unit)data`, `data as unit`, `data is unit`, `case unit u` from an `object`, a `widget` or a `T`: a game handle fails every check for its type | a field or variable of the handle's type, or a class of your own that holds it |
+| MW0035 | `(unit)data`, `data as unit`, `data is unit`, `case unit u` from an `object`, a `widget` or a `T`, `foreach (unit u in widgets)`, `widgets.OfType<unit>()` and `widgets.Cast<unit>()`: a game handle fails every check for its type | a field or variable of the handle's type, or a class of your own that holds it |
 
 What works is most of the language: classes, structs, records, primary constructors, interfaces and default methods,
 generics with constraints, enums, delegates, events, `switch` statements, `is` patterns with constants, types and
