@@ -68,6 +68,14 @@ namespace Moonwell.Engine
             masks = null;
         }
 
+#if DEBUG
+        /// <summary>How many units are being pushed; the debug mode's statistics read it.</summary>
+        internal static int Active
+        {
+            get { return Physics.IsInstalled ? active : 0; }
+        }
+
+#endif
         /// <summary>The push of a unit that has not ended; null when the unit is not pushed, or the package is not installed.</summary>
         internal static Pushed? Find(Unit unit)
         {

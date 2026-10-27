@@ -503,6 +503,8 @@ target.Knockback(caster.AngleTo(target), 300f, 0.5f); // 300 away over half a se
   destructable. A bridge made by code is not ground, nor a type with no deck Moonwell knows (an ice floe, or the map's
   own type with its model changed): the build warns of it.
 - Everything runs on every machine. Reads are safe in `Local.For`; firing, pushing and every set are not.
+- In the debug mode, a selected missile's panel shows its speed, velocity and radius, and a pushed unit's its push;
+  `-stats` counts the missiles (and how many rest) and the pushed units.
 
 ## Areas
 

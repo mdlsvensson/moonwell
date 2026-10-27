@@ -108,6 +108,9 @@ namespace Moonwell
             Pass.Reset(kept);
             hook = Pass.Run;
             Tracking.BeforeGizmos = hook;
+#if DEBUG
+            DebugViews.Add(PhysicsView.Instance);
+#endif
         }
 
         /// <summary>

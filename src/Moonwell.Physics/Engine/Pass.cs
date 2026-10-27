@@ -116,6 +116,36 @@ namespace Moonwell.Engine
             }
         }
 
+#if DEBUG
+        /// <summary>How many missiles have not begun to end, and how many of those rest; the debug mode's statistics read it.</summary>
+        internal static int Flying(out int resting)
+        {
+            resting = 0;
+            var list = missiles;
+            if (list == null || !Physics.IsInstalled)
+            {
+                return 0;
+            }
+
+            var flying = 0;
+            var count = list.Count;
+            for (var i = 0; i < count; i++)
+            {
+                var missile = Raw.At(list, i);
+                if (!missile.ending)
+                {
+                    flying++;
+                    if (missile.resting)
+                    {
+                        resting++;
+                    }
+                }
+            }
+
+            return flying;
+        }
+
+#endif
         /// <summary>Wakes each resting missile in a box, as the deck there has gone: it falls from its next step.</summary>
         public static void GroundGone(float minX, float minY, float maxX, float maxY)
         {

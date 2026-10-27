@@ -133,6 +133,8 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "debug.areas.region", Run = AreasViewCases.Region });
             list.Add(new Case { Name = "debug.areas.no-tracker", Run = AreasViewCases.NoTracker });
             list.Add(new Case { Name = "debug.areas.registered", Run = AreasViewCases.Registered });
+            list.Add(new Case { Name = "debug.physics.lines", Run = PhysicsViewCases.Lines });
+            list.Add(new Case { Name = "debug.physics.stats", Run = PhysicsViewCases.Stats });
 #endif
         }
 
