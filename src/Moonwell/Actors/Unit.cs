@@ -846,6 +846,7 @@ namespace Moonwell
             {
                 throw new MoonwellException("Unit.Create: the game made no unit of type " + Names.IdText(typeId));
             }
+
             var made = KnownUnits.TakeIn(handle, owner, true)!;
             if (owner != null && made.Owner == null)
             {

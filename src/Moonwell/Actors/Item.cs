@@ -280,6 +280,7 @@ namespace Moonwell
             {
                 throw new MoonwellException("Item.Create: the game made no item of type " + Names.IdText(typeId));
             }
+
             var made = KnownItems.TakeIn(handle, owner)!;
             if (owner != null && made.Owner == null)
             {
