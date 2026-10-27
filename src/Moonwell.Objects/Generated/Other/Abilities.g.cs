@@ -847,12 +847,14 @@ namespace Moonwell.Objects
                 public AIcd()
                 {
                     Area = Levels(900f);
+                    AttackDamageIncrease = Levels(0.1f);
                     Buffs.Set<global::Moonwell.Objects.Orc.Buffs.BOac>();
                     CastTime = Levels(0f);
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
                     Duration = Levels(0f);
                     EditorSuffix = "(Item)";
+                    FlatBonus = Levels(false);
                     HeroAbility = false;
                     HeroDuration = Levels(0f);
                     Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNGnollCommandAura.blp";
@@ -860,13 +862,48 @@ namespace Moonwell.Objects
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
+                    MeleeBonus = Levels(true);
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
+                    RangedBonus = Levels(true);
                     RequiredLevel = 0;
                     Target = "Abilities\\Spells\\Orc\\WarDrums\\DrumsCasterHeal.mdl";
                     TargetAttachmentPoint1 = "origin";
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Cac1</c>.</summary>
+                [global::Moonwell.Objects.Field("Cac1", Label = "Attack Damage Increase")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> AttackDamageIncrease
+                {
+                    get { return Fields.GetLevels<float>(this, "Cac1"); }
+                    protected set { Fields.Put("Cac1", value); }
+                }
+
+                /// <summary>The field <c>Ear2</c>.</summary>
+                [global::Moonwell.Objects.Field("Ear2", Label = "Melee Bonus")]
+                public global::Moonwell.Objects.Levels<bool> MeleeBonus
+                {
+                    get { return Fields.GetLevels<bool>(this, "Ear2"); }
+                    protected set { Fields.Put("Ear2", value); }
+                }
+
+                /// <summary>The field <c>Ear3</c>.</summary>
+                [global::Moonwell.Objects.Field("Ear3", Label = "Ranged Bonus")]
+                public global::Moonwell.Objects.Levels<bool> RangedBonus
+                {
+                    get { return Fields.GetLevels<bool>(this, "Ear3"); }
+                    protected set { Fields.Put("Ear3", value); }
+                }
+
+                /// <summary>The field <c>Ear4</c>.</summary>
+                [global::Moonwell.Objects.Field("Ear4", Label = "Flat Bonus")]
+                public global::Moonwell.Objects.Levels<bool> FlatBonus
+                {
+                    get { return Fields.GetLevels<bool>(this, "Ear4"); }
+                    protected set { Fields.Put("Ear4", value); }
                 }
             }
 
@@ -1909,8 +1946,11 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public ApprehendAHap()
                 {
+                    AirUnitHeight = Levels(200f, 200f, 200f);
+                    AirUnitLowerDuration = Levels(0.6f, 0.6f, 0.6f);
                     AnimationNames = "spell,throw";
                     Area = Levels(200f, 275f, 350f);
+                    AttackSpeedReductionPercent = Levels(0.3f, 0.45f, 0.6f);
                     Buffs.Set<global::Moonwell.Objects.Other.Buffs.Apprehend, global::Moonwell.Objects.Other.Buffs.ApprehendBHag>();
                     ButtonPositionNormalX = 1;
                     ButtonPositionNormalY = 2;
@@ -1931,6 +1971,7 @@ namespace Moonwell.Objects
                     LevelCount = 3;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(65, 65, 65);
+                    MeleeAttackRange = Levels(128f, 128f, 128f);
                     MissileArt = "Abilities\\Spells\\Orc\\Ensnare\\EnsnareMissile.mdl";
                     MissileHomingEnabled = true;
                     MissileSpeed = 1500;
@@ -1940,12 +1981,75 @@ namespace Moonwell.Objects
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     Range = Levels(500f, 500f, 500f);
                     RequiredLevel = 1;
+                    StunDuration = Levels(0.1f, 0.1f, 0.1f);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground, global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground);
                     Tooltip = Levels("Apprehend - [|cffffcc00Level 1|r]", "Apprehend - [|cffffcc00Level 2|r]", "Apprehend - [|cffffcc00Level 3|r]");
                     TooltipExtended = Levels("Throw a net at an area, ensnaring all enemy units. Ensnared units have their attack rate reduced by <AHap,DataE1,%>% and cannot move.|nLasts <AHap,Dur1> seconds.", "Throw a net at an area, ensnaring all enemy units. Ensnared units have their attack rate reduced by <AHap,DataE2,%>% and cannot move.|nLasts <AHap,Dur2> seconds.", "Throw a net at an area, ensnaring all enemy units. Ensnared units have their attack rate reduced by <AHap,DataE3,%>% and cannot move.|nLasts <AHap,Dur3> seconds.");
                     TooltipLearn = "Learn Apprehend - [|cffffcc00Level %d|r]";
                     TooltipLearnExtended = "Throws a net at a point, ensnaring all units nearby and reducing their attack rate. |n|n|cffffcc00Level 1|r - <AHap,DataE1,%>% attack rate, <AHap,Dur1> seconds. |n|cffffcc00Level 2|r - <AHap,DataE2,%>% attack rate, <AHap,Dur2> seconds.|n|cffffcc00Level 3|r - <AHap,DataE3,%>% attack rate, <AHap,Dur3> seconds.";
                     UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>Ens1</c>.</summary>
+                [global::Moonwell.Objects.Field("Ens1", Label = "Air Unit Lower Duration")]
+                [global::Moonwell.Objects.Limits(0.001, 300)]
+                public global::Moonwell.Objects.Levels<float> AirUnitLowerDuration
+                {
+                    get { return Fields.GetLevels<float>(this, "Ens1"); }
+                    protected set { Fields.Put("Ens1", value); }
+                }
+
+                /// <summary>The field <c>Ens2</c>.</summary>
+                [global::Moonwell.Objects.Field("Ens2", Label = "Air Unit Height")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> AirUnitHeight
+                {
+                    get { return Fields.GetLevels<float>(this, "Ens2"); }
+                    protected set { Fields.Put("Ens2", value); }
+                }
+
+                /// <summary>The field <c>Ens3</c>.</summary>
+                [global::Moonwell.Objects.Field("Ens3", Label = "Melee Attack Range")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> MeleeAttackRange
+                {
+                    get { return Fields.GetLevels<float>(this, "Ens3"); }
+                    protected set { Fields.Put("Ens3", value); }
+                }
+
+                /// <summary>The field <c>Ens4</c>.</summary>
+                [global::Moonwell.Objects.Field("Ens4", Label = "Stun Duration")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> StunDuration
+                {
+                    get { return Fields.GetLevels<float>(this, "Ens4"); }
+                    protected set { Fields.Put("Ens4", value); }
+                }
+
+                /// <summary>The field <c>Ens5</c>.</summary>
+                [global::Moonwell.Objects.Field("Ens5", Label = "Attack Speed Reduction Percent")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> AttackSpeedReductionPercent
+                {
+                    get { return Fields.GetLevels<float>(this, "Ens5"); }
+                    protected set { Fields.Put("Ens5", value); }
+                }
+
+                /// <summary>The field <c>Ens6</c>.</summary>
+                [global::Moonwell.Objects.Field("Ens6", Label = "Bonus Damage Taken Percent")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> BonusDamageTakenPercent
+                {
+                    get { return Fields.GetLevels<float>(this, "Ens6"); }
+                    protected set { Fields.Put("Ens6", value); }
+                }
+
+                /// <summary>The field <c>Ens7</c>.</summary>
+                [global::Moonwell.Objects.Field("Ens7", Label = "Silences When Ensnared")]
+                public global::Moonwell.Objects.Levels<bool> SilencesWhenEnsnared
+                {
+                    get { return Fields.GetLevels<bool>(this, "Ens7"); }
+                    protected set { Fields.Put("Ens7", value); }
                 }
             }
 
@@ -2354,6 +2458,8 @@ namespace Moonwell.Objects
                     Area = Levels(200f, 200f, 200f);
                     BonusLifeSteal = Levels(20, 20, 20);
                     BonusResolve = Levels(20, 20, 20);
+                    BonusSpellCrit = Levels(10, 10, 10);
+                    BonusSpellCritDamage = Levels(10, 10, 10);
                     BonusSpellVamp = Levels(20, 20, 20);
                     BonusStrength = Levels(20, 20, 20);
                     Buffs.Set<global::Moonwell.Objects.Other.Buffs.AvatarOfLight>();
@@ -2365,6 +2471,7 @@ namespace Moonwell.Objects
                     Caster = "Abilities\\Spells\\other\\avataroflight\\avataroflightCaster.mdl";
                     CheckDependencies = true;
                     Cooldown = Levels(15f, 15f, 15f);
+                    DamageOnCast = Levels(400f, 500f, 600f);
                     DoubleBonusBelowHealth = Levels(70, 70, 70);
                     Duration = Levels(10f, 10f, 10f);
                     HealthCost = Levels(20, 20, 20);
@@ -2444,6 +2551,33 @@ namespace Moonwell.Objects
                 {
                     get { return Fields.GetLevels<int>(this, "uvg6"); }
                     protected set { Fields.Put("uvg6", value); }
+                }
+
+                /// <summary>The field <c>uvg7</c>.</summary>
+                [global::Moonwell.Objects.Field("uvg7", Label = "Damage On Cast")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> DamageOnCast
+                {
+                    get { return Fields.GetLevels<float>(this, "uvg7"); }
+                    protected set { Fields.Put("uvg7", value); }
+                }
+
+                /// <summary>The field <c>uvg8</c>.</summary>
+                [global::Moonwell.Objects.Field("uvg8", Label = "% Bonus Spell Crit")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<int> BonusSpellCrit
+                {
+                    get { return Fields.GetLevels<int>(this, "uvg8"); }
+                    protected set { Fields.Put("uvg8", value); }
+                }
+
+                /// <summary>The field <c>uvg9</c>.</summary>
+                [global::Moonwell.Objects.Field("uvg9", Label = "% Bonus Spell Crit Damage")]
+                [global::Moonwell.Objects.Limits(0, 100)]
+                public global::Moonwell.Objects.Levels<int> BonusSpellCritDamage
+                {
+                    get { return Fields.GetLevels<int>(this, "uvg9"); }
+                    protected set { Fields.Put("uvg9", value); }
                 }
             }
 
@@ -4037,7 +4171,9 @@ namespace Moonwell.Objects
                     CastTime = Levels(0f);
                     CheckDependencies = true;
                     Cooldown = Levels(0f);
+                    CreatesBlight = Levels(false);
                     Duration = Levels(0.08f);
+                    ExpansionAmount = Levels(64f);
                     HeroAbility = false;
                     HeroDuration = Levels(0.08f);
                     ItemAbility = false;
@@ -4049,6 +4185,23 @@ namespace Moonwell.Objects
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Bli1</c>.</summary>
+                [global::Moonwell.Objects.Field("Bli1", Label = "Expansion Amount")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ExpansionAmount
+                {
+                    get { return Fields.GetLevels<float>(this, "Bli1"); }
+                    protected set { Fields.Put("Bli1", value); }
+                }
+
+                /// <summary>The field <c>Bli2</c>.</summary>
+                [global::Moonwell.Objects.Field("Bli2", Label = "Creates Blight")]
+                public global::Moonwell.Objects.Levels<bool> CreatesBlight
+                {
+                    get { return Fields.GetLevels<bool>(this, "Bli2"); }
+                    protected set { Fields.Put("Bli2", value); }
                 }
             }
 
@@ -4064,7 +4217,9 @@ namespace Moonwell.Objects
                     CastTime = Levels(0f);
                     CheckDependencies = true;
                     Cooldown = Levels(0f);
+                    CreatesBlight = Levels(false);
                     Duration = Levels(0.08f);
+                    ExpansionAmount = Levels(64f);
                     HeroAbility = false;
                     HeroDuration = Levels(0.08f);
                     ItemAbility = false;
@@ -4076,6 +4231,23 @@ namespace Moonwell.Objects
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Bli1</c>.</summary>
+                [global::Moonwell.Objects.Field("Bli1", Label = "Expansion Amount")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ExpansionAmount
+                {
+                    get { return Fields.GetLevels<float>(this, "Bli1"); }
+                    protected set { Fields.Put("Bli1", value); }
+                }
+
+                /// <summary>The field <c>Bli2</c>.</summary>
+                [global::Moonwell.Objects.Field("Bli2", Label = "Creates Blight")]
+                public global::Moonwell.Objects.Levels<bool> CreatesBlight
+                {
+                    get { return Fields.GetLevels<bool>(this, "Bli2"); }
+                    protected set { Fields.Put("Bli2", value); }
                 }
             }
 
@@ -4794,6 +4966,7 @@ namespace Moonwell.Objects
                 public CargoHold()
                 {
                     Area = Levels(250f);
+                    CargoCapacity = Levels(8);
                     CastTime = Levels(0f);
                     CheckDependencies = true;
                     Cooldown = Levels(0f);
@@ -4813,6 +4986,15 @@ namespace Moonwell.Objects
                     RequiredLevel = 0;
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Nonsapper | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Car1</c>.</summary>
+                [global::Moonwell.Objects.Field("Car1", Label = "Cargo Capacity")]
+                [global::Moonwell.Objects.Limits(0, 8)]
+                public global::Moonwell.Objects.Levels<int> CargoCapacity
+                {
+                    get { return Fields.GetLevels<int>(this, "Car1"); }
+                    protected set { Fields.Put("Car1", value); }
                 }
             }
 
@@ -4882,6 +5064,7 @@ namespace Moonwell.Objects
                 public CargoHoldSch5()
                 {
                     Area = Levels(250f);
+                    CargoCapacity = Levels(10);
                     CastTime = Levels(0f);
                     CheckDependencies = true;
                     Cooldown = Levels(0f);
@@ -4901,6 +5084,15 @@ namespace Moonwell.Objects
                     RequiredLevel = 0;
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Nonsapper | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Car1</c>.</summary>
+                [global::Moonwell.Objects.Field("Car1", Label = "Cargo Capacity")]
+                [global::Moonwell.Objects.Limits(0, 8)]
+                public global::Moonwell.Objects.Levels<int> CargoCapacity
+                {
+                    get { return Fields.GetLevels<int>(this, "Car1"); }
+                    protected set { Fields.Put("Car1", value); }
                 }
             }
 
@@ -4980,6 +5172,9 @@ namespace Moonwell.Objects
                 {
                     AnimationNames = "spell";
                     Area = Levels(450f, 450f, 450f);
+                    BonusAttack = Levels(0.1f, 0.2f, 0.3f);
+                    BonusDefense = Levels(0.1f, 0.2f, 0.3f);
+                    BonusesDuration = Levels(2f, 2f, 2f);
                     Buffs.Set<global::Moonwell.Objects.Other.Buffs.TauntBtau, global::Moonwell.Objects.Other.Buffs.TauntBtad, global::Moonwell.Objects.Other.Buffs.Taunt>();
                     ButtonPositionNormalX = 2;
                     ButtonPositionNormalY = 2;
@@ -5016,6 +5211,8 @@ namespace Moonwell.Objects
                     TooltipExtended = Levels("Taunts nearby enemy units, forcing them to attack this hero. Gain <AHnt,DataH1,%>% damage and <AHnt,DataF1,%>% armor for every enemy unit taunted. Lasts <AHnt,Dur1> seconds.", "Taunts nearby enemy units, forcing them to attack this hero. Gain <AHnt,DataH2,%>% damage and <AHnt,DataF2,%>% armor for every enemy unit taunted. Lasts <AHnt,Dur2> seconds.", "Taunts nearby enemy units, forcing them to attack this hero. Gain <AHnt,DataH3,%>% damage and <AHnt,DataF3,%>% armor for every enemy unit taunted. Lasts <AHnt,Dur3> seconds.");
                     TooltipLearn = "Learn Challenging Call - [|cffffcc00Level %d|r]";
                     TooltipLearnExtended = "Taunts nearby enemy units, gaining damage and armor and forcing them to attack this hero. |n|n|cffffcc00Level 1|r - <AHnt,DataH1,%>% damage and <AHnt,DataF1,%>% armor per enemy, lasts <AHnt,Dur1> seconds. |n|cffffcc00Level 2|r - <AHnt,DataH2,%>% damage and <AHnt,DataF2,%>% armor per enemy, lasts <AHnt,Dur2> seconds. |n|cffffcc00Level 3|r - <AHnt,DataH3,%>% damage and <AHnt,DataF3,%>% armor per enemy, lasts <AHnt,Dur3> seconds.";
+                    UseAttackValueAsPercentage = Levels(true, true, true);
+                    UseDefenseValueAsPercentage = Levels(true, true, true);
                     UseNewDefaultLevelCap = true;
                 }
 
@@ -5062,6 +5259,49 @@ namespace Moonwell.Objects
                 {
                     get { return Fields.GetLevels<float>(this, "Tau5"); }
                     protected set { Fields.Put("Tau5", value); }
+                }
+
+                /// <summary>The field <c>Tau6</c>.</summary>
+                [global::Moonwell.Objects.Field("Tau6", Label = "Bonus defense")]
+                [global::Moonwell.Objects.Limits(0, 300)]
+                public global::Moonwell.Objects.Levels<float> BonusDefense
+                {
+                    get { return Fields.GetLevels<float>(this, "Tau6"); }
+                    protected set { Fields.Put("Tau6", value); }
+                }
+
+                /// <summary>The field <c>Tau7</c>.</summary>
+                [global::Moonwell.Objects.Field("Tau7", Label = "Use defense value as percentage")]
+                public global::Moonwell.Objects.Levels<bool> UseDefenseValueAsPercentage
+                {
+                    get { return Fields.GetLevels<bool>(this, "Tau7"); }
+                    protected set { Fields.Put("Tau7", value); }
+                }
+
+                /// <summary>The field <c>Tau8</c>.</summary>
+                [global::Moonwell.Objects.Field("Tau8", Label = "Bonus Attack")]
+                [global::Moonwell.Objects.Limits(0, 300)]
+                public global::Moonwell.Objects.Levels<float> BonusAttack
+                {
+                    get { return Fields.GetLevels<float>(this, "Tau8"); }
+                    protected set { Fields.Put("Tau8", value); }
+                }
+
+                /// <summary>The field <c>Tau9</c>.</summary>
+                [global::Moonwell.Objects.Field("Tau9", Label = "Use attack value as percentage")]
+                public global::Moonwell.Objects.Levels<bool> UseAttackValueAsPercentage
+                {
+                    get { return Fields.GetLevels<bool>(this, "Tau9"); }
+                    protected set { Fields.Put("Tau9", value); }
+                }
+
+                /// <summary>The field <c>TauA</c>.</summary>
+                [global::Moonwell.Objects.Field("TauA", Label = "Bonuses duration")]
+                [global::Moonwell.Objects.Limits(0, 300)]
+                public global::Moonwell.Objects.Levels<float> BonusesDuration
+                {
+                    get { return Fields.GetLevels<float>(this, "TauA"); }
+                    protected set { Fields.Put("TauA", value); }
                 }
             }
 
@@ -5305,12 +5545,14 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public ClarityPotion()
                 {
+                    AllowWhenFull = Levels(global::Moonwell.Objects.FullFlags.Never);
                     Buffs.Set<global::Moonwell.Objects.Other.Buffs.Rejuvenation, global::Moonwell.Objects.Other.Buffs.Regeneration, global::Moonwell.Objects.Other.Buffs.ClarityPotion>();
                     CastTime = Levels(0f);
                     Caster = "Abilities\\Spells\\Items\\AIma\\AImaTarget.mdl";
                     CasterAttachmentPoint1 = "origin";
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
+                    DispelOnAttack = Levels(true);
                     Duration = Levels(45f);
                     HeroAbility = false;
                     HeroDuration = Levels(45f);
@@ -5318,12 +5560,57 @@ namespace Moonwell.Objects
                     ItemAbility = true;
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
+                    LifeRegenerated = Levels(0f);
                     ManaCost = Levels(0);
+                    ManaRegenerated = Levels(200f);
                     Name = "Clarity Potion";
+                    NoTargetRequired = Levels(true);
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>irl1</c>.</summary>
+                [global::Moonwell.Objects.Field("irl1", Label = "Life Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> LifeRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl1"); }
+                    protected set { Fields.Put("irl1", value); }
+                }
+
+                /// <summary>The field <c>irl2</c>.</summary>
+                [global::Moonwell.Objects.Field("irl2", Label = "Mana Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ManaRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl2"); }
+                    protected set { Fields.Put("irl2", value); }
+                }
+
+                /// <summary>The field <c>irl3</c>.</summary>
+                [global::Moonwell.Objects.Field("irl3", Label = "Allow When Full")]
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.FullFlags> AllowWhenFull
+                {
+                    get { return Fields.GetLevels<global::Moonwell.Objects.FullFlags>(this, "irl3"); }
+                    protected set { Fields.Put("irl3", value); }
+                }
+
+                /// <summary>The field <c>irl4</c>.</summary>
+                [global::Moonwell.Objects.Field("irl4", Label = "No Target Required")]
+                public global::Moonwell.Objects.Levels<bool> NoTargetRequired
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl4"); }
+                    protected set { Fields.Put("irl4", value); }
+                }
+
+                /// <summary>The field <c>irl5</c>.</summary>
+                [global::Moonwell.Objects.Field("irl5", Label = "Dispel On Attack")]
+                public global::Moonwell.Objects.Levels<bool> DispelOnAttack
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl5"); }
+                    protected set { Fields.Put("irl5", value); }
                 }
             }
 
@@ -8253,10 +8540,12 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public GenericItemRejuvEffect()
                 {
+                    AllowWhenFull = Levels(global::Moonwell.Objects.FullFlags.Never);
                     Buffs.Set<global::Moonwell.Objects.Other.Buffs.Rejuvenation, global::Moonwell.Objects.Other.Buffs.Regeneration, global::Moonwell.Objects.Other.Buffs.ClarityPotion>();
                     CastTime = Levels(0f);
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
+                    DispelOnAttack = Levels(true);
                     Duration = Levels(30f);
                     HeroAbility = false;
                     HeroDuration = Levels(30f);
@@ -8264,12 +8553,57 @@ namespace Moonwell.Objects
                     ItemAbility = true;
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
+                    LifeRegenerated = Levels(100f);
                     ManaCost = Levels(0);
+                    ManaRegenerated = Levels(25f);
                     Name = "Generic Item-Rejuv Effect";
+                    NoTargetRequired = Levels(true);
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>irl1</c>.</summary>
+                [global::Moonwell.Objects.Field("irl1", Label = "Life Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> LifeRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl1"); }
+                    protected set { Fields.Put("irl1", value); }
+                }
+
+                /// <summary>The field <c>irl2</c>.</summary>
+                [global::Moonwell.Objects.Field("irl2", Label = "Mana Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ManaRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl2"); }
+                    protected set { Fields.Put("irl2", value); }
+                }
+
+                /// <summary>The field <c>irl3</c>.</summary>
+                [global::Moonwell.Objects.Field("irl3", Label = "Allow When Full")]
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.FullFlags> AllowWhenFull
+                {
+                    get { return Fields.GetLevels<global::Moonwell.Objects.FullFlags>(this, "irl3"); }
+                    protected set { Fields.Put("irl3", value); }
+                }
+
+                /// <summary>The field <c>irl4</c>.</summary>
+                [global::Moonwell.Objects.Field("irl4", Label = "No Target Required")]
+                public global::Moonwell.Objects.Levels<bool> NoTargetRequired
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl4"); }
+                    protected set { Fields.Put("irl4", value); }
+                }
+
+                /// <summary>The field <c>irl5</c>.</summary>
+                [global::Moonwell.Objects.Field("irl5", Label = "Dispel On Attack")]
+                public global::Moonwell.Objects.Levels<bool> DispelOnAttack
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl5"); }
+                    protected set { Fields.Put("irl5", value); }
                 }
             }
 
@@ -8281,10 +8615,12 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public GenericItemRejuvEffectAIp2()
                 {
+                    AllowWhenFull = Levels(global::Moonwell.Objects.FullFlags.Never);
                     Buffs.Set<global::Moonwell.Objects.Other.Buffs.Rejuvenation, global::Moonwell.Objects.Other.Buffs.Regeneration, global::Moonwell.Objects.Other.Buffs.ClarityPotion>();
                     CastTime = Levels(0f);
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
+                    DispelOnAttack = Levels(true);
                     Duration = Levels(30f);
                     EditorSuffix = "(II)";
                     HeroAbility = false;
@@ -8293,12 +8629,57 @@ namespace Moonwell.Objects
                     ItemAbility = true;
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
+                    LifeRegenerated = Levels(150f);
                     ManaCost = Levels(0);
+                    ManaRegenerated = Levels(50f);
                     Name = "Generic Item-Rejuv Effect";
+                    NoTargetRequired = Levels(true);
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>irl1</c>.</summary>
+                [global::Moonwell.Objects.Field("irl1", Label = "Life Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> LifeRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl1"); }
+                    protected set { Fields.Put("irl1", value); }
+                }
+
+                /// <summary>The field <c>irl2</c>.</summary>
+                [global::Moonwell.Objects.Field("irl2", Label = "Mana Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ManaRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl2"); }
+                    protected set { Fields.Put("irl2", value); }
+                }
+
+                /// <summary>The field <c>irl3</c>.</summary>
+                [global::Moonwell.Objects.Field("irl3", Label = "Allow When Full")]
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.FullFlags> AllowWhenFull
+                {
+                    get { return Fields.GetLevels<global::Moonwell.Objects.FullFlags>(this, "irl3"); }
+                    protected set { Fields.Put("irl3", value); }
+                }
+
+                /// <summary>The field <c>irl4</c>.</summary>
+                [global::Moonwell.Objects.Field("irl4", Label = "No Target Required")]
+                public global::Moonwell.Objects.Levels<bool> NoTargetRequired
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl4"); }
+                    protected set { Fields.Put("irl4", value); }
+                }
+
+                /// <summary>The field <c>irl5</c>.</summary>
+                [global::Moonwell.Objects.Field("irl5", Label = "Dispel On Attack")]
+                public global::Moonwell.Objects.Levels<bool> DispelOnAttack
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl5"); }
+                    protected set { Fields.Put("irl5", value); }
                 }
             }
 
@@ -8310,10 +8691,12 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public GenericItemRejuvEffectAIp3()
                 {
+                    AllowWhenFull = Levels(global::Moonwell.Objects.FullFlags.Never);
                     Buffs.Set<global::Moonwell.Objects.Other.Buffs.Rejuvenation, global::Moonwell.Objects.Other.Buffs.Regeneration, global::Moonwell.Objects.Other.Buffs.ClarityPotion>();
                     CastTime = Levels(0f);
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
+                    DispelOnAttack = Levels(true);
                     Duration = Levels(30f);
                     EditorSuffix = "(III)";
                     HeroAbility = false;
@@ -8322,12 +8705,57 @@ namespace Moonwell.Objects
                     ItemAbility = true;
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
+                    LifeRegenerated = Levels(200f);
                     ManaCost = Levels(0);
+                    ManaRegenerated = Levels(75f);
                     Name = "Generic Item-Rejuv Effect";
+                    NoTargetRequired = Levels(true);
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>irl1</c>.</summary>
+                [global::Moonwell.Objects.Field("irl1", Label = "Life Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> LifeRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl1"); }
+                    protected set { Fields.Put("irl1", value); }
+                }
+
+                /// <summary>The field <c>irl2</c>.</summary>
+                [global::Moonwell.Objects.Field("irl2", Label = "Mana Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ManaRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl2"); }
+                    protected set { Fields.Put("irl2", value); }
+                }
+
+                /// <summary>The field <c>irl3</c>.</summary>
+                [global::Moonwell.Objects.Field("irl3", Label = "Allow When Full")]
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.FullFlags> AllowWhenFull
+                {
+                    get { return Fields.GetLevels<global::Moonwell.Objects.FullFlags>(this, "irl3"); }
+                    protected set { Fields.Put("irl3", value); }
+                }
+
+                /// <summary>The field <c>irl4</c>.</summary>
+                [global::Moonwell.Objects.Field("irl4", Label = "No Target Required")]
+                public global::Moonwell.Objects.Levels<bool> NoTargetRequired
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl4"); }
+                    protected set { Fields.Put("irl4", value); }
+                }
+
+                /// <summary>The field <c>irl5</c>.</summary>
+                [global::Moonwell.Objects.Field("irl5", Label = "Dispel On Attack")]
+                public global::Moonwell.Objects.Levels<bool> DispelOnAttack
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl5"); }
+                    protected set { Fields.Put("irl5", value); }
                 }
             }
 
@@ -8339,10 +8767,12 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public GenericItemRejuvEffectAIp4()
                 {
+                    AllowWhenFull = Levels(global::Moonwell.Objects.FullFlags.Never);
                     Buffs.Set<global::Moonwell.Objects.Other.Buffs.Rejuvenation, global::Moonwell.Objects.Other.Buffs.Regeneration, global::Moonwell.Objects.Other.Buffs.ClarityPotion>();
                     CastTime = Levels(0f);
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
+                    DispelOnAttack = Levels(true);
                     Duration = Levels(30f);
                     EditorSuffix = "(IV)";
                     HeroAbility = false;
@@ -8351,12 +8781,57 @@ namespace Moonwell.Objects
                     ItemAbility = true;
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
+                    LifeRegenerated = Levels(400f);
                     ManaCost = Levels(0);
+                    ManaRegenerated = Levels(125f);
                     Name = "Generic Item-Rejuv Effect";
+                    NoTargetRequired = Levels(true);
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>irl1</c>.</summary>
+                [global::Moonwell.Objects.Field("irl1", Label = "Life Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> LifeRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl1"); }
+                    protected set { Fields.Put("irl1", value); }
+                }
+
+                /// <summary>The field <c>irl2</c>.</summary>
+                [global::Moonwell.Objects.Field("irl2", Label = "Mana Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ManaRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl2"); }
+                    protected set { Fields.Put("irl2", value); }
+                }
+
+                /// <summary>The field <c>irl3</c>.</summary>
+                [global::Moonwell.Objects.Field("irl3", Label = "Allow When Full")]
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.FullFlags> AllowWhenFull
+                {
+                    get { return Fields.GetLevels<global::Moonwell.Objects.FullFlags>(this, "irl3"); }
+                    protected set { Fields.Put("irl3", value); }
+                }
+
+                /// <summary>The field <c>irl4</c>.</summary>
+                [global::Moonwell.Objects.Field("irl4", Label = "No Target Required")]
+                public global::Moonwell.Objects.Levels<bool> NoTargetRequired
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl4"); }
+                    protected set { Fields.Put("irl4", value); }
+                }
+
+                /// <summary>The field <c>irl5</c>.</summary>
+                [global::Moonwell.Objects.Field("irl5", Label = "Dispel On Attack")]
+                public global::Moonwell.Objects.Levels<bool> DispelOnAttack
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl5"); }
+                    protected set { Fields.Put("irl5", value); }
                 }
             }
 
@@ -8368,6 +8843,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public GenericItemRejuvEffectAIp5()
                 {
+                    AllowWhenFull = Levels(global::Moonwell.Objects.FullFlags.Never);
                     Area = Levels(600f);
                     Buffs.Set<global::Moonwell.Objects.Other.Buffs.Rejuvenation, global::Moonwell.Objects.Other.Buffs.Regeneration, global::Moonwell.Objects.Other.Buffs.ClarityPotion>();
                     CastTime = Levels(0f);
@@ -8375,6 +8851,7 @@ namespace Moonwell.Objects
                     CasterAttachmentPoint1 = "origin";
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
+                    DispelOnAttack = Levels(true);
                     Duration = Levels(45f);
                     EditorSuffix = "(V)";
                     HeroAbility = false;
@@ -8383,13 +8860,58 @@ namespace Moonwell.Objects
                     ItemAbility = true;
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
+                    LifeRegenerated = Levels(250f);
                     ManaCost = Levels(0);
+                    ManaRegenerated = Levels(100f);
                     Name = "Generic Item-Rejuv Effect";
+                    NoTargetRequired = Levels(true);
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>irl1</c>.</summary>
+                [global::Moonwell.Objects.Field("irl1", Label = "Life Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> LifeRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl1"); }
+                    protected set { Fields.Put("irl1", value); }
+                }
+
+                /// <summary>The field <c>irl2</c>.</summary>
+                [global::Moonwell.Objects.Field("irl2", Label = "Mana Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ManaRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl2"); }
+                    protected set { Fields.Put("irl2", value); }
+                }
+
+                /// <summary>The field <c>irl3</c>.</summary>
+                [global::Moonwell.Objects.Field("irl3", Label = "Allow When Full")]
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.FullFlags> AllowWhenFull
+                {
+                    get { return Fields.GetLevels<global::Moonwell.Objects.FullFlags>(this, "irl3"); }
+                    protected set { Fields.Put("irl3", value); }
+                }
+
+                /// <summary>The field <c>irl4</c>.</summary>
+                [global::Moonwell.Objects.Field("irl4", Label = "No Target Required")]
+                public global::Moonwell.Objects.Levels<bool> NoTargetRequired
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl4"); }
+                    protected set { Fields.Put("irl4", value); }
+                }
+
+                /// <summary>The field <c>irl5</c>.</summary>
+                [global::Moonwell.Objects.Field("irl5", Label = "Dispel On Attack")]
+                public global::Moonwell.Objects.Levels<bool> DispelOnAttack
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl5"); }
+                    protected set { Fields.Put("irl5", value); }
                 }
             }
 
@@ -8401,6 +8923,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public GenericItemRejuvEffectAIp6()
                 {
+                    AllowWhenFull = Levels(global::Moonwell.Objects.FullFlags.Never);
                     Area = Levels(600f);
                     Buffs.Set<global::Moonwell.Objects.Other.Buffs.Rejuvenation, global::Moonwell.Objects.Other.Buffs.Regeneration, global::Moonwell.Objects.Other.Buffs.ClarityPotion>();
                     CastTime = Levels(0f);
@@ -8408,6 +8931,7 @@ namespace Moonwell.Objects
                     CasterAttachmentPoint1 = "origin";
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
+                    DispelOnAttack = Levels(true);
                     Duration = Levels(45f);
                     EditorSuffix = "(VI)";
                     HeroAbility = false;
@@ -8416,13 +8940,58 @@ namespace Moonwell.Objects
                     ItemAbility = true;
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
+                    LifeRegenerated = Levels(450f);
                     ManaCost = Levels(0);
+                    ManaRegenerated = Levels(150f);
                     Name = "Generic Item-Rejuv Effect";
+                    NoTargetRequired = Levels(true);
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>irl1</c>.</summary>
+                [global::Moonwell.Objects.Field("irl1", Label = "Life Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> LifeRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl1"); }
+                    protected set { Fields.Put("irl1", value); }
+                }
+
+                /// <summary>The field <c>irl2</c>.</summary>
+                [global::Moonwell.Objects.Field("irl2", Label = "Mana Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ManaRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl2"); }
+                    protected set { Fields.Put("irl2", value); }
+                }
+
+                /// <summary>The field <c>irl3</c>.</summary>
+                [global::Moonwell.Objects.Field("irl3", Label = "Allow When Full")]
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.FullFlags> AllowWhenFull
+                {
+                    get { return Fields.GetLevels<global::Moonwell.Objects.FullFlags>(this, "irl3"); }
+                    protected set { Fields.Put("irl3", value); }
+                }
+
+                /// <summary>The field <c>irl4</c>.</summary>
+                [global::Moonwell.Objects.Field("irl4", Label = "No Target Required")]
+                public global::Moonwell.Objects.Levels<bool> NoTargetRequired
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl4"); }
+                    protected set { Fields.Put("irl4", value); }
+                }
+
+                /// <summary>The field <c>irl5</c>.</summary>
+                [global::Moonwell.Objects.Field("irl5", Label = "Dispel On Attack")]
+                public global::Moonwell.Objects.Levels<bool> DispelOnAttack
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl5"); }
+                    protected set { Fields.Put("irl5", value); }
                 }
             }
 
@@ -8450,7 +9019,25 @@ namespace Moonwell.Objects
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
                     UnitSkinList = "Rgfo";
+                    UpgradeLevels = Levels(1);
+                    UpgradeType.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfFortification>();
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Igl1</c>.</summary>
+                [global::Moonwell.Objects.Field("Igl1", Label = "Upgrade Levels")]
+                [global::Moonwell.Objects.Limits(1, 100)]
+                public global::Moonwell.Objects.Levels<int> UpgradeLevels
+                {
+                    get { return Fields.GetLevels<int>(this, "Igl1"); }
+                    protected set { Fields.Put("Igl1", value); }
+                }
+
+                /// <summary>The field <c>Iglu</c>.</summary>
+                [global::Moonwell.Objects.Field("Iglu", Label = "Upgrade Type")]
+                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Upgrade> UpgradeType
+                {
+                    get { return Fields.GetRef<global::Moonwell.Upgrade>("Iglu"); }
                 }
             }
 
@@ -8478,7 +9065,25 @@ namespace Moonwell.Objects
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
                     UnitSkinList = "Rguv,Reuv";
+                    UpgradeLevels = Levels(1, 1);
+                    UpgradeType.Set<global::Moonwell.Objects.Other.Upgrades.GlyphOfUltravision>();
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Igl1</c>.</summary>
+                [global::Moonwell.Objects.Field("Igl1", Label = "Upgrade Levels")]
+                [global::Moonwell.Objects.Limits(1, 100)]
+                public global::Moonwell.Objects.Levels<int> UpgradeLevels
+                {
+                    get { return Fields.GetLevels<int>(this, "Igl1"); }
+                    protected set { Fields.Put("Igl1", value); }
+                }
+
+                /// <summary>The field <c>Iglu</c>.</summary>
+                [global::Moonwell.Objects.Field("Iglu", Label = "Upgrade Type")]
+                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Upgrade> UpgradeType
+                {
+                    get { return Fields.GetRef<global::Moonwell.Upgrade>("Iglu"); }
                 }
             }
 
@@ -10822,12 +11427,14 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public HealingSalve()
                 {
+                    AllowWhenFull = Levels(global::Moonwell.Objects.FullFlags.Never);
                     Buffs.Set<global::Moonwell.Objects.Other.Buffs.Rejuvenation, global::Moonwell.Objects.Other.Buffs.Regeneration, global::Moonwell.Objects.Other.Buffs.ClarityPotion>();
                     CastTime = Levels(0f);
                     Caster = "Abilities\\Spells\\Human\\Heal\\HealTarget.mdl";
                     CasterAttachmentPoint1 = "origin";
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
+                    DispelOnAttack = Levels(true);
                     Duration = Levels(40f);
                     HeroAbility = false;
                     HeroDuration = Levels(40f);
@@ -10835,8 +11442,11 @@ namespace Moonwell.Objects
                     ItemAbility = true;
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
+                    LifeRegenerated = Levels(400f);
                     ManaCost = Levels(0);
+                    ManaRegenerated = Levels(0f);
                     Name = "Healing Salve";
+                    NoTargetRequired = Levels(false);
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     Range = Levels(500f);
@@ -10845,6 +11455,48 @@ namespace Moonwell.Objects
                     TargetAttachmentPoint1 = "origin";
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>irl1</c>.</summary>
+                [global::Moonwell.Objects.Field("irl1", Label = "Life Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> LifeRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl1"); }
+                    protected set { Fields.Put("irl1", value); }
+                }
+
+                /// <summary>The field <c>irl2</c>.</summary>
+                [global::Moonwell.Objects.Field("irl2", Label = "Mana Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ManaRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl2"); }
+                    protected set { Fields.Put("irl2", value); }
+                }
+
+                /// <summary>The field <c>irl3</c>.</summary>
+                [global::Moonwell.Objects.Field("irl3", Label = "Allow When Full")]
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.FullFlags> AllowWhenFull
+                {
+                    get { return Fields.GetLevels<global::Moonwell.Objects.FullFlags>(this, "irl3"); }
+                    protected set { Fields.Put("irl3", value); }
+                }
+
+                /// <summary>The field <c>irl4</c>.</summary>
+                [global::Moonwell.Objects.Field("irl4", Label = "No Target Required")]
+                public global::Moonwell.Objects.Levels<bool> NoTargetRequired
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl4"); }
+                    protected set { Fields.Put("irl4", value); }
+                }
+
+                /// <summary>The field <c>irl5</c>.</summary>
+                [global::Moonwell.Objects.Field("irl5", Label = "Dispel On Attack")]
+                public global::Moonwell.Objects.Levels<bool> DispelOnAttack
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl5"); }
+                    protected set { Fields.Put("irl5", value); }
                 }
             }
 
@@ -13604,6 +14256,7 @@ namespace Moonwell.Objects
                     CastTime = Levels(0f);
                     CheckDependencies = false;
                     Cooldown = Levels(30f);
+                    DamageToSummonedUnits = Levels(0f);
                     Duration = Levels(15f);
                     HeroAbility = false;
                     HeroDuration = Levels(15f);
@@ -13611,14 +14264,53 @@ namespace Moonwell.Objects
                     ItemAbility = true;
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
+                    MagicDamageReduction = Levels(10f);
                     ManaCost = Levels(0);
+                    ManaLoss = Levels(0);
                     Name = "Item Anti-Magic Shell";
                     Order = "antimagicshell";
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
+                    ShieldLife = Levels(0);
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground);
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Ams3</c>.</summary>
+                [global::Moonwell.Objects.Field("Ams3", Label = "Shield Life")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<int> ShieldLife
+                {
+                    get { return Fields.GetLevels<int>(this, "Ams3"); }
+                    protected set { Fields.Put("Ams3", value); }
+                }
+
+                /// <summary>The field <c>Ams4</c>.</summary>
+                [global::Moonwell.Objects.Field("Ams4", Label = "Mana Loss")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<int> ManaLoss
+                {
+                    get { return Fields.GetLevels<int>(this, "Ams4"); }
+                    protected set { Fields.Put("Ams4", value); }
+                }
+
+                /// <summary>The field <c>Ixs1</c>.</summary>
+                [global::Moonwell.Objects.Field("Ixs1", Label = "Damage To Summoned Units")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> DamageToSummonedUnits
+                {
+                    get { return Fields.GetLevels<float>(this, "Ixs1"); }
+                    protected set { Fields.Put("Ixs1", value); }
+                }
+
+                /// <summary>The field <c>Ixs2</c>.</summary>
+                [global::Moonwell.Objects.Field("Ixs2", Label = "Magic Damage Reduction")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> MagicDamageReduction
+                {
+                    get { return Fields.GetLevels<float>(this, "Ixs2"); }
+                    protected set { Fields.Put("Ixs2", value); }
                 }
             }
 
@@ -15677,7 +16369,10 @@ namespace Moonwell.Objects
                     CastTime = Levels(0f);
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
+                    DamageBonus = Levels(5f);
                     Duration = Levels(3f);
+                    EnabledAttackIndex = Levels(2);
+                    HealingMultiplier = Levels(0.65f);
                     HeroAbility = false;
                     HeroDuration = Levels(3f);
                     Icon = "ReplaceableTextures\\CommandButtons\\BTNOrbOfFire.blp";
@@ -15697,6 +16392,33 @@ namespace Moonwell.Objects
                     TargetAttachmentPoint1 = "weapon";
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Ward);
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Idam</c>.</summary>
+                [global::Moonwell.Objects.Field("Idam", Label = "Damage Bonus")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> DamageBonus
+                {
+                    get { return Fields.GetLevels<float>(this, "Idam"); }
+                    protected set { Fields.Put("Idam", value); }
+                }
+
+                /// <summary>The field <c>Iob5</c>.</summary>
+                [global::Moonwell.Objects.Field("Iob5", Label = "Enabled Attack Index")]
+                [global::Moonwell.Objects.Limits(0, 2)]
+                public global::Moonwell.Objects.Levels<int> EnabledAttackIndex
+                {
+                    get { return Fields.GetLevels<int>(this, "Iob5"); }
+                    protected set { Fields.Put("Iob5", value); }
+                }
+
+                /// <summary>The field <c>Iofr</c>.</summary>
+                [global::Moonwell.Objects.Field("Iofr", Label = "Healing Multiplier")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> HealingMultiplier
+                {
+                    get { return Fields.GetLevels<float>(this, "Iofr"); }
+                    protected set { Fields.Put("Iofr", value); }
                 }
             }
 
@@ -37241,12 +37963,22 @@ namespace Moonwell.Objects
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
+                    ManaPointsGained = Levels(125);
                     Name = "Item Mana Regain";
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     Range = Levels(100f);
                     RequiredLevel = 0;
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Impg</c>.</summary>
+                [global::Moonwell.Objects.Field("Impg", Label = "Mana Points Gained")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<int> ManaPointsGained
+                {
+                    get { return Fields.GetLevels<int>(this, "Impg"); }
+                    protected set { Fields.Put("Impg", value); }
                 }
             }
 
@@ -37272,12 +38004,22 @@ namespace Moonwell.Objects
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
+                    ManaPointsGained = Levels(200);
                     Name = "Item Mana Regain";
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     Range = Levels(100f);
                     RequiredLevel = 0;
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Impg</c>.</summary>
+                [global::Moonwell.Objects.Field("Impg", Label = "Mana Points Gained")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<int> ManaPointsGained
+                {
+                    get { return Fields.GetLevels<int>(this, "Impg"); }
+                    protected set { Fields.Put("Impg", value); }
                 }
             }
 
@@ -49092,12 +49834,14 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public LesserClarityPotion()
                 {
+                    AllowWhenFull = Levels(global::Moonwell.Objects.FullFlags.Never);
                     Buffs.Set<global::Moonwell.Objects.Other.Buffs.Rejuvenation, global::Moonwell.Objects.Other.Buffs.Regeneration, global::Moonwell.Objects.Other.Buffs.ClarityPotion>();
                     CastTime = Levels(0f);
                     Caster = "Abilities\\Spells\\Items\\AIma\\AImaTarget.mdl";
                     CasterAttachmentPoint1 = "origin";
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
+                    DispelOnAttack = Levels(true);
                     Duration = Levels(30f);
                     HeroAbility = false;
                     HeroDuration = Levels(30f);
@@ -49105,12 +49849,57 @@ namespace Moonwell.Objects
                     ItemAbility = true;
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
+                    LifeRegenerated = Levels(0f);
                     ManaCost = Levels(0);
+                    ManaRegenerated = Levels(100f);
                     Name = "Lesser Clarity Potion";
+                    NoTargetRequired = Levels(true);
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>irl1</c>.</summary>
+                [global::Moonwell.Objects.Field("irl1", Label = "Life Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> LifeRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl1"); }
+                    protected set { Fields.Put("irl1", value); }
+                }
+
+                /// <summary>The field <c>irl2</c>.</summary>
+                [global::Moonwell.Objects.Field("irl2", Label = "Mana Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ManaRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl2"); }
+                    protected set { Fields.Put("irl2", value); }
+                }
+
+                /// <summary>The field <c>irl3</c>.</summary>
+                [global::Moonwell.Objects.Field("irl3", Label = "Allow When Full")]
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.FullFlags> AllowWhenFull
+                {
+                    get { return Fields.GetLevels<global::Moonwell.Objects.FullFlags>(this, "irl3"); }
+                    protected set { Fields.Put("irl3", value); }
+                }
+
+                /// <summary>The field <c>irl4</c>.</summary>
+                [global::Moonwell.Objects.Field("irl4", Label = "No Target Required")]
+                public global::Moonwell.Objects.Levels<bool> NoTargetRequired
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl4"); }
+                    protected set { Fields.Put("irl4", value); }
+                }
+
+                /// <summary>The field <c>irl5</c>.</summary>
+                [global::Moonwell.Objects.Field("irl5", Label = "Dispel On Attack")]
+                public global::Moonwell.Objects.Levels<bool> DispelOnAttack
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl5"); }
+                    protected set { Fields.Put("irl5", value); }
                 }
             }
 
@@ -49201,13 +49990,13 @@ namespace Moonwell.Objects
                     UseNewDefaultLevelCap = false;
                 }
 
-                /// <summary>The field <c>Lsh1</c>.</summary>
-                [global::Moonwell.Objects.Field("Lsh1", Label = "Damage per Second")]
+                /// <summary>The field <c>Idps</c>.</summary>
+                [global::Moonwell.Objects.Field("Idps", Label = "Damage Per Second")]
                 [global::Moonwell.Objects.Limits(0, 99999)]
                 public global::Moonwell.Objects.Levels<float> DamagePerSecond
                 {
-                    get { return Fields.GetLevels<float>(this, "Lsh1"); }
-                    protected set { Fields.Put("Lsh1", value); }
+                    get { return Fields.GetLevels<float>(this, "Idps"); }
+                    protected set { Fields.Put("Idps", value); }
                 }
             }
 
@@ -53176,6 +53965,7 @@ namespace Moonwell.Objects
                     CheckDependencies = true;
                     Cooldown = Levels(3f);
                     Duration = Levels(5f);
+                    GivenAbilities.Set<global::Moonwell.Objects.Other.Abilities.RaiseTheBannerCrit, global::Moonwell.Objects.Other.Abilities.RaiseTheBannerSpellCrit>();
                     HeroAbility = true;
                     HeroDuration = Levels(5f);
                     ItemAbility = false;
@@ -53191,6 +53981,14 @@ namespace Moonwell.Objects
                     TargetAttachmentPoint1 = "origin";
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
                     UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>aga1</c>.</summary>
+                [global::Moonwell.Objects.Field("aga1", Label = "Given Abilities")]
+                [global::Moonwell.Objects.MaxEntries(99999)]
+                public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> GivenAbilities
+                {
+                    get { return Fields.GetList<global::Moonwell.Ability>(this, "aga1"); }
                 }
             }
 
@@ -56358,6 +57156,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public ScrollOfRegeneration()
                 {
+                    AllowWhenFull = Levels(global::Moonwell.Objects.FullFlags.Never);
                     Area = Levels(600f);
                     Buffs.Set<global::Moonwell.Objects.Other.Buffs.Rejuvenation, global::Moonwell.Objects.Other.Buffs.Regeneration, global::Moonwell.Objects.Other.Buffs.ClarityPotion>();
                     CastTime = Levels(0f);
@@ -56365,6 +57164,7 @@ namespace Moonwell.Objects
                     CasterAttachmentPoint1 = "origin";
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
+                    DispelOnAttack = Levels(true);
                     Duration = Levels(45f);
                     HeroAbility = false;
                     HeroDuration = Levels(45f);
@@ -56372,13 +57172,58 @@ namespace Moonwell.Objects
                     ItemAbility = true;
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
+                    LifeRegenerated = Levels(225f);
                     ManaCost = Levels(0);
+                    ManaRegenerated = Levels(0f);
                     Name = "Scroll of Regeneration";
+                    NoTargetRequired = Levels(true);
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
                     RequiredLevel = 0;
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Ground | global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Organic | global::Moonwell.Objects.Targets.Self | global::Moonwell.Objects.Targets.Vulnerable | global::Moonwell.Objects.Targets.Friend);
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>irl1</c>.</summary>
+                [global::Moonwell.Objects.Field("irl1", Label = "Life Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> LifeRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl1"); }
+                    protected set { Fields.Put("irl1", value); }
+                }
+
+                /// <summary>The field <c>irl2</c>.</summary>
+                [global::Moonwell.Objects.Field("irl2", Label = "Mana Regenerated")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ManaRegenerated
+                {
+                    get { return Fields.GetLevels<float>(this, "irl2"); }
+                    protected set { Fields.Put("irl2", value); }
+                }
+
+                /// <summary>The field <c>irl3</c>.</summary>
+                [global::Moonwell.Objects.Field("irl3", Label = "Allow When Full")]
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.FullFlags> AllowWhenFull
+                {
+                    get { return Fields.GetLevels<global::Moonwell.Objects.FullFlags>(this, "irl3"); }
+                    protected set { Fields.Put("irl3", value); }
+                }
+
+                /// <summary>The field <c>irl4</c>.</summary>
+                [global::Moonwell.Objects.Field("irl4", Label = "No Target Required")]
+                public global::Moonwell.Objects.Levels<bool> NoTargetRequired
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl4"); }
+                    protected set { Fields.Put("irl4", value); }
+                }
+
+                /// <summary>The field <c>irl5</c>.</summary>
+                [global::Moonwell.Objects.Field("irl5", Label = "Dispel On Attack")]
+                public global::Moonwell.Objects.Levels<bool> DispelOnAttack
+                {
+                    get { return Fields.GetLevels<bool>(this, "irl5"); }
+                    protected set { Fields.Put("irl5", value); }
                 }
             }
 
@@ -57239,6 +58084,7 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SlowOrbOfSlowNew()
                 {
+                    AttackSpeedFactor = Levels(0.25f);
                     Buffs.Set<global::Moonwell.Objects.Other.Buffs.OrbOfSlow>();
                     CastTime = Levels(0f);
                     Caster = "Abilities\\Spells\\Human\\Slow\\SlowCaster.mdl";
@@ -57252,6 +58098,7 @@ namespace Moonwell.Objects
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
+                    MovementSpeedFactor = Levels(0.55f);
                     Name = "Slow (Orb of Slow New)";
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Other;
@@ -57259,6 +58106,32 @@ namespace Moonwell.Objects
                     RequiredLevel = 0;
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Air | global::Moonwell.Objects.Targets.Enemies | global::Moonwell.Objects.Targets.Ground);
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Slo1</c>.</summary>
+                [global::Moonwell.Objects.Field("Slo1", Label = "Movement Speed Factor")]
+                [global::Moonwell.Objects.Limits(-10, 10)]
+                public global::Moonwell.Objects.Levels<float> MovementSpeedFactor
+                {
+                    get { return Fields.GetLevels<float>(this, "Slo1"); }
+                    protected set { Fields.Put("Slo1", value); }
+                }
+
+                /// <summary>The field <c>Slo2</c>.</summary>
+                [global::Moonwell.Objects.Field("Slo2", Label = "Attack Speed Factor")]
+                [global::Moonwell.Objects.Limits(-10, 10)]
+                public global::Moonwell.Objects.Levels<float> AttackSpeedFactor
+                {
+                    get { return Fields.GetLevels<float>(this, "Slo2"); }
+                    protected set { Fields.Put("Slo2", value); }
+                }
+
+                /// <summary>The field <c>Slo3</c>.</summary>
+                [global::Moonwell.Objects.Field("Slo3", Label = "Always Autocast")]
+                public global::Moonwell.Objects.Levels<bool> AlwaysAutocast
+                {
+                    get { return Fields.GetLevels<bool>(this, "Slo3"); }
+                    protected set { Fields.Put("Slo3", value); }
                 }
             }
 

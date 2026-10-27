@@ -441,7 +441,9 @@ namespace Moonwell.Objects
                     CastTime = Levels(0f);
                     CheckDependencies = true;
                     Cooldown = Levels(0f);
+                    CreatesBlight = Levels(true);
                     Duration = Levels(0.08f);
+                    ExpansionAmount = Levels(64f);
                     HeroAbility = false;
                     HeroDuration = Levels(0.08f);
                     ItemAbility = false;
@@ -453,6 +455,23 @@ namespace Moonwell.Objects
                     Race = global::Moonwell.Objects.UnitRace.Undead;
                     RequiredLevel = 0;
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Bli1</c>.</summary>
+                [global::Moonwell.Objects.Field("Bli1", Label = "Expansion Amount")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ExpansionAmount
+                {
+                    get { return Fields.GetLevels<float>(this, "Bli1"); }
+                    protected set { Fields.Put("Bli1", value); }
+                }
+
+                /// <summary>The field <c>Bli2</c>.</summary>
+                [global::Moonwell.Objects.Field("Bli2", Label = "Creates Blight")]
+                public global::Moonwell.Objects.Levels<bool> CreatesBlight
+                {
+                    get { return Fields.GetLevels<bool>(this, "Bli2"); }
+                    protected set { Fields.Put("Bli2", value); }
                 }
             }
 
@@ -468,7 +487,9 @@ namespace Moonwell.Objects
                     CastTime = Levels(0f);
                     CheckDependencies = true;
                     Cooldown = Levels(0f);
+                    CreatesBlight = Levels(true);
                     Duration = Levels(0.08f);
+                    ExpansionAmount = Levels(64f);
                     HeroAbility = false;
                     HeroDuration = Levels(0.08f);
                     ItemAbility = false;
@@ -480,6 +501,23 @@ namespace Moonwell.Objects
                     Race = global::Moonwell.Objects.UnitRace.Undead;
                     RequiredLevel = 0;
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Bli1</c>.</summary>
+                [global::Moonwell.Objects.Field("Bli1", Label = "Expansion Amount")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> ExpansionAmount
+                {
+                    get { return Fields.GetLevels<float>(this, "Bli1"); }
+                    protected set { Fields.Put("Bli1", value); }
+                }
+
+                /// <summary>The field <c>Bli2</c>.</summary>
+                [global::Moonwell.Objects.Field("Bli2", Label = "Creates Blight")]
+                public global::Moonwell.Objects.Levels<bool> CreatesBlight
+                {
+                    get { return Fields.GetLevels<bool>(this, "Bli2"); }
+                    protected set { Fields.Put("Bli2", value); }
                 }
             }
 
@@ -957,6 +995,7 @@ namespace Moonwell.Objects
                 public CargoHold()
                 {
                     Area = Levels(250f);
+                    CargoCapacity = Levels(8);
                     CastTime = Levels(0f);
                     CheckDependencies = true;
                     Cooldown = Levels(0f);
@@ -976,6 +1015,15 @@ namespace Moonwell.Objects
                     RequiredLevel = 0;
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Dead);
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Car1</c>.</summary>
+                [global::Moonwell.Objects.Field("Car1", Label = "Cargo Capacity")]
+                [global::Moonwell.Objects.Limits(0, 8)]
+                public global::Moonwell.Objects.Levels<int> CargoCapacity
+                {
+                    get { return Fields.GetLevels<int>(this, "Car1"); }
+                    protected set { Fields.Put("Car1", value); }
                 }
             }
 

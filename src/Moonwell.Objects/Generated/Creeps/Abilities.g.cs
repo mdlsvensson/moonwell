@@ -3409,6 +3409,7 @@ namespace Moonwell.Objects
                 public CommandAura()
                 {
                     Area = Levels(900f);
+                    AttackDamageIncrease = Levels(0.1f);
                     Buffs.Set<global::Moonwell.Objects.Orc.Buffs.BOac>();
                     ButtonPositionNormalX = 0;
                     ButtonPositionNormalY = 2;
@@ -3416,6 +3417,7 @@ namespace Moonwell.Objects
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
                     Duration = Levels(0f);
+                    FlatBonus = Levels(false);
                     HeroAbility = false;
                     HeroDuration = Levels(0f);
                     Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNGnollCommandAura.blp";
@@ -3423,9 +3425,11 @@ namespace Moonwell.Objects
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
+                    MeleeBonus = Levels(true);
                     Name = "Command Aura";
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
+                    RangedBonus = Levels(true);
                     RequiredLevel = 0;
                     Target = "Abilities\\Spells\\Orc\\WarDrums\\DrumsCasterHeal.mdl";
                     TargetAttachmentPoint1 = "origin";
@@ -3433,6 +3437,39 @@ namespace Moonwell.Objects
                     Tooltip = Levels("Command Aura");
                     TooltipExtended = Levels("Gives extra damage to the attacks of nearby friendly units.");
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Cac1</c>.</summary>
+                [global::Moonwell.Objects.Field("Cac1", Label = "Attack Damage Increase")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> AttackDamageIncrease
+                {
+                    get { return Fields.GetLevels<float>(this, "Cac1"); }
+                    protected set { Fields.Put("Cac1", value); }
+                }
+
+                /// <summary>The field <c>Ear2</c>.</summary>
+                [global::Moonwell.Objects.Field("Ear2", Label = "Melee Bonus")]
+                public global::Moonwell.Objects.Levels<bool> MeleeBonus
+                {
+                    get { return Fields.GetLevels<bool>(this, "Ear2"); }
+                    protected set { Fields.Put("Ear2", value); }
+                }
+
+                /// <summary>The field <c>Ear3</c>.</summary>
+                [global::Moonwell.Objects.Field("Ear3", Label = "Ranged Bonus")]
+                public global::Moonwell.Objects.Levels<bool> RangedBonus
+                {
+                    get { return Fields.GetLevels<bool>(this, "Ear3"); }
+                    protected set { Fields.Put("Ear3", value); }
+                }
+
+                /// <summary>The field <c>Ear4</c>.</summary>
+                [global::Moonwell.Objects.Field("Ear4", Label = "Flat Bonus")]
+                public global::Moonwell.Objects.Levels<bool> FlatBonus
+                {
+                    get { return Fields.GetLevels<bool>(this, "Ear4"); }
+                    protected set { Fields.Put("Ear4", value); }
                 }
             }
 
@@ -9981,6 +10018,7 @@ namespace Moonwell.Objects
                     TooltipExtended = Levels("Absorbs the life essence of a target enemy unit by taking <ANdr,DataA1> hit points per second from it and giving them to the Dark Ranger, or transfers <ANdr,DataD1> hit points from the Dark Ranger to an ally. |n|nAlso applies the current rank of the Black Arrow debuff to the target. |nLasts <ANdr,Dur1> seconds.", "Absorbs the life essence of a target enemy unit by taking <ANdr,DataA2> hit points per second from it and giving them to the Dark Ranger, or transfers <ANdr,DataD2> hit points from the Dark Ranger to an ally. |n|nAlso applies the current rank of the Black Arrow debuff to the target. |nLasts <ANdr,Dur2> seconds.", "Absorbs the life essence of a target enemy unit by taking <ANdr,DataA3> hit points per second from it and giving them to the Dark Ranger, or transfers <ANdr,DataD3> hit points from the Dark Ranger to an ally. |n|nAlso applies the current rank of the Black Arrow debuff to the target. |nLasts <ANdr,Dur3> seconds.");
                     TooltipLearn = "Learn Life Drain - [|cffffcc00Level %d|r]";
                     TooltipLearnExtended = "Absorbs the life essence of a target enemy unit by taking hit points from it every second and giving them to the Dark Ranger, or transfers hit points from the Dark Ranger to an ally. |n|nLife Drain also applies the current rank of the Black Arrow debuff to the target. |nLasts <ANdr,Dur1> seconds. |n|n|cffffcc00Level 1|r - <ANdr,DataA1> hit point drain per second, or transfers <ANdr,DataD1> hit points per second to an ally. |n|cffffcc00Level 2|r - <ANdr,DataA2> hit point drain per second, or transfers <ANdr,DataD2> hit points per second to an ally. |n|cffffcc00Level 3|r - <ANdr,DataA3> hit point drain per second, or transfers <ANdr,DataD3> hit points per second to an ally.";
+                    UseBlackArrowEffect = Levels(true, true, true);
                     UseNewDefaultLevelCap = false;
                 }
 
@@ -10063,6 +10101,14 @@ namespace Moonwell.Objects
                 {
                     get { return Fields.GetLevels<float>(this, "Ndr9"); }
                     protected set { Fields.Put("Ndr9", value); }
+                }
+
+                /// <summary>The field <c>NdrA</c>.</summary>
+                [global::Moonwell.Objects.Field("NdrA", Label = "Use Black Arrow Effect")]
+                public global::Moonwell.Objects.Levels<bool> UseBlackArrowEffect
+                {
+                    get { return Fields.GetLevels<bool>(this, "NdrA"); }
+                    protected set { Fields.Put("NdrA", value); }
                 }
             }
 
@@ -16372,6 +16418,8 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public Submerge()
                 {
+                    AlternateFormUnit.Set<global::Moonwell.Objects.Campaign.Units.SubmergedNagaMyrmidon>();
+                    AltitudeAdjustmentDuration = Levels(0f);
                     ButtonPositionNormalX = 3;
                     ButtonPositionNormalY = 2;
                     ButtonPositionTurnOffX = 3;
@@ -16392,7 +16440,9 @@ namespace Moonwell.Objects
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
+                    MorphingFlags = Levels(global::Moonwell.Objects.MorphFlags.Uninterruptable);
                     Name = "Submerge";
+                    NormalFormUnit.Set<global::Moonwell.Objects.Campaign.Units.NagaMyrmidon>();
                     Order = "submerge";
                     OrderStringTurnOff = "unsubmerge";
                     PriorityForSpellSteal = 0;
@@ -16406,6 +16456,37 @@ namespace Moonwell.Objects
                     UnitSkinList = "nmys";
                     UseNewDefaultLevelCap = false;
                 }
+
+                /// <summary>The field <c>Eme1</c>.</summary>
+                [global::Moonwell.Objects.Field("Eme1", Label = "Normal Form Unit")]
+                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> NormalFormUnit
+                {
+                    get { return Fields.GetRef<global::Moonwell.Unit>("Eme1"); }
+                }
+
+                /// <summary>The field <c>Eme2</c>.</summary>
+                [global::Moonwell.Objects.Field("Eme2", Label = "Morphing Flags")]
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.MorphFlags> MorphingFlags
+                {
+                    get { return Fields.GetLevels<global::Moonwell.Objects.MorphFlags>(this, "Eme2"); }
+                    protected set { Fields.Put("Eme2", value); }
+                }
+
+                /// <summary>The field <c>Eme3</c>.</summary>
+                [global::Moonwell.Objects.Field("Eme3", Label = "Altitude Adjustment Duration")]
+                [global::Moonwell.Objects.Limits(0.001, 300)]
+                public global::Moonwell.Objects.Levels<float> AltitudeAdjustmentDuration
+                {
+                    get { return Fields.GetLevels<float>(this, "Eme3"); }
+                    protected set { Fields.Put("Eme3", value); }
+                }
+
+                /// <summary>The field <c>Emeu</c>.</summary>
+                [global::Moonwell.Objects.Field("Emeu", Label = "Alternate Form Unit")]
+                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> AlternateFormUnit
+                {
+                    get { return Fields.GetRef<global::Moonwell.Unit>("Emeu"); }
+                }
             }
 
             /// <summary>Submerge (Royal Guard), Asb2.</summary>
@@ -16416,6 +16497,8 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SubmergeAsb2()
                 {
+                    AlternateFormUnit.Set<global::Moonwell.Objects.Campaign.Units.SubmergedNagaRoyalGuard>();
+                    AltitudeAdjustmentDuration = Levels(0f);
                     ButtonPositionNormalX = 3;
                     ButtonPositionNormalY = 2;
                     ButtonPositionTurnOffX = 3;
@@ -16436,7 +16519,9 @@ namespace Moonwell.Objects
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
+                    MorphingFlags = Levels(global::Moonwell.Objects.MorphFlags.Uninterruptable);
                     Name = "Submerge";
+                    NormalFormUnit.Set<global::Moonwell.Objects.Campaign.Units.NagaRoyalGuard>();
                     Order = "submerge";
                     OrderStringTurnOff = "unsubmerge";
                     PriorityForSpellSteal = 0;
@@ -16449,6 +16534,37 @@ namespace Moonwell.Objects
                     UnitSkinList = "nnrs";
                     UseNewDefaultLevelCap = false;
                 }
+
+                /// <summary>The field <c>Eme1</c>.</summary>
+                [global::Moonwell.Objects.Field("Eme1", Label = "Normal Form Unit")]
+                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> NormalFormUnit
+                {
+                    get { return Fields.GetRef<global::Moonwell.Unit>("Eme1"); }
+                }
+
+                /// <summary>The field <c>Eme2</c>.</summary>
+                [global::Moonwell.Objects.Field("Eme2", Label = "Morphing Flags")]
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.MorphFlags> MorphingFlags
+                {
+                    get { return Fields.GetLevels<global::Moonwell.Objects.MorphFlags>(this, "Eme2"); }
+                    protected set { Fields.Put("Eme2", value); }
+                }
+
+                /// <summary>The field <c>Eme3</c>.</summary>
+                [global::Moonwell.Objects.Field("Eme3", Label = "Altitude Adjustment Duration")]
+                [global::Moonwell.Objects.Limits(0.001, 300)]
+                public global::Moonwell.Objects.Levels<float> AltitudeAdjustmentDuration
+                {
+                    get { return Fields.GetLevels<float>(this, "Eme3"); }
+                    protected set { Fields.Put("Eme3", value); }
+                }
+
+                /// <summary>The field <c>Emeu</c>.</summary>
+                [global::Moonwell.Objects.Field("Emeu", Label = "Alternate Form Unit")]
+                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> AlternateFormUnit
+                {
+                    get { return Fields.GetRef<global::Moonwell.Unit>("Emeu"); }
+                }
             }
 
             /// <summary>Submerge (Snap Dragon), Asb3.</summary>
@@ -16459,6 +16575,8 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SubmergeAsb3()
                 {
+                    AlternateFormUnit.Set<global::Moonwell.Objects.Campaign.Units.SubmergedSnapDragon>();
+                    AltitudeAdjustmentDuration = Levels(0f);
                     ButtonPositionNormalX = 3;
                     ButtonPositionNormalY = 2;
                     ButtonPositionTurnOffX = 3;
@@ -16479,7 +16597,9 @@ namespace Moonwell.Objects
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
+                    MorphingFlags = Levels(global::Moonwell.Objects.MorphFlags.Uninterruptable);
                     Name = "Submerge";
+                    NormalFormUnit.Set<global::Moonwell.Objects.Campaign.Units.SnapDragon>();
                     Order = "submerge";
                     OrderStringTurnOff = "unsubmerge";
                     PriorityForSpellSteal = 0;
@@ -16492,6 +16612,37 @@ namespace Moonwell.Objects
                     TooltipTurnOffExtended = Levels("Allows this unit to emerge from the water.");
                     UnitSkinList = "nsbs";
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Eme1</c>.</summary>
+                [global::Moonwell.Objects.Field("Eme1", Label = "Normal Form Unit")]
+                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> NormalFormUnit
+                {
+                    get { return Fields.GetRef<global::Moonwell.Unit>("Eme1"); }
+                }
+
+                /// <summary>The field <c>Eme2</c>.</summary>
+                [global::Moonwell.Objects.Field("Eme2", Label = "Morphing Flags")]
+                public global::Moonwell.Objects.Levels<global::Moonwell.Objects.MorphFlags> MorphingFlags
+                {
+                    get { return Fields.GetLevels<global::Moonwell.Objects.MorphFlags>(this, "Eme2"); }
+                    protected set { Fields.Put("Eme2", value); }
+                }
+
+                /// <summary>The field <c>Eme3</c>.</summary>
+                [global::Moonwell.Objects.Field("Eme3", Label = "Altitude Adjustment Duration")]
+                [global::Moonwell.Objects.Limits(0.001, 300)]
+                public global::Moonwell.Objects.Levels<float> AltitudeAdjustmentDuration
+                {
+                    get { return Fields.GetLevels<float>(this, "Eme3"); }
+                    protected set { Fields.Put("Eme3", value); }
+                }
+
+                /// <summary>The field <c>Emeu</c>.</summary>
+                [global::Moonwell.Objects.Field("Emeu", Label = "Alternate Form Unit")]
+                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> AlternateFormUnit
+                {
+                    get { return Fields.GetRef<global::Moonwell.Unit>("Emeu"); }
                 }
             }
 
@@ -17760,6 +17911,8 @@ namespace Moonwell.Objects
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
                     RequiredLevel = 0;
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground);
+                    TerrainDeformationAmplitude = Levels(-50f);
+                    TerrainDeformationDurationMs = Levels(300);
                     Tooltip = Levels("War Stomp");
                     TooltipExtended = Levels("Slams the ground, dealing <Awrg,DataA1> damage to nearby enemy land units and stunning them for <Awrg,Dur1> seconds.");
                     UseNewDefaultLevelCap = false;
@@ -17772,6 +17925,24 @@ namespace Moonwell.Objects
                 {
                     get { return Fields.GetLevels<float>(this, "Wrs1"); }
                     protected set { Fields.Put("Wrs1", value); }
+                }
+
+                /// <summary>The field <c>Wrs2</c>.</summary>
+                [global::Moonwell.Objects.Field("Wrs2", Label = "Terrain Deformation Amplitude")]
+                [global::Moonwell.Objects.Limits(-1000, 1000)]
+                public global::Moonwell.Objects.Levels<float> TerrainDeformationAmplitude
+                {
+                    get { return Fields.GetLevels<float>(this, "Wrs2"); }
+                    protected set { Fields.Put("Wrs2", value); }
+                }
+
+                /// <summary>The field <c>Wrs3</c>.</summary>
+                [global::Moonwell.Objects.Field("Wrs3", Label = "Terrain Deformation Duration (ms)")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<int> TerrainDeformationDurationMs
+                {
+                    get { return Fields.GetLevels<int>(this, "Wrs3"); }
+                    protected set { Fields.Put("Wrs3", value); }
                 }
             }
 
@@ -17809,6 +17980,8 @@ namespace Moonwell.Objects
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
                     RequiredLevel = 0;
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground);
+                    TerrainDeformationAmplitude = Levels(-50f);
+                    TerrainDeformationDurationMs = Levels(300);
                     Tooltip = Levels("War Stomp");
                     TooltipExtended = Levels("Slams the ground, dealing <Awrh,DataA1> damage to nearby enemy land units and stunning them for <Awrh,Dur1> seconds.");
                     UseNewDefaultLevelCap = false;
@@ -17821,6 +17994,24 @@ namespace Moonwell.Objects
                 {
                     get { return Fields.GetLevels<float>(this, "Wrs1"); }
                     protected set { Fields.Put("Wrs1", value); }
+                }
+
+                /// <summary>The field <c>Wrs2</c>.</summary>
+                [global::Moonwell.Objects.Field("Wrs2", Label = "Terrain Deformation Amplitude")]
+                [global::Moonwell.Objects.Limits(-1000, 1000)]
+                public global::Moonwell.Objects.Levels<float> TerrainDeformationAmplitude
+                {
+                    get { return Fields.GetLevels<float>(this, "Wrs2"); }
+                    protected set { Fields.Put("Wrs2", value); }
+                }
+
+                /// <summary>The field <c>Wrs3</c>.</summary>
+                [global::Moonwell.Objects.Field("Wrs3", Label = "Terrain Deformation Duration (ms)")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<int> TerrainDeformationDurationMs
+                {
+                    get { return Fields.GetLevels<int>(this, "Wrs3"); }
+                    protected set { Fields.Put("Wrs3", value); }
                 }
             }
 
@@ -17858,6 +18049,8 @@ namespace Moonwell.Objects
                     Race = global::Moonwell.Objects.UnitRace.Creeps;
                     RequiredLevel = 0;
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Ground);
+                    TerrainDeformationAmplitude = Levels(-50f);
+                    TerrainDeformationDurationMs = Levels(300);
                     Tooltip = Levels("War Stomp");
                     TooltipExtended = Levels("Slams the ground, dealing <Awrs,DataA1> damage to nearby enemy land units and stunning them for <Awrs,Dur1> seconds.");
                     UseNewDefaultLevelCap = false;
@@ -17870,6 +18063,24 @@ namespace Moonwell.Objects
                 {
                     get { return Fields.GetLevels<float>(this, "Wrs1"); }
                     protected set { Fields.Put("Wrs1", value); }
+                }
+
+                /// <summary>The field <c>Wrs2</c>.</summary>
+                [global::Moonwell.Objects.Field("Wrs2", Label = "Terrain Deformation Amplitude")]
+                [global::Moonwell.Objects.Limits(-1000, 1000)]
+                public global::Moonwell.Objects.Levels<float> TerrainDeformationAmplitude
+                {
+                    get { return Fields.GetLevels<float>(this, "Wrs2"); }
+                    protected set { Fields.Put("Wrs2", value); }
+                }
+
+                /// <summary>The field <c>Wrs3</c>.</summary>
+                [global::Moonwell.Objects.Field("Wrs3", Label = "Terrain Deformation Duration (ms)")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<int> TerrainDeformationDurationMs
+                {
+                    get { return Fields.GetLevels<int>(this, "Wrs3"); }
+                    protected set { Fields.Put("Wrs3", value); }
                 }
             }
 

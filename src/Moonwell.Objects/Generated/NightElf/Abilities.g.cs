@@ -2044,18 +2044,43 @@ namespace Moonwell.Objects
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
+                    MoveToPartner = Levels(false);
                     Name = "Mount Hippogryph";
                     Order = "coupletarget";
+                    PartnerUnitType.Set<global::Moonwell.Objects.NightElf.Units.Hippogryph>();
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.NightElf;
                     Range = Levels(99999f);
                     RequiredLevel = 0;
                     Requires.Set<global::Moonwell.Objects.NightElf.Units.Hippogryph>();
+                    ResultingUnitType.Set<global::Moonwell.Objects.NightElf.Units.HippogryphRider>();
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Vulnerable);
                     Tooltip = Levels("Mount Hippogryph");
                     TooltipExtended = Levels("Mounts a Hippogryph so that the Archer can attack from the air. |n|n|cffffcc00Attacks land and air units.|r");
                     UnitSkinList = "ehpr";
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>coa1</c>.</summary>
+                [global::Moonwell.Objects.Field("coa1", Label = "Partner Unit Type")]
+                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> PartnerUnitType
+                {
+                    get { return Fields.GetRef<global::Moonwell.Unit>("coa1"); }
+                }
+
+                /// <summary>The field <c>coa2</c>.</summary>
+                [global::Moonwell.Objects.Field("coa2", Label = "Move To Partner")]
+                public global::Moonwell.Objects.Levels<bool> MoveToPartner
+                {
+                    get { return Fields.GetLevels<bool>(this, "coa2"); }
+                    protected set { Fields.Put("coa2", value); }
+                }
+
+                /// <summary>The field <c>coau</c>.</summary>
+                [global::Moonwell.Objects.Field("coau", Label = "Resulting Unit Type")]
+                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> ResultingUnitType
+                {
+                    get { return Fields.GetRef<global::Moonwell.Unit>("coau"); }
                 }
             }
 
@@ -2222,18 +2247,43 @@ namespace Moonwell.Objects
                     LevelCount = 1;
                     LevelSkipRequirement = 0;
                     ManaCost = Levels(0);
+                    MoveToPartner = Levels(true);
                     Name = "Pick up Archer";
                     Order = "coupletarget";
+                    PartnerUnitType.Set<global::Moonwell.Objects.NightElf.Units.Archer>();
                     PriorityForSpellSteal = 0;
                     Race = global::Moonwell.Objects.UnitRace.NightElf;
                     Range = Levels(0f);
                     RequiredLevel = 0;
                     Requires.Set<global::Moonwell.Objects.NightElf.Units.Hippogryph>();
+                    ResultingUnitType.Set<global::Moonwell.Objects.NightElf.Units.HippogryphRider>();
                     TargetsAllowed = Levels(global::Moonwell.Objects.Targets.Invulnerable | global::Moonwell.Objects.Targets.Vulnerable);
                     Tooltip = Levels("Pick up Archer");
                     TooltipExtended = Levels("Picks up an Archer so that the Archer can attack from the air. |n|n|cffffcc00Attacks land and air units.|r");
                     UnitSkinList = "ehpr";
                     UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>coa1</c>.</summary>
+                [global::Moonwell.Objects.Field("coa1", Label = "Partner Unit Type")]
+                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> PartnerUnitType
+                {
+                    get { return Fields.GetRef<global::Moonwell.Unit>("coa1"); }
+                }
+
+                /// <summary>The field <c>coa2</c>.</summary>
+                [global::Moonwell.Objects.Field("coa2", Label = "Move To Partner")]
+                public global::Moonwell.Objects.Levels<bool> MoveToPartner
+                {
+                    get { return Fields.GetLevels<bool>(this, "coa2"); }
+                    protected set { Fields.Put("coa2", value); }
+                }
+
+                /// <summary>The field <c>coau</c>.</summary>
+                [global::Moonwell.Objects.Field("coau", Label = "Resulting Unit Type")]
+                public global::Moonwell.Objects.ObjectRef<global::Moonwell.Unit> ResultingUnitType
+                {
+                    get { return Fields.GetRef<global::Moonwell.Unit>("coau"); }
                 }
             }
 
