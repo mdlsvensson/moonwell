@@ -424,6 +424,10 @@ public sealed class ShopFloor : Area // a game component: Components.Add(new Sho
   polygon, a circle, or `AreaShape.Of(a, b)` for several. `OnUnitStays` runs every `Tick` seconds; 0 never runs it.
 - Only units count, alive and with a place: a dead, hidden or loaded unit leaves, and one hidden at the start enters
   once shown (the game sends no event for hiding, so that is up to 0.25 s late). `End()` lets every unit inside leave.
+- `Accepts` is asked as a unit comes inside, and again every 0.25 s for each unit inside and each one in the area it
+  refused: a no makes a unit leave (`OnUnitLeft`), a later yes lets it enter. An area whose answer for a unit never
+  changes sets `RecheckAccepts = false;` in its constructor to save the calls; a refused unit is then asked again only
+  when it next comes inside.
 - The game sees an area in whole 32 cells: a rect or World Editor region is rounded out to the cells it touches (an edge
   on the 32 grid ends its cells, so two that share an edge do not overlap), a polygon or circle is the cells whose centre
   is inside, and always the cell its own centre is in (a polygon's centroid). So a small circle (a landmine) or a band thinner than
