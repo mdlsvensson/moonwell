@@ -18,6 +18,7 @@ namespace Moonwell.Testing
             AddInteractions(list);
             AddTerrain(list);
             AddAreas(list);
+            AddAuditAreas(list);
             AddInput(list);
             AddLifecycle(list);
             AddDebug(list);
@@ -267,6 +268,13 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "areas.area.step-hands-over-and-restarts", Run = AreaCases.StepHandsOverAndRestarts });
             list.Add(new Case { Name = "areas.area.step-hands-over-and-keeps-running", Run = AreaCases.StepHandsOverAndKeepsRunning });
             list.Add(new Case { Name = "areas.area.step-leaves-and-reenters", Run = AreaCases.StepLeavesAndReenters });
+        }
+
+        /// <summary>Adds the cases for the full audit's fixes to areas and input.</summary>
+        private static void AddAuditAreas(List<Case> list)
+        {
+            list.Add(new Case { Name = "audit.areas.fake-covers-as-the-game", Run = AuditAreaCases.FakeCoversAsTheGame });
+            list.Add(new Case { Name = "audit.areas.fake-walks", Run = AuditAreaCases.FakeWalks });
         }
 
         /// <summary>Adds the input package's cases.</summary>
