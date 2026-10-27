@@ -393,6 +393,33 @@ namespace Moonwell.Testing
             Expect.True(along > 400.0f, what + "went on down along the wall: " + along);
         }
 
+        /// <summary>
+        /// A Pass ball whose OnImpact moves it, at its first meeting with a long wall, to another part of the same wall's
+        /// near side meets the wall again where it comes to it there: what it kept of the wall is forgotten when a reaction
+        /// moves it, as when it is moved from outside. The touch kept as passed skipped the second meeting.
+        /// </summary>
+        public static void JumpedAlong(FakeWorld world)
+        {
+            Fresh();
+            Wall.Create(600.0f, 100.0f, 600.0f, 2000.0f);
+            var shot = ShotAt(Contact.Pass, 400.0f, 200.0f, 100.0f, 600.0f, 0.0f);
+            var jumped = false;
+            shot.Impacting = impact =>
+            {
+                if (!jumped)
+                {
+                    jumped = true;
+                    shot.X = 400.0f;
+                    shot.Y = 1500.0f;
+                }
+            };
+
+            Steps(world, 32);
+            Expect.Equal(2, shot.Impacts.Count, "it met the wall where it was moved to as well");
+            Within(1500.0f, Read(shot, 1, 2), 0.01f, "there: y");
+            Within(600.0f, Read(shot, 1, 1), 0.01f, "at the wall: x");
+        }
+
         /// <summary>A footman pushed at 600 into a wall across its way stops short of it, its collision size off, and OnSlammed runs once with the normal out of the wall.</summary>
         public static void Push(FakeWorld world)
         {

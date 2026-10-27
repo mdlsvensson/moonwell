@@ -367,6 +367,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "wall.slide-under-gravity", Run = WallCases.SlideUnderGravity });
             list.Add(new Case { Name = "wall.slide-into-corner", Run = WallCases.SlideIntoCorner });
             list.Add(new Case { Name = "wall.slide-radius-zero", Run = WallCases.SlideRadiusZero });
+            list.Add(new Case { Name = "wall.jumped-along", Run = WallCases.JumpedAlong });
             list.Add(new Case { Name = "wall.push-corner", Run = WallCases.PushCorner });
             list.Add(new Case { Name = "wall.push-on-wall", Run = WallCases.PushOnWall });
             list.Add(new Case { Name = "wall.push-glancing", Run = WallCases.PushGlancing });

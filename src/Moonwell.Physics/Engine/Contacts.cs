@@ -828,7 +828,7 @@ namespace Moonwell.Engine
             }
         }
 
-        /// <summary>A reaction moved the missile at a contact: it stays where it was put, and its next sweep starts there.</summary>
+        /// <summary>A reaction moved the missile at a contact: it stays where it was put, and its next sweep starts there. It is no longer at the walls it was at, so it forgets them, as when it is moved from outside: a wall it passed or refused is met again where it next comes to it.</summary>
         private static void Jumped(Missile missile, Entry entry)
         {
             var x = entry.X;
@@ -838,6 +838,12 @@ namespace Moonwell.Engine
             missile.lastY = y;
             missile.lastZ = z;
             missile.lastStep = Tracking.StepNow;
+            var walls = missile.wallTouches;
+            if (walls != null)
+            {
+                Raw.Truncate(walls, 0);
+            }
+
             Placed(missile, x, y, z);
         }
 
@@ -1699,6 +1705,12 @@ namespace Moonwell.Engine
 
                 kept.round = round;
                 var next = Hit(missile, kept, ImpactKind.Wall, met, null, bestInside ? 0.0f : bestT, bestInside, bestX, bestY, bestZ, bestTop, 0.0f, 0.0f, missile.wallContact, met.bounciness);
+                if (missile.wallTouches!.Count == 0)
+                {
+                    // A reaction moved it and it forgot its walls: the walk ends, and its next sweep starts where it was put.
+                    break;
+                }
+
                 if (next == Hold)
                 {
                     kept.held = true;
