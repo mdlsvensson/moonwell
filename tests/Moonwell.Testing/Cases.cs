@@ -11,6 +11,7 @@ namespace Moonwell.Testing
         {
             var list = new List<Case>();
             AddFirst(list);
+            AddAuditTimers(list);
             AddMiddle(list);
             AddLast(list);
             AddMaths(list);
@@ -452,6 +453,26 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "players.print", Run = PlayerCases.PlayersPrint });
             list.Add(new Case { Name = "players.print-seconds", Run = PlayerCases.PlayersPrintSeconds });
             list.Add(new Case { Name = "game.print", Run = PlayerCases.GamePrint });
+        }
+
+        /// <summary>Adds the cases from the full audit's timer findings; the one that needs Moonwell's clock exists only in a development build, and is named debug.* (see AddDebug).</summary>
+        private static void AddAuditTimers(List<Case> list)
+        {
+            list.Add(new Case { Name = "timers.every-late-no-drift", Run = AuditTimerCases.EveryLateNoDrift });
+            list.Add(new Case { Name = "timers.every-tiny-late", Run = AuditTimerCases.EveryTinyLate });
+            list.Add(new Case { Name = "timers.every-milli-very-late", Run = AuditTimerCases.EveryMilliVeryLate });
+            list.Add(new Case { Name = "timers.buff-ticks-late", Run = AuditTimerCases.BuffTicksLate });
+            list.Add(new Case { Name = "timers.near-times-order", Run = AuditTimerCases.NearTimesOrder });
+            list.Add(new Case { Name = "timers.near-times-many", Run = AuditTimerCases.NearTimesMany });
+            list.Add(new Case { Name = "timers.after-zero-same-instant", Run = AuditTimerCases.AfterZeroSameInstant });
+            list.Add(new Case { Name = "timers.after-zero-runaway", Run = AuditTimerCases.AfterZeroRunaway });
+            list.Add(new Case { Name = "timers.runaway-many-timers", Run = AuditTimerCases.RunawayManyTimers });
+            list.Add(new Case { Name = "timers.catch-up-not-runaway", Run = AuditTimerCases.CatchUpNotRunaway });
+            list.Add(new Case { Name = "timers.every-zero-refused", Run = AuditTimerCases.EveryZeroRefused });
+            list.Add(new Case { Name = "timers.remaining-in-every", Run = AuditTimerCases.RemainingInEvery });
+#if DEBUG
+            list.Add(new Case { Name = "debug.timers.no-drift-at-speed", Run = AuditTimerCases.NoDriftAtSpeed });
+#endif
         }
 
         /// <summary>Adds the player, local, unit and inventory cases (Lua allows 200 locals in a function, and each case made here is one).</summary>
