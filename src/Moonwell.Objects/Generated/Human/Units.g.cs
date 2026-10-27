@@ -2779,147 +2779,13 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Keep (hkee).</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("hkee")]
-            public class Keep : global::Moonwell.Objects.StandardUnit
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public Keep()
-                {
-                    AIPlacementRadius = 8f;
-                    AIPlacementType = global::Moonwell.Objects.AiBuffer.Townhall;
-                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.BlightDispelLarge, global::Moonwell.Objects.Human.Abilities.CallToArms, global::Moonwell.Objects.Other.Abilities.ReturnGoldAndLumber>();
-                    AllowCustomTeamColor = false;
-                    AnimationBlendTimeSeconds = 0.25f;
-                    AnimationCastBackswing = 0.51f;
-                    AnimationRunSpeed = 200f;
-                    AnimationWalkSpeed = 200f;
-                    Armor = 5;
-                    ArmorType = global::Moonwell.Objects.ArmorType.Wood;
-                    Attack1DamageLossFactor = 0f;
-                    Attack1DamageSpillDistance = 0f;
-                    Attack1DamageSpillRadius = 0f;
-                    Attack1ProjectileArc = 0.15f;
-                    Attack1ProjectileArt = "Abilities\\Weapons\\GuardTowerMissile\\GuardTowerMissile.mdl";
-                    Attack1ProjectileSpeed = 1800;
-                    Attack1ShowUI = true;
-                    Attack2AttackType = global::Moonwell.AttackType.Normal;
-                    Attack2DamageLossFactor = 0f;
-                    Attack2DamageSpillDistance = 0f;
-                    Attack2DamageSpillRadius = 0f;
-                    Attack2MaximumNumberOfTargets = 1;
-                    Attack2ShowUI = true;
-                    AttackType = global::Moonwell.AttackType.Normal;
-                    AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
-                    BuildTime = 140;
-                    ButtonPositionX = 0;
-                    ButtonPositionY = 2;
-                    CanBeBuiltOn = false;
-                    CanBuildOn = false;
-                    CanDropItemsOnDeath = true;
-                    CanFlee = true;
-                    CategorizationCampaign = false;
-                    CategorizationSpecial = false;
-                    CollisionSize = 176f;
-                    Construction = "BuildingConstructionLoop";
-                    DeathTimeSeconds = 3.17f;
-                    DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
-                    DefenseType = global::Moonwell.DefenseType.Fort;
-                    DefenseUpgradeBonus = 1;
-                    ElevationSamplePoints = 4;
-                    ElevationSampleRadius = 50f;
-                    FlyHeight = 0f;
-                    FogOfWarSampleRadius = 0f;
-                    FoodProduced = 14;
-                    ForceBuildingHitPointsDisplay = false;
-                    GoldBountyAwardedBase = 0;
-                    GoldBountyAwardedNumberOfDice = 0;
-                    GoldBountyAwardedSidesPerDie = 0;
-                    GoldCost = 705;
-                    GroundTexture = "HTOW";
-                    HasTilesetSpecificData = true;
-                    HasWaterShadow = true;
-                    HeightMinimum = 0f;
-                    HideMinimapDisplay = false;
-                    HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
-                    Hotkey = "U";
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNKeep.blp";
-                    IsABuilding = true;
-                    LoopingFadeInRate = 512;
-                    LoopingFadeOutRate = 512;
-                    LumberBountyAwardedBase = 0;
-                    LumberBountyAwardedNumberOfDice = 0;
-                    LumberBountyAwardedSidesPerDie = 0;
-                    LumberCost = 415;
-                    MaxLife = 2000;
-                    MaximumPitchAngleDegrees = 0f;
-                    MaximumRollAngleDegrees = 0f;
-                    Model = "buildings\\human\\TownHall\\TownHall";
-                    ModelFileExtraVersions = 0;
-                    Name = "Keep";
-                    NormalSkin = "Abdl,Amic,Argl";
-                    OccluderHeight = 0f;
-                    OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
-                    OrientationInterpolation = 0;
-                    PathingMap = "PathTextures\\16x16Simple.tga";
-                    PlaceableInEditor = true;
-                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
-                    PlacementRequiresWaterRadius = 0f;
-                    PointValue = 100;
-                    PortraitModelFile = "buildings\\human\\TownHall\\TownHall_portrait";
-                    Priority = 7;
-                    ProjectileImpactZ = 160f;
-                    ProjectileImpactZSwimming = 0f;
-                    ProjectileLaunchX = 0f;
-                    ProjectileLaunchY = 0f;
-                    ProjectileLaunchZ = 60f;
-                    ProjectileLaunchZSwimming = 0f;
-                    PropulsionWindowDegrees = 60f;
-                    Race = global::Moonwell.Objects.UnitRace.Human;
-                    RepairGoldCost = 705;
-                    RepairLumberCost = 415;
-                    RepairTime = 120;
-                    RequiredAnimationNames = "upgrade,first";
-                    RequiredAnimationNamesAttachments = "large";
-                    ResearchesAvailable.Set<global::Moonwell.Objects.Human.Upgrades.Backpack>();
-                    Scale = 1f;
-                    ScaleProjectiles = true;
-                    SelectionCircleHeight = 0f;
-                    SelectionCircleOnWater = false;
-                    SelectionScale = 6.3f;
-                    ShadowTextureBuilding = "ShadowKeep";
-                    SightRadiusNight = 600;
-                    SightRange = 900;
-                    Sleeps = false;
-                    Special = "Objects\\Spawnmodels\\Human\\HCancelDeath\\HCancelDeath.mdl";
-                    SpeedMaximum = 0;
-                    SpeedMinimum = 0;
-                    TargetedAs = global::Moonwell.Objects.Targets.Structure;
-                    TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
-                    Tilesets = "*";
-                    TintingColor1Red = 255;
-                    TintingColor2Green = 255;
-                    TintingColor3Blue = 255;
-                    Tooltip = "Upgrade to Keep";
-                    TooltipExtended = "Upgrade to Keep to enable the production of additional types of structures and units.";
-                    Trains.Set<global::Moonwell.Objects.Human.Units.Peasant>();
-                    UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical | global::Moonwell.Objects.UnitClass.TownHall;
-                    UnitSoundSet = "Keep";
-                    UpgradesTo.Set<global::Moonwell.Objects.Human.Units.Castle>();
-                    UpgradesUsed.Set<global::Moonwell.Objects.Human.Upgrades.ImprovedMasonry, global::Moonwell.Objects.Other.Upgrades.GlyphOfFortification>();
-                    UseClickHelper = false;
-                    UseExtendedLineOfSight = false;
-                }
-            }
-
             /// <summary>High Elf Archmage (Haah).</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Haah")]
-            public class KelenTheSeeker : global::Moonwell.Objects.StandardHero
+            public class HighElfArchmage : global::Moonwell.Objects.StandardHero
             {
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public KelenTheSeeker()
+                public HighElfArchmage()
                 {
                     Abilities.Set<global::Moonwell.Objects.Other.Abilities.Inventory>();
                     AcquisitionRange = 600f;
@@ -3088,6 +2954,140 @@ namespace Moonwell.Objects
                     TurnRate = 0.5f;
                     Type = global::Moonwell.Objects.MoveType.Foot;
                     UnitSoundSet = "HeroArchMage";
+                    UseClickHelper = false;
+                    UseExtendedLineOfSight = false;
+                }
+            }
+
+            /// <summary>Keep (hkee).</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("hkee")]
+            public class Keep : global::Moonwell.Objects.StandardUnit
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public Keep()
+                {
+                    AIPlacementRadius = 8f;
+                    AIPlacementType = global::Moonwell.Objects.AiBuffer.Townhall;
+                    Abilities.Set<global::Moonwell.Objects.Other.Abilities.BlightDispelLarge, global::Moonwell.Objects.Human.Abilities.CallToArms, global::Moonwell.Objects.Other.Abilities.ReturnGoldAndLumber>();
+                    AllowCustomTeamColor = false;
+                    AnimationBlendTimeSeconds = 0.25f;
+                    AnimationCastBackswing = 0.51f;
+                    AnimationRunSpeed = 200f;
+                    AnimationWalkSpeed = 200f;
+                    Armor = 5;
+                    ArmorType = global::Moonwell.Objects.ArmorType.Wood;
+                    Attack1DamageLossFactor = 0f;
+                    Attack1DamageSpillDistance = 0f;
+                    Attack1DamageSpillRadius = 0f;
+                    Attack1ProjectileArc = 0.15f;
+                    Attack1ProjectileArt = "Abilities\\Weapons\\GuardTowerMissile\\GuardTowerMissile.mdl";
+                    Attack1ProjectileSpeed = 1800;
+                    Attack1ShowUI = true;
+                    Attack2AttackType = global::Moonwell.AttackType.Normal;
+                    Attack2DamageLossFactor = 0f;
+                    Attack2DamageSpillDistance = 0f;
+                    Attack2DamageSpillRadius = 0f;
+                    Attack2MaximumNumberOfTargets = 1;
+                    Attack2ShowUI = true;
+                    AttackType = global::Moonwell.AttackType.Normal;
+                    AttacksEnabled = global::Moonwell.Objects.AttackBits.None;
+                    BuildTime = 140;
+                    ButtonPositionX = 0;
+                    ButtonPositionY = 2;
+                    CanBeBuiltOn = false;
+                    CanBuildOn = false;
+                    CanDropItemsOnDeath = true;
+                    CanFlee = true;
+                    CategorizationCampaign = false;
+                    CategorizationSpecial = false;
+                    CollisionSize = 176f;
+                    Construction = "BuildingConstructionLoop";
+                    DeathTimeSeconds = 3.17f;
+                    DeathType = global::Moonwell.Objects.DeathType.CantRaiseDoesDecay;
+                    DefenseType = global::Moonwell.DefenseType.Fort;
+                    DefenseUpgradeBonus = 1;
+                    ElevationSamplePoints = 4;
+                    ElevationSampleRadius = 50f;
+                    FlyHeight = 0f;
+                    FogOfWarSampleRadius = 0f;
+                    FoodProduced = 14;
+                    ForceBuildingHitPointsDisplay = false;
+                    GoldBountyAwardedBase = 0;
+                    GoldBountyAwardedNumberOfDice = 0;
+                    GoldBountyAwardedSidesPerDie = 0;
+                    GoldCost = 705;
+                    GroundTexture = "HTOW";
+                    HasTilesetSpecificData = true;
+                    HasWaterShadow = true;
+                    HeightMinimum = 0f;
+                    HideMinimapDisplay = false;
+                    HitPointsRegenerationType = global::Moonwell.Objects.RegenType.None;
+                    Hotkey = "U";
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNKeep.blp";
+                    IsABuilding = true;
+                    LoopingFadeInRate = 512;
+                    LoopingFadeOutRate = 512;
+                    LumberBountyAwardedBase = 0;
+                    LumberBountyAwardedNumberOfDice = 0;
+                    LumberBountyAwardedSidesPerDie = 0;
+                    LumberCost = 415;
+                    MaxLife = 2000;
+                    MaximumPitchAngleDegrees = 0f;
+                    MaximumRollAngleDegrees = 0f;
+                    Model = "buildings\\human\\TownHall\\TownHall";
+                    ModelFileExtraVersions = 0;
+                    Name = "Keep";
+                    NormalSkin = "Abdl,Amic,Argl";
+                    OccluderHeight = 0f;
+                    OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
+                    OrientationInterpolation = 0;
+                    PathingMap = "PathTextures\\16x16Simple.tga";
+                    PlaceableInEditor = true;
+                    PlacementRequires = global::Moonwell.Objects.PathingRequire.Buildable;
+                    PlacementRequiresWaterRadius = 0f;
+                    PointValue = 100;
+                    PortraitModelFile = "buildings\\human\\TownHall\\TownHall_portrait";
+                    Priority = 7;
+                    ProjectileImpactZ = 160f;
+                    ProjectileImpactZSwimming = 0f;
+                    ProjectileLaunchX = 0f;
+                    ProjectileLaunchY = 0f;
+                    ProjectileLaunchZ = 60f;
+                    ProjectileLaunchZSwimming = 0f;
+                    PropulsionWindowDegrees = 60f;
+                    Race = global::Moonwell.Objects.UnitRace.Human;
+                    RepairGoldCost = 705;
+                    RepairLumberCost = 415;
+                    RepairTime = 120;
+                    RequiredAnimationNames = "upgrade,first";
+                    RequiredAnimationNamesAttachments = "large";
+                    ResearchesAvailable.Set<global::Moonwell.Objects.Human.Upgrades.Backpack>();
+                    Scale = 1f;
+                    ScaleProjectiles = true;
+                    SelectionCircleHeight = 0f;
+                    SelectionCircleOnWater = false;
+                    SelectionScale = 6.3f;
+                    ShadowTextureBuilding = "ShadowKeep";
+                    SightRadiusNight = 600;
+                    SightRange = 900;
+                    Sleeps = false;
+                    Special = "Objects\\Spawnmodels\\Human\\HCancelDeath\\HCancelDeath.mdl";
+                    SpeedMaximum = 0;
+                    SpeedMinimum = 0;
+                    TargetedAs = global::Moonwell.Objects.Targets.Structure;
+                    TeamColor = global::Moonwell.Objects.TeamColor.MatchOwningPlayer;
+                    Tilesets = "*";
+                    TintingColor1Red = 255;
+                    TintingColor2Green = 255;
+                    TintingColor3Blue = 255;
+                    Tooltip = "Upgrade to Keep";
+                    TooltipExtended = "Upgrade to Keep to enable the production of additional types of structures and units.";
+                    Trains.Set<global::Moonwell.Objects.Human.Units.Peasant>();
+                    UnitClassification = global::Moonwell.Objects.UnitClass.Mechanical | global::Moonwell.Objects.UnitClass.TownHall;
+                    UnitSoundSet = "Keep";
+                    UpgradesTo.Set<global::Moonwell.Objects.Human.Units.Castle>();
+                    UpgradesUsed.Set<global::Moonwell.Objects.Human.Upgrades.ImprovedMasonry, global::Moonwell.Objects.Other.Upgrades.GlyphOfFortification>();
                     UseClickHelper = false;
                     UseExtendedLineOfSight = false;
                 }

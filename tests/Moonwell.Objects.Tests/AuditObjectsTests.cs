@@ -105,6 +105,14 @@ namespace Moonwell.Objects.Tests
         }
 
         [Fact]
+        public void a_melee_hero_is_named_by_its_type_and_a_campaign_hero_by_its_one_proper_name()
+        {
+            Assert.Equal("Haah", IdOf(typeof(Human.Units.HighElfArchmage)));
+            Assert.Equal("Nglx", IdOf(typeof(Creeps.Units.Merchant)));
+            Assert.Equal("Ecen", IdOf(typeof(Campaign.Units.Cenarius)));
+        }
+
+        [Fact]
         public void a_target_type_of_self_is_named_self()
         {
             // worldeditstrings.txt gives the label as "Self", then again as "Shelf"; the first one is the name.
