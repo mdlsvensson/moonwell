@@ -55,16 +55,39 @@ namespace Moonwell.Engine
             Natives.TriggerAddAction(deathTrigger, DestructableDeathAction);
         }
 
-        /// <summary>Game seconds since the runtime started.</summary>
+        /// <summary>Game seconds since the runtime started; in a development build, Moonwell's time on its clock (Runtime.Clock).</summary>
         public float Now()
+        {
+#if DEBUG
+            return Runtime.Clock.Now(GameNow());
+#else
+            return lapStart + Natives.TimerGetElapsed(clock);
+#endif
+        }
+#if DEBUG
+
+        /// <summary>Game seconds since the runtime started, under Moonwell's clock: what the clock and the debug world take.</summary>
+        internal float GameNow()
         {
             return lapStart + Natives.TimerGetElapsed(clock);
         }
+#endif
 
-        /// <summary>Calls Runtime.Wake once after the seconds; a later request replaces it.</summary>
+        /// <summary>Calls Runtime.Wake once after the seconds; a later request replaces it. In a development build the seconds are Moonwell's, and a request while its clock is halted stops the wake until the clock re-arms it.</summary>
         public void WakeIn(float seconds)
         {
+#if DEBUG
+            if (Runtime.Clock.Arm(seconds, out var gameSeconds))
+            {
+                Natives.TimerStart(wake, gameSeconds < 0.0f ? 0.0f : gameSeconds, false, WakeAction);
+            }
+            else
+            {
+                Natives.PauseTimer(wake);
+            }
+#else
             Natives.TimerStart(wake, seconds < 0.0f ? 0.0f : seconds, false, WakeAction);
+#endif
         }
 
         /// <summary>Starts delivering an event to Inbound.</summary>

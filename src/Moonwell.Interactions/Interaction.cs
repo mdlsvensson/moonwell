@@ -53,6 +53,11 @@ namespace Moonwell
 
         /// <summary>The kind of thing TOther is exactly (Tracking.ExactKind), which a check compares an entry's kind with; 0 when it tests the thing's class.</summary>
         internal int otherKind;
+#if DEBUG
+
+        /// <summary>The debug mode's counts of the interaction's class; null until it has started with a holder in the grid.</summary>
+        internal InteractionStats? debugStats;
+#endif
 
         /// <summary>Only Interaction&lt;THolder, TOther&gt; derives from it.</summary>
         internal Interaction()
@@ -129,6 +134,14 @@ namespace Moonwell
 
         /// <summary>The check at a tick: what is near now meets, ticks or parts. It gives the error the package's own code raised in it, or null; the reactions' errors are reported where they run.</summary>
         internal abstract Exception? RunCheck();
+#if DEBUG
+
+        /// <summary>The name of the other class, as the debug mode shows it when it is not one kind of thing.</summary>
+        internal abstract string OtherClassName();
+
+        /// <summary>Reads a pair of the interaction into the debug mode's facts; only the typed class can cast it.</summary>
+        internal abstract void ReadPair(Owner pair, PairFacts facts);
+#endif
 
         /// <summary>The check itself, from the holder's read on; RunCheck runs it guarded, and takes what it added off the shared lists after, as a finally would.</summary>
         internal abstract void CheckNear();
@@ -169,6 +182,9 @@ namespace Moonwell
             Tracking.Hold(entry, this);
             due = new InteractionDue(this);
             due.ArmFirst();
+#if DEBUG
+            debugStats = InteractionsView.Started(this);
+#endif
         }
 
         /// <summary>Joins a new pair to the interaction: it is the interaction's, last in meeting order, and found by its other's entry.</summary>
@@ -178,6 +194,12 @@ namespace Moonwell
             pairs.Add(pair);
             byOther[other.Id] = pair;
             Tracking.AddPartner(other, pair);
+#if DEBUG
+            if (debugStats != null)
+            {
+                debugStats.Pairs++;
+            }
+#endif
         }
 
         /// <summary>Takes a parting pair out of the interaction's lists and its other's; one already out is passed over.</summary>
@@ -188,6 +210,12 @@ namespace Moonwell
                 if (Raw.At(pairs, i) == pair)
                 {
                     pairs.RemoveAt(i);
+#if DEBUG
+                    if (debugStats != null)
+                    {
+                        debugStats.Pairs--;
+                    }
+#endif
                     break;
                 }
             }
@@ -313,6 +341,15 @@ namespace Moonwell
             {
                 Tracking.Unhold(holderEntry, this);
             }
+#if DEBUG
+
+            // The pairs are taken out here, before they end, so Unpair does not count them out again.
+            if (debugStats != null)
+            {
+                debugStats.Count--;
+                debugStats.Pairs -= pairs.Count;
+            }
+#endif
 
             while (pairs.Count > 0)
             {
@@ -406,6 +443,32 @@ namespace Moonwell
         {
             CallPart(Pairing.As<THolder, TOther>(pair));
         }
+#if DEBUG
+
+        /// <summary>The name of TOther.</summary>
+        internal sealed override string OtherClassName()
+        {
+            return typeof(TOther).Name;
+        }
+
+        /// <summary>Reads a pair, as the Pair it is, into the debug mode's facts.</summary>
+        internal sealed override void ReadPair(Owner owner, PairFacts facts)
+        {
+            Pair pair = Pairing.As<THolder, TOther>(owner);
+            facts.Holder = pair.holder;
+            facts.Other = pair.other;
+            facts.Distance = pair.Distance;
+            facts.HolderX = pair.HolderX;
+            facts.HolderY = pair.HolderY;
+            facts.OtherX = pair.OtherX;
+            facts.OtherY = pair.OtherY;
+            facts.Since = pair.Since;
+            facts.Waits = pair.Waits;
+            facts.Cooldown = pair.Cooldown;
+            facts.Paused = pair.IsPaused;
+            facts.Ticked = pair.ticked;
+        }
+#endif
 
         /// <summary>
         /// The check at a tick, in this order. The holder is read; with no place every pair parts and the check ends. The
@@ -610,6 +673,14 @@ namespace Moonwell
         /// <summary>Runs OnTick with the pair as the current owner, and reports an error it throws.</summary>
         private void CallTick(Pair pair)
         {
+#if DEBUG
+            // The debug mode's counts: plain int fields, so a tick makes no table.
+            pair.ticked++;
+            if (debugStats != null)
+            {
+                debugStats.StepTicks++;
+            }
+#endif
             var previous = Owner.current;
             Owner.current = pair;
             var failure = Guard.Tick(this, pair);
@@ -685,6 +756,11 @@ namespace Moonwell
 
             /// <summary>The map's own value.</summary>
             private object? data;
+#if DEBUG
+
+            /// <summary>How many times OnTick has run, for the debug mode.</summary>
+            internal int ticked;
+#endif
 
             /// <summary>Only Pairing makes a pair.</summary>
             internal Pair()
@@ -782,6 +858,18 @@ namespace Moonwell
                 get { return paused; }
             }
 
+#if DEBUG
+            /// <summary>The seconds left of a Wait, for the debug mode; 0 when none runs.</summary>
+            internal float Waits
+            {
+                get
+                {
+                    var left = waitUntil - Tracking.StepNow;
+                    return left > 0 ? left * Interactions.Step : 0.0f;
+                }
+            }
+
+#endif
             /// <summary>Whether the pair ticks at this step: it is not paused and does not wait.</summary>
             internal bool Ready
             {

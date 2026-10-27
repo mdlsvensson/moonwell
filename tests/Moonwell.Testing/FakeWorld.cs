@@ -438,16 +438,31 @@ namespace Moonwell.Testing
             }
         }
 
-        /// <summary>The game seconds since the world was made.</summary>
+        /// <summary>The game seconds since the world was made; in a development build, Moonwell's time on its clock (Runtime.Clock), as NativeWorld's.</summary>
         public float Now()
         {
+#if DEBUG
+            return Runtime.Clock.Now(Time);
+#else
             return Time;
+#endif
         }
 
-        /// <summary>Requests a wake the seconds from now; replaces any earlier request.</summary>
+        /// <summary>Requests a wake the seconds from now; replaces any earlier request. In a development build the seconds are Moonwell's, and a request while its clock is halted drops the wake until the clock re-arms it, as NativeWorld's.</summary>
         public void WakeIn(float seconds)
         {
+#if DEBUG
+            if (Runtime.Clock.Arm(seconds, out var gameSeconds))
+            {
+                WakeAt = Time + gameSeconds;
+            }
+            else
+            {
+                WakeAt = null;
+            }
+#else
             WakeAt = Time + seconds;
+#endif
         }
 
         /// <summary>Records that the runtime asked to hear an event, once.</summary>

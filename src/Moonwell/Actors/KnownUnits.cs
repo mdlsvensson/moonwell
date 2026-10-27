@@ -83,6 +83,12 @@ namespace Moonwell
             {
                 Hooks.CallTakenIn(made);
             }
+#if DEBUG
+            if (!made.HasEnded)
+            {
+                DebugSession.UnitTakenIn(made);
+            }
+#endif
 
             return made;
         }

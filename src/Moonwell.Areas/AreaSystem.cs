@@ -53,6 +53,14 @@ namespace Moonwell
             }
         }
 
+#if DEBUG
+        /// <summary>The world the package talks to, or null before Install; reading it throws nothing.</summary>
+        internal static IAreaWorld? WorldIfInstalled
+        {
+            get { return world; }
+        }
+#endif
+
         /// <summary>Finds a World Editor region by name; false when the map has none of that name. Throws before Install.</summary>
         internal static bool TryRegion(string name, out Bounds bounds)
         {

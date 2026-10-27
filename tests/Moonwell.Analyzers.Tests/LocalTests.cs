@@ -87,6 +87,24 @@ public class LocalTests
     }
 
     [Fact]
+    public void debug_mode_select_and_halt_are_rejected_inside()
+    {
+        var found = MapCode.Check("""
+            var unit = Unit.Of(u)!;
+            Local.For(p, () =>
+            {
+                var on = DebugMode.IsOn;
+                var selected = DebugMode.Selected;
+                var mine = DebugMode.IsSelected(unit);
+                DebugMode.Select(unit);
+                DebugMode.Halt();
+            });
+            """);
+
+        Assert.Equal(new[] { "MW0001: DebugMode.Select(unit)", "MW0001: DebugMode.Halt()" }, found);
+    }
+
+    [Fact]
     public void damage_package_members_need_local_safe()
     {
         var found = MapCode.Check("""

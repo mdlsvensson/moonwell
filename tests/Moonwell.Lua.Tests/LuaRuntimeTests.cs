@@ -30,6 +30,8 @@ public class LuaRuntimeTests
 
         var failures = lines.Where(line => line.StartsWith("FAIL", StringComparison.Ordinal)).ToList();
         Assert.True(failures.Count == 0, string.Join(Environment.NewLine, failures));
-        Assert.Equal("DONE " + Cases.All().Count, lines.LastOrDefault());
+        // The debug mode's cases exist only in a development build (Cases.AddDebug).
+        var count = release ? Cases.All().Count(testCase => !testCase.Name.StartsWith("debug.", StringComparison.Ordinal)) : Cases.All().Count;
+        Assert.Equal("DONE " + count, lines.LastOrDefault());
     }
 }

@@ -93,6 +93,29 @@ namespace Moonwell.Engine
             get { return tracked; }
         }
 
+#if DEBUG
+        /// <summary>How many things of a kind are tracked, for the debug mode's statistics: the gizmos are those that are not of the game's kinds.</summary>
+        public static int CountOf(int kind)
+        {
+            if (kind == UnitKind)
+            {
+                return unitEntries.Count;
+            }
+
+            if (kind == ItemKind)
+            {
+                return itemEntries.Count;
+            }
+
+            if (kind == DestructableKind)
+            {
+                return destructableEntries.Count;
+            }
+
+            return tracked - unitEntries.Count - itemEntries.Count - destructableEntries.Count;
+        }
+#endif
+
         /// <summary>The cell checks, made on first use.</summary>
         private static CellChecks Checks
         {

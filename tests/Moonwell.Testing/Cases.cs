@@ -18,7 +18,73 @@ namespace Moonwell.Testing
             AddTerrain(list);
             AddAreas(list);
             AddInput(list);
+            AddDebug(list);
             return list;
+        }
+
+        /// <summary>Adds the debug mode's cases; they exist only in a development build, as the debug mode does.</summary>
+        private static void AddDebug(List<Case> list)
+        {
+            // Every case here must be named debug.*: the release Lua test leaves those out of its count by that prefix.
+#if DEBUG
+            list.Add(new Case { Name = "debug.clock.halt", Run = ClockCases.Halt });
+            list.Add(new Case { Name = "debug.clock.step-advances", Run = ClockCases.StepAdvances });
+            list.Add(new Case { Name = "debug.clock.speed", Run = ClockCases.Speed });
+            list.Add(new Case { Name = "debug.clock.no-jump", Run = ClockCases.NoJump });
+            list.Add(new Case { Name = "debug.clock.timer-while-halted", Run = ClockCases.TimerWhileHalted });
+            list.Add(new Case { Name = "debug.clock.halt-inside-timer", Run = ClockCases.HaltInsideTimer });
+            list.Add(new Case { Name = "debug.clock.catchup", Run = ClockCases.Catchup });
+            list.Add(new Case { Name = "debug.session.off-at-start", Run = SessionCases.OffAtStart });
+            list.Add(new Case { Name = "debug.session.toggle", Run = SessionCases.Toggle });
+            list.Add(new Case { Name = "debug.session.halt-holds", Run = SessionCases.HaltHolds });
+            list.Add(new Case { Name = "debug.session.halt-free", Run = SessionCases.HaltFree });
+            list.Add(new Case { Name = "debug.session.map-paused-stays", Run = SessionCases.MapPausedStays });
+            list.Add(new Case { Name = "debug.session.new-unit-held", Run = SessionCases.NewUnitHeld });
+            list.Add(new Case { Name = "debug.session.step-free", Run = SessionCases.StepFree });
+            list.Add(new Case { Name = "debug.session.step-held", Run = SessionCases.StepHeld });
+            list.Add(new Case { Name = "debug.session.step-dropped", Run = SessionCases.StepDropped });
+            list.Add(new Case { Name = "debug.session.resume-mid-step", Run = SessionCases.ResumeMidStep });
+            list.Add(new Case { Name = "debug.session.speeds", Run = SessionCases.Speeds });
+            list.Add(new Case { Name = "debug.session.step-count", Run = SessionCases.StepCount });
+            list.Add(new Case { Name = "debug.session.off-restores", Run = SessionCases.OffRestores });
+            list.Add(new Case { Name = "debug.session.select", Run = SessionCases.Select });
+            list.Add(new Case { Name = "debug.session.select-next", Run = SessionCases.SelectNext });
+            list.Add(new Case { Name = "debug.session.select-nothing", Run = SessionCases.SelectNothing });
+            list.Add(new Case { Name = "debug.session.facade", Run = SessionCases.Facade });
+            list.Add(new Case { Name = "debug.session.halt-from-code-turns-on", Run = SessionCases.HaltFromCodeTurnsOn });
+            list.Add(new Case { Name = "debug.session.held-h-toggles-once", Run = SessionCases.HeldHTogglesOnce });
+            list.Add(new Case { Name = "debug.session.held-unit-removed", Run = SessionCases.HeldUnitRemoved });
+            list.Add(new Case { Name = "debug.session.breakpoint-escapes", Run = SessionCases.BreakpointEscapes });
+            list.Add(new Case { Name = "debug.session.right-ctrl-selects", Run = SessionCases.RightCtrlSelects });
+            list.Add(new Case { Name = "debug.session.step-bare", Run = SessionCases.StepBare });
+            list.Add(new Case { Name = "debug.session.speed-bare", Run = SessionCases.SpeedBare });
+            list.Add(new Case { Name = "debug.session.ended-selected-reads-null", Run = SessionCases.EndedSelectedReadsNull });
+            list.Add(new Case { Name = "debug.panel.status", Run = PanelCases.Status });
+            list.Add(new Case { Name = "debug.panel.unit", Run = PanelCases.SelectedUnit });
+            list.Add(new Case { Name = "debug.panel.numbers", Run = PanelCases.Numbers });
+            list.Add(new Case { Name = "debug.panel.cap", Run = PanelCases.Cap });
+            list.Add(new Case { Name = "debug.panel.throwing-shown", Run = PanelCases.ThrowingShown });
+            list.Add(new Case { Name = "debug.panel.refresh", Run = PanelCases.Refresh });
+            list.Add(new Case { Name = "debug.panel.ended", Run = PanelCases.Ended });
+            list.Add(new Case { Name = "debug.panel.off", Run = PanelCases.Off });
+            list.Add(new Case { Name = "debug.panel.reuse", Run = PanelCases.Reuse });
+            list.Add(new Case { Name = "debug.panel.stats", Run = PanelCases.Stats });
+            list.Add(new Case { Name = "debug.panel.free-halt-follows", Run = PanelCases.FreeHaltFollows });
+            list.Add(new Case { Name = "debug.interactions.candidates-no-tracking", Run = DebugViewCases.CandidatesNoTracking });
+            list.Add(new Case { Name = "debug.interactions.lines", Run = DebugViewCases.Lines });
+            list.Add(new Case { Name = "debug.interactions.paired-by", Run = DebugViewCases.PairedBy });
+            list.Add(new Case { Name = "debug.interactions.draw", Run = DebugViewCases.Draw });
+            list.Add(new Case { Name = "debug.interactions.pair-limit", Run = DebugViewCases.PairLimit });
+            list.Add(new Case { Name = "debug.interactions.gizmo-ends", Run = DebugViewCases.GizmoEnds });
+            list.Add(new Case { Name = "debug.interactions.stats", Run = DebugViewCases.Stats });
+            list.Add(new Case { Name = "debug.interactions.step-length", Run = DebugViewCases.StepLength });
+            list.Add(new Case { Name = "debug.areas.lines", Run = AreasViewCases.Lines });
+            list.Add(new Case { Name = "debug.areas.outlines", Run = AreasViewCases.Outlines });
+            list.Add(new Case { Name = "debug.areas.not-in-any", Run = AreasViewCases.NotInAny });
+            list.Add(new Case { Name = "debug.areas.region", Run = AreasViewCases.Region });
+            list.Add(new Case { Name = "debug.areas.no-tracker", Run = AreasViewCases.NoTracker });
+            list.Add(new Case { Name = "debug.areas.registered", Run = AreasViewCases.Registered });
+#endif
         }
 
         /// <summary>Adds the interactions package's cases.</summary>

@@ -61,10 +61,39 @@ namespace Moonwell.Engine
                 world.ListenDeaths(made.Died, made.Revived);
                 Hooks.AddEnding(made.Ending);
                 current = made;
+#if DEBUG
+                // The package's view in the debug mode, added once: Runtime.Reset clears the views, and with them the tracker.
+                DebugViews.Add(AreasView.Instance);
+#endif
             }
 
             return current;
         }
+
+#if DEBUG
+        /// <summary>The tracker of the installed world and this game when one has been made; null otherwise. Asking makes none.</summary>
+        internal static AreaTracker? Existing()
+        {
+            if (current == null || current.game != Game.Instance || !object.ReferenceEquals(current.World, AreaSystem.WorldIfInstalled))
+            {
+                return null;
+            }
+
+            return current;
+        }
+
+        /// <summary>How many areas are being tracked.</summary>
+        internal int AreaCount
+        {
+            get { return areas.Count; }
+        }
+
+        /// <summary>The area at a place in the order they were added.</summary>
+        internal Area AreaAt(int index)
+        {
+            return areas[index];
+        }
+#endif
 
         /// <summary>Forgets the tracker, so that the next area starts a new one; for the cases.</summary>
         internal static void Forget()
