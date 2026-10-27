@@ -144,6 +144,7 @@ public class ObjectsWriterTests
                 "Kinds/StandardItem.g.cs",
                 "Kinds/StandardUnit.g.cs",
                 "Kinds/StandardUpgrade.g.cs",
+                "Orc/Buffs.g.cs",
                 "Values/ability.json",
                 "Values/buff.json",
                 "Values/destructable.json",

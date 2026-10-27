@@ -98,6 +98,21 @@ public class ExportTablesTests
     }
 
     [Fact]
+    public void a_text_section_names_its_object_whatever_the_case()
+    {
+        // As in the real export: neutralabilitystrings.txt files the Command Aura buff's strings under [Boac], its id
+        // is BOac, and the game and World Editor name it "Command Aura". The skin file spells it BOac.
+        var buffs = ExportTables.Read(MiniExport()).Objects(Kind.Buff, null);
+
+        var aura = Find(buffs, "BOac");
+        Assert.Equal("Command Aura", aura.Values["Bufftip"]);
+        Assert.StartsWith("This unit is under the effects of Command Aura", aura.Values["Buffubertip"]);
+        Assert.Contains("Buffubertip", aura.Wrapped!);
+        Assert.Equal(@"ReplaceableTextures\CommandButtons\BTNGnollCommandAura.blp", aura.Values["Buffart"]);
+        Assert.DoesNotContain(buffs, b => b.Id == "Boac");
+    }
+
+    [Fact]
     public void a_row_only_a_later_table_holds_is_dropped()
     {
         // unitweapons.slk of the fixture, as of the real export, has a row for nrmf that unitdata.slk lacks.

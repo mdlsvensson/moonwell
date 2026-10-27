@@ -392,6 +392,22 @@ namespace Moonwell.Objects
                 }
             }
 
+            /// <summary>Sentinel (Effect) (Xesn).</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("Xesn")]
+            public class SentinelEffect : global::Moonwell.Objects.StandardBuff
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public SentinelEffect()
+                {
+                    IsAnEffect = true;
+                    Name = "Sentinel (Effect)";
+                    Race = global::Moonwell.Objects.UnitRace.NightElf;
+                    Target = "Units\\NightElf\\Owl\\Owl.mdl";
+                    TargetAttachmentPoint1 = "overhead";
+                }
+            }
+
             /// <summary>Shadow Strike (BEsh).</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("BEsh")]
@@ -622,19 +638,6 @@ namespace Moonwell.Objects
                 {
                     IsAnEffect = false;
                     Name = "War Club";
-                    Race = global::Moonwell.Objects.UnitRace.NightElf;
-                }
-            }
-
-            /// <summary>Xesn.</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Xesn")]
-            public class Xesn : global::Moonwell.Objects.StandardBuff
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public Xesn()
-                {
-                    IsAnEffect = true;
                     Race = global::Moonwell.Objects.UnitRace.NightElf;
                 }
             }

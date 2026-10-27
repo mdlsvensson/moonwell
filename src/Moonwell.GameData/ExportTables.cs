@@ -43,7 +43,9 @@ public sealed record ObjectRows(string Id, IReadOnlyDictionary<string, string> V
 /// An object's values are merged in a fixed order, a later source replacing an earlier one on the same key: the
 /// kind's tables in the order of <see cref="Sources"/>, then its func files, skin files and locale strings. The
 /// objects are the ids of the kind's first table (<c>unitdata.slk</c> for units); a row or text section of any other
-/// id is dropped, such as the stray <c>nrmf</c> row of <c>unitweapons.slk</c>.
+/// id is dropped, such as the stray <c>nrmf</c> row of <c>unitweapons.slk</c>. A text section is the object's
+/// whatever its case, as the game and World Editor read it: the Command Aura buff <c>BOac</c> has its strings under
+/// <c>[Boac]</c>. A section that spells an id exactly goes to that id first.
 /// </para>
 /// <para>
 /// A balance set (<c>melee_v0</c>, <c>custom_v0</c>, <c>custom_v1</c>) holds whole replacement files: a file the
@@ -373,18 +375,26 @@ public sealed class ExportTables
         Dictionary<string, HashSet<string>> wrapped,
         List<string> files)
     {
+        var ids = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var id in values.Keys)
+        {
+            ids.TryAdd(id, id);
+        }
+
         foreach (var file in files)
         {
             foreach (var section in ReadSections(file, out var wrappedKeys))
             {
-                if (!values.TryGetValue(section.Key, out var merged))
+                var id = values.ContainsKey(section.Key) ? section.Key : ids.GetValueOrDefault(section.Key);
+                if (id == null)
                 {
                     continue;
                 }
 
-                if (!wrapped.TryGetValue(section.Key, out var keys))
+                var merged = values[id];
+                if (!wrapped.TryGetValue(id, out var keys))
                 {
-                    wrapped[section.Key] = keys = new HashSet<string>(StringComparer.Ordinal);
+                    wrapped[id] = keys = new HashSet<string>(StringComparer.Ordinal);
                 }
 
                 foreach (var entry in section.Value)
