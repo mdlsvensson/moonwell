@@ -655,6 +655,7 @@ namespace Moonwell.Engine
 
             if (stopped)
             {
+                // No Place: a stopped step keeps x, y and z at its start, where the last step's Place put the effects.
                 if (pull <= friction)
                 {
                     Rest(missile);
