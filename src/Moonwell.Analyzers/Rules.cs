@@ -158,15 +158,24 @@ public static class Rules
 
     public static readonly DiagnosticDescriptor UnseenReaction = new(
         "MW0036",
-        "Damage reaction the package never calls",
+        "Reaction a package never calls",
         "'{0}' {1}",
-        "Damage",
+        "Reactions",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "The damage package's interfaces give every reaction an empty body, so the compiler accepts a class that only seems to write one. The package calls a reaction that is a public, non-static method of the interface's name and parameter, on a unit's class or its components (buffs too) for IDamageSource and IDamageTarget, and on the game's and players' components for IDamageWatch. The rule rejects a method named like a reaction that is not one (not public, static, another parameter, an explicit implementation, or a reaction of an interface the class does not implement), a name renamed in Moonwell 0.3, a public method taking a Hit or a Burst whose name is a letter off a reaction (one added, removed, changed, or two swapped) in a class with reactions, a reaction in a unit or component that lacks its interface (an abstract class is left alone: its subclasses may list the interface), and an interface on a class the package never calls. #pragma warning disable MW0036 keeps a helper's name.");
+        description: "The damage package's and the input package's interfaces give every reaction an empty body, so the compiler accepts a class that only seems to write one. A package calls a reaction that is a public, non-static method of the interface's name and parameters: on a unit's class or its components (buffs too) for IDamageSource and IDamageTarget, and on the game's and players' components for IDamageWatch and IMouseWatch. The rule rejects a method named like a reaction that is not one (not public, static, other parameters, an explicit implementation, or a reaction of an interface the class does not implement), a name renamed in Moonwell 0.3, a public method shaped like a reaction (a Hit or a Burst; a Mouse and a button) whose name is a letter off a reaction (one added, removed, changed, or two swapped) in a class with reactions, a reaction in a class that lacks its interface (an abstract class is left alone: its subclasses may list the interface), and an interface on a class the package never calls. For IMouseWatch an explicit implementation and a method with other parameters run in the game's Lua, which calls them by name, and not on .NET, so the two disagree. #pragma warning disable MW0036 keeps a helper's name.");
 
-    /// <summary>The rules for the damage package's reactions.</summary>
-    public static ImmutableArray<DiagnosticDescriptor> Reactions { get; } = ImmutableArray.Create(UnseenReaction);
+    public static readonly DiagnosticDescriptor HiddenReaction = new(
+        "MW0041",
+        "Reaction that never runs",
+        "'{0}' {1}",
+        "Reactions",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "A reaction of a Moonwell class (a unit's OnDamaged, a component's OnKill, a game component's OnGameStart, a buff's OnTick, an area's OnUnitEntered) is a virtual method the map overrides. One written without override, or with new, hides it: the compiler only warns (CS0114), and Moonwell never calls it. A method named On... like a reaction but with other parameters never runs as the reaction either, and on .NET Moonwell's lookup of reactions by name fails on it when the class is added, while the game's Lua takes it.");
+
+    /// <summary>The rules for reactions: the packages' interfaces (damage, mouse) and Moonwell's virtual methods.</summary>
+    public static ImmutableArray<DiagnosticDescriptor> Reactions { get; } = ImmutableArray.Create(UnseenReaction, HiddenReaction);
 
     public static readonly DiagnosticDescriptor LiveInDeclaration = new(
         "MW0012",
