@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    Reads the game's object tables (a war3.w3mod export): the fields, choice types and standard objects of each kind.
-    Moonwell's generator writes Moonwell.Objects from them; Moonwell Editor reads them as a package.
+    Reads the game's object tables from a Warcraft III install's storage (or a war3.w3mod export of it): the fields,
+    choice types and standard objects of each kind, and the install's other files (icons, models) by the paths object
+    data writes. Moonwell's generator writes Moonwell.Objects from them; Moonwell Editor reads them as a package.
   -->
   <PropertyGroup>
-    <Description>Reads Warcraft III's object tables from a war3.w3mod export: each kind's fields, choice types and standard objects.</Description>
+    <Description>Reads Warcraft III's object tables from the game's install (or a war3.w3mod export): each kind's fields, choice types and standard objects, and the install's icons and models.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
@@ -16,6 +17,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="field-names.txt" LogicalName="field-names.txt" />
+    <InternalsVisibleTo Include="Moonwell.Generator.Tests" />
   </ItemGroup>
 
 </Project>

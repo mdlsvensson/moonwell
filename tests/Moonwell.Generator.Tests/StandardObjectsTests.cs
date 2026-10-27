@@ -10,14 +10,14 @@ public class StandardObjectsTests
             Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Fixtures", "MiniExport", "war3.w3mod"));
     }
 
-    private static IReadOnlyList<StandardObject> Of(ExportTables tables, Kind kind)
+    private static IReadOnlyList<StandardObject> Of(GameTables tables, Kind kind)
     {
         return StandardObjects.Of(tables, kind, Fields.Of(tables, kind));
     }
 
     private static IReadOnlyList<StandardObject> Of(Kind kind)
     {
-        return Of(ExportTables.Read(MiniExportFolder()), kind);
+        return Of(GameTables.OpenExport(MiniExportFolder()), kind);
     }
 
     private static StandardObject Find(IReadOnlyList<StandardObject> objects, string id)
@@ -36,9 +36,9 @@ public class StandardObjectsTests
             CopyFolder(MiniExportFolder(), _folder);
         }
 
-        public ExportTables Tables()
+        public GameTables Tables()
         {
-            return ExportTables.Read(_folder);
+            return GameTables.OpenExport(_folder);
         }
 
         /// <summary>Replaces the first <paramref name="find"/> after the first <paramref name="anchor"/> in a file.</summary>
@@ -505,7 +505,7 @@ public class StandardObjectsTests
     [Fact]
     public void a_world_editor_string_key_as_a_name_is_resolved_to_the_label()
     {
-        var tables = ExportTables.Read(MiniExportFolder());
+        var tables = GameTables.OpenExport(MiniExportFolder());
         var doodad = Find(Of(tables, Kind.Doodad), "ZPlp");
         var destructable = Find(Of(tables, Kind.Destructable), "LTlt");
 
@@ -516,7 +516,7 @@ public class StandardObjectsTests
     [Fact]
     public void the_values_keep_the_raw_key()
     {
-        var tables = ExportTables.Read(MiniExportFolder());
+        var tables = GameTables.OpenExport(MiniExportFolder());
 
         Assert.Equal("WESTRING_DOOD_LPLP", Find(Of(tables, Kind.Doodad), "ZPlp").Values["dnam"]);
         Assert.Equal("WESTRING_DEST_SUMMER_TREE_WALL", Find(Of(tables, Kind.Destructable), "LTlt").Values["bnam"]);

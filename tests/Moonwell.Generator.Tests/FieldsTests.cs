@@ -5,9 +5,9 @@ namespace Moonwell.Generator.Tests;
 
 public class FieldsTests
 {
-    private static ExportTables MiniExport()
+    private static GameTables MiniExport()
     {
-        return ExportTables.Read(Path.GetFullPath(
+        return GameTables.OpenExport(Path.GetFullPath(
             Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Fixtures", "MiniExport", "war3.w3mod")));
     }
 
