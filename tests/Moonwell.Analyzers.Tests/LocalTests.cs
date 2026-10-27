@@ -760,4 +760,28 @@ public class LocalTests
             });
             """));
     }
+
+    [Fact]
+    public void a_pattern_on_another_units_name_in_a_constructor_is_mw0002()
+    {
+        // Wave 1: every pattern input counted as the object itself.
+        Assert.Equal(new[] { "MW0002: Name", "MW0002: Name", "MW0002: Name" }, MapCode.CheckFile("""
+            using Moonwell;
+            using Moonwell.Objects;
+
+            namespace Map
+            {
+                public class Mage : Human.Units.Footman
+                {
+                    public Mage(Unit other, Unit[] party)
+                    {
+                        var guard = other is Unit { Name: "Guard" };
+                        var kind = other switch { { Name: "Guard" } => 1, _ => 0 };
+                        var first = party is [{ Name: "Guard" }, ..];
+                        var self = this is { Name: "Mage" };
+                    }
+                }
+            }
+            """));
+    }
 }

@@ -354,9 +354,11 @@ public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
                 return false;
             }
 
-            if (instance is IInstanceReferenceOperation)
+            if (instance is IInstanceReferenceOperation reference)
             {
-                return InDeclaredConstructor(operation);
+                // In a pattern the input is what the pattern tests, which is the object itself only for this is { Name: ... }.
+                return (reference.ReferenceKind != InstanceReferenceKind.PatternInput || PatternInput(operation) is IInstanceReferenceOperation { ReferenceKind: InstanceReferenceKind.ContainingTypeInstance })
+                    && InDeclaredConstructor(operation);
             }
 
             return instance switch
@@ -365,6 +367,41 @@ public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
                 IInvocationOperation { TargetMethod: { Name: "Default", IsGenericMethod: true } method } => IsRuntime(method),
                 _ => false,
             };
+        }
+
+        /// <summary>
+        /// The value a property pattern's member is read on: the value an is, a switch or a switch expression tests, when
+        /// the property pattern is at the top of the pattern; null when it is nested (in a list, a position or another
+        /// property pattern), whose input is a part of that value.
+        /// </summary>
+        private static IOperation? PatternInput(IOperation member)
+        {
+            var up = member.Parent;
+            if (up is not IPropertySubpatternOperation)
+            {
+                return null;
+            }
+
+            up = up.Parent;
+            if (up is not IRecursivePatternOperation)
+            {
+                return null;
+            }
+
+            up = up.Parent;
+            while (up is IBinaryPatternOperation or INegatedPatternOperation)
+            {
+                up = up.Parent;
+            }
+
+            var value = up switch
+            {
+                IIsPatternOperation test => test.Value,
+                ISwitchExpressionArmOperation { Parent: ISwitchExpressionOperation choice } => choice.Value,
+                IPatternCaseClauseOperation { Parent: ISwitchCaseOperation { Parent: ISwitchOperation choice } } => choice.Value,
+                _ => null,
+            };
+            return value == null ? null : Unwrap(value);
         }
 
         // nameof(Name) names the member without reading it.
