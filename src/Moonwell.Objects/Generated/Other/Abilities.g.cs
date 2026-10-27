@@ -14,41 +14,6 @@ namespace Moonwell.Objects
         /// @CSharpLua.Ignore
         public static partial class Abilities
         {
-            /// <summary>AEqu.</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("AEqu")]
-            public class AEqu : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public AEqu()
-                {
-                    CastTime = Levels(0f);
-                    CheckDependencies = true;
-                    Cooldown = Levels(0f);
-                    Duration = Levels(0f);
-                    EquipmentLevelThreshold = Levels(10, 15);
-                    HeroAbility = false;
-                    HeroDuration = Levels(0f);
-                    ItemAbility = false;
-                    LevelCount = 3;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(0);
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    RequiredLevel = 0;
-                    UseNewDefaultLevelCap = true;
-                }
-
-                /// <summary>The field <c>equ1</c>.</summary>
-                [global::Moonwell.Objects.Field("equ1", Label = "Equipment Level Threshold")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<int> EquipmentLevelThreshold
-                {
-                    get { return Fields.GetLevels<int>(this, "equ1"); }
-                    protected set { Fields.Put("equ1", value); }
-                }
-            }
-
             /// <summary>AHw2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AHw2")]
@@ -848,7 +813,7 @@ namespace Moonwell.Objects
                 {
                     Area = Levels(900f);
                     AttackDamageIncrease = Levels(0.1f);
-                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.BOac>();
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.CommandAura>();
                     CastTime = Levels(0f);
                     CheckDependencies = false;
                     Cooldown = Levels(0f);
@@ -1686,41 +1651,6 @@ namespace Moonwell.Objects
                 public global::Moonwell.Objects.ObjectList<global::Moonwell.Ability> AbilityUpgrade4
                 {
                     get { return Fields.GetList<global::Moonwell.Ability>(this, "Neg6"); }
-                }
-            }
-
-            /// <summary>Aisy.</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("Aisy")]
-            public class Aisy : global::Moonwell.Objects.StandardAbility
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public Aisy()
-                {
-                    AttackSpeedIncrease = Levels(0.2f);
-                    CastTime = Levels(0f);
-                    CheckDependencies = false;
-                    Cooldown = Levels(0f);
-                    Duration = Levels(0f);
-                    HeroAbility = false;
-                    HeroDuration = Levels(0f);
-                    ItemAbility = true;
-                    LevelCount = 1;
-                    LevelSkipRequirement = 0;
-                    ManaCost = Levels(0);
-                    PriorityForSpellSteal = 0;
-                    Race = global::Moonwell.Objects.UnitRace.Other;
-                    RequiredLevel = 0;
-                    UseNewDefaultLevelCap = false;
-                }
-
-                /// <summary>The field <c>Isx1</c>.</summary>
-                [global::Moonwell.Objects.Field("Isx1", Label = "Attack Speed Increase")]
-                [global::Moonwell.Objects.Limits(0, 99999)]
-                public global::Moonwell.Objects.Levels<float> AttackSpeedIncrease
-                {
-                    get { return Fields.GetLevels<float>(this, "Isx1"); }
-                    protected set { Fields.Put("Isx1", value); }
                 }
             }
 
@@ -4998,7 +4928,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Cargo Hold Death (Achd).</summary>
+            /// <summary>Cargo Hold Death (Neutral Hostile), Achd.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Achd")]
             public class CargoHoldDeath : global::Moonwell.Objects.StandardAbility
@@ -5011,6 +4941,7 @@ namespace Moonwell.Objects
                     CheckDependencies = true;
                     Cooldown = Levels(0f);
                     Duration = Levels(60f);
+                    EditorSuffix = "(Neutral Hostile)";
                     HeroAbility = false;
                     HeroDuration = Levels(30f);
                     ItemAbility = false;
@@ -7679,6 +7610,43 @@ namespace Moonwell.Objects
                 {
                     get { return Fields.GetLevels<int>(this, "inv6"); }
                     protected set { Fields.Put("inv6", value); }
+                }
+            }
+
+            /// <summary>Equipment Slots (Hero), AEqu.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("AEqu")]
+            public class EquipmentSlots : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public EquipmentSlots()
+                {
+                    CastTime = Levels(0f);
+                    CheckDependencies = true;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Hero)";
+                    EquipmentLevelThreshold = Levels(10, 15);
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    ItemAbility = false;
+                    LevelCount = 3;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Equipment Slots";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    RequiredLevel = 0;
+                    UseNewDefaultLevelCap = true;
+                }
+
+                /// <summary>The field <c>equ1</c>.</summary>
+                [global::Moonwell.Objects.Field("equ1", Label = "Equipment Level Threshold")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<int> EquipmentLevelThreshold
+                {
+                    get { return Fields.GetLevels<int>(this, "equ1"); }
+                    protected set { Fields.Put("equ1", value); }
                 }
             }
 
@@ -17402,6 +17370,44 @@ namespace Moonwell.Objects
                 }
             }
 
+            /// <summary>Item Attack Speed Bonus (Greater), Aisy.</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("Aisy")]
+            public class ItemAttackSpeedBonusAisy : global::Moonwell.Objects.StandardAbility
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public ItemAttackSpeedBonusAisy()
+                {
+                    AttackSpeedIncrease = Levels(0.2f);
+                    CastTime = Levels(0f);
+                    CheckDependencies = false;
+                    Cooldown = Levels(0f);
+                    Duration = Levels(0f);
+                    EditorSuffix = "(Greater)";
+                    HeroAbility = false;
+                    HeroDuration = Levels(0f);
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGlove.blp";
+                    ItemAbility = true;
+                    LevelCount = 1;
+                    LevelSkipRequirement = 0;
+                    ManaCost = Levels(0);
+                    Name = "Item Attack Speed Bonus";
+                    PriorityForSpellSteal = 0;
+                    Race = global::Moonwell.Objects.UnitRace.Other;
+                    RequiredLevel = 0;
+                    UseNewDefaultLevelCap = false;
+                }
+
+                /// <summary>The field <c>Isx1</c>.</summary>
+                [global::Moonwell.Objects.Field("Isx1", Label = "Attack Speed Increase")]
+                [global::Moonwell.Objects.Limits(0, 99999)]
+                public global::Moonwell.Objects.Levels<float> AttackSpeedIncrease
+                {
+                    get { return Fields.GetLevels<float>(this, "Isx1"); }
+                    protected set { Fields.Put("Isx1", value); }
+                }
+            }
+
             /// <summary>Item Aura Command 5 (AIcq).</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("AIcq")]
@@ -17411,7 +17417,7 @@ namespace Moonwell.Objects
                 public ItemAuraCommand5()
                 {
                     Area = Levels(900f);
-                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.BOac>();
+                    Buffs.Set<global::Moonwell.Objects.Orc.Buffs.CommandAura>();
                     CastTime = Levels(0f);
                     CheckDependencies = false;
                     Cooldown = Levels(0f);

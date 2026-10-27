@@ -14,23 +14,6 @@ namespace Moonwell.Objects
         /// @CSharpLua.Ignore
         public static partial class Buffs
         {
-            /// <summary>BOac.</summary>
-            /// @CSharpLua.Ignore
-            [global::Moonwell.Objects.Standard("BOac")]
-            public class BOac : global::Moonwell.Objects.StandardBuff
-            {
-                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
-                public BOac()
-                {
-                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGnollCommandAura.blp";
-                    IsAnEffect = false;
-                    Race = global::Moonwell.Objects.UnitRace.Orc;
-                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.Medium;
-                    Target = "Abilities\\Spells\\Other\\GeneralAuraTarget\\GeneralAuraTarget.mdl";
-                    TargetAttachmentPoint1 = "origin";
-                }
-            }
-
             /// <summary>Berserk (Bbsk).</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Bbsk")]
@@ -212,6 +195,25 @@ namespace Moonwell.Objects
                     IsAnEffect = true;
                     Name = "Burning Oil (Effect)";
                     Race = global::Moonwell.Objects.UnitRace.Orc;
+                }
+            }
+
+            /// <summary>Command Aura (BOac).</summary>
+            /// @CSharpLua.Ignore
+            [global::Moonwell.Objects.Standard("BOac")]
+            public class CommandAura : global::Moonwell.Objects.StandardBuff
+            {
+                /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
+                public CommandAura()
+                {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNGnollCommandAura.blp";
+                    IsAnEffect = false;
+                    Race = global::Moonwell.Objects.UnitRace.Orc;
+                    RequiredSpellDetail = global::Moonwell.Objects.SpellDetail.Medium;
+                    Target = "Abilities\\Spells\\Other\\GeneralAuraTarget\\GeneralAuraTarget.mdl";
+                    TargetAttachmentPoint1 = "origin";
+                    Tooltip = "Command Aura";
+                    TooltipExtended = "This unit is under the effects of Command Aura; it has increased attack damage.";
                 }
             }
 

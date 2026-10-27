@@ -1,5 +1,5 @@
 ID;PWXL;N;E
-B;X9;Y2;D0
+B;X9;Y3;D0
 C;X1;Y1;K"alias"
 C;X2;K"code"
 C;X3;K"comments"
@@ -17,5 +17,14 @@ C;X5;K0
 C;X6;K1
 C;X7;K"hero"
 C;X8;K"human"
+C;X9;K1
+C;X1;Y3;K"BOac"
+C;X2;K"BOac"
+C;X3;K"Command Aura       "
+C;X4;K0
+C;X5;K0
+C;X6;K1
+C;X7;K"hero"
+C;X8;K"orc"
 C;X9;K1
 E

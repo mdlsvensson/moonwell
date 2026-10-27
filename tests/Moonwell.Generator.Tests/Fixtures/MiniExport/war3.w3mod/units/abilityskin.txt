@@ -17,3 +17,7 @@ Targetart=Abilities\Spells\Human\HolyBolt\HolyBoltSpecialArt.mdl
 skinType=buff
 Buffart=ReplaceableTextures\CommandButtons\BTNBlizzard.blp
 Targetart=Abilities\Spells\Other\FrostDamage\FrostDamage.mdl
+
+[BOac]
+skinType=buff
+Buffart=ReplaceableTextures\CommandButtons\BTNGnollCommandAura.blp

@@ -2363,8 +2363,11 @@ namespace Moonwell.Objects
                 /// <summary>Makes the object with the values of the base tables, World Editor's Default.</summary>
                 public SpellShield()
                 {
+                    Icon = "ReplaceableTextures\\CommandButtons\\BTNSpellShieldAmulet.blp";
                     IsAnEffect = false;
                     Race = global::Moonwell.Objects.UnitRace.Other;
+                    Target = "Abilities\\Spells\\Items\\SpellShieldAmulet\\SpellShieldCaster.mdl";
+                    TargetAttachmentPoint1 = "origin";
                     Tooltip = "Spell Shield";
                     TooltipExtended = "A protective shield that blocks a spell.";
                 }
