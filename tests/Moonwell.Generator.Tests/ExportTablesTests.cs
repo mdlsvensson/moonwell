@@ -1,4 +1,4 @@
-using Moonwell.Generator.Objects;
+using Moonwell.GameData;
 
 namespace Moonwell.Generator.Tests;
 

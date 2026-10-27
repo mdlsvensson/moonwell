@@ -1,3 +1,4 @@
+using Moonwell.GameData;
 using Moonwell.Generator;
 using Moonwell.Generator.Objects;
 

@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using Moonwell.GameData;
 
 namespace Moonwell.Generator.Objects;
 

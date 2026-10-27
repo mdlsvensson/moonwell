@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Moonwell.GameData;
 using Moonwell.Generator.Objects;
 
 namespace Moonwell.Generator.Tests;

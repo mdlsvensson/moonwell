@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Moonwell.Generator.Objects;
+namespace Moonwell.GameData;
 
 /// <summary>One standard object of the game: its identity and its field values under the base tables and each balance set.</summary>
 /// <param name="Kind">The kind of object.</param>
@@ -423,6 +423,11 @@ public static class StandardObjects
             }
         }
 
+        /// <summary>Whether the field applies to an object.</summary>
+        /// <param name="kind">The object's kind.</param>
+        /// <param name="code">For an ability, its code, which the field's <c>notSpecific</c> list may exclude.</param>
+        /// <param name="hero">For a unit, whether it is a hero.</param>
+        /// <param name="building">For a unit, whether it is a building.</param>
         /// <param name="own">For an ability, the ids of the fields specific to it (<see cref="Fields.SpecificOf"/>).</param>
         public bool Applies(Kind kind, string? code, bool hero, bool building, IReadOnlySet<string>? own)
         {

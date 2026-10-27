@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
-using ObjectKind = Moonwell.Generator.Objects.Kind;
+using Moonwell.GameData;
+using ObjectKind = Moonwell.GameData.Kind;
 
 namespace Moonwell.Generator.Objects;
 

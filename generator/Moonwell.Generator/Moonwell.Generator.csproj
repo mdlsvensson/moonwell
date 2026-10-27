@@ -6,11 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Moonwell.War3Net.IO.Slk" Version="6.0.2-moonwell.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Objects\field-names.txt" LogicalName="field-names.txt" />
+    <!-- Reads the game's object tables, which Objects/ writes the classes of Moonwell.Objects from. -->
+    <ProjectReference Include="..\..\src\Moonwell.GameData\Moonwell.GameData.csproj" />
   </ItemGroup>
 
 </Project>

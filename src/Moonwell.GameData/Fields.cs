@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Moonwell.Generator.Objects;
+namespace Moonwell.GameData;
 
 /// <summary>The type of a field's value, from the metadata <c>type</c>.</summary>
 public enum FieldType

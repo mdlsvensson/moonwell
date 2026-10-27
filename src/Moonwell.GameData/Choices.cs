@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Moonwell.Generator.Objects;
+namespace Moonwell.GameData;
 
 /// <summary>How the values of a choice type make one field value.</summary>
 public enum ChoiceForm
@@ -91,7 +91,7 @@ public static class Choices
     /// Whether the enum of a metadata type is core Moonwell's (<c>attackType</c> is <c>Moonwell.AttackType</c>), written by
     /// hand in <c>src/Moonwell/Types</c> and compiled to the map's Lua with its names, rather than generated into
     /// <c>Moonwell.Objects</c>. The fields hold the core enum, and <c>Moonwell.Objects</c> keeps the game's texts of its
-    /// members (<see cref="ObjectsWriter.Choices"/>).
+    /// members (<c>ObjectsWriter.Choices</c> in Moonwell's generator).
     /// </summary>
     public static bool IsCore(string type)
     {
@@ -113,7 +113,7 @@ public static class Choices
     /// its order: the generated fields and the game's texts take the data's.
     /// </summary>
     /// <param name="choice">A core choice type.</param>
-    /// <param name="members">The core enum's members in order (<see cref="RuntimeMembers.EnumMembers"/>); null when Moonwell has no such enum.</param>
+    /// <param name="members">The core enum's members in order (<c>RuntimeMembers.EnumMembers</c> in Moonwell's generator); null when Moonwell has no such enum.</param>
     /// <exception cref="InvalidOperationException">The members differ, or there is no enum.</exception>
     public static void CheckCore(ChoiceType choice, IReadOnlyList<(string Name, int Value)>? members)
     {

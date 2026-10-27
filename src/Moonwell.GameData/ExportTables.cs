@@ -1,7 +1,7 @@
 using System.Text;
 using War3Net.IO.Slk;
 
-namespace Moonwell.Generator.Objects;
+namespace Moonwell.GameData;
 
 /// <summary>The seven kinds of standard game object.</summary>
 public enum Kind

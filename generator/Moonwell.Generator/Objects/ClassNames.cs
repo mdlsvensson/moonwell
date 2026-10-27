@@ -1,3 +1,5 @@
+using Moonwell.GameData;
+
 namespace Moonwell.Generator.Objects;
 
 /// <summary>The class name of one standard object: a class nested in the classes of its group and kind.</summary>
