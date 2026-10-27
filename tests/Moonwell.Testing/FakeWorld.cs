@@ -417,20 +417,50 @@ namespace Moonwell.Testing
             return null;
         }
 
-        /// <summary>Moves time forward by the seconds, calling Runtime.Wake at each wake request on the way, WakeLate after the time it asked for. The frame of the last calls ends first: the drops that waited for it fire, and the units removed in it read type id 0.</summary>
+        /// <summary>Moves time forward by the seconds, calling Runtime.Wake at each wake request on the way, WakeLate after the time it asked for. The frame of the last calls ends first: the drops that waited for it fire, and the units removed in it read type id 0. The second wake in a row that would not move the time comes at the game's next tick instead (NextTick), as the game's own clock moves on.</summary>
         public void Advance(float seconds)
         {
             var target = Time + seconds;
             DeliverPendingDrops();
             EndPendingRemovals();
+            var standing = 0;
             while (WakeAt.HasValue && WakeAt.Value + WakeLate <= target + 0.001f)
             {
-                Time = WakeAt.Value + WakeLate;
+                var next = WakeAt.Value + WakeLate;
+                standing = next <= Time ? standing + 1 : 0;
+                if (standing >= 2)
+                {
+                    next = NextTick(Time);
+                    standing = 0;
+                    if (next > target + 0.001f)
+                    {
+                        break;
+                    }
+                }
+
+                Time = next;
                 WakeAt = null;
                 Runtime.Wake();
             }
 
             Time = target;
+        }
+
+        /// <summary>
+        /// The game's next tick after a time: 1/256 s later, or the smallest doubling of that which moves a time so late. In
+        /// the game's Lua an addition drops what is below two float steps (game-facts, 10-27), so late in a game a short wake
+        /// can ask for the time it is now again and again; the game's own clock still moves on, and a wake of 0 s comes at
+        /// its next tick.
+        /// </summary>
+        private static float NextTick(float time)
+        {
+            var tick = 1.0f / 256.0f;
+            while (time + tick <= time)
+            {
+                tick *= 2.0f;
+            }
+
+            return time + tick;
         }
 
         /// <summary>Makes the units removed in the frame that ends read type id 0.</summary>

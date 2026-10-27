@@ -266,12 +266,13 @@ namespace Moonwell.Testing
         /// <summary>
         /// Every with 0, a negative period or NaN is reported and refused in every build: each gives an ended timer that never
         /// runs, and the log names Timer.Every. The case ends each after 10000 runs, which it reaches in one instant when it runs.
+        /// The game's Lua has no NaN (float.NaN is 1 there), so there the case gives Every 0 and -1 only.
         /// </summary>
         public static void EveryZeroRefused(FakeWorld world)
         {
             var runs = 0;
             var timers = new List<Timer>();
-            var periods = new float[] { 0.0f, -1.0f, float.NaN };
+            var periods = GameNumbers.HasNaN ? new float[] { 0.0f, -1.0f, float.NaN } : new float[] { 0.0f, -1.0f };
             for (var i = 0; i < periods.Length; i++)
             {
                 Timer? timer = null;
@@ -297,7 +298,8 @@ namespace Moonwell.Testing
             }
 
             var reported = LoggedWith(world, "Timer.Every failed: seconds must be more than 0");
-            Expect.Equal("0 3 3", runs + " " + ended + " " + reported, "runs of Every(0), Every(-1) and Every(NaN) in 1 s, the timers ended, and the lines reported");
+            var count = periods.Length;
+            Expect.Equal("0 " + count + " " + count, runs + " " + ended + " " + reported, "runs of Every(0), Every(-1) and Every(NaN) in 1 s, the timers ended, and the lines reported");
         }
 
         /// <summary>Inside a repeating timer's own run, Remaining is the time to its next run: 0.5 s for Every(0.5).</summary>
