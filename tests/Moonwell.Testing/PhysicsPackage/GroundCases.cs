@@ -283,6 +283,54 @@ namespace Moonwell.Testing
         }
 
         /// <summary>
+        /// On the ground a Bounce is pulled down a slope, and rested, by Physics.Gravity, as a Slide is, whatever its own
+        /// Gravity: with Gravity 1,715 (what Fire gives flight.arc's shot) and the default Friction 200, a Bounce laid on a
+        /// slope of 10 degrees rests at once, as a Slide does, and on a slope of 1 in 2 goes down no further than the Slide
+        /// beside it in 2 s. By its own Gravity it slid 189 down the gentle slope and never rested, and went 998 down the
+        /// steep one where the Slide went 278.
+        /// </summary>
+        public static void BounceOwnGravity(FakeWorld world)
+        {
+            var heights = new float[12];
+            for (var i = 0; i < heights.Length; i++)
+            {
+                heights[i] = i * SlopeRise;
+            }
+
+            Along(heights);
+            var gentle = Laid(Contact.Bounce, 1715.0f, 700.0f, 64.0f);
+            var gentleSlide = Laid(Contact.Slide, 1715.0f, 700.0f, 192.0f);
+            Steps(world, 32);
+            Expect.Equal(1, gentleSlide.Rested, "the Slide rests on the slope of 10 degrees");
+            Expect.Equal(1, gentle.Rested, "and so does the Bounce, OnRest once");
+            Within(700.0f, gentle.X, 1.0f, "where it lay");
+
+            var steep = new float[16];
+            for (var i = 0; i < steep.Length; i++)
+            {
+                steep[i] = i * 64.0f;
+            }
+
+            Along(steep);
+            var bounce = Laid(Contact.Bounce, 1715.0f, 1000.0f, 64.0f);
+            var slide = Laid(Contact.Slide, 1715.0f, 1000.0f, 192.0f);
+            Steps(world, 64);
+            Expect.Equal(0, bounce.Rested, "on the slope of 1 in 2 the Bounce does not rest");
+            Expect.True(bounce.X < 900.0f, "it goes down; at " + bounce.X);
+            Expect.True(bounce.X >= slide.X - 1.0f, "no further than the Slide: at " + bounce.X + " against " + slide.X);
+        }
+
+        /// <summary>Lays a ball with a GroundContact and a Gravity on the ground at a place, with no velocity.</summary>
+        private static Ball Laid(Contact contact, float gravity, float x, float y)
+        {
+            var ball = new Ball();
+            ball.GroundContact = contact;
+            ball.Gravity = gravity;
+            Missile.Create(ball, x, y, Physics.GroundHeight(x, y) + 16.0f);
+            return ball;
+        }
+
+        /// <summary>
         /// A cast to an end out of any map gives false at once, instead of sampling every 32 along it for ever: an end at
         /// 2^127 along x, which 1 / 0 is in the game's Lua, an infinite end, and, where the cases run with NaN, a NaN end. A
         /// cast 100,000 straight down still meets the ground.

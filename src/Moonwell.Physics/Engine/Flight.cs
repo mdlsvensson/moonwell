@@ -373,7 +373,8 @@ namespace Moonwell.Engine
                     // A Bounce keeps the step's gravity along the ground, as the guide's loop keeps it when it slides on
                     // after a hit: without it, a Bounce on a slope meets it at the start of every step and stands where it
                     // is. A Slide that comes along the ground rolls, and Roll pulls it down the slope against its Friction.
-                    var pull = missile.gravity * step;
+                    // On the ground both are pulled by Physics.Gravity, whatever their own (an Arc gives one its own).
+                    var pull = Physics.Current().Gravity * step;
                     vx += pull * nz * nx;
                     vy += pull * nz * ny;
                     vz -= pull * (1.0f - nz * nz);
@@ -411,7 +412,7 @@ namespace Moonwell.Engine
         /// None and Pass let it on through to where its move took it (endX, endY, endZ). A Bounce or Slide that was on the
         /// ground already (<paramref name="along"/>) and comes back to it slower than SlideSpeed goes on along it with no
         /// impact, a Slide rolling, and a Bounce losing its Friction a second for the step, as a Slide rolling does: stopped
-        /// where the slope's pull is no more than its friction, it rests and OnRest runs. A Stop that touches the ground
+        /// where the slope's pull (by Physics.Gravity, as Roll's) is no more than its friction, it rests and OnRest runs. A Stop that touches the ground
         /// stops, however slowly.
         /// </summary>
         private static void Meet(Missile missile, float step, Grid grid, IPhysicsWorld world, Entry entry, float hitX, float hitY, float hitZ, float nx, float ny, float nz, float vx, float vy, float vz, float endX, float endY, float endZ, bool along)
@@ -449,7 +450,7 @@ namespace Moonwell.Engine
                         missile.vz = 0.0f;
                         Place(missile, world, hitX, hitY, hitZ + radius);
                         var steep = 1.0f - nz * nz;
-                        if ((steep > 0.0f ? missile.gravity * Trig.Sqrt(steep) : 0.0f) <= friction)
+                        if ((steep > 0.0f ? Physics.Current().Gravity * Trig.Sqrt(steep) : 0.0f) <= friction)
                         {
                             Rest(missile);
                         }
