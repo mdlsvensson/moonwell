@@ -43,11 +43,11 @@ public static class Rules
     public static readonly DiagnosticDescriptor HashLoop = new(
         "MW0004",
         "Loop over a Dictionary or HashSet",
-        "A {0} loops in no fixed order, which can differ between machines; use OrderedMap or OrderedSet",
+        "{0} loops in no fixed order, which can differ between machines; use OrderedMap or OrderedSet",
         Category,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "In the game's Lua a Dictionary or HashSet gives its items in no fixed order. Lookups are fine; loops are not." + Silence);
+        description: "In the game's Lua a Dictionary or HashSet gives its items in no fixed order. Lookups are fine; loops are not: foreach, LINQ, CopyTo, a copy into a list, and a Dictionary or HashSet held as an IEnumerable, ICollection or IReadOnlyCollection. A foreach or LINQ through IDictionary, IReadOnlyDictionary, ISet or IReadOnlySet (or their Keys and Values) is one too, since in a map only a Dictionary or a HashSet implements them." + Silence);
 
     public static readonly DiagnosticDescriptor NumberType = new(
         "MW0005",

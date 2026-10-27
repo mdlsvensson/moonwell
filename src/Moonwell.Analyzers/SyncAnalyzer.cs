@@ -37,6 +37,7 @@ public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
                 OperationKind.Conversion, OperationKind.Using, OperationKind.UsingDeclaration, OperationKind.Loop, OperationKind.LocalReference,
                 OperationKind.EventReference);
             start.RegisterOperationAction(checker.Delegates, OperationKind.Argument, OperationKind.ParameterReference);
+            start.RegisterOperationAction(checker.HashArgument, OperationKind.Argument);
             start.RegisterSymbolAction(checker.Declaration, SymbolKind.Field, SymbolKind.Property, SymbolKind.Method, SymbolKind.NamedType);
         });
     }
@@ -57,8 +58,10 @@ public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
         private readonly INamedTypeSymbol? localSafe;
         private readonly INamedTypeSymbol? syncUnchecked;
         private readonly INamedTypeSymbol?[] hashTypes;
-        private readonly INamedTypeSymbol? enumerable;
-        private readonly INamedTypeSymbol? enumerableOfT;
+        /// <summary>The interfaces of the collections that give their items in no fixed order.</summary>
+        private readonly INamedTypeSymbol?[] hashInterfaces;
+        /// <summary>The interfaces that hand out a collection's items: what a loop or LINQ goes through.</summary>
+        private readonly INamedTypeSymbol?[] collections;
         private readonly INamedTypeSymbol? handle;
 
         /// <summary>What each followed node of the map reaches; a node that reaches nothing rejected maps to null.</summary>
@@ -99,8 +102,21 @@ public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
                 compilation.GetTypeByMetadataName("System.Collections.Generic.Dictionary`2+ValueCollection"),
                 compilation.GetTypeByMetadataName("System.Collections.Generic.HashSet`1"),
             };
-            enumerable = compilation.GetTypeByMetadataName("System.Collections.IEnumerable");
-            enumerableOfT = compilation.GetTypeByMetadataName("System.Collections.Generic.IEnumerable`1");
+            hashInterfaces = new[]
+            {
+                compilation.GetTypeByMetadataName("System.Collections.Generic.IDictionary`2"),
+                compilation.GetTypeByMetadataName("System.Collections.Generic.IReadOnlyDictionary`2"),
+                compilation.GetTypeByMetadataName("System.Collections.Generic.ISet`1"),
+                compilation.GetTypeByMetadataName("System.Collections.Generic.IReadOnlySet`1"),
+            };
+            collections = new[]
+            {
+                compilation.GetTypeByMetadataName("System.Collections.IEnumerable"),
+                compilation.GetTypeByMetadataName("System.Collections.Generic.IEnumerable`1"),
+                compilation.GetTypeByMetadataName("System.Collections.ICollection"),
+                compilation.GetTypeByMetadataName("System.Collections.Generic.ICollection`1"),
+                compilation.GetTypeByMetadataName("System.Collections.Generic.IReadOnlyCollection`1"),
+            };
             handle = compilation.GetTypeByMetadataName("Moonwell.handle");
             overriders = new(FindOverriders, LazyThreadSafetyMode.ExecutionAndPublication);
             memberValues = new(FindMemberValues, LazyThreadSafetyMode.ExecutionAndPublication);
@@ -130,9 +146,10 @@ public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
                 context.ReportDiagnostic(Diagnostic.Create(Rules.HandleId, location));
             }
 
-            if (member.Name == "GetEnumerator" && IsHash(member.ContainingType))
+            if (member.Name is "GetEnumerator" or "CopyTo"
+                && (IsHash(member.ContainingType) ? member.ContainingType.Name : operation is IInvocationOperation { Instance: { } instance } ? HashName(instance) : null) is { } hash)
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rules.HashLoop, location, member.ContainingType.Name));
+                context.ReportDiagnostic(Diagnostic.Create(Rules.HashLoop, location, Article(hash)));
             }
 
             if (Has(member, desyncs))
@@ -404,9 +421,9 @@ public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
         public void Loop(OperationAnalysisContext context)
         {
             if (context.Operation is IForEachLoopOperation loop && !Silenced(loop, context.ContainingSymbol)
-                && Unwrap(loop.Collection).Type is { } type && IsHash(type))
+                && HashName(loop.Collection) is { } hash)
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rules.HashLoop, loop.Collection.Syntax.GetLocation(), type.Name));
+                context.ReportDiagnostic(Diagnostic.Create(Rules.HashLoop, loop.Collection.Syntax.GetLocation(), Article(hash)));
             }
         }
 
@@ -423,10 +440,21 @@ public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
                 context.ReportDiagnostic(Diagnostic.Create(Rules.NumberType, conversion.Syntax.GetLocation(), banned, Why(banned)));
             }
 
-            if (conversion.Operand.Type is { } source && IsHash(source) && IsEnumerable(conversion.Type)
+            if (HashName(conversion.Operand) is { } hash && IsCollection(conversion.Type)
                 && !(conversion.Parent is IForEachLoopOperation loop && loop.Collection == conversion))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Rules.HashLoop, conversion.Operand.Syntax.GetLocation(), source.Name));
+                context.ReportDiagnostic(Diagnostic.Create(Rules.HashLoop, conversion.Operand.Syntax.GetLocation(), Article(hash)));
+            }
+        }
+
+        /// <summary>MW0004 for the keys or values of a dictionary interface given as they are to an IEnumerable parameter (LINQ on them), where no conversion shows.</summary>
+        public void HashArgument(OperationAnalysisContext context)
+        {
+            var argument = (IArgumentOperation)context.Operation;
+            if (argument.Value is IPropertyReferenceOperation { Property.Name: "Keys" or "Values" } keys && HashName(keys) is { } hash
+                && argument.Parameter != null && IsCollection(argument.Parameter.Type) && !Silenced(argument, context.ContainingSymbol))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rules.HashLoop, keys.Syntax.GetLocation(), Article(hash)));
             }
         }
 
@@ -567,9 +595,33 @@ public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
             return false;
         }
 
-        private bool IsEnumerable(ITypeSymbol? type) =>
-            type != null && (SymbolEqualityComparer.Default.Equals(type, enumerable)
-                || SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, enumerableOfT));
+        /// <summary>
+        /// The name of the type of a value that gives its items in no fixed order: a Dictionary or a HashSet (or a class
+        /// derived from one, or a Dictionary's Keys or Values), an interface only those implement in the game's Lua
+        /// (IDictionary, IReadOnlyDictionary, ISet, IReadOnlySet), or the Keys or Values of one. Null for any other.
+        /// </summary>
+        private string? HashName(IOperation value)
+        {
+            value = Unwrap(value);
+            if (value.Type is not INamedTypeSymbol type)
+            {
+                return null;
+            }
+
+            if (IsHash(type) || hashInterfaces.Any(h => h != null && SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, h)))
+            {
+                return type.Name;
+            }
+
+            return value is IPropertyReferenceOperation { Property.Name: "Keys" or "Values", Instance: { } instance } ? HashName(instance) : null;
+        }
+
+        // A Dictionary's name with its article: "A Dictionary", "An IReadOnlyDictionary".
+        private static string Article(string name) => ("AEIOU".IndexOf(name[0]) >= 0 ? "An " : "A ") + name;
+
+        // An interface a loop or a LINQ call goes through: IEnumerable, IEnumerable<T>, ICollection, ICollection<T>, IReadOnlyCollection<T>.
+        private bool IsCollection(ITypeSymbol? type) =>
+            type != null && collections.Any(c => c != null && SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, c));
 
         private static IOperation Unwrap(IOperation operation)
         {
