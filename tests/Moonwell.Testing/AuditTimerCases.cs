@@ -250,12 +250,15 @@ namespace Moonwell.Testing
             Expect.Equal("10000 12000 1", first + " " + runs + " " + reported, "runs at 1.1 s and at 1.132 s, and the lines reported");
         }
 
-        /// <summary>A repeating timer catching up after a slow frame is no runaway: Every(0.001) runs 5000 times in the wake after a frame of 5 s, and nothing is reported.</summary>
+        /// <summary>
+        /// A repeating timer catching up after a slow frame is no runaway: Every(0.001) runs 5000 times in the wake after a frame
+        /// of 5 s, and nothing is reported. The wake is at 4.9995 s, so no run is due at the edge of the scheduler's 0.001 s.
+        /// </summary>
         public static void CatchUpNotRunaway(FakeWorld world)
         {
             var runs = 0;
             Timer.Every(0.001f, () => { runs++; });
-            world.Time = 5.0f;
+            world.Time = 4.9995f;
             Runtime.Wake();
             Expect.Equal("5000 0", runs + " " + world.Logged.Count, "runs in the wake after a frame of 5 s, and the lines reported");
         }
