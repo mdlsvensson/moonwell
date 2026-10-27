@@ -520,9 +520,10 @@ target.Knockback(caster.AngleTo(target), 300f, 0.5f); // 300 away over half a se
   move them against it; with `Friction = 0` they never slow.
 - **Ownership**: a missile belongs to the game unless `Fire` or `Create` is given an `owner`, so one fired in a spell
   outlives the cast. `OnImpact` runs with the missile's owner.
-- **Knockback** keeps the unit's order. It stops at trees, cliffs, walls (`Wall.Create`) and a bridge's rail; a stopped
-  push stops a little short of the edge. `IPushTarget` has `OnPushed`, `OnSlammed` and `OnGrounded`; an `OnPushed`
-  that pushes its own unit again loops.
+- **Knockback** keeps the unit's order. It stops at trees, buildings, cliffs, walls (`Wall.Create`) and a bridge's
+  rail, which keeps its body on the deck. A stopped push stops short of the edge, by up to a step's move and the unit's
+  collision size (about 37 and its collision size at 1,200 a second). `IPushTarget` has `OnPushed`, `OnSlammed` and
+  `OnGrounded`; an `OnPushed` that pushes its own unit calls itself again, without end.
 - **Bridges**: placed bridges are ground, for missiles landing (from above: one below a deck flies under it) and units
   standing, until the bridge dies (brought back to life, it is not ground again); missiles do not meet it as a
   destructable. A deck stands on the ground beneath any water at its bridge's place, as in the game; the build writes
