@@ -28,6 +28,9 @@ namespace Moonwell.Engine
         /// <summary>Degrees to radians.</summary>
         private const float Radians = 0.0174532925f;
 
+        /// <summary>The least share of a unit's edge point's direction a move goes toward it for the point to be checked against a deck's rail: the cosine of about 89.4 degrees.</summary>
+        private const float Toward = 0.01f;
+
         /// <summary>The cosine of an eighth of a turn, for the points of a unit's edge between the axes.</summary>
         private const float Slant = 0.70710678f;
 
@@ -567,16 +570,21 @@ namespace Moonwell.Engine
         /// <summary>
         /// Whether a unit on a deck at (fromX, fromY), the deck <paramref name="here"/> high under its middle, keeps its body
         /// inside the deck's rail when it moves to (centreX, centreY), where the deck is <paramref name="there"/> high: each
-        /// point of its edge, its collision size out every eighth of a turn, on the side it moves toward, is on a deck or
-        /// over ground within DeckStep of the deck where it moves to, or was off both already where it is, against the
-        /// deck's height there (a body over the rail already does not hold it, so it can be pushed back or along). Each
-        /// against its own middle's height, so a unit that comes onto a ramp with its body over the side meets the rail
-        /// where the rail begins, not after.
+        /// point of its edge, its collision size out every eighth of a turn, that it moves toward (by more than Toward of the
+        /// move), is on a deck or over ground within DeckStep of the deck where it moves to, or was off both already where
+        /// it is, against the deck's height there (a body over the rail already does not hold it, so it can be pushed back
+        /// or along). Each against its own middle's height, so a unit that comes onto a ramp with its body over the side
+        /// meets the rail where the rail begins, not after.
         /// </summary>
         private static bool Inside(float size, float fromX, float fromY, float centreX, float centreY, float here, float there)
         {
             var moveX = centreX - fromX;
             var moveY = centreY - fromY;
+            // A point is checked when the move goes toward it by more than Toward of its length: a unit pushed along the
+            // deck, whose sides may be at its edge or over it, is not stopped by a float's last bit of sideways move.
+            var least = Toward * size * Trig.Sqrt(moveX * moveX + moveY * moveY);
+            moveX /= least > 0.0f ? least : 1.0f;
+            moveY /= least > 0.0f ? least : 1.0f;
             var slant = size * Slant;
             return Rim(moveX, moveY, size, 0.0f, fromX, fromY, centreX, centreY, here, there)
                 && Rim(moveX, moveY, -size, 0.0f, fromX, fromY, centreX, centreY, here, there)
@@ -588,10 +596,10 @@ namespace Moonwell.Engine
                 && Rim(moveX, moveY, -slant, -slant, fromX, fromY, centreX, centreY, here, there);
         }
 
-        /// <summary>Whether one point of a unit's edge, (offsetX, offsetY) from its middle, does not take it over a deck's rail: on a side it does not move toward, held where it moves to (against the deck's height there), or not held where it is already (against the height here).</summary>
+        /// <summary>Whether one point of a unit's edge, (offsetX, offsetY) from its middle, does not take it over a deck's rail: on a side it does not move toward (the move, scaled by Inside, goes toward it by no more than 1), held where it moves to (against the deck's height there), or not held where it is already (against the height here).</summary>
         private static bool Rim(float moveX, float moveY, float offsetX, float offsetY, float fromX, float fromY, float centreX, float centreY, float here, float there)
         {
-            if (moveX * offsetX + moveY * offsetY <= 0.0f)
+            if (moveX * offsetX + moveY * offsetY <= 1.0f)
             {
                 return true;
             }
