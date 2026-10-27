@@ -302,6 +302,75 @@ namespace Moonwell.Testing
         }
 
         /// <summary>
+        /// A ball falling at a slant onto a deck over sloped terrain bounces off the deck's slope, not the terrain's beneath
+        /// it: the terrain rises north 20 a tile (its normal leans 0.154 south), the deck's south half rises 10 a cell (its
+        /// normal leans 0.298 south) and its north half falls so (0.298 north). The first ball meets the deck where it was
+        /// given the terrain's normal before (its contact on the deck to the last bit, and the deck left out); the others,
+        /// from further south and slower, meet it along both halves.
+        /// </summary>
+        public static void SlopeNormal(FakeWorld world)
+        {
+            Interactions.Install(new FakeInteractionWorld());
+            var fake = new FakePhysicsWorld();
+            Physics.Install(fake);
+            var terrain = new FakeTerrainWorld();
+            var text = "";
+            for (var j = 0; j < 17; j++)
+            {
+                var corner = GridText.Corner(20.0f * (j - 4), 2, false, false);
+                for (var i = 0; i < 17; i++)
+                {
+                    text = text + corner;
+                }
+            }
+
+            Terrain.Install(terrain, 17, 17, 0.0f, 0.0f, text);
+            Placed(world, fake);
+            var rise = 10.0f / 32.0f;
+            var length = MathF.Sqrt(rise * rise + 1.0f);
+            var slope = 20.0f / 128.0f;
+            Within(-slope / MathF.Sqrt(slope * slope + 1.0f), Terrain.Normal(512.0f, 480.0f).Y, 0.001f, "the terrain's normal beneath leans south less than the deck's");
+            for (var k = 0; k < 9; k++)
+            {
+                var ball = new Ball();
+                ball.GroundContact = Contact.Bounce;
+                ball.Gravity = 800.0f;
+                ball.VY = k == 0 ? 300.0f : 200.0f;
+                ball.VZ = -200.0f;
+                var first = new float[4];
+                ball.Impacting = impact =>
+                {
+                    if (first[3] == 0.0f)
+                    {
+                        first[0] = impact.Y;
+                        first[1] = impact.Normal.Y;
+                        first[2] = impact.Normal.Z;
+                        first[3] = impact.Z;
+                    }
+                };
+                var startY = k == 0 ? 300.0f : 296.0f + 16.0f * k;
+                Missile.Create(ball, 512.0f, startY, 400.0f);
+                Steps(world, 48);
+                var what = "the ball from y " + startY + ", met at y " + first[0];
+                Expect.True(ball.Impacts >= 1, what + ": it met the deck");
+                Within(Physics.GroundHeight(512.0f, first[0]), first[3], 0.01f, what + ": on the deck");
+                var south = first[0] < 512.0f;
+                Expect.True(first[0] > 420.0f && first[0] < 604.0f && Math.Abs(first[0] - 512.0f) > 1.0f, what + ": between its end rows, off its middle");
+                Within((south ? -rise : rise) / length, first[1], 0.001f, what + ": the deck's normal, y");
+                Within(1.0f / length, first[2], 0.001f, what + ": z");
+                if (k == 0)
+                {
+                    Within(479.976f, first[0], 0.01f, "the first ball meets the deck where it took the terrain's normal before");
+                }
+
+                if (!ball.HasEnded)
+                {
+                    ball.End();
+                }
+            }
+        }
+
+        /// <summary>
         /// A bridge that dies is watched, and its deck is ground no more at once: GroundHeight reads the water beneath, and a
         /// ball resting on the deck falls onto the water. A bridge that leaves the game takes its deck too.
         /// </summary>

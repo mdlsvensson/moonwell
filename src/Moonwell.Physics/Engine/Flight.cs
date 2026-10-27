@@ -223,6 +223,10 @@ namespace Moonwell.Engine
             float hitY;
             float hitZ;
             var fraction = 1.0f;
+            // The height the decks were taken not above when the contact was found: the normal is read with it, so it is
+            // the normal of the surface the contact is on. Read with the contact's own height, a deck the contact is on
+            // could be left out by the last bit of a float, and the terrain beneath it would give the normal.
+            var limit = fromZ;
             if (missile.followsGround)
             {
                 // It keeps its height above the ground, so it meets the ground only when it comes down onto it.
@@ -312,6 +316,11 @@ namespace Moonwell.Engine
                     // It began the step on the ground, near enough.
                     fraction = 0.0f;
                 }
+                else
+                {
+                    // The cast takes the decks not above the ball's lowest point at the start.
+                    limit = fromZ - radius;
+                }
             }
 
             // The velocity where it met the ground: gravity has acted only for the part of the step before.
@@ -326,16 +335,17 @@ namespace Moonwell.Engine
                 hitX = x;
                 hitY = y;
                 hitZ = Ground.Last(missile);
+                limit = fromZ;
             }
 
             float nx;
             float ny;
             float nz;
-            Ground.Normal(hitX, hitY, hitZ, out nx, out ny, out nz);
+            Ground.Normal(hitX, hitY, limit, out nx, out ny, out nz);
             if (nz == 0.0f && vx * nx + vy * ny >= 0.0f)
             {
                 // A cliff's face it is not moving into, as one falling onto it: it meets the blend.
-                Ground.Slope(hitX, hitY, hitZ, out nx, out ny, out nz);
+                Ground.Slope(hitX, hitY, limit, out nx, out ny, out nz);
             }
 
             if (again)
