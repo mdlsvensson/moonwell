@@ -359,9 +359,11 @@ if (Terrain.Raycast(from, to, out var hit)) { /* the missile meets the ground at
 
 - The build writes the height grid from the map's terrain file, so it is the same on every machine. It does not see
   deformations or bridges; `Terrain.LocalHeight`, inside `Local.For` only, reads the live height and sees both.
-- A height blends the four corners of each 128 tile, so it is rough within 128 of a cliff. `IsCliff` tells a cliff tile,
-  for treating it as a wall. Water reads its surface where that is above the ground. Over the water at the map's outer
-  edge, far outside the playable area, heights can differ from the game's.
+- A height blends the four corners of each 128 tile. It is the game's at the corners, and rough between them on steep
+  ground and within 128 of a cliff: on Lost Temple the game's heights between corners differed from such a blend by 0.05
+  on average away from cliffs, but by up to 77 there and 96 near a cliff or ramp. How the game blends inside a tile has
+  not been measured. `IsCliff` tells a cliff tile, for treating it as a wall. Water reads its surface where that is above
+  the ground. Over the water at the map's outer edge, far outside the playable area, heights can differ from the game's.
 - `IsWalkable`, `IsFlyable`, `IsBuildable` and `IsWater` are terrain only, as the game's own. After changing pathing with
   natives, call `Terrain.Refresh(area)`. `CanStand` also sees trees and buildings and needs walkable ground, but it
   places a hidden item, so it changes game state and is not for `Local.For`.
