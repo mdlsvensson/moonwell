@@ -274,7 +274,7 @@ public static class Rules
         "MW0027",
         "String call the game's Lua gets wrong",
         "'{0}' {1}",
-        "s.Split(\"--\") with a string separator runs out of memory; StartsWith(char) and EndsWith(char) fail; IndexOf, StartsWith and EndsWith with an ignore-case StringComparison give the wrong answer or an error; LINQ Reverse() on a string fails. Split(char), Contains(char), the Ordinal comparisons and Replace/Equals/Compare with a comparison work.");
+        "s.Split(\"--\") with a string separator runs out of memory, and s.Split(new[] { \", \" }, options) with string separators never ends; StartsWith(char) and EndsWith(char) fail; IndexOf, StartsWith and EndsWith with an ignore-case StringComparison give the wrong answer or an error; LINQ Reverse() on a string fails. Split(char), Contains(char), the Ordinal comparisons and Replace/Equals/Compare with a comparison work.");
 
     public static readonly DiagnosticDescriptor BoxedValue = Syntax(
         "MW0028",

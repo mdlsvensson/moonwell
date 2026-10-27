@@ -53,6 +53,7 @@ public class SyntaxTests
     [InlineData("MW0026", "var f = (params int[] xs) => xs.Length;", "params int[] xs")]
     // MW0027: strings
     [InlineData("MW0027", "var n = \"a--b\".Split(\"--\").Length;", "\"a--b\".Split(\"--\")")]
+    [InlineData("MW0027", "var n = \"a, b\".Split(new[] { \", \" }, StringSplitOptions.None).Length;", "\"a, b\".Split(new[] { \", \" }, StringSplitOptions.None)")]
     [InlineData("MW0027", "var b = \"abc\".StartsWith('a');", "\"abc\".StartsWith('a')")]
     [InlineData("MW0027", "var b = \"abc\".EndsWith('c');", "\"abc\".EndsWith('c')")]
     [InlineData("MW0027", "var i = \"abc\".IndexOf(\"B\", StringComparison.OrdinalIgnoreCase);", "\"abc\".IndexOf(\"B\", StringComparison.OrdinalIgnoreCase)")]

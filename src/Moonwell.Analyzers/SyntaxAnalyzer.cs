@@ -571,6 +571,10 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
             {
                 Report(context, invocation, "Split(string) runs out of memory in the game's Lua; split on a char");
             }
+            else if (reduced.Name == "Split" && first is IArrayTypeSymbol { ElementType.SpecialType: SpecialType.System_String })
+            {
+                Report(context, invocation, "Split(string[]) never ends in the game's Lua; split on a char");
+            }
             else if (reduced.Name is "StartsWith" or "EndsWith" && first?.SpecialType == SpecialType.System_Char)
             {
                 Report(context, invocation, reduced.Name + "(char) fails in the game's Lua; use a string");
