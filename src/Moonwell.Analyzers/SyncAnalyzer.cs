@@ -24,7 +24,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
         {
             var checker = new Checker(start.Compilation);
             start.RegisterOperationAction(checker.Call,
-                OperationKind.Invocation, OperationKind.PropertyReference, OperationKind.MethodReference, OperationKind.ObjectCreation);
+                OperationKind.Invocation, OperationKind.PropertyReference, OperationKind.MethodReference, OperationKind.ObjectCreation, OperationKind.FieldReference);
             start.RegisterOperationAction(checker.Loop, OperationKind.Loop);
             start.RegisterOperationAction(checker.Conversion, OperationKind.Conversion);
             start.RegisterOperationAction(checker.Literal, OperationKind.Literal);
@@ -57,6 +57,25 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
         public Dictionary<object, int> Depths { get; } = new(new NodeComparer());
 
         public int Low { get; set; } = int.MaxValue;
+    }
+
+    /// <summary>A part of a class that is followed as one: its static initializers and constructor, or its instance initializers.</summary>
+    private sealed class Part
+    {
+        public Part(INamedTypeSymbol type, bool isStatic)
+        {
+            Type = type;
+            IsStatic = isStatic;
+        }
+
+        public INamedTypeSymbol Type { get; }
+
+        public bool IsStatic { get; }
+
+        public override bool Equals(object? other) =>
+            other is Part part && part.IsStatic == IsStatic && SymbolEqualityComparer.Default.Equals(part.Type, Type);
+
+        public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(Type) * 2 + (IsStatic ? 1 : 0);
     }
 
     /// <summary>Compares followed nodes: symbols as Roslyn compares them, anything else by its own equality.</summary>
@@ -154,7 +173,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             }
             else if (IsLocal(operation, context.ContainingSymbol))
             {
-                var finding = Rejected(member, write, new Walk());
+                var finding = Rejected(member, write, new Walk(), context.ContainingSymbol as INamedTypeSymbol ?? context.ContainingSymbol.ContainingType);
                 if (finding != null)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Rules.StateInLocal, location, finding.Message(Name(member))));
@@ -464,11 +483,12 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             }
         }
 
-        /// <summary>The member an operation calls, and whether it writes a property.</summary>
+        /// <summary>The member an operation calls or touches, and whether it writes a property or field.</summary>
         private static (ISymbol? Member, bool Write) Target(IOperation operation) => operation switch
         {
             IInvocationOperation invocation => (invocation.TargetMethod, false),
             IPropertyReferenceOperation property => (property.Property, IsWritten(property)),
+            IFieldReferenceOperation field => (field.Field, IsWritten(field)),
             IMethodReferenceOperation reference => (reference.Method, false),
             IObjectCreationOperation creation => (creation.Constructor, false),
             _ => (null, false),
@@ -481,8 +501,11 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             _ => false,
         };
 
-        /// <summary>Why a member may not be called on one machine; null when it may.</summary>
-        private Finding? Rejected(ISymbol member, bool write, Walk walk)
+        /// <summary>
+        /// Why a member may not be called on one machine; null when it may. The code that calls it is code of the class
+        /// from (null for none), which is there already: touching its own members runs nothing of it for the first time.
+        /// </summary>
+        private Finding? Rejected(ISymbol member, bool write, Walk walk, INamedTypeSymbol? from)
         {
             var name = Name(member);
             if (IsNative(member))
@@ -500,6 +523,11 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
                 return Has(member, changesState) ? new Finding(name, "changes game state") : null;
             }
 
+            if (member is IFieldSymbol && !IsMap(member))
+            {
+                return null;
+            }
+
             if ((runtime != null && SymbolEqualityComparer.Default.Equals(member.ContainingAssembly, runtime))
                 || packages.Any(package => SymbolEqualityComparer.Default.Equals(member.ContainingAssembly, package)))
             {
@@ -512,10 +540,26 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
                 return new Finding(name, "may change game state (it is not marked [LocalSafe])");
             }
 
-            if (!SymbolEqualityComparer.Default.Equals(member.ContainingAssembly, compilation.Assembly)
-                || Has(member, syncUnchecked) || IsMachineLocal(member, write))
+            if (!IsMap(member))
             {
                 return null;
+            }
+
+            // CSharp.lua runs a class's static initializers and static constructor when the class is first touched.
+            var type = member.ContainingType.OriginalDefinition;
+            if (!SymbolEqualityComparer.Default.Equals(type, from?.OriginalDefinition) && FollowStatics(type, walk) is { } statics)
+            {
+                return new Finding(name + " > static " + type.Name + "() > " + statics.Path, statics.What);
+            }
+
+            if (member is IFieldSymbol || Has(member, syncUnchecked) || IsMachineLocal(member, write))
+            {
+                return null;
+            }
+
+            if (member is IMethodSymbol { MethodKind: MethodKind.Constructor } constructor)
+            {
+                return FollowConstructor(constructor, walk) is { } made ? new Finding(name + " > " + made.Path, made.What) : null;
             }
 
             var methods = member switch
@@ -535,11 +579,65 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
             return null;
         }
 
+        private bool IsMap(ISymbol member) => SymbolEqualityComparer.Default.Equals(member.ContainingAssembly, compilation.Assembly);
+
+        /// <summary>What a class's static field and property initializers and its static constructor reach.</summary>
+        private Finding? FollowStatics(INamedTypeSymbol type, Walk walk) =>
+            Follow(new Part(type, true), Initializers(type, true).Concat(type.StaticConstructors.SelectMany(Syntax)), type, walk);
+
+        /// <summary>
+        /// What making an object with a constructor of the map reaches: its body, its class's field and property
+        /// initializers, and an implicit constructor's base constructor.
+        /// </summary>
+        private Finding? FollowConstructor(IMethodSymbol constructor, Walk walk)
+        {
+            constructor = constructor.OriginalDefinition;
+            var type = constructor.ContainingType;
+            var found = Follow(constructor, Syntax(constructor).Concat(Initializers(type, false)), type, walk);
+            if (found == null && constructor.IsImplicitlyDeclared
+                && type.BaseType?.InstanceConstructors.FirstOrDefault(c => c.Parameters.Length == 0) is { } baseConstructor)
+            {
+                found = Rejected(baseConstructor, false, walk, type);
+            }
+
+            return found;
+        }
+
+        /// <summary>The initializers of a class's static or instance fields and properties.</summary>
+        private static IEnumerable<SyntaxNode> Initializers(INamedTypeSymbol type, bool isStatic)
+        {
+            foreach (var member in type.GetMembers())
+            {
+                if (member.IsStatic != isStatic || member.IsImplicitlyDeclared || member is not (IFieldSymbol { IsConst: false } or IPropertySymbol))
+                {
+                    continue;
+                }
+
+                foreach (var reference in member.DeclaringSyntaxReferences)
+                {
+                    var initializer = reference.GetSyntax() switch
+                    {
+                        VariableDeclaratorSyntax variable => variable.Initializer,
+                        PropertyDeclarationSyntax property => property.Initializer,
+                        _ => null,
+                    };
+                    if (initializer != null)
+                    {
+                        yield return initializer;
+                    }
+                }
+            }
+        }
+
+        // The declarations of a method; a primary constructor's is its class's, whose parameters run nothing.
+        private static IEnumerable<SyntaxNode> Syntax(IMethodSymbol method) =>
+            method.DeclaringSyntaxReferences.Select(reference => reference.GetSyntax()).Where(syntax => syntax is not TypeDeclarationSyntax);
+
         /// <summary>What a method of the map reaches that may not run on one machine.</summary>
         private Finding? Follow(IMethodSymbol method, Walk walk)
         {
             method = method.OriginalDefinition;
-            return Follow(method, method.DeclaringSyntaxReferences.Select(reference => reference.GetSyntax()), walk);
+            return Follow(method, Syntax(method), method.ContainingType, walk);
         }
 
         /// <summary>
@@ -548,7 +646,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
         /// result is kept for later only when no cycle was cut back to a node that is still being followed above it,
         /// since that node's own code may still find something, so the answer never depends on what was followed first.
         /// </summary>
-        private Finding? Follow(object node, IEnumerable<SyntaxNode> code, Walk walk)
+        private Finding? Follow(object node, IEnumerable<SyntaxNode> code, INamedTypeSymbol? from, Walk walk)
         {
             if (followed.TryGetValue(node, out var known))
             {
@@ -577,7 +675,7 @@ public sealed class SyncAnalyzer : DiagnosticAnalyzer
                 foreach (var inner in body.DescendantsAndSelf())
                 {
                     var (member, write) = Target(inner);
-                    if (member != null && (found = Rejected(member, write, walk)) != null)
+                    if (member != null && (found = Rejected(member, write, walk, from)) != null)
                     {
                         break;
                     }
