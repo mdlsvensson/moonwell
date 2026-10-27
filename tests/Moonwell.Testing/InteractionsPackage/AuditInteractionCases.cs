@@ -309,5 +309,26 @@ namespace Moonwell.Testing
             Expect.Equal(1, CountOf("part c"), "c parted once in all");
             Expect.Equal(CountOf("meet b") + CountOf("meet c") + CountOf("meet d"), CountOf("part b") + CountOf("part c") + CountOf("part d"), "OnPart once per OnMeet");
         }
+
+        /// <summary>In a gizmo's OnLeave the gizmo has no place: a Find from it does not see it, though it is still in its cell, and a gizmo beside it is found; it leaves the cell after.</summary>
+        public static void GizmoLeaveHasNoPlace(FakeWorld world)
+        {
+            Fresh();
+            var well = new Well();
+            var beside = Gizmo.Create(new Well(), 20.0f, 10.0f);
+            var found = new List<Well>();
+            var cell = -2;
+            well.Leaving = () =>
+            {
+                found = Find.InRange<Well>(10.0f, 10.0f, 50.0f);
+                cell = well.entry!.Cell;
+            };
+            Gizmo.Create(well, 10.0f, 10.0f);
+            well.End();
+            Expect.Equal(1, found.Count, "a Find from OnLeave finds only the gizmo beside it");
+            Expect.Same(beside, found[0], "that one");
+            Expect.True(cell >= 0, "though the gizmo is still in its cell");
+            Expect.Equal(-1, well.entry!.Cell, "and leaves it after");
+        }
     }
 }
