@@ -284,7 +284,8 @@ after armor, the target's armor has cut it and only the amount can change. The l
 - A hit of 0 that the game starts and that is no attack, such as Storm Bolt's first and Fireball's extra two, runs no
   reaction of the package; `OnDamaged` still sees it. An attack of 0, and a hit of 0 from `source.Damage`, are not
   silenced.
-- A reaction the package would never call is an error, MW0036: one that is not public or takes another parameter, a
+- A reaction the package would never call is an error, MW0036, for the physics interfaces (`IPushTarget`,
+  `IMissileTarget`) as for these: one that is not public or takes another parameter, a
   public one a letter off a reaction's name, a name from before 0.3, a reaction in a unit or component without its
   interface, or an interface on a class the package does not call it on. `#pragma warning disable MW0036` keeps a
   helper's name.
@@ -360,6 +361,87 @@ var near = Find.InRange<Unit>(x, y, 500f);                // a new list; or Find
 - `Interactions.CellSize` (128), `CellCheck` (0.1), `Slack` (64) and `Step` (1/32) are set in the map's constructor.
 - `Find` is fine inside `Local.For`: it reads and changes nothing there (a kind nothing outside has asked for yet is
   searched through the objects Moonwell knows, slower). `IsTree()` needs `Moonwell.Objects`; the build warns if missing.
+
+## Physics and missiles
+
+Add the `Moonwell.Physics` package (the template's `.csproj` has the line, commented) for missiles, knockback, walls
+and ballistics. It brings `Moonwell.Maths`, `Moonwell.Terrain` and `Moonwell.Interactions` with it. A map that does not
+reference it carries none of its code.
+
+```csharp
+public sealed class Firebolt : Missile // a bolt that flies straight and burns the first enemy it meets
+{
+    public Firebolt()
+    {
+        Model = @"Abilities\Weapons\RedDragonBreath\RedDragonMissile.mdl";
+        Speed = 900f;
+        Radius = 24f;
+        ImpactDamage = 75f;
+        DamageKind = DamageKind.Fire;
+    }
+
+    public override bool CanHit(Actor other) => other is Unit unit && Source!.Player.IsEnemy(unit.Player);
+}
+
+caster.Fire(new Firebolt(), target); // or Fire(missile, x, y), or Fire(missile, x, y, z)
+
+public sealed class Shell : Missile // a mortar shell that arcs to a point and blasts what is near where it lands
+{
+    public Shell()
+    {
+        Model = @"Abilities\Weapons\Mortar\MortarMissile.mdl";
+        Speed = 700f;
+        Arc = 0.35f;                // the game's Missile Arc: the peak is this times the distance
+        UnitContact = Contact.None; // flies over units; only the ground stops it
+        Components.Add(new Shadow());
+    }
+
+    public override void OnImpact(Impact impact)
+    {
+        foreach (var unit in Find.InRange<Unit>(impact.X, impact.Y, 200f, u => Source!.Player.IsEnemy(u.Player)))
+        {
+            Source!.Damage(unit, 60f, tag: this);
+        }
+    }
+}
+
+target.Knockback(caster.AngleTo(target), 300f, 0.5f); // 300 away over half a second, slowing to a stop
+```
+
+- **One motion** for every missile: each step its speed changes by `Acceleration` (up to `MaxSpeed`), `Gravity` pulls it
+  down, and it moves. Set `Speed` or `Velocity` (or `VX`, `VY`, `VZ`); `Physics.Gravity` (800) is the world's. The rest:
+  `Radius` (16), `Mass`, `Bounciness` (0.5), `Friction` (200), `Duration`, `MaxDistance`, `FollowsGround`. Settings
+  are written in the constructor and are live after.
+- `Fire` starts the missile `LaunchHeight` (60) above the unit and `LaunchOffset` ahead, with the unit as its `Source`.
+  Without `Arc` it flies level and on past the mark. With `Arc` it sets its own `Gravity` and lands on the mark: the
+  peak is above the line from launch to mark, and an arc at a unit lands on the unit's middle, where it was at launch
+  (unless the missile has `Homing`). `Missile.Create(missile, x, y, z, player, owner)` places one at rest, for code that
+  sets the velocity itself; one created touching the ground with `GroundContact = Stop` ends at once.
+- Components: `Homing { TurnRate }` (`Fire(missile, unit)` gives it its target), `Shadow` and `LoopingSound(path)`.
+  `ImpactDamage`, `DamageKind`, `AttackType`, `IsAttack` and `Ranged` go through `source.Damage` with the missile as its
+  `Tag`, so `Moonwell.Damage`'s stages see it. A missile with damage and no `Source` deals none.
+- **Contacts**: `UnitContact` and `GroundContact` are `Stop`; `DestructableContact`, `ItemContact`, `MissileContact`
+  and `WallContact` are `None`, which is not checked at all. The others: `Bounce`, `Pass` (reacts once each time it
+  enters, flies on) and, for ground and walls, `Slide` (bounces until slow, then rolls).
+- **At a contact**, in this order: the missile's `OnImpact` and its components'; then, on a unit, `OnStruck` of
+  `IMissileTarget` (its class, components and buffs), so the defender has the last word; then the damage; then the
+  outcome. `Impact` has `Kind`, `Other`, `Unit`, `Destructable`, `Item`, `Missile`, `X`, `Y`, `Z`, `Normal`, `Speed`,
+  and a `Contact` and `Damage` a reaction may change (a shield sets `Contact.Bounce` and `Damage = 0f`).
+- **Ownership**: a missile belongs to the game unless `Fire` or `Create` is given an `owner`, so one fired in a spell
+  outlives the cast. `OnImpact` runs with the missile's owner, so what it makes outlives a missile that stops there.
+- **Knockback**: `Push(vx, vy, vz)`, `Knockback`, `PushVelocity()`, `IsPushed()` and `StopPush()`. The unit's order carries
+  on. It stops at trees, cliffs, buildings, walls (`Wall.Create(x1, y1, x2, y2)`) and a bridge's rail, sliding along
+  them when it can; a stopped push stops a little short of the edge. `Body` (`Mass`, `Height`, `Friction`,
+  `Immovable`) sets a unit's weight and shape. `IPushTarget` has `OnPushed`, `OnSlammed` and `OnGrounded`; an `OnPushed`
+  that pushes its own unit again loops.
+- **Bridges**: placed bridges are ground. A missile lands on one, a unit stands on it and a push slides along its
+  rail. A bridge made by code is not (the game cannot say which way it faces). `Physics.GroundHeight(x, y)` reads
+  the ground with them; `Physics.DestructableSize(typeId, radius, height)` sizes a destructable type (64 around, 250
+  tall unless set).
+- `Ballistics.Velocity(from, to, speed, high, Physics.Gravity, out var launch)` gives the velocity that lobs
+  something onto a point; `Ballistics.Speed` the speed for a launch angle.
+- Everything runs on every machine, in the same order. Reads are safe inside `Local.For`; firing, creating, pushing
+  and every set are changes and are not.
 
 ## Areas
 
