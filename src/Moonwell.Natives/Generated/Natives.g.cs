@@ -9845,7 +9845,6 @@ namespace Moonwell
         public static extern void SaveGameCheckpoint(string saveFileName, bool showWindow);
 
         /// @CSharpLua.Template = "SyncSelections()"
-        [ChangesState]
         public static extern void SyncSelections();
 
         /// @CSharpLua.Template = "SetFloatGameState({0}, {1})"
@@ -9961,23 +9960,18 @@ namespace Moonwell
         public static extern bool StoreString(gamecache cache, string missionKey, string key, string value);
 
         /// @CSharpLua.Template = "SyncStoredInteger({0}, {1}, {2})"
-        [ChangesState]
         public static extern void SyncStoredInteger(gamecache cache, string missionKey, string key);
 
         /// @CSharpLua.Template = "SyncStoredReal({0}, {1}, {2})"
-        [ChangesState]
         public static extern void SyncStoredReal(gamecache cache, string missionKey, string key);
 
         /// @CSharpLua.Template = "SyncStoredBoolean({0}, {1}, {2})"
-        [ChangesState]
         public static extern void SyncStoredBoolean(gamecache cache, string missionKey, string key);
 
         /// @CSharpLua.Template = "SyncStoredUnit({0}, {1}, {2})"
-        [ChangesState]
         public static extern void SyncStoredUnit(gamecache cache, string missionKey, string key);
 
         /// @CSharpLua.Template = "SyncStoredString({0}, {1}, {2})"
-        [ChangesState]
         public static extern void SyncStoredString(gamecache cache, string missionKey, string key);
 
         /// @CSharpLua.Template = "HaveStoredInteger({0}, {1}, {2})"
@@ -12628,7 +12622,6 @@ namespace Moonwell
         public static extern @event BlzTriggerRegisterPlayerSyncEvent(trigger whichTrigger, player whichPlayer, string prefix, bool fromServer);
 
         /// @CSharpLua.Template = "BlzSendSyncData({0}, {1})"
-        [ChangesState]
         public static extern bool BlzSendSyncData(string prefix, string data);
 
         /// @CSharpLua.Template = "BlzGetTriggerSyncPrefix()"

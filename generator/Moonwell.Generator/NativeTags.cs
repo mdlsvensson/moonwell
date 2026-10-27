@@ -92,6 +92,10 @@ public static partial class NativeTags
         "ShowImage", "ShowUbersplat", "SetTerrainFog", "SetTerrainFogEx", "ResetTerrainFog",
         "MultiboardDisplay", "MultiboardMinimize", "LeaderboardDisplay", "TimerDialogDisplay",
         "Preload", "PreloadGenClear", "PreloadGenStart", "PreloadGenEnd",
+        // They send this machine's value (sync data, a stored gamecache value, the selection) to every machine:
+        // running in local code is what they are for.
+        "BlzSendSyncData", "SyncStoredInteger", "SyncStoredReal", "SyncStoredBoolean", "SyncStoredUnit", "SyncStoredString",
+        "SyncSelections",
     };
 
     /// <summary>Natives that desync when run in local code, whatever their callback does: ForGroup and ForForce by

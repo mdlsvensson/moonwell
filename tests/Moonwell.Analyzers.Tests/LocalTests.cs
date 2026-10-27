@@ -742,4 +742,22 @@ public class LocalTests
             var name = copy.Name;
             """));
     }
+
+    [Fact]
+    public void the_sync_natives_are_allowed_inside()
+    {
+        // Sending this machine's value to every machine is what they are for.
+        Assert.Empty(MapCode.Check("""
+            Local.For(p, () =>
+            {
+                var sent = Natives.BlzSendSyncData("cam", Natives.R2S(Natives.GetCameraTargetPositionX()));
+                Natives.SyncStoredInteger(null!, "a", "b");
+                Natives.SyncStoredReal(null!, "a", "b");
+                Natives.SyncStoredBoolean(null!, "a", "b");
+                Natives.SyncStoredUnit(null!, "a", "b");
+                Natives.SyncStoredString(null!, "a", "b");
+                Natives.SyncSelections();
+            });
+            """));
+    }
 }
