@@ -109,6 +109,31 @@ namespace Moonwell.Testing
             ExpectLog(log, new[] { "added released Left", "two released Left", "added released Left", "one released Left" }, "each player's own watchers");
         }
 
+        /// <summary>
+        /// A component with a field set to <c>CameraSetup.Named("Intro")</c>, made before the package starts (a component listed in
+        /// the map's <c>Components</c> is made in its constructor, before the installs), is made without an error, and the setup
+        /// is looked up when applied; a name the map does not have throws ArgumentException there. After the start, Named gives
+        /// the installed setup, the same each time.
+        /// </summary>
+        public static void CameraNamedBeforeStart(FakeWorld world)
+        {
+            TwoUsers(world);
+            InputSystem.Uninstall();
+            var tour = new IntroTour();
+            var unknown = CameraSetup.Named("Nowhere");
+            Expect.Equal("Intro", tour.Intro.Name, "the setup has its name");
+            var fake = new FakeInputWorld();
+            InputSystem.Install(fake, false, false, new[] { "Intro" }, new[] { 100f, 200f, 0f, -1f });
+            Game.Instance.Add(tour);
+            tour.Show(Player.Two);
+            Expect.Equal(1, fake.CameraCalls.Count, "one apply");
+            Expect.Equal("apply", fake.CameraCalls[0].Kind, "an apply");
+            Expect.Same(fake.Made[0].Setup, fake.CameraCalls[0].Setup, "of World Editor's Intro");
+            Expect.Throws<ArgumentException>(() => Player.One.Camera().Apply(unknown), "an unknown name throws when applied");
+            Expect.Same(CameraSetup.Named("Intro"), CameraSetup.Named("Intro"), "after the start, the same setup each time");
+            Expect.Throws<ArgumentException>(() => CameraSetup.Named("Nowhere"), "and an unknown name throws at once");
+        }
+
         /// <summary>With the mouse and its moves on, all three events are listened to; with the mouse off, none, whatever the moves say.</summary>
         public static void Moves(FakeWorld world)
         {
@@ -127,6 +152,19 @@ namespace Moonwell.Testing
     /// <summary>A game component that does not watch the mouse.</summary>
     public sealed class QuietGame : GameComponent
     {
+    }
+
+    /// <summary>A game component with World Editor's "Intro" camera in a field, as a map writes it.</summary>
+    public sealed class IntroTour : GameComponent
+    {
+        /// <summary>The camera, named when the component is made.</summary>
+        public readonly CameraSetup Intro = CameraSetup.Named("Intro");
+
+        /// <summary>Applies the camera to a player.</summary>
+        public void Show(Player player)
+        {
+            player.Camera().Apply(Intro, 1f);
+        }
     }
 
     /// <summary>A game component whose press reaction logs "adder pressed", adds a watcher to the game the first time, and ends another.</summary>

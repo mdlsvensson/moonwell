@@ -290,6 +290,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "audit.input.moves", Run = AuditInputCases.Moves });
             list.Add(new Case { Name = "audit.input.watchers-kept", Run = AuditInputCases.WatchersKept });
             list.Add(new Case { Name = "audit.input.watchers-changed-in-dispatch", Run = AuditInputCases.WatchersChangedInDispatch });
+            list.Add(new Case { Name = "audit.input.camera-named-before-start", Run = AuditInputCases.CameraNamedBeforeStart });
         }
 
         /// <summary>Adds the input package's cases.</summary>

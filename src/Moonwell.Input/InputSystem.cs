@@ -136,6 +136,12 @@ namespace Moonwell
             return eachCamera[slot];
         }
 
+        /// <summary>Whether the package has been installed, so that World Editor's cameras can be looked up.</summary>
+        internal static bool Installed
+        {
+            get { return setups != null; }
+        }
+
         /// <summary>The setup World Editor's camera of this name made, or ArgumentException when none has it. Throws before Install.</summary>
         internal static CameraSetup SetupNamed(string name)
         {
