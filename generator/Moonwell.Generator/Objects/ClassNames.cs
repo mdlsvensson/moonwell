@@ -68,7 +68,8 @@ public static class ClassNames
     /// The class name of each of <paramref name="objects"/>, keyed by kind and id. A unit, ability, buff or upgrade is
     /// nested in its race (<c>Campaign</c> for a campaign unit), then the kind's plural (<c>Moonwell.Objects.Human.Units</c>);
     /// an item, destructable or doodad in the kind's plural only (<c>Moonwell.Objects.Items</c>). The name is the in-game name as <see cref="FieldNames.FromLabel"/>
-    /// writes it, or the id when there is none; a hero with exactly one proper name (<c>Arthas</c>) is named by it.
+    /// writes it, or the id when there is none; a campaign hero with exactly one proper name (<c>Arthas</c>) is named by
+    /// it, while any other hero keeps its type's name, as World Editor lists it (the High Elf Archmage, not Kelen).
     /// </summary>
     /// <remarks>
     /// A name that is a C# keyword, one of the classes it is nested in or a type of <see cref="TakenByTypes"/> gets the
@@ -182,10 +183,10 @@ public static class ClassNames
         return o.Id.Length > 0 && char.IsAsciiDigit(o.Id[0]) ? "_" + o.Id : o.Id;
     }
 
-    /// <summary>The proper name of a hero whose proper names hold exactly one non-empty name, otherwise null.</summary>
+    /// <summary>The proper name of a campaign hero whose proper names hold exactly one non-empty name, otherwise null.</summary>
     private static string? SingleProperName(StandardObject o)
     {
-        if (!o.IsHero || !o.Values.TryGetValue(ProperNamesId, out var names))
+        if (!o.IsHero || !o.Campaign || !o.Values.TryGetValue(ProperNamesId, out var names))
         {
             return null;
         }

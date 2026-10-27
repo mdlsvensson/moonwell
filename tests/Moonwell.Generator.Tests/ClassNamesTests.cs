@@ -193,9 +193,18 @@ public class ClassNamesTests
         Assert.Equal(
             "Moonwell.Objects.Campaign.Units.KelThuzad",
             FullName(Object(Kind.Unit, "Uktl", "Lich", "undead", true, " Kel'Thuzad ")));
-        Assert.Equal("Moonwell.Objects.Human.Units.Paladin", FullName(Object(Kind.Unit, "Hxxx", "Paladin", "human", properNames: " ")));
-        Assert.Equal("Moonwell.Objects.Human.Units.Paladin", FullName(Object(Kind.Unit, "Hyyy", "Paladin", "human", properNames: "'")));
-        Assert.Equal("Moonwell.Objects.Human.Units.Paladin", FullName(Object(Kind.Unit, "Hzzz", "Paladin", "human", properNames: "Arthas,")));
+        Assert.Equal("Moonwell.Objects.Campaign.Units.Paladin", FullName(Object(Kind.Unit, "Hxxx", "Paladin", "human", true, " ")));
+        Assert.Equal("Moonwell.Objects.Campaign.Units.Paladin", FullName(Object(Kind.Unit, "Hyyy", "Paladin", "human", true, "'")));
+        Assert.Equal("Moonwell.Objects.Campaign.Units.Paladin", FullName(Object(Kind.Unit, "Hzzz", "Paladin", "human", true, "Arthas,")));
+    }
+
+    [Fact]
+    public void a_melee_hero_with_one_proper_name_keeps_its_type_name()
+    {
+        // The High Elf Archmage (Haah) has one proper name, Kelen the Seeker; World Editor lists it by its type.
+        var archmage = Object(Kind.Unit, "Haah", "High Elf Archmage", "human", properNames: "Kelen the Seeker");
+
+        Assert.Equal("Moonwell.Objects.Human.Units.HighElfArchmage", FullName(archmage));
     }
 
     [Fact]
@@ -211,11 +220,11 @@ public class ClassNamesTests
     {
         var names = ClassNames.Assign(new[]
         {
-            Object(Kind.Unit, "Hct1", "Guard Lieutenant", "human", properNames: "Garek"),
-            Object(Kind.Unit, "Hctl", "Guard Captain", "human", properNames: "Garek"),
+            Object(Kind.Unit, "Hct1", "Guard Lieutenant", "human", true, "Garek"),
+            Object(Kind.Unit, "Hctl", "Guard Captain", "human", true, "Garek"),
         });
 
-        Assert.Equal("Garek", names[(Kind.Unit, "Hct1")].Name);
+        Assert.Equal("GarekHct1", names[(Kind.Unit, "Hct1")].Name);
         Assert.Equal("GarekHctl", names[(Kind.Unit, "Hctl")].Name);
     }
 
