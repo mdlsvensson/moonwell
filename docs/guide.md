@@ -79,8 +79,11 @@ public sealed class Champion : Human.Units.Paladin
 }
 ```
 
-- A field with levels takes `Levels(75f, 150f, 225f)`, `PerLevel(level => ...)` to compute each level, or one value
-  for every level: an upgrade's `Name = "Sharpened Blades"`.
+- A field with levels takes `Levels(75f, 150f, 225f)`, one value for each level (another count fails the build),
+  `PerLevel(level => ...)` to compute each level, or one value for every level: an upgrade's
+  `Name = "Sharpened Blades"`. Raising an ability's `LevelCount` past the game's writes every level you give; a field
+  you leave keeps the game's own data there (a Storm Bolt of 6 levels deals 325 at levels 4 to 6, its table's 4th
+  level), and reads so.
 - A field World Editor offers a list of values for holds an enum of them, named as the game's data spells them:
   `AttackType = AttackType.Magic`. One that takes several, such as the targets, holds flags:
   `Attack1TargetsAllowed = Targets.Air | Targets.Ground`. A flags field of 0 has none of them; `Targets.None` is
