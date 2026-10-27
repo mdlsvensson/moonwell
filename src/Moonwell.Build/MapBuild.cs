@@ -77,7 +77,7 @@ namespace Moonwell.Build
             BalanceCheck.Run(declarations, standard, data);
 
             var ids = ObjectIds.Assign(declarations.Objects, standard.AllIds(), MapObjectIds.Defined(project));
-            EntryWriter.Write(project, settings, true, Installs(project, map, targetPath, log));
+            EntryWriter.Write(project, settings, true, Installs(project, map, targetPath, BridgeWriter.Declared(declarations.Objects, ids), standard.AllIds(), log));
             RegistryWriter.Write(project, declarations.Used, declarations.Objects, ids);
             LuaCompiler.Compile(project, map, targetPath, options.Release, declarations, ids, standard, data.ValueSet, Declarations.References(targetPath, InteractionsAssemblyName));
             StageWith(project, () => Stage.Write(project, map, declarations.Objects, ids, declarations.StandardClassIds, standard, log));
@@ -104,15 +104,16 @@ namespace Moonwell.Build
             // The build reads no declarations, but a unit's Level is still set only in a declared class's constructor.
             Declarations.CheckSetters(targetPath);
 
-            EntryWriter.Write(project, settings, false, Installs(project, map, targetPath, log));
+            EntryWriter.Write(project, settings, false, Installs(project, map, targetPath, new List<BridgeWriter.OwnType>(), null, log));
             LuaCompiler.Compile(project, map, targetPath, options.Release);
             StageWith(project, () => Stage.WriteWithoutObjects(project, map, log));
         }
 
         // What the map's Main installs before anything registers: each package the map references, in this order. The terrain's grid, the
         // areas' regions, the input's cameras and the physics' bridges are written here too, from the map's ground, regions, cameras and
-        // placed destructables, and a file an earlier build wrote is removed when the map no longer uses the package.
-        private static List<string> Installs(MapProject project, War3Net.Build.Map map, string targetPath, TextWriter log)
+        // placed destructables (with the destructable types the map declares and the standard ids, when it uses Moonwell.Objects),
+        // and a file an earlier build wrote is removed when the map no longer uses the package.
+        private static List<string> Installs(MapProject project, War3Net.Build.Map map, string targetPath, IReadOnlyList<BridgeWriter.OwnType> declared, IReadOnlySet<string>? standardIds, TextWriter log)
         {
             var installs = new List<string>();
             if (Declarations.References(targetPath, DamageAssemblyName))
@@ -164,7 +165,7 @@ namespace Moonwell.Build
             if (physics)
             {
                 // After the terrain: a deck stands on the ground at its bridge's place.
-                BridgeWriter.Write(project, map.Doodads, log);
+                BridgeWriter.Write(project, map.Doodads, declared, standardIds, log);
                 installs.Add("global::Moonwell.Physics.Install(global::Moonwell.Generated.PhysicsData.Bridges(), global::Moonwell.Generated.PhysicsData.Decks());");
             }
             else

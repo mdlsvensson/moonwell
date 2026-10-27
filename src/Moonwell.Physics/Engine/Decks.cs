@@ -143,6 +143,27 @@ namespace Moonwell.Engine
             return false;
         }
 
+        /// <summary>Whether a destructable is a placed bridge with a deck, living or not: missiles do not meet it as a destructable.</summary>
+        internal static bool IsBridge(Destructable destructable)
+        {
+            var list = decks;
+            if (list == null)
+            {
+                return false;
+            }
+
+            var length = list.Count;
+            for (var i = 0; i < length; i++)
+            {
+                if (object.ReferenceEquals(Raw.At(list, i).bridge, destructable))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>Gives the height of the highest deck at a point that is not above a height, so a deck is met from above only; false when there is none.</summary>
         internal static bool Top(float x, float y, float z, out float height)
         {

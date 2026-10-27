@@ -30,6 +30,15 @@ namespace Moonwell.Testing
             + ". 110 110 110 .\n"
             + ". 100 100 100 .\n";
 
+        /// <summary>A shape with no symmetry: 4 cells across and 6 along, each 100 + 10 a row + 1 a column, its place at column 1, row 2.</summary>
+        private const string Ramp = "32 4 6 1 2\n"
+            + "100 101 102 103\n"
+            + "110 111 112 113\n"
+            + "120 121 122 123\n"
+            + "130 131 132 133\n"
+            + "140 141 142 143\n"
+            + "150 151 152 153\n";
+
         /// <summary>Installs the interactions, physics and terrain packages on fakes, the terrain flat over 16 by 16 tiles from (0, 0) at a height, under water when wet, and registers Pushee. Gives the physics fake.</summary>
         private static FakePhysicsWorld Fresh(float height, bool wet, out FakeTerrainWorld terrain)
         {
@@ -60,6 +69,7 @@ namespace Moonwell.Testing
         {
             var handle = world.NewDestructable(ObjectTypes.FourCC(type));
             world.PlaceDestructable(handle, x, y);
+            world.PlacedDestructables.Add(handle);
             fake.Placed[ObjectTypes.FourCC(type)] = handle;
             return handle;
         }
@@ -130,8 +140,11 @@ namespace Moonwell.Testing
         }
 
         /// <summary>
-        /// A bridge whose type turns with its facing, at facing 0 and scale 1.5, runs east to west, its cells 48 apart and its
-        /// heights 1.5 times as high, and its normal leans along it; a fixed-rotation bridge at facing 90 is not turned.
+        /// Two bridges of a shape with no symmetry (each cell 100 + 10 a row + 1 a column, its place at column 1, row 2), so
+        /// a wrong turn, a turn the wrong way or a wrong origin each reads otherwise. One whose type turns with its facing, at
+        /// facing 0 and scale 1.5, is turned a quarter counterclockwise from facing 270: its rows run west, its columns north,
+        /// its cells 48 apart and its heights 1.5 times as high, and its normal leans with it. A fixed-rotation one at facing 0
+        /// is not turned.
         /// </summary>
         public static void TurnedScaled(FakeWorld world)
         {
@@ -139,27 +152,54 @@ namespace Moonwell.Testing
             var fake = Fresh(0.0f, false, out terrain);
             Bridge(world, fake, TurningId, 512.0f, 512.0f);
             Bridge(world, fake, FixedId, 1536.0f, 1536.0f);
-            Physics.Install(TurningId + " 0 500 500 0 1.5 1\n" + FixedId + " 0 1530 1530 90 1 0", Shape);
+            Physics.Install(TurningId + " 0 500 500 0 1.5 1\n" + FixedId + " 0 1530 1530 0 1 0", Ramp);
             Expect.Equal(2, Decks.count, "two decks");
-            Within(195.0f, Physics.GroundHeight(512.0f, 512.0f), 0.01f, "the turned one's middle: 1.5 times 130");
-            Within(180.0f, Physics.GroundHeight(464.0f, 512.0f), 0.01f, "a cell of 48 west");
-            Within(180.0f, Physics.GroundHeight(560.0f, 512.0f), 0.01f, "a cell of 48 east");
-            Within(150.0f, Physics.GroundHeight(368.0f, 512.0f), 0.01f, "its west end");
-            Within(195.0f, Physics.GroundHeight(512.0f, 560.0f), 0.01f, "across it, a cell north");
-            Within(0.0f, Physics.GroundHeight(512.0f, 608.0f), 0.01f, "two cells north: no deck");
-            Within(0.0f, Physics.GroundHeight(512.0f, 680.0f), 0.01f, "north of it");
+            Within(181.5f, Physics.GroundHeight(512.0f, 512.0f), 0.01f, "the turned one's place: 1.5 times its cell, 121");
+            Within(183.0f, Physics.GroundHeight(512.0f, 560.0f), 0.01f, "48 north: the next column");
+            Within(196.5f, Physics.GroundHeight(464.0f, 512.0f), 0.01f, "48 west: the next row");
+            Within(166.5f, Physics.GroundHeight(560.0f, 512.0f), 0.01f, "48 east: the row before");
+            Within(229.5f, Physics.GroundHeight(368.0f, 608.0f), 0.01f, "its far corner: the last row and column, 153");
+            Within(0.0f, Physics.GroundHeight(656.0f, 512.0f), 0.01f, "east of its first row");
+            Within(0.0f, Physics.GroundHeight(512.0f, 416.0f), 0.01f, "south of its first column");
             float nx;
             float ny;
             float nz;
-            Ground.Normal(440.0f, 512.0f, 1000.0f, out nx, out ny, out nz);
-            var rise = 15.0f / 48.0f;
-            var length = MathF.Sqrt(rise * rise + 1.0f);
-            Within(-rise / length, nx, 0.001f, "the normal leans west, down the deck: x");
-            Within(0.0f, ny, 0.001f, "y");
+            Ground.Normal(488.0f, 520.0f, 1000.0f, out nx, out ny, out nz);
+            var west = 10.0f * 1.5f / 48.0f;
+            var north = 1.0f * 1.5f / 48.0f;
+            var length = MathF.Sqrt(west * west + north * north + 1.0f);
+            Within(west / length, nx, 0.001f, "the normal leans east, down the rows: x");
+            Within(-north / length, ny, 0.001f, "and south, down the columns: y");
             Within(1.0f / length, nz, 0.001f, "z");
-            Within(130.0f, Physics.GroundHeight(1536.0f, 1536.0f), 0.01f, "the fixed one's middle");
-            Within(100.0f, Physics.GroundHeight(1536.0f, 1632.0f), 0.01f, "its north end: it runs north to south, whatever its facing");
-            Within(0.0f, Physics.GroundHeight(1632.0f, 1536.0f), 0.01f, "east of it");
+            Within(121.0f, Physics.GroundHeight(1536.0f, 1536.0f), 0.01f, "the fixed one's place");
+            Within(122.0f, Physics.GroundHeight(1568.0f, 1536.0f), 0.01f, "32 east: the next column, whatever its facing");
+            Within(131.0f, Physics.GroundHeight(1536.0f, 1568.0f), 0.01f, "32 north: the next row");
+            Within(100.0f, Physics.GroundHeight(1504.0f, 1472.0f), 0.01f, "its first cell, south-west");
+            Within(143.0f, Physics.GroundHeight(1600.0f, 1600.0f), 0.01f, "its last column, two rows north");
+        }
+
+        /// <summary>A missile with DestructableContact set to Stop flies over a deck, through where the bridge would stand as a destructable 64 around and 250 tall on its deck, and stops at a barrel past it: the bridge is not met as a destructable.</summary>
+        public static void NotACylinder(FakeWorld world)
+        {
+            FakeTerrainWorld terrain;
+            var fake = Fresh(0.0f, false, out terrain);
+            Placed(world, fake);
+            var barrel = world.NewDestructable(ObjectTypes.FourCC("LTbr"));
+            world.PlaceDestructable(barrel, 900.0f, 512.0f);
+            world.PlacedDestructables.Add(barrel);
+            var shot = new Shot();
+            shot.DestructableContact = Contact.Stop;
+            Missile.Create(shot, 300.0f, 512.0f, 200.0f);
+            shot.VX = 600.0f;
+            for (var i = 0; i < 48 && !shot.HasEnded; i++)
+            {
+                world.Advance(Interactions.Step);
+            }
+
+            Expect.True(shot.HasEnded, "it ended");
+            Expect.Equal(1, shot.Impacts.Count, "one impact");
+            Expect.Same(Destructable.Of(barrel), shot.Met[0], "the barrel, not the bridge");
+            Within(836.0f, shot.Reads[1], 0.5f, "at the barrel's side, 64 from its middle, past the bridge");
         }
 
         /// <summary>A missile flying level under a deck passes under it; one dropped onto it from above lands on it, as one coming down onto it from beside it over the low ground does.</summary>

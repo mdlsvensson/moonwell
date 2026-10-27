@@ -2083,9 +2083,15 @@ namespace Moonwell.Engine
         }
     }
 
-    /// <summary>A missile's checks against destructables: the package starts it on a missile whose DestructableContact is not None.</summary>
+    /// <summary>A missile's checks against destructables: the package starts it on a missile whose DestructableContact is not None. A placed bridge is not one of them: its deck is its shape, met as the ground.</summary>
     internal sealed class DestructableContacts : Interaction<Missile, Destructable>
     {
+        /// <summary>Refuses a placed bridge, which is ground where its deck is, not an upright cylinder.</summary>
+        public override bool Accepts(Destructable other)
+        {
+            return Decks.count == 0 || !Decks.IsBridge(other);
+        }
+
         /// <summary>Keeps what the pair needs: the destructable's size.</summary>
         public override void OnMeet(Pair pair)
         {

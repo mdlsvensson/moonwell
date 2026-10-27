@@ -9,8 +9,9 @@ namespace Moonwell.Build
     /// from: each placed walkable destructable (its type, the number of its deck shape, its place, facing and scale, and
     /// whether its type turns with its facing) and the deck shapes of the types placed, from the shapes Moonwell ships
     /// (<c>Data/Decks.txt</c>, measured in the game). A type of the map's own that is based on a standard bridge takes its
-    /// base's shape, unless it changes the model or the fixed rotation, which would change the deck. A placed walkable type
-    /// with no shape is a warning: the package does not see it as ground.
+    /// base's shape, unless it changes the model or the fixed rotation, which would change the deck; one declared in code
+    /// wins over the object files. A placed walkable type with no shape is a warning, as is a placed type that is neither
+    /// standard nor the map's own: the package does not see it as ground. One placed dead (life 0) is left out.
     /// </summary>
     public static class BridgeWriter
     {
@@ -32,43 +33,59 @@ namespace Moonwell.Build
         /// <summary>The placed bridges' text, one bridge a line: <c>type shape x y facing scale turns</c>.</summary>
         /// <param name="project">The map project; its map folder's object files give the map's own destructable types.</param>
         /// <param name="doodads">The map's placed doodads and destructables; null when it has no <c>war3map.doo</c>.</param>
-        /// <param name="log">Where a placed walkable type with no deck shape is warned of.</param>
+        /// <param name="declared">The destructable types the map declares in code, which win over its object files; empty without <c>Moonwell.Objects</c>.</param>
+        /// <param name="standardIds">The ids of the game's standard objects, of every kind; null without <c>Moonwell.Objects</c>, when a placed type the map does not know cannot be told from a standard one.</param>
+        /// <param name="log">Where a placed walkable type with no deck shape, and a placed type nobody knows, are warned of.</param>
         /// <param name="decks">The shapes of the types placed, in the order the bridges number them: <c>cell columns rows originColumn originRow</c>, then the rows.</param>
         /// <returns>The text.</returns>
-        public static string Encode(MapProject project, MapDoodads? doodads, TextWriter log, out string decks)
+        public static string Encode(MapProject project, MapDoodads? doodads, IReadOnlyList<OwnType> declared, IReadOnlySet<string>? standardIds, TextWriter log, out string decks)
         {
             var shapes = Shapes(out var unmeasured);
-            var news = new Dictionary<string, (string Base, HashSet<string> Changed, bool? Walkable)>(StringComparer.Ordinal);
-            ReadObjects(project, news);
+            var own = new Dictionary<string, OwnType>(StringComparer.Ordinal);
+            ReadObjects(project, own);
+            foreach (var type in declared)
+            {
+                own[type.Id] = type;
+            }
 
             var bridges = new StringBuilder();
             var used = new List<string>();
             var warned = new HashSet<string>(StringComparer.Ordinal);
             foreach (var doodad in doodads?.Doodads ?? new List<DoodadData>())
             {
-                var type = ObjectTable.TextOf(doodad.TypeId);
-                var baseType = type;
-                var changed = new HashSet<string>(StringComparer.Ordinal);
-                bool? walkable = null;
-                if (news.TryGetValue(type, out var own))
-                {
-                    baseType = own.Base;
-                    changed = own.Changed;
-                    walkable = own.Walkable;
-                }
-
-                var key = baseType + " " + doodad.Variation.ToString(CultureInfo.InvariantCulture);
-                var standard = shapes.ContainsKey(key) || unmeasured.Contains(baseType) || shapes.Keys.Any(shape => shape.StartsWith(baseType + " ", StringComparison.Ordinal));
-                if (!(walkable ?? standard))
+                // One placed dead is not there to stand on at the start.
+                if (doodad.Life == 0)
                 {
                     continue;
                 }
 
-                if (!shapes.ContainsKey(key) || changed.Contains(ModelField) || changed.Contains(RotationField))
+                var id = ObjectTable.TextOf(doodad.TypeId);
+                own.TryGetValue(id, out var mine);
+                var baseType = mine?.Base ?? id;
+                var variation = doodad.Variation.ToString(CultureInfo.InvariantCulture);
+                var key = baseType + " " + variation;
+                var standard = shapes.ContainsKey(key) || unmeasured.Contains(baseType) || shapes.Keys.Any(shape => shape.StartsWith(baseType + " ", StringComparison.Ordinal));
+                if (mine == null && !standard && standardIds != null && !standardIds.Contains(id))
                 {
-                    if (warned.Add(type))
+                    if (warned.Add(id))
                     {
-                        log.WriteLine($"warning: war3map.doo places {Described(type, baseType, changed)}, a walkable destructable with no deck shape: the physics package does not see it as ground");
+                        log.WriteLine($"warning: war3map.doo places {id}, a type that is neither a standard object nor one of the map's own: if it is a bridge, the physics package does not see it as ground");
+                    }
+
+                    continue;
+                }
+
+                if (!(mine?.Walkable ?? standard))
+                {
+                    continue;
+                }
+
+                var reshaped = mine != null && mine.Reshaped;
+                if (!shapes.ContainsKey(key) || reshaped)
+                {
+                    if (warned.Add(id + " " + variation))
+                    {
+                        log.WriteLine($"warning: war3map.doo places {Described(id, variation, mine)}, a walkable destructable with no deck shape: the physics package does not see it as ground");
                     }
 
                     continue;
@@ -82,7 +99,7 @@ namespace Moonwell.Build
                 }
 
                 var facing = doodad.Rotation * 180.0 / Math.PI;
-                bridges.Append(type)
+                bridges.Append(id)
                     .Append(' ').Append(index.ToString(CultureInfo.InvariantCulture))
                     .Append(' ').Append(Number(doodad.Position.X))
                     .Append(' ').Append(Number(doodad.Position.Y))
@@ -102,17 +119,48 @@ namespace Moonwell.Build
             return bridges.ToString();
         }
 
+        /// <summary>The destructable types a map declares in code, as the bridges see them, and its doodad types, which are never walkable.</summary>
+        /// <param name="objects">The map's declared objects.</param>
+        /// <param name="ids">The id of each declared class, by its full name.</param>
+        /// <returns>The declared destructables.</returns>
+        public static IReadOnlyList<OwnType> Declared(IReadOnlyList<DeclaredObject> objects, IReadOnlyDictionary<string, string> ids)
+        {
+            var types = new List<OwnType>();
+            foreach (var declared in objects)
+            {
+                if ((declared.Kind != "destructable" && declared.Kind != "doodad") || !ids.TryGetValue(declared.ClassName, out var id))
+                {
+                    continue;
+                }
+
+                if (declared.Kind == "doodad")
+                {
+                    // A doodad is never walkable; it is listed so that placing one is not a type nobody knows.
+                    types.Add(new OwnType(id, declared.StandardRoot, false, false, declared.ClassName));
+                    continue;
+                }
+
+                bool? walkable = declared.Changed.TryGetValue(WalkableField, out var value) && value is bool set ? set : null;
+                var reshaped = declared.Changed.ContainsKey(ModelField) || declared.Changed.ContainsKey(RotationField);
+                types.Add(new OwnType(id, declared.StandardRoot, reshaped, walkable, declared.ClassName));
+            }
+
+            return types;
+        }
+
         /// <summary>
         /// Writes <c>PhysicsData.g.cs</c> into the project's generated folder: <c>Moonwell.Generated.PhysicsData</c> with the bridges'
         /// text from <c>Bridges()</c> and the shapes' from <c>Decks()</c>, methods so that CSharp.lua writes each text once.
         /// </summary>
         /// <param name="project">The map project.</param>
         /// <param name="doodads">The map's placed doodads and destructables; null when it has no <c>war3map.doo</c>.</param>
-        /// <param name="log">Where a placed walkable type with no deck shape is warned of.</param>
+        /// <param name="declared">The destructable types the map declares in code; empty without <c>Moonwell.Objects</c>.</param>
+        /// <param name="standardIds">The ids of the game's standard objects; null without <c>Moonwell.Objects</c>.</param>
+        /// <param name="log">Where a placed walkable type with no deck shape, and a placed type nobody knows, are warned of.</param>
         /// <returns>The path of the written file.</returns>
-        public static string Write(MapProject project, MapDoodads? doodads, TextWriter log)
+        public static string Write(MapProject project, MapDoodads? doodads, IReadOnlyList<OwnType> declared, IReadOnlySet<string>? standardIds, TextWriter log)
         {
-            var bridges = Encode(project, doodads, log, out var decks);
+            var bridges = Encode(project, doodads, declared, standardIds, log, out var decks);
             Directory.CreateDirectory(project.GeneratedFolder);
             var path = Path.Combine(project.GeneratedFolder, FileName);
             var text = string.Join(
@@ -195,9 +243,19 @@ namespace Moonwell.Build
         }
 
         // The map's own destructable types (new ones, and standard ones it changes), from its object files, main and skin:
-        // each one's base, the fields it changes, and whether it sets itself walkable.
-        private static void ReadObjects(MapProject project, Dictionary<string, (string Base, HashSet<string> Changed, bool? Walkable)> types)
+        // each one's base, whether it changes the model or the fixed rotation, and whether it sets itself walkable.
+        private static void ReadObjects(MapProject project, Dictionary<string, OwnType> types)
         {
+            // The map's own doodads are never walkable; they are listed so that placing one is not a type nobody knows.
+            foreach (var name in new[] { ObjectKinds.MainName("w3d"), ObjectKinds.SkinName("w3d") })
+            {
+                var table = ObjectTable.Read(Path.Combine(project.MapFolder, name), "doodad");
+                foreach (var entry in table.Originals.Concat(table.News))
+                {
+                    types[entry.Id] = new OwnType(entry.Id, entry.OldId, false, false, null);
+                }
+            }
+
             foreach (var name in new[] { ObjectKinds.MainName("w3b"), ObjectKinds.SkinName("w3b") })
             {
                 var table = ObjectTable.Read(Path.Combine(project.MapFolder, name), "destructable");
@@ -205,33 +263,51 @@ namespace Moonwell.Build
                 {
                     if (!types.TryGetValue(entry.Id, out var type))
                     {
-                        type = (entry.OldId, new HashSet<string>(StringComparer.Ordinal), null);
+                        type = new OwnType(entry.Id, entry.OldId, false, null, null);
+                        types[entry.Id] = type;
                     }
 
                     foreach (var modification in entry.Modifications)
                     {
-                        type.Changed.Add(modification.Field);
-                        if (modification.Field == WalkableField)
+                        if (modification.Field == ModelField || modification.Field == RotationField)
+                        {
+                            type.Reshaped = true;
+                        }
+                        else if (modification.Field == WalkableField)
                         {
                             type.Walkable = Convert.ToInt32(modification.Value, CultureInfo.InvariantCulture) != 0;
                         }
                     }
-
-                    types[entry.Id] = type;
                 }
             }
         }
 
-        // The type as the warning names it: its id, its base when it is the map's own, and whether it changes the deck.
-        private static string Described(string type, string baseType, HashSet<string> changed)
+        // The type as the warning names it: its id and variation, and for the map's own its class, its base and whether it changes the deck.
+        private static string Described(string id, string variation, OwnType? mine)
         {
-            var reshaped = changed.Contains(ModelField) || changed.Contains(RotationField);
-            if (type == baseType)
+            var text = id + " variation " + variation;
+            if (mine == null)
             {
-                return reshaped ? type + " (its model or fixed rotation changed)" : type;
+                return text;
             }
 
-            return $"{type} (based on {baseType}" + (reshaped ? ", its model or fixed rotation changed)" : ")");
+            var about = new List<string>();
+            if (mine.ClassName != null)
+            {
+                about.Add(mine.ClassName);
+            }
+
+            if (mine.Base != id)
+            {
+                about.Add("based on " + mine.Base);
+            }
+
+            if (mine.Reshaped)
+            {
+                about.Add("its model or fixed rotation changed");
+            }
+
+            return about.Count == 0 ? text : text + " (" + string.Join(", ", about) + ")";
         }
 
         private static string Number(double value)
@@ -243,6 +319,40 @@ namespace Moonwell.Build
         private static string Escaped(string text)
         {
             return text.Replace("\n", "\\n", StringComparison.Ordinal);
+        }
+
+        /// <summary>A destructable type of the map's own, declared in code or in its object files, as the bridges see it.</summary>
+        public sealed class OwnType
+        {
+            /// <summary>Makes one.</summary>
+            /// <param name="id">The type's id.</param>
+            /// <param name="baseType">The id of the standard type it is based on; its own id when it changes a standard type.</param>
+            /// <param name="reshaped">Whether it changes the model or the fixed rotation, which change the deck.</param>
+            /// <param name="walkable">Whether it sets itself walkable or not; null when it keeps its base's.</param>
+            /// <param name="className">The class that declares it in code; null for one from the object files.</param>
+            public OwnType(string id, string baseType, bool reshaped, bool? walkable, string? className)
+            {
+                Id = id;
+                Base = baseType;
+                Reshaped = reshaped;
+                Walkable = walkable;
+                ClassName = className;
+            }
+
+            /// <summary>The type's id.</summary>
+            public string Id { get; }
+
+            /// <summary>The id of the standard type it is based on.</summary>
+            public string Base { get; }
+
+            /// <summary>Whether it changes the model or the fixed rotation.</summary>
+            public bool Reshaped { get; internal set; }
+
+            /// <summary>Whether it sets itself walkable or not; null when it keeps its base's.</summary>
+            public bool? Walkable { get; internal set; }
+
+            /// <summary>The class that declares it in code; null for one from the object files.</summary>
+            public string? ClassName { get; }
         }
     }
 }

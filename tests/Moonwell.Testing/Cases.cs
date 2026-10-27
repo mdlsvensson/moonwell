@@ -250,6 +250,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "deck.unit-on", Run = DeckCases.UnitOn });
             list.Add(new Case { Name = "deck.push-rail", Run = DeckCases.PushRail });
             list.Add(new Case { Name = "deck.dies", Run = DeckCases.Dies });
+            list.Add(new Case { Name = "deck.not-a-cylinder", Run = DeckCases.NotACylinder });
         }
 
         /// <summary>Adds the areas package's cases.</summary>

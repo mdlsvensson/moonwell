@@ -1,4 +1,5 @@
 using War3Net.Build.Extensions;
+using War3Net.Build.Object;
 using War3Net.Build.Widget;
 using Moonwell.Tool;
 using Xunit;
@@ -109,6 +110,77 @@ namespace Moonwell.Build.Tests
         {
             // An Ice Floe (ITf1) is walkable, but its deck moves, so Moonwell ships no shape for it.
             var project = folders.TemporaryCopyOf("Physics");
+            Place(project, ("ITf1", 1024f, 1024f, 100));
+
+            var output = new StringWriter();
+            var error = new StringWriter();
+            var exitCode = Cli.Run(new[] { "build", project }, output, error, (_, _) => throw new InvalidOperationException("build starts nothing"));
+            Assert.True(exitCode == 0, error.ToString() + output);
+            Assert.Contains("warning: war3map.doo places ITf1 variation 0, a walkable destructable with no deck shape", output.ToString() + error);
+            var data = File.ReadAllText(Path.Combine(project, "build", "generated", "PhysicsData.g.cs"));
+            Assert.DoesNotContain("ITf1", data);
+            Assert.Contains("YT16 0 0 1280 270 1 0", data);
+        }
+
+        [Fact]
+        public void the_maps_own_bridges_take_their_base_deck()
+        {
+            // B000 and B001 are declared in code, B002 and B003 in the map's object file; each pair is a Long Stone Bridge as
+            // it is and one with its model changed. Zzz9 is a type nobody knows; the YT16 at (0, 2048) is placed dead.
+            var project = folders.TemporaryCopyOf("Physics");
+            File.WriteAllText(Path.Combine(project, "Spans.cs"), string.Join(
+                "\n",
+                "namespace PhysicsFixture",
+                "{",
+                "    [Moonwell.Objects.ObjectId(\"B000\")]",
+                "    public class StoneSpan : Moonwell.Objects.Destructables.LongStoneBridge",
+                "    {",
+                "    }",
+                "",
+                "    [Moonwell.Objects.ObjectId(\"B001\")]",
+                "    public class PaintedSpan : Moonwell.Objects.Destructables.LongStoneBridge",
+                "    {",
+                "        public PaintedSpan()",
+                "        {",
+                "            Model = \"Doodads\\\\Painted\\\\Span.mdl\";",
+                "        }",
+                "    }",
+                "}",
+                string.Empty));
+            var table = ObjectTable.Read(Path.Combine(project, "map", "war3map.w3b"), "destructable");
+            table.News.Add(new ObjectTable.Entry("YT16", "B002", table.NewUnknown(), new List<ObjectTable.Modification>()));
+            table.News.Add(new ObjectTable.Entry("YT16", "B003", table.NewUnknown(), new List<ObjectTable.Modification>
+            {
+                new ObjectTable.Modification("bfil", ObjectDataType.String, "Doodads\\Other\\Span.mdl", 0, 0),
+            }));
+            table.Write(Path.Combine(project, "map", "war3map.w3b"), "destructable");
+            Place(project, ("B000", 1024f, 0f, 100), ("B001", 1024f, 1024f, 100), ("B002", -1024f, 0f, 100), ("B003", -1024f, 1024f, 100), ("Zzz9", 2048f, 0f, 100), ("YT16", 0f, 2048f, 0));
+
+            var output = new StringWriter();
+            var error = new StringWriter();
+            var exitCode = Cli.Run(new[] { "build", project }, output, error, (_, _) => throw new InvalidOperationException("build starts nothing"));
+            Assert.True(exitCode == 0, error.ToString() + output);
+            var log = output.ToString() + error;
+            Assert.Contains("warning: war3map.doo places B001 variation 0 (PhysicsFixture.PaintedSpan, based on YT16, its model or fixed rotation changed), a walkable destructable with no deck shape", log);
+            Assert.Contains("warning: war3map.doo places B003 variation 0 (based on YT16, its model or fixed rotation changed), a walkable destructable with no deck shape", log);
+            Assert.Contains("warning: war3map.doo places Zzz9, a type that is neither a standard object nor one of the map's own", log);
+            Assert.DoesNotContain("places B000", log);
+            Assert.DoesNotContain("places B002", log);
+
+            var data = File.ReadAllText(Path.Combine(project, "build", "generated", "PhysicsData.g.cs"));
+            Assert.Contains("B000 0 1024 0 270 1 0\\n", data);
+            Assert.Contains("B002 0 -1024 0 270 1 0\\n", data);
+            Assert.DoesNotContain("B001", data);
+            Assert.DoesNotContain("B003", data);
+            Assert.DoesNotContain("Zzz9", data);
+            Assert.DoesNotContain(" 0 2048 ", data);
+            var decks = data.Split('\n').Single(line => line.Contains("public static string Decks() => ", StringComparison.Ordinal));
+            Assert.Single(decks.Split("32 13 41 6 20").Skip(1));
+        }
+
+        // Adds placed destructables to a project's war3map.doo, each at facing 270 and scale 1, with a life in percent.
+        private static void Place(string project, params (string Type, float X, float Y, byte Life)[] placed)
+        {
             var doo = Path.Combine(project, "map", "war3map.doo");
             MapDoodads doodads;
             using (var reader = new BinaryReader(File.OpenRead(doo)))
@@ -118,33 +190,28 @@ namespace Moonwell.Build.Tests
 
             // War3Net reads a doo that held no doodads as the old layout, which the game cannot load once doodads are added.
             doodads.UseNewFormat = true;
-            var floe = BitConverter.ToInt32(System.Text.Encoding.ASCII.GetBytes("ITf1"));
-            doodads.Doodads.Add(new DoodadData
+            foreach (var (type, x, y, life) in placed)
             {
-                TypeId = floe,
-                Variation = 0,
-                Position = new System.Numerics.Vector3(1024f, 1024f, 0f),
-                Rotation = 0f,
-                Scale = new System.Numerics.Vector3(1f, 1f, 1f),
-                SkinId = floe,
-                State = DoodadState.Normal,
-                Life = 100,
-                MapItemTableId = -1,
-                CreationNumber = doodads.Doodads.Count,
-            });
+                var id = BitConverter.ToInt32(System.Text.Encoding.ASCII.GetBytes(type));
+                doodads.Doodads.Add(new DoodadData
+                {
+                    TypeId = id,
+                    Variation = 0,
+                    Position = new System.Numerics.Vector3(x, y, 0f),
+                    Rotation = 1.5f * MathF.PI,
+                    Scale = new System.Numerics.Vector3(1f, 1f, 1f),
+                    SkinId = id,
+                    State = DoodadState.Normal,
+                    Life = life,
+                    MapItemTableId = -1,
+                    CreationNumber = doodads.Doodads.Count,
+                });
+            }
+
             using (var writer = new BinaryWriter(File.Create(doo)))
             {
                 writer.Write(doodads);
             }
-
-            var output = new StringWriter();
-            var error = new StringWriter();
-            var exitCode = Cli.Run(new[] { "build", project }, output, error, (_, _) => throw new InvalidOperationException("build starts nothing"));
-            Assert.True(exitCode == 0, error.ToString() + output);
-            Assert.Contains("warning: war3map.doo places ITf1, a walkable destructable with no deck shape", output.ToString() + error);
-            var data = File.ReadAllText(Path.Combine(project, "build", "generated", "PhysicsData.g.cs"));
-            Assert.DoesNotContain("ITf1", data);
-            Assert.Contains("YT16 0 0 1280 270 1 0", data);
         }
 
         [Fact]
