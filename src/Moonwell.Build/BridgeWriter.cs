@@ -290,23 +290,23 @@ namespace Moonwell.Build
                 var table = ObjectTable.Read(Path.Combine(project.MapFolder, name), "destructable");
                 foreach (var entry in table.Originals.Concat(table.News))
                 {
-                    if (!types.TryGetValue(entry.Id, out var type))
-                    {
-                        type = new OwnType(entry.Id, entry.OldId, false, null, null);
-                        types[entry.Id] = type;
-                    }
-
+                    // The skin file adds to what the main file said of a type: each is made whole from both.
+                    types.TryGetValue(entry.Id, out var before);
+                    var reshaped = before != null && before.Reshaped;
+                    var walkable = before?.Walkable;
                     foreach (var modification in entry.Modifications)
                     {
                         if (modification.Field == ModelField || modification.Field == RotationField)
                         {
-                            type.Reshaped = true;
+                            reshaped = true;
                         }
                         else if (modification.Field == WalkableField)
                         {
-                            type.Walkable = Convert.ToInt32(modification.Value, CultureInfo.InvariantCulture) != 0;
+                            walkable = Convert.ToInt32(modification.Value, CultureInfo.InvariantCulture) != 0;
                         }
                     }
+
+                    types[entry.Id] = new OwnType(entry.Id, before?.Base ?? entry.OldId, reshaped, walkable, before?.ClassName);
                 }
             }
         }
@@ -375,10 +375,10 @@ namespace Moonwell.Build
             public string Base { get; }
 
             /// <summary>Whether it changes the model or the fixed rotation.</summary>
-            public bool Reshaped { get; internal set; }
+            public bool Reshaped { get; }
 
             /// <summary>Whether it sets itself walkable or not; null when it keeps its base's.</summary>
-            public bool? Walkable { get; internal set; }
+            public bool? Walkable { get; }
 
             /// <summary>The class that declares it in code; null for one from the object files.</summary>
             public string? ClassName { get; }
