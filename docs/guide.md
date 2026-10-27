@@ -55,9 +55,13 @@ replaces the list.
 
 A unit, hero, item, ability, buff, destructable, doodad or upgrade is a class that inherits one of the game's own,
 from `Moonwell.Objects`, by race and kind: `Human.Units.Paladin`, `Human.Abilities.Defend`, `Human.Upgrades.Defend`,
-`Campaign.Units.Arthas`, and `Items.ClawsOfAttack15`, `Destructables.X` and `Doodads.X` for the kinds with no race.
+`Campaign.Units.ArthasHart`, and `Items.ClawsOfAttack15`, `Destructables.X` and `Doodads.X` for the kinds with no race.
 `using Moonwell.Objects;` reaches all of them; `using static Moonwell.Objects.Human;` lets a file write
-`Abilities.Defend`. Its constructor changes fields; a field it does not change keeps its base's value. Every new object
+`Abilities.Defend`. A class takes the object's in-game name. Where objects of one race and kind share a name, the one
+World Editor lists without an editor suffix keeps it and the others get their id added: `Orc.Abilities.Shockwave` is
+the Tauren Chieftain's, `Orc.Abilities.ShockwaveAOs2` Cairne's. Campaign units that share a name all get their id
+(`ArthasHart`, `ArthasUear`). A class's hover shows its name, editor suffix and id: "Shockwave (Cairne), AOs2."
+Its constructor changes fields; a field it does not change keeps its base's value. Every new object
 has its id on the class, as World Editor shows it: a hero's starts with an upper-case letter, another unit's with a
 lower-case one.
 
