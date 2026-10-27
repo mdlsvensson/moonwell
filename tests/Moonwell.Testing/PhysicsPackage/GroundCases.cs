@@ -552,6 +552,36 @@ namespace Moonwell.Testing
             Expect.True(twin.HasEnded, "and expired on that step");
         }
 
+        /// <summary>
+        /// Going along the ground at 1,500 a second into a cliff's face with Bounce, a ball is met at the face from where it
+        /// was, as a Slide rolling is: the impact is on the low ground before the cliff tile, at the ground's height, with a
+        /// level normal, and it bounces back. It was met at the end of its move, 45 into the cliff tile and 45 up it.
+        /// </summary>
+        public static void CliffBounce(FakeWorld world)
+        {
+            var low0 = GridText.Corner(0.0f, 2);
+            var high = GridText.Corner(128.0f, 3);
+            var row = low0 + low0 + high + high;
+            Fresh(4, 2, row + row);
+            var ball = new Ball();
+            ball.GroundContact = Contact.Bounce;
+            ball.Gravity = 800.0f;
+            Missile.Create(ball, 32.0f, 64.0f, 16.0f);
+            ball.VX = 1500.0f;
+            for (var i = 0; i < 16 && ball.Impacts == 0; i++)
+            {
+                Steps(world, 1);
+            }
+
+            Expect.Equal(1, ball.Impacts, "it met the cliff");
+            Expect.True(ball.Read[1] <= 128.0f, "on the low ground, not in the cliff tile; at x " + ball.Read[1]);
+            Within(0.0f, ball.Read[3], 0.5f, "at the ground's height, not up the face");
+            Within(-1.0f, ball.Read[4], 0.001f, "the normal points back: x");
+            Within(0.0f, ball.Read[6], 0.001f, "level, as a wall");
+            Expect.True(ball.VX < 0.0f, "it bounces back; VX " + ball.VX);
+            Expect.True(ball.X <= 128.0f, "from the low ground; at " + ball.X);
+        }
+
         /// <summary>With GroundContact None a missile is not checked against the ground: it falls through it, reads nothing, and ends below -2,000.</summary>
         public static void None(FakeWorld world)
         {

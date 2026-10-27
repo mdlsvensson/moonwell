@@ -332,7 +332,8 @@ namespace Moonwell.Engine
             if (again)
             {
                 // It began the step on the ground: it left it and came back within the step, or went along it. It is met
-                // at the end of its move, on the ground there, coming back as fast as it left.
+                // at the end of its move, on the ground there, coming back as fast as it left; into a cliff's face, at the
+                // start of its move.
                 hitX = x;
                 hitY = y;
                 hitZ = Ground.Last(missile);
@@ -348,8 +349,16 @@ namespace Moonwell.Engine
                 // A cliff's face it is not moving into, as one falling onto it: it meets the blend.
                 Ground.Slope(hitX, hitY, limit, out nx, out ny, out nz);
             }
+            else if (again && nz == 0.0f)
+            {
+                // Along the ground into a cliff's face: met at the face from where it was, as Roll meets it, not at the end
+                // of its move up the cliff's blend.
+                hitX = fromX;
+                hitY = fromY;
+                hitZ = fromZ - radius;
+            }
 
-            if (again)
+            if (again && nz > 0.0f)
             {
                 var leaving = vx * nx + vy * ny + vz * nz;
                 if (leaving > 0.0f)

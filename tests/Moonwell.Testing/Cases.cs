@@ -300,6 +300,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "ground.wake-moved", Run = GroundCases.WakeMoved });
             list.Add(new Case { Name = "ground.fast-ridge", Run = GroundCases.FastRidge });
             list.Add(new Case { Name = "ground.cliff-roll", Run = GroundCases.CliffRoll });
+            list.Add(new Case { Name = "ground.cliff-bounce", Run = GroundCases.CliffBounce });
             list.Add(new Case { Name = "ground.put-off", Run = GroundCases.PutOff });
             list.Add(new Case { Name = "ground.bounce-under-gravity", Run = GroundCases.BounceUnderGravity });
             list.Add(new Case { Name = "ground.bounce-friction", Run = GroundCases.BounceFriction });
