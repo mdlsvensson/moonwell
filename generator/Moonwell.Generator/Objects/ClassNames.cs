@@ -72,8 +72,11 @@ public static class ClassNames
     /// </summary>
     /// <remarks>
     /// A name that is a C# keyword, one of the classes it is nested in or a type of <see cref="TakenByTypes"/> gets the
-    /// id appended. Where several objects of a namespace share a name, each gets the id appended, except the one
-    /// with the first id (ordinal) when it is not a campaign object.
+    /// id appended. Where several objects of a namespace share a name, each gets the id appended except one, which keeps
+    /// the plain name (decision 71): the object without an editor suffix (<see cref="StandardObject.EditorSuffix"/>),
+    /// the one with the first id (ordinal) among several such, or the first id when every one has a suffix. A campaign
+    /// object never keeps it: the campaign units have a namespace of their own, so a clash there is of campaign objects
+    /// only, and each gets its id.
     /// </remarks>
     /// <exception cref="InvalidOperationException">Two objects still share a full name after that.</exception>
     public static IReadOnlyDictionary<(Kind, string), ClassName> Assign(IReadOnlyList<StandardObject> objects)
@@ -105,18 +108,10 @@ public static class ClassNames
                 continue;
             }
 
-            var first = group[0];
+            var keeper = Keeper(objects, group);
             foreach (var i in group)
             {
-                if (string.CompareOrdinal(objects[i].Id, objects[first].Id) < 0)
-                {
-                    first = i;
-                }
-            }
-
-            foreach (var i in group)
-            {
-                if (i != first || objects[i].Campaign)
+                if (i != keeper)
                 {
                     names[i] += Capitalize(objects[i].Id);
                 }
@@ -139,6 +134,36 @@ public static class ClassNames
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// The object of a clash that keeps the plain name: the first id (ordinal) of those without an editor suffix, else
+    /// of all; -1 for a clash of campaign objects, where none does.
+    /// </summary>
+    private static int Keeper(IReadOnlyList<StandardObject> objects, List<int> group)
+    {
+        var keeper = -1;
+        foreach (var i in group)
+        {
+            if (objects[i].Campaign)
+            {
+                continue;
+            }
+
+            if (keeper < 0 || Rank(objects[i]) < Rank(objects[keeper])
+                || (Rank(objects[i]) == Rank(objects[keeper]) && string.CompareOrdinal(objects[i].Id, objects[keeper].Id) < 0))
+            {
+                keeper = i;
+            }
+        }
+
+        return keeper;
+    }
+
+    // An object without an editor suffix comes first.
+    private static int Rank(StandardObject o)
+    {
+        return o.EditorSuffix.Trim().Length == 0 ? 0 : 1;
     }
 
     private static string Plain(StandardObject o)

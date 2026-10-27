@@ -409,6 +409,27 @@ public class StandardObjectsTests
     }
 
     [Fact]
+    public void an_object_has_its_editor_suffix_trimmed()
+    {
+        using var copy = new Copy();
+        copy.Replace("_locales/enus.w3mod/units/humanunitstrings.txt", "[hfoo]", "Name=Footman", "Name=Footman\r\nEditorSuffix= (Campaign) ");
+
+        var units = Of(copy.Tables(), Kind.Unit);
+
+        Assert.Equal("(Campaign)", Find(units, "hfoo").EditorSuffix);
+        Assert.Equal("", Find(units, "Hpal").EditorSuffix);
+    }
+
+    [Fact]
+    public void an_upgrade_has_the_editor_suffix_of_its_first_level()
+    {
+        using var copy = new Copy();
+        copy.Replace("_locales/enus.w3mod/units/humanupgradestrings.txt", "[Rhme]", "Name=", "EditorSuffix=(First),(Second)\r\nName=");
+
+        Assert.Equal("(First)", Find(Of(copy.Tables(), Kind.Upgrade), "Rhme").EditorSuffix);
+    }
+
+    [Fact]
     public void a_doodad_has_a_name_and_no_race()
     {
         var doodad = Of(Kind.Doodad).First();

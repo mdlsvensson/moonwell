@@ -28,6 +28,11 @@ namespace Moonwell.Generator.Objects;
 /// The balance sets the object does not exist under (<c>melee_v0</c>, <c>custom_v0</c>, <c>custom_v1</c>), and
 /// <c>base</c> when the base tables lack it.
 /// </param>
+/// <param name="EditorSuffix">
+/// The editor suffix World Editor shows after the name (<c>(Cairne)</c>): the value of the kind's <c>EditorSuffix</c>
+/// field (an upgrade's at level 1), trimmed, a <c>WESTRING_</c> key replaced as for <paramref name="Name"/>; the empty
+/// string for none, and for a doodad, which has no such field.
+/// </param>
 public sealed record StandardObject(
     Kind Kind,
     string Id,
@@ -38,7 +43,8 @@ public sealed record StandardObject(
     string? Code,
     IReadOnlyDictionary<string, string> Values,
     IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Sets,
-    IReadOnlyList<string> MissingFrom);
+    IReadOnlyList<string> MissingFrom,
+    string EditorSuffix = "");
 
 /// <summary>The game's standard objects of a kind, with the value of each field that applies to them.</summary>
 /// <remarks>
@@ -68,6 +74,7 @@ public static class StandardObjects
     private const string LevelCountName = "LevelCount";
     private const string NameName = "Name";
     private const string TooltipName = "Tooltip";
+    private const string SuffixColumn = "EditorSuffix";
     private const string KeyPrefix = "WESTRING_";
 
     /// <summary>The standard objects of <paramref name="kind"/> ordered by id (ordinal), with the values of <paramref name="fields"/>.</summary>
@@ -164,7 +171,8 @@ public static class StandardObjects
             kind == Kind.Ability ? Clean(row.Get("code")) : null,
             values,
             sets,
-            missing);
+            missing,
+            Resolved(tables, evaluator.SuffixOf(values)).Trim());
     }
 
     /// <summary>The label of a <c>WESTRING_</c> key; the empty string for a key the export has no label for; any other name as it is.</summary>
@@ -456,6 +464,7 @@ public static class StandardObjects
         private readonly List<FieldPlan> _plans;
         private readonly FieldPlan? _levels;
         private readonly List<string> _nameIds = new();
+        private readonly string? _suffixId;
 
         public Evaluator(Kind kind, List<FieldPlan> plans)
         {
@@ -476,6 +485,11 @@ public static class StandardObjects
                 else if (plan.Field.Name == TooltipName)
                 {
                     tooltip = plan.Field.Id;
+                }
+
+                if (plan.Field.Column == SuffixColumn)
+                {
+                    _suffixId = plan.Field.Id;
                 }
             }
 
@@ -518,6 +532,17 @@ public static class StandardObjects
                 {
                     return name;
                 }
+            }
+
+            return "";
+        }
+
+        /// <summary>The editor suffix in <paramref name="values"/> (an upgrade's at level 1); the empty string for none.</summary>
+        public string SuffixOf(Dictionary<string, string> values)
+        {
+            if (_suffixId != null && (values.TryGetValue(_suffixId, out var suffix) || values.TryGetValue(_suffixId + ":1", out suffix)))
+            {
+                return suffix;
             }
 
             return "";

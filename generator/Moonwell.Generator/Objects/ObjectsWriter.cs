@@ -668,8 +668,15 @@ public static class ObjectsWriter
         return hero ? "hero" : kind.ToString().ToLowerInvariant();
     }
 
+    // "Paladin (Hpal).", with an editor suffix "Shockwave (Cairne), AOs2." (decision 71), and "spur." for no name.
     private static string Summary(StandardObject obj)
     {
+        var suffix = obj.EditorSuffix.Trim();
+        if (suffix.Length > 0)
+        {
+            return obj.Name.Length == 0 ? $"{suffix}, {obj.Id}." : $"{obj.Name} {suffix}, {obj.Id}.";
+        }
+
         return obj.Name.Length == 0 ? obj.Id + "." : $"{obj.Name} ({obj.Id}).";
     }
 

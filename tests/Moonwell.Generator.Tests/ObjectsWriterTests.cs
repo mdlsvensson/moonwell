@@ -504,6 +504,27 @@ public class ObjectsWriterTests
     }
 
     [Fact]
+    public void a_class_summary_shows_the_editor_suffix_before_the_id()
+    {
+        var tables = MiniExport();
+        var item = Find(StandardObjects.Of(tables, Kind.Item, Fields.Of(tables, Kind.Item)), "ratf");
+
+        var text = ObjectsWriter.Group(
+            "Moonwell.Objects.Items",
+            new[]
+            {
+                (item with { Id = "b001", Name = "Shockwave", EditorSuffix = "(Cairne)" }, new ClassName("Moonwell.Objects.Items", "ShockwaveB001")),
+                (item with { Id = "b002", Name = "", EditorSuffix = "(Cairne)" }, new ClassName("Moonwell.Objects.Items", "b002")),
+                (item with { Id = "b003", Name = "Shockwave" }, new ClassName("Moonwell.Objects.Items", "Shockwave")),
+            },
+            Array.Empty<Field>());
+
+        Assert.Contains("/// <summary>Shockwave (Cairne), b001.</summary>", text);
+        Assert.Contains("/// <summary>(Cairne), b002.</summary>", text);
+        Assert.Contains("/// <summary>Shockwave (b003).</summary>", text);
+    }
+
+    [Fact]
     public void classes_are_ordered_by_name()
     {
         var tables = MiniExport();
