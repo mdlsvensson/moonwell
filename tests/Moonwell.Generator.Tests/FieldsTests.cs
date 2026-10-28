@@ -602,4 +602,30 @@ public class FieldsTests
         Assert.False(Find(fields, "uabi").HeroOnly);
         Assert.All(Fields.Of(MiniExport(), Kind.Ability), f => Assert.False(f.HeroOnly));
     }
+
+    [Fact]
+    public void A_field_carries_its_use_flags()
+    {
+        var fields = Fields.Of(MiniExport(), Kind.Unit);
+
+        var strength = Find(fields, "ustr");
+        Assert.True(strength.ForHero);
+        Assert.False(strength.ForUnit);
+        Assert.False(strength.ForBuilding);
+
+        var hitPoints = Find(fields, "uhpm");
+        Assert.True(hitPoints.ForUnit);
+        Assert.True(hitPoints.ForHero);
+        Assert.True(hitPoints.ForBuilding);
+
+        Assert.Empty(hitPoints.NotSpecific);
+    }
+
+    [Fact]
+    public void A_common_ability_field_carries_its_not_specific_codes()
+    {
+        var cast = Find(Fields.Of(MiniExport(), Kind.Ability), "acas");
+
+        Assert.Equal(new[] { "Arpb", "Arpl", "Arpm", "ANpa" }, cast.NotSpecific);
+    }
 }

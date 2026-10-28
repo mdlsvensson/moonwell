@@ -1,3 +1,4 @@
+using Moonwell.GameData;
 using War3Net.Build.Info;
 
 namespace Moonwell.Build
@@ -43,37 +44,28 @@ namespace Moonwell.Build
         /// <exception cref="BuildException">A value is not one of the enum's values.</exception>
         public static GameData Of(int dataSet, int dataVersion)
         {
-            var set = dataSet switch
+            var (set, setOption) = dataSet switch
             {
-                Default => GameDataSet.Default,
-                Custom => GameDataSet.Custom,
-                Melee => GameDataSet.Melee,
+                Default => (GameDataSet.Default, DataSetOption.Default),
+                Custom => (GameDataSet.Custom, DataSetOption.Custom),
+                Melee => (GameDataSet.Melee, DataSetOption.Melee),
                 _ => throw new BuildException($"DataSet {dataSet} is not a data set of this version of Moonwell"),
             };
-            var version = dataVersion switch
+            var (version, versionOption) = dataVersion switch
             {
-                ReignOfChaos => GameDataVersion.RoC,
-                FrozenThrone => GameDataVersion.TFT,
-                ForsakenKingdom => GameDataVersion.ForsakenKingdom,
+                ReignOfChaos => (GameDataVersion.RoC, DataVersionOption.ReignOfChaos),
+                FrozenThrone => (GameDataVersion.TFT, DataVersionOption.FrozenThrone),
+                ForsakenKingdom => (GameDataVersion.ForsakenKingdom, DataVersionOption.ForsakenKingdom),
                 _ => throw new BuildException($"DataVersion {dataVersion} is not a data version of this version of Moonwell"),
             };
 
-            if (dataVersion == ForsakenKingdom)
-            {
-                return new GameData(set, version, null, null);
-            }
+            var tables = DataOptions.TablesOf(setOption, versionOption);
+            return new GameData(set, version, NullForBase(tables.Values), NullForBase(tables.Objects));
+        }
 
-            if (dataSet == Melee)
-            {
-                // Under Melee / Frozen Throne the game takes every value from the base tables but has only the objects custom_v1 has
-                // (inferred from three units).
-                return dataVersion == ReignOfChaos
-                    ? new GameData(set, version, "melee_v0", "melee_v0")
-                    : new GameData(set, version, null, "custom_v1");
-            }
-
-            var tables = dataVersion == ReignOfChaos ? "custom_v0" : "custom_v1";
-            return new GameData(set, version, tables, tables);
+        private static string? NullForBase(string tables)
+        {
+            return tables == "base" ? null : tables;
         }
 
         /// <summary>Words the pair as World Editor does.</summary>

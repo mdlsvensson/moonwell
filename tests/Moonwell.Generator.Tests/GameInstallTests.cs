@@ -66,6 +66,17 @@ public class GameInstallTests
     }
 
     [Fact]
+    public void a_folder_is_an_install_when_it_has_build_info()
+    {
+        using var empty = new TempFolder();
+        using var install = new TempFolder();
+        File.WriteAllText(Path.Combine(install.Path, ".build.info"), "");
+
+        Assert.False(GameInstall.IsInstall(empty.Path));
+        Assert.True(GameInstall.IsInstall(install.Path));
+    }
+
+    [Fact]
     public void no_install_is_an_error_that_names_where_it_looked_and_the_variable()
     {
         using var empty = new TempFolder();

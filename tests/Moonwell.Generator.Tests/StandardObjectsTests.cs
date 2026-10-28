@@ -168,6 +168,70 @@ public class StandardObjectsTests
     }
 
     [Fact]
+    public void A_value_the_modes_differ_on_has_each_mode()
+    {
+        var paladin = Find(Of(Kind.Unit), "Hpal");
+
+        Assert.Equal(new[] { "sd", "hd", "de" }, StandardObjects.Modes);
+        Assert.Equal(new Dictionary<string, string> { ["sd"] = "1", ["hd"] = "1.2", ["de"] = "0.935" }, paladin.Modes["usca"]);
+        Assert.Equal("0.935", paladin.Values["usca"]);
+    }
+
+    [Fact]
+    public void A_value_the_modes_agree_on_has_no_modes()
+    {
+        var footman = Find(Of(Kind.Unit), "hfoo");
+
+        Assert.Contains("uhpm", footman.Values.Keys);
+        Assert.NotEmpty(footman.Modes);
+        Assert.All(footman.Modes.Values, byMode => Assert.True(byMode.Values.Distinct().Count() > 1));
+        Assert.False(footman.Modes.ContainsKey("uhpm"));
+    }
+
+    [Fact]
+    public void A_value_held_only_for_hd_is_empty_in_classic()
+    {
+        using var copy = new Copy();
+        copy.SetFootmanScales("modelScale:hd=2");
+
+        var footman = Find(Of(copy.Tables(), Kind.Unit), "hfoo");
+
+        Assert.Equal(new Dictionary<string, string> { ["sd"] = "", ["hd"] = "2", ["de"] = "2" }, footman.Modes["usca"]);
+        Assert.Equal("2", footman.Values["usca"]);
+    }
+
+    [Fact]
+    public void A_bare_value_is_the_classic_one_beside_a_reforged_one()
+    {
+        using var copy = new Copy();
+        copy.SetFootmanScales("modelScale=1", "modelScale:hd=0.9");
+
+        Assert.Equal(new Dictionary<string, string> { ["sd"] = "1", ["hd"] = "0.9", ["de"] = "0.9" }, Find(Of(copy.Tables(), Kind.Unit), "hfoo").Modes["usca"]);
+    }
+
+    [Fact]
+    public void A_blank_definitive_edition_value_is_empty_in_definitive_edition_only()
+    {
+        // As Values reads it: the key has no value in de, not the :hd or the plain key's.
+        using var copy = new Copy();
+        copy.SetFootmanScales("modelScale=1", "modelScale:de=", "modelScale:hd=0.9");
+
+        var footman = Find(Of(copy.Tables(), Kind.Unit), "hfoo");
+
+        Assert.Equal(new Dictionary<string, string> { ["sd"] = "1", ["hd"] = "0.9", ["de"] = "" }, footman.Modes["usca"]);
+        Assert.False(footman.Values.ContainsKey("usca"));
+    }
+
+    [Fact]
+    public void An_object_with_no_mode_keys_has_no_modes()
+    {
+        using var copy = new Copy();
+        copy.SetFootmanScales("modelScale=1");
+
+        Assert.Empty(Find(Of(copy.Tables(), Kind.Unit), "hfoo").Modes);
+    }
+
+    [Fact]
     public void objects_are_ordered_by_id()
     {
         var ids = Of(Kind.Unit).Select(o => o.Id).ToList();
@@ -414,6 +478,96 @@ public class StandardObjectsTests
         var plain = Find(Of(Kind.Unit), "hfoo");
         Assert.DoesNotContain("ustr", plain.Values.Keys);
         Assert.Equal("2", plain.Values["ulev"]);
+    }
+
+    [Fact]
+    public void A_building_is_marked()
+    {
+        using var copy = new Copy();
+        copy.Replace("units/unitbalance.slk", "C;X1;Y3;K\"hfoo\"", "C;X53;K0", "C;X53;K1");
+
+        var units = Of(copy.Tables(), Kind.Unit);
+
+        Assert.True(Find(units, "hfoo").Building);
+        Assert.False(Find(units, "Hpal").Building);
+        Assert.False(Find(Of(Kind.Unit), "hfoo").Building);
+    }
+
+    [Fact]
+    public void Applies_follows_the_abilitys_own_fields()
+    {
+        var tables = GameTables.OpenExport(MiniExportFolder());
+        var fields = Fields.Of(tables, Kind.Ability);
+        var holyLight = Find(StandardObjects.Of(tables, Kind.Ability, fields), "AHhb");
+
+        var specific = fields.Where(field => field.Specific.Count > 0).ToList();
+        Assert.Contains(specific, field => holyLight.Own.Contains(field.Id));
+        Assert.Contains(specific, field => !holyLight.Own.Contains(field.Id));
+        Assert.All(specific, field => Assert.Equal(holyLight.Own.Contains(field.Id), StandardObjects.Applies(field, holyLight)));
+
+        // A common field applies to every ability but those its notSpecific lists by code: acas lists Arpb.
+        var cast = fields.Single(field => field.Id == "acas");
+        Assert.Contains("Arpb", cast.NotSpecific);
+        Assert.True(StandardObjects.Applies(cast, holyLight));
+
+        using var copy = new Copy();
+        copy.Replace("units/abilitydata.slk", "C;X1;Y3;K\"AHhb\"", "C;X2;K\"AHhb\"", "C;X2;K\"Arpb\"");
+        var tablesCopy = copy.Tables();
+        var listed = Find(StandardObjects.Of(tablesCopy, Kind.Ability, Fields.Of(tablesCopy, Kind.Ability)), "AHhb");
+        Assert.Equal("Arpb", listed.Code);
+        Assert.False(StandardObjects.Applies(cast, listed));
+    }
+
+    [Fact]
+    public void Applies_follows_a_buildings_own_use_flags()
+    {
+        // utra (Trains) is for buildings only, ubui (Builds) for units and heroes only.
+        using var copy = new Copy();
+        copy.Replace("units/unitbalance.slk", "C;X1;Y3;K\"hfoo\"", "C;X53;K0", "C;X53;K1");
+        var tables = copy.Tables();
+        var fields = Fields.Of(tables, Kind.Unit);
+        var trains = fields.Single(field => field.Id == "utra");
+        var builds = fields.Single(field => field.Id == "ubui");
+        Assert.True(trains.ForBuilding && !trains.ForUnit);
+        Assert.True(builds.ForUnit && !builds.ForBuilding);
+
+        var footman = Find(StandardObjects.Of(tables, Kind.Unit, fields), "hfoo");
+
+        Assert.True(footman.Building);
+        Assert.True(StandardObjects.Applies(trains, footman));
+        Assert.False(StandardObjects.Applies(builds, footman));
+
+        // The same footman, not a building: the flags swap.
+        var plainTables = GameTables.OpenExport(MiniExportFolder());
+        var plain = Find(StandardObjects.Of(plainTables, Kind.Unit, fields), "hfoo");
+        Assert.False(plain.Building);
+        Assert.False(StandardObjects.Applies(trains, plain));
+        Assert.True(StandardObjects.Applies(builds, plain));
+    }
+
+    [Fact]
+    public void An_ability_knows_its_own_fields()
+    {
+        var tables = GameTables.OpenExport(MiniExportFolder());
+        var fields = Fields.Of(tables, Kind.Ability);
+        var objects = StandardObjects.Of(tables, Kind.Ability, fields);
+
+        var holyLight = Find(objects, "AHhb");
+        Assert.NotEmpty(holyLight.Own);
+        Assert.Equal(Fields.SpecificOf(fields, "AHhb", holyLight.Code).Select(f => f.Id), holyLight.Own);
+        Assert.Empty(Find(Of(Kind.Unit), "hfoo").Own);
+    }
+
+    [Fact]
+    public void Applies_follows_the_use_flags()
+    {
+        var tables = GameTables.OpenExport(MiniExportFolder());
+        var fields = Fields.Of(tables, Kind.Unit);
+        var units = StandardObjects.Of(tables, Kind.Unit, fields);
+        var strength = fields.Single(f => f.Id == "ustr");
+
+        Assert.True(StandardObjects.Applies(strength, Find(units, "Hpal")));
+        Assert.False(StandardObjects.Applies(strength, Find(units, "hfoo")));
     }
 
     [Fact]

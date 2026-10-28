@@ -34,6 +34,21 @@ namespace Moonwell.GameData;
 /// field (an upgrade's at level 1), trimmed, a <c>WESTRING_</c> key replaced as for <paramref name="Name"/>; the empty
 /// string for none, and for a doodad, which has no such field.
 /// </param>
+/// <param name="Building">
+/// True for a unit whose <c>isbldg</c> column is 1 (<c>hbar</c>, the Human Barracks); false for every other kind and
+/// for a unit that is not a building (<c>hfoo</c>).
+/// </param>
+/// <param name="Own">
+/// For an ability, the ids of the fields specific to it (<see cref="Fields.SpecificOf"/>), in the fields' order
+/// (<c>AHhb</c>, Holy Light, has <c>Hhb1</c>); empty for every other kind. Never null once made.
+/// </param>
+/// <param name="Modes">
+/// The keys of <paramref name="Values"/> whose value differs between the graphics modes (<see cref="StandardObjects.Modes"/>:
+/// <c>sd</c> Classic, <c>hd</c> Reforged, <c>de</c> Definitive Edition), read from the same rows as
+/// <paramref name="Values"/>, which is the <c>de</c> reading. For each such key, the value in each mode; the empty
+/// string stands for a mode the key has no value in (<c>usca</c> of a unit with only <c>modelScale:hd</c> is empty in
+/// <c>sd</c>). Never null once made.
+/// </param>
 public sealed record StandardObject(
     Kind Kind,
     string Id,
@@ -45,7 +60,20 @@ public sealed record StandardObject(
     IReadOnlyDictionary<string, string> Values,
     IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Sets,
     IReadOnlyList<string> MissingFrom,
-    string EditorSuffix = "");
+    string EditorSuffix = "",
+    bool Building = false,
+    IReadOnlyList<string>? Own = null,
+    IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>>? Modes = null)
+{
+    private static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> EmptyModes =
+        new Dictionary<string, IReadOnlyDictionary<string, string>>();
+
+    /// <summary>The ids of the fields specific to an ability, as the <c>Own</c> parameter above says (<c>Hhb1</c> for <c>AHhb</c>); empty for every other kind. Never null.</summary>
+    public IReadOnlyList<string> Own { get; init; } = Own ?? Array.Empty<string>();
+
+    /// <summary>The keys whose value differs between the graphics modes, with the value in each mode (<c>sd</c>, <c>hd</c>, <c>de</c>); empty for none. Never null.</summary>
+    public IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Modes { get; init; } = Modes ?? EmptyModes;
+}
 
 /// <summary>The game's standard objects of a kind, with the value of each field that applies to them.</summary>
 /// <remarks>
@@ -84,6 +112,10 @@ public static class StandardObjects
     private const string TooltipName = "Tooltip";
     private const string SuffixColumn = "EditorSuffix";
     private const string KeyPrefix = "WESTRING_";
+    private const string DefinitiveMode = "de";
+
+    /// <summary>The graphics modes, by the names <see cref="StandardObject.Modes"/> uses: <c>sd</c> Classic, <c>hd</c> Reforged, <c>de</c> Definitive Edition. <see cref="StandardObject.Values"/> is the <c>de</c> reading.</summary>
+    public static readonly IReadOnlyList<string> Modes = ["sd", "hd", "de"];
 
     /// <summary>The standard objects of <paramref name="kind"/> ordered by id (ordinal), with the values of <paramref name="fields"/>.</summary>
     public static IReadOnlyList<StandardObject> Of(GameTables tables, Kind kind, IReadOnlyList<Field> fields)
@@ -179,12 +211,32 @@ public static class StandardObjects
             missing.Insert(0, BaseTables);
         }
 
-        var row = new Row(primary);
+        var row = new Row(primary, DefinitiveMode);
         var values = evaluator.Values(id, row);
         var sets = new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.Ordinal);
         foreach (var set in existing)
         {
-            sets[set] = Diff(values, evaluator.Values(id, new Row(setRows[set][id])));
+            sets[set] = Diff(values, evaluator.Values(id, new Row(setRows[set][id], DefinitiveMode)));
+        }
+
+        // Only the skin files key values by mode, so most objects need no second reading.
+        var modes = new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.Ordinal);
+        if (row.HasModes)
+        {
+            var byMode = Modes.Select(mode => mode == DefinitiveMode ? values : evaluator.Values(id, row.In(mode))).ToArray();
+            foreach (var key in byMode.SelectMany(read => read.Keys).Distinct(StringComparer.Ordinal))
+            {
+                var perMode = new Dictionary<string, string>(StringComparer.Ordinal);
+                for (var i = 0; i < Modes.Count; i++)
+                {
+                    perMode[Modes[i]] = byMode[i].GetValueOrDefault(key, "");
+                }
+
+                if (perMode.Values.Distinct(StringComparer.Ordinal).Count() > 1)
+                {
+                    modes[key] = perMode;
+                }
+            }
         }
 
         return new StandardObject(
@@ -198,7 +250,33 @@ public static class StandardObjects
             values,
             sets,
             missing,
-            Resolved(tables, evaluator.SuffixOf(values)).Trim());
+            Resolved(tables, evaluator.SuffixOf(values)).Trim(),
+            evaluator.BuildingOf(row),
+            evaluator.OwnOf(id, kind == Kind.Ability ? Clean(row.Get("code")) : null),
+            modes);
+    }
+
+    /// <summary>Whether a field applies to an object: by use flags for a unit, by its specific and <c>notSpecific</c> codes for an ability, always for any other kind.</summary>
+    /// <param name="field">A field of the object's kind.</param>
+    /// <param name="obj">The object, as <see cref="Of"/> built it.</param>
+    /// <returns>True when the object has a value for the field to hold, e.g. <c>ustr</c> (Strength) applies to a hero but not to a footman.</returns>
+    public static bool Applies(Field field, StandardObject obj)
+    {
+        return Applies(field, obj.Kind, obj.Code, obj.IsHero, obj.Building, obj.Own);
+    }
+
+    /// <summary>The rule of <see cref="Applies(Field, StandardObject)"/>, written once for it and for the generator's reading of the tables.</summary>
+    private static bool Applies(Field field, Kind kind, string? code, bool hero, bool building, IEnumerable<string>? own)
+    {
+        switch (kind)
+        {
+            case Kind.Unit:
+                return building ? field.ForBuilding : hero ? field.ForHero : field.ForUnit;
+            case Kind.Ability:
+                return field.Specific.Count > 0 ? own != null && own.Contains(field.Id) : !field.NotSpecific.Contains(code ?? "");
+            default:
+                return true;
+        }
     }
 
     /// <summary>The label of a <c>WESTRING_</c> key; the empty string for a key the tables have no label for; any other name as it is.</summary>
@@ -290,7 +368,8 @@ public static class StandardObjects
     /// is what the game read in graphics mode 2 on 3.0.1 (game-facts, seen 2026-10-22): the key's <c>:de</c> value, else its
     /// <c>:hd</c> value, else the key itself, and never its <c>:sd</c> value (a footman's scale 0.8 with <c>:hd</c> 0.95, a
     /// peasant's 0.85 beside its <c>modelScale=1</c>, an assassin's 1.2 with <c>:hd</c> 1.2 and <c>:sd</c> 1.3). In the
-    /// other modes the game reads that mode's values.
+    /// other modes the game reads that mode's values: Classic the key's <c>:sd</c> value, else the key itself; Reforged
+    /// its <c>:hd</c> value, else the key itself (<see cref="In"/>).
     /// </summary>
     private sealed class Row
     {
@@ -299,13 +378,34 @@ public static class StandardObjects
         // the same way.
         private const string GameMode = ":de";
         private const string FallbackMode = ":hd";
+        private const string ClassicMode = ":sd";
 
         private readonly ObjectRows _rows;
+        private readonly string _mode;
         private Dictionary<string, string?>? _folded;
+        private bool? _hasModes;
 
-        public Row(ObjectRows rows)
+        /// <summary>The rows as read in a graphics mode (<see cref="StandardObjects.Modes"/>).</summary>
+        public Row(ObjectRows rows, string mode)
         {
             _rows = rows;
+            _mode = mode;
+        }
+
+        private Row(Row from, string mode)
+        {
+            _rows = from._rows;
+            _mode = mode;
+            _folded = from.Folded();
+        }
+
+        /// <summary>Whether the rows hold a key with a mode suffix (<c>modelScale:hd</c>), so that the modes may read different values.</summary>
+        public bool HasModes => _hasModes ??= _rows.Values.Keys.Any(HasModeSuffix);
+
+        /// <summary>The same rows read in another mode.</summary>
+        public Row In(string mode)
+        {
+            return new Row(this, mode);
         }
 
         /// <summary>The value of the key, or null when no key matches or several keys match without regard to case.</summary>
@@ -338,7 +438,19 @@ public static class StandardObjects
 
         private string? Spelling(string key)
         {
-            return Spelled(key + GameMode) ?? Spelled(key + FallbackMode) ?? Spelled(key);
+            return _mode switch
+            {
+                "sd" => Spelled(key + ClassicMode) ?? Spelled(key),
+                "hd" => Spelled(key + FallbackMode) ?? Spelled(key),
+                _ => Spelled(key + GameMode) ?? Spelled(key + FallbackMode) ?? Spelled(key),
+            };
+        }
+
+        private static bool HasModeSuffix(string key)
+        {
+            return key.EndsWith(GameMode, StringComparison.OrdinalIgnoreCase)
+                || key.EndsWith(FallbackMode, StringComparison.OrdinalIgnoreCase)
+                || key.EndsWith(ClassicMode, StringComparison.OrdinalIgnoreCase);
         }
 
         private string? Spelled(string key)
@@ -348,6 +460,12 @@ public static class StandardObjects
                 return key;
             }
 
+            return Folded().GetValueOrDefault(key);
+        }
+
+        /// <summary>The keys without regard to case, each to its spelling, or to null when several keys match.</summary>
+        private Dictionary<string, string?> Folded()
+        {
             if (_folded == null)
             {
                 _folded = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
@@ -357,7 +475,7 @@ public static class StandardObjects
                 }
             }
 
-            return _folded.GetValueOrDefault(key);
+            return _folded;
         }
     }
 
@@ -369,11 +487,6 @@ public static class StandardObjects
         private readonly int _element;
         private readonly bool _list;
         private readonly bool _appended;
-        private readonly HashSet<string> _specific;
-        private readonly HashSet<string> _notSpecific;
-        private readonly bool _hero;
-        private readonly bool _unit;
-        private readonly bool _building;
 
         // The last level whose column the tables hold, for an ability field held in a column of each level; 0 otherwise.
         private int _lastLevel;
@@ -384,11 +497,6 @@ public static class StandardObjects
         public FieldPlan(Field field, MetaRow meta)
         {
             Field = field;
-            _specific = new HashSet<string>(field.Specific, StringComparer.Ordinal);
-            _notSpecific = new HashSet<string>(Codes(Cell(meta, "notSpecific")), StringComparer.Ordinal);
-            _hero = Cell(meta, "useHero") == "1";
-            _unit = Cell(meta, "useUnit") == "1";
-            _building = Cell(meta, "useBuilding") == "1";
             _appended = Cell(meta, "appendIndex") == "1";
             _element = -1;
             _column = field.Column;
@@ -431,15 +539,7 @@ public static class StandardObjects
         /// <param name="own">For an ability, the ids of the fields specific to it (<see cref="Fields.SpecificOf"/>).</param>
         public bool Applies(Kind kind, string? code, bool hero, bool building, IReadOnlySet<string>? own)
         {
-            switch (kind)
-            {
-                case Kind.Unit:
-                    return building ? _building : hero ? _hero : _unit;
-                case Kind.Ability:
-                    return _specific.Count > 0 ? own != null && own.Contains(Field.Id) : !_notSpecific.Contains(code ?? "");
-                default:
-                    return true;
-            }
+            return StandardObjects.Applies(Field, kind, code, hero, building, own);
         }
 
         /// <summary>Adds the field's values: one, or one for each level up to <paramref name="levels"/> (null: no level count).</summary>
@@ -508,18 +608,6 @@ public static class StandardObjects
         {
             return meta.Columns.TryGetValue(column, out var value) ? value.Trim() : "";
         }
-
-        private static IEnumerable<string> Codes(string cell)
-        {
-            foreach (var part in cell.Split(',', '.'))
-            {
-                var code = part.Trim();
-                if (code.Length > 0)
-                {
-                    yield return code;
-                }
-            }
-        }
     }
 
     /// <summary>The values of every field that applies to an object of one kind.</summary>
@@ -576,11 +664,9 @@ public static class StandardObjects
         {
             var code = _kind == Kind.Ability ? Clean(row.Get("code")) : null;
             var hero = IsHero(_kind, id);
-            var building = _kind == Kind.Unit && Clean(row.Get("isbldg")) == "1";
+            var building = BuildingOf(row);
             var levels = LevelCount(row);
-            var own = _kind == Kind.Ability
-                ? new HashSet<string>(Fields.SpecificOf(_fields, id, code).Select(field => field.Id), StringComparer.Ordinal)
-                : null;
+            var own = _kind == Kind.Ability ? new HashSet<string>(OwnOf(id, code), StringComparer.Ordinal) : null;
             var values = new Dictionary<string, string>(StringComparer.Ordinal);
             foreach (var plan in _plans)
             {
@@ -591,6 +677,18 @@ public static class StandardObjects
             }
 
             return values;
+        }
+
+        /// <summary>Whether the object is a unit whose <c>isbldg</c> is 1.</summary>
+        public bool BuildingOf(Row row)
+        {
+            return _kind == Kind.Unit && Clean(row.Get("isbldg")) == "1";
+        }
+
+        /// <summary>The ids of the ability's own fields (<see cref="Fields.SpecificOf"/>); empty for any other kind.</summary>
+        public List<string> OwnOf(string id, string? code)
+        {
+            return _kind == Kind.Ability ? Fields.SpecificOf(_fields, id, code).Select(field => field.Id).ToList() : new List<string>();
         }
 
         /// <summary>The name in <paramref name="values"/>: the <c>Name</c> field's (an upgrade's at level 1; a buff's tooltip first).</summary>
