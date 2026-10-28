@@ -1,3 +1,4 @@
+using Moonwell.MapFiles;
 using War3Net.Build.Extensions;
 
 namespace Moonwell.Build
@@ -6,9 +7,9 @@ namespace Moonwell.Build
     public static class Stage
     {
         // The object files are written by ObjectFiles, or copied as they are when the map does not use Moonwell.Objects.
-        private static readonly string[] ObjectFileNames = ObjectKinds.All
-            .Select(kind => ObjectKinds.MainName(kind.Extension))
-            .Concat(ObjectKinds.All.Select(kind => ObjectKinds.SkinName(kind.Extension)))
+        private static readonly string[] ObjectFileNames = Kinds.All
+            .Select(Kinds.MainName)
+            .Concat(Kinds.All.Select(Kinds.SkinName))
             .ToArray();
 
         // The script and info files are regenerated. The trigger files stay: World Editor needs them to open the map, so they are copied unparsed.

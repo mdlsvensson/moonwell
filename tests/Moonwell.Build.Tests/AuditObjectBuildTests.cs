@@ -1,4 +1,5 @@
 using System.Text;
+using Moonwell.MapFiles;
 using War3Net.Build.Extensions;
 using War3Net.Build.Object;
 using Xunit;
@@ -229,9 +230,9 @@ namespace Moonwell.Build.Tests
         // Each level's value of a field of an object, as "level=value", by level.
         private static string[] LevelsOf(IEnumerable<LevelObjectModification> objects, string id, string field)
         {
-            var one = Assert.Single(objects, candidate => candidate.NewId == ObjectTable.IdOf(id));
+            var one = Assert.Single(objects, candidate => candidate.NewId == Rawcodes.IdOf(id));
             return one.Modifications
-                .Where(modification => modification.Id == ObjectTable.IdOf(field))
+                .Where(modification => modification.Id == Rawcodes.IdOf(field))
                 .OrderBy(modification => modification.Level)
                 .Select(modification => $"{modification.Level}={modification.Value}")
                 .ToArray();
@@ -246,9 +247,9 @@ namespace Moonwell.Build.Tests
         // A field of an object without levels, as "0=value".
         private static string[] LevelsOf(IEnumerable<SimpleObjectModification> objects, string id, string field)
         {
-            var one = Assert.Single(objects, candidate => candidate.NewId == ObjectTable.IdOf(id));
+            var one = Assert.Single(objects, candidate => candidate.NewId == Rawcodes.IdOf(id));
             return one.Modifications
-                .Where(modification => modification.Id == ObjectTable.IdOf(field))
+                .Where(modification => modification.Id == Rawcodes.IdOf(field))
                 .Select(modification => $"0={modification.Value}")
                 .ToArray();
         }

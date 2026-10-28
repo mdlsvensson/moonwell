@@ -4,8 +4,6 @@ namespace Moonwell.Build
     public static class ObjectIds
     {
         private const string CarrierSuffix = "#carrier";
-        private const string Digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        private const int CounterLimit = 36 * 36 * 36;
 
         /// <summary>
         /// The object ids of a build, as the classes give them: a <c>[Replaces]</c> class has its standard object's id, every other
@@ -127,7 +125,7 @@ namespace Moonwell.Build
             }
 
             // An id is four bytes: the object file would write a character past ASCII as '?', and the Lua as another id still.
-            if (id.Any(letter => letter < '!' || letter > '~'))
+            if (!MapFiles.ObjectIds.IsValid(id))
             {
                 throw new BuildException($"{owner} has the id \"{id}\", with a character that is not an ASCII letter, digit or sign");
             }
@@ -138,12 +136,12 @@ namespace Moonwell.Build
             }
 
             // The game makes a unit whose id starts with an upper-case letter a hero, and only such a unit.
-            if (kind == "hero" && !char.IsAsciiLetterUpper(id[0]))
+            if (kind == "hero" && !MapFiles.ObjectIds.IsHeroId(id))
             {
                 throw new BuildException($"{owner} is a hero, so its id {id} must start with an upper-case letter");
             }
 
-            if (kind == "unit" && char.IsAsciiLetterUpper(id[0]))
+            if (kind == "unit" && MapFiles.ObjectIds.IsHeroId(id))
             {
                 throw new BuildException($"{owner} is a unit, so its id {id} must not start with an upper-case letter: the game makes such a unit a hero");
             }
@@ -161,7 +159,7 @@ namespace Moonwell.Build
             claimed[id] = owner;
         }
 
-        // The first id of the letter that nothing has, claimed for the owner so that the next suggestion differs.
+        // The first id of the letter that nothing has (counting from 000, as World Editor does), claimed for the owner so that the next suggestion differs.
         private static string Free(
             char letter,
             Dictionary<string, string> claimed,
@@ -169,19 +167,10 @@ namespace Moonwell.Build
             IReadOnlySet<string> sourceMapIds,
             string owner)
         {
-            for (var count = 1; count < CounterLimit; count++)
-            {
-                var id = new string(new[] { letter, Digits[count / 1296], Digits[count / 36 % 36], Digits[count % 36] });
-                if (standardIds.Contains(id) || sourceMapIds.Contains(id) || claimed.ContainsKey(id))
-                {
-                    continue;
-                }
-
-                claimed[id] = owner;
-                return id;
-            }
-
-            throw new BuildException($"no free id starting with {letter} is left for {owner}");
+            var id = MapFiles.ObjectIds.Next(letter, taken => standardIds.Contains(taken) || sourceMapIds.Contains(taken) || claimed.ContainsKey(taken))
+                ?? throw new BuildException($"no free id starting with {letter} is left for {owner}");
+            claimed[id] = owner;
+            return id;
         }
 
         private static string SpaceOf(string kind)

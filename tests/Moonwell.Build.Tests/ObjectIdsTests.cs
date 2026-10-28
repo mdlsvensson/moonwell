@@ -31,12 +31,12 @@ namespace Moonwell.Build.Tests
         public void missing_id_fails_naming_a_free_one()
         {
             var error = Assert.Throws<BuildException>(() => Assign(
+                new HashSet<string> { "H000" },
                 new HashSet<string> { "H001" },
-                new HashSet<string> { "H002" },
                 Obj("Objects.Arthas", "hero"),
-                Obj("Objects.Other", "hero", pin: "H003")));
+                Obj("Objects.Other", "hero", pin: "H002")));
 
-            Assert.Equal("Objects.Arthas has no object id; add [ObjectId(\"H004\")] to it", error.Message);
+            Assert.Equal("Objects.Arthas has no object id; add [ObjectId(\"H003\")] to it", error.Message);
         }
 
         [Fact]
@@ -48,9 +48,9 @@ namespace Moonwell.Build.Tests
                 Obj("Objects.Burn", "buff")));
 
             Assert.Equal(
-                "Objects.Burn has no object id; add [ObjectId(\"B001\", Carrier = \"A001\")] to it\n"
-                + "Objects.Footman has no object id; add [ObjectId(\"h001\")] to it\n"
-                + "Objects.Grunt has no object id; add [ObjectId(\"h002\")] to it",
+                "Objects.Burn has no object id; add [ObjectId(\"B000\", Carrier = \"A000\")] to it\n"
+                + "Objects.Footman has no object id; add [ObjectId(\"h000\")] to it\n"
+                + "Objects.Grunt has no object id; add [ObjectId(\"h001\")] to it",
                 error.Message);
         }
 
@@ -58,10 +58,10 @@ namespace Moonwell.Build.Tests
         public void buff_without_carrier_fails_naming_a_free_ability_id()
         {
             var error = Assert.Throws<BuildException>(() => Assign(
-                Obj("Objects.Bolt", "ability", pin: "A001"),
+                Obj("Objects.Bolt", "ability", pin: "A000"),
                 Obj("Objects.Burn", "buff", pin: "B001")));
 
-            Assert.Equal("Objects.Burn has no carrier id; add Carrier = \"A002\" to its [ObjectId]", error.Message);
+            Assert.Equal("Objects.Burn has no carrier id; add Carrier = \"A001\" to its [ObjectId]", error.Message);
         }
 
         [Fact]
@@ -171,7 +171,7 @@ namespace Moonwell.Build.Tests
         {
             var error = Assert.Throws<BuildException>(() => Assign(Obj("Objects.Slow", "buff", root: "Bslo", replaces: true)));
 
-            Assert.Equal("Objects.Slow has no carrier id; add [ObjectId(Carrier = \"A001\")] to it", error.Message);
+            Assert.Equal("Objects.Slow has no carrier id; add [ObjectId(Carrier = \"A000\")] to it", error.Message);
         }
 
         [Fact]

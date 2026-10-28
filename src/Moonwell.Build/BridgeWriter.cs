@@ -1,5 +1,7 @@
 using System.Globalization;
 using System.Text;
+using Moonwell.GameData;
+using Moonwell.MapFiles;
 using War3Net.Build.Environment;
 using War3Net.Build.Widget;
 
@@ -69,7 +71,7 @@ namespace Moonwell.Build
                     continue;
                 }
 
-                var id = ObjectTable.TextOf(doodad.TypeId);
+                var id = Rawcodes.TextOf(doodad.TypeId);
                 own.TryGetValue(id, out var mine);
                 var baseType = mine?.Base ?? id;
                 var variation = doodad.Variation.ToString(CultureInfo.InvariantCulture);
@@ -278,25 +280,27 @@ namespace Moonwell.Build
         private static void ReadObjects(MapProject project, Dictionary<string, OwnType> types)
         {
             // The map's own doodads are never walkable; they are listed so that placing one is not a type nobody knows.
-            foreach (var name in new[] { ObjectKinds.MainName("w3d"), ObjectKinds.SkinName("w3d") })
+            foreach (var name in new[] { Kinds.MainName(Kind.Doodad), Kinds.SkinName(Kind.Doodad) })
             {
-                var table = ObjectTable.Read(Path.Combine(project.MapFolder, name), "doodad");
-                foreach (var entry in table.Originals.Concat(table.News))
+                var table = SourceObjectFile.Read(Path.Combine(project.MapFolder, name), Kind.Doodad);
+                foreach (var entry in table.Entries)
                 {
-                    types[entry.Id] = new OwnType(entry.Id, entry.OldId, false, false, null);
+                    var id = SourceObjectFile.IdOf(entry);
+                    types[id] = new OwnType(id, entry.BaseId, false, false, null);
                 }
             }
 
-            foreach (var name in new[] { ObjectKinds.MainName("w3b"), ObjectKinds.SkinName("w3b") })
+            foreach (var name in new[] { Kinds.MainName(Kind.Destructable), Kinds.SkinName(Kind.Destructable) })
             {
-                var table = ObjectTable.Read(Path.Combine(project.MapFolder, name), "destructable");
-                foreach (var entry in table.Originals.Concat(table.News))
+                var table = SourceObjectFile.Read(Path.Combine(project.MapFolder, name), Kind.Destructable);
+                foreach (var entry in table.Entries)
                 {
                     // The skin file adds to what the main file said of a type: each is made whole from both.
-                    types.TryGetValue(entry.Id, out var before);
+                    var id = SourceObjectFile.IdOf(entry);
+                    types.TryGetValue(id, out var before);
                     var reshaped = before != null && before.Reshaped;
                     var walkable = before?.Walkable;
-                    foreach (var modification in entry.Modifications)
+                    foreach (var modification in entry.Mods)
                     {
                         if (modification.Field == ModelField || modification.Field == RotationField)
                         {
@@ -304,11 +308,11 @@ namespace Moonwell.Build
                         }
                         else if (modification.Field == WalkableField)
                         {
-                            walkable = Convert.ToInt32(modification.Value, CultureInfo.InvariantCulture) != 0;
+                            walkable = Convert.ToInt32(SourceObjectFile.ValueOf(modification), CultureInfo.InvariantCulture) != 0;
                         }
                     }
 
-                    types[entry.Id] = new OwnType(entry.Id, before?.Base ?? entry.OldId, reshaped, walkable, before?.ClassName);
+                    types[id] = new OwnType(id, before?.Base ?? entry.BaseId, reshaped, walkable, before?.ClassName);
                 }
             }
         }

@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using Moonwell.MapFiles;
 
 namespace Moonwell.Build
 {
@@ -11,7 +12,7 @@ namespace Moonwell.Build
         // The name a missingFrom list gives the base tables.
         private const string BaseSet = "base";
 
-        private static readonly string[] KindFiles = ObjectKinds.All.Select(kind => kind.Kind).ToArray();
+        private static readonly string[] KindFiles = Kinds.All.Select(Kinds.Key).ToArray();
 
         private readonly Dictionary<string, IReadOnlyList<ObjectField>> fields;
         private readonly Dictionary<string, IReadOnlySet<string>> ids;

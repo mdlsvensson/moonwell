@@ -1,3 +1,5 @@
+using Moonwell.GameData;
+using Moonwell.MapFiles;
 using War3Net.Build.Environment;
 using War3Net.Build.Extensions;
 using War3Net.Build.Object;
@@ -149,13 +151,11 @@ namespace Moonwell.Build.Tests
                 "    }",
                 "}",
                 string.Empty));
-            var table = ObjectTable.Read(Path.Combine(project, "map", "war3map.w3b"), "destructable");
-            table.News.Add(new ObjectTable.Entry("YT16", "B002", table.NewUnknown(), new List<ObjectTable.Modification>()));
-            table.News.Add(new ObjectTable.Entry("YT16", "B003", table.NewUnknown(), new List<ObjectTable.Modification>
-            {
-                new ObjectTable.Modification("bfil", ObjectDataType.String, "Doodads\\Other\\Span.mdl", 0, 0),
-            }));
-            table.Write(Path.Combine(project, "map", "war3map.w3b"), "destructable");
+            var w3b = Path.Combine(project, "map", "war3map.w3b");
+            var table = SourceObjectFile.Read(w3b, Kind.Destructable);
+            table.File.AddCustom("YT16", "B002");
+            table.File.AddCustom("YT16", "B003").Set("bfil", 0, 0, new FieldValue.Text("Doodads\\Other\\Span.mdl"));
+            table.Write(w3b);
             Place(project, ("B000", 1024f, 0f, 100), ("B001", 1024f, 1024f, 100), ("B002", -1024f, 0f, 100), ("B003", -1024f, 1024f, 100), ("Zzz9", 2048f, 0f, 100), ("YT16", 0f, 2048f, 0));
 
             var output = new StringWriter();
