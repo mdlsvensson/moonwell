@@ -9,11 +9,11 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Moonwell.Analyzers;
 
 /// <summary>
-/// MW0036: a reaction of a package's interface (damage, mouse) the package would never call. The interfaces give every
-/// reaction an empty default body, so the compiler takes a misspelt, non-public or wrongly typed reaction without a
-/// word, while the package finds a class's reactions by name and calls only the interface's own. MW0041: a reaction of
-/// a Moonwell class written without override, or a method with a reaction's name and other parameters, which Moonwell
-/// never calls either. It does nothing in a map without Moonwell.
+/// MW0036: a reaction of a package's interface (damage, mouse, physics) the package would never call. The interfaces
+/// give every reaction an empty default body, so the compiler takes a misspelt, non-public or wrongly typed reaction
+/// without a word, while the package finds a class's reactions by name and calls only the interface's own. MW0041: a
+/// reaction of a Moonwell class written without override, or a method with a reaction's name and other parameters,
+/// which Moonwell never calls either. It does nothing in a map without Moonwell.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class ReactionAnalyzer : DiagnosticAnalyzer
@@ -35,6 +35,12 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
                 new KeyValuePair<string, string>("OnLanded", "OnUnitHurt"),
                 new KeyValuePair<string, string>("OnBurst", "OnUnitBurst"),
             })),
+            // OnLanded is IDamageSource's name: a push's landing is OnGrounded.
+            new KeyValuePair<string, ImmutableDictionary<string, string>>("IPushTarget", ImmutableDictionary.CreateRange(new[]
+            {
+                new KeyValuePair<string, string>("OnLanded", "OnGrounded"),
+            })),
+            new KeyValuePair<string, ImmutableDictionary<string, string>>("IMissileTarget", ImmutableDictionary<string, string>.Empty),
         });
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules.Reactions;
@@ -77,6 +83,23 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
                         && first.ContainingNamespace?.ToDisplayString() == "Moonwell", true));
             }
 
+            foreach (var name in new[] { "IPushTarget", "IMissileTarget" })
+            {
+                if (compilation.GetTypeByMetadataName("Moonwell." + name) is { } face)
+                {
+                    // A physics reaction takes one parameter: an Impact, a Slam, the pusher or the landing speed. A slip is
+                    // judged against the reactions that take what the method takes (or any reaction's Hit, Burst, Impact or Slam).
+                    var takes = face.GetMembers().OfType<IMethodSymbol>().Where(m => m.MethodKind == MethodKind.Ordinary && m.Parameters.Length == 1)
+                        .Select(m => m.Parameters[0].Type).ToList();
+                    families.Add(new Family(face, "physics package", unitHosts, UnitHosts, Renamed[name],
+                        method => method.Parameters.Length == 1 && (IsReactionParameter(method.Parameters[0].Type)
+                            || takes.Any(type => SymbolEqualityComparer.Default.Equals(type, method.Parameters[0].Type))),
+                        false,
+                        (method, reaction) => method.Parameters.Length == 1 && reaction.Parameters.Length == 1
+                            && (IsReactionParameter(method.Parameters[0].Type) || SymbolEqualityComparer.Default.Equals(method.Parameters[0].Type, reaction.Parameters[0].Type))));
+                }
+            }
+
             var checker = new Checker(families, unit, unitComponent, mapComponent);
             start.RegisterSymbolAction(checker.Check, SymbolKind.NamedType);
             start.RegisterSymbolAction(checker.CheckHidden, SymbolKind.Method);
@@ -87,6 +110,12 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
     private static bool IsDamageParameter(ITypeSymbol type)
     {
         return type.ContainingNamespace?.ToDisplayString() == "Moonwell" && (type.Name == "Hit" || type.Name == "Burst");
+    }
+
+    /// <summary>Whether a type is one a reaction takes: the damage package's Hit or Burst, or the physics package's Impact or Slam.</summary>
+    private static bool IsReactionParameter(ITypeSymbol type)
+    {
+        return IsDamageParameter(type) || (type.ContainingNamespace?.ToDisplayString() == "Moonwell" && (type.Name == "Impact" || type.Name == "Slam"));
     }
 
     /// <summary>Whether a type is a class or derives from it.</summary>
@@ -111,7 +140,8 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
     private sealed class Family
     {
         public Family(INamedTypeSymbol face, string package, Func<INamedTypeSymbol, bool> hosts, string hostsText,
-            ImmutableDictionary<string, string> renamed, Func<IMethodSymbol, bool> shaped, bool luaByName)
+            ImmutableDictionary<string, string> renamed, Func<IMethodSymbol, bool> shaped, bool luaByName,
+            Func<IMethodSymbol, IMethodSymbol, bool>? fits = null)
         {
             Interface = face;
             Package = package;
@@ -120,6 +150,7 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
             RenamedNames = renamed;
             Shaped = shaped;
             LuaByName = luaByName;
+            Fits = fits ?? ((method, reaction) => true);
         }
 
         public INamedTypeSymbol Interface { get; }
@@ -136,6 +167,12 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
         public Func<IMethodSymbol, bool> Shaped { get; }
 
         public bool LuaByName { get; }
+
+        /// <summary>
+        /// Whether a method shaped like this interface's reactions is shaped like one reaction in particular; the
+        /// physics package's reactions each take a different parameter, the others' share theirs.
+        /// </summary>
+        public Func<IMethodSymbol, IMethodSymbol, bool> Fits { get; }
 
         /// <summary>The reaction methods of the interface.</summary>
         public IEnumerable<IMethodSymbol> Reactions => Interface.GetMembers().OfType<IMethodSymbol>().Where(m => m.MethodKind == MethodKind.Ordinary);
@@ -242,12 +279,14 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
             }
 
             var renamed = implemented
-                .Where(f => f.RenamedNames.ContainsKey(name))
-                .Select(f => f.Interface.Name + "'s reaction of that stage is " + f.RenamedNames[name])
+                .Where(f => f.RenamedNames.TryGetValue(name, out var now) && f.Reactions.FirstOrDefault(r => r.Name == now) is { } reaction
+                    && f.Fits(method, reaction))
                 .ToList();
             if (renamed.Count > 0)
             {
-                return "never runs: " + string.Join(", and ", renamed) + " since Moonwell 0.3";
+                // Only the damage package's names changed in 0.3; the physics package began in it.
+                var since = renamed.All(f => f.Interface.Name.StartsWith("IDamage", StringComparison.Ordinal)) ? " since Moonwell 0.3" : string.Empty;
+                return "never runs: " + string.Join(", and ", renamed.Select(f => f.Interface.Name + "'s reaction of that stage is " + f.RenamedNames[name])) + since;
             }
 
             // A forgotten interface; an abstract class may be writing reactions for subclasses that list it.
@@ -255,7 +294,7 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
             {
                 foreach (var family in shaped)
                 {
-                    if (family.Reactions.Any(r => r.Name == name))
+                    if (family.Reactions.Any(r => r.Name == name && family.Fits(method, r)))
                     {
                         return family.Hosts(type)
                             ? "never runs: it is a reaction of " + family.Interface.Name + ", which this class does not implement"
@@ -273,7 +312,7 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
 
             var near = implemented
                 .Where(f => f.Shaped(method))
-                .SelectMany(f => f.Reactions.Select(r => (Family: f, Name: r.Name, Distance: Distance(name, r.Name))))
+                .SelectMany(f => f.Reactions.Where(r => f.Fits(method, r)).Select(r => (Family: f, Name: r.Name, Distance: Distance(name, r.Name))))
                 .OrderBy(candidate => candidate.Distance)
                 .FirstOrDefault();
             if (near.Family != null && near.Distance <= 1)
@@ -288,11 +327,15 @@ public sealed class ReactionAnalyzer : DiagnosticAnalyzer
             method.Parameters.Length == reaction.Parameters.Length
             && method.Parameters.Zip(reaction.Parameters, (a, b) => SymbolEqualityComparer.Default.Equals(a.Type, b.Type)).All(same => same);
 
-        // What a reaction takes: "a Hit", or "(Mouse, MouseButton)".
+        // How a type a reaction takes is named: shortly, and a class without the nullable mark ("a Unit", not "a Unit?").
+        private static readonly SymbolDisplayFormat TypeName = SymbolDisplayFormat.MinimallyQualifiedFormat
+            .RemoveMiscellaneousOptions(SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
+
+        // What a reaction takes: "a Hit", "a float", or "(Mouse, MouseButton)".
         private static string Takes(IMethodSymbol reaction) =>
             reaction.Parameters.Length == 1
-                ? "a " + reaction.Parameters[0].Type.Name
-                : "(" + string.Join(", ", reaction.Parameters.Select(p => p.Type.Name)) + ")";
+                ? "a " + reaction.Parameters[0].Type.ToDisplayString(TypeName)
+                : "(" + string.Join(", ", reaction.Parameters.Select(p => p.Type.ToDisplayString(TypeName))) + ")";
 
         /// <summary>Reports a reaction interface on a class the package never calls it on.</summary>
         private void CheckHosts(SymbolAnalysisContext context, INamedTypeSymbol type)

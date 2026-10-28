@@ -21,6 +21,8 @@
   <ItemGroup>
     <InternalsVisibleTo Include="Moonwell.Testing" />
     <InternalsVisibleTo Include="Moonwell.Tests" />
+    <!-- The physics package reads the grid's slope and cliffs in floats, with no vector a read. -->
+    <InternalsVisibleTo Include="Moonwell.Physics" />
   </ItemGroup>
 
 </Project>

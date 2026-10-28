@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Moonwell.Engine;
 
 namespace Moonwell
@@ -24,6 +25,9 @@ namespace Moonwell
 
         /// <summary>The seconds between ticks; 0 for none.</summary>
         internal float tick;
+
+        /// <summary>The components the class starts with, added in order when the gizmo is created: after its owner is set and before OnCreated runs. A class lists them in its constructor. Assigning a new list drops what a parent class listed.</summary>
+        protected List<GizmoComponent> Components { get; set; } = new List<GizmoComponent>();
 
         /// <summary>The gizmo's left-to-right place. Setting it moves the gizmo's entry to the cell of the new place at once.</summary>
         [LocalSafe]
@@ -81,7 +85,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Places a gizmo of the map at a place for a player, and returns it. It belongs to the owner, or else the current owner, and ends with it; the player is Neutral Passive unless given. OnCreated runs with the gizmo as the current owner.</summary>
+        /// <summary>Places a gizmo of the map at a place for a player, and returns it. It belongs to the owner, or else the current owner (a missile: the game), and ends with it; the player is Neutral Passive unless given. OnCreated runs with the gizmo as the current owner.</summary>
         public static T Create<T>(T gizmo, float x, float y, Player? player = null, Owner? owner = null)
             where T : Gizmo
         {
@@ -89,7 +93,21 @@ namespace Moonwell
             Interactions.EnsureInstalled();
             gizmo.player = player ?? Player.NeutralPassive;
             gizmo.entry = Tracking.Begin(gizmo, Tracking.GizmoKind, x, y);
-            (owner ?? Owner.Current).Adopt(gizmo);
+            (owner ?? gizmo.DefaultOwner()).Adopt(gizmo);
+            if (!gizmo.HasEnded)
+            {
+                gizmo.Placed();
+            }
+
+            if (!gizmo.HasEnded)
+            {
+                var starting = gizmo.Components;
+                for (var i = 0; i < starting.Count; i++)
+                {
+                    gizmo.Add(starting[i]);
+                }
+            }
+
             if (!gizmo.HasEnded)
             {
                 gizmo.CallCreated();
@@ -108,10 +126,30 @@ namespace Moonwell
             return interaction;
         }
 
+        /// <summary>Adds a component to the gizmo, and returns it. It ends with the gizmo, or by Remove. Fails in a development build when the component is on an actor already or has ended.</summary>
+        public T Add<T>(T component)
+            where T : GizmoComponent => AddComponent(component);
+
         /// <summary>Ends the gizmo: OnLeave runs and it leaves the grid. The same as End.</summary>
         public void Remove()
         {
             End();
+        }
+
+        /// <summary>The owner Create adopts the gizmo into when it is given none: the current owner. A package's kind of gizmo may choose another, as a missile belongs to the game.</summary>
+        internal virtual Owner DefaultOwner()
+        {
+            return Owner.Current;
+        }
+
+        /// <summary>Runs in Create once the gizmo has its entry and its owner, before its components are added and OnCreated runs; nothing for a plain gizmo. A package's kind of gizmo starts its own part here, as a missile joins the physics pass.</summary>
+        internal virtual void Placed()
+        {
+        }
+
+        /// <summary>Runs when the gizmo's place is set by its X, Y or Position to another place, (x, y), before it moves there; not when it is set to where it is. Nothing for a plain gizmo. A package's kind of gizmo answers its own part here, as a wall wakes what rests against it.</summary>
+        internal virtual void Moving(float x, float y)
+        {
         }
 
         /// <summary>Runs on its own at every Tick, in the cycle's first pass, before the interactions check what is near.</summary>
@@ -198,6 +236,11 @@ namespace Moonwell
             if (entry == null)
             {
                 Dev.Check(false, Names.NameOf(this) + ": the gizmo has not been created");
+            }
+
+            if (x != entry!.X || y != entry.Y)
+            {
+                Moving(x, y);
             }
 
             Interactions.Grid.Move(entry!, x, y);

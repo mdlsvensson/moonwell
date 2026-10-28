@@ -18,6 +18,8 @@
     <!-- <PackageReference Include="Moonwell.Interactions" Version="MOONWELL_VERSION" /> -->
     <!-- For the ground's height, slope, pathing and ground raycasts, take the comment off the next line. -->
     <!-- <PackageReference Include="Moonwell.Terrain" Version="MOONWELL_VERSION" /> -->
+    <!-- For missiles, knockback, walls and ballistics, take the comment off the next line. -->
+    <!-- <PackageReference Include="Moonwell.Physics" Version="MOONWELL_VERSION" /> -->
     <!-- For parts of the map that units enter and leave, take the comment off the next line. -->
     <!-- <PackageReference Include="Moonwell.Areas" Version="MOONWELL_VERSION" /> -->
     <!-- For each player's mouse and camera, take the comment off the next line. -->

@@ -44,8 +44,7 @@ namespace Moonwell.Build
             for (var index = 0; index < environment.TerrainTiles.Count; index++)
             {
                 var tile = environment.TerrainTiles[index];
-                var ground = (tile.Height * 128f) + ((tile.CliffLevel - 2) * 128f);
-                ground += 32f * HigherRampTiles(environment, columns, rows, index);
+                var ground = Ground(environment, columns, rows, index);
 
                 var surface = (tile.WaterHeight * 128f) - 89.6f;
 
@@ -67,6 +66,35 @@ namespace Moonwell.Build
             }
 
             return text.ToString();
+        }
+
+        /// <summary>
+        /// The ground's height at a point beneath any water, which the grid does not keep (it keeps the water's surface where
+        /// that is above the ground): the four corners of the point's tile, each its ground raised on a ramp as
+        /// <see cref="Encode"/> raises it and kept to a twentieth as the grid keeps it, blended as the grid blends them. A
+        /// point outside the grid reads its edge. A placed bridge's deck stands on it.
+        /// </summary>
+        /// <param name="environment">The map's ground.</param>
+        /// <param name="x">The point's x.</param>
+        /// <param name="y">The point's y.</param>
+        /// <returns>The height.</returns>
+        public static float GroundBeneath(MapEnvironment environment, float x, float y)
+        {
+            var columns = Columns(environment);
+            var rows = Rows(environment);
+            var u = Math.Clamp((x - environment.Left) / 128f, 0f, columns - 1);
+            var v = Math.Clamp((y - environment.Bottom) / 128f, 0f, rows - 1);
+            var i = Math.Min((int)MathF.Floor(u), Math.Max(columns - 2, 0));
+            var j = Math.Min((int)MathF.Floor(v), Math.Max(rows - 2, 0));
+            var right = i + 1 < columns ? i + 1 : i;
+            var top = j + 1 < rows ? j + 1 : j;
+            var fx = u - i;
+            var fy = v - j;
+            var z00 = Kept(Ground(environment, columns, rows, (j * columns) + i));
+            var z10 = Kept(Ground(environment, columns, rows, (j * columns) + right));
+            var z01 = Kept(Ground(environment, columns, rows, (top * columns) + i));
+            var z11 = Kept(Ground(environment, columns, rows, (top * columns) + right));
+            return ((1f - fy) * (((1f - fx) * z00) + (fx * z10))) + (fy * (((1f - fx) * z01) + (fx * z11)));
         }
 
         /// <summary>
@@ -110,6 +138,20 @@ namespace Moonwell.Build
             {
                 File.Delete(path);
             }
+        }
+
+        // A corner's ground: its height and cliff level, raised on a ramp, whatever water is above it.
+        private static float Ground(MapEnvironment environment, int columns, int rows, int index)
+        {
+            var tile = environment.TerrainTiles[index];
+            var ground = (tile.Height * 128f) + ((tile.CliffLevel - 2) * 128f);
+            return ground + (32f * HigherRampTiles(environment, columns, rows, index));
+        }
+
+        // A height kept to a twentieth, as the grid keeps it.
+        private static float Kept(float z)
+        {
+            return MathF.Round(z * 20f) / 20f;
         }
 
         // A ramp corner is raised 32 for each tile around it (up to four) that has another corner with the ramp flag and

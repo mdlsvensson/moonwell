@@ -51,6 +51,22 @@ namespace Moonwell.Testing
             Expect.Equal(1, inside.Created, "and for the one made inside Run");
         }
 
+        /// <summary>A plain gizmo given no owner is adopted by the current owner: the one running code, else the root.</summary>
+        public static void DefaultOwner(FakeWorld world)
+        {
+            Fresh();
+            var log = new List<string>();
+            var owner = new TestOwner("owner", log);
+            var inside = new Well();
+            owner.Run(() => Gizmo.Create(inside, 0.0f, 0.0f));
+            Expect.Same(owner, inside.Owner, "inside Run: the owner running the code");
+            var outside = Gizmo.Create(new Well(), 0.0f, 0.0f);
+            Expect.Same(Runtime.Root, outside.Owner, "outside Run: the root");
+            owner.End();
+            Expect.True(inside.HasEnded, "it ends with that owner");
+            Expect.True(!outside.HasEnded, "the root's is left");
+        }
+
         /// <summary>OnCreated and OnLeave run with the gizmo as the current owner.</summary>
         public static void ReactionOwner(FakeWorld world)
         {
@@ -369,6 +385,114 @@ namespace Moonwell.Testing
             Expect.Equal(-1, well.entry!.Cell, "and leaves the grid, though its OnLeave threw");
             Expect.True(Logged(world, "Well.OnCreated failed"), "OnCreated is reported");
             Expect.True(Logged(world, "Well.OnLeave failed"), "OnLeave is reported");
+        }
+
+        /// <summary>A gizmo class that lists components in its constructor has them added at Create, in order, before OnCreated; Get finds them, Remove takes the first of a class, and the gizmo ending ends the rest, newest first.</summary>
+        public static void Components(FakeWorld world)
+        {
+            Fresh();
+            var log = new List<string>();
+            var fitted = Gizmo.Create(new Fitted(log), 0.0f, 0.0f);
+            Expect.Equal("a added 1,b added 2,c added 3,created 3", string.Join(",", log), "added in order before OnCreated");
+            Expect.Equal(3, fitted.ComponentCount, "three components");
+            var first = fitted.Get<Part>();
+            Expect.True(first != null, "Get finds a part");
+            Expect.Same(fitted, first!.Gizmo, "the part's Gizmo is the gizmo it is on");
+            Expect.Same(fitted, first.Actor, "and its Actor");
+            Expect.Same(fitted, first.Owner, "the gizmo owns it");
+            Expect.Equal(0, first.Bits, "a gizmo component has no game event");
+            Expect.Equal(3, fitted.GetAll<Part>().Count, "GetAll lists all three");
+            log.Clear();
+            Expect.True(fitted.Remove<Part>(), "Remove<Part> removes one");
+            Expect.Equal("a removed", string.Join(",", log), "the first in add order");
+            Expect.True(first.HasEnded, "and it has ended");
+            Expect.Equal(2, fitted.ComponentCount, "two are left");
+            log.Clear();
+            fitted.End();
+            Expect.Equal("c removed,b removed", string.Join(",", log), "the gizmo ending ends the rest, newest first");
+            Expect.Equal(0, fitted.ComponentCount, "none are left");
+            var other = new List<string>();
+            var ended = new TestOwner("owner", other);
+            ended.End();
+            var late = Gizmo.Create(new Fitted(log), 0.0f, 0.0f, null, ended);
+            Expect.True(late.HasEnded, "a gizmo made for an owner that has ended ends at once");
+            Expect.Equal(0, late.ComponentCount, "and starts no components");
+        }
+
+        /// <summary>Add puts a component on a gizmo after Create, and returns it; it ends with the gizmo.</summary>
+        public static void AddLater(FakeWorld world)
+        {
+            Fresh();
+            var log = new List<string>();
+            var well = Gizmo.Create(new Well(), 0.0f, 0.0f);
+            var part = well.Add(new Part("x", log));
+            Expect.Equal("x added 1", string.Join(",", log), "OnAdded ran");
+            Expect.Same(part, well.Get<Part>(), "Get finds it");
+            Expect.Same(well, part.Gizmo, "its Gizmo");
+            well.Remove();
+            Expect.Equal("x added 1,x removed", string.Join(",", log), "it ended with the gizmo");
+            Expect.True(part.HasEnded, "and has ended");
+        }
+
+        /// <summary>The hook set on Tracking.BeforeGizmos runs once in each step, before the gizmos tick; one that throws is reported and the tick still runs; null runs nothing.</summary>
+        public static void BeforeGizmos(FakeWorld world)
+        {
+            Fresh();
+            var log = new List<string>();
+            var well = new Well(Interactions.Step);
+            well.Ticking = () => log.Add("tick");
+            Gizmo.Create(well, 0.0f, 0.0f);
+            Steps(world, 1);
+            Expect.Equal("tick", string.Join(",", log), "no hook, only the tick");
+            Tracking.BeforeGizmos = () => log.Add("before");
+            log.Clear();
+            Steps(world, 2);
+            Expect.Equal("before,tick,before,tick", string.Join(",", log), "once a step, before the tick");
+            Tracking.BeforeGizmos = () =>
+            {
+                log.Add("before");
+                throw new InvalidOperationException("boom");
+            };
+            log.Clear();
+            Steps(world, 1);
+            Expect.Equal("before,tick", string.Join(",", log), "a hook that threw does not stop the tick");
+            Expect.True(Logged(world, "Moonwell.Physics failed"), "the error is reported as Moonwell.Physics");
+            log.Clear();
+            Steps(world, 1);
+            Expect.Equal("before,tick", string.Join(",", log), "and it runs again at the next step");
+            Interactions.Install(new FakeInteractionWorld());
+            Expect.True(Tracking.BeforeGizmos == null, "an install clears the hook");
+        }
+
+        /// <summary>While Tracking.Awake is above 0 the cycle's timer runs with nothing tracked; at 0 it stops, unless something is tracked.</summary>
+        public static void Awake(FakeWorld world)
+        {
+            Fresh();
+            Expect.True(!Tracking.Running, "no timer to begin with");
+            Tracking.Awake = 1;
+            Expect.True(Tracking.Running, "the timer runs with Awake 1 and nothing tracked");
+            Expect.Equal(0, Tracking.Count, "nothing is tracked");
+            var start = Tracking.StepNow;
+            Steps(world, 3);
+            Expect.Equal(start + 3, Tracking.StepNow, "and the cycle takes its steps");
+            Tracking.Awake = 0;
+            Expect.True(!Tracking.Running, "it stops at 0");
+            Tracking.Awake = 2;
+            var well = Gizmo.Create(new Well(), 0.0f, 0.0f);
+            well.End();
+            Expect.True(Tracking.Running, "the last gizmo ending leaves it running while Awake is above 0");
+            Tracking.Awake = 0;
+            Expect.True(!Tracking.Running, "and it stops when Awake does, with nothing tracked");
+            Tracking.Awake = 1;
+            var held = Gizmo.Create(new Well(), 0.0f, 0.0f);
+            Tracking.Awake = 0;
+            Expect.True(Tracking.Running, "Awake at 0 does not stop it while a gizmo is tracked");
+            held.End();
+            Expect.True(!Tracking.Running, "it stops when the gizmo does");
+            Tracking.Awake = 1;
+            Interactions.Install(new FakeInteractionWorld());
+            Expect.Equal(0, Tracking.Awake, "an install clears Awake");
+            Expect.True(!Tracking.Running, "and stops the timer");
         }
 
         /// <summary>Whether a line of the log has the text.</summary>

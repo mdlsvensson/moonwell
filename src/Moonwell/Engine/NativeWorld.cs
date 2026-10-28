@@ -743,6 +743,12 @@ namespace Moonwell.Engine
             return Natives.UnitDamageTarget(source, target, amount, attack, ranged, Natives.ConvertAttackType(attackType), Natives.ConvertDamageType(damageType), Natives.ConvertWeaponType(weaponType));
         }
 
+        /// <summary>Deals damage from a unit to a destructable, with the game's attack, damage and weapon numbers.</summary>
+        public void DealDamageTo(unit source, destructable target, float amount, bool attack, bool ranged, int attackType, int damageType, int weaponType)
+        {
+            Natives.UnitDamageTarget(source, target, amount, attack, ranged, Natives.ConvertAttackType(attackType), Natives.ConvertDamageType(damageType), Natives.ConvertWeaponType(weaponType));
+        }
+
         /// <summary>Whether the game counts a unit as alive.</summary>
         public bool IsAlive(unit unit)
         {

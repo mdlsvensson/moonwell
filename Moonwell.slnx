@@ -14,6 +14,7 @@
     <Project Path="src/Moonwell.Maths/Moonwell.Maths.csproj" />
     <Project Path="src/Moonwell.Natives/Moonwell.Natives.csproj" />
     <Project Path="src/Moonwell.Objects/Moonwell.Objects.csproj" />
+    <Project Path="src/Moonwell.Physics/Moonwell.Physics.csproj" />
     <Project Path="src/Moonwell.Terrain/Moonwell.Terrain.csproj" />
     <Project Path="src/Moonwell/Moonwell.csproj" />
   </Folder>

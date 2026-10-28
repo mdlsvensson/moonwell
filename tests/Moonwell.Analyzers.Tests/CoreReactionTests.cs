@@ -34,6 +34,26 @@ public class CoreReactionTests
     }
 
     [Fact]
+    public void a_missile_reaction_without_override_is_an_error()
+    {
+        Assert.Equal(new[] { "MW0041: OnImpact", "MW0041: OnRest", "MW0041: OnExpire" }, MapCode.CheckFile("""
+            using Moonwell;
+
+            namespace Map
+            {
+                public class Bolt : Missile
+                {
+                    public void OnImpact(Impact impact) { }
+
+                    public new void OnRest() { }
+
+                    protected void OnExpire() { }
+                }
+            }
+            """));
+    }
+
+    [Fact]
     public void a_helper_named_like_a_reaction_with_other_parameters_is_an_error()
     {
         Assert.Equal(new[] { "MW0041: OnDeath", "MW0041: OnUnitDied" }, MapCode.CheckFile("""

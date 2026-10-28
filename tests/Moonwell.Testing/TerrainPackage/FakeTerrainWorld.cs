@@ -49,6 +49,9 @@ namespace Moonwell.Testing
         /// <summary>The y the item lands at when Lands is true.</summary>
         public float LandsY;
 
+        /// <summary>Where something stands that an item will not lie on, as a tree or a building: an item put where this answers true lands 64 to the right. Null for nowhere.</summary>
+        public Func<float, float, bool>? Occupied;
+
         /// <summary>The playable area's lower-left x.</summary>
         public float AreaMinX = -512f;
 
@@ -86,7 +89,7 @@ namespace Moonwell.Testing
         /// <summary>Whether ships can float at a point.</summary>
         public bool IsFloatable(float x, float y) => Allowed(x, y, NoFloat);
 
-        /// <summary>Puts the item down: where it was asked, or where the case says it lands.</summary>
+        /// <summary>Puts the item down: where it was asked, or where the case says it lands, or 64 to the right of a place that is occupied.</summary>
         public void Place(float x, float y, out float landedX, out float landedY)
         {
             PlaceCalls++;
@@ -94,6 +97,10 @@ namespace Moonwell.Testing
             AskedY = y;
             landedX = Lands ? LandsX : x;
             landedY = Lands ? LandsY : y;
+            if (!Lands && Occupied != null && Occupied(x, y))
+            {
+                landedX = x + 64f;
+            }
         }
 
         /// <summary>The playable area the case set.</summary>

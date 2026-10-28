@@ -96,6 +96,34 @@ namespace Moonwell.Testing
             Expect.Equal("attack|no attack", string.Join("|", watch.Seen), "what the reactions saw");
         }
 
+        /// <summary>Damage from a unit to a destructable asks the game to deal it with the game's numbers, the source and the destructable's handles.</summary>
+        public static void DealToDestructable(FakeWorld world)
+        {
+            var source = Unit.Of(world.NewUnit(ObjectTypes.FourCC("ofoo"), slot: 0))!;
+            var handle = world.NewDestructable(ObjectTypes.FourCC("dfoo"));
+            var target = Destructable.Of(handle)!;
+            source.Damage(target, 10f);
+            Expect.Equal(1, world.DealtToDestructables.Count, "the damage the game was asked to deal");
+            Expect.Same(source.Handle, world.DealtToDestructableSources[0], "the source");
+            Expect.Same(handle, world.DealtToDestructableTargets[0], "the destructable");
+            Expect.Equal("10 attack:False ranged:False 0 14 0", world.DealtToDestructables[0], "the plain damage's numbers");
+            source.Damage(target, 5f, DamageKind.Fire, AttackType.Siege, isAttack: true, ranged: true, sound: WeaponSound.MetalLightChop);
+            Expect.Equal("5 attack:True ranged:True 3 8 1", world.DealtToDestructables[1], "the given numbers");
+            Expect.Equal(0, world.Dealt.Count, "nothing was dealt to a unit");
+        }
+
+        /// <summary>Damage to a destructable that has ended deals nothing and raises no error.</summary>
+        public static void DealToDestructableGone(FakeWorld world)
+        {
+            var source = Unit.Of(world.NewUnit(ObjectTypes.FourCC("ofoo"), slot: 0))!;
+            var target = Destructable.Of(world.NewDestructable(ObjectTypes.FourCC("dfoo")))!;
+            target.Remove();
+            Expect.True(target.HasEnded, "the destructable has ended");
+            source.Damage(target, 10f);
+            Expect.Equal(0, world.DealtToDestructables.Count, "the damage the game was asked to deal");
+            Expect.Equal(0, world.Logged.Count, "the lines logged");
+        }
+
         /// <summary>When the game deals nothing, Unit.Damage returns null.</summary>
         public static void DealRefused(FakeWorld world)
         {

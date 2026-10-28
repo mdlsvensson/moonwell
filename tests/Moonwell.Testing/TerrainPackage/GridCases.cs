@@ -121,5 +121,112 @@ namespace Moonwell.Testing
             Expect.Throws<ArgumentException>(() => new HeightGrid(1, 1, 0f, 0f, "AA A").Z(0, 0), "a space");
             Expect.Throws<ArgumentException>(() => new HeightGrid(1, 1, 0f, 0f, "AA=A").Z(0, 0), "a padding sign");
         }
+
+        /// <summary>
+        /// Span's box holds only points whose height is strictly between its low and high: swept over grids of 17 and 33
+        /// corners and 33 by 20, with steep corners just across each block's right and top edges (the next block's first
+        /// column high, its first row low, the corner between them highest), which the bounds must take in. A point
+        /// outside the grid's tiles, in a block not unpacked yet, or on a grid one corner across has no box.
+        /// </summary>
+        public static void Span(FakeWorld world)
+        {
+            Expect.True(SpanSweep(17, 17) >= 1, "a grid of 17 corners has a box");
+            Expect.True(SpanSweep(33, 33) >= 4, "a grid of 33 corners has a box in each of its four blocks of tiles");
+            Expect.True(SpanSweep(33, 20) >= 2, "33 by 20 has boxes");
+
+            var fresh = new HeightGrid(33, 33, 0f, 0f, SpanCorners(33, 33));
+            Expect.True(!fresh.Span(100f, 100f, out _, out _, out _, out _, out _, out _), "no box in a block not unpacked");
+            fresh.Height(100f, 100f);
+            Expect.True(fresh.Span(100f, 100f, out var minX, out var minY, out var maxX, out var maxY, out var low, out var high), "a box once a read there unpacked it");
+            Expect.True(minX == 1f && minY == 1f && maxX == 2047f && maxY == 2047f, "the first block's tiles, drawn in by 1");
+            Expect.True(high >= 1501f && low <= -701f, "the bounds take in the next block's first column and row; low " + low + ", high " + high);
+            Expect.True(!fresh.Span(-10f, 100f, out _, out _, out _, out _, out _, out _), "no box left of the grid");
+            Expect.True(!fresh.Span(100f, 32f * 128f + 10f, out _, out _, out _, out _, out _, out _), "no box above the last corner");
+
+            var narrow = new HeightGrid(1, 20, 0f, 0f, SpanCorners(1, 20));
+            for (var y = -100f; y < 20f * 128f; y += 97f)
+            {
+                narrow.Height(0f, y);
+                Expect.True(!narrow.Span(0f, y, out _, out _, out _, out _, out _, out _), "no box on a grid one corner across, at y " + y);
+            }
+        }
+
+        /// <summary>The corners of a Span sweep's grid: small rises and dips, and in each block the next block's first column at 900 to 1,000, its first row at -700 to -600 and the corner between them at 1,500.</summary>
+        private static string SpanCorners(int columns, int rows)
+        {
+            var text = new StringBuilder();
+            for (var row = 0; row < rows; row++)
+            {
+                for (var column = 0; column < columns; column++)
+                {
+                    var z = ((column * 7 + row * 13) % 11) * 3f;
+                    if (column % 16 == 0 && row % 16 == 0 && column > 0 && row > 0)
+                    {
+                        z = 1500f;
+                    }
+                    else if (column % 16 == 0 && column > 0)
+                    {
+                        z = 900f + row * 3f;
+                    }
+                    else if (row % 16 == 0 && row > 0)
+                    {
+                        z = -700f + column * 3f;
+                    }
+
+                    text.Append(GridText.Corner(z, 2));
+                }
+            }
+
+            return text.ToString();
+        }
+
+        /// <summary>Reads a grid at points over it and around it, and for each box Span gives, reads a lattice of points in it, its edges included: each must be strictly between the box's low and high. Gives how many boxes there were.</summary>
+        private static int SpanSweep(int columns, int rows)
+        {
+            var grid = new HeightGrid(columns, rows, -1000f, 500f, SpanCorners(columns, rows));
+            var boxes = 0;
+            var lastMinX = 0f;
+            var lastMinY = 0f;
+            for (var y = 500f - 150f; y < 500f + rows * 128f + 150f; y += 131f)
+            {
+                for (var x = -1000f - 150f; x < -1000f + columns * 128f + 150f; x += 131f)
+                {
+                    grid.Height(x, y);
+                    if (!grid.Span(x, y, out var minX, out var minY, out var maxX, out var maxY, out var low, out var high))
+                    {
+                        continue;
+                    }
+
+                    if (!(x >= minX && x <= maxX && y >= minY && y <= maxY))
+                    {
+                        Expect.True(false, "the box holds the point (" + x + ", " + y + ")");
+                    }
+                    if (boxes > 0 && minX == lastMinX && minY == lastMinY)
+                    {
+                        continue;
+                    }
+
+                    boxes++;
+                    lastMinX = minX;
+                    lastMinY = minY;
+                    for (var j = 0; j <= 24; j++)
+                    {
+                        for (var i = 0; i <= 24; i++)
+                        {
+                            var px = i == 24 ? maxX : minX + (maxX - minX) * i / 24f;
+                            var py = j == 24 ? maxY : minY + (maxY - minY) * j / 24f;
+                            var height = grid.Height(px, py);
+                            if (!(height > low && height < high))
+                            {
+                                // The text is made only on a failure: the sweep reads thousands of points.
+                                Expect.True(false, "the height at (" + px + ", " + py + ") is " + height + ", between " + low + " and " + high);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return boxes;
+        }
     }
 }

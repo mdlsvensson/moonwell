@@ -453,6 +453,50 @@ namespace Moonwell.Testing
             Expect.Near(600.0f, entry.X, "the next step reads it again");
         }
 
+        /// <summary>A tracked thing told it was moved takes the place for this step and its cell at once: a Find in the same step sees it there, though it was read earlier in the step. A thing not tracked is passed over.</summary>
+        public static void Moved(FakeWorld world)
+        {
+            Fresh();
+            var unit = UnitAt(world, 10.0f, 10.0f);
+            Tracking.Need(Tracking.UnitKind);
+            var entry = Tracked(unit);
+            var well = new Well(Interactions.Step);
+            var near = -1;
+            var far = -1;
+            var step = -1;
+            var stale = -1;
+            well.Ticking = () =>
+            {
+                Tracking.ReadNow(entry);
+                world.MoveUnit(unit.Handle, 1000.0f, -1000.0f);
+                stale = Find.InRange<Unit>(1000.0f, -1000.0f, 10.0f).Count;
+                Tracking.Moved(unit, 1000.0f, -1000.0f);
+                near = Find.InRange<Unit>(1000.0f, -1000.0f, 10.0f).Count;
+                far = Find.InRange<Unit>(10.0f, 10.0f, 10.0f).Count;
+                step = entry.ReadStep;
+                well.Ticking = null;
+            };
+            Gizmo.Create(well, 0.0f, 0.0f);
+            Steps(world, 1);
+            Expect.Equal(0, stale, "a unit read earlier in the step is still where it was read");
+            Expect.Equal(1, near, "after Moved a Find in the same step finds it at its new place");
+            Expect.Equal(0, far, "and not at the old one");
+            Expect.Equal(Tracking.StepNow, step, "its entry was read for this step");
+            Expect.Near(1000.0f, entry.X, "X");
+            Expect.Near(-1000.0f, entry.Y, "Y");
+            Expect.Equal(7, entry.Cell, "and the cell is the new place's");
+            Steps(world, 1);
+            Expect.Near(1000.0f, entry.X, "the next step reads the unit where the game has it");
+            var plain = Gizmo.Create(new Well(), 0.0f, 0.0f);
+            Tracking.Moved(plain, 50.0f, 50.0f);
+            Expect.Near(50.0f, plain.X, "a gizmo has its place set");
+            var gone = UnitAt(world, 30.0f, 30.0f);
+            Tracking.Reset();
+            Tracking.Moved(gone, 1.0f, 1.0f);
+            Expect.Equal(0, Tracking.Count, "a thing not tracked is passed over, and nothing is tracked by it");
+            Expect.True(Tracking.EntryOf(gone) == null, "and it is still not tracked");
+        }
+
         /// <summary>Outside a running step there is no step to read once in: every ask reads the place, so a Find from a button sees a unit that has just been moved.</summary>
         public static void ReadOutsideStep(FakeWorld world)
         {

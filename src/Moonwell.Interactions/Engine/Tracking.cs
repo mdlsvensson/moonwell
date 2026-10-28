@@ -61,6 +61,31 @@ namespace Moonwell.Engine
         /// <summary>Whether destructables have been asked for.</summary>
         private static bool destructablesAsked;
 
+        /// <summary>What the physics package runs each step before the gizmos' pass, guarded by the cycle; null while there is none, and then the step does nothing for it. Reset clears it.</summary>
+        internal static Action? BeforeGizmos;
+
+        /// <summary>How many things keep the cycle's timer running with nothing tracked, such as a pushed unit on a map with no gizmo; the timer stops when this is 0 and nothing is tracked. Reset clears it.</summary>
+        private static int awake;
+
+        /// <summary>How many things keep the cycle running with nothing tracked; setting it to more than 0 starts the cycle's timer, and to 0 ends it unless something is tracked or items are asked for.</summary>
+        internal static int Awake
+        {
+            get { return awake; }
+            set
+            {
+                Interactions.EnsureInstalled();
+                awake = value < 0 ? 0 : value;
+                if (awake > 0)
+                {
+                    StartTimer();
+                }
+                else
+                {
+                    StopTimerIfIdle();
+                }
+            }
+        }
+
         /// <summary>The cycle, made on first use.</summary>
         public static Cycle Beat
         {
@@ -139,6 +164,8 @@ namespace Moonwell.Engine
                 timer = null;
             }
 
+            BeforeGizmos = null;
+            awake = 0;
             cycle = null;
             checks = null;
             scan = null;
@@ -602,7 +629,58 @@ namespace Moonwell.Engine
                 tracked--;
             }
 
-            if (tracked == 0 && !itemsAsked && timer != null)
+            StopTimerIfIdle();
+        }
+
+        /// <summary>Tells the package a thing was moved by code to a place, as a push does: when the thing is tracked, its entry takes the place for this step at once (so it is not read again until the next step) and its cell follows; a thing not tracked is passed over.</summary>
+        public static void Moved(Actor thing, float x, float y)
+        {
+            var unit = thing as Unit;
+            if (unit != null)
+            {
+                UnitMoved(unit, x, y);
+                return;
+            }
+
+            var entry = EntryOf(thing);
+            if (entry == null)
+            {
+                return;
+            }
+
+            entry.ReadStep = (cycle ?? Beat).StepNow;
+            Interactions.Grid.Move(entry, x, y);
+        }
+
+        /// <summary>Moved for a unit, which a push calls for its unit every step: the entry is looked up by the unit's handle, as EntryOf does for a unit, with none of EntryOf's casts, and the unit's last place is kept too.</summary>
+        public static void UnitMoved(Unit unit, float x, float y)
+        {
+            var handle = unit.Handle;
+            if (handle == null)
+            {
+                return;
+            }
+
+            Entry? entry;
+            unitEntries.TryGetValue(handle, out entry);
+            if (entry == null || entry.Ended)
+            {
+                return;
+            }
+
+            entry.ReadStep = (cycle ?? Beat).StepNow;
+            Interactions.Grid.Move(entry, x, y);
+            if (Local.Depth == 0)
+            {
+                unit.lastX = x;
+                unit.lastY = y;
+            }
+        }
+
+        /// <summary>Ends the cycle's timer when nothing is tracked, no items are asked for and nothing keeps it awake.</summary>
+        private static void StopTimerIfIdle()
+        {
+            if (tracked == 0 && !itemsAsked && awake == 0 && timer != null)
             {
                 timer.End();
                 timer = null;

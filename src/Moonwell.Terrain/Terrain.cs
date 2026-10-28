@@ -146,7 +146,9 @@ namespace Moonwell
         /// <summary>
         /// Whether units can walk at a point, as the map's terrain says: cliffs, deep water and the like, not trees,
         /// buildings or units. A point outside the map reads the edge. Read a cell at a time, once, and kept until
-        /// <c>Refresh</c>. On a bridge it reads false, as the water beneath does.
+        /// <c>Refresh</c>. Under a bridge it reads what the map's pathing file holds there: World Editor writes a placed
+        /// bridge's footprint walkable, so its deck reads true; under a bridge made at runtime, or in a map whose pathing
+        /// file a tool wrote, it reads the water or ground beneath (false over deep water).
         /// </summary>
         [LocalSafe]
         public static bool IsWalkable(float x, float y)
@@ -235,6 +237,19 @@ namespace Moonwell
         public static bool CanStand(Vector2 point, out Vector2 nearest)
         {
             return CanStand(point.X, point.Y, out nearest);
+        }
+
+        /// <summary>
+        /// Whether an item put at a point lands within 1 of it: CanStand's test after IsWalkable, in floats and with no
+        /// vector, for the physics package, which asks it for every pushed unit each step. Changes game state as CanStand
+        /// does.
+        /// </summary>
+        internal static bool ItemLands(float x, float y)
+        {
+            World.Place(x, y, out var landedX, out var landedY);
+            var dx = landedX - x;
+            var dy = landedY - y;
+            return dx * dx + dy * dy <= 1f;
         }
 
         /// <summary>

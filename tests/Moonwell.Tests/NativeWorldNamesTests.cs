@@ -46,10 +46,10 @@ public class ClassMethodsShadowingNativesTests
 {
     private static readonly string[] Packages =
     {
-        "Moonwell", "Moonwell.Damage", "Moonwell.Terrain", "Moonwell.Interactions", "Moonwell.Areas", "Moonwell.Input",
+        "Moonwell", "Moonwell.Damage", "Moonwell.Terrain", "Moonwell.Interactions", "Moonwell.Physics", "Moonwell.Areas", "Moonwell.Input",
     };
 
-    // The same hazard as above, for every class of the six packages: CSharp.lua declares a class's methods as chunk-level
+    // The same hazard as above, for every class of the seven packages: CSharp.lua declares a class's methods as chunk-level
     // locals, so a method named like a native the class calls (in its own code or its lambdas') calls itself instead.
     // This reads each method's IL for the calls to Natives.
     [Fact]

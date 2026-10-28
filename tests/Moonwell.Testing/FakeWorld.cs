@@ -46,6 +46,15 @@ namespace Moonwell.Testing
         /// <summary>The damage the runtime asked the game to deal: the amount (whole), attack, ranged, and the game's attack, damage and weapon numbers.</summary>
         public List<string> Dealt = new List<string>();
 
+        /// <summary>The damage the runtime dealt to destructables: the game's numbers, as in Dealt.</summary>
+        public List<string> DealtToDestructables = new List<string>();
+
+        /// <summary>The unit each damage to a destructable came from.</summary>
+        public List<unit> DealtToDestructableSources = new List<unit>();
+
+        /// <summary>The destructable each damage to a destructable went to.</summary>
+        public List<destructable> DealtToDestructableTargets = new List<destructable>();
+
         /// <summary>The type ids SpawnUnit and SpawnItem make nothing of, as the game for an id it has no object for.</summary>
         public List<int> Unmakeable = new List<int>();
 
@@ -286,6 +295,7 @@ namespace Moonwell.Testing
             var world = new FakeWorld();
             Runtime.Reset(world);
             Interactions.ResetSettings();
+            Physics.ResetSettings();
             Runtime.ListenForCarriers();
             return world;
         }
@@ -546,6 +556,14 @@ namespace Moonwell.Testing
             }
 
             return true;
+        }
+
+        /// <summary>Records the damage to a destructable: the game's numbers, and the handles it was dealt between.</summary>
+        public void DealDamageTo(unit source, destructable target, float amount, bool attack, bool ranged, int attackType, int damageType, int weaponType)
+        {
+            DealtToDestructables.Add((int)amount + " attack:" + attack + " ranged:" + ranged + " " + attackType + " " + damageType + " " + weaponType);
+            DealtToDestructableSources.Add(source);
+            DealtToDestructableTargets.Add(target);
         }
 
         /// <summary>Records that the runtime asked to hear a destructable's death, once.</summary>

@@ -14,5 +14,6 @@ internal static class Packages
         typeof(Moonwell.Terrain).Assembly,
         typeof(Moonwell.Area).Assembly,
         typeof(Moonwell.Mouse).Assembly,
+        typeof(Moonwell.Physics).Assembly,
     };
 }
