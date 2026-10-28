@@ -531,6 +531,41 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_text_with_a_nul_fails_naming_class_and_field()
+        {
+            var unit = Odd(new SortedDictionary<string, object?> { ["unam"] = "a\0b" });
+
+            var error = Assert.Throws<BuildException>(
+                () => WriteObjects(new[] { unit }, new Dictionary<string, string> { ["Objects.Odd"] = "h001" }, new Dictionary<string, string>(), built.Standard));
+
+            Assert.Equal("Objects.Odd: unam holds a NUL character, which an object file cannot store", error.Message);
+        }
+
+        [Fact]
+        public void a_text_with_half_a_surrogate_pair_fails_naming_class_and_field()
+        {
+            // Built at run time: an attribute argument cannot carry a lone surrogate.
+            var unit = Odd(new SortedDictionary<string, object?> { ["unam"] = "a" + (char)0xD800 + "b" });
+
+            var error = Assert.Throws<BuildException>(
+                () => WriteObjects(new[] { unit }, new Dictionary<string, string> { ["Objects.Odd"] = "h001" }, new Dictionary<string, string>(), built.Standard));
+
+            Assert.Equal("Objects.Odd: unam holds text that is not valid Unicode (half of a surrogate pair)", error.Message);
+        }
+
+        [Fact]
+        public void a_source_object_file_that_cannot_be_read_fails_naming_the_file()
+        {
+            File.WriteAllBytes(Path.Combine(folder, "map", "war3map.w3u"), new byte[] { 1, 2, 3 });
+
+            var error = Assert.Throws<BuildException>(
+                () => WriteObjects(Array.Empty<DeclaredObject>(), new Dictionary<string, string>(), new Dictionary<string, string>()));
+
+            Assert.StartsWith("cannot read war3map.w3u: ", error.Message);
+            Assert.DoesNotContain("War3Net cannot read", error.Message);
+        }
+
+        [Fact]
         public void a_word_that_is_no_number_fails()
         {
             var unit = new DeclaredObject(

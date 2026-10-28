@@ -156,8 +156,20 @@ namespace Moonwell.Build
 
                 var (type, value) = StoredValues.Of(one.ClassName, field, one.Changed[key]!, name => resolver.IdOf(one.ClassName, fieldId, name));
 
-                // A unit's, item's, destructable's or buff's modification has no level and no pointer in the file.
-                (field.Skin ? skinEntry : mainEntry).Set(fieldId, hasLevels ? level : 0, hasLevels ? field.Pointer : 0, FieldValueOf(type, value));
+                // A unit's, item's, destructable's or buff's modification has no level and no pointer in the file. Set changes a
+                // modification of the same field and level instead of adding another; the declared keys (a field and a level) never collide.
+                try
+                {
+                    (field.Skin ? skinEntry : mainEntry).Set(fieldId, hasLevels ? level : 0, hasLevels ? field.Pointer : 0, FieldValueOf(type, value));
+                }
+                catch (ArgumentException failure) when (failure.ParamName == "Value")
+                {
+                    // An object file stores a text NUL-terminated as UTF-8: no NUL, no half of a surrogate pair.
+                    var reason = value is string text && text.Contains(' ')
+                        ? "a NUL character, which an object file cannot store"
+                        : "text that is not valid Unicode (half of a surrogate pair)";
+                    throw new BuildException($"{one.ClassName}: {fieldId} holds {reason}");
+                }
             }
         }
 

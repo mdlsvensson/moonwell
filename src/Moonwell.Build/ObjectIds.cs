@@ -124,7 +124,7 @@ namespace Moonwell.Build
                 throw new BuildException($"{owner} has the id \"{id}\", which is not four characters");
             }
 
-            // An id is four bytes: the object file would write a character past ASCII as '?', and the Lua as another id still.
+            // An id is four bytes: the object file would write a character over one byte as '?', and the Lua as another id still; a Latin-1 character such as Å is one byte but no ASCII sign.
             if (!MapFiles.ObjectIds.IsValid(id))
             {
                 throw new BuildException($"{owner} has the id \"{id}\", with a character that is not an ASCII letter, digit or sign");
