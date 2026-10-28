@@ -63,34 +63,44 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
 
     private static void SwitchArm(SyntaxNodeAnalysisContext context)
     {
-        Walk(context, ((SwitchExpressionArmSyntax)context.Node).Pattern, arm: true, sub: false);
+        Walk(context, ((SwitchExpressionArmSyntax)context.Node).Pattern, arm: true, sub: false, nested: false);
     }
 
     private static void IsPattern(SyntaxNodeAnalysisContext context)
     {
-        Walk(context, ((IsPatternExpressionSyntax)context.Node).Pattern, arm: false, sub: false);
+        Walk(context, ((IsPatternExpressionSyntax)context.Node).Pattern, arm: false, sub: false, nested: false);
     }
 
-    // arm: the pattern of a switch expression arm; sub: inside a property pattern.
-    private static void Walk(SyntaxNodeAnalysisContext context, PatternSyntax pattern, bool arm, bool sub)
+    // arm: at the top of a switch expression arm; sub: a member of a property pattern; nested: inside a property or
+    // positional pattern. Parentheses, not in a property pattern and an extended property pattern work since the fork's
+    // 2.0.4-moonwell.12, except at the top of an arm (decision 80; the cases in PatternCases).
+    private static void Walk(SyntaxNodeAnalysisContext context, PatternSyntax pattern, bool arm, bool sub, bool nested)
     {
         switch (pattern)
         {
             case BinaryPatternSyntax binary:
-                Walk(context, binary.Left, arm, sub);
-                Walk(context, binary.Right, arm, sub);
+                Walk(context, binary.Left, arm, sub, nested);
+                Walk(context, binary.Right, arm, sub, nested);
                 break;
-            case ParenthesizedPatternSyntax:
-                Stops(context, pattern, "a pattern in parentheses");
-                break;
-            case UnaryPatternSyntax not:
-                if (arm || sub)
+            case ParenthesizedPatternSyntax parenthesized:
+                if (arm)
                 {
-                    Stops(context, pattern, "not " + (arm ? "in a switch expression" : "in a property pattern"));
+                    Stops(context, pattern, "a pattern in parentheses in a switch expression");
                 }
                 else
                 {
-                    Walk(context, not.Pattern, false, false);
+                    Walk(context, parenthesized.Pattern, false, sub, nested);
+                }
+
+                break;
+            case UnaryPatternSyntax not:
+                if (arm)
+                {
+                    Stops(context, pattern, "not in a switch expression");
+                }
+                else
+                {
+                    Walk(context, not.Pattern, false, sub, nested);
                 }
 
                 break;
@@ -107,23 +117,24 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
                 Stops(context, pattern, "a name in a property pattern");
                 break;
             case RecursivePatternSyntax recursive:
-                if (recursive.PositionalPatternClause != null && !arm)
+                if (recursive.PositionalPatternClause != null)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Rules.PatternWrong, pattern.GetLocation(),
-                        "A positional pattern in an is test is false or stops the compiler; use a property pattern ({ X: 1 }) or a switch expression"));
+                    if (!arm)
+                    {
+                        Positional(context, recursive, nested);
+                    }
+
+                    foreach (var subpattern in recursive.PositionalPatternClause.Subpatterns)
+                    {
+                        Walk(context, subpattern.Pattern, false, false, true);
+                    }
                 }
 
                 if (recursive.PropertyPatternClause != null)
                 {
                     foreach (var subpattern in recursive.PropertyPatternClause.Subpatterns)
                     {
-                        if (subpattern.ExpressionColon?.Expression is MemberAccessExpressionSyntax)
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(Rules.PatternWrong, subpattern.GetLocation(),
-                                "An extended property pattern ({ A.B: 1 }) is always false; write { A: { B: 1 } }"));
-                        }
-
-                        Walk(context, subpattern.Pattern, false, true);
+                        Walk(context, subpattern.Pattern, false, true, true);
                     }
                 }
 
@@ -144,6 +155,33 @@ public sealed class SyntaxAnalyzer : DiagnosticAnalyzer
     private static void Stops(SyntaxNodeAnalysisContext context, SyntaxNode node, string what)
     {
         context.ReportDiagnostic(Diagnostic.Create(Rules.PatternStops, node.GetLocation(), what));
+    }
+
+    // A positional pattern outside a switch expression arm works only at the top of the pattern, with no names, on a
+    // value that cannot be null: a tuple or a struct, not a class, a record, a nullable struct or object.
+    private static void Positional(SyntaxNodeAnalysisContext context, RecursivePatternSyntax pattern, bool nested)
+    {
+        string? why = null;
+        if (nested)
+        {
+            why = "A positional pattern inside another pattern stops the compiler; test it on its own";
+        }
+        else if (pattern.PositionalPatternClause!.Subpatterns.Any(subpattern => subpattern.NameColon != null))
+        {
+            why = "A positional pattern with names ((A: 1, B: 2)) is false or stops the compiler; leave the names out";
+        }
+        else if (context.SemanticModel.GetOperation(pattern, context.CancellationToken) is not IRecursivePatternOperation
+                 {
+                     InputType: { IsValueType: true, OriginalDefinition.SpecialType: not SpecialType.System_Nullable_T }
+                 })
+        {
+            why = "A positional pattern on a value that can be null (a class, a record, a nullable struct, object) stops the compiler; use a property pattern ({ X: 1 })";
+        }
+
+        if (why != null)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(Rules.PatternWrong, pattern.GetLocation(), why));
+        }
     }
 
     // ---- MW0020 ----

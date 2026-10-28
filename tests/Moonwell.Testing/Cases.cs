@@ -84,6 +84,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "debug.clock.halt-inside-timer", Run = ClockCases.HaltInsideTimer });
             list.Add(new Case { Name = "debug.clock.catchup", Run = ClockCases.Catchup });
             list.Add(new Case { Name = "debug.session.off-at-start", Run = SessionCases.OffAtStart });
+            list.Add(new Case { Name = "debug.actors.actor-before-added", Run = ActorCases.ActorBeforeAdded });
             list.Add(new Case { Name = "debug.session.toggle", Run = SessionCases.Toggle });
             list.Add(new Case { Name = "debug.session.halt-holds", Run = SessionCases.HaltHolds });
             list.Add(new Case { Name = "debug.session.halt-free", Run = SessionCases.HaltFree });
@@ -528,6 +529,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "terrain.height.ramp", Run = HeightCases.Ramp });
             list.Add(new Case { Name = "terrain.height.normal-and-slope", Run = HeightCases.NormalAndSlope });
             list.Add(new Case { Name = "terrain.height.not-a-number", Run = HeightCases.NotANumber });
+            list.Add(new Case { Name = "terrain.height.vector-point", Run = HeightCases.VectorPoint });
             list.Add(new Case { Name = "terrain.height.not-installed", Run = HeightCases.NotInstalled });
             list.Add(new Case { Name = "terrain.pathing.flags", Run = PathingCases.Flags });
             list.Add(new Case { Name = "terrain.pathing.filled-once", Run = PathingCases.FilledOnce });
@@ -539,6 +541,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "terrain.pathing.can-stand", Run = PathingCases.CanStand });
             list.Add(new Case { Name = "terrain.pathing.can-stand-water", Run = PathingCases.CanStandWater });
             list.Add(new Case { Name = "terrain.pathing.local-height", Run = PathingCases.LocalHeight });
+            list.Add(new Case { Name = "terrain.pathing.vector-point", Run = PathingCases.VectorPoint });
             list.Add(new Case { Name = "terrain.pathing.not-installed", Run = PathingCases.NotInstalled });
             list.Add(new Case { Name = "terrain.pathing.reinstall", Run = PathingCases.Reinstall });
             list.Add(new Case { Name = "terrain.raycast.hill-hit", Run = GroundRayCases.HillHit });
@@ -1016,6 +1019,10 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "conditionals.struct-type-parameter", Run = ConditionalCases.StructTypeParameter });
             list.Add(new Case { Name = "conditionals.still-right", Run = ConditionalCases.StillRight });
             list.Add(new Case { Name = "compiler.out-discard-lambda", Run = CompilerCases.OutDiscardLambda });
+            list.Add(new Case { Name = "compiler.patterns.is-parentheses", Run = PatternCases.IsParentheses });
+            list.Add(new Case { Name = "compiler.patterns.not-in-property", Run = PatternCases.NotInProperty });
+            list.Add(new Case { Name = "compiler.patterns.extended-property", Run = PatternCases.ExtendedProperty });
+            list.Add(new Case { Name = "compiler.patterns.positional-on-value", Run = PatternCases.PositionalOnValue });
             list.Add(new Case { Name = "compiler.return-last-in-loop", Run = CompilerCases.ReturnLastInLoop });
             list.Add(new Case { Name = "compiler.continue-in-switch", Run = CompilerCases.ContinueInSwitch });
             list.Add(new Case { Name = "compiler.primary-constructors", Run = CompilerCases.PrimaryConstructors });

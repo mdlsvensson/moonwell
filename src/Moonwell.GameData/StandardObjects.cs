@@ -8,10 +8,10 @@ namespace Moonwell.GameData;
 /// <param name="Name">
 /// The in-game name: the kind's <c>Name</c> field (an upgrade's at level 1; a buff's tooltip title first), or the
 /// empty string. A <c>WESTRING_</c> key, which the game resolves itself, is replaced by the editor's English label
-/// (<see cref="ExportTables.Label"/>), or by the empty string when the export has none; <paramref name="Values"/>
+/// (<see cref="GameTables.Label"/>), or by the empty string when the tables have none; <paramref name="Values"/>
 /// keeps the key.
 /// </param>
-/// <param name="Race">The export's <c>race</c> value as written (<c>human</c>), or the empty string for a kind without one.</param>
+/// <param name="Race">The tables' <c>race</c> value as written (<c>human</c>), or the empty string for a kind without one.</param>
 /// <param name="Campaign">True for a unit whose <c>campaign</c> column is 1; false for every other kind.</param>
 /// <param name="IsHero">True for a unit whose id starts with a capital letter.</param>
 /// <param name="Code">An ability's <c>code</c> column, the ability it behaves as; null for every other kind.</param>
@@ -57,7 +57,7 @@ public sealed record StandardObject(
 /// Two fields of one ability that share a column, such as a common <c>Area</c> and a specific one, both get the value.
 /// </para>
 /// <para>
-/// An object exists under a balance set when <see cref="ExportTables.Present"/> says so. Its level count is the
+/// An object exists under a balance set when <see cref="GameTables.Present"/> says so. Its level count is the
 /// ability's <c>levels</c> and the upgrade's <c>maxlevel</c> (the field named <c>LevelCount</c>); a per-level field
 /// then has a value for each level from 1 to the count. A kind without a level count (a doodad's tinting colours)
 /// has a value for each entry of its comma list.
@@ -86,7 +86,7 @@ public static class StandardObjects
     private const string KeyPrefix = "WESTRING_";
 
     /// <summary>The standard objects of <paramref name="kind"/> ordered by id (ordinal), with the values of <paramref name="fields"/>.</summary>
-    public static IReadOnlyList<StandardObject> Of(ExportTables tables, Kind kind, IReadOnlyList<Field> fields)
+    public static IReadOnlyList<StandardObject> Of(GameTables tables, Kind kind, IReadOnlyList<Field> fields)
     {
         var meta = new Dictionary<string, MetaRow>(StringComparer.Ordinal);
         foreach (var row in tables.Meta(kind))
@@ -152,7 +152,7 @@ public static class StandardObjects
     }
 
     private static StandardObject Build(
-        ExportTables tables,
+        GameTables tables,
         Kind kind,
         string id,
         Evaluator evaluator,
@@ -201,8 +201,8 @@ public static class StandardObjects
             Resolved(tables, evaluator.SuffixOf(values)).Trim());
     }
 
-    /// <summary>The label of a <c>WESTRING_</c> key; the empty string for a key the export has no label for; any other name as it is.</summary>
-    private static string Resolved(ExportTables tables, string name)
+    /// <summary>The label of a <c>WESTRING_</c> key; the empty string for a key the tables have no label for; any other name as it is.</summary>
+    private static string Resolved(GameTables tables, string name)
     {
         var label = tables.Label(name);
         return string.Equals(label, name, StringComparison.Ordinal) && name.StartsWith(KeyPrefix, StringComparison.Ordinal) ? "" : label;
@@ -294,7 +294,7 @@ public static class StandardObjects
     /// </summary>
     private sealed class Row
     {
-        // A blank :de value is read as the value, so the key has none: the export's only one, Aent's Casterart:de, leaves
+        // A blank :de value is read as the value, so the key has none: the tables' only one, Aent's Casterart:de, leaves
         // Entangle Gold Mine without its caster art. Not checked in the game. A blank :hd value, with no :de one, is read
         // the same way.
         private const string GameMode = ":de";

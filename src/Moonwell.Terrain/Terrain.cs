@@ -65,6 +65,13 @@ namespace Moonwell
             return Grid.Height(x, y);
         }
 
+        /// <summary>The ground's height at a point, as <c>Height(x, y)</c>.</summary>
+        [LocalSafe]
+        public static float Height(Vector2 point)
+        {
+            return Height(point.X, point.Y);
+        }
+
         /// <summary>
         /// Whether a point is in a cliff tile, one whose corners are on more than one cliff level with no ramp: the
         /// face between the levels, which physics can treat as a wall. <c>Height</c> still blends there.
@@ -73,6 +80,13 @@ namespace Moonwell
         public static bool IsCliff(float x, float y)
         {
             return Grid.IsCliff(x, y);
+        }
+
+        /// <summary>Whether a point is in a cliff tile, as <c>IsCliff(x, y)</c>.</summary>
+        [LocalSafe]
+        public static bool IsCliff(Vector2 point)
+        {
+            return IsCliff(point.X, point.Y);
         }
 
         /// <summary>
@@ -86,6 +100,13 @@ namespace Moonwell
             return new Vector3(-alongX, -alongY, 1f).Normalized();
         }
 
+        /// <summary>The direction straight out of the ground at a point, as <c>Normal(x, y)</c>.</summary>
+        [LocalSafe]
+        public static Vector3 Normal(Vector2 point)
+        {
+            return Normal(point.X, point.Y);
+        }
+
         /// <summary>
         /// How steep the ground is at a point, in degrees: 0 flat, 90 a wall. Of the blended ground in every tile, so a
         /// cliff tile reads as the slope between its corners. Outside the grid it is the slope of the edge tile.
@@ -95,6 +116,13 @@ namespace Moonwell
         {
             Grid.Gradient(x, y, out var alongX, out var alongY);
             return Maths.AngleBetween(0f, 0f, 1f, MathF.Sqrt(alongX * alongX + alongY * alongY));
+        }
+
+        /// <summary>How steep the ground is at a point, in degrees, as <c>Slope(x, y)</c>.</summary>
+        [LocalSafe]
+        public static float Slope(Vector2 point)
+        {
+            return Slope(point.X, point.Y);
         }
 
         /// <summary>
@@ -128,11 +156,25 @@ namespace Moonwell
             return (Pathing.Flags(x, y) & PathingGrid.Walkable) != 0;
         }
 
+        /// <summary>Whether units can walk at a point, as <c>IsWalkable(x, y)</c>.</summary>
+        [LocalSafe]
+        public static bool IsWalkable(Vector2 point)
+        {
+            return IsWalkable(point.X, point.Y);
+        }
+
         /// <summary>Whether flying units can fly at a point, as the map's terrain says. A point outside the map reads the edge.</summary>
         [LocalSafe]
         public static bool IsFlyable(float x, float y)
         {
             return (Pathing.Flags(x, y) & PathingGrid.Flyable) != 0;
+        }
+
+        /// <summary>Whether flying units can fly at a point, as <c>IsFlyable(x, y)</c>.</summary>
+        [LocalSafe]
+        public static bool IsFlyable(Vector2 point)
+        {
+            return IsFlyable(point.X, point.Y);
         }
 
         /// <summary>Whether a building can be built at a point, as the map's terrain says. A point outside the map reads the edge.</summary>
@@ -142,11 +184,25 @@ namespace Moonwell
             return (Pathing.Flags(x, y) & PathingGrid.Buildable) != 0;
         }
 
+        /// <summary>Whether a building can be built at a point, as <c>IsBuildable(x, y)</c>.</summary>
+        [LocalSafe]
+        public static bool IsBuildable(Vector2 point)
+        {
+            return IsBuildable(point.X, point.Y);
+        }
+
         /// <summary>Whether a point is water, where ships can float. A point outside the map reads the edge.</summary>
         [LocalSafe]
         public static bool IsWater(float x, float y)
         {
             return (Pathing.Flags(x, y) & PathingGrid.Water) != 0;
+        }
+
+        /// <summary>Whether a point is water, as <c>IsWater(x, y)</c>.</summary>
+        [LocalSafe]
+        public static bool IsWater(Vector2 point)
+        {
+            return IsWater(point.X, point.Y);
         }
 
         /// <summary>
@@ -176,6 +232,13 @@ namespace Moonwell
             return IsWalkable(x, y) && dx * dx + dy * dy <= 1f;
         }
 
+        /// <summary>Whether something can stand at a point, as <c>CanStand(x, y, out nearest)</c>; it moves an item for a moment, so it changes game state.</summary>
+        [ChangesState]
+        public static bool CanStand(Vector2 point, out Vector2 nearest)
+        {
+            return CanStand(point.X, point.Y, out nearest);
+        }
+
         /// <summary>
         /// Whether an item put at a point lands within 1 of it: CanStand's test after IsWalkable, in floats and with no
         /// vector, for the physics package, which asks it for every pushed unit each step. Changes game state as CanStand
@@ -197,6 +260,13 @@ namespace Moonwell
         public static float LocalHeight(float x, float y)
         {
             return World.LocationZ(x, y);
+        }
+
+        /// <summary>The ground's height at a point as this machine's game reads it, as <c>LocalHeight(x, y)</c>: only inside <c>Local.For</c>.</summary>
+        [MachineLocal]
+        public static float LocalHeight(Vector2 point)
+        {
+            return LocalHeight(point.X, point.Y);
         }
 
         /// <summary>The world the package talks to.</summary>

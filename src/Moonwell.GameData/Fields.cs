@@ -23,9 +23,9 @@ public enum FieldType
 /// <param name="CanBeEmpty">True when the editor accepts an empty value (<c>canBeEmpty</c>).</param>
 /// <param name="MaxLength">
 /// For a <c>string</c> field, the most characters allowed, from a numeric <c>maxVal</c>; null when there is none or
-/// when the export names a text size (<c>TTName</c>, <c>TTDesc</c>, <c>TTUber</c>), which is not a number of characters.
+/// when the tables name a text size (<c>TTName</c>, <c>TTDesc</c>, <c>TTUber</c>), which is not a number of characters.
 /// </param>
-/// <param name="Label">The field's World Editor label, or null when the export has none.</param>
+/// <param name="Label">The field's World Editor label, or null when the tables have none.</param>
 /// <param name="MaxEntries">
 /// For a <c>stringList</c> or an object list, the most entries allowed, from a numeric <c>maxVal</c>; null when there
 /// is none. The standard data shows it counts entries: upro holds 279 characters in 18 names under a maxVal of 32.
@@ -107,7 +107,7 @@ public sealed record Field(
     public FieldRules Rules { get; init; } = Rules ?? FieldRules.None;
 }
 
-/// <summary>The fields of each kind of object, from the export's metadata tables.</summary>
+/// <summary>The fields of each kind of object, from the metadata tables.</summary>
 /// <remarks>
 /// <para>
 /// A field's <see cref="Field.Column"/> is the key of its value in <see cref="ObjectRows.Values"/>:
@@ -141,11 +141,11 @@ public static class Fields
     /// The fields of <paramref name="kind"/>, ordered by field id. A shared field (<see cref="SharedFields"/>) is named
     /// like its live member; any other name in <paramref name="reserved"/> (the members of the runtime class the kind's
     /// objects inherit) is never given to a field: see <see cref="FieldNames.Assign"/>.
-    /// A field of a type in <paramref name="choices"/> holds its enum (<see cref="Choices.All"/> of the export when
+    /// A field of a type in <paramref name="choices"/> holds its enum (<see cref="Choices.All"/> of the tables when
     /// null), and no property is named like an enum it does not hold: see <see cref="BesideEnums"/>.
     /// </summary>
     public static IReadOnlyList<Field> Of(
-        ExportTables tables,
+        GameTables tables,
         Kind kind,
         IReadOnlySet<string>? reserved = null,
         IReadOnlyDictionary<string, ChoiceType>? choices = null)
@@ -288,7 +288,7 @@ public static class Fields
     /// (<paramref name="mentioned"/>): such an ability's class has the fields of its code and of its id, so they must not
     /// share a name. From the base tables and every balance set.
     /// </summary>
-    private static Dictionary<string, List<string>> Aliases(ExportTables tables, List<string> mentioned)
+    private static Dictionary<string, List<string>> Aliases(GameTables tables, List<string> mentioned)
     {
         var named = new HashSet<string>(mentioned, StringComparer.Ordinal);
         var aliases = new Dictionary<string, List<string>>(StringComparer.Ordinal);
@@ -562,9 +562,9 @@ public static class Fields
 
     /// <summary>
     /// The editor's label of a field: <c>displayName</c> looked up (it may name another label) and, for an upgrade
-    /// effect, <c>%s</c> replaced by the row's <c>effectType</c>. The empty string when the export has no label.
+    /// effect, <c>%s</c> replaced by the row's <c>effectType</c>. The empty string when the tables have no label.
     /// </summary>
-    private static string LabelOf(ExportTables tables, MetaRow row)
+    private static string LabelOf(GameTables tables, MetaRow row)
     {
         var key = Value(row, "displayName");
         var label = key;

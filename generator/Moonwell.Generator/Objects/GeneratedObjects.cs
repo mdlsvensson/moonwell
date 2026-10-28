@@ -3,7 +3,7 @@ using Moonwell.GameData;
 
 namespace Moonwell.Generator.Objects;
 
-/// <summary>Makes every file of <c>Moonwell.Objects/Generated</c> from the game's export.</summary>
+/// <summary>Makes every file of <c>Moonwell.Objects/Generated</c> from the game's tables.</summary>
 public static class GeneratedObjects
 {
     private const string RootNamespace = "Moonwell.Objects.";
@@ -25,10 +25,10 @@ public static class GeneratedObjects
     /// (<c>Choices.g.cs</c>), the eight kind bases (<c>Kinds/</c>), one file for each namespace (<c>Units/Human.g.cs</c>,
     /// <c>Items.g.cs</c>) and a values file for each kind (<c>Values/unit.json</c>, heroes included) and the gameplay constants (<c>Values/misc.json</c>).
     /// </summary>
-    /// <param name="tables">The export.</param>
+    /// <param name="tables">The game's tables.</param>
     /// <param name="runtime">The runtime classes' members, whose names no field takes; null for none.</param>
     /// <param name="gameVersion">The game version written in each C# file's first line.</param>
-    public static IReadOnlyDictionary<string, string> Make(ExportTables tables, RuntimeMembers? runtime, string gameVersion)
+    public static IReadOnlyDictionary<string, string> Make(GameTables tables, RuntimeMembers? runtime, string gameVersion)
     {
         var files = new SortedDictionary<string, string>(StringComparer.Ordinal);
         // CSharp.lua compiles with MOONWELL_LUA and reads the build's stubs of the used classes instead.
@@ -100,8 +100,8 @@ public static class GeneratedObjects
         return files;
     }
 
-    /// <summary>The constants of <see cref="MiscKeys"/> in the base file and in each balance set the export holds, by set (<c>base</c> for the base).</summary>
-    private static Dictionary<string, IReadOnlyDictionary<string, string>> MiscConstants(ExportTables tables)
+    /// <summary>The constants of <see cref="MiscKeys"/> in the base file and in each balance set the tables hold, by set (<c>base</c> for the base).</summary>
+    private static Dictionary<string, IReadOnlyDictionary<string, string>> MiscConstants(GameTables tables)
     {
         var sets = new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.Ordinal);
         foreach (var set in new string?[] { null }.Concat(tables.Sets))

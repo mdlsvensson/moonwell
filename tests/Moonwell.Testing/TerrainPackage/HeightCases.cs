@@ -31,6 +31,17 @@ namespace Moonwell.Testing
             Expect.True(!Terrain.IsCliff(64f, 64f), "one level is no cliff");
         }
 
+        /// <summary>Height, IsCliff, Normal and Slope of a Vector2 answer as of its X and Y (decision 79).</summary>
+        public static void VectorPoint(FakeWorld world)
+        {
+            OneTile(GridText.Tile(GridText.Corner(0f, 2), GridText.Corner(128f, 2), GridText.Corner(0f, 2), GridText.Corner(64f, 2)));
+            var point = new Vector2(40f, 90f);
+            Expect.Near(Terrain.Height(40f, 90f), Terrain.Height(point), "Height");
+            Expect.True(Terrain.IsCliff(40f, 90f) == Terrain.IsCliff(point), "IsCliff");
+            Expect.True(Terrain.Normal(40f, 90f) == Terrain.Normal(point), "Normal");
+            Expect.Near(Terrain.Slope(40f, 90f), Terrain.Slope(point), "Slope");
+        }
+
         /// <summary>A point outside the grid reads the edge corner nearest it.</summary>
         public static void Clamped(FakeWorld world)
         {

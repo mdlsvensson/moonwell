@@ -16,9 +16,9 @@ public class ObjectsWriterTests
     private static readonly Lazy<IReadOnlyDictionary<string, string>> MiniFiles = new(
         () => GeneratedObjects.Make(MiniExport(), Runtime.Value, Version));
 
-    private static ExportTables MiniExport()
+    private static GameTables MiniExport()
     {
-        return ExportTables.Read(Path.GetFullPath(
+        return GameTables.OpenExport(Path.GetFullPath(
             Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Fixtures", "MiniExport", "war3.w3mod")));
     }
 

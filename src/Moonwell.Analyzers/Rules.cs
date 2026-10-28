@@ -234,14 +234,14 @@ public static class Rules
     public static readonly DiagnosticDescriptor PatternStops = Syntax(
         "MW0017",
         "Pattern the compiler stops on",
-        "{0}: CSharp.lua stops with \"Compiler has a bug\" on this pattern",
-        "CSharp.lua cannot compile these patterns: in a switch expression a relational pattern (> 10), a type pattern without a name (int =>), var, not and a pattern in parentheses; anywhere a var or a declaration pattern (Y: int y) or not inside a property pattern, a pattern in parentheses, and a list pattern's slice with a name ([var first, .. var rest]). Constants, or, a typed name (int i =>) with when, property patterns of constants and tuples of constants work. Write a when clause on a named variable, or an if.");
+        "{0}: CSharp.lua stops on this pattern",
+        "CSharp.lua cannot compile these patterns: at the top of a switch expression arm a relational pattern (> 10), a type pattern without a name (int =>), var, not and a pattern in parentheses; anywhere a var or a declaration pattern inside a property pattern ({ Y: int y }), and a list pattern's slice with a name ([var first, .. var rest]). Constants, or, a typed name (int i =>) with when, property patterns, not and parentheses inside them, and parentheses in an is test work. Write a when clause on a named variable, or an if.");
 
     public static readonly DiagnosticDescriptor PatternWrong = Syntax(
         "MW0018",
         "Pattern that gives the wrong answer",
         "{0}",
-        "A positional pattern in an is test (p is (1, 2), t is (1, _), p is Pt(var a, var b)) and an extended property pattern (p is { Inner.X: 9 }) compile to Lua that is false, or stops the compiler. A positional pattern in a switch expression arm works, except on a class or record given null, whose Deconstruct runs before the null check (the analyzer does not see that); so does a property pattern with one name per level ({ Inner: { X: 9 } }).");
+        "A positional pattern outside a switch expression arm stops the compiler, or is false, on a value that can be null (a class, a record, a nullable struct, object: p is (1, 2)), inside another pattern ({ T: (1, _) }) and with names ((A: 1, B: 2)). On a tuple or a struct it works (t is (1, _), s is (var a, var b)). A positional pattern in a switch expression arm works, except on a class or record given null, whose Deconstruct runs before the null check (the analyzer does not see that). An extended property pattern ({ Inner.X: 9 }) works.");
 
     public static readonly DiagnosticDescriptor StructCopy = Syntax(
         "MW0020",
