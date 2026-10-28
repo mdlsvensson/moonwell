@@ -9,7 +9,8 @@ namespace Moonwell.Testing
     /// parameters (C25, C31), two object initializers in one statement and a foreach left early over an iterator (C25);
     /// until 2.0.4-moonwell.11, a field named as a base class's private field (C32); and until 2.0.4-moonwell.12, a local
     /// function used above its declaration (C36), a return after a using declaration (C37), a nullable struct compared
-    /// with null (C38), patterns in a switch statement (C39) and the negation of a negative constant (C40).
+    /// with null (C38), patterns in a switch statement (C39) and the negation of a negative constant (C40); and until
+    /// 2.0.4-moonwell.13, a conditional added to an element or a property (C42).
     /// The build's line marks put a comment after a loop body's last return, which is the shape C29 was found in.
     /// </summary>
     public static class CompilerCases
@@ -151,6 +152,23 @@ namespace Moonwell.Testing
             var integer = -NegativeInteger;
             Expect.Near(2f, single, "a float constant");
             Expect.Equal(5, integer, "an int constant");
+        }
+
+        /// <summary>A conditional on the right of a compound assignment to an array element, a list's and a property.</summary>
+        public static void CompoundConditional(FakeWorld world)
+        {
+            var yes = true;
+            var counts = new int[2];
+            counts[0] += yes ? 1 : 0;
+            counts[1] -= yes ? 2 : 0;
+            var list = new List<int> { 5 };
+            list[0] *= yes ? 2 : 3;
+            var holder = new CountHolder();
+            holder.Count += yes ? 4 : 0;
+            Expect.Equal(1, counts[0], "an array element");
+            Expect.Equal(-2, counts[1], "an array element, subtracted");
+            Expect.Equal(10, list[0], "a list's element");
+            Expect.Equal(4, holder.Count, "a property");
         }
 
         private const float NegativeSingle = -2f;
@@ -300,6 +318,14 @@ namespace Moonwell.Testing
             public int Count;
 
             public Holder? Next;
+        }
+
+        /// <summary>A property with a getter and a setter, which CSharp.lua writes as two functions.</summary>
+        private sealed class CountHolder
+        {
+            private int count;
+
+            public int Count { get { return count; } set { count = value; } }
         }
 
         private sealed class Logged(List<string> log) : IDisposable
